@@ -619,6 +619,7 @@ export type Database = {
         | "temperamentos"
         | "eneagrama"
         | "solis"
+        | "arquetipos_proposito"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -757,6 +758,7 @@ export const Constants = {
         "temperamentos",
         "eneagrama",
         "solis",
+        "arquetipos_proposito",
       ],
     },
   },
