@@ -1,12 +1,12 @@
 import { Target, Lightbulb, Sparkles, Award, Users, Heart, Zap, Star } from "lucide-react";
 
 const profiles = [
+  { icon: Heart, title: "Líderes Espirituais", description: "Padres, pastores, missionários e conselheiros" },
   { icon: Target, title: "Profissionais com Propósito", description: "Médicos, advogados, terapeutas que buscam impacto" },
   { icon: Lightbulb, title: "Líderes de Impacto", description: "Empreendedores, gestores e coordenadores visionários" },
   { icon: Sparkles, title: "Pessoas que Transformam", description: "Educadores, coaches e mentores inspiradores" },
   { icon: Award, title: "Autoridades em sua Área", description: "Especialistas que comunicam credibilidade" },
   { icon: Users, title: "Influenciadores de Bem", description: "Criadores de conteúdo com propósito e valores" },
-  { icon: Heart, title: "Líderes Espirituais", description: "Pastores, padres, missionários e conselheiros" },
   { icon: Zap, title: "Agentes de Mudança", description: "Ativistas, voluntários e líderes comunitários" },
   { icon: Star, title: "Profissionais em Transição", description: "Pessoas reinventando sua imagem profissional" },
 ];
