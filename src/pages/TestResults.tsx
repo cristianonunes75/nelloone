@@ -3,16 +3,22 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Download, Calendar, CheckCircle } from "lucide-react";
+import { Download, Calendar, CheckCircle, Lock } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import PhotoSessionBooking from "@/components/cliente/PhotoSessionBooking";
+import ArchetypeResults from "@/components/cliente/ArchetypeResults";
+import { calculateArchetypeScores, getDominantArchetypes } from "@/lib/archetypes";
+import { useAuth } from "@/hooks/useAuth";
+import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 
 export default function TestResults() {
   const { userTestId } = useParams();
   const navigate = useNavigate();
   const resultsRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+  const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
 
   const { data: userTest, isLoading } = useQuery({
     queryKey: ["user-test-result", userTestId],
@@ -38,6 +44,29 @@ export default function TestResults() {
 
       if (error) throw error;
       return data;
+    },
+  });
+
+  // Check if user has purchased this test (for paid tests)
+  const { data: hasPurchased } = useQuery({
+    queryKey: ["test-purchase", user?.id, userTest?.test_id],
+    enabled: !!user && !!userTest && !userTest.tests?.is_free,
+    queryFn: async () => {
+      if (!user || !userTest) return false;
+      
+      const { data, error } = await supabase
+        .from("test_purchases")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("test_id", userTest.test_id)
+        .eq("payment_status", "completed")
+        .single();
+
+      if (error) {
+        // No purchase found
+        return false;
+      }
+      return !!data;
     },
   });
 
@@ -103,6 +132,19 @@ export default function TestResults() {
     );
   }
 
+  // Determine if this is the archetypos test
+  const isArchetyposTest = userTest.tests?.type === 'arquetipos_proposito';
+  const isFreeVersion = userTest.tests?.is_free || false;
+  const shouldShowFullResults = isFreeVersion || hasPurchased;
+
+  // Calculate archetype scores if this is the archetypos test
+  let archetypeScores;
+  let dominantArchetypes;
+  if (isArchetyposTest && answers && answers.length > 0) {
+    archetypeScores = calculateArchetypeScores(answers);
+    dominantArchetypes = getDominantArchetypes(archetypeScores);
+  }
+
   return (
     <div className="container mx-auto p-6 max-w-4xl space-y-6">
       <div className="flex items-center justify-between">
@@ -148,41 +190,93 @@ export default function TestResults() {
                   </div>
                 </div>
               </div>
-
-              <div className="border-t pt-4">
-                <h3 className="text-lg font-semibold mb-2">Análise dos Resultados</h3>
-                <p className="text-muted-foreground">
-                  Seus resultados indicam características únicas do seu perfil. 
-                  Com base nas suas respostas, podemos criar uma sessão fotográfica 
-                  personalizada que captura sua essência autêntica.
-                </p>
-              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Suas Respostas</CardTitle>
-            <CardDescription>
-              Revise suas respostas do teste
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {answers?.map((answer, index) => (
-                <div key={answer.id} className="border-b pb-4 last:border-b-0">
-                  <p className="font-medium mb-2">
-                    {index + 1}. {answer.test_questions?.question_text}
-                  </p>
-                  <p className="text-muted-foreground">
-                    Resposta: {(answer.answer as any)?.value || "Não respondida"}
-                  </p>
+        {/* Mostrar análise completa de arquétipos se for versão paga ou se o usuário comprou */}
+        {isArchetyposTest && shouldShowFullResults && dominantArchetypes ? (
+          <ArchetypeResults
+            primaryArchetype={dominantArchetypes.primary.archetype}
+            secondaryArchetype={dominantArchetypes.secondary?.archetype}
+            primaryScore={dominantArchetypes.primary.score}
+            secondaryScore={dominantArchetypes.secondary?.score}
+          />
+        ) : isArchetyposTest && !shouldShowFullResults ? (
+          // Versão gratuita - mostrar apenas respostas com CTA de upgrade
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle>Suas Respostas</CardTitle>
+                <CardDescription>
+                  Padrão de escolhas revelado pelo teste
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {answers?.map((answer, index) => (
+                    <div key={answer.id} className="border-b pb-4 last:border-b-0">
+                      <p className="font-medium mb-2">
+                        {index + 1}. {answer.test_questions?.question_text}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Resposta: {(answer.answer as any)?.text || "Não respondida"}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-primary/10">
+              <CardContent className="pt-6 text-center space-y-4">
+                <Lock className="h-12 w-12 mx-auto text-primary" />
+                <h3 className="text-2xl font-bold">Descubra Seu Arquétipo Dominante</h3>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  Seu padrão de escolhas revela traços marcantes do seu arquétipo. 
+                  Para descobrir seu arquétipo dominante e desbloquear sua essência 
+                  visual e emocional completa, ative o acesso Essentia Full.
+                </p>
+                <div className="pt-4">
+                  <Button size="lg" onClick={() => setPurchaseDialogOpen(true)}>
+                    Desbloquear Meu Arquétipo
+                  </Button>
+                  <PurchaseTestDialog
+                    open={purchaseDialogOpen}
+                    onOpenChange={setPurchaseDialogOpen}
+                    testId={userTest.test_id}
+                    testName={userTest.tests?.name || ""}
+                    price={userTest.tests?.price_brl ? parseFloat(userTest.tests.price_brl.toString()) : 97}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        ) : (
+          // Para outros testes, mostrar resultados padrão
+          <Card>
+            <CardHeader>
+              <CardTitle>Suas Respostas</CardTitle>
+              <CardDescription>
+                Revise suas respostas do teste
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {answers?.map((answer, index) => (
+                  <div key={answer.id} className="border-b pb-4 last:border-b-0">
+                    <p className="font-medium mb-2">
+                      {index + 1}. {answer.test_questions?.question_text}
+                    </p>
+                    <p className="text-muted-foreground">
+                      Resposta: {(answer.answer as any)?.value || "Não respondida"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <div className="flex gap-4">
