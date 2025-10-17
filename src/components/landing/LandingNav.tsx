@@ -38,6 +38,24 @@ export const LandingNav = () => {
             </Button>
             
             <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/fotografo")}
+              className="hidden md:inline-flex text-xs"
+            >
+              Fotógrafo
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/admin")}
+              className="hidden md:inline-flex text-xs"
+            >
+              Admin
+            </Button>
+            
+            <Button
               variant="default"
               size="default"
               onClick={() => navigate("/auth")}
