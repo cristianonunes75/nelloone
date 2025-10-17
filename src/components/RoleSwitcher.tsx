@@ -32,7 +32,7 @@ const roleRoutes: Record<UserRole, string> = {
 };
 
 export const RoleSwitcher = () => {
-  const { userRoles, userRole } = useAuth();
+  const { userRoles, userRole, setActiveRole } = useAuth();
   const navigate = useNavigate();
 
   // Only show switcher if user has multiple roles
@@ -41,6 +41,7 @@ export const RoleSwitcher = () => {
   }
 
   const handleRoleSwitch = (role: UserRole) => {
+    setActiveRole(role);
     navigate(roleRoutes[role]);
   };
 

@@ -12,6 +12,7 @@ interface AuthContextType {
   userRoles: UserRole[];
   isLoading: boolean;
   signOut: () => Promise<void>;
+  setActiveRole: (role: UserRole) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -21,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   userRoles: [],
   isLoading: true,
   signOut: async () => {},
+  setActiveRole: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -130,8 +132,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const setActiveRole = (role: UserRole) => {
+    if (userRoles.includes(role)) {
+      setUserRole(role);
+    }
+  };
+  
   return (
-    <AuthContext.Provider value={{ user, session, userRole, userRoles, isLoading, signOut }}>
+    <AuthContext.Provider value={{ user, session, userRole, userRoles, isLoading, signOut, setActiveRole }}>
       {children}
     </AuthContext.Provider>
   );
