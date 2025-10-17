@@ -34,7 +34,7 @@ const App = () => (
             <Route
               path="/cliente"
               element={
-                <ProtectedRoute allowedRoles={["cliente"]}>
+                <ProtectedRoute allowedRoles={["cliente", "admin"]}>
                   <Cliente />
                 </ProtectedRoute>
               }
@@ -42,7 +42,7 @@ const App = () => (
             <Route
               path="/cliente/perfil"
               element={
-                <ProtectedRoute allowedRoles={["cliente"]}>
+                <ProtectedRoute allowedRoles={["cliente", "admin"]}>
                   <ClientePerfil />
                 </ProtectedRoute>
               }
@@ -50,7 +50,7 @@ const App = () => (
             <Route
               path="/cliente/test-execution/:testId/:userTestId"
               element={
-                <ProtectedRoute allowedRoles={["cliente"]}>
+                <ProtectedRoute allowedRoles={["cliente", "admin"]}>
                   <TestExecution />
                 </ProtectedRoute>
               }
@@ -58,7 +58,7 @@ const App = () => (
             <Route
               path="/cliente/test-results/:userTestId"
               element={
-                <ProtectedRoute allowedRoles={["cliente"]}>
+                <ProtectedRoute allowedRoles={["cliente", "admin"]}>
                   <TestResults />
                 </ProtectedRoute>
               }
@@ -66,13 +66,13 @@ const App = () => (
             <Route
               path="/fotografo"
               element={
-                <ProtectedRoute allowedRoles={["fotografo"]}>
+                <ProtectedRoute allowedRoles={["fotografo", "admin"]}>
                   <Fotografo />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/admin"
+              path="/admin/*"
               element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <Admin />

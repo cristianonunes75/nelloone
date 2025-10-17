@@ -6,10 +6,17 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { DashboardStats } from "@/components/admin/DashboardStats";
 import { ViewModeSelector } from "@/components/admin/ViewModeSelector";
 import { UsersManagement } from "@/components/admin/UsersManagement";
+import { TestsManagement } from "@/components/admin/TestsManagement";
+import { PaymentsManagement } from "@/components/admin/PaymentsManagement";
+import { CouponsManagement } from "@/components/admin/CouponsManagement";
+import { CommunicationManagement } from "@/components/admin/CommunicationManagement";
+import { ReportsManagement } from "@/components/admin/ReportsManagement";
+import { PhotographersManagement } from "@/components/admin/PhotographersManagement";
+import { SchedulingManagement } from "@/components/admin/SchedulingManagement";
 import { AuditLogs } from "@/components/admin/AuditLogs";
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import logo from "@/assets/logo.png";
-import { Shield, AlertTriangle } from "lucide-react";
+import { Shield } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const AdminDashboard = () => (
@@ -33,17 +40,6 @@ const AdminDashboard = () => (
   </div>
 );
 
-const PlaceholderSection = ({ title, description }: { title: string; description: string }) => (
-  <div className="space-y-4">
-    <h2 className="text-3xl font-bold">{title}</h2>
-    <Alert>
-      <AlertTriangle className="h-4 w-4" />
-      <AlertDescription>
-        {description} - Módulo em desenvolvimento.
-      </AlertDescription>
-    </Alert>
-  </div>
-);
 
 const Admin = () => {
   const { signOut } = useAuth();
@@ -72,36 +68,15 @@ const Admin = () => {
             <Routes>
               <Route path="/" element={<AdminDashboard />} />
               <Route path="/usuarios" element={<UsersManagement />} />
+              <Route path="/fotografos" element={<PhotographersManagement />} />
+              <Route path="/agendamentos" element={<SchedulingManagement />} />
+              <Route path="/testes" element={<TestsManagement />} />
+              <Route path="/pagamentos" element={<PaymentsManagement />} />
+              <Route path="/cupons" element={<CouponsManagement />} />
+              <Route path="/comunicacao" element={<CommunicationManagement />} />
+              <Route path="/relatorios" element={<ReportsManagement />} />
               <Route path="/logs" element={<AuditLogs />} />
               <Route path="/configuracoes" element={<SystemSettings />} />
-              <Route 
-                path="/fotografos" 
-                element={<PlaceholderSection title="Gerenciamento de Fotógrafos" description="Aprovar, remover e gerenciar fotógrafos" />} 
-              />
-              <Route 
-                path="/agendamentos" 
-                element={<PlaceholderSection title="Agendamentos" description="Visualizar e gerenciar todas as sessões" />} 
-              />
-              <Route 
-                path="/testes" 
-                element={<PlaceholderSection title="Testes e Formulários" description="Editar perguntas e visualizar estatísticas" />} 
-              />
-              <Route 
-                path="/pagamentos" 
-                element={<PlaceholderSection title="Gestão Financeira" description="Relatórios e controle de pagamentos" />} 
-              />
-              <Route 
-                path="/cupons" 
-                element={<PlaceholderSection title="Cupons e Promoções" description="Criar e gerenciar cupons de desconto" />} 
-              />
-              <Route 
-                path="/comunicacao" 
-                element={<PlaceholderSection title="Comunicação" description="Envio de mensagens e notificações" />} 
-              />
-              <Route 
-                path="/relatorios" 
-                element={<PlaceholderSection title="Relatórios" description="Analytics e métricas do sistema" />} 
-              />
             </Routes>
           </main>
         </div>
