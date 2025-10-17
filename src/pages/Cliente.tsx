@@ -5,6 +5,7 @@ import { TestCard } from "@/components/cliente/TestCard";
 import { LogoText } from "@/components/LogoText";
 import { LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import EssentiaConcierge from "@/components/cliente/EssentiaConcierge";
 
 const Cliente = () => {
   const { user, signOut } = useAuth();
@@ -83,6 +84,7 @@ const Cliente = () => {
           </div>
         </div>
       </main>
+      <EssentiaConcierge />
     </div>
   );
 };

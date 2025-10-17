@@ -14,6 +14,153 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gallery_photos: {
+        Row: {
+          created_at: string
+          description: string | null
+          gallery_id: string
+          id: string
+          metadata: Json | null
+          order_index: number
+          storage_path: string
+          thumbnail_path: string | null
+          title: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          gallery_id: string
+          id?: string
+          metadata?: Json | null
+          order_index?: number
+          storage_path: string
+          thumbnail_path?: string | null
+          title?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          gallery_id?: string
+          id?: string
+          metadata?: Json | null
+          order_index?: number
+          storage_path?: string
+          thumbnail_path?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gallery_photos_gallery_id_fkey"
+            columns: ["gallery_id"]
+            isOneToOne: false
+            referencedRelation: "photo_galleries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      photo_galleries: {
+        Row: {
+          client_id: string | null
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          photographer_id: string
+          session_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          client_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          photographer_id: string
+          session_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          photographer_id?: string
+          session_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_galleries_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "photo_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       photo_sessions: {
         Row: {
           created_at: string
