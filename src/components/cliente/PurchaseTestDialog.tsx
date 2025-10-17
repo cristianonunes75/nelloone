@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CreditCard, ShoppingCart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PurchaseTestDialogProps {
   open: boolean;
@@ -27,11 +28,43 @@ export const PurchaseTestDialog = ({
   const { toast } = useToast();
 
   const handlePurchase = async () => {
-    // TODO: Integrar com Stripe/PagSeguro/Mercado Pago
-    toast({
-      title: "Em desenvolvimento",
-      description: "O sistema de pagamento será integrado em breve.",
-    });
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Erro",
+          description: "Você precisa estar logado para fazer uma compra.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create checkout session
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: {
+          testId,
+          testName,
+          price,
+          userId: user.id,
+          userEmail: user.email,
+        },
+      });
+
+      if (error) throw error;
+
+      // Redirect to Stripe checkout
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error: any) {
+      console.error("Purchase error:", error);
+      toast({
+        title: "Erro ao processar pagamento",
+        description: error.message || "Tente novamente em alguns instantes.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

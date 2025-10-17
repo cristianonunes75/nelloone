@@ -6,7 +6,10 @@ import { TestCard } from "@/components/cliente/TestCard";
 import { LockedTestCard } from "@/components/cliente/LockedTestCard";
 import { LogoText } from "@/components/LogoText";
 import { LogOut, User } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import EssentiaConcierge from "@/components/cliente/EssentiaConcierge";
 
 const Cliente = () => {
@@ -14,6 +17,39 @@ const Cliente = () => {
   const { tests, isLoading, getTestStatus, getTestProgress, startTest } = useTests();
   const { hasAccess } = useTestAccess();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Handle payment success callback
+  useEffect(() => {
+    const paymentStatus = searchParams.get("payment");
+    
+    if (paymentStatus === "success") {
+      toast({
+        title: "Pagamento confirmado! 🎉",
+        description: "Seu teste foi liberado. Você já pode começar!",
+      });
+      
+      // Invalidate queries to refresh test access
+      queryClient.invalidateQueries({ queryKey: ["test-purchases"] });
+      
+      // Clean up URL
+      searchParams.delete("payment");
+      searchParams.delete("test_id");
+      setSearchParams(searchParams);
+    } else if (paymentStatus === "cancelled") {
+      toast({
+        title: "Pagamento cancelado",
+        description: "Você pode tentar novamente quando quiser.",
+        variant: "destructive",
+      });
+      
+      // Clean up URL
+      searchParams.delete("payment");
+      setSearchParams(searchParams);
+    }
+  }, [searchParams, setSearchParams, toast, queryClient]);
 
   if (isLoading) {
     return (
