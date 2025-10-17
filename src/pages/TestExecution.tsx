@@ -8,14 +8,17 @@ import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight, CheckCircle, Lock } from "lucide-react";
 import { useState, useEffect } from "react";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { calculateArchetypeScores, getDominantArchetypes } from "@/lib/archetypes";
 
 export default function TestExecution() {
   const { testId, userTestId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   const {
     questions,
@@ -83,7 +86,7 @@ export default function TestExecution() {
     previousQuestion();
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     if (currentQuestion && selectedAnswer) {
       saveAnswer({
         questionId: currentQuestion.id,
@@ -91,19 +94,61 @@ export default function TestExecution() {
       });
     }
 
-    // If this is the free version and user finished 12 questions, show upgrade
+    // If this is the free version and user finished 12 questions, calculate partial results
     if (!hasPaidAccess && !isFreeTest && isLastQuestion) {
+      // Fetch all answers to calculate partial results
+      const { data: allAnswers } = await supabase
+        .from("test_answers")
+        .select("*")
+        .eq("user_test_id", userTestId!);
+
+      if (allAnswers && allAnswers.length > 0) {
+        // Calculate archetype scores from the 12 questions
+        const scores = calculateArchetypeScores(allAnswers);
+        const dominantArchetypes = getDominantArchetypes(scores);
+
+        // Save partial results as JSON
+        await supabase
+          .from("user_tests")
+          .update({
+            status: "completed",
+            completed_at: new Date().toISOString(),
+            result_data: JSON.parse(JSON.stringify({
+              partial: true,
+              scores,
+              dominantArchetypes,
+              total_questions: questions?.length || 0,
+            })),
+          })
+          .eq("id", userTestId!);
+
+        // Invalidate queries to refresh data
+        queryClient.invalidateQueries({ queryKey: ["user-tests"] });
+      }
+
       setShowUpgradeDialog(true);
       return;
     }
 
-    // Calculate basic results (this can be enhanced based on test type)
-    const resultData = {
-      completed_at: new Date().toISOString(),
-      total_questions: questions?.length || 0,
-    };
+    // Calculate full results for paid users
+    const { data: allAnswers } = await supabase
+      .from("test_answers")
+      .select("*")
+      .eq("user_test_id", userTestId!);
 
-    completeTest(resultData);
+    if (allAnswers && allAnswers.length > 0) {
+      const scores = calculateArchetypeScores(allAnswers);
+      const dominantArchetypes = getDominantArchetypes(scores);
+
+      const resultData = JSON.parse(JSON.stringify({
+        completed_at: new Date().toISOString(),
+        total_questions: questions?.length || 0,
+        scores,
+        dominantArchetypes,
+      }));
+
+      completeTest(resultData);
+    }
   };
 
   if (isLoading) {
@@ -134,6 +179,56 @@ export default function TestExecution() {
   }
 
   const options = currentQuestion.options as { value: string; label: string }[];
+
+  // Show welcome screen at the start
+  if (showWelcome && currentQuestionIndex === 0) {
+    return (
+      <div className="container mx-auto p-6 max-w-3xl">
+        <Card className="border-2 border-accent">
+          <CardHeader className="text-center space-y-4">
+            <div className="text-6xl">🧭</div>
+            <CardTitle className="text-3xl">Bem-vindo ao Teste dos Arquétipos!</CardTitle>
+            <CardDescription className="text-lg space-y-4">
+              <p>
+                Descubra quais arquétipos influenciam sua imagem, decisões e comunicação.
+                Uma jornada de autoconhecimento baseada nos 12 arquétipos universais.
+              </p>
+              <p className="font-medium text-foreground">
+                Responda 12 perguntas e receba uma prévia do seu perfil. Ao final, você poderá
+                desbloquear o resultado completo com 36 perguntas e análise aprofundada.
+              </p>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="bg-accent/10 rounded-lg p-6">
+              <h3 className="font-semibold text-xl mb-3">O que você vai descobrir:</h3>
+              <ul className="space-y-2 text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                  <span>Seus arquétipos dominantes e como eles se manifestam</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                  <span>Como sua essência influencia suas decisões e comunicação</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                  <span>Recomendações personalizadas para imagem e propósito</span>
+                </li>
+              </ul>
+            </div>
+            <Button 
+              onClick={() => setShowWelcome(false)} 
+              className="w-full"
+              size="lg"
+            >
+              Começar Teste Gratuito
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Show upgrade card if completing free version
   if (showUpgradeDialog) {
@@ -184,17 +279,20 @@ export default function TestExecution() {
             <div className="flex gap-4">
               <Button
                 variant="outline"
-                onClick={() => navigate("/cliente")}
+                onClick={() => navigate(`/cliente/test-results/${userTestId}`)}
                 className="flex-1"
               >
                 Ver Resultado Parcial
               </Button>
               <Button
-                onClick={() => setShowUpgradeDialog(false)}
+                onClick={() => {
+                  setShowUpgradeDialog(false);
+                  // The purchase dialog will open automatically based on the state below
+                }}
                 className="flex-1"
                 size="lg"
               >
-                Desbloquear Diagnóstico Completo
+                Desbloquear Diagnóstico Completo (R$ 29,00)
               </Button>
             </div>
           </CardContent>
@@ -203,7 +301,9 @@ export default function TestExecution() {
         <PurchaseTestDialog
           open={!showUpgradeDialog && testDetails !== undefined}
           onOpenChange={(open) => {
-            if (!open) navigate("/cliente");
+            if (!open) {
+              setShowUpgradeDialog(true);
+            }
           }}
           testId={testId!}
           testName={testDetails?.name || ""}
