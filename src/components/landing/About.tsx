@@ -14,13 +14,16 @@ export const About = () => {
                 Essentia é mais que um ensaio fotográfico. É uma <strong className="text-foreground">jornada de autoconhecimento</strong> que revela sua identidade verdadeira através da imagem.
               </p>
               <p>
-                Combinamos <strong className="text-foreground">9 testes de personalidade</strong> com consultoria de imagem profissional e fotografia de alta qualidade, tudo guiado por valores cristãos de verdade e autenticidade.
+                Combinamos <strong className="text-foreground">9 testes de personalidade</strong> com consultoria de imagem profissional e fotografia de alta qualidade para criar uma imagem que comunica verdade e autenticidade.
               </p>
               <p>
-                Seu resultado? Uma imagem que não apenas impressiona, mas que <strong className="text-foreground">comunica quem você realmente é</strong> — sua essência, sua missão, sua fé.
+                Seu resultado? Uma imagem que não apenas impressiona, mas que <strong className="text-foreground">comunica quem você realmente é</strong> — sua essência, sua missão, seu propósito.
               </p>
-              <p className="text-gold font-semibold pt-4">
-                Sua imagem comunica sua missão.
+              <p className="text-gold font-semibold pt-4 border-t border-border/30 mt-6">
+                Inspirado por valores cristãos, aberto a todos que buscam propósito e autenticidade.
+              </p>
+              <p className="text-sm text-muted-foreground/80 italic">
+                Atendemos exclusivamente em <strong className="text-foreground">Brasília-DF</strong>, garantindo qualidade e excelência em cada detalhe.
               </p>
             </div>
           </div>

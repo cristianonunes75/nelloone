@@ -107,14 +107,17 @@ export const LandingFooter = () => {
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-primary-foreground/60">
               <p>&copy; 2025 Essentia. Todos os direitos reservados.</p>
               <div className="flex gap-6">
-                <button className="hover:text-primary-foreground/80 transition-colors">
+                <button 
+                  onClick={() => navigate("/termos")}
+                  className="hover:text-primary-foreground/80 transition-colors"
+                >
                   Termos de Uso
                 </button>
-                <button className="hover:text-primary-foreground/80 transition-colors">
+                <button 
+                  onClick={() => navigate("/privacidade")}
+                  className="hover:text-primary-foreground/80 transition-colors"
+                >
                   Política de Privacidade
-                </button>
-                <button className="hover:text-primary-foreground/80 transition-colors">
-                  LGPD
                 </button>
               </div>
             </div>

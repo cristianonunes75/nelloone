@@ -1,14 +1,14 @@
-import { Scale, Stethoscope, Briefcase, Heart, GraduationCap, Users, BookOpen, Globe } from "lucide-react";
+import { Target, Lightbulb, Sparkles, Award, Users, Heart, Zap, Star } from "lucide-react";
 
 const profiles = [
-  { icon: Scale, title: "Advogados", description: "Autoridade e credibilidade" },
-  { icon: Stethoscope, title: "Médicos", description: "Confiança e profissionalismo" },
-  { icon: Briefcase, title: "Empreendedores", description: "Visão e liderança" },
-  { icon: Heart, title: "Líderes Católicos", description: "Fé e propósito" },
-  { icon: GraduationCap, title: "Educadores", description: "Sabedoria e inspiração" },
-  { icon: Users, title: "Terapeutas", description: "Empatia e acolhimento" },
-  { icon: BookOpen, title: "Coordenadores", description: "Organização e clareza" },
-  { icon: Globe, title: "Missionários", description: "Vocação e entrega" },
+  { icon: Target, title: "Profissionais com Propósito", description: "Médicos, advogados, terapeutas que buscam impacto" },
+  { icon: Lightbulb, title: "Líderes de Impacto", description: "Empreendedores, gestores e coordenadores visionários" },
+  { icon: Sparkles, title: "Pessoas que Transformam", description: "Educadores, coaches e mentores inspiradores" },
+  { icon: Award, title: "Autoridades em sua Área", description: "Especialistas que comunicam credibilidade" },
+  { icon: Users, title: "Influenciadores de Bem", description: "Criadores de conteúdo com propósito e valores" },
+  { icon: Heart, title: "Líderes Espirituais", description: "Pastores, padres, missionários e conselheiros" },
+  { icon: Zap, title: "Agentes de Mudança", description: "Ativistas, voluntários e líderes comunitários" },
+  { icon: Star, title: "Profissionais em Transição", description: "Pessoas reinventando sua imagem profissional" },
 ];
 
 export const ForWho = () => {
@@ -21,7 +21,7 @@ export const ForWho = () => {
               Para quem é o <span className="text-gold">Essentia</span>?
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Profissionais e líderes que desejam comunicar sua essência com verdade e impacto.
+              Para todos que buscam uma imagem autêntica, alinhada com quem realmente são e com o impacto que desejam gerar no mundo.
             </p>
           </div>
 

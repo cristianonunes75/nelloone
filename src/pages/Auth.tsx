@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/logo.png";
@@ -14,6 +15,9 @@ const authSchema = z.object({
   password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
   fullName: z.string().min(2, { message: "Nome deve ter pelo menos 2 caracteres" }).optional(),
   phone: z.string().optional(),
+  termsAccepted: z.boolean().refine((val) => val === true, {
+    message: "Você deve aceitar os termos para continuar",
+  }).optional(),
 });
 
 const Auth = () => {
@@ -22,6 +26,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -44,6 +49,7 @@ const Auth = () => {
         password,
         fullName: isLogin ? undefined : fullName,
         phone: isLogin ? undefined : phone,
+        termsAccepted: isLogin ? undefined : termsAccepted,
       });
 
       if (!validation.success) {
@@ -194,11 +200,47 @@ const Auth = () => {
             />
           </div>
 
+          {!isLogin && (
+            <div className="flex items-start space-x-3 p-4 bg-accent/10 rounded-lg border border-border">
+              <Checkbox
+                id="terms"
+                checked={termsAccepted}
+                onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                className="mt-1"
+              />
+              <div className="flex-1">
+                <label
+                  htmlFor="terms"
+                  className="text-sm leading-relaxed cursor-pointer"
+                >
+                  Ao prosseguir, você concorda com o uso de seus dados exclusivamente para fins de 
+                  análise de imagem e entrega da proposta de ensaio fotográfico. Leia nossos{" "}
+                  <button
+                    type="button"
+                    onClick={() => window.open("/termos", "_blank")}
+                    className="text-gold hover:underline font-semibold"
+                  >
+                    Termos de Uso
+                  </button>
+                  {" "}e{" "}
+                  <button
+                    type="button"
+                    onClick={() => window.open("/privacidade", "_blank")}
+                    className="text-gold hover:underline font-semibold"
+                  >
+                    Política de Privacidade
+                  </button>
+                  .
+                </label>
+              </div>
+            </div>
+          )}
+
           <Button
             type="submit"
             className="w-full"
             size="lg"
-            disabled={isLoading}
+            disabled={isLoading || (!isLogin && !termsAccepted)}
           >
             {isLoading
               ? "Carregando..."
