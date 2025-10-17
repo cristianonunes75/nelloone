@@ -341,6 +341,83 @@ export type Database = {
           },
         ]
       }
+      test_combos: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          discount_percentage: number | null
+          id: string
+          name: string
+          price_brl: number
+          test_count: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          discount_percentage?: number | null
+          id?: string
+          name: string
+          price_brl: number
+          test_count: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          discount_percentage?: number | null
+          id?: string
+          name?: string
+          price_brl?: number
+          test_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      test_purchases: {
+        Row: {
+          id: string
+          payment_method: string | null
+          payment_status: string
+          price_paid: number
+          purchased_at: string
+          test_id: string
+          transaction_id: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          payment_method?: string | null
+          payment_status?: string
+          price_paid: number
+          purchased_at?: string
+          test_id: string
+          transaction_id?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          payment_method?: string | null
+          payment_status?: string
+          price_paid?: number
+          purchased_at?: string
+          test_id?: string
+          transaction_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_purchases_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       test_questions: {
         Row: {
           created_at: string
@@ -384,7 +461,9 @@ export type Database = {
           estimated_minutes: number
           icon: string | null
           id: string
+          is_free: boolean
           name: string
+          price_brl: number | null
           questions_count: number
           type: Database["public"]["Enums"]["test_type"]
         }
@@ -395,7 +474,9 @@ export type Database = {
           estimated_minutes: number
           icon?: string | null
           id?: string
+          is_free?: boolean
           name: string
+          price_brl?: number | null
           questions_count: number
           type: Database["public"]["Enums"]["test_type"]
         }
@@ -406,7 +487,9 @@ export type Database = {
           estimated_minutes?: number
           icon?: string | null
           id?: string
+          is_free?: boolean
           name?: string
+          price_brl?: number | null
           questions_count?: number
           type?: Database["public"]["Enums"]["test_type"]
         }

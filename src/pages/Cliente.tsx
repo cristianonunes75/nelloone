@@ -1,7 +1,9 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useTests } from "@/hooks/useTests";
+import { useTestAccess } from "@/hooks/useTestAccess";
 import { Button } from "@/components/ui/button";
 import { TestCard } from "@/components/cliente/TestCard";
+import { LockedTestCard } from "@/components/cliente/LockedTestCard";
 import { LogoText } from "@/components/LogoText";
 import { LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +12,7 @@ import EssentiaConcierge from "@/components/cliente/EssentiaConcierge";
 const Cliente = () => {
   const { user, signOut } = useAuth();
   const { tests, isLoading, getTestStatus, getTestProgress, startTest } = useTests();
+  const { hasAccess } = useTestAccess();
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -49,27 +52,48 @@ const Cliente = () => {
               Olá, {user?.user_metadata?.full_name?.split(" ")[0] || "Cliente"}!
             </h1>
             <p className="text-xl text-muted-foreground">
-              Complete os 8 testes para descobrir sua essência e preparar sua sessão fotográfica.
+              Comece pelo <strong>Teste de Arquétipos</strong> — é gratuito e o primeiro passo para descobrir sua essência.
             </p>
           </div>
 
           <div className="mb-8">
             <h2 className="text-2xl font-semibold mb-6">Seus Testes</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {tests?.map((test) => (
-                <TestCard
-                  key={test.id}
-                  id={test.id}
-                  name={test.name}
-                  description={test.description}
-                  questionsCount={test.questions_count}
-                  estimatedMinutes={test.estimated_minutes}
-                  icon={test.icon || "Circle"}
-                  status={getTestStatus(test.id)}
-                  progress={getTestProgress(test.id)}
-                  onStart={() => startTest(test.id)}
-                />
-              ))}
+              {tests?.map((test) => {
+                const isFree = test.is_free || false;
+                const hasTestAccess = hasAccess(test.id, isFree);
+
+                if (!hasTestAccess) {
+                  return (
+                    <LockedTestCard
+                      key={test.id}
+                      id={test.id}
+                      name={test.name}
+                      description={test.description}
+                      questionsCount={test.questions_count}
+                      estimatedMinutes={test.estimated_minutes}
+                      icon={test.icon || "Circle"}
+                      price={test.price_brl || 29.0}
+                    />
+                  );
+                }
+
+                return (
+                  <TestCard
+                    key={test.id}
+                    id={test.id}
+                    name={test.name}
+                    description={test.description}
+                    questionsCount={test.questions_count}
+                    estimatedMinutes={test.estimated_minutes}
+                    icon={test.icon || "Circle"}
+                    status={getTestStatus(test.id)}
+                    progress={getTestProgress(test.id)}
+                    onStart={() => startTest(test.id)}
+                    isFree={isFree}
+                  />
+                );
+              })}
             </div>
           </div>
 

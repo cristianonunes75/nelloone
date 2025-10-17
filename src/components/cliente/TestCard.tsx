@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Clock, CheckCircle, Play } from "lucide-react";
+import { Clock, CheckCircle, Play, Gift } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -20,6 +20,7 @@ interface TestCardProps {
   status: TestStatus;
   progress: number;
   onStart: () => void;
+  isFree?: boolean;
 }
 
 export const TestCard = ({
@@ -32,6 +33,7 @@ export const TestCard = ({
   status,
   progress,
   onStart,
+  isFree = false,
 }: TestCardProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -81,12 +83,20 @@ export const TestCard = ({
   const ButtonIcon = config.button.icon;
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
+    <div className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg transition-all duration-300 relative">
+      {isFree && (
+        <div className="absolute top-4 right-4">
+          <Badge variant="secondary" className="bg-green-500/10 text-green-600 border-green-500/20">
+            <Gift className="w-3 h-3 mr-1" />
+            Grátis
+          </Badge>
+        </div>
+      )}
       <div className="flex items-start justify-between mb-4">
         <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center">
           <IconComponent className="w-6 h-6 text-gold" />
         </div>
-        <Badge variant={config.badge.variant}>{config.badge.label}</Badge>
+        {!isFree && <Badge variant={config.badge.variant}>{config.badge.label}</Badge>}
       </div>
 
       <h3 className="text-xl font-semibold mb-2">{name}</h3>
