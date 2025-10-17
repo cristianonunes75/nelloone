@@ -44,6 +44,116 @@ export type Database = {
         }
         Relationships: []
       }
+      test_answers: {
+        Row: {
+          answer: Json
+          answered_at: string
+          id: string
+          question_id: string
+          user_test_id: string
+        }
+        Insert: {
+          answer: Json
+          answered_at?: string
+          id?: string
+          question_id: string
+          user_test_id: string
+        }
+        Update: {
+          answer?: Json
+          answered_at?: string
+          id?: string
+          question_id?: string
+          user_test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "test_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "test_answers_user_test_id_fkey"
+            columns: ["user_test_id"]
+            isOneToOne: false
+            referencedRelation: "user_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      test_questions: {
+        Row: {
+          created_at: string
+          id: string
+          options: Json
+          question_number: number
+          question_text: string
+          test_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          options: Json
+          question_number: number
+          question_text: string
+          test_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          options?: Json
+          question_number?: number
+          question_text?: string
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_questions_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tests: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string
+          estimated_minutes: number
+          icon: string | null
+          id: string
+          name: string
+          questions_count: number
+          type: Database["public"]["Enums"]["test_type"]
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description: string
+          estimated_minutes: number
+          icon?: string | null
+          id?: string
+          name: string
+          questions_count: number
+          type: Database["public"]["Enums"]["test_type"]
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string
+          estimated_minutes?: number
+          icon?: string | null
+          id?: string
+          name?: string
+          questions_count?: number
+          type?: Database["public"]["Enums"]["test_type"]
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -65,6 +175,50 @@ export type Database = {
         }
         Relationships: []
       }
+      user_tests: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          result_data: Json | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["test_status"]
+          test_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          result_data?: Json | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["test_status"]
+          test_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          result_data?: Json | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["test_status"]
+          test_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_tests_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -84,6 +238,16 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "fotografo" | "cliente"
+      test_status: "not_started" | "in_progress" | "completed"
+      test_type:
+        | "disc"
+        | "mbti"
+        | "arquetipos"
+        | "inteligencias_multiplas"
+        | "linguagens_amor"
+        | "temperamentos"
+        | "eneagrama"
+        | "solis"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -212,6 +376,17 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "fotografo", "cliente"],
+      test_status: ["not_started", "in_progress", "completed"],
+      test_type: [
+        "disc",
+        "mbti",
+        "arquetipos",
+        "inteligencias_multiplas",
+        "linguagens_amor",
+        "temperamentos",
+        "eneagrama",
+        "solis",
+      ],
     },
   },
 } as const

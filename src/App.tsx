@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Cliente from "./pages/Cliente";
+import ClientePerfil from "./pages/ClientePerfil";
 import Fotografo from "./pages/Fotografo";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
@@ -29,6 +30,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["cliente"]}>
                   <Cliente />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cliente/perfil"
+              element={
+                <ProtectedRoute allowedRoles={["cliente"]}>
+                  <ClientePerfil />
                 </ProtectedRoute>
               }
             />
