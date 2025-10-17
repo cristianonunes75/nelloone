@@ -4,7 +4,7 @@ interface LogoTextProps {
 }
 
 export const LogoText = ({ className = "", variant = "default" }: LogoTextProps) => {
-  const baseStyles = "font-light tracking-[0.2em] uppercase";
+  const baseStyles = "font-serif font-light tracking-[0.3em] uppercase";
   
   const variantStyles = {
     default: "text-foreground",
@@ -14,7 +14,7 @@ export const LogoText = ({ className = "", variant = "default" }: LogoTextProps)
 
   return (
     <div className={`${baseStyles} ${variantStyles[variant]} ${className}`}>
-      <span className="font-extralight">Essentia</span>
+      <span>Essentia</span>
     </div>
   );
 };

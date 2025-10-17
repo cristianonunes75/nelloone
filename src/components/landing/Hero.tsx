@@ -23,15 +23,15 @@ export const Hero = () => {
         <div className="max-w-4xl mx-auto">
           <LogoText 
             variant="outline" 
-            className="text-6xl md:text-8xl mb-8 animate-fade-in text-white"
+            className="text-6xl md:text-8xl mb-16 animate-fade-in text-white"
           />
           
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight animate-fade-in">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight animate-fade-in">
             Sua imagem pode comunicar<br />
             <span className="text-gold">verdade, fé e autoridade</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in">
+          <p className="text-lg md:text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in">
             Uma experiência completa de autoconhecimento, consultoria de imagem e fotografia profissional. 
             Tudo com propósito e verdade.
           </p>
