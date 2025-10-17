@@ -19,7 +19,7 @@ const plans = [
     price: "59",
     originalPrice: "149",
     features: [
-      "9 testes completos de personalidade",
+      "8 testes completos de personalidade",
       "Todos os relatórios em PDF",
       "Análise integrada dos resultados",
       "Suporte via WhatsApp",
@@ -32,7 +32,7 @@ const plans = [
     priceSplit: "ou 3x de R$ 69",
     originalPrice: "497",
     features: [
-      "9 testes completos de personalidade",
+      "8 testes completos de personalidade",
       "Todos os relatórios em PDF",
       "Sessão fotográfica profissional",
       "Consultoria de imagem personalizada",

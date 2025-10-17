@@ -28,7 +28,7 @@ const faqs = [
   },
   {
     question: "Posso fazer os testes sem a sessão fotográfica?",
-    answer: "Sim! Oferecemos o Pacote Testes (9 testes completos) e também testes individuais. São opções perfeitas para quem quer começar pelo autoconhecimento antes de investir na fotografia.",
+    answer: "Sim! Oferecemos o Pacote Testes (8 testes completos) e também testes individuais. São opções perfeitas para quem quer começar pelo autoconhecimento antes de investir na fotografia.",
   },
   {
     question: "A oferta promocional é limitada?",

@@ -1,15 +1,14 @@
-import { Brain, Target, Compass, Star, Thermometer, Lightbulb, Heart, Cross, Calendar } from "lucide-react";
+import { Brain, Target, Compass, Star, Thermometer, Lightbulb, Heart, Cross } from "lucide-react";
 
 const tests = [
-  { icon: Star, title: "Arquétipos", description: "Descubra os padrões que guiam sua personalidade" },
-  { icon: Target, title: "DISC", description: "Entenda seu estilo de comportamento e comunicação" },
-  { icon: Brain, title: "MBTI", description: "Revele sua estrutura cognitiva e preferências" },
-  { icon: Compass, title: "Eneagrama", description: "Explore suas motivações mais profundas" },
-  { icon: Thermometer, title: "Temperamentos", description: "Identifique suas tendências emocionais" },
-  { icon: Lightbulb, title: "Múltiplas Inteligências", description: "Reconheça seus talentos únicos" },
-  { icon: Heart, title: "Linguagens do Amor", description: "Compreenda como você se conecta" },
-  { icon: Cross, title: "SOLIS", description: "Espiritualidade e liderança com sentido" },
-  { icon: Calendar, title: "Momento Pessoal", description: "Numerologia cristã adaptada" },
+  { icon: Star, title: "Arquétipos de Marca", description: "Padrões simbólicos para comunicação e branding pessoal" },
+  { icon: Target, title: "DISC", description: "Perfil comportamental e estilo de comunicação" },
+  { icon: Brain, title: "MBTI", description: "Tipos psicológicos e preferências cognitivas" },
+  { icon: Compass, title: "Eneagrama", description: "Motivações profundas com abordagem psicológica" },
+  { icon: Thermometer, title: "Temperamentos", description: "Base tradicional (São Tomás de Aquino)" },
+  { icon: Lightbulb, title: "Inteligências Múltiplas", description: "Reconheça seus talentos únicos (Howard Gardner)" },
+  { icon: Heart, title: "Linguagens do Amor", description: "Comunicação afetiva e relacional (Gary Chapman)" },
+  { icon: Cross, title: "SOLIS", description: "Simbologia da Luz Interior e de Estilo — expressão fotográfica" },
 ];
 
 export const Tests = () => {
@@ -19,10 +18,10 @@ export const Tests = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              9 Testes de <span className="text-gold">Autoconhecimento</span>
+              8 Testes de <span className="text-gold">Autoconhecimento</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Uma análise completa e profunda da sua personalidade, talentos e propósito de vida.
+              Ferramentas validadas de análise de personalidade, talentos e comunicação.
             </p>
           </div>
 
@@ -45,8 +44,12 @@ export const Tests = () => {
           </div>
 
           <div className="text-center mt-12">
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-muted-foreground mb-4">
               Todos os testes com <strong className="text-foreground">relatórios em PDF personalizados</strong> e entrega visual profissional.
+            </p>
+            <p className="text-sm text-muted-foreground italic max-w-2xl mx-auto">
+              Os resultados são simbólicos e servem como ferramentas de autoconhecimento e comunicação. 
+              Não substituem oração, discernimento espiritual ou aconselhamento pessoal.
             </p>
           </div>
         </div>
