@@ -24,18 +24,13 @@ export const LandingFooter = () => {
               </p>
               <div className="flex gap-4">
                 <a
-                  href="https://instagram.com/essentia.studio"
+                  href="https://instagram.com/essentiaimagem"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 flex items-center justify-center transition-colors"
+                  aria-label="Instagram Essentia"
                 >
                   <Instagram className="w-5 h-5" />
-                </a>
-                <a
-                  href="mailto:contato@essentia.com.br"
-                  className="w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 flex items-center justify-center transition-colors"
-                >
-                  <Mail className="w-5 h-5" />
                 </a>
               </div>
             </div>
@@ -84,18 +79,23 @@ export const LandingFooter = () => {
               <h4 className="font-semibold mb-4">Contato</h4>
               <ul className="space-y-3 text-primary-foreground/80">
                 <li>
-                  <a href="mailto:contato@essentia.com.br" className="hover:text-gold transition-colors">
-                    contato@essentia.com.br
-                  </a>
-                </li>
-                <li>
-                  <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
-                    +55 (11) 99999-9999
+                  <a 
+                    href="https://wa.me/5561992430090" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="hover:text-gold transition-colors flex items-center gap-2"
+                  >
+                    <span>WhatsApp</span>
                   </a>
                 </li>
                 <li className="pt-2">
-                  <a href="https://instagram.com/essentia.studio" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
-                    @essentia.studio
+                  <a 
+                    href="https://instagram.com/essentiaimagem" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="hover:text-gold transition-colors"
+                  >
+                    @essentiaimagem
                   </a>
                 </li>
               </ul>
