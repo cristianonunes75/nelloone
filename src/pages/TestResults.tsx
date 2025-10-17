@@ -217,8 +217,10 @@ export default function TestResults() {
           <ArchetypeResults
             primaryArchetype={dominantArchetypes.primary.archetype}
             secondaryArchetype={dominantArchetypes.secondary?.archetype}
+            tertiaryArchetype={dominantArchetypes.tertiary?.archetype}
             primaryScore={dominantArchetypes.primary.score}
             secondaryScore={dominantArchetypes.secondary?.score}
+            tertiaryScore={dominantArchetypes.tertiary?.score}
           />
         ) : isArchetyposTest && !shouldShowFullResults ? (
           // Versão gratuita - mostrar apenas respostas com CTA de upgrade
@@ -264,7 +266,7 @@ export default function TestResults() {
                     onOpenChange={setPurchaseDialogOpen}
                     testId={userTest.test_id}
                     testName={userTest.tests?.name || ""}
-                    price={userTest.tests?.price_brl ? parseFloat(userTest.tests.price_brl.toString()) : 97}
+                    price={userTest.tests?.price_brl ? parseFloat(userTest.tests.price_brl.toString()) : 29}
                   />
                 </div>
               </CardContent>

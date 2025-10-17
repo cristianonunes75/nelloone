@@ -207,7 +207,7 @@ export default function TestExecution() {
           }}
           testId={testId!}
           testName={testDetails?.name || ""}
-          price={testDetails?.price_brl ? parseFloat(testDetails.price_brl.toString()) : 97}
+          price={testDetails?.price_brl ? parseFloat(testDetails.price_brl.toString()) : 29}
         />
       </div>
     );
@@ -242,24 +242,31 @@ export default function TestExecution() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <RadioGroup value={selectedAnswer} onValueChange={handleAnswerChange}>
-            <div className="space-y-3">
-              {options?.map((option) => (
-                <div
-                  key={option.value}
-                  className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-accent transition-colors cursor-pointer"
-                >
-                  <RadioGroupItem value={option.value} id={option.value} />
-                  <Label
-                    htmlFor={option.value}
-                    className="flex-1 cursor-pointer"
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground text-center mb-4">
+              Avalie seu nível de concordância (0 = Discordo totalmente, 4 = Concordo totalmente)
+            </p>
+            <RadioGroup value={selectedAnswer} onValueChange={handleAnswerChange}>
+              <div className="space-y-2">
+                {options?.map((option) => (
+                  <div
+                    key={option.value}
+                    className={`flex items-center justify-between border rounded-lg p-4 hover:bg-accent transition-colors cursor-pointer ${
+                      selectedAnswer === option.value ? 'bg-accent border-primary' : ''
+                    }`}
                   >
-                    {option.label}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </RadioGroup>
+                    <Label
+                      htmlFor={option.value}
+                      className="flex-1 cursor-pointer font-normal"
+                    >
+                      {option.label}
+                    </Label>
+                    <RadioGroupItem value={option.value} id={option.value} />
+                  </div>
+                ))}
+              </div>
+            </RadioGroup>
+          </div>
 
           <div className="flex items-center justify-between mt-6 gap-4">
             <Button

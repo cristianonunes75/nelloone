@@ -6,18 +6,23 @@ import { Sparkles, Palette, Camera } from "lucide-react";
 interface ArchetypeResultsProps {
   primaryArchetype: string;
   secondaryArchetype?: string;
+  tertiaryArchetype?: string;
   primaryScore: number;
   secondaryScore?: number;
+  tertiaryScore?: number;
 }
 
 export default function ArchetypeResults({
   primaryArchetype,
   secondaryArchetype,
+  tertiaryArchetype,
   primaryScore,
   secondaryScore,
+  tertiaryScore,
 }: ArchetypeResultsProps) {
   const primary = ARCHETYPES[primaryArchetype];
   const secondary = secondaryArchetype ? ARCHETYPES[secondaryArchetype] : null;
+  const tertiary = tertiaryArchetype ? ARCHETYPES[tertiaryArchetype] : null;
 
   if (!primary) return null;
 
@@ -135,6 +140,31 @@ export default function ArchetypeResults({
                 ))}
               </div>
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Arquétipo Terciário */}
+      {tertiary && tertiaryScore && (
+        <Card>
+          <CardHeader className="bg-muted/20">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{tertiary.emoji}</span>
+                <div>
+                  <CardTitle className="text-lg">{tertiary.name}</CardTitle>
+                  <CardDescription>Arquétipo Terciário</CardDescription>
+                </div>
+              </div>
+              <Badge variant="outline" className="text-sm px-2 py-1">
+                {tertiaryScore} {tertiaryScore === 1 ? 'ponto' : 'pontos'}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {tertiary.description}
+            </p>
           </CardContent>
         </Card>
       )}

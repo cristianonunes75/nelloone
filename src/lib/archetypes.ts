@@ -189,16 +189,17 @@ export interface ArchetypeScore {
 export function calculateArchetypeScores(answers: any[]): ArchetypeScore[] {
   const scores: Record<string, number> = {};
 
-  // Contar pontos para cada arquétipo baseado nas respostas
+  // Sum points for each archetype based on responses (0-4 scale)
   answers.forEach((answer) => {
     const selectedOption = answer.answer;
     if (selectedOption && selectedOption.archetype) {
       const archetype = selectedOption.archetype;
-      scores[archetype] = (scores[archetype] || 0) + 1;
+      const points = parseInt(selectedOption.value || "0", 10);
+      scores[archetype] = (scores[archetype] || 0) + points;
     }
   });
 
-  // Converter para array e ordenar por pontuação
+  // Convert to array and sort by score
   const sortedScores = Object.entries(scores)
     .map(([archetype, score]) => ({ archetype, score }))
     .sort((a, b) => b.score - a.score);
@@ -209,11 +210,13 @@ export function calculateArchetypeScores(answers: any[]): ArchetypeScore[] {
 export function getDominantArchetypes(scores: ArchetypeScore[]): {
   primary: ArchetypeScore;
   secondary?: ArchetypeScore;
+  tertiary?: ArchetypeScore;
 } {
-  const [primary, secondary] = scores;
+  const [primary, secondary, tertiary] = scores;
   
   return {
     primary,
-    secondary: secondary && secondary.score > 0 ? secondary : undefined
+    secondary: secondary && secondary.score > 0 ? secondary : undefined,
+    tertiary: tertiary && tertiary.score > 0 ? tertiary : undefined
   };
 }
