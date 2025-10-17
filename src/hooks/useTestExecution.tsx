@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useToast } from "./use-toast";
 import { useNavigate } from "react-router-dom";
+import { useTestAccess } from "./useTestAccess";
 
 export const useTestExecution = (testId: string, userTestId?: string) => {
   const { user } = useAuth();
@@ -11,9 +12,28 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const { hasAccess } = useTestAccess();
+
+  // Get test info to check if it's paid
+  const { data: testInfo } = useQuery({
+    queryKey: ["test-info", testId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tests")
+        .select("is_free")
+        .eq("id", testId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const isFreeTest = testInfo?.is_free || false;
+  const hasPaidAccess = hasAccess(testId, isFreeTest);
 
   // Fetch questions for this test
-  const { data: questions, isLoading: questionsLoading } = useQuery({
+  const { data: allQuestions, isLoading: questionsLoading } = useQuery({
     queryKey: ["test-questions", testId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -26,6 +46,12 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
       return data;
     },
   });
+
+  // Limit questions to first 12 if user hasn't paid for full access
+  const FREE_QUESTION_LIMIT = 12;
+  const questions = !hasPaidAccess && !isFreeTest
+    ? allQuestions?.slice(0, FREE_QUESTION_LIMIT)
+    : allQuestions;
 
   // Fetch existing answers
   const { data: answers, isLoading: answersLoading } = useQuery({
@@ -154,5 +180,8 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
     isLastQuestion: questions
       ? currentQuestionIndex === questions.length - 1
       : false,
+    hasPaidAccess,
+    isFreeTest,
+    totalQuestions: allQuestions?.length || 0,
   };
 };
