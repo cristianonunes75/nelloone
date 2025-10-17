@@ -8,60 +8,56 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 0 0% 17%;
+    /* Essentia Color Palette - Briefing colors */
+    --background: 40 28% 93%; /* #EAE4DC - bege claro */
+    --foreground: 0 0% 18%; /* #2F2F2F - cinza escuro */
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 17%;
+    --card-foreground: 0 0% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 17%;
+    --popover-foreground: 0 0% 18%;
 
-    --primary: 0 0% 17%;
+    --primary: 0 0% 18%; /* #2F2F2F - cinza escuro */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 0 0% 95%;
-    --secondary-foreground: 0 0% 17%;
+    --secondary-foreground: 0 0% 18%;
 
-    --muted: 0 0% 95%;
+    --muted: 40 20% 90%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 38 35% 60%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 36 23% 69%; /* #BFAE9A - dourado/bege */
+    --accent-foreground: 0 0% 18%;
 
-    --gold: 38 35% 60%;
-    --gold-light: 38 35% 70%;
-    --gold-dark: 38 35% 50%;
+    --gold: 36 23% 69%; /* #BFAE9A - cor principal do briefing */
+    --gold-light: 36 23% 79%;
+    --gold-dark: 36 23% 59%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 38 35% 60%;
+    --border: 40 20% 85%;
+    --input: 40 20% 85%;
+    --ring: 36 23% 69%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
     
-    --gradient-gold: linear-gradient(135deg, hsl(38 35% 60%), hsl(38 35% 70%));
-    --gradient-dark: linear-gradient(180deg, hsl(0 0% 17%), hsl(0 0% 10%));
+    /* Essentia Gradients */
+    --gradient-gold: linear-gradient(135deg, hsl(36 23% 69%), hsl(36 23% 79%));
+    --gradient-hero: linear-gradient(180deg, hsl(0 0% 0% / 0.6), hsl(0 0% 0% / 0.4));
     --shadow-elegant: 0 20px 60px -10px hsl(0 0% 0% / 0.15);
+    --shadow-soft: 0 10px 30px -5px hsl(0 0% 0% / 0.1);
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
+    --sidebar-background: 40 28% 93%;
+    --sidebar-foreground: 0 0% 18%;
+    --sidebar-primary: 0 0% 18%;
     --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 40 20% 90%;
+    --sidebar-accent-foreground: 0 0% 18%;
+    --sidebar-border: 40 20% 85%;
+    --sidebar-ring: 36 23% 69%;
   }
 
   .dark {
@@ -75,7 +71,7 @@ All colors MUST be HSL.
     --popover-foreground: 0 0% 98%;
 
     --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 17%;
+    --primary-foreground: 0 0% 18%;
 
     --secondary: 0 0% 20%;
     --secondary-foreground: 0 0% 98%;
@@ -83,27 +79,28 @@ All colors MUST be HSL.
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 60%;
 
-    --accent: 38 35% 60%;
+    --accent: 36 23% 69%;
     --accent-foreground: 0 0% 98%;
 
-    --gold: 38 35% 60%;
-    --gold-light: 38 35% 70%;
-    --gold-dark: 38 35% 50%;
+    --gold: 36 23% 69%;
+    --gold-light: 36 23% 79%;
+    --gold-dark: 36 23% 59%;
 
     --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 0 0% 20%;
     --input: 0 0% 20%;
-    --ring: 38 35% 60%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --ring: 36 23% 69%;
+    
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 36 23% 69%;
+    --sidebar-primary-foreground: 0 0% 10%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 36 23% 69%;
   }
 }
 
@@ -126,11 +123,32 @@ All colors MUST be HSL.
     background: var(--gradient-gold);
   }
   
-  .gradient-dark {
-    background: var(--gradient-dark);
+  .gradient-hero {
+    background: var(--gradient-hero);
   }
   
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
