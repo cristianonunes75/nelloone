@@ -6,10 +6,12 @@ import { PhotoSession } from "@/components/landing/PhotoSession";
 import { Pricing } from "@/components/landing/Pricing";
 import { FAQ } from "@/components/landing/FAQ";
 import { LandingFooter } from "@/components/landing/LandingFooter";
+import { LandingNav } from "@/components/landing/LandingNav";
 
 const Landing = () => {
   return (
     <div className="min-h-screen">
+      <LandingNav />
       <Hero />
       <About />
       <ForWho />
