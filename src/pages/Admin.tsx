@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { DashboardStats } from "@/components/admin/DashboardStats";
+import { ViewModeSelector } from "@/components/admin/ViewModeSelector";
 import { UsersManagement } from "@/components/admin/UsersManagement";
 import { AuditLogs } from "@/components/admin/AuditLogs";
 import { SystemSettings } from "@/components/admin/SystemSettings";
@@ -12,12 +13,16 @@ import { Shield, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const AdminDashboard = () => (
-  <div className="space-y-6">
+  <div className="space-y-8">
     <div>
       <h1 className="text-4xl font-bold mb-2">Painel Administrativo</h1>
       <p className="text-muted-foreground">Visão geral do sistema Essentia</p>
     </div>
+    
     <DashboardStats />
+    
+    <ViewModeSelector />
+    
     <Alert className="border-gold/50 bg-gold/5">
       <Shield className="h-4 w-4 text-gold" />
       <AlertDescription className="text-sm">
