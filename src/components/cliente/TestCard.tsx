@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Clock, CheckCircle, Play, Gift } from "lucide-react";
+import { Clock, CheckCircle, Play, Gift, RotateCcw } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -20,6 +20,7 @@ interface TestCardProps {
   status: TestStatus;
   progress: number;
   onStart: () => void;
+  onReset?: () => void;
   isFree?: boolean;
 }
 
@@ -33,11 +34,13 @@ export const TestCard = ({
   status,
   progress,
   onStart,
+  onReset,
   isFree = false,
 }: TestCardProps) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const IconComponent = (Icons as any)[icon] || Icons.Circle;
+  const isAdmin = userRole === "admin";
 
   // Get user test ID for this test
   const { data: userTest } = useQuery({
@@ -121,14 +124,26 @@ export const TestCard = ({
         </div>
       )}
 
-      <Button
-        onClick={config.button.action}
-        className="w-full"
-        variant={status === "completed" ? "outline" : "default"}
-      >
-        <ButtonIcon className="w-4 h-4 mr-2" />
-        {config.button.label}
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          onClick={config.button.action}
+          className="flex-1"
+          variant={status === "completed" ? "outline" : "default"}
+        >
+          <ButtonIcon className="w-4 h-4 mr-2" />
+          {config.button.label}
+        </Button>
+        {isAdmin && status === "completed" && onReset && (
+          <Button
+            onClick={onReset}
+            variant="ghost"
+            size="icon"
+            title="Reiniciar teste"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

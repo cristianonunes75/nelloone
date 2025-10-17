@@ -90,11 +90,62 @@ export const useTests = () => {
     return 0;
   };
 
+  // Reset a test (admin only)
+  const resetTest = useMutation({
+    mutationFn: async (testId: string) => {
+      if (!user) throw new Error("User not authenticated");
+
+      // Find the user_test record
+      const { data: userTest } = await supabase
+        .from("user_tests")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("test_id", testId)
+        .single();
+
+      if (!userTest) throw new Error("Test not found");
+
+      // Delete all answers for this test
+      await supabase
+        .from("test_answers")
+        .delete()
+        .eq("user_test_id", userTest.id);
+
+      // Reset the user_test status
+      const { error } = await supabase
+        .from("user_tests")
+        .update({
+          status: "not_started",
+          started_at: null,
+          completed_at: null,
+          result_data: null,
+        })
+        .eq("id", userTest.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-tests"] });
+      toast({
+        title: "Teste reiniciado!",
+        description: "Você pode começar novamente do zero.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao reiniciar teste",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     tests,
     userTests,
     isLoading: testsLoading || userTestsLoading,
     startTest: startTest.mutate,
+    resetTest: resetTest.mutate,
     getTestStatus,
     getTestProgress,
   };

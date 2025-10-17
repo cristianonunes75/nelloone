@@ -14,8 +14,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import EssentiaConcierge from "@/components/cliente/EssentiaConcierge";
 
 const Cliente = () => {
-  const { user, signOut } = useAuth();
-  const { tests, isLoading, getTestStatus, getTestProgress, startTest } = useTests();
+  const { user, signOut, userRole } = useAuth();
+  const { tests, isLoading, getTestStatus, getTestProgress, startTest, resetTest } = useTests();
   const { hasAccess } = useTestAccess();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -128,6 +128,7 @@ const Cliente = () => {
                     status={getTestStatus(test.id)}
                     progress={getTestProgress(test.id)}
                     onStart={() => startTest(test.id)}
+                    onReset={userRole === "admin" ? () => resetTest(test.id) : undefined}
                     isFree={isFree}
                   />
                 );

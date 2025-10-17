@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Download, Calendar, CheckCircle, Lock } from "lucide-react";
+import { Download, Calendar, CheckCircle, Lock, RotateCcw } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef, useState } from "react";
@@ -12,13 +12,16 @@ import ArchetypeResults from "@/components/cliente/ArchetypeResults";
 import { calculateArchetypeScores, getDominantArchetypes } from "@/lib/archetypes";
 import { useAuth } from "@/hooks/useAuth";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
+import { useTests } from "@/hooks/useTests";
 
 export default function TestResults() {
   const { userTestId } = useParams();
   const navigate = useNavigate();
   const resultsRef = useRef<HTMLDivElement>(null);
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
+  const { resetTest } = useTests();
+  const isAdmin = userRole === "admin";
 
   const { data: userTest, isLoading } = useQuery({
     queryKey: ["user-test-result", userTestId],
@@ -105,6 +108,13 @@ export default function TestResults() {
     pdf.save(`resultado-${userTest?.tests?.name}.pdf`);
   };
 
+  const handleResetTest = () => {
+    if (userTest?.test_id) {
+      resetTest(userTest.test_id);
+      navigate("/cliente");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto p-6 flex items-center justify-center min-h-screen">
@@ -149,9 +159,17 @@ export default function TestResults() {
     <div className="container mx-auto p-6 max-w-4xl space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Seus Resultados</h1>
-        <Button onClick={() => navigate("/cliente")}>
-          Voltar para Dashboard
-        </Button>
+        <div className="flex gap-2">
+          {isAdmin && (
+            <Button onClick={handleResetTest} variant="outline">
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Reiniciar Teste
+            </Button>
+          )}
+          <Button onClick={() => navigate("/cliente")}>
+            Voltar para Dashboard
+          </Button>
+        </div>
       </div>
 
       <div ref={resultsRef} className="space-y-6">
