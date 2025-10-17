@@ -21,7 +21,7 @@ interface UserWithRole {
   full_name: string;
   phone: string;
   created_at: string;
-  role: string;
+  roles: string[];
 }
 
 export const UsersManagement = () => {
@@ -48,8 +48,8 @@ export const UsersManagement = () => {
 
       if (profilesError) throw profilesError;
 
-      // Get roles separately
-      const { data: roles, error: rolesError } = await supabase
+      // Get all roles for each user
+      const { data: allRoles, error: rolesError } = await supabase
         .from("user_roles")
         .select("user_id, role");
 
@@ -60,15 +60,15 @@ export const UsersManagement = () => {
       
       const usersWithData = await Promise.all(
         (profiles || []).map(async (profile) => {
-          // Find role
-          const userRole = roles?.find(r => r.user_id === profile.id);
+          // Find all roles for this user
+          const userRoles = allRoles?.filter(r => r.user_id === profile.id).map(r => r.role) || ["cliente"];
           
           // For now, use a placeholder email since we can't access auth.users easily
           // In production, you'd need a separate API endpoint with proper permissions
           return {
             ...profile,
             email: profile.id === currentUser?.id ? currentUser.email : "user@essentia.com.br",
-            role: userRole?.role || "cliente",
+            roles: userRoles,
           };
         })
       );
@@ -85,26 +85,51 @@ export const UsersManagement = () => {
     }
   };
 
-  const changeUserRole = async (userId: string, newRole: "admin" | "fotografo" | "cliente") => {
+  const toggleUserRole = async (userId: string, role: "admin" | "fotografo" | "cliente", currentRoles: string[]) => {
     try {
-      const { error } = await supabase
-        .from("user_roles")
-        .update({ role: newRole })
-        .eq("user_id", userId);
+      const hasRole = currentRoles.includes(role);
+      
+      if (hasRole) {
+        // Remove role
+        const { error } = await supabase.rpc("remove_user_role", {
+          _user_id: userId,
+          _role: role,
+        });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      await supabase.rpc("log_audit", {
-        p_action: "CHANGE_ROLE",
-        p_table_name: "user_roles",
-        p_record_id: userId,
-        p_new_data: { role: newRole } as any,
-      });
+        await supabase.rpc("log_audit", {
+          p_action: "REMOVE_ROLE",
+          p_table_name: "user_roles",
+          p_record_id: userId,
+          p_new_data: { role, action: "removed" } as any,
+        });
 
-      toast({
-        title: "Role atualizada",
-        description: `Usuário agora é ${newRole}`,
-      });
+        toast({
+          title: "Role removida",
+          description: `Role ${role} foi removida`,
+        });
+      } else {
+        // Add role
+        const { error } = await supabase.rpc("add_user_role", {
+          _user_id: userId,
+          _role: role,
+        });
+
+        if (error) throw error;
+
+        await supabase.rpc("log_audit", {
+          p_action: "ADD_ROLE",
+          p_table_name: "user_roles",
+          p_record_id: userId,
+          p_new_data: { role, action: "added" } as any,
+        });
+
+        toast({
+          title: "Role adicionada",
+          description: `Usuário agora também é ${role}`,
+        });
+      }
       
       fetchUsers();
     } catch (error: any) {
@@ -170,35 +195,35 @@ export const UsersManagement = () => {
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.phone || "-"}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={getRoleBadgeColor(user.role)}>
-                      {user.role}
-                    </Badge>
+                    <div className="flex gap-1 flex-wrap">
+                      {user.roles.map((role) => (
+                        <Badge key={role} variant="outline" className={getRoleBadgeColor(role)}>
+                          {role}
+                        </Badge>
+                      ))}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {new Date(user.created_at).toLocaleDateString("pt-BR")}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex gap-2 justify-end">
-                      {user.role !== "admin" && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => changeUserRole(user.id, "admin")}
-                          title="Tornar Admin"
-                        >
-                          <Shield className="w-4 h-4" />
-                        </Button>
-                      )}
-                      {user.role !== "fotografo" && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => changeUserRole(user.id, "fotografo")}
-                          title="Tornar Fotógrafo"
-                        >
-                          <UserCheck className="w-4 h-4" />
-                        </Button>
-                      )}
+                      <Button
+                        size="sm"
+                        variant={user.roles.includes("admin") ? "default" : "ghost"}
+                        onClick={() => toggleUserRole(user.id, "admin", user.roles)}
+                        title={user.roles.includes("admin") ? "Remover Admin" : "Adicionar Admin"}
+                      >
+                        <Shield className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={user.roles.includes("fotografo") ? "default" : "ghost"}
+                        onClick={() => toggleUserRole(user.id, "fotografo", user.roles)}
+                        title={user.roles.includes("fotografo") ? "Remover Fotógrafo" : "Adicionar Fotógrafo"}
+                      >
+                        <UserCheck className="w-4 h-4" />
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>

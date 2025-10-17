@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Upload, LogOut, Image as ImageIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { RoleSwitcher } from "@/components/RoleSwitcher";
 
 export default function Fotografo() {
   const { user } = useAuth();
@@ -75,10 +76,13 @@ export default function Fotografo() {
             <h1 className="text-2xl font-bold">Área do Fotógrafo</h1>
             <p className="text-sm text-muted-foreground">{user?.email}</p>
           </div>
-          <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Sair
-          </Button>
+          <div className="flex items-center gap-4">
+            <RoleSwitcher />
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Sair
+            </Button>
+          </div>
         </div>
       </header>
 

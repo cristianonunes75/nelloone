@@ -18,6 +18,7 @@ import { SystemSettings } from "@/components/admin/SystemSettings";
 import logo from "@/assets/logo.png";
 import { Shield } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { RoleSwitcher } from "@/components/RoleSwitcher";
 
 const AdminDashboard = () => (
   <div className="space-y-8">
@@ -59,9 +60,12 @@ const Admin = () => {
                 <span className="font-semibold">Admin Master</span>
               </div>
             </div>
-            <Button variant="outline" onClick={signOut}>
-              Sair
-            </Button>
+            <div className="flex items-center gap-4">
+              <RoleSwitcher />
+              <Button variant="outline" onClick={signOut}>
+                Sair
+              </Button>
+            </div>
           </header>
 
           <main className="flex-1 p-8 overflow-auto">

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { TestCard } from "@/components/cliente/TestCard";
 import { LockedTestCard } from "@/components/cliente/LockedTestCard";
 import { LogoText } from "@/components/LogoText";
+import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { LogOut, User } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
@@ -65,6 +66,7 @@ const Cliente = () => {
         <div className="container px-4 py-4 flex items-center justify-between">
           <LogoText className="text-2xl" variant="solid" />
           <div className="flex items-center gap-4">
+            <RoleSwitcher />
             <Button
               variant="ghost"
               size="sm"

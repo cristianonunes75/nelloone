@@ -9,6 +9,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   userRole: UserRole | null;
+  userRoles: UserRole[];
   isLoading: boolean;
   signOut: () => Promise<void>;
 }
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   userRole: null,
+  userRoles: [],
   isLoading: true,
   signOut: async () => {},
 });
@@ -25,6 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -35,7 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
 
-        // Fetch user role after state updates
+        // Fetch user roles after state updates
         if (session?.user) {
           setTimeout(async () => {
             try {
@@ -43,19 +46,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 .from("user_roles")
                 .select("role")
                 .eq("user_id", session.user.id)
-                .order("created_at", { ascending: true })
-                .limit(1)
-                .maybeSingle();
+                .order("created_at", { ascending: true });
 
               if (error) throw error;
-              setUserRole(data?.role as UserRole || "cliente");
+              
+              const roles = (data || []).map((r: any) => r.role as UserRole);
+              setUserRoles(roles);
+              
+              // Set primary role based on priority
+              const primaryRole = roles.find(r => r === "admin") || 
+                                 roles.find(r => r === "fotografo") || 
+                                 roles[0] || "cliente";
+              setUserRole(primaryRole);
             } catch (error) {
-              console.error("Error fetching user role:", error);
+              console.error("Error fetching user roles:", error);
+              setUserRoles(["cliente"]);
               setUserRole("cliente");
             }
           }, 0);
         } else {
           setUserRole(null);
+          setUserRoles([]);
         }
 
         setIsLoading(false);
@@ -74,14 +85,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .from("user_roles")
               .select("role")
               .eq("user_id", session.user.id)
-              .order("created_at", { ascending: true })
-              .limit(1)
-              .maybeSingle();
+              .order("created_at", { ascending: true });
 
             if (error) throw error;
-            setUserRole(data?.role as UserRole || "cliente");
+            
+            const roles = (data || []).map((r: any) => r.role as UserRole);
+            setUserRoles(roles);
+            
+            // Set primary role based on priority
+            const primaryRole = roles.find(r => r === "admin") || 
+                               roles.find(r => r === "fotografo") || 
+                               roles[0] || "cliente";
+            setUserRole(primaryRole);
           } catch (error) {
-            console.error("Error fetching user role:", error);
+            console.error("Error fetching user roles:", error);
+            setUserRoles(["cliente"]);
             setUserRole("cliente");
           }
           setIsLoading(false);
@@ -113,7 +131,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, userRole, isLoading, signOut }}>
+    <AuthContext.Provider value={{ user, session, userRole, userRoles, isLoading, signOut }}>
       {children}
     </AuthContext.Provider>
   );
