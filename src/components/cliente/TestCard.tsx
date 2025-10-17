@@ -4,6 +4,9 @@ import { Progress } from "@/components/ui/progress";
 import { Clock, CheckCircle, Play } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 type TestStatus = "not_started" | "in_progress" | "completed";
 
@@ -31,7 +34,25 @@ export const TestCard = ({
   onStart,
 }: TestCardProps) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const IconComponent = (Icons as any)[icon] || Icons.Circle;
+
+  // Get user test ID for this test
+  const { data: userTest } = useQuery({
+    queryKey: ["user-test-id", id, user?.id],
+    enabled: !!user && status !== "not_started",
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_tests")
+        .select("id")
+        .eq("test_id", id)
+        .eq("user_id", user!.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const statusConfig = {
     not_started: {
@@ -43,7 +64,7 @@ export const TestCard = ({
       button: {
         label: "Continuar",
         icon: Play,
-        action: () => navigate(`/cliente/teste/${id}`),
+        action: () => userTest && navigate(`/cliente/test-execution/${id}/${userTest.id}`),
       },
     },
     completed: {
@@ -51,7 +72,7 @@ export const TestCard = ({
       button: {
         label: "Ver resultado",
         icon: CheckCircle,
-        action: () => navigate(`/cliente/teste/${id}/resultado`),
+        action: () => userTest && navigate(`/cliente/test-results/${userTest.id}`),
       },
     },
   };

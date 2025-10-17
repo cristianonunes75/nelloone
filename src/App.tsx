@@ -9,6 +9,8 @@ import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Cliente from "./pages/Cliente";
 import ClientePerfil from "./pages/ClientePerfil";
+import TestExecution from "./pages/TestExecution";
+import TestResults from "./pages/TestResults";
 import Fotografo from "./pages/Fotografo";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
@@ -38,6 +40,22 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["cliente"]}>
                   <ClientePerfil />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cliente/test-execution/:testId/:userTestId"
+              element={
+                <ProtectedRoute allowedRoles={["cliente"]}>
+                  <TestExecution />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cliente/test-results/:userTestId"
+              element={
+                <ProtectedRoute allowedRoles={["cliente"]}>
+                  <TestResults />
                 </ProtectedRoute>
               }
             />
