@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-image.jpg";
+import logo from "@/assets/logo.png";
 
 export const Hero = () => {
   return (
@@ -17,14 +18,21 @@ export const Hero = () => {
       {/* Content */}
       <div className="container relative z-10 px-4 md:px-6 lg:px-8 py-24 md:py-32">
         <div className="max-w-3xl">
+          <div className="mb-8">
+            <img 
+              src={logo} 
+              alt="Essentia" 
+              className="h-16 md:h-20 w-auto"
+            />
+          </div>
+          
           <div className="mb-6 inline-block">
             <span className="text-gold text-sm font-medium tracking-wider uppercase">
               Mais que Imagem
             </span>
           </div>
           
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-primary-foreground mb-6 leading-tight">
-            Essentia é
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-6 leading-tight">
             <span className="block text-gold">Identidade Revelada</span>
           </h1>
           

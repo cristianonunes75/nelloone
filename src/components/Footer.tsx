@@ -1,3 +1,5 @@
+import logo from "@/assets/logo.png";
+
 export const Footer = () => {
   return (
     <footer className="bg-primary text-primary-foreground py-12">
@@ -5,7 +7,11 @@ export const Footer = () => {
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           {/* Brand */}
           <div>
-            <h3 className="text-2xl font-bold text-gold mb-4">Essentia</h3>
+            <img 
+              src={logo} 
+              alt="Essentia" 
+              className="h-10 w-auto mb-4 brightness-0 invert opacity-90"
+            />
             <p className="text-primary-foreground/80 leading-relaxed">
               Imagem com propósito.<br />
               Identidade revelada.<br />
