@@ -116,6 +116,15 @@ All colors MUST be HSL.
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
   }
+
+  /* Logo outline effect */
+  .-webkit-text-stroke\:1\.5px_currentColor {
+    -webkit-text-stroke: 1.5px currentColor;
+  }
+  
+  .-webkit-text-stroke\:2px_currentColor {
+    -webkit-text-stroke: 2px currentColor;
+  }
 }
 
 @layer utilities {

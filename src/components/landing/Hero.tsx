@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import logo from "@/assets/logo.png";
+import { LogoText } from "@/components/LogoText";
 import heroImage from "@/assets/hero-image.jpg";
 
 export const Hero = () => {
@@ -21,10 +21,9 @@ export const Hero = () => {
       {/* Content */}
       <div className="container relative z-10 px-6 py-24 md:py-32 text-center">
         <div className="max-w-4xl mx-auto">
-          <img 
-            src={logo} 
-            alt="Essentia" 
-            className="h-20 md:h-24 w-auto mx-auto mb-8 animate-fade-in"
+          <LogoText 
+            variant="outline" 
+            className="text-6xl md:text-8xl mb-8 animate-fade-in text-white"
           />
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight animate-fade-in">
