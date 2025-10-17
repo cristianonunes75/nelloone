@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
 export const useTestAccess = () => {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
 
   // Fetch test purchases for current user
   const { data: purchases } = useQuery({
@@ -25,6 +25,9 @@ export const useTestAccess = () => {
 
   // Check if user has access to a specific test
   const hasAccess = (testId: string, isFree: boolean) => {
+    // Admins have access to all tests
+    if (userRole === "admin") return true;
+    
     if (isFree) return true;
     return purchases?.some((p) => p.test_id === testId) || false;
   };
