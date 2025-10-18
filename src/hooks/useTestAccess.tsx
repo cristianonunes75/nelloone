@@ -32,5 +32,10 @@ export const useTestAccess = () => {
     return purchases?.some((p) => p.test_id === testId) || false;
   };
 
-  return { hasAccess, purchases };
+  // Check if user has purchased a test (ignoring admin role for freemium flow)
+  const hasPurchased = (testId: string) => {
+    return purchases?.some((p) => p.test_id === testId) || false;
+  };
+
+  return { hasAccess, hasPurchased, purchases };
 };

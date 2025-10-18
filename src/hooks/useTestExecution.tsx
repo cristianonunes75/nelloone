@@ -12,7 +12,7 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const { hasAccess } = useTestAccess();
+  const { hasPurchased } = useTestAccess();
 
   // Get test info to check if it's paid
   const { data: testInfo } = useQuery({
@@ -30,7 +30,7 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   });
 
   const isFreeTest = testInfo?.is_free || false;
-  const hasPaidAccess = hasAccess(testId, isFreeTest);
+  const hasPaidAccess = isFreeTest || hasPurchased(testId);
 
   // Fetch questions for this test
   const { data: allQuestions, isLoading: questionsLoading } = useQuery({
@@ -83,11 +83,16 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
 
       const { data, error } = await supabase
         .from("test_answers")
-        .upsert({
-          user_test_id: userTestId,
-          question_id: questionId,
-          answer,
-        })
+        .upsert(
+          {
+            user_test_id: userTestId,
+            question_id: questionId,
+            answer,
+          },
+          {
+            onConflict: "user_test_id,question_id",
+          }
+        )
         .select()
         .single();
 
