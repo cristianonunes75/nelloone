@@ -195,27 +195,31 @@ export default function TestExecution() {
   // Show welcome screen at the start
   if (showWelcome && currentQuestionIndex === 0) {
     return (
-      <div className="container mx-auto p-6 max-w-2xl">
-        <Card>
-          <CardHeader className="text-center space-y-6 py-12">
-            <CardTitle className="text-4xl font-light tracking-tight leading-tight">
+      <div className="container mx-auto p-6 max-w-3xl">
+        <Card className="border-none shadow-lg">
+          <CardHeader className="text-center space-y-8 py-16 px-8">
+            <CardTitle className="text-5xl font-light tracking-tight leading-tight text-foreground">
               Bem-vindo(a) ao Teste Essentia
             </CardTitle>
+            <div className="w-16 h-1 bg-gradient-to-r from-primary/20 via-primary to-primary/20 mx-auto rounded-full" />
           </CardHeader>
-          <CardContent className="space-y-8 pb-12">
-            <div className="space-y-6 text-center max-w-xl mx-auto">
-              <p className="text-lg leading-relaxed text-muted-foreground">
-                Este é um teste de autoconhecimento inspirado nos 12 arquétipos universais de Jung.
+          <CardContent className="space-y-10 pb-16 px-8">
+            <div className="space-y-8 text-center max-w-2xl mx-auto">
+              <p className="text-xl leading-relaxed text-muted-foreground font-light">
+                Descubra qual energia arquetípica guia sua presença e expressão.
               </p>
-              <p className="text-base leading-relaxed text-muted-foreground">
-                São perguntas rápidas e intuitivas. Escolha a opção que mais combina com você.
+              <p className="text-lg leading-relaxed text-muted-foreground/80">
+                Responda com o coração. Cada escolha revela um aspecto da sua essência.
+              </p>
+              <p className="text-base leading-relaxed text-muted-foreground/70">
+                São perguntas rápidas e intuitivas — confie na sua primeira resposta.
               </p>
             </div>
-            <div className="flex justify-center pt-4">
+            <div className="flex justify-center pt-6">
               <Button 
                 size="lg" 
                 onClick={() => setShowWelcome(false)}
-                className="min-w-[240px] h-12 text-base"
+                className="min-w-[280px] h-14 text-lg font-light tracking-wide"
               >
                 Começar o Teste
               </Button>
@@ -229,47 +233,53 @@ export default function TestExecution() {
   // Show upgrade card if completing free version
   if (showUpgradeDialog) {
     return (
-      <div className="container mx-auto p-6 max-w-2xl">
-        <Card>
-          <CardHeader className="text-center space-y-4 py-10">
-            <div className="text-5xl">🌿</div>
-            <CardTitle className="text-3xl font-light tracking-tight">
-              Resultado Parcial
-            </CardTitle>
+      <div className="container mx-auto p-6 max-w-3xl">
+        <Card className="border-none shadow-lg">
+          <CardHeader className="text-center space-y-6 py-14">
+            <div className="text-6xl">🌿</div>
+            <div>
+              <CardTitle className="text-4xl font-light tracking-tight mb-4">
+                Resultado Parcial
+              </CardTitle>
+              <p className="text-xl text-muted-foreground font-light">
+                Seu Campo de Presença
+              </p>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-8 pb-10">
-            <div className="space-y-6 text-center max-w-xl mx-auto">
+          <CardContent className="space-y-10 pb-12 px-8">
+            <div className="space-y-8 text-center max-w-2xl mx-auto">
               <p className="text-lg leading-relaxed text-muted-foreground">
-                Sua energia atual está se movendo fortemente em torno do arquétipo predominante,
-                revelando traços importantes da sua essência e o modo como você se expressa hoje no mundo.
+                Sua energia está se movendo principalmente em torno do arquétipo predominante,
+                revelando como você se manifesta <strong>hoje</strong> no mundo.
+              </p>
+              <p className="text-base leading-relaxed text-muted-foreground/80">
+                Isso mostra os seus comportamentos mais frequentes e como você inspira, protege e cria.
               </p>
             </div>
 
-            <div className="bg-primary/5 rounded-lg p-6 space-y-4">
-              <p className="text-center font-medium text-lg">
-                ✨ Deseja saber como esses arquétipos se manifestam em diferentes áreas da sua vida 
-                (pessoal, profissional e espiritual)?
+            <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-8 space-y-6 border border-primary/20">
+              <p className="text-center text-lg font-light">
+                ✨ Deseja descobrir o seu <strong>Arquétipo de Essência</strong> e o equilíbrio completo dos 12 arquétipos?
               </p>
-              <p className="text-center text-sm text-muted-foreground">
-                Desbloqueie o relatório completo e veja <strong>gráficos, percentuais e descrições 
-                aprofundadas</strong> dos 12 arquétipos.
+              <p className="text-center text-base text-muted-foreground">
+                Desbloqueie o relatório completo com <strong>gráficos, percentuais e leitura simbólica</strong> dos seus arquétipos em três dimensões da vida: pessoal, profissional e espiritual.
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 pt-4">
+            <div className="flex flex-col gap-4 pt-6 max-w-md mx-auto">
               <Button
                 onClick={() => {
                   setShowUpgradeDialog(false);
                 }}
                 size="lg"
-                className="w-full h-12"
+                className="w-full h-14 text-lg font-light"
               >
-                Desbloquear Relatório Completo
+                🔓 Desbloquear Relatório Completo
               </Button>
               <Button
-                variant="outline"
+                variant="ghost"
                 onClick={() => navigate(`/cliente/test-results/${userTestId}`)}
-                className="w-full"
+                className="w-full font-light"
               >
                 Ver Depois
               </Button>
@@ -293,74 +303,91 @@ export default function TestExecution() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-3xl">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between mb-4">
+    <div className="container mx-auto p-6 max-w-4xl">
+      <Card className="border-none shadow-lg">
+        <CardHeader className="pb-6">
+          <div className="flex items-center justify-between mb-6">
             <Button
               variant="ghost"
               onClick={() => navigate("/cliente")}
               size="sm"
+              className="font-light"
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Voltar
             </Button>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground font-light">
               Questão {currentQuestionIndex + 1} de {questions?.length}
               {!hasPaidAccess && !isFreeTest && (
-                <span className="ml-2 text-xs text-primary">
-                  (Versão gratuita: {questions?.length}/{totalQuestions})
+                <span className="ml-2 text-xs text-primary/80">
+                  (Versão gratuita)
                 </span>
               )}
             </div>
           </div>
-          <Progress value={progress} className="mb-4" />
-          <CardTitle className="text-2xl">{currentQuestion.question_text}</CardTitle>
-          <CardDescription>
+          <Progress value={progress} className="mb-6 h-2" />
+          <CardTitle className="text-3xl font-light tracking-tight leading-tight mb-3">
+            {currentQuestion.question_text}
+          </CardTitle>
+          <CardDescription className="text-base font-light">
             Responda com sua primeira intuição
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <RadioGroup value={selectedAnswer} onValueChange={handleAnswerChange}>
-              <div className="space-y-2">
-                {displayOptions?.map((option) => (
-                  <div
-                    key={option.value}
-                    className={`flex items-center justify-between border rounded-lg p-4 hover:bg-accent transition-colors cursor-pointer ${
-                      selectedAnswer === option.value ? 'bg-accent border-primary' : ''
-                    }`}
+        <CardContent className="space-y-6">
+          <RadioGroup value={selectedAnswer} onValueChange={handleAnswerChange}>
+            <div className="space-y-3">
+              {displayOptions?.map((option) => (
+                <div
+                  key={option.value}
+                  className={`group relative flex items-center border-2 rounded-xl p-5 transition-all duration-200 cursor-pointer ${
+                    selectedAnswer === option.value 
+                      ? 'bg-primary/5 border-primary shadow-md' 
+                      : 'border-border hover:border-primary/40 hover:bg-accent/50'
+                  }`}
+                  onClick={() => handleAnswerChange(option.value)}
+                >
+                  <Label
+                    htmlFor={option.value}
+                    className="flex-1 cursor-pointer font-light text-base leading-relaxed"
                   >
-                    <Label
-                      htmlFor={option.value}
-                      className="flex-1 cursor-pointer font-normal"
-                    >
-                      {option.label}
-                    </Label>
-                    <RadioGroupItem value={option.value} id={option.value} />
-                  </div>
-                ))}
-              </div>
-            </RadioGroup>
-          </div>
+                    {option.label}
+                  </Label>
+                  <RadioGroupItem 
+                    value={option.value} 
+                    id={option.value}
+                    className="shrink-0"
+                  />
+                </div>
+              ))}
+            </div>
+          </RadioGroup>
 
-          <div className="flex items-center justify-between mt-6 gap-4">
+          <div className="flex items-center justify-between pt-8 gap-4">
             <Button
               variant="outline"
               onClick={handlePrevious}
               disabled={isFirstQuestion}
+              className="min-w-[140px] font-light"
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Anterior
             </Button>
 
             {!isLastQuestion ? (
-              <Button onClick={handleNext} disabled={!selectedAnswer}>
+              <Button 
+                onClick={handleNext} 
+                disabled={!selectedAnswer}
+                className="min-w-[140px] font-light"
+              >
                 Próxima
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
-              <Button onClick={handleComplete} disabled={!selectedAnswer}>
+              <Button 
+                onClick={handleComplete} 
+                disabled={!selectedAnswer}
+                className="min-w-[160px] font-light"
+              >
                 Concluir Teste
                 <CheckCircle className="ml-2 h-4 w-4" />
               </Button>

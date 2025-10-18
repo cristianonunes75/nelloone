@@ -186,16 +186,40 @@ export interface ArchetypeScore {
   score: number;
 }
 
+// Mapeamento de respostas para arquétipos baseado no JSON fornecido
+const ANSWER_TO_ARCHETYPE: Record<string, string[]> = {
+  "Governante": ["1A","2B","3E","4C","5E","6E","7D","8B","9E","10A","11D","12E","14E","15D","16E","17E","18E","20B","21C","22A","23D","24B","25B","26A","27D","28C","29E","30B","31E","32D","33C","34D","35C","36D"],
+  "Herói": ["1A","2B","3E","4D","6E","7D","8B","9E","10A","11D","12B","14E","15D","16E","17E","18E","19B","21C","22E","23D","24C","25B","26A","27B","28C","29E","31E","32D","33C","34D","35C","36D"],
+  "Criador": ["1B","2C","3B","4B","5B","6D","7E","8C","9B","10C","11B","12B","13E","14C","15C","16C","17C","18C","19B","21A","22B","23E","24A","25A","26E","27A","28A","29D","30D","31B","34D","35D","36D"],
+  "Mago": ["1B","2C","3B","4B","5B","6D","8D","9B","10E","12A","13D","14A","15C","16C","17C","18C","19B","21A","22B","23E","24A","25A","26E","27B","28A","29A","30A","31B","32B","33A","34A","35D","36A"],
+  "Inocente": ["1C","2A","3C","4E","5A","6C","7E","8D","9D","10E","11E","12A","13D","14A","15D","16D","17A","18D","20A","21E","23B","24D","26D","27C","29A","30A","31C","32B","33A","34A","35C","36A"],
+  "Realista": ["1C","2A","3A","4C","5C","6B","7C","8E","9E","10D","11C","12E","14B","15B","16D","17B","18E","20B","21D","22E","23A","24B","25C","26D","27D","28D","29B","30E","31D","32C","33B","34B","35B","36B"],
+  "Cuidador": ["1D","2D","3E","4A","5D","6A","7B","8A","9C","10B","11B","12C","13A","14D","15A","16A","17A","18A","19A","20C","21B","22A","23E","24C","25D","26C","27E","28B","29C","30C","31A","32A","33D","35A","36C"],
+  "Amante": ["1D","2D","3D","4A","5D","6A","7B","8A","9C","10B","11B","12C","13A","14D","15A","16A","17A","18A","19A","20C","21B","22A","23E","24C","25D","26C","27E","28B","29C","30C","31A","32A","33D","35A","36C"],
+  "Explorador": ["1E","2E","3B","4D","5B","7A","8E","9A","10C","11A","12D","13B","14E","15E","16B","17D","18B","19E","20D","21A","22D","23C","24E","25E","26B","27C","28E","29D","30E","31C","32E","33E","34E","35E","36E"],
+  "Rebelde": ["1E","2E","3B","4D","5B","7A","8C","9A","10C","11A","12D","13B","14E","15E","16B","17D","18B","19E","20D","21A","22D","23C","24E","25E","26B","27C","28E","29D","30E","31C","32E","33E","34E","35E","36E"],
+  "Sábio": ["2C","3A","4E","5A","6B","7C","8E","9D","10D","11C","12E","13E","14B","15B","16D","17B","18D","19D","20E","21D","22C","23A","24D","25C","26D","27E","28D","29B","30B","31D","32C","33B","34B","35B","36B"],
+  "Comediante": ["2A","5C","6C","9C","10C","11E","19C"]
+};
+
 export function calculateArchetypeScores(answers: any[]): ArchetypeScore[] {
   const scores: Record<string, number> = {};
 
-  // Sum points for each archetype based on responses (1-3 scale)
+  // Initialize all archetypes with 0
+  Object.keys(ANSWER_TO_ARCHETYPE).forEach(archetype => {
+    scores[archetype] = 0;
+  });
+
+  // Count occurrences for each archetype based on answers
   answers.forEach((answer) => {
-    const selectedOption = answer.answer;
-    if (selectedOption && selectedOption.archetype) {
-      const archetype = selectedOption.archetype;
-      const points = parseInt(selectedOption.value || "0", 10);
-      scores[archetype] = (scores[archetype] || 0) + points;
+    const answerValue = answer.answer?.value || answer.answer;
+    if (answerValue) {
+      // Check which archetypes this answer contributes to
+      Object.entries(ANSWER_TO_ARCHETYPE).forEach(([archetype, answerKeys]) => {
+        if (answerKeys.includes(answerValue)) {
+          scores[archetype] = (scores[archetype] || 0) + 1;
+        }
+      });
     }
   });
 
