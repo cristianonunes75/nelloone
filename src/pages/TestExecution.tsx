@@ -178,7 +178,11 @@ export default function TestExecution() {
     );
   }
 
-  const options = currentQuestion.options as { value: string; label: string }[];
+  const options = currentQuestion.options as { value: string | number; text?: string; label?: string }[];
+  const displayOptions = options?.map(opt => ({
+    value: String(opt.value),
+    label: opt.text || opt.label || String(opt.value)
+  }));
 
   // Show welcome screen at the start
   if (showWelcome && currentQuestionIndex === 0) {
@@ -348,7 +352,7 @@ export default function TestExecution() {
             </p>
             <RadioGroup value={selectedAnswer} onValueChange={handleAnswerChange}>
               <div className="space-y-2">
-                {options?.map((option) => (
+                {displayOptions?.map((option) => (
                   <div
                     key={option.value}
                     className={`flex items-center justify-between border rounded-lg p-4 hover:bg-accent transition-colors cursor-pointer ${
