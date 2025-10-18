@@ -47,12 +47,17 @@ export const useTests = () => {
 
       const { data, error } = await supabase
         .from("user_tests")
-        .upsert({
-          user_id: user.id,
-          test_id: testId,
-          status: "in_progress",
-          started_at: new Date().toISOString(),
-        })
+        .upsert(
+          {
+            user_id: user.id,
+            test_id: testId,
+            status: "in_progress",
+            started_at: new Date().toISOString(),
+          },
+          {
+            onConflict: "user_id,test_id",
+          }
+        )
         .select()
         .single();
 
