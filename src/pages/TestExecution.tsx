@@ -196,17 +196,17 @@ export default function TestExecution() {
   if (showWelcome && currentQuestionIndex === 0) {
     return (
       <div className="container mx-auto p-6 max-w-3xl">
-        <Card className="border-none shadow-lg">
+        <Card className="border-none shadow-lg bg-card">
           <CardHeader className="text-center space-y-8 py-16 px-8">
             <CardTitle className="text-5xl font-light tracking-tight leading-tight text-foreground">
               Bem-vindo(a) ao Teste Essentia
             </CardTitle>
-            <div className="w-16 h-1 bg-gradient-to-r from-primary/20 via-primary to-primary/20 mx-auto rounded-full" />
+            <div className="w-16 h-1 bg-gradient-to-r from-accent/30 via-accent to-accent/30 mx-auto rounded-full" />
           </CardHeader>
           <CardContent className="space-y-10 pb-16 px-8">
             <div className="space-y-8 text-center max-w-2xl mx-auto">
               <p className="text-xl leading-relaxed text-muted-foreground font-light">
-                Descubra qual energia arquetípica guia sua presença e expressão.
+                Descubra qual energia arquetípica guia sua presença no mundo.
               </p>
               <p className="text-lg leading-relaxed text-muted-foreground/80">
                 Responda com o coração. Cada escolha revela um aspecto da sua essência.
@@ -219,7 +219,7 @@ export default function TestExecution() {
               <Button 
                 size="lg" 
                 onClick={() => setShowWelcome(false)}
-                className="min-w-[280px] h-14 text-lg font-light tracking-wide"
+                className="min-w-[280px] h-14 text-lg font-light tracking-wide bg-foreground text-background hover:bg-foreground/90"
               >
                 Começar o Teste
               </Button>
@@ -234,7 +234,7 @@ export default function TestExecution() {
   if (showUpgradeDialog) {
     return (
       <div className="container mx-auto p-6 max-w-3xl">
-        <Card className="border-none shadow-lg">
+        <Card className="border-none shadow-lg bg-card">
           <CardHeader className="text-center space-y-6 py-14">
             <div className="text-6xl">🌿</div>
             <div>
@@ -257,7 +257,7 @@ export default function TestExecution() {
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-8 space-y-6 border border-primary/20">
+            <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-xl p-8 space-y-6 border border-accent/30">
               <p className="text-center text-lg font-light">
                 ✨ Deseja descobrir o seu <strong>Arquétipo de Essência</strong> e o equilíbrio completo dos 12 arquétipos?
               </p>
@@ -266,23 +266,46 @@ export default function TestExecution() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-4 pt-6 max-w-md mx-auto">
-              <Button
-                onClick={() => {
-                  setShowUpgradeDialog(false);
-                }}
-                size="lg"
-                className="w-full h-14 text-lg font-light"
-              >
-                🔓 Desbloquear Relatório Completo
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => navigate(`/cliente/test-results/${userTestId}`)}
-                className="w-full font-light"
-              >
-                Ver Depois
-              </Button>
+            <div className="space-y-6 pt-6">
+              <div className="bg-gradient-to-br from-accent/5 to-transparent rounded-xl p-8 border border-accent/20">
+                <p className="text-center text-lg font-light mb-4">🌟 Seu resultado está só começando.</p>
+                <p className="text-center text-base text-muted-foreground mb-6">
+                  As próximas 24 perguntas revelam como seus arquétipos se expressam em 3 dimensões:
+                </p>
+                <ul className="space-y-2 text-sm text-muted-foreground max-w-md mx-auto">
+                  <li className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-accent" />
+                    Vida pessoal
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-accent" />
+                    Trabalho e missão
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-accent" />
+                    Espiritualidade e propósito
+                  </li>
+                </ul>
+              </div>
+
+              <div className="flex flex-col gap-4 max-w-md mx-auto">
+                <Button
+                  onClick={() => {
+                    setShowUpgradeDialog(false);
+                  }}
+                  size="lg"
+                  className="w-full h-14 text-lg font-light bg-foreground text-background hover:bg-foreground/90"
+                >
+                  🔓 Liberar Relatório Completo
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate(`/cliente/test-results/${userTestId}`)}
+                  className="w-full font-light"
+                >
+                  Ver Depois
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

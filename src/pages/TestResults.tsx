@@ -148,11 +148,17 @@ export default function TestResults() {
   const shouldShowFullResults = isFreeVersion || hasPurchased;
 
   // Calculate archetype scores if this is the archetypos test
-  let archetypeScores;
+  let archetypeScoresArray;
+  let archetypeScores: Record<string, number> = {};
   let dominantArchetypes;
   if (isArchetyposTest && answers && answers.length > 0) {
-    archetypeScores = calculateArchetypeScores(answers);
-    dominantArchetypes = getDominantArchetypes(archetypeScores);
+    archetypeScoresArray = calculateArchetypeScores(answers);
+    dominantArchetypes = getDominantArchetypes(archetypeScoresArray);
+    // Convert array to record for the graph component
+    archetypeScores = archetypeScoresArray.reduce((acc, { archetype, score }) => {
+      acc[archetype] = score;
+      return acc;
+    }, {} as Record<string, number>);
   }
 
   return (
@@ -221,6 +227,7 @@ export default function TestResults() {
             primaryScore={dominantArchetypes.primary.score}
             secondaryScore={dominantArchetypes.secondary?.score}
             tertiaryScore={dominantArchetypes.tertiary?.score}
+            allScores={archetypeScores}
           />
         ) : isArchetyposTest && !shouldShowFullResults ? (
           // Versão gratuita - mostrar apenas respostas com CTA de upgrade
