@@ -189,7 +189,7 @@ export interface ArchetypeScore {
 export function calculateArchetypeScores(answers: any[]): ArchetypeScore[] {
   const scores: Record<string, number> = {};
 
-  // Sum points for each archetype based on responses (0-4 scale)
+  // Sum points for each archetype based on responses (1-3 scale)
   answers.forEach((answer) => {
     const selectedOption = answer.answer;
     if (selectedOption && selectedOption.archetype) {

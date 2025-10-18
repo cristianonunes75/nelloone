@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { ChevronLeft, ChevronRight, CheckCircle, Lock } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -68,9 +68,13 @@ export default function TestExecution() {
 
   const handleNext = () => {
     if (currentQuestion && selectedAnswer) {
+      // Find the complete option object
+      const selectedOption = displayOptions?.find(opt => opt.value === selectedAnswer);
+      const fullOption = options?.find(opt => String(opt.value) === selectedAnswer);
+      
       saveAnswer({
         questionId: currentQuestion.id,
-        answer: { value: selectedAnswer },
+        answer: fullOption || { value: selectedAnswer },
       });
     }
     nextQuestion();
@@ -78,9 +82,11 @@ export default function TestExecution() {
 
   const handlePrevious = () => {
     if (currentQuestion && selectedAnswer) {
+      const fullOption = options?.find(opt => String(opt.value) === selectedAnswer);
+      
       saveAnswer({
         questionId: currentQuestion.id,
-        answer: { value: selectedAnswer },
+        answer: fullOption || { value: selectedAnswer },
       });
     }
     previousQuestion();
@@ -88,9 +94,11 @@ export default function TestExecution() {
 
   const handleComplete = async () => {
     if (currentQuestion && selectedAnswer) {
+      const fullOption = options?.find(opt => String(opt.value) === selectedAnswer);
+      
       saveAnswer({
         questionId: currentQuestion.id,
-        answer: { value: selectedAnswer },
+        answer: fullOption || { value: selectedAnswer },
       });
     }
 
@@ -191,15 +199,13 @@ export default function TestExecution() {
         <Card className="border-2 border-accent">
           <CardHeader className="text-center space-y-4">
             <div className="text-6xl">🧭</div>
-            <CardTitle className="text-3xl">Bem-vindo ao Teste dos Arquétipos!</CardTitle>
+            <CardTitle className="text-3xl">Descubra qual energia arquetípica guia sua presença e expressão.</CardTitle>
             <CardDescription className="text-lg space-y-4">
               <p>
-                Descubra quais arquétipos influenciam sua imagem, decisões e comunicação.
-                Uma jornada de autoconhecimento baseada nos 12 arquétipos universais.
+                Responda intuitivamente, sem pensar demais — confie na sua primeira sensação.
               </p>
               <p className="font-medium text-foreground">
-                Responda 12 perguntas e receba uma prévia do seu perfil. Ao final, você poderá
-                desbloquear o resultado completo com 36 perguntas e análise aprofundada.
+                São perguntas rápidas que revelam o que você transmite ao mundo.
               </p>
             </CardDescription>
           </CardHeader>
@@ -226,7 +232,7 @@ export default function TestExecution() {
               className="w-full"
               size="lg"
             >
-              Começar Teste Gratuito
+              Começar o Teste
             </Button>
           </CardContent>
         </Card>
@@ -240,42 +246,40 @@ export default function TestExecution() {
       <div className="container mx-auto p-6 max-w-3xl">
         <Card className="border-2 border-primary">
           <CardHeader className="text-center">
-            <Lock className="h-16 w-16 mx-auto mb-4 text-primary" />
+            <div className="text-6xl mb-4">✨</div>
             <CardTitle className="text-3xl mb-2">
-              Parabéns! Você completou as 12 perguntas gratuitas
+              Seu resultado está quase completo.
             </CardTitle>
-            <CardDescription className="text-lg">
-              Seu padrão de respostas já revela traços do seu arquétipo. Desbloqueie o
-              diagnóstico completo com mais 24 perguntas aprofundadas.
+            <CardDescription className="text-lg space-y-3">
+              <p>
+                12 respostas já revelaram muito sobre você — mas as próximas 24 trarão clareza sobre quem você realmente é.
+              </p>
+              <p>
+                O relatório completo mostra como sua energia muda em diferentes contextos (vida, trabalho e espiritualidade).
+              </p>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="bg-accent/10 rounded-lg p-6">
-              <h3 className="font-semibold text-xl mb-4">
-                O que você ganha no diagnóstico completo:
+              <h3 className="font-semibold text-xl mb-4 text-center">
+                🌟 Desbloqueie sua leitura completa e veja o arquétipo que conduz sua essência.
               </h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-2">
                   <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Arquétipo dominante com descrição detalhada</span>
+                  <span>Seus 3 arquétipos dominantes com descrição detalhada</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Arquétipo secundário e como ele se manifesta</span>
+                  <span>Como sua energia se manifesta em diferentes contextos</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Arquétipo oculto (ponto cego ou bloqueado)</span>
+                  <span>Análise aprofundada de comunicação e propósito</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span>
-                    Análise de comunicação, liderança e comportamento em crises
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Recomendações personalizadas para sessão fotográfica</span>
+                  <span>Recomendações personalizadas para imagem e sessão fotográfica</span>
                 </li>
               </ul>
             </div>
@@ -286,7 +290,7 @@ export default function TestExecution() {
                 onClick={() => navigate(`/cliente/test-results/${userTestId}`)}
                 className="flex-1"
               >
-                Ver Resultado Parcial
+                Ver Prévia do Resultado
               </Button>
               <Button
                 onClick={() => {
@@ -296,7 +300,7 @@ export default function TestExecution() {
                 className="flex-1"
                 size="lg"
               >
-                Desbloquear Diagnóstico Completo (R$ 29,00)
+                Desbloquear Resultado Completo - R$ 29,00
               </Button>
             </div>
           </CardContent>
@@ -342,14 +346,11 @@ export default function TestExecution() {
           <Progress value={progress} className="mb-4" />
           <CardTitle className="text-2xl">{currentQuestion.question_text}</CardTitle>
           <CardDescription>
-            Selecione a opção que melhor se aplica a você
+            Responda com sua primeira intuição
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground text-center mb-4">
-              Avalie seu nível de concordância (0 = Discordo totalmente, 4 = Concordo totalmente)
-            </p>
             <RadioGroup value={selectedAnswer} onValueChange={handleAnswerChange}>
               <div className="space-y-2">
                 {displayOptions?.map((option) => (
