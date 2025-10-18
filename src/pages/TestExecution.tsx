@@ -195,45 +195,31 @@ export default function TestExecution() {
   // Show welcome screen at the start
   if (showWelcome && currentQuestionIndex === 0) {
     return (
-      <div className="container mx-auto p-6 max-w-3xl">
-        <Card className="border-2 border-accent">
-          <CardHeader className="text-center space-y-4">
-            <div className="text-6xl">🧭</div>
-            <CardTitle className="text-3xl">Descubra qual energia arquetípica guia sua presença e expressão.</CardTitle>
-            <CardDescription className="text-lg space-y-4">
-              <p>
-                Responda intuitivamente, sem pensar demais — confie na sua primeira sensação.
-              </p>
-              <p className="font-medium text-foreground">
-                São perguntas rápidas que revelam o que você transmite ao mundo.
-              </p>
-            </CardDescription>
+      <div className="container mx-auto p-6 max-w-2xl">
+        <Card>
+          <CardHeader className="text-center space-y-6 py-12">
+            <CardTitle className="text-4xl font-light tracking-tight leading-tight">
+              Bem-vindo(a) ao Teste Essentia
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="bg-accent/10 rounded-lg p-6">
-              <h3 className="font-semibold text-xl mb-3">O que você vai descobrir:</h3>
-              <ul className="space-y-2 text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                  <span>Seus arquétipos dominantes e como eles se manifestam</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                  <span>Como sua essência influencia suas decisões e comunicação</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                  <span>Recomendações personalizadas para imagem e propósito</span>
-                </li>
-              </ul>
+          <CardContent className="space-y-8 pb-12">
+            <div className="space-y-6 text-center max-w-xl mx-auto">
+              <p className="text-lg leading-relaxed text-muted-foreground">
+                Este é um teste de autoconhecimento inspirado nos 12 arquétipos universais de Jung.
+              </p>
+              <p className="text-base leading-relaxed text-muted-foreground">
+                São perguntas rápidas e intuitivas. Escolha a opção que mais combina com você.
+              </p>
             </div>
-            <Button 
-              onClick={() => setShowWelcome(false)} 
-              className="w-full"
-              size="lg"
-            >
-              Começar o Teste
-            </Button>
+            <div className="flex justify-center pt-4">
+              <Button 
+                size="lg" 
+                onClick={() => setShowWelcome(false)}
+                className="min-w-[240px] h-12 text-base"
+              >
+                Começar o Teste
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -243,64 +229,49 @@ export default function TestExecution() {
   // Show upgrade card if completing free version
   if (showUpgradeDialog) {
     return (
-      <div className="container mx-auto p-6 max-w-3xl">
-        <Card className="border-2 border-primary">
-          <CardHeader className="text-center">
-            <div className="text-6xl mb-4">✨</div>
-            <CardTitle className="text-3xl mb-2">
-              Seu resultado está quase completo.
+      <div className="container mx-auto p-6 max-w-2xl">
+        <Card>
+          <CardHeader className="text-center space-y-4 py-10">
+            <div className="text-5xl">🌿</div>
+            <CardTitle className="text-3xl font-light tracking-tight">
+              Resultado Parcial
             </CardTitle>
-            <CardDescription className="text-lg space-y-3">
-              <p>
-                12 respostas já revelaram muito sobre você — mas as próximas 24 trarão clareza sobre quem você realmente é.
-              </p>
-              <p>
-                O relatório completo mostra como sua energia muda em diferentes contextos (vida, trabalho e espiritualidade).
-              </p>
-            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="bg-accent/10 rounded-lg p-6">
-              <h3 className="font-semibold text-xl mb-4 text-center">
-                🌟 Desbloqueie sua leitura completa e veja o arquétipo que conduz sua essência.
-              </h3>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Seus 3 arquétipos dominantes com descrição detalhada</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Como sua energia se manifesta em diferentes contextos</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Análise aprofundada de comunicação e propósito</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Recomendações personalizadas para imagem e sessão fotográfica</span>
-                </li>
-              </ul>
+          <CardContent className="space-y-8 pb-10">
+            <div className="space-y-6 text-center max-w-xl mx-auto">
+              <p className="text-lg leading-relaxed text-muted-foreground">
+                Sua energia atual está se movendo fortemente em torno do arquétipo predominante,
+                revelando traços importantes da sua essência e o modo como você se expressa hoje no mundo.
+              </p>
             </div>
 
-            <div className="flex gap-4">
-              <Button
-                variant="outline"
-                onClick={() => navigate(`/cliente/test-results/${userTestId}`)}
-                className="flex-1"
-              >
-                Ver Prévia do Resultado
-              </Button>
+            <div className="bg-primary/5 rounded-lg p-6 space-y-4">
+              <p className="text-center font-medium text-lg">
+                ✨ Deseja saber como esses arquétipos se manifestam em diferentes áreas da sua vida 
+                (pessoal, profissional e espiritual)?
+              </p>
+              <p className="text-center text-sm text-muted-foreground">
+                Desbloqueie o relatório completo e veja <strong>gráficos, percentuais e descrições 
+                aprofundadas</strong> dos 12 arquétipos.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 pt-4">
               <Button
                 onClick={() => {
                   setShowUpgradeDialog(false);
-                  // The purchase dialog will open automatically based on the state below
                 }}
-                className="flex-1"
                 size="lg"
+                className="w-full h-12"
               >
-                Desbloquear Resultado Completo - R$ 29,00
+                Desbloquear Relatório Completo
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigate(`/cliente/test-results/${userTestId}`)}
+                className="w-full"
+              >
+                Ver Depois
               </Button>
             </div>
           </CardContent>

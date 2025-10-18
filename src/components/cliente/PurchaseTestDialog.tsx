@@ -71,83 +71,41 @@ export const PurchaseTestDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Desbloquear {testName}</DialogTitle>
-          <DialogDescription>
-            Escolha como deseja pagar para ter acesso imediato ao teste.
+          <DialogTitle className="text-2xl font-light">
+            Seu resultado está quase completo
+          </DialogTitle>
+          <DialogDescription className="text-base pt-2 space-y-3">
+            <p>
+              12 respostas já revelaram muito sobre você — mas as próximas 24 trarão 
+              clareza sobre quem você realmente é.
+            </p>
+            <p>
+              O relatório completo mostra como sua energia muda em diferentes contextos 
+              (vida, trabalho e espiritualidade).
+            </p>
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <div className="bg-accent/10 border border-border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-medium">Teste Individual</span>
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="font-medium">Relatório Completo</span>
               <span className="text-2xl font-bold text-primary">
                 R$ {price.toFixed(2)}
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Acesso vitalício ao teste {testName}
+              🌟 Desbloqueie sua leitura completa e veja o arquétipo que conduz sua essência
             </p>
           </div>
 
           <Button onClick={handlePurchase} className="w-full" size="lg">
             <CreditCard className="w-4 h-4 mr-2" />
-            Pagar Agora
+            Desbloquear Agora
           </Button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Ou escolha um combo
-              </span>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <div className="bg-gold/10 border border-gold/20 rounded-lg p-3">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium">Combo 3 Testes</span>
-                <span className="text-lg font-bold text-gold">R$ 59,00</span>
-              </div>
-              <p className="text-xs text-muted-foreground mb-2">
-                Economize R$ 28,00 • Escolha 3 testes à sua escolha
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full border-gold/30 hover:bg-gold/10"
-                onClick={handlePurchase}
-              >
-                <ShoppingCart className="w-3 h-3 mr-2" />
-                Comprar Combo
-              </Button>
-            </div>
-
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium">Plano Premium</span>
-                <span className="text-lg font-bold text-primary">R$ 950,00</span>
-              </div>
-              <p className="text-xs text-muted-foreground mb-2">
-                Todos os testes + sessão fotográfica + consultoria completa
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full border-primary/30 hover:bg-primary/10"
-                onClick={handlePurchase}
-              >
-                <ShoppingCart className="w-3 h-3 mr-2" />
-                Comprar Premium
-              </Button>
-            </div>
-          </div>
         </div>
 
-        <div className="text-xs text-center text-muted-foreground">
+        <div className="text-xs text-center text-muted-foreground space-y-1">
           <p>✅ Acesso imediato após pagamento</p>
           <p>✅ Nota fiscal gerada automaticamente</p>
         </div>
