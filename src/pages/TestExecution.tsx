@@ -10,7 +10,8 @@ import { useState, useEffect } from "react";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { calculateArchetypeScores, getDominantArchetypes } from "@/lib/archetypes";
+import { calculateArchetypeScores, getDominantArchetypes, ARCHETYPES } from "@/lib/archetypes";
+import { Badge } from "@/components/ui/badge";
 
 export default function TestExecution() {
   const { testId, userTestId } = useParams();
@@ -19,6 +20,11 @@ export default function TestExecution() {
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [partialArchetypes, setPartialArchetypes] = useState<{
+    primary: { archetype: string; score: number };
+    secondary?: { archetype: string; score: number };
+    tertiary?: { archetype: string; score: number };
+  } | null>(null);
 
   const {
     questions,
@@ -114,6 +120,9 @@ export default function TestExecution() {
         // Calculate archetype scores from the 12 questions
         const scores = calculateArchetypeScores(allAnswers);
         const dominantArchetypes = getDominantArchetypes(scores);
+
+        // Store for display in upgrade dialog
+        setPartialArchetypes(dominantArchetypes);
 
         // Save partial results as JSON
         await supabase
@@ -231,7 +240,7 @@ export default function TestExecution() {
   }
 
   // Show upgrade card if completing free version
-  if (showUpgradeDialog) {
+  if (showUpgradeDialog && partialArchetypes) {
     return (
       <div className="container mx-auto p-6 max-w-3xl">
         <Card className="border-none shadow-lg bg-card">
@@ -249,13 +258,79 @@ export default function TestExecution() {
           <CardContent className="space-y-10 pb-12 px-8">
             <div className="space-y-8 text-center max-w-2xl mx-auto">
               <p className="text-lg leading-relaxed text-muted-foreground">
-                Sua energia está se movendo principalmente em torno do arquétipo predominante,
+                Sua energia está se movendo principalmente em torno dos arquétipos abaixo,
                 revelando como você se manifesta <strong>hoje</strong> no mundo.
               </p>
               <p className="text-base leading-relaxed text-muted-foreground/80">
                 Isso mostra os seus comportamentos mais frequentes e como você inspira, protege e cria.
               </p>
             </div>
+
+            {/* Top 3 Arquétipos */}
+            <Card className="border-2 border-accent">
+              <CardHeader className="bg-gradient-to-r from-accent/10 to-accent/5">
+                <CardTitle className="text-xl font-light flex items-center gap-2">
+                  <span className="text-3xl">{ARCHETYPES[partialArchetypes.primary.archetype]?.emoji}</span>
+                  Seus 3 Arquétipos Predominantes
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-6">
+                {/* Arquétipo Principal */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{ARCHETYPES[partialArchetypes.primary.archetype]?.emoji}</span>
+                      <div>
+                        <h3 className="font-semibold text-lg">{ARCHETYPES[partialArchetypes.primary.archetype]?.name}</h3>
+                        <p className="text-sm text-muted-foreground">Arquétipo Principal</p>
+                      </div>
+                    </div>
+                    <Badge variant="default" className="bg-accent text-accent-foreground">
+                      {partialArchetypes.primary.score} pontos
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground pl-12">
+                    {ARCHETYPES[partialArchetypes.primary.archetype]?.description}
+                  </p>
+                </div>
+
+                {/* Arquétipo Secundário */}
+                {partialArchetypes.secondary && (
+                  <div className="space-y-2 border-t pt-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{ARCHETYPES[partialArchetypes.secondary.archetype]?.emoji}</span>
+                        <div>
+                          <h3 className="font-medium">{ARCHETYPES[partialArchetypes.secondary.archetype]?.name}</h3>
+                          <p className="text-xs text-muted-foreground">Arquétipo Secundário</p>
+                        </div>
+                      </div>
+                      <Badge variant="secondary">
+                        {partialArchetypes.secondary.score} pontos
+                      </Badge>
+                    </div>
+                  </div>
+                )}
+
+                {/* Arquétipo Terciário */}
+                {partialArchetypes.tertiary && (
+                  <div className="space-y-2 border-t pt-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl">{ARCHETYPES[partialArchetypes.tertiary.archetype]?.emoji}</span>
+                        <div>
+                          <h3 className="font-medium">{ARCHETYPES[partialArchetypes.tertiary.archetype]?.name}</h3>
+                          <p className="text-xs text-muted-foreground">Arquétipo Terciário</p>
+                        </div>
+                      </div>
+                      <Badge variant="outline">
+                        {partialArchetypes.tertiary.score} pontos
+                      </Badge>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
             <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-xl p-8 space-y-6 border border-accent/30">
               <p className="text-center text-lg font-light">

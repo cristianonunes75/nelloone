@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Download, Calendar, CheckCircle, Lock, RotateCcw } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ARCHETYPES } from "@/lib/archetypes";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef, useState } from "react";
@@ -229,44 +231,99 @@ export default function TestResults() {
             tertiaryScore={dominantArchetypes.tertiary?.score}
             allScores={archetypeScores}
           />
-        ) : isArchetyposTest && !shouldShowFullResults ? (
-          // Versão gratuita - mostrar apenas respostas com CTA de upgrade
+        ) : isArchetyposTest && !shouldShowFullResults && dominantArchetypes ? (
+          // Versão gratuita - mostrar resultado parcial com top 3 arquétipos
           <>
-            <Card>
-              <CardHeader>
-                <CardTitle>Suas Respostas</CardTitle>
-                <CardDescription>
-                  Padrão de escolhas revelado pelo teste
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {answers?.map((answer, index) => (
-                    <div key={answer.id} className="border-b pb-4 last:border-b-0">
-                      <p className="font-medium mb-2">
-                        {index + 1}. {answer.test_questions?.question_text}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Resposta: {(answer.answer as any)?.text || "Não respondida"}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+            <Card className="border-none bg-gradient-to-br from-accent/10 to-accent/5">
+              <CardContent className="pt-12 pb-10 text-center">
+                <div className="text-5xl mb-4">🌿</div>
+                <h2 className="text-3xl font-light tracking-tight mb-3">Resultado Parcial</h2>
+                <p className="text-xl text-muted-foreground font-light">Seu Campo de Presença</p>
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-primary/10">
-              <CardContent className="pt-6 text-center space-y-4">
-                <Lock className="h-12 w-12 mx-auto text-primary" />
-                <h3 className="text-2xl font-bold">Descubra Seu Arquétipo Dominante</h3>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Seu padrão de escolhas revela traços marcantes do seu arquétipo. 
-                  Para descobrir seu arquétipo dominante e desbloquear sua essência 
-                  visual e emocional completa, ative o acesso Essentia Full.
-                </p>
+            {/* Top 3 Arquétipos */}
+            <Card className="border-2 border-accent">
+              <CardHeader className="bg-gradient-to-r from-accent/10 to-accent/5">
+                <CardTitle className="text-xl font-light flex items-center gap-2">
+                  <span className="text-3xl">{ARCHETYPES[dominantArchetypes.primary.archetype]?.emoji}</span>
+                  Seus 3 Arquétipos Predominantes
+                </CardTitle>
+                <CardDescription>
+                  Sua energia está se movendo principalmente em torno desses arquétipos
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-6">
+                {/* Arquétipo Principal */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{ARCHETYPES[dominantArchetypes.primary.archetype]?.emoji}</span>
+                      <div>
+                        <h3 className="font-semibold text-lg">{ARCHETYPES[dominantArchetypes.primary.archetype]?.name}</h3>
+                        <p className="text-sm text-muted-foreground">Arquétipo Principal</p>
+                      </div>
+                    </div>
+                    <Badge variant="default" className="bg-accent text-accent-foreground">
+                      {dominantArchetypes.primary.score} pontos
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground pl-12">
+                    {ARCHETYPES[dominantArchetypes.primary.archetype]?.description}
+                  </p>
+                </div>
+
+                {/* Arquétipo Secundário */}
+                {dominantArchetypes.secondary && (
+                  <div className="space-y-2 border-t pt-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{ARCHETYPES[dominantArchetypes.secondary.archetype]?.emoji}</span>
+                        <div>
+                          <h3 className="font-medium">{ARCHETYPES[dominantArchetypes.secondary.archetype]?.name}</h3>
+                          <p className="text-xs text-muted-foreground">Arquétipo Secundário</p>
+                        </div>
+                      </div>
+                      <Badge variant="secondary">
+                        {dominantArchetypes.secondary.score} pontos
+                      </Badge>
+                    </div>
+                  </div>
+                )}
+
+                {/* Arquétipo Terciário */}
+                {dominantArchetypes.tertiary && (
+                  <div className="space-y-2 border-t pt-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl">{ARCHETYPES[dominantArchetypes.tertiary.archetype]?.emoji}</span>
+                        <div>
+                          <h3 className="font-medium">{ARCHETYPES[dominantArchetypes.tertiary.archetype]?.name}</h3>
+                          <p className="text-xs text-muted-foreground">Arquétipo Terciário</p>
+                        </div>
+                      </div>
+                      <Badge variant="outline">
+                        {dominantArchetypes.tertiary.score} pontos
+                      </Badge>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* CTA para upgrade */}
+            <Card className="border-2 border-accent bg-gradient-to-br from-accent/10 to-accent/5">
+              <CardContent className="pt-8 pb-8 text-center space-y-6">
+                <Lock className="h-12 w-12 mx-auto text-accent" />
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-light">✨ Deseja descobrir o seu <strong>Arquétipo de Essência</strong>?</h3>
+                  <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                    Desbloqueie o relatório completo com <strong>gráficos, percentuais e leitura simbólica</strong> dos seus arquétipos em três dimensões da vida: pessoal, profissional e espiritual.
+                  </p>
+                </div>
                 <div className="pt-4">
-                  <Button size="lg" onClick={() => setPurchaseDialogOpen(true)}>
-                    Desbloquear Meu Arquétipo
+                  <Button size="lg" onClick={() => setPurchaseDialogOpen(true)} className="min-w-[280px]">
+                    🔓 Liberar Relatório Completo
                   </Button>
                   <PurchaseTestDialog
                     open={purchaseDialogOpen}
