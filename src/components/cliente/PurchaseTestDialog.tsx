@@ -40,12 +40,10 @@ export const PurchaseTestDialog = ({
         return;
       }
 
-      // Create checkout session
+      // Create checkout session (price is validated server-side)
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: {
           testId,
-          testName,
-          price,
           userId: user.id,
           userEmail: user.email,
         },

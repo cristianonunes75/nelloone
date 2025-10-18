@@ -13,11 +13,12 @@ const corsHeaders = {
 
 interface CheckoutRequest {
   testId: string;
-  testName: string;
-  price: number;
   userId: string;
   userEmail: string;
 }
+
+const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -26,17 +27,45 @@ serve(async (req) => {
   }
 
   try {
-    const { testId, testName, price, userId, userEmail }: CheckoutRequest =
-      await req.json();
+    const { testId, userId, userEmail }: CheckoutRequest = await req.json();
 
     console.log("Creating checkout session for:", {
       testId,
-      testName,
-      price,
       userId,
     });
 
-    // Create Stripe checkout session
+    // Import Supabase client for server-side validation
+    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.39.3");
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Fetch actual test price from database (server-side validation)
+    const { data: test, error: testError } = await supabase
+      .from("tests")
+      .select("name, price_brl")
+      .eq("id", testId)
+      .single();
+
+    if (testError || !test) {
+      console.error("Test not found:", testId);
+      return new Response(
+        JSON.stringify({ error: "Test not found" }),
+        {
+          status: 404,
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders,
+          },
+        }
+      );
+    }
+
+    console.log("Test validated:", {
+      testId,
+      testName: test.name,
+      price: test.price_brl,
+    });
+
+    // Create Stripe checkout session with validated price from database
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
@@ -44,10 +73,10 @@ serve(async (req) => {
           price_data: {
             currency: "brl",
             product_data: {
-              name: `Teste: ${testName}`,
-              description: `Acesso vitalício ao teste ${testName}`,
+              name: `Teste: ${test.name}`,
+              description: `Acesso vitalício ao teste ${test.name}`,
             },
-            unit_amount: Math.round(price * 100), // Convert to centavos
+            unit_amount: Math.round(parseFloat(test.price_brl) * 100), // Use DB price
           },
           quantity: 1,
         },

@@ -43,17 +43,60 @@ serve(async (req) => {
         return new Response("Missing metadata", { status: 400 });
       }
 
-      // Record the purchase
+      // Validate test exists and price matches
+      const { data: test, error: testError } = await supabase
+        .from("tests")
+        .select("id, price_brl")
+        .eq("id", testId)
+        .single();
+
+      if (testError || !test) {
+        console.error("Invalid test_id in webhook:", testId, testError);
+        return new Response("Invalid test", { status: 400 });
+      }
+
+      // Verify amount paid matches test price (allow small variance for fees)
+      const pricePaid = (session.amount_total || 0) / 100;
+      const expectedPrice = parseFloat(test.price_brl);
+      if (Math.abs(pricePaid - expectedPrice) > 1) {
+        console.error("Price mismatch:", { pricePaid, expectedPrice, testId });
+        return new Response("Price mismatch", { status: 400 });
+      }
+
+      // Check for duplicate purchase (idempotency)
+      const { data: existing } = await supabase
+        .from("test_purchases")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("test_id", testId)
+        .eq("payment_status", "completed")
+        .single();
+
+      if (existing) {
+        console.warn("Duplicate purchase attempt:", { userId, testId });
+        return new Response(JSON.stringify({ received: true, duplicate: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // Record the purchase with conflict resolution
       const { error: purchaseError } = await supabase
         .from("test_purchases")
-        .upsert({
-          user_id: userId,
-          test_id: testId,
-          price_paid: (session.amount_total || 0) / 100,
-          payment_status: "completed",
-          payment_method: "stripe",
-          transaction_id: session.payment_intent as string,
-        });
+        .upsert(
+          {
+            user_id: userId,
+            test_id: testId,
+            price_paid: pricePaid,
+            payment_status: "completed",
+            payment_method: "stripe",
+            transaction_id: session.payment_intent as string,
+          },
+          {
+            onConflict: "transaction_id",
+            ignoreDuplicates: true,
+          }
+        );
 
       if (purchaseError) {
         console.error("Error recording purchase:", purchaseError);
