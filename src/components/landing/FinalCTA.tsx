@@ -27,10 +27,13 @@ export const FinalCTA = () => {
             <Button 
               size="lg" 
               className="bg-gold hover:bg-gold-dark text-foreground font-semibold text-lg px-8 py-6"
-              onClick={() => navigate("/auth")}
+              onClick={() => {
+                const pricingSection = document.getElementById('planos');
+                pricingSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
             >
               <Sparkles className="w-5 h-5 mr-2" />
-              Começar Agora
+              Ver Planos e Comprar
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             
@@ -38,12 +41,9 @@ export const FinalCTA = () => {
               size="lg" 
               variant="outline"
               className="border-gold text-gold hover:bg-gold/10 font-semibold text-lg px-8 py-6"
-              onClick={() => {
-                const pricingSection = document.getElementById('planos');
-                pricingSection?.scrollIntoView({ behavior: 'smooth' });
-              }}
+              onClick={() => navigate("/auth")}
             >
-              Ver Planos e Preços
+              Entrar na Plataforma
             </Button>
           </div>
 

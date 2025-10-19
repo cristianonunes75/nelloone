@@ -40,6 +40,15 @@ export const LandingNav = () => {
             <Button
               variant="ghost"
               size="sm"
+              onClick={() => navigate("/influence")}
+              className="hidden lg:inline-flex text-xs"
+            >
+              Influence
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => navigate("/fotografo")}
               className="hidden md:inline-flex text-xs"
             >
