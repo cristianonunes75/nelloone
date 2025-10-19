@@ -9,30 +9,30 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Essentia Color Palette - Briefing colors */
-    --background: 40 28% 93%; /* #EAE4DC - bege claro */
-    --foreground: 0 0% 18%; /* #2F2F2F - cinza escuro */
+    --background: 40 29% 96%; /* #F7F4EF - bege-areia */
+    --foreground: 0 0% 17%; /* #2B2B2B - cinza escuro */
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 18%;
+    --card-foreground: 0 0% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 18%;
+    --popover-foreground: 0 0% 17%;
 
-    --primary: 0 0% 18%; /* #2F2F2F - cinza escuro */
+    --primary: 0 0% 12%; /* #1E1E1E - preto-grafite */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 0 0% 95%;
-    --secondary-foreground: 0 0% 18%;
+    --secondary-foreground: 0 0% 17%;
 
     --muted: 40 20% 90%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 39 48% 63%; /* #CDAE73 - dourado Essentia */
-    --accent-foreground: 0 0% 18%;
+    --accent: 43 61% 52%; /* #D4AF37 - dourado Essentia */
+    --accent-foreground: 0 0% 17%;
 
-    --gold: 39 48% 63%; /* #CDAE73 - cor principal Essentia */
-    --gold-light: 39 48% 73%;
-    --gold-dark: 39 48% 53%;
+    --gold: 43 61% 52%; /* #D4AF37 - cor principal Essentia */
+    --gold-light: 43 61% 62%;
+    --gold-dark: 43 61% 42%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;

@@ -204,37 +204,70 @@ export default function TestExecution() {
   // Show welcome screen at the start
   if (showWelcome && currentQuestionIndex === 0) {
     return (
-      <div className="container mx-auto p-6 max-w-3xl">
-        <Card className="border-none shadow-lg bg-card">
-          <CardHeader className="text-center space-y-8 py-16 px-8">
-            <CardTitle className="text-5xl font-light tracking-tight leading-tight text-foreground">
-              Bem-vindo(a) ao Teste Essentia
-            </CardTitle>
-            <div className="w-16 h-1 bg-gradient-to-r from-accent/30 via-accent to-accent/30 mx-auto rounded-full" />
-          </CardHeader>
-          <CardContent className="space-y-10 pb-16 px-8">
-            <div className="space-y-8 text-center max-w-2xl mx-auto">
-              <p className="text-xl leading-relaxed text-muted-foreground font-light">
-                Descubra qual energia arquetípica guia sua presença no mundo.
-              </p>
-              <p className="text-lg leading-relaxed text-muted-foreground/80">
-                Responda com o coração. Cada escolha revela um aspecto da sua essência.
-              </p>
-              <p className="text-base leading-relaxed text-muted-foreground/70">
-                São perguntas rápidas e intuitivas — confie na sua primeira resposta.
-              </p>
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="max-w-3xl w-full text-center space-y-8">
+          {/* Icon/Logo */}
+          <div className="flex justify-center mb-6">
+            <div className="text-6xl">✴️</div>
+          </div>
+
+          {/* Main Title */}
+          <div className="space-y-4">
+            <h1 className="text-5xl md:text-6xl font-light tracking-tight text-foreground">
+              Teste Essentia
+            </h1>
+            <p className="text-2xl md:text-3xl font-light text-foreground/80">
+              Arquétipos com Propósito
+            </p>
+          </div>
+
+          {/* Subtitle */}
+          <div className="max-w-2xl mx-auto space-y-3">
+            <p className="text-lg text-foreground/90 leading-relaxed">
+              Descubra qual energia arquetípica guia sua presença no mundo.
+            </p>
+            <p className="text-lg text-foreground/90 leading-relaxed">
+              Comece com 12 perguntas gratuitas e desbloqueie a leitura completa de 36.
+            </p>
+          </div>
+
+          {/* Description */}
+          <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Um teste profundo, intuitivo e visual que revela seu campo de presença — as forças simbólicas que inspiram suas decisões, relações e propósito.
+          </p>
+
+          {/* Info Tags */}
+          <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground py-6">
+            <div className="flex items-center gap-2">
+              <span>⏱️</span>
+              <span>15 minutos</span>
             </div>
-            <div className="flex justify-center pt-6">
-              <Button 
-                size="lg" 
-                onClick={() => setShowWelcome(false)}
-                className="min-w-[280px] h-14 text-lg font-light tracking-wide bg-foreground text-background hover:bg-foreground/90"
-              >
-                Começar o Teste
-              </Button>
+            <div className="flex items-center gap-2">
+              <span>📜</span>
+              <span>36 questões</span>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex items-center gap-2">
+              <span>🔓</span>
+              <span>Primeiras 12 gratuitas</span>
+            </div>
+          </div>
+
+          {/* CTA Button */}
+          <div className="pt-4">
+            <Button 
+              onClick={() => setShowWelcome(false)}
+              size="lg" 
+              className="text-lg px-12 py-7 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              ▶️ Começar Teste
+            </Button>
+          </div>
+
+          {/* Footer Note */}
+          <p className="text-xs text-muted-foreground max-w-xl mx-auto leading-relaxed pt-6">
+            O Teste Essentia oferece gratuitamente as 12 primeiras perguntas. Após o resultado parcial, você poderá desbloquear o relatório completo com 36 perguntas e leitura personalizada.
+          </p>
+        </div>
       </div>
     );
   }
