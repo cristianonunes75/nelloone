@@ -155,6 +155,54 @@ export default function ArchetypeResults({
           </div>
 
           <div className="border-t pt-6">
+            <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+              <span className="text-2xl">💪</span>
+              Pontos Fortes e Desafios
+            </h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
+                <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-3 flex items-center gap-2">
+                  <span>✓</span> Quando Alinhado
+                </h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Você manifesta {primaryData.characteristics[0]?.toLowerCase()} e {primaryData.characteristics[1]?.toLowerCase()}, 
+                  tornando-se uma fonte de inspiração e transformação para quem está ao seu redor.
+                </p>
+              </div>
+              <div className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20">
+                <h4 className="font-semibold text-amber-700 dark:text-amber-400 mb-3 flex items-center gap-2">
+                  <span>⚠</span> Quando em Excesso
+                </h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Pode tender ao desequilíbrio manifestando rigidez ou exagero em {primaryData.characteristics[2]?.toLowerCase()}, 
+                  necessitando reconexão com sua essência verdadeira.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t pt-6">
+            <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+              <span className="text-2xl">🎨</span>
+              Estilo Visual e Expressão
+            </h3>
+            <div className="space-y-3">
+              <div className="p-4 rounded-lg bg-muted/30">
+                <h4 className="font-medium mb-2">Paleta de Cores Sugerida</h4>
+                <p className="text-sm text-muted-foreground">
+                  {primaryData.colorPalette.join(", ")}
+                </p>
+              </div>
+              <div className="p-4 rounded-lg bg-muted/30">
+                <h4 className="font-medium mb-2">Estilo de Expressão</h4>
+                <p className="text-sm text-muted-foreground">
+                  {primaryData.visualStyle}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t pt-6">
             <div className="bg-[hsl(var(--accent))]/5 p-6 rounded-lg border border-[hsl(var(--accent))]/20">
               <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
                 <span className="text-2xl">💫</span>
@@ -275,13 +323,32 @@ export default function ArchetypeResults({
               <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--accent))]/10">
                 <span className="text-2xl">💛</span>
               </div>
-              <h3 className="font-semibold text-xl">Vida Pessoal</h3>
+              <h3 className="font-semibold text-xl">Vida Pessoal e Relações</h3>
             </div>
-            <p className="text-muted-foreground leading-relaxed pl-15">
-              Suas energias moldam suas relações e emoções através de {primaryData.characteristics[0]?.toLowerCase()}.
-              Você tende a buscar conexões que ressoem com sua essência de {primaryData.name.toLowerCase()},
-              valorizando {primaryData.characteristics[1]?.toLowerCase()} em seus vínculos mais profundos.
-            </p>
+            <div className="space-y-4 pl-15">
+              <p className="text-muted-foreground leading-relaxed">
+                Suas energias moldam suas relações e emoções através de {primaryData.characteristics[0]?.toLowerCase()}.
+                Você tende a buscar conexões que ressoem com sua essência de {primaryData.name.toLowerCase()},
+                valorizando {primaryData.characteristics[1]?.toLowerCase()} em seus vínculos mais profundos.
+              </p>
+              <div className="p-4 rounded-lg bg-muted/30">
+                <h4 className="font-medium mb-2 text-base">Como você aparece nas relações:</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="text-[hsl(var(--accent))] mt-1">→</span>
+                    <span>Nas amizades, oferece {primaryData.characteristics[0]?.toLowerCase()}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[hsl(var(--accent))] mt-1">→</span>
+                    <span>No amor, busca parceiros que valorizem {primaryData.characteristics[1]?.toLowerCase()}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[hsl(var(--accent))] mt-1">→</span>
+                    <span>Em família, expressa {primaryData.characteristics[2]?.toLowerCase()}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
 
           {/* Trabalho e Missão */}
@@ -292,11 +359,29 @@ export default function ArchetypeResults({
               </div>
               <h3 className="font-semibold text-xl">Trabalho e Missão</h3>
             </div>
-            <p className="text-muted-foreground leading-relaxed pl-15">
-              No campo profissional, você expressa seus dons através de {primaryData.characteristics[2]?.toLowerCase()}.
-              Seu propósito está em trazer {primaryData.characteristics[0]?.toLowerCase()} para o mundo,
-              criando impacto através da sua capacidade única de {primaryData.characteristics[1]?.toLowerCase()}.
-            </p>
+            <div className="space-y-4 pl-15">
+              <p className="text-muted-foreground leading-relaxed">
+                No campo profissional, você expressa seus dons através de {primaryData.characteristics[2]?.toLowerCase()}.
+                Seu propósito está em trazer {primaryData.characteristics[0]?.toLowerCase()} para o mundo,
+                criando impacto através da sua capacidade única de {primaryData.characteristics[1]?.toLowerCase()}.
+              </p>
+              <div className="grid md:grid-cols-2 gap-3">
+                <div className="p-4 rounded-lg bg-[hsl(var(--accent))]/5 border border-[hsl(var(--accent))]/20">
+                  <h4 className="font-medium mb-2 text-base">Áreas de Atuação Ideais:</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Ambientes que valorizem {primaryData.characteristics[0]?.toLowerCase()} e permitam 
+                    expressar {primaryData.characteristics[1]?.toLowerCase()}.
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg bg-[hsl(var(--accent))]/5 border border-[hsl(var(--accent))]/20">
+                  <h4 className="font-medium mb-2 text-base">Seu Diferencial Único:</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Capacidade natural de {primaryData.characteristics[2]?.toLowerCase()} combinada 
+                    com sua essência de {primaryData.name.toLowerCase()}.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Espiritualidade */}
@@ -307,11 +392,62 @@ export default function ArchetypeResults({
               </div>
               <h3 className="font-semibold text-xl">Espiritualidade e Propósito</h3>
             </div>
-            <p className="text-muted-foreground leading-relaxed pl-15">
-              Sua alma busca aprender e oferecer {primaryData.characteristics[0]?.toLowerCase()}.
-              O caminho espiritual de {primaryData.name} está em viver plenamente sua essência,
-              equilibrando luz e sombra, e trazendo sua energia única para manifestar propósito no mundo.
-            </p>
+            <div className="space-y-4 pl-15">
+              <p className="text-muted-foreground leading-relaxed">
+                Sua alma busca aprender e oferecer {primaryData.characteristics[0]?.toLowerCase()}.
+                O caminho espiritual de {primaryData.name} está em viver plenamente sua essência,
+                equilibrando luz e sombra, e trazendo sua energia única para manifestar propósito no mundo.
+              </p>
+              <div className="p-4 rounded-lg bg-gradient-to-r from-[hsl(var(--accent))]/10 to-transparent">
+                <h4 className="font-medium mb-2 text-base">Prática Espiritual Recomendada:</h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Conecte-se com sua essência através de práticas que honrem {primaryData.characteristics[0]?.toLowerCase()} 
+                  e cultivem {primaryData.characteristics[1]?.toLowerCase()}.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  <strong>Mantra pessoal:</strong> "Eu sou {primaryData.name.toLowerCase()}, e minha luz 
+                  brilha através de {primaryData.characteristics[0]?.toLowerCase()}."
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Como Cultivar Seu Arquétipo */}
+          <div className="space-y-3 border-t pt-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--accent))]/10">
+                <span className="text-2xl">🌱</span>
+              </div>
+              <h3 className="font-semibold text-xl">Como Cultivar Seu Arquétipo</h3>
+            </div>
+            <div className="space-y-3 pl-15">
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                Para viver plenamente como {primaryData.name}, cultive estas práticas diárias:
+              </p>
+              <div className="grid md:grid-cols-3 gap-3">
+                <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
+                  <div className="text-2xl mb-2">🌅</div>
+                  <h4 className="font-medium text-sm mb-2">Pela Manhã</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Inicie o dia conectando-se com {primaryData.characteristics[0]?.toLowerCase()}
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
+                  <div className="text-2xl mb-2">☀️</div>
+                  <h4 className="font-medium text-sm mb-2">Durante o Dia</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Expresse {primaryData.characteristics[1]?.toLowerCase()} em suas ações
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
+                  <div className="text-2xl mb-2">🌙</div>
+                  <h4 className="font-medium text-sm mb-2">À Noite</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Reflita sobre como manifestou {primaryData.characteristics[2]?.toLowerCase()}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Mensagem Final */}
