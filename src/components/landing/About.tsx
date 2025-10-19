@@ -14,7 +14,7 @@ export const About = () => {
                 Essentia é mais que um ensaio fotográfico. É uma <strong className="text-foreground">jornada de autoconhecimento</strong> que revela sua identidade verdadeira através da imagem.
               </p>
               <p>
-                Combinamos <strong className="text-foreground">9 testes de personalidade</strong> com consultoria de imagem profissional e fotografia de alta qualidade para criar uma imagem que comunica verdade e autenticidade.
+                Combinamos <strong className="text-foreground">8 testes de personalidade</strong> com consultoria de imagem profissional e fotografia de alta qualidade para criar uma imagem que comunica verdade e autenticidade.
               </p>
               <p>
                 Seu resultado? Uma imagem que não apenas impressiona, mas que <strong className="text-foreground">comunica quem você realmente é</strong> — sua essência, sua missão, seu propósito.
