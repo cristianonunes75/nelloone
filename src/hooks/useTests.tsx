@@ -64,7 +64,7 @@ export const useTests = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["user-tests"] });
       toast({
         title: "Teste iniciado!",
@@ -150,6 +150,7 @@ export const useTests = () => {
     userTests,
     isLoading: testsLoading || userTestsLoading,
     startTest: startTest.mutate,
+    startTestAsync: startTest.mutateAsync,
     resetTest: resetTest.mutate,
     getTestStatus,
     getTestProgress,

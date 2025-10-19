@@ -15,7 +15,7 @@ import EssentiaConcierge from "@/components/cliente/EssentiaConcierge";
 
 const Cliente = () => {
   const { user, signOut, userRole } = useAuth();
-  const { tests, isLoading, getTestStatus, getTestProgress, startTest, resetTest } = useTests();
+  const { tests, isLoading, getTestStatus, getTestProgress, startTest, startTestAsync, resetTest } = useTests();
   const { hasAccess } = useTestAccess();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -90,7 +90,7 @@ const Cliente = () => {
               Olá, {user?.user_metadata?.full_name?.split(" ")[0] || "Cliente"}!
             </h1>
             <p className="text-xl text-muted-foreground">
-              Comece pelo <strong>Teste de Arquétipos</strong> — é gratuito e o primeiro passo para descobrir sua essência.
+              Comece pelo <strong>Teste de Arquétipos</strong> — 12 perguntas gratuitas para descobrir sua essência.
             </p>
           </div>
 
@@ -127,7 +127,10 @@ const Cliente = () => {
                     icon={test.icon || "Circle"}
                     status={getTestStatus(test.id)}
                     progress={getTestProgress(test.id)}
-                    onStart={() => startTest(test.id)}
+                    onStart={async () => {
+                      const userTest = await startTestAsync(test.id);
+                      navigate(`/cliente/test-execution/${test.id}/${userTest.id}`);
+                    }}
                     onReset={userRole === "admin" ? () => resetTest(test.id) : undefined}
                     isFree={isFree}
                   />
