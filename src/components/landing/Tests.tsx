@@ -1,14 +1,55 @@
-import { Brain, Target, Compass, Star, Thermometer, Lightbulb, Heart, Cross } from "lucide-react";
+import { Brain, Target, Compass, Star, Thermometer, Lightbulb, Heart, Cross, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const tests = [
-  { icon: Star, title: "Arquétipos de Marca", description: "Padrões simbólicos para comunicação e branding pessoal" },
-  { icon: Target, title: "DISC", description: "Perfil comportamental e estilo de comunicação" },
-  { icon: Brain, title: "MBTI", description: "Tipos psicológicos e preferências cognitivas" },
-  { icon: Compass, title: "Eneagrama", description: "Motivações profundas com abordagem psicológica" },
-  { icon: Thermometer, title: "Temperamentos", description: "Base tradicional (São Tomás de Aquino)" },
-  { icon: Lightbulb, title: "Inteligências Múltiplas", description: "Reconheça seus talentos únicos (Howard Gardner)" },
-  { icon: Heart, title: "Linguagens do Amor", description: "Comunicação afetiva e relacional (Gary Chapman)" },
-  { icon: Cross, title: "SOLIS", description: "Simbologia da Luz Interior e de Estilo — expressão fotográfica" },
+  { 
+    icon: Star, 
+    title: "Arquétipos de Marca", 
+    description: "Padrões simbólicos para comunicação e branding pessoal",
+    link: "https://pt.wikipedia.org/wiki/Arqu%C3%A9tipo"
+  },
+  { 
+    icon: Target, 
+    title: "DISC", 
+    description: "Perfil comportamental e estilo de comunicação",
+    link: "https://pt.wikipedia.org/wiki/DISC"
+  },
+  { 
+    icon: Brain, 
+    title: "MBTI", 
+    description: "Tipos psicológicos e preferências cognitivas",
+    link: "https://pt.wikipedia.org/wiki/Myers-Briggs_Type_Indicator"
+  },
+  { 
+    icon: Compass, 
+    title: "Eneagrama", 
+    description: "Motivações profundas com abordagem psicológica",
+    link: "https://pt.wikipedia.org/wiki/Eneagrama"
+  },
+  { 
+    icon: Thermometer, 
+    title: "Temperamentos", 
+    description: "Base tradicional (São Tomás de Aquino)",
+    link: "https://pt.wikipedia.org/wiki/Teoria_dos_quatro_temperamentos"
+  },
+  { 
+    icon: Lightbulb, 
+    title: "Inteligências Múltiplas", 
+    description: "Reconheça seus talentos únicos (Howard Gardner)",
+    link: "https://pt.wikipedia.org/wiki/Teoria_das_intelig%C3%AAncias_m%C3%BAltiplas"
+  },
+  { 
+    icon: Heart, 
+    title: "Linguagens do Amor", 
+    description: "Comunicação afetiva e relacional (Gary Chapman)",
+    link: "https://pt.wikipedia.org/wiki/As_Cinco_Linguagens_do_Amor"
+  },
+  { 
+    icon: Cross, 
+    title: "SOLIS", 
+    description: "Simbologia da Luz Interior e de Estilo — expressão fotográfica",
+    link: "#"
+  },
 ];
 
 export const Tests = () => {
@@ -25,19 +66,29 @@ export const Tests = () => {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {tests.map((test, index) => {
               const Icon = test.icon;
               return (
                 <div 
                   key={index}
-                  className="group bg-accent/30 border border-border rounded-2xl p-6 hover:bg-accent/50 transition-all duration-300"
+                  className="group bg-accent/30 border border-border rounded-2xl p-6 hover:bg-accent/50 transition-all duration-300 flex flex-col"
                 >
                   <div className="w-14 h-14 rounded-2xl bg-gold/10 group-hover:bg-gold/20 flex items-center justify-center mb-4 transition-colors">
                     <Icon className="w-7 h-7 text-gold" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">{test.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{test.description}</p>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-4 flex-grow">{test.description}</p>
+                  {test.link !== "#" && (
+                    <a 
+                      href={test.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-gold text-sm font-medium hover:text-gold-dark transition-colors flex items-center gap-1"
+                    >
+                      Saiba mais <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
                 </div>
               );
             })}
