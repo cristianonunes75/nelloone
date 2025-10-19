@@ -31,7 +31,7 @@ export const About = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
           <div className="order-2 lg:order-1">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              {content?.title || "O que é o"} <span className="text-gold">Essentia</span>?
+              {content?.title || "O que é o"} <span className="text-gold">Essentia</span>
             </h2>
             <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
               {content?.content.paragraphs.map((paragraph, index) => (
