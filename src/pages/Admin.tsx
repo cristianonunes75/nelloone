@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -13,13 +14,14 @@ import { CommunicationManagement } from "@/components/admin/CommunicationManagem
 import { ReportsManagement } from "@/components/admin/ReportsManagement";
 import { PhotographersManagement } from "@/components/admin/PhotographersManagement";
 import { SchedulingManagement } from "@/components/admin/SchedulingManagement";
-import { HomeContentManagement } from "@/components/admin/HomeContentManagement";
 import { AuditLogs } from "@/components/admin/AuditLogs";
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import logo from "@/assets/logo.png";
-import { Shield } from "lucide-react";
+import { Shield, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
+
+const AdminHomeContent = lazy(() => import("@/pages/AdminHomeContent"));
 
 const AdminDashboard = () => (
   <div className="space-y-8">
@@ -70,20 +72,22 @@ const Admin = () => {
           </header>
 
           <main className="flex-1 p-8 overflow-auto">
-            <Routes>
-              <Route path="/" element={<AdminDashboard />} />
-              <Route path="/usuarios" element={<UsersManagement />} />
-              <Route path="/fotografos" element={<PhotographersManagement />} />
-              <Route path="/agendamentos" element={<SchedulingManagement />} />
-              <Route path="/testes" element={<TestsManagement />} />
-              <Route path="/pagamentos" element={<PaymentsManagement />} />
-              <Route path="/cupons" element={<CouponsManagement />} />
-              <Route path="/comunicacao" element={<CommunicationManagement />} />
-              <Route path="/home-content" element={<HomeContentManagement />} />
-              <Route path="/relatorios" element={<ReportsManagement />} />
-              <Route path="/logs" element={<AuditLogs />} />
-              <Route path="/configuracoes" element={<SystemSettings />} />
-            </Routes>
+            <Suspense fallback={<div className="flex items-center justify-center h-full"><Loader2 className="w-8 h-8 animate-spin text-gold" /></div>}>
+              <Routes>
+                <Route path="/" element={<AdminDashboard />} />
+                <Route path="/usuarios" element={<UsersManagement />} />
+                <Route path="/fotografos" element={<PhotographersManagement />} />
+                <Route path="/agendamentos" element={<SchedulingManagement />} />
+                <Route path="/testes" element={<TestsManagement />} />
+                <Route path="/pagamentos" element={<PaymentsManagement />} />
+                <Route path="/cupons" element={<CouponsManagement />} />
+                <Route path="/comunicacao" element={<CommunicationManagement />} />
+                <Route path="/home-content" element={<AdminHomeContent />} />
+                <Route path="/relatorios" element={<ReportsManagement />} />
+                <Route path="/logs" element={<AuditLogs />} />
+                <Route path="/configuracoes" element={<SystemSettings />} />
+              </Routes>
+            </Suspense>
           </main>
         </div>
       </div>

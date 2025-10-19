@@ -1,10 +1,31 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { LogoText } from "@/components/LogoText";
+import { useHomeContent } from "@/hooks/useHomeContent";
+import { Skeleton } from "@/components/ui/skeleton";
 import heroImage from "@/assets/hero-image.jpg";
 
 export const Hero = () => {
   const navigate = useNavigate();
+  const { content, isLoading } = useHomeContent("hero");
+
+  if (isLoading) {
+    return (
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <div className="absolute inset-0 z-0">
+          <img src={heroImage} alt="Essentia" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60" />
+        </div>
+        <div className="container relative z-10 px-6 py-24 md:py-32 text-center">
+          <div className="max-w-4xl mx-auto">
+            <Skeleton className="h-24 w-3/4 mx-auto mb-16" />
+            <Skeleton className="h-16 w-full mb-6" />
+            <Skeleton className="h-12 w-2/3 mx-auto mb-12" />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
@@ -27,13 +48,12 @@ export const Hero = () => {
           />
           
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight animate-fade-in">
-            Sua imagem pode comunicar<br />
-            <span className="text-gold">verdade, fé e autoridade</span>
+            {content?.title || "Sua imagem pode comunicar"}<br />
+            <span className="text-gold">{(content?.content as any)?.subtitle || "verdade, fé e autoridade"}</span>
           </h1>
           
           <p className="text-lg md:text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in">
-            Uma experiência completa de autoconhecimento, consultoria de imagem e fotografia profissional. 
-            Tudo com propósito e verdade.
+            {(content?.content as any)?.description || "Uma experiência completa de autoconhecimento, consultoria de imagem e fotografia profissional. Tudo com propósito e verdade."}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
@@ -42,7 +62,7 @@ export const Hero = () => {
               className="text-lg px-8 py-6 bg-gold hover:bg-gold-dark text-white"
               onClick={() => navigate("/auth")}
             >
-              Comece sua jornada Essentia
+              {(content?.content as any)?.primaryButtonText || "Comece sua jornada Essentia"}
             </Button>
             <Button 
               size="lg" 
@@ -52,7 +72,7 @@ export const Hero = () => {
                 document.getElementById('sobre')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              Conheça o Essentia
+              {(content?.content as any)?.secondaryButtonText || "Conheça o Essentia"}
             </Button>
           </div>
         </div>

@@ -1,33 +1,51 @@
 import { Target, Lightbulb, Sparkles, Award, Users, Heart, Zap, Star } from "lucide-react";
+import { useHomeContent } from "@/hooks/useHomeContent";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const profiles = [
-  { icon: Heart, title: "Líderes Espirituais", description: "Padres, pastores, missionários e conselheiros" },
-  { icon: Target, title: "Profissionais com Propósito", description: "Médicos, advogados, terapeutas que buscam impacto" },
-  { icon: Lightbulb, title: "Líderes de Impacto", description: "Empreendedores, gestores e coordenadores visionários" },
-  { icon: Sparkles, title: "Pessoas que Transformam", description: "Educadores, coaches e mentores inspiradores" },
-  { icon: Award, title: "Autoridades em sua Área", description: "Especialistas que comunicam credibilidade" },
-  { icon: Users, title: "Influenciadores de Bem", description: "Criadores de conteúdo com propósito e valores" },
-  { icon: Zap, title: "Agentes de Mudança", description: "Ativistas, voluntários e líderes comunitários" },
-  { icon: Star, title: "Profissionais em Transição", description: "Pessoas reinventando sua imagem profissional" },
-];
+const iconMap: Record<string, any> = {
+  Heart, Target, Lightbulb, Sparkles, Award, Users, Zap, Star
+};
 
 export const ForWho = () => {
+  const { content, isLoading } = useHomeContent("for_who");
+
+  if (isLoading) {
+    return (
+      <section className="py-24 bg-accent/20">
+        <div className="container px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <Skeleton className="h-12 w-1/2 mx-auto mb-6" />
+              <Skeleton className="h-6 w-3/4 mx-auto" />
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <Skeleton key={i} className="h-40 rounded-2xl" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const profiles = (content?.content as any)?.profiles || [];
   return (
     <section className="py-24 bg-accent/20">
       <div className="container px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Para quem é o <span className="text-gold">Essentia</span>?
+              {content?.title || "Para quem é o"} <span className="text-gold">Essentia</span>?
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Para todos que buscam uma imagem autêntica, alinhada com quem realmente são e com o impacto que desejam gerar no mundo.
+              {(content?.content as any)?.description || "Para todos que buscam uma imagem autêntica, alinhada com quem realmente são e com o impacto que desejam gerar no mundo."}
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {profiles.map((profile, index) => {
-              const Icon = profile.icon;
+            {profiles.map((profile: any, index: number) => {
+              const Icon = iconMap[profile.icon] || Heart;
               return (
                 <div 
                   key={index}
