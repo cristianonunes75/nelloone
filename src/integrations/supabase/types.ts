@@ -153,6 +153,36 @@ export type Database = {
           },
         ]
       }
+      home_content: {
+        Row: {
+          content: Json
+          created_at: string | null
+          id: string
+          section: string
+          title: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          content: Json
+          created_at?: string | null
+          id?: string
+          section: string
+          title?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          content?: Json
+          created_at?: string | null
+          id?: string
+          section?: string
+          title?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       photo_galleries: {
         Row: {
           client_id: string | null
