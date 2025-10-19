@@ -33,6 +33,7 @@ const menuItems = [
   { title: "Pagamentos", url: "/admin/pagamentos", icon: CreditCard },
   { title: "Cupons", url: "/admin/cupons", icon: Tag },
   { title: "Comunicação", url: "/admin/comunicacao", icon: MessageSquare },
+  { title: "Conteúdo Home", url: "/admin/home-content", icon: FileText },
   { title: "Relatórios", url: "/admin/relatorios", icon: BarChart3 },
   { title: "Logs de Auditoria", url: "/admin/logs", icon: Shield },
   { title: "Configurações", url: "/admin/configuracoes", icon: Settings },

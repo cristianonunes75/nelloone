@@ -1,30 +1,49 @@
 import conceptImage from "@/assets/concept-image.jpg";
+import { useHomeContent } from "@/hooks/useHomeContent";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const About = () => {
+  const { content, isLoading } = useHomeContent("about");
+
+  if (isLoading) {
+    return (
+      <section id="sobre" className="py-24 bg-background">
+        <div className="container px-6">
+          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
+            <div className="order-2 lg:order-1 space-y-4">
+              <Skeleton className="h-12 w-3/4" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+            </div>
+            <div className="order-1 lg:order-2">
+              <Skeleton className="h-96 w-full rounded-3xl" />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="sobre" className="py-24 bg-background">
       <div className="container px-6">
         <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
           <div className="order-2 lg:order-1">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              O que é o <span className="text-gold">Essentia</span>?
+              {content?.title || "O que é o"} <span className="text-gold">Essentia</span>?
             </h2>
             <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
-              <p>
-                Essentia é mais que um ensaio fotográfico. É uma <strong className="text-foreground">jornada de autoconhecimento</strong> que revela sua identidade verdadeira através da imagem.
-              </p>
-              <p>
-                Combinamos <strong className="text-foreground">8 testes de personalidade</strong> com consultoria de imagem profissional e fotografia de alta qualidade para criar uma imagem que comunica verdade e autenticidade.
-              </p>
-              <p>
-                Seu resultado? Uma imagem que não apenas impressiona, mas que <strong className="text-foreground">comunica quem você realmente é</strong> — sua essência, sua missão, seu propósito.
-              </p>
-              <p className="text-gold font-semibold pt-4 border-t border-border/30 mt-6">
-                Inspirado por valores cristãos, aberto a todos que buscam propósito e autenticidade.
-              </p>
-              <p className="text-sm text-muted-foreground/80 italic">
-                Atendemos exclusivamente em <strong className="text-foreground">Brasília-DF</strong>, garantindo qualidade e excelência em cada detalhe.
-              </p>
+              {content?.content.paragraphs.map((paragraph, index) => (
+                <p key={index} className={index === content.content.paragraphs.length - 1 ? "text-gold font-semibold pt-4 border-t border-border/30 mt-6" : ""}>
+                  {paragraph}
+                </p>
+              ))}
+              {content?.content.location && (
+                <p className="text-sm text-muted-foreground/80 italic">
+                  {content.content.location}
+                </p>
+              )}
             </div>
           </div>
           

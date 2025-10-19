@@ -13,6 +13,7 @@ import { CommunicationManagement } from "@/components/admin/CommunicationManagem
 import { ReportsManagement } from "@/components/admin/ReportsManagement";
 import { PhotographersManagement } from "@/components/admin/PhotographersManagement";
 import { SchedulingManagement } from "@/components/admin/SchedulingManagement";
+import { HomeContentManagement } from "@/components/admin/HomeContentManagement";
 import { AuditLogs } from "@/components/admin/AuditLogs";
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import logo from "@/assets/logo.png";
@@ -78,6 +79,7 @@ const Admin = () => {
               <Route path="/pagamentos" element={<PaymentsManagement />} />
               <Route path="/cupons" element={<CouponsManagement />} />
               <Route path="/comunicacao" element={<CommunicationManagement />} />
+              <Route path="/home-content" element={<HomeContentManagement />} />
               <Route path="/relatorios" element={<ReportsManagement />} />
               <Route path="/logs" element={<AuditLogs />} />
               <Route path="/configuracoes" element={<SystemSettings />} />
