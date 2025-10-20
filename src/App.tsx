@@ -43,14 +43,14 @@ const App = () => (
             <Route path="/consultoria-essentia" element={<ConsultoriaEssentia />} />
             <Route path="/termos" element={<TermsOfService />} />
             <Route path="/privacidade" element={<PrivacyPolicy />} />
-            <Route path="/testes/arquetipos-marca" element={<ArquetiposMarca />} />
-            <Route path="/testes/disc" element={<DISC />} />
-            <Route path="/testes/mbti" element={<MBTI />} />
-            <Route path="/testes/eneagrama" element={<Eneagrama />} />
-            <Route path="/testes/temperamentos" element={<Temperamentos />} />
-            <Route path="/testes/inteligencias-multiplas" element={<InteligenciasMultiplas />} />
-            <Route path="/testes/linguagens-amor" element={<LinguagensAmor />} />
-            <Route path="/testes/solis" element={<SOLIS />} />
+            <Route path="/teste-arquetipos" element={<ArquetiposMarca />} />
+            <Route path="/teste-disc" element={<DISC />} />
+            <Route path="/teste-mbti" element={<MBTI />} />
+            <Route path="/teste-eneagrama" element={<Eneagrama />} />
+            <Route path="/teste-temperamentos" element={<Temperamentos />} />
+            <Route path="/teste-inteligencias" element={<InteligenciasMultiplas />} />
+            <Route path="/teste-linguagens" element={<LinguagensAmor />} />
+            <Route path="/teste-solis" element={<SOLIS />} />
             <Route
               path="/cliente"
               element={
