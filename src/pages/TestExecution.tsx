@@ -11,6 +11,7 @@ import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { calculateArchetypeScores, getDominantArchetypes, ARCHETYPES } from "@/lib/archetypes";
+import { getDISCResults } from "@/lib/disc";
 import { Badge } from "@/components/ui/badge";
 
 export default function TestExecution() {
@@ -108,6 +109,15 @@ export default function TestExecution() {
       });
     }
 
+    // Get test type to determine which calculation logic to use
+    const { data: testData } = await supabase
+      .from("tests")
+      .select("type")
+      .eq("id", testId!)
+      .single();
+
+    const testType = testData?.type;
+
     // If this is the free version and user finished 12 questions, calculate partial results
     if (!hasPaidAccess && !isFreeTest && isLastQuestion) {
       // Fetch all answers to calculate partial results
@@ -154,15 +164,37 @@ export default function TestExecution() {
       .eq("user_test_id", userTestId!);
 
     if (allAnswers && allAnswers.length > 0) {
-      const scores = calculateArchetypeScores(allAnswers);
-      const dominantArchetypes = getDominantArchetypes(scores);
+      let resultData;
 
-      const resultData = JSON.parse(JSON.stringify({
-        completed_at: new Date().toISOString(),
-        total_questions: questions?.length || 0,
-        scores,
-        dominantArchetypes,
-      }));
+      // Calculate results based on test type
+      if (testType === "disc") {
+        const discResults = getDISCResults(allAnswers as any);
+        resultData = JSON.parse(JSON.stringify({
+          completed_at: new Date().toISOString(),
+          total_questions: questions?.length || 0,
+          testType: "disc",
+          scores: discResults.scores,
+          dominantProfile: discResults.dominantProfile,
+          profileData: discResults.profileData,
+        }));
+      } else if (testType === "arquetipos_proposito") {
+        const scores = calculateArchetypeScores(allAnswers);
+        const dominantArchetypes = getDominantArchetypes(scores);
+        resultData = JSON.parse(JSON.stringify({
+          completed_at: new Date().toISOString(),
+          total_questions: questions?.length || 0,
+          testType: "arquetipos",
+          scores,
+          dominantArchetypes,
+        }));
+      } else {
+        // Default result format for other tests
+        resultData = JSON.parse(JSON.stringify({
+          completed_at: new Date().toISOString(),
+          total_questions: questions?.length || 0,
+          testType,
+        }));
+      }
 
       completeTest(resultData);
     }

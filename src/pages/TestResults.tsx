@@ -12,6 +12,7 @@ import { useRef, useState } from "react";
 import PhotoSessionBooking from "@/components/cliente/PhotoSessionBooking";
 import ArchetypeResults from "@/components/cliente/ArchetypeResults";
 import { calculateArchetypeScores, getDominantArchetypes } from "@/lib/archetypes";
+import { getDISCResults, DISC_PROFILES } from "@/lib/disc";
 import { useAuth } from "@/hooks/useAuth";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useTests } from "@/hooks/useTests";
@@ -144,8 +145,9 @@ export default function TestResults() {
     );
   }
 
-  // Determine if this is the archetypos test
+  // Determine test type
   const isArchetyposTest = userTest.tests?.type === 'arquetipos_proposito';
+  const isDISCTest = userTest.tests?.type === 'disc';
   const isFreeVersion = userTest.tests?.is_free || false;
   const shouldShowFullResults = isFreeVersion || hasPurchased;
 
@@ -161,6 +163,12 @@ export default function TestResults() {
       acc[archetype] = score;
       return acc;
     }, {} as Record<string, number>);
+  }
+
+  // Calculate DISC results if this is the DISC test
+  let discResults;
+  if (isDISCTest && answers && answers.length > 0) {
+    discResults = getDISCResults(answers as any);
   }
 
   return (
@@ -415,6 +423,93 @@ export default function TestResults() {
               </CardContent>
             </Card>
           </>
+        ) : isDISCTest && discResults ? (
+          // DISC Test Results
+          <Card className="border-none shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
+              <div className="text-center space-y-4">
+                <div className="text-6xl">{discResults.profileData.emoji}</div>
+                <CardTitle className="text-3xl font-light">
+                  {discResults.profileData.name}
+                </CardTitle>
+                <CardDescription className="text-lg">
+                  Seu Perfil Comportamental
+                </CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-8 space-y-8">
+              {/* Descrição do perfil */}
+              <div className="space-y-4 text-center max-w-3xl mx-auto">
+                <p className="text-lg leading-relaxed">
+                  {discResults.profileData.description}
+                </p>
+              </div>
+
+              {/* Pontuação por perfil */}
+              <Card className="border-2 border-accent/30">
+                <CardHeader>
+                  <CardTitle className="text-xl">Suas Pontuações</CardTitle>
+                  <CardDescription>
+                    Distribuição das suas respostas pelos 4 perfis DISC
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {Object.entries(discResults.scores)
+                    .sort(([,a], [,b]) => (Number(b) - Number(a)))
+                    .map(([profile, score]) => {
+                      const profileData = DISC_PROFILES[profile as keyof typeof DISC_PROFILES];
+                      const isMain = profile === discResults.dominantProfile;
+                      return (
+                        <div key={profile} className={`space-y-2 p-4 rounded-lg ${isMain ? 'bg-accent/20 border-2 border-accent' : 'bg-muted/50'}`}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <span className="text-3xl">{profileData.emoji}</span>
+                              <div>
+                                <h3 className="font-semibold text-lg">{profileData.name}</h3>
+                                {isMain && (
+                                  <Badge variant="default" className="mt-1">
+                                    Perfil Dominante
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-2xl font-bold">{String(score)}</p>
+                              <p className="text-xs text-muted-foreground">respostas</p>
+                            </div>
+                          </div>
+                          <div className="pl-12">
+                            <p className="text-sm text-muted-foreground">
+                              {profileData.traits.join(" • ")}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </CardContent>
+              </Card>
+
+              {/* Caminho de crescimento */}
+              <Card className="bg-gradient-to-br from-accent/10 to-background border-accent/30">
+                <CardContent className="pt-6 space-y-4">
+                  <div className="flex items-center gap-2 text-lg font-semibold">
+                    <span className="text-2xl">🌱</span>
+                    Seu Caminho de Crescimento
+                  </div>
+                  <p className="text-base leading-relaxed pl-8">
+                    {discResults.profileData.growth}
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Frase final */}
+              <div className="text-center py-8">
+                <p className="text-lg font-light italic text-muted-foreground">
+                  Essentia — uma jornada de autoconhecimento e verdade interior.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         ) : (
           // Para outros testes, mostrar resultados padrão
           <Card>
