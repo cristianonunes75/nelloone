@@ -9,7 +9,8 @@ import {
   MessageSquare,
   BarChart3,
   Tag,
-  Home
+  Home,
+  DollarSign
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -34,6 +35,7 @@ const menuItems = [
   { title: "Cupons", url: "/admin/cupons", icon: Tag },
   { title: "Comunicação", url: "/admin/comunicacao", icon: MessageSquare },
   { title: "Conteúdo Home", url: "/admin/home-content", icon: FileText },
+  { title: "Preços", url: "/admin/precos", icon: DollarSign },
   { title: "Relatórios", url: "/admin/relatorios", icon: BarChart3 },
   { title: "Logs de Auditoria", url: "/admin/logs", icon: Shield },
   { title: "Configurações", url: "/admin/configuracoes", icon: Settings },

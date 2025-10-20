@@ -16,6 +16,7 @@ import { PhotographersManagement } from "@/components/admin/PhotographersManagem
 import { SchedulingManagement } from "@/components/admin/SchedulingManagement";
 import { AuditLogs } from "@/components/admin/AuditLogs";
 import { SystemSettings } from "@/components/admin/SystemSettings";
+import { PricingManagement } from "@/components/admin/PricingManagement";
 import logo from "@/assets/logo.png";
 import { Shield, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -83,6 +84,7 @@ const Admin = () => {
                 <Route path="/cupons" element={<CouponsManagement />} />
                 <Route path="/comunicacao" element={<CommunicationManagement />} />
                 <Route path="/home-content" element={<AdminHomeContent />} />
+                <Route path="/precos" element={<PricingManagement />} />
                 <Route path="/relatorios" element={<ReportsManagement />} />
                 <Route path="/logs" element={<AuditLogs />} />
                 <Route path="/configuracoes" element={<SystemSettings />} />
