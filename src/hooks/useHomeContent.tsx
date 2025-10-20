@@ -19,7 +19,7 @@ export const useHomeContent = (section: string) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: content, isLoading } = useQuery({
+  const { data: content, isLoading, refetch } = useQuery({
     queryKey: ["home-content", section],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -35,6 +35,9 @@ export const useHomeContent = (section: string) => {
         content: data.content as unknown as HomeContentData,
       } as HomeContent;
     },
+    staleTime: 0, // Always consider data stale
+    refetchOnMount: true, // Refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window regains focus
   });
 
   const updateContent = useMutation({
@@ -56,10 +59,11 @@ export const useHomeContent = (section: string) => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["home-content", section] });
+      queryClient.invalidateQueries({ queryKey: ["home-content"] }); // Invalidate all home content
+      queryClient.refetchQueries({ queryKey: ["home-content"] }); // Force refetch
       toast({
-        title: "Conteúdo atualizado",
-        description: "As alterações foram salvas com sucesso.",
+        title: "Conteúdo atualizado! ✅",
+        description: "Recarregue a página inicial para ver as alterações.",
       });
     },
     onError: (error) => {
@@ -76,5 +80,6 @@ export const useHomeContent = (section: string) => {
     isLoading,
     updateContent: updateContent.mutate,
     isUpdating: updateContent.isPending,
+    refetch,
   };
 };
