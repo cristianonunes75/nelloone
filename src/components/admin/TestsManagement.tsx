@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, DollarSign, Gift } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { FileText, DollarSign, Gift, ShoppingCart } from "lucide-react";
 
 interface Test {
   id: string;
@@ -22,7 +23,9 @@ interface Test {
 export const TestsManagement = () => {
   const [tests, setTests] = useState<Test[]>([]);
   const [loading, setLoading] = useState(true);
+  const [simulatingPurchase, setSimulatingPurchase] = useState<string | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchTests();
@@ -96,6 +99,58 @@ export const TestsManagement = () => {
         description: error.message,
         variant: "destructive",
       });
+    }
+  };
+
+  const simulatePurchase = async (testId: string, testPrice: number) => {
+    if (!user) return;
+    
+    setSimulatingPurchase(testId);
+    try {
+      // Check if purchase already exists
+      const { data: existing } = await supabase
+        .from("test_purchases")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("test_id", testId)
+        .eq("payment_status", "completed")
+        .single();
+
+      if (existing) {
+        toast({
+          title: "Compra já existe",
+          description: "Você já possui este teste.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create simulated purchase
+      const { error } = await supabase
+        .from("test_purchases")
+        .insert({
+          user_id: user.id,
+          test_id: testId,
+          price_paid: testPrice,
+          payment_status: "completed",
+          payment_method: "admin_simulation",
+          transaction_id: `SIM-${Date.now()}`,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Compra simulada com sucesso! 🎉",
+        description: "O teste foi liberado para você. Acesse a área do cliente para fazer o teste.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao simular compra",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSimulatingPurchase(null);
     }
   };
 
@@ -173,6 +228,17 @@ export const TestsManagement = () => {
                     {test.is_free ? "Gratuito" : "Pago"}
                   </span>
                 </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => simulatePurchase(test.id, test.price_brl)}
+                  disabled={simulatingPurchase === test.id || test.is_free}
+                  className="w-full"
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  {simulatingPurchase === test.id ? "Simulando..." : "Simular Compra"}
+                </Button>
               </div>
             </div>
           </Card>
