@@ -80,7 +80,26 @@ const Auth = () => {
           description: "Bem-vindo de volta ao Essentia.",
         });
         
-        navigate("/cliente");
+        // Wait for roles to be fetched before redirecting
+        setTimeout(async () => {
+          const { data: rolesData } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", (await supabase.auth.getUser()).data.user?.id);
+          
+          const roles = (rolesData || []).map((r: any) => r.role);
+          const primaryRole = roles.find((r: string) => r === "admin") || 
+                             roles.find((r: string) => r === "fotografo") || 
+                             "cliente";
+          
+          if (primaryRole === "admin") {
+            navigate("/admin");
+          } else if (primaryRole === "fotografo") {
+            navigate("/fotografo");
+          } else {
+            navigate("/cliente");
+          }
+        }, 500);
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -115,7 +134,26 @@ const Auth = () => {
         if (signInError) {
           console.error("Error auto-signing in:", signInError);
         } else {
-          navigate("/cliente");
+          // Wait for roles to be fetched before redirecting
+          setTimeout(async () => {
+            const { data: rolesData } = await supabase
+              .from("user_roles")
+              .select("role")
+              .eq("user_id", (await supabase.auth.getUser()).data.user?.id);
+            
+            const roles = (rolesData || []).map((r: any) => r.role);
+            const primaryRole = roles.find((r: string) => r === "admin") || 
+                               roles.find((r: string) => r === "fotografo") || 
+                               "cliente";
+            
+            if (primaryRole === "admin") {
+              navigate("/admin");
+            } else if (primaryRole === "fotografo") {
+              navigate("/fotografo");
+            } else {
+              navigate("/cliente");
+            }
+          }, 500);
         }
       }
     } catch (error: any) {

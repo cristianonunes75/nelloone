@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { ArrowLeft } from "lucide-react";
+import { useEffect } from "react";
 
 interface TestDetailLayoutProps {
   title: string;
@@ -23,6 +24,22 @@ export const TestDetailLayout = ({
   testId,
   price = "R$19",
 }: TestDetailLayoutProps) => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const handleBackClick = () => {
+    navigate("/");
+    setTimeout(() => {
+      const testesSection = document.getElementById("testes");
+      if (testesSection) {
+        testesSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <LandingNav />
@@ -31,14 +48,12 @@ export const TestDetailLayout = ({
         <div className="container max-w-4xl mx-auto px-4">
           {/* Back Button */}
           <Button 
-            asChild 
+            onClick={handleBackClick}
             variant="ghost" 
             className="mb-8 -ml-2 hover:bg-transparent hover:text-primary"
           >
-            <Link to="/#testes" className="flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Voltar para Testes
-            </Link>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar para Testes
           </Button>
 
           {/* Header */}
