@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { CreditCard, ShoppingCart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface PurchaseTestDialogProps {
   open: boolean;
@@ -26,17 +27,15 @@ export const PurchaseTestDialog = ({
   price,
 }: PurchaseTestDialogProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handlePurchase = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        toast({
-          title: "Erro",
-          description: "Você precisa estar logado para fazer uma compra.",
-          variant: "destructive",
-        });
+        onOpenChange(false);
+        navigate("/auth?redirect=purchase");
         return;
       }
 

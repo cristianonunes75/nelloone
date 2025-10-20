@@ -33,6 +33,10 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+  
+  // Check if user came from a purchase attempt
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectToPurchase = searchParams.get("redirect") === "purchase";
 
   // Redirect if already logged in
   if (user) {
@@ -183,11 +187,14 @@ const Auth = () => {
               ? "Acesse sua área reservada"
               : "Comece sua jornada Essentia"}
           </p>
-          {!isLogin && (
-            <Alert className="text-left">
+          {redirectToPurchase && (
+            <Alert className="text-left mb-4">
               <Info className="h-4 w-4" />
               <AlertDescription>
-                Para comprar e realizar os testes, é necessário criar uma conta. Seus resultados ficarão salvos para consulta futura.
+                {isLogin 
+                  ? "Para concluir sua compra, faça login ou crie uma conta."
+                  : "Para comprar e realizar os testes, é necessário criar uma conta. Seus resultados ficarão salvos para consulta futura."
+                }
               </AlertDescription>
             </Alert>
           )}
