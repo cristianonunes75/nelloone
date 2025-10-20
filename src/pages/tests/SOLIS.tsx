@@ -14,6 +14,7 @@ Inspirado no conceito da luz interior, ele revela como a sua alma se manifesta a
         "Como tornar sua imagem uma mensagem viva",
       ]}
       audience="Quem deseja alinhar imagem, espiritualidade e propósito de vida."
+      testType="solis"
     />
   );
 };

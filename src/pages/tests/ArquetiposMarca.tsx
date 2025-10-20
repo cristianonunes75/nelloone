@@ -16,6 +16,7 @@ Mais do que marketing, é um mapa espiritual da sua comunicação."
         "Como alinhar sua imagem à sua verdade interior",
       ]}
       audience="Líderes, empreendedores e comunicadores que desejam se posicionar com fé, autoridade e autenticidade."
+      testType="arquetipos"
     />
   );
 };

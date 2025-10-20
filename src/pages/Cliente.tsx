@@ -116,6 +116,21 @@ const Cliente = () => {
                   );
                 }
 
+                // Map test types to their specific pages
+                const testPageMap: Record<string, string> = {
+                  'arquetipos': '/teste-arquetipos',
+                  'disc': '/teste-disc',
+                  'mbti': '/teste-mbti',
+                  'eneagrama': '/teste-eneagrama',
+                  'temperamentos': '/teste-temperamentos',
+                  'inteligencias_multiplas': '/teste-inteligencias',
+                  'linguagens_amor': '/teste-linguagens',
+                  'solis': '/teste-solis',
+                };
+
+                const testPage = testPageMap[test.type];
+                const status = getTestStatus(test.id);
+
                 return (
                   <TestCard
                     key={test.id}
@@ -125,11 +140,17 @@ const Cliente = () => {
                     questionsCount={test.questions_count}
                     estimatedMinutes={test.estimated_minutes}
                     icon={test.icon || "Circle"}
-                    status={getTestStatus(test.id)}
+                    status={status}
                     progress={getTestProgress(test.id)}
                     onStart={async () => {
-                      const userTest = await startTestAsync(test.id);
-                      navigate(`/cliente/test-execution/${test.id}/${userTest.id}`);
+                      // If test is not started, go to test detail page first
+                      if (status === "not_started" && testPage) {
+                        navigate(testPage);
+                      } else {
+                        // If already in progress, continue directly to execution
+                        const userTest = await startTestAsync(test.id);
+                        navigate(`/cliente/test-execution/${test.id}/${userTest.id}`);
+                      }
                     }}
                     onReset={userRole === "admin" ? () => resetTest(test.id) : undefined}
                     isFree={isFree}

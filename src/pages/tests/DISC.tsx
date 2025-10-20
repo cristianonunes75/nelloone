@@ -15,6 +15,7 @@ Cada pessoa tem um ritmo único de ação. O DISC mostra como você se expressa,
         "Seu caminho de crescimento pessoal"
       ]}
       audience="Profissionais, gestores, mentores e missionários que desejam liderar com empatia e propósito."
+      testType="disc"
     />
   );
 };

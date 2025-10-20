@@ -13,6 +13,7 @@ Esse teste revela o modo como você manifesta os dons que Deus te confiou."
         "Como usar suas habilidades para servir e prosperar",
       ]}
       audience="Profissionais, educadores, artistas e empreendedores que desejam alinhar talento, propósito e fé."
+      testType="inteligencias_multiplas"
     />
   );
 };

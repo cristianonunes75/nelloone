@@ -13,6 +13,7 @@ const Eneagrama = () => {
         "O caminho de crescimento espiritual único do seu tipo",
       ]}
       audience="Para quem busca compreender as motivações profundas da alma e viver com mais equilíbrio interior."
+      testType="eneagrama"
     />
   );
 };

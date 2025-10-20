@@ -13,6 +13,7 @@ Esse teste, inspirado em Gary Chapman, ajuda você a compreender como expressa e
         "Como fortalecer vínculos com empatia e equilíbrio",
       ]}
       audience="Casais, pais, líderes e qualquer pessoa que deseja amar melhor."
+      testType="linguagens_amor"
     />
   );
 };

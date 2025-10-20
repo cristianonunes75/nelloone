@@ -4,6 +4,9 @@ import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { ArrowLeft } from "lucide-react";
 import { useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useTests } from "@/hooks/useTests";
+import { useToast } from "@/hooks/use-toast";
 
 interface TestDetailLayoutProps {
   title: string;
@@ -11,7 +14,7 @@ interface TestDetailLayoutProps {
   storytelling: string;
   benefits: string[];
   audience: string;
-  testId?: string;
+  testType: string; // Use test type instead of testId
   price?: string;
 }
 
@@ -21,10 +24,16 @@ export const TestDetailLayout = ({
   storytelling,
   benefits,
   audience,
-  testId,
+  testType,
   price = "R$19",
 }: TestDetailLayoutProps) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { tests, startTestAsync } = useTests();
+  const { toast } = useToast();
+
+  // Find test by type
+  const test = tests?.find(t => t.type === testType);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -102,16 +111,30 @@ export const TestDetailLayout = ({
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            {testId ? (
-              <Button asChild size="lg" variant="hero" className="w-full sm:w-auto">
-                <Link to={`/cliente/test-execution/${testId}`}>
-                  Fazer o Teste – {price}
-                </Link>
+            {user && test ? (
+              <Button 
+                size="lg" 
+                variant="hero" 
+                className="w-full sm:w-auto"
+                onClick={async () => {
+                  try {
+                    const userTest = await startTestAsync(test.id);
+                    navigate(`/cliente/test-execution/${test.id}/${userTest.id}`);
+                  } catch (error) {
+                    toast({
+                      title: "Erro ao iniciar teste",
+                      description: "Tente novamente mais tarde.",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+              >
+                Começar Teste
               </Button>
             ) : (
               <Button asChild size="lg" variant="hero" className="w-full sm:w-auto">
                 <Link to="/auth">
-                  Fazer o Teste – {price}
+                  Fazer Login para Começar
                 </Link>
               </Button>
             )}

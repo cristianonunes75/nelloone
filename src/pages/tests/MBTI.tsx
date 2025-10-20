@@ -12,6 +12,7 @@ const MBTI = () => {
         "Como se posicionar com clareza em decisões profissionais e pessoais",
       ]}
       audience="Quem busca autoconhecimento profundo e alinhamento entre mente e fé."
+      testType="mbti"
     />
   );
 };

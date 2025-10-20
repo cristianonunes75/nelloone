@@ -14,6 +14,7 @@ No Essentia, esse teste conecta sabedoria tradicional e espiritualidade para uma
         "Como usar seus dons naturais em missão e convivência",
       ]}
       audience="Quem deseja compreender suas reações e encontrar equilíbrio emocional com base na fé."
+      testType="temperamentos"
     />
   );
 };
