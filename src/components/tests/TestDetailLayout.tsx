@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingFooter } from "@/components/landing/LandingFooter";
+import { ArrowLeft } from "lucide-react";
 
 interface TestDetailLayoutProps {
   title: string;
@@ -28,6 +29,18 @@ export const TestDetailLayout = ({
       
       <main className="pt-24 pb-16">
         <div className="container max-w-4xl mx-auto px-4">
+          {/* Back Button */}
+          <Button 
+            asChild 
+            variant="ghost" 
+            className="mb-8 -ml-2 hover:bg-transparent hover:text-primary"
+          >
+            <Link to="/#testes" className="flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              Voltar para Testes
+            </Link>
+          </Button>
+
           {/* Header */}
           <div className="text-center mb-12 animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
