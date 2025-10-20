@@ -12,6 +12,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { calculateArchetypeScores, getDominantArchetypes, ARCHETYPES } from "@/lib/archetypes";
 import { getDISCResults } from "@/lib/disc";
+import { getMBTIResults } from "@/lib/mbti";
 import { Badge } from "@/components/ui/badge";
 
 export default function TestExecution() {
@@ -177,6 +178,16 @@ export default function TestExecution() {
           dominantProfile: discResults.dominantProfile,
           profileData: discResults.profileData,
         }));
+      } else if (testType === "mbti") {
+        const mbtiResults = getMBTIResults(allAnswers as any);
+        resultData = JSON.parse(JSON.stringify({
+          completed_at: new Date().toISOString(),
+          total_questions: questions?.length || 0,
+          testType: "mbti",
+          type: mbtiResults.type,
+          scores: mbtiResults.scores,
+          profileData: mbtiResults.profileData,
+        }));
       } else if (testType === "arquetipos_proposito") {
         const scores = calculateArchetypeScores(allAnswers);
         const dominantArchetypes = getDominantArchetypes(scores);
@@ -227,11 +238,17 @@ export default function TestExecution() {
     );
   }
 
-  const options = currentQuestion.options as { value: string | number; text?: string; label?: string }[];
-  const displayOptions = options?.map(opt => ({
-    value: String(opt.value),
-    label: opt.text || opt.label || String(opt.value)
-  }));
+  // Handle both Likert scale and multiple choice formats
+  const options = currentQuestion.options as any;
+  const isLikertScale = options && options.scale;
+  const displayOptions = isLikertScale 
+    ? options.scale 
+    : (Array.isArray(options) 
+        ? options.map((opt: any) => ({
+            value: String(opt.value),
+            label: opt.text || opt.label || String(opt.value)
+          }))
+        : []);
 
   // Show welcome screen at the start
   if (showWelcome && currentQuestionIndex === 0) {

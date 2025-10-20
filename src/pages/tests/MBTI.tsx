@@ -5,9 +5,7 @@ const MBTI = () => {
     <TestDetailLayout
       title="MBTI"
       subtitle="Compreenda sua forma única de pensar e decidir"
-      storytelling="Cada mente é uma combinação única entre razão e intuição.
-O MBTI (Myers-Briggs) revela como você processa o mundo e toma decisões.
-No Essentia, ele é usado para compreender como sua essência pensa, sente e age diante da vida."
+      storytelling="Descubra como você percebe o mundo, toma decisões e se relaciona com a vida. Este teste identifica o seu tipo psicológico segundo a teoria dos tipos de Carl Jung e adapta-o à linguagem simbólica do Essentia."
       benefits={[
         "Seu tipo psicológico (ex: INFP, ESTJ etc.)",
         "Como equilibrar razão, emoção e propósito",
