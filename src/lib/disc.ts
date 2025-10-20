@@ -4,30 +4,30 @@ export const DISC_PROFILES = {
   D: {
     name: "Perfil Dominante",
     emoji: "🎯",
-    description: "Prático, decidido e orientado a resultados. Gosta de desafios e de assumir o controle das situações. Sua força está na ação, mas o crescimento vem ao equilibrar a firmeza com empatia.",
+    description: "Você é orientado à ação, gosta de desafios e se motiva por resultados concretos. Sua presença inspira movimento e coragem. Seu crescimento vem quando equilibra firmeza com empatia e escuta.",
     traits: ["Direto", "Decisivo", "Orientado a resultados", "Desafiador"],
-    growth: "Equilibrar firmeza com empatia"
+    growth: "Equilibrar firmeza com empatia e escuta"
   },
   I: {
     name: "Perfil Influente",
     emoji: "✨",
-    description: "Comunicativo, carismático e motivador. Gosta de inspirar e conectar pessoas. Sua força está na energia e na criatividade, mas floresce ao cultivar mais escuta e foco.",
+    description: "Você é comunicativo, criativo e entusiasmado. Gosta de inspirar, conectar e ver pessoas prosperarem. Evolui ao cultivar foco e consistência, sem perder sua alegria natural.",
     traits: ["Comunicativo", "Entusiasta", "Inspirador", "Carismático"],
-    growth: "Cultivar escuta e foco"
+    growth: "Cultivar foco e consistência"
   },
   S: {
     name: "Perfil Estável",
     emoji: "🤝",
-    description: "Paciente, confiável e leal. Gosta de segurança e harmonia. Sua força está na constância e na calma, e o crescimento surge quando expressa mais autonomia e confiança pessoal.",
+    description: "Você é calmo, confiável e paciente. Valoriza harmonia e segurança. Sua força está em manter a paz onde há tensão, e o amadurecimento vem ao agir com mais iniciativa.",
     traits: ["Paciente", "Leal", "Confiável", "Harmonioso"],
-    growth: "Expressar autonomia e confiança"
+    growth: "Agir com mais iniciativa"
   },
   C: {
     name: "Perfil Cauteloso",
     emoji: "📊",
-    description: "Analítico, organizado e confiável. Gosta de padrões claros e de precisão. Sua força está na lógica e no detalhe, e o amadurecimento vem ao permitir mais flexibilidade e intuição.",
+    description: "Você é analítico, disciplinado e busca a excelência. Gosta de regras claras e previsibilidade. Cresce ao permitir mais flexibilidade e confiar no processo da vida.",
     traits: ["Analítico", "Organizado", "Preciso", "Detalhista"],
-    growth: "Permitir flexibilidade e intuição"
+    growth: "Permitir flexibilidade e confiar no processo"
   }
 };
 
