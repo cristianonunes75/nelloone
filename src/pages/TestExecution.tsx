@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { calculateArchetypeScores, getDominantArchetypes, ARCHETYPES } from "@/lib/archetypes";
 import { getDISCResults } from "@/lib/disc";
 import { getMBTIResults } from "@/lib/mbti";
+import { getEnneagramResults } from "@/lib/eneagrama";
 import { Badge } from "@/components/ui/badge";
 
 export default function TestExecution() {
@@ -181,6 +182,16 @@ export default function TestExecution() {
           type: mbtiResults.type,
           scores: mbtiResults.scores,
           profileData: mbtiResults.profileData,
+        }));
+      } else if (testType === "eneagrama") {
+        const enneagramResults = getEnneagramResults(allAnswers as any);
+        resultData = JSON.parse(JSON.stringify({
+          completed_at: new Date().toISOString(),
+          total_questions: questions?.length || 0,
+          testType: "eneagrama",
+          primaryType: enneagramResults.primaryType,
+          scores: enneagramResults.scores,
+          percentages: enneagramResults.percentages,
         }));
       } else if (testType === "arquetipos_proposito") {
         const scores = calculateArchetypeScores(allAnswers);
