@@ -1,6 +1,6 @@
 import { ReactNode, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 type UserRole = "admin" | "fotografo" | "cliente";
 
@@ -12,10 +12,17 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const { user, userRole, isLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!isLoading && !user) {
-      navigate("/auth");
+      const currentPath = location.pathname;
+      // Check if user is trying to access a test or purchase flow
+      if (currentPath.includes("/cliente/test-execution") || currentPath.includes("/purchase")) {
+        navigate("/auth?redirect=purchase");
+      } else {
+        navigate("/auth");
+      }
     }
 
     if (!isLoading && user && allowedRoles && userRole && !allowedRoles.includes(userRole)) {
@@ -34,7 +41,7 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
           navigate("/");
       }
     }
-  }, [user, userRole, isLoading, allowedRoles, navigate]);
+  }, [user, userRole, isLoading, allowedRoles, navigate, location.pathname]);
 
   if (isLoading) {
     return (
