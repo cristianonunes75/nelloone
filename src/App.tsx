@@ -18,6 +18,14 @@ import ConsultoriaEssentia from "./pages/ConsultoriaEssentia";
 import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ArquetiposMarca from "./pages/tests/ArquetiposMarca";
+import DISC from "./pages/tests/DISC";
+import MBTI from "./pages/tests/MBTI";
+import Eneagrama from "./pages/tests/Eneagrama";
+import Temperamentos from "./pages/tests/Temperamentos";
+import InteligenciasMultiplas from "./pages/tests/InteligenciasMultiplas";
+import LinguagensAmor from "./pages/tests/LinguagensAmor";
+import SOLIS from "./pages/tests/SOLIS";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +43,14 @@ const App = () => (
             <Route path="/consultoria-essentia" element={<ConsultoriaEssentia />} />
             <Route path="/termos" element={<TermsOfService />} />
             <Route path="/privacidade" element={<PrivacyPolicy />} />
+            <Route path="/testes/arquetipos-marca" element={<ArquetiposMarca />} />
+            <Route path="/testes/disc" element={<DISC />} />
+            <Route path="/testes/mbti" element={<MBTI />} />
+            <Route path="/testes/eneagrama" element={<Eneagrama />} />
+            <Route path="/testes/temperamentos" element={<Temperamentos />} />
+            <Route path="/testes/inteligencias-multiplas" element={<InteligenciasMultiplas />} />
+            <Route path="/testes/linguagens-amor" element={<LinguagensAmor />} />
+            <Route path="/testes/solis" element={<SOLIS />} />
             <Route
               path="/cliente"
               element={
