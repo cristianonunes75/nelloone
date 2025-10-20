@@ -3,8 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Download, Calendar, CheckCircle, Lock, RotateCcw } from "lucide-react";
+import { Download, CheckCircle, Lock, RotateCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { ARCHETYPES } from "@/lib/archetypes";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -17,7 +18,6 @@ import { MBTI_PROFILES } from "@/lib/mbti";
 import { useAuth } from "@/hooks/useAuth";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useTests } from "@/hooks/useTests";
-import { Progress } from "@/components/ui/progress";
 
 export default function TestResults() {
   const { userTestId } = useParams();
@@ -55,7 +55,6 @@ export default function TestResults() {
     },
   });
 
-  // Check if user has purchased this test (for paid tests)
   const { data: hasPurchased } = useQuery({
     queryKey: ["test-purchase", user?.id, userTest?.test_id],
     enabled: !!user && !!userTest && !userTest.tests?.is_free,
@@ -70,10 +69,7 @@ export default function TestResults() {
         .eq("payment_status", "completed")
         .single();
 
-      if (error) {
-        // No purchase found
-        return false;
-      }
+      if (error) return false;
       return !!data;
     },
   });
@@ -101,15 +97,7 @@ export default function TestResults() {
     const imgX = (pdfWidth - imgWidth * ratio) / 2;
     const imgY = 10;
 
-    pdf.addImage(
-      imgData,
-      "PNG",
-      imgX,
-      imgY,
-      imgWidth * ratio,
-      imgHeight * ratio
-    );
-
+    pdf.addImage(imgData, "PNG", imgX, imgY, imgWidth * ratio, imgHeight * ratio);
     pdf.save(`resultado-${userTest?.tests?.name}.pdf`);
   };
 
@@ -133,13 +121,9 @@ export default function TestResults() {
       <div className="container mx-auto p-6">
         <Card>
           <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">
-              Resultados não encontrados.
-            </p>
+            <p className="text-center text-muted-foreground">Resultados não encontrados.</p>
             <div className="flex justify-center mt-4">
-              <Button onClick={() => navigate("/cliente")}>
-                Voltar para Dashboard
-              </Button>
+              <Button onClick={() => navigate("/cliente")}>Voltar para Dashboard</Button>
             </div>
           </CardContent>
         </Card>
@@ -148,30 +132,29 @@ export default function TestResults() {
   }
 
   // Determine test type
-  const isArchetyposTest = userTest?.tests?.type === 'arquetipos_proposito';
-  const isDISCTest = userTest?.tests?.type === 'disc';
-  const isMBTITest = userTest?.tests?.type === 'mbti';
-  const isFreeVersion = userTest?.tests?.is_free || false;
+  const isArchetyposTest = userTest.tests?.type === 'arquetipos_proposito';
+  const isDISCTest = userTest.tests?.type === 'disc';
+  const isMBTITest = userTest.tests?.type === 'mbti';
+  const isFreeVersion = userTest.tests?.is_free || false;
   const shouldShowFullResults = isFreeVersion || hasPurchased;
   
   // Cast result_data for MBTI
-  const mbtiResultData = isMBTITest ? (userTest?.result_data as any) : null;
+  const mbtiResultData = isMBTITest ? (userTest.result_data as any) : null;
 
-  // Calculate archetype scores if this is the archetypos test
+  // Calculate archetype scores
   let archetypeScoresArray;
   let archetypeScores: Record<string, number> = {};
   let dominantArchetypes;
   if (isArchetyposTest && answers && answers.length > 0) {
     archetypeScoresArray = calculateArchetypeScores(answers);
     dominantArchetypes = getDominantArchetypes(archetypeScoresArray);
-    // Convert array to record for the graph component
     archetypeScores = archetypeScoresArray.reduce((acc, { archetype, score }) => {
       acc[archetype] = score;
       return acc;
     }, {} as Record<string, number>);
   }
 
-  // Calculate DISC results if this is the DISC test
+  // Calculate DISC results
   let discResults;
   if (isDISCTest && answers && answers.length > 0) {
     discResults = getDISCResults(answers as any);
@@ -188,9 +171,7 @@ export default function TestResults() {
               Reiniciar Teste
             </Button>
           )}
-          <Button onClick={() => navigate("/cliente")}>
-            Voltar para Dashboard
-          </Button>
+          <Button onClick={() => navigate("/cliente")}>Voltar para Dashboard</Button>
         </div>
       </div>
 
@@ -202,8 +183,7 @@ export default function TestResults() {
               <div>
                 <CardTitle className="text-2xl">{userTest.tests?.name}</CardTitle>
                 <CardDescription className="text-primary-foreground/80">
-                  Teste concluído em{" "}
-                  {new Date(userTest.completed_at!).toLocaleDateString("pt-BR")}
+                  Teste concluído em {new Date(userTest.completed_at!).toLocaleDateString("pt-BR")}
                 </CardDescription>
               </div>
             </div>
@@ -212,11 +192,8 @@ export default function TestResults() {
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-semibold mb-2">Sobre o Teste</h3>
-                <p className="text-muted-foreground">
-                  {userTest.tests?.description}
-                </p>
+                <p className="text-muted-foreground">{userTest.tests?.description}</p>
               </div>
-
               <div className="border-t pt-4">
                 <h3 className="text-lg font-semibold mb-2">Estatísticas</h3>
                 <div className="grid grid-cols-2 gap-4">
@@ -234,8 +211,127 @@ export default function TestResults() {
           </CardContent>
         </Card>
 
-        {/* Show appropriate results based on test type */}
-        {isArchetyposTest && shouldShowFullResults ? (
+        {/* MBTI Results */}
+        {isMBTITest && mbtiResultData?.type && (
+          <Card className="border-none shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
+              <div className="text-center space-y-4">
+                <div className="text-6xl">🧠</div>
+                <CardTitle className="text-3xl font-light">{mbtiResultData.type}</CardTitle>
+                <CardDescription className="text-lg">
+                  {MBTI_PROFILES[mbtiResultData.type]?.name || "Seu Tipo Psicológico"}
+                </CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-8 space-y-8">
+              <div className="space-y-4 text-center max-w-3xl mx-auto">
+                <p className="text-lg leading-relaxed">
+                  {MBTI_PROFILES[mbtiResultData.type]?.description}
+                </p>
+              </div>
+
+              <Card className="border-2 border-accent/30">
+                <CardHeader>
+                  <CardTitle className="text-xl">Suas Dimensões</CardTitle>
+                  <CardDescription>Como você se posiciona nas 4 dimensões do MBTI</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* E vs I */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Energia</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[0] === 'E' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium">Extroversão (E)</span>
+                          <span className="text-lg font-bold">{mbtiResultData.scores?.E || 0}</span>
+                        </div>
+                        <Progress value={(mbtiResultData.scores?.E / (mbtiResultData.scores?.E + mbtiResultData.scores?.I)) * 100} className="h-2" />
+                      </div>
+                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[0] === 'I' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium">Introversão (I)</span>
+                          <span className="text-lg font-bold">{mbtiResultData.scores?.I || 0}</span>
+                        </div>
+                        <Progress value={(mbtiResultData.scores?.I / (mbtiResultData.scores?.E + mbtiResultData.scores?.I)) * 100} className="h-2" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* S vs N */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Percepção</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[1] === 'S' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium">Sensação (S)</span>
+                          <span className="text-lg font-bold">{mbtiResultData.scores?.S || 0}</span>
+                        </div>
+                        <Progress value={(mbtiResultData.scores?.S / (mbtiResultData.scores?.S + mbtiResultData.scores?.N)) * 100} className="h-2" />
+                      </div>
+                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[1] === 'N' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium">Intuição (N)</span>
+                          <span className="text-lg font-bold">{mbtiResultData.scores?.N || 0}</span>
+                        </div>
+                        <Progress value={(mbtiResultData.scores?.N / (mbtiResultData.scores?.S + mbtiResultData.scores?.N)) * 100} className="h-2" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* T vs F */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Julgamento</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[2] === 'T' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium">Pensamento (T)</span>
+                          <span className="text-lg font-bold">{mbtiResultData.scores?.T || 0}</span>
+                        </div>
+                        <Progress value={(mbtiResultData.scores?.T / (mbtiResultData.scores?.T + mbtiResultData.scores?.F)) * 100} className="h-2" />
+                      </div>
+                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[2] === 'F' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium">Sentimento (F)</span>
+                          <span className="text-lg font-bold">{mbtiResultData.scores?.F || 0}</span>
+                        </div>
+                        <Progress value={(mbtiResultData.scores?.F / (mbtiResultData.scores?.T + mbtiResultData.scores?.F)) * 100} className="h-2" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* J vs P */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Estilo de Vida</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[3] === 'J' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium">Julgamento (J)</span>
+                          <span className="text-lg font-bold">{mbtiResultData.scores?.J || 0}</span>
+                        </div>
+                        <Progress value={(mbtiResultData.scores?.J / (mbtiResultData.scores?.J + mbtiResultData.scores?.P)) * 100} className="h-2" />
+                      </div>
+                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[3] === 'P' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium">Percepção (P)</span>
+                          <span className="text-lg font-bold">{mbtiResultData.scores?.P || 0}</span>
+                        </div>
+                        <Progress value={(mbtiResultData.scores?.P / (mbtiResultData.scores?.J + mbtiResultData.scores?.P)) * 100} className="h-2" />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="text-center py-8">
+                <p className="text-lg font-light italic text-muted-foreground">
+                  Essentia — uma jornada de autoconhecimento e verdade interior.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {isArchetyposTest && shouldShowFullResults && dominantArchetypes && (
           <ArchetypeResults
             primaryArchetype={dominantArchetypes.primary.archetype}
             secondaryArchetype={dominantArchetypes.secondary?.archetype}
@@ -245,366 +341,73 @@ export default function TestResults() {
             tertiaryScore={dominantArchetypes.tertiary?.score}
             allScores={archetypeScores}
           />
-        ) : isArchetyposTest && !shouldShowFullResults ? (
-          <>
-            {/* PÁGINA 1 - CAPA DO RELATÓRIO PARCIAL */}
-            <Card className="border-none bg-gradient-to-br from-[hsl(var(--accent))]/5 to-background overflow-hidden">
-              <CardContent className="pt-16 pb-16 text-center relative">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[hsl(var(--accent))] to-transparent opacity-50" />
-                <div className="text-6xl mb-6">🌿</div>
-                <h2 className="text-4xl font-light tracking-tight mb-4">Relatório Parcial</h2>
-                <p className="text-xl text-muted-foreground font-light mb-6">Campo de Presença Essentia</p>
-                <div className="mt-8 pt-8 border-t border-border/30 max-w-2xl mx-auto">
-                  <p className="text-sm text-muted-foreground italic leading-relaxed">
-                    "Cada escolha revela uma parte da sua essência.<br />
-                    Este é o retrato do que você vibra neste momento —<br />
-                    uma amostra do seu campo de presença."
-                  </p>
-                </div>
-                <div className="mt-8 text-sm text-muted-foreground">
-                  Data do teste: {new Date(userTest.completed_at!).toLocaleDateString("pt-BR")}
-                </div>
-              </CardContent>
-            </Card>
+        )}
 
-            {/* PÁGINA 2 - RESULTADO PARCIAL */}
-            <Card className="border-2 border-[hsl(var(--accent))]/30">
-              <CardHeader className="bg-gradient-to-r from-[hsl(var(--accent))]/5 to-background">
-                <CardTitle className="text-2xl font-light flex items-center gap-2">
-                  <span className="text-3xl">{ARCHETYPES[dominantArchetypes.primary.archetype]?.emoji}</span>
-                  Arquétipos Predominantes
-                </CardTitle>
-                <CardDescription className="text-base">
-                  Seu campo de presença atual está fortemente guiado por:
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-8 space-y-8">
-                {/* Top 3 Arquétipos */}
-                <div className="space-y-6">
-                  {/* Principal */}
-                  <div className="flex items-start gap-4 p-4 rounded-lg bg-gradient-to-r from-[hsl(var(--accent))]/10 to-transparent">
-                    <span className="text-4xl">{ARCHETYPES[dominantArchetypes.primary.archetype]?.emoji}</span>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-xl">{ARCHETYPES[dominantArchetypes.primary.archetype]?.name}</h3>
-                        <Badge className="bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))]">
-                          {dominantArchetypes.primary.score} pontos
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {ARCHETYPES[dominantArchetypes.primary.archetype]?.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Secundário */}
-                  {dominantArchetypes.secondary && (
-                    <div className="flex items-start gap-4 p-4 rounded-lg bg-muted/30">
-                      <span className="text-3xl">{ARCHETYPES[dominantArchetypes.secondary.archetype]?.emoji}</span>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-medium text-lg">{ARCHETYPES[dominantArchetypes.secondary.archetype]?.name}</h3>
-                          <Badge variant="secondary">
-                            {dominantArchetypes.secondary.score} pontos
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {ARCHETYPES[dominantArchetypes.secondary.archetype]?.description}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Terciário */}
-                  {dominantArchetypes.tertiary && (
-                    <div className="flex items-start gap-4 p-4 rounded-lg bg-muted/20">
-                      <span className="text-2xl">{ARCHETYPES[dominantArchetypes.tertiary.archetype]?.emoji}</span>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-medium">{ARCHETYPES[dominantArchetypes.tertiary.archetype]?.name}</h3>
-                          <Badge variant="outline">
-                            {dominantArchetypes.tertiary.score} pontos
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {ARCHETYPES[dominantArchetypes.tertiary.archetype]?.description}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Significado simbólico */}
-                <div className="border-t pt-6">
-                  <h4 className="font-medium mb-3 flex items-center gap-2">
-                    <span className="text-xl">✨</span>
-                    Significado da combinação
-                  </h4>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Essa combinação representa uma energia que tende a inspirar, proteger e criar. 
-                    Pessoas com esse campo costumam unir {ARCHETYPES[dominantArchetypes.primary.archetype]?.characteristics[0]} 
-                    {dominantArchetypes.secondary && ` com ${ARCHETYPES[dominantArchetypes.secondary.archetype]?.characteristics[0]}`}, 
-                    criando uma presença percebida como equilibrada e autêntica.
-                  </p>
-                </div>
-
-                {/* Interpretação encoberta com gradiente */}
-                <div className="relative border-t pt-6">
-                  <div className="space-y-4 relative">
-                    <h4 className="font-medium flex items-center gap-2">
-                      <span className="text-xl">🕊️</span>
-                      Leitura em andamento...
-                    </h4>
-                    <div className="text-muted-foreground leading-relaxed space-y-3">
-                      <p>
-                        Há aspectos mais profundos sobre sua energia de essência que estão prontos para ser revelados —
-                        incluindo seu <strong>arquétipo base</strong> (alma), <strong>arquétipo social</strong> (expressão) 
-                        e <strong>arquétipo de propósito</strong> (missão).
-                      </p>
-                      <div className="relative">
-                        <p className="blur-sm select-none opacity-60">
-                          Sua essência completa revela um padrão único de expressão que combina forças criativas, 
-                          racionais e espirituais em perfeita harmonia. O relatório completo mostra como essas 
-                          energias se manifestam em sua vida pessoal, profissional e espiritual, oferecendo 
-                          orientações práticas para você viver em alinhamento com seu propósito mais elevado.
-                        </p>
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* CTA para upgrade - melhorado */}
-            <Card className="border-2 border-[hsl(var(--accent))] bg-gradient-to-br from-[hsl(var(--accent))]/10 via-[hsl(var(--accent))]/5 to-background overflow-hidden relative">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[hsl(var(--accent))] to-transparent" />
-              <CardContent className="pt-12 pb-12 text-center space-y-8">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[hsl(var(--accent))]/20">
-                  <Lock className="h-10 w-10 text-[hsl(var(--accent))]" />
-                </div>
-                <div className="space-y-4 max-w-2xl mx-auto">
-                  <h3 className="text-3xl font-light">
-                    ✨ Desbloqueie o <strong className="font-semibold">Relatório Completo</strong>
-                  </h3>
-                  <p className="text-lg text-muted-foreground leading-relaxed">
-                    Acesse seu <strong>Arquétipo de Essência</strong> com análise detalhada, 
-                    gráfico visual dos 12 arquétipos e leitura simbólica em 3 dimensões da vida.
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 text-sm">
-                    <div className="flex flex-col items-center gap-2 p-4 rounded-lg bg-background/50">
-                      <span className="text-2xl">📊</span>
-                      <p className="font-medium">Gráfico Completo</p>
-                      <p className="text-xs text-muted-foreground">12 arquétipos com percentuais</p>
-                    </div>
-                    <div className="flex flex-col items-center gap-2 p-4 rounded-lg bg-background/50">
-                      <span className="text-2xl">🌟</span>
-                      <p className="font-medium">Leitura Simbólica</p>
-                      <p className="text-xs text-muted-foreground">Essência, sombra e propósito</p>
-                    </div>
-                    <div className="flex flex-col items-center gap-2 p-4 rounded-lg bg-background/50">
-                      <span className="text-2xl">🧭</span>
-                      <p className="font-medium">3 Dimensões</p>
-                      <p className="text-xs text-muted-foreground">Pessoal, profissional e espiritual</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="pt-4">
-                  <Button 
-                    size="lg" 
-                    onClick={() => setPurchaseDialogOpen(true)} 
-                    className="min-w-[300px] h-14 text-lg font-medium shadow-lg hover:shadow-xl transition-all"
-                  >
-                    🔓 Liberar minha leitura completa
-                  </Button>
-                  <PurchaseTestDialog
-                    open={purchaseDialogOpen}
-                    onOpenChange={setPurchaseDialogOpen}
-                    testId={userTest.test_id}
-                    testName={userTest.tests?.name || ""}
-                    price={userTest.tests?.price_brl ? parseFloat(userTest.tests.price_brl.toString()) : 29}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </>
-        ) : isDISCTest ? (
-          <div>DISC Results</div>
-        ) : isMBTITest && mbtiResultData?.type ? (
+        {isDISCTest && discResults && (
           <Card className="border-none shadow-lg">
             <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
               <div className="text-center space-y-4">
-                <div className="text-6xl">🧠</div>
-                <CardTitle className="text-3xl font-light">
-                  {mbtiResultData.type}
-                </CardTitle>
-                <CardDescription className="text-lg">
-                  {MBTI_PROFILES[mbtiResultData.type]?.name || "Seu Tipo Psicológico"}
-                </CardDescription>
+                <div className="text-6xl">{discResults.profileData.emoji}</div>
+                <CardTitle className="text-3xl font-light">{discResults.profileData.name}</CardTitle>
+                <CardDescription className="text-lg">Seu Perfil Comportamental</CardDescription>
               </div>
             </CardHeader>
             <CardContent className="pt-8 space-y-8">
-              {/* Descrição do tipo */}
               <div className="space-y-4 text-center max-w-3xl mx-auto">
-                <p className="text-lg leading-relaxed">
-                  {MBTI_PROFILES[mbtiResultData.type]?.description}
-                </p>
+                <p className="text-lg leading-relaxed">{discResults.profileData.description}</p>
               </div>
 
-              {/* Dimensões MBTI */}
               <Card className="border-2 border-accent/30">
                 <CardHeader>
-                  <CardTitle className="text-xl">Suas Dimensões</CardTitle>
-                  <CardDescription>
-                    Como você se posiciona nas 4 dimensões do MBTI
-                  </CardDescription>
+                  <CardTitle className="text-xl">Suas Pontuações</CardTitle>
+                  <CardDescription>Distribuição das suas respostas pelos 4 perfis DISC</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* E vs I */}
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                      Energia
-                    </h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[0] === 'E' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">Extroversão (E)</span>
-                          <span className="text-lg font-bold">{mbtiResultData.scores?.E || 0}</span>
+                <CardContent className="space-y-4">
+                  {Object.entries(discResults.scores)
+                    .sort(([,a], [,b]) => (Number(b) - Number(a)))
+                    .map(([profile, score]) => {
+                      const profileData = DISC_PROFILES[profile as keyof typeof DISC_PROFILES];
+                      const isMain = profile === discResults.dominantProfile;
+                      return (
+                        <div key={profile} className={`space-y-2 p-4 rounded-lg ${isMain ? 'bg-accent/20 border-2 border-accent' : 'bg-muted/50'}`}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <span className="text-3xl">{profileData.emoji}</span>
+                              <div>
+                                <h3 className="font-semibold text-lg">{profileData.name}</h3>
+                                {isMain && <Badge variant="default" className="mt-1">Perfil Dominante</Badge>}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-2xl font-bold">{String(score)}</p>
+                              <p className="text-xs text-muted-foreground">respostas</p>
+                            </div>
+                          </div>
+                          <div className="pl-12">
+                            <p className="text-sm text-muted-foreground">{profileData.traits.join(" • ")}</p>
+                          </div>
                         </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all" 
-                            style={{ width: `${(mbtiResultData.scores?.E / (mbtiResultData.scores?.E + mbtiResultData.scores?.I)) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[0] === 'I' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">Introversão (I)</span>
-                          <span className="text-lg font-bold">{mbtiResultData.scores?.I || 0}</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all" 
-                            style={{ width: `${(mbtiResultData.scores?.I / (mbtiResultData.scores?.E + mbtiResultData.scores?.I)) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* S vs N */}
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                      Percepção
-                    </h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[1] === 'S' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">Sensação (S)</span>
-                          <span className="text-lg font-bold">{mbtiResultData.scores?.S || 0}</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all" 
-                            style={{ width: `${(mbtiResultData.scores?.S / (mbtiResultData.scores?.S + mbtiResultData.scores?.N)) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[1] === 'N' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">Intuição (N)</span>
-                          <span className="text-lg font-bold">{mbtiResultData.scores?.N || 0}</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all" 
-                            style={{ width: `${(mbtiResultData.scores?.N / (mbtiResultData.scores?.S + mbtiResultData.scores?.N)) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* T vs F */}
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                      Julgamento
-                    </h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[2] === 'T' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">Pensamento (T)</span>
-                          <span className="text-lg font-bold">{mbtiResultData.scores?.T || 0}</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all" 
-                            style={{ width: `${(mbtiResultData.scores?.T / (mbtiResultData.scores?.T + mbtiResultData.scores?.F)) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[2] === 'F' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">Sentimento (F)</span>
-                          <span className="text-lg font-bold">{mbtiResultData.scores?.F || 0}</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all" 
-                            style={{ width: `${(mbtiResultData.scores?.F / (mbtiResultData.scores?.T + mbtiResultData.scores?.F)) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* J vs P */}
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                      Estilo de Vida
-                    </h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[3] === 'J' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">Julgamento (J)</span>
-                          <span className="text-lg font-bold">{mbtiResultData.scores?.J || 0}</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all" 
-                            style={{ width: `${(mbtiResultData.scores?.J / (mbtiResultData.scores?.J + mbtiResultData.scores?.P)) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[3] === 'P' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">Percepção (P)</span>
-                          <span className="text-lg font-bold">{mbtiResultData.scores?.P || 0}</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all" 
-                            style={{ width: `${(mbtiResultData.scores?.P / (mbtiResultData.scores?.J + mbtiResultData.scores?.P)) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                      );
+                    })}
                 </CardContent>
               </Card>
 
-              {/* Frase final */}
+              <Card className="bg-gradient-to-br from-accent/10 to-background border-accent/30">
+                <CardContent className="pt-6 space-y-4">
+                  <div className="flex items-center gap-2 text-lg font-semibold">
+                    <span className="text-2xl">🌱</span>
+                    Seu Caminho de Crescimento
+                  </div>
+                  <p className="text-base leading-relaxed pl-8">{discResults.profileData.growth}</p>
+                </CardContent>
+              </Card>
+
               <div className="text-center py-8">
                 <p className="text-lg font-light italic text-muted-foreground">
                   Essentia — uma jornada de autoconhecimento e verdade interior.
                 </p>
               </div>
             </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardContent>Default Results</CardContent>
           </Card>
         )}
       </div>
@@ -618,18 +421,23 @@ export default function TestResults() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            <CardTitle>Agende sua Sessão Fotográfica</CardTitle>
-          </div>
+          <CardTitle>Agendar Sessão de Fotos</CardTitle>
           <CardDescription>
-            Agora que você conhece seu perfil, vamos capturar sua essência!
+            Complete sua jornada com uma sessão fotográfica profissional
           </CardDescription>
         </CardHeader>
         <CardContent>
           <PhotoSessionBooking />
         </CardContent>
       </Card>
+
+      <PurchaseTestDialog
+        open={purchaseDialogOpen}
+        onOpenChange={setPurchaseDialogOpen}
+        testId={userTest.test_id}
+        testName={userTest.tests?.name || ""}
+        price={userTest.tests?.price_brl ? parseFloat(userTest.tests.price_brl.toString()) : 29}
+      />
     </div>
   );
 }

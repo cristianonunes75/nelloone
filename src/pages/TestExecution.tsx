@@ -76,13 +76,11 @@ export default function TestExecution() {
 
   const handleNext = () => {
     if (currentQuestion && selectedAnswer) {
-      // Find the complete option object
-      const selectedOption = displayOptions?.find(opt => opt.value === selectedAnswer);
-      const fullOption = options?.find(opt => String(opt.value) === selectedAnswer);
-      
+      // For Likert scale, save the numeric value
+      // For multiple choice, save the value string
       saveAnswer({
         questionId: currentQuestion.id,
-        answer: fullOption || { value: selectedAnswer },
+        answer: { value: isLikertScale ? parseInt(selectedAnswer) : selectedAnswer },
       });
     }
     nextQuestion();
@@ -90,11 +88,9 @@ export default function TestExecution() {
 
   const handlePrevious = () => {
     if (currentQuestion && selectedAnswer) {
-      const fullOption = options?.find(opt => String(opt.value) === selectedAnswer);
-      
       saveAnswer({
         questionId: currentQuestion.id,
-        answer: fullOption || { value: selectedAnswer },
+        answer: { value: isLikertScale ? parseInt(selectedAnswer) : selectedAnswer },
       });
     }
     previousQuestion();
@@ -102,11 +98,9 @@ export default function TestExecution() {
 
   const handleComplete = async () => {
     if (currentQuestion && selectedAnswer) {
-      const fullOption = options?.find(opt => String(opt.value) === selectedAnswer);
-      
       saveAnswer({
         questionId: currentQuestion.id,
-        answer: fullOption || { value: selectedAnswer },
+        answer: { value: isLikertScale ? parseInt(selectedAnswer) : selectedAnswer },
       });
     }
 
