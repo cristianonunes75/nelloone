@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import logo from "@/assets/logo.png";
+import { LogoText } from "@/components/LogoText";
 import { z } from "zod";
+import { Info } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const authSchema = z.object({
   email: z.string().email({ message: "Email inválido" }),
@@ -172,19 +174,23 @@ const Auth = () => {
     <div className="min-h-screen bg-background flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <img
-            src={logo}
-            alt="Essentia"
-            className="h-16 mx-auto mb-4"
-          />
+          <LogoText className="text-4xl mb-6" />
           <h1 className="text-3xl font-bold mb-2">
             {isLogin ? "Entrar" : "Criar Conta"}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-4">
             {isLogin
               ? "Acesse sua área reservada"
               : "Comece sua jornada Essentia"}
           </p>
+          {!isLogin && (
+            <Alert className="text-left">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Para comprar e realizar os testes, é necessário criar uma conta. Seus resultados ficarão salvos para consulta futura.
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
