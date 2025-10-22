@@ -47,13 +47,13 @@ export default function TestExecution() {
     totalQuestions,
   } = useTestExecution(testId!, userTestId);
 
-  // Get test details for purchase dialog
+  // Get test details for purchase dialog and welcome screen
   const { data: testDetails } = useQuery({
     queryKey: ["test-details", testId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tests")
-        .select("name, price_brl")
+        .select("name, description, price_brl, questions_count, estimated_minutes, icon, type")
         .eq("id", testId!)
         .single();
 
@@ -257,53 +257,65 @@ export default function TestExecution() {
 
   // Show welcome screen at the start
   if (showWelcome && currentQuestionIndex === 0) {
+    const testIcon = testDetails?.icon || "Circle";
+    const testName = testDetails?.name || "Teste";
+    const testDescription = testDetails?.description || "";
+    const questionsCount = testDetails?.questions_count || totalQuestions;
+    const estimatedMinutes = testDetails?.estimated_minutes || 15;
+    const showFreeMessage = !isFreeTest && !hasPaidAccess;
+
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="max-w-3xl w-full text-center space-y-8">
           {/* Icon/Logo */}
           <div className="flex justify-center mb-6">
-            <div className="text-6xl">✴️</div>
+            <div className="text-6xl">
+              {testIcon === "Brain" ? "🧠" : 
+               testIcon === "Heart" ? "❤️" : 
+               testIcon === "Palette" ? "🎨" : 
+               testIcon === "Target" ? "🎯" : 
+               testIcon === "Users" ? "👥" : 
+               testIcon === "Compass" ? "🧭" : 
+               testIcon === "Lightbulb" ? "💡" : 
+               testIcon === "Star" ? "⭐" : "✴️"}
+            </div>
           </div>
 
           {/* Main Title */}
           <div className="space-y-4">
             <h1 className="text-5xl md:text-6xl font-light tracking-tight text-foreground">
-              Teste Essentia
+              {testName}
             </h1>
-            <p className="text-2xl md:text-3xl font-light text-foreground/80">
-              Arquétipos com Propósito
-            </p>
-          </div>
-
-          {/* Subtitle */}
-          <div className="max-w-2xl mx-auto space-y-3">
-            <p className="text-lg text-foreground/90 leading-relaxed">
-              Descubra qual energia arquetípica guia sua presença no mundo.
-            </p>
-            <p className="text-lg text-foreground/90 leading-relaxed">
-              Comece com 12 perguntas gratuitas e desbloqueie a leitura completa de 36.
-            </p>
           </div>
 
           {/* Description */}
-          <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Um teste profundo, intuitivo e visual que revela seu campo de presença — as forças simbólicas que inspiram suas decisões, relações e propósito.
-          </p>
+          <div className="max-w-2xl mx-auto space-y-3">
+            <p className="text-lg text-foreground/90 leading-relaxed">
+              {testDescription}
+            </p>
+            {showFreeMessage && (
+              <p className="text-lg text-foreground/90 leading-relaxed">
+                Comece com 12 perguntas gratuitas e desbloqueie a leitura completa de {questionsCount}.
+              </p>
+            )}
+          </div>
 
           {/* Info Tags */}
           <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground py-6">
             <div className="flex items-center gap-2">
               <span>⏱️</span>
-              <span>15 minutos</span>
+              <span>{estimatedMinutes} minutos</span>
             </div>
             <div className="flex items-center gap-2">
               <span>📜</span>
-              <span>36 questões</span>
+              <span>{questionsCount} questões</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span>🔓</span>
-              <span>Primeiras 12 gratuitas</span>
-            </div>
+            {showFreeMessage && (
+              <div className="flex items-center gap-2">
+                <span>🔓</span>
+                <span>Primeiras 12 gratuitas</span>
+              </div>
+            )}
           </div>
 
           {/* CTA Button */}
@@ -318,9 +330,11 @@ export default function TestExecution() {
           </div>
 
           {/* Footer Note */}
-          <p className="text-xs text-muted-foreground max-w-xl mx-auto leading-relaxed pt-6">
-            O Teste Essentia oferece gratuitamente as 12 primeiras perguntas. Após o resultado parcial, você poderá desbloquear o relatório completo com 36 perguntas e leitura personalizada.
-          </p>
+          {showFreeMessage && (
+            <p className="text-xs text-muted-foreground max-w-xl mx-auto leading-relaxed pt-6">
+              Este teste oferece gratuitamente as 12 primeiras perguntas. Após o resultado parcial, você poderá desbloquear o relatório completo com {questionsCount} perguntas e leitura personalizada.
+            </p>
+          )}
         </div>
       </div>
     );
