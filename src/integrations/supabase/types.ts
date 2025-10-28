@@ -458,6 +458,7 @@ export type Database = {
       test_purchases: {
         Row: {
           id: string
+          metadata: Json | null
           payment_method: string | null
           payment_status: string
           price_paid: number
@@ -468,6 +469,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          metadata?: Json | null
           payment_method?: string | null
           payment_status?: string
           price_paid: number
@@ -478,6 +480,7 @@ export type Database = {
         }
         Update: {
           id?: string
+          metadata?: Json | null
           payment_method?: string | null
           payment_status?: string
           price_paid?: number
@@ -543,6 +546,7 @@ export type Database = {
           name: string
           price_brl: number | null
           questions_count: number
+          stripe_price_id: string | null
           type: Database["public"]["Enums"]["test_type"]
         }
         Insert: {
@@ -556,6 +560,7 @@ export type Database = {
           name: string
           price_brl?: number | null
           questions_count: number
+          stripe_price_id?: string | null
           type: Database["public"]["Enums"]["test_type"]
         }
         Update: {
@@ -569,6 +574,7 @@ export type Database = {
           name?: string
           price_brl?: number | null
           questions_count?: number
+          stripe_price_id?: string | null
           type?: Database["public"]["Enums"]["test_type"]
         }
         Relationships: []

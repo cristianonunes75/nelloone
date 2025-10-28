@@ -1,20 +1,24 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@14.21.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") as string, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-08-27.basil",
 });
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+const logStep = (step: string, details?: any) => {
+  console.log(`[STRIPE-WEBHOOK] ${step}`, details ? JSON.stringify(details) : '');
+};
+
 serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
 
   if (!signature) {
-    console.error("No Stripe signature found");
+    logStep("ERROR: No Stripe signature found");
     return new Response("No signature", { status: 400 });
   }
 
@@ -22,88 +26,115 @@ serve(async (req) => {
     const body = await req.text();
     const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
 
-    // Verify webhook signature
     const event = webhookSecret
       ? stripe.webhooks.constructEvent(body, signature, webhookSecret)
       : JSON.parse(body);
 
-    console.log("Webhook event received:", event.type);
+    logStep("Webhook event received", { type: event.type });
 
-    // Handle successful payment
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       
-      console.log("Processing completed checkout:", session.id);
+      logStep("Processing completed checkout", { sessionId: session.id });
 
-      const testId = session.metadata?.test_id;
+      // Support both single test (legacy) and multiple tests (new)
+      let testIds: string[];
+      if (session.metadata?.test_ids) {
+        try {
+          testIds = JSON.parse(session.metadata.test_ids);
+        } catch {
+          testIds = [session.metadata.test_ids];
+        }
+      } else if (session.metadata?.test_id) {
+        // Legacy single test support
+        testIds = [session.metadata.test_id];
+      } else {
+        logStep("ERROR: Missing test metadata", { metadata: session.metadata });
+        return new Response("Missing test metadata", { status: 400 });
+      }
+
       const userId = session.metadata?.user_id;
 
-      if (!testId || !userId) {
-        console.error("Missing metadata in session:", session.metadata);
-        return new Response("Missing metadata", { status: 400 });
+      if (!userId || userId === "guest") {
+        logStep("WARN: Guest purchase - cannot record without user_id");
+        return new Response(JSON.stringify({ received: true, warning: "Guest purchase" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
       }
 
-      // Validate test exists and price matches
-      const { data: test, error: testError } = await supabase
+      logStep("Processing purchase", { userId, testIds, count: testIds.length });
+
+      // Fetch all tests
+      const { data: tests, error: testsError } = await supabase
         .from("tests")
-        .select("id, price_brl")
-        .eq("id", testId)
-        .single();
+        .select("id, name, price_brl")
+        .in("id", testIds);
 
-      if (testError || !test) {
-        console.error("Invalid test_id in webhook:", testId, testError);
-        return new Response("Invalid test", { status: 400 });
+      if (testsError || !tests || tests.length === 0) {
+        logStep("ERROR: Invalid test IDs", { testIds, error: testsError });
+        return new Response("Invalid tests", { status: 400 });
       }
 
-      // Verify amount paid matches test price (allow small variance for fees)
-      const pricePaid = (session.amount_total || 0) / 100;
-      const expectedPrice = parseFloat(test.price_brl);
-      if (Math.abs(pricePaid - expectedPrice) > 1) {
-        console.error("Price mismatch:", { pricePaid, expectedPrice, testId });
-        return new Response("Price mismatch", { status: 400 });
-      }
+      const amountPaid = (session.amount_total || 0) / 100;
+      logStep("Payment details", { amountPaid, testsCount: tests.length });
 
-      // Check for duplicate purchase (idempotency)
-      const { data: existing } = await supabase
+      // Check for existing purchases (idempotency)
+      const { data: existingPurchases } = await supabase
         .from("test_purchases")
-        .select("id")
+        .select("test_id")
         .eq("user_id", userId)
-        .eq("test_id", testId)
-        .eq("payment_status", "completed")
-        .single();
+        .in("test_id", testIds)
+        .eq("payment_status", "completed");
 
-      if (existing) {
-        console.warn("Duplicate purchase attempt:", { userId, testId });
+      const existingTestIds = existingPurchases?.map(p => p.test_id) || [];
+      const newTestIds = testIds.filter(id => !existingTestIds.includes(id));
+
+      if (newTestIds.length === 0) {
+        logStep("WARN: All tests already purchased", { userId, testIds });
         return new Response(JSON.stringify({ received: true, duplicate: true }), {
           status: 200,
           headers: { "Content-Type": "application/json" },
         });
       }
 
-      // Record the purchase with conflict resolution
+      // Record purchases for each test
+      const pricePerTest = tests.length > 0 ? amountPaid / tests.length : 0;
+      
+      const purchaseRecords = newTestIds.map(testId => {
+        const test = tests.find(t => t.id === testId);
+        return {
+          user_id: userId,
+          test_id: testId,
+          price_paid: pricePerTest,
+          payment_status: "completed" as const,
+          payment_method: "stripe",
+          transaction_id: session.payment_intent as string,
+          metadata: {
+            session_id: session.id,
+            total_tests: tests.length,
+            test_ids: testIds,
+          },
+        };
+      });
+
       const { error: purchaseError } = await supabase
         .from("test_purchases")
-        .upsert(
-          {
-            user_id: userId,
-            test_id: testId,
-            price_paid: pricePaid,
-            payment_status: "completed",
-            payment_method: "stripe",
-            transaction_id: session.payment_intent as string,
-          },
-          {
-            onConflict: "transaction_id",
-            ignoreDuplicates: true,
-          }
-        );
+        .upsert(purchaseRecords, {
+          onConflict: "user_id,test_id",
+          ignoreDuplicates: false,
+        });
 
       if (purchaseError) {
-        console.error("Error recording purchase:", purchaseError);
+        logStep("ERROR: Failed to record purchases", { error: purchaseError });
         throw purchaseError;
       }
 
-      console.log("Purchase recorded successfully for user:", userId);
+      logStep("Purchases recorded successfully", { 
+        userId, 
+        count: newTestIds.length,
+        testIds: newTestIds 
+      });
     }
 
     return new Response(JSON.stringify({ received: true }), {
@@ -111,7 +142,7 @@ serve(async (req) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error: any) {
-    console.error("Webhook error:", error);
+    logStep("ERROR in webhook processing", { message: error.message });
     return new Response(
       JSON.stringify({ error: error.message }),
       {

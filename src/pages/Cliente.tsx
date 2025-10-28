@@ -6,12 +6,15 @@ import { TestCard } from "@/components/cliente/TestCard";
 import { LockedTestCard } from "@/components/cliente/LockedTestCard";
 import { LogoText } from "@/components/LogoText";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, ShoppingCart } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import EssentiaConcierge from "@/components/cliente/EssentiaConcierge";
+import { CartSummary } from "@/components/cliente/CartSummary";
+import { useCart } from "@/hooks/useCart";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const Cliente = () => {
   const { user, signOut, userRole } = useAuth();
@@ -21,6 +24,7 @@ const Cliente = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { selectedTests, toggleTest, isSelected, clearCart } = useCart();
 
   // Handle payment success callback
   useEffect(() => {
@@ -34,6 +38,7 @@ const Cliente = () => {
       
       // Invalidate queries to refresh test access
       queryClient.invalidateQueries({ queryKey: ["test-purchases"] });
+      clearCart(); // Clear cart after successful purchase
       
       // Clean up URL
       searchParams.delete("payment");
@@ -95,7 +100,15 @@ const Cliente = () => {
           </div>
 
           <div className="mb-8">
-            <h2 className="text-2xl font-semibold mb-6">Seus Testes</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold">Seus Testes</h2>
+              {selectedTests.length > 0 && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <ShoppingCart className="w-4 h-4" />
+                  {selectedTests.length} selecionado{selectedTests.length > 1 ? 's' : ''}
+                </div>
+              )}
+            </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {tests?.map((test) => {
                 const isFree = test.is_free || false;
@@ -103,16 +116,26 @@ const Cliente = () => {
 
                 if (!hasTestAccess) {
                   return (
-                    <LockedTestCard
-                      key={test.id}
-                      id={test.id}
-                      name={test.name}
-                      description={test.description}
-                      questionsCount={test.questions_count}
-                      estimatedMinutes={test.estimated_minutes}
-                      icon={test.icon || "Circle"}
-                      price={test.price_brl || 29.0}
-                    />
+                    <div key={test.id} className="relative">
+                      {!test.is_free && (
+                        <div className="absolute top-4 left-4 z-10">
+                          <Checkbox
+                            checked={isSelected(test.id)}
+                            onCheckedChange={() => toggleTest(test.id)}
+                            className="bg-background border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                          />
+                        </div>
+                      )}
+                      <LockedTestCard
+                        id={test.id}
+                        name={test.name}
+                        description={test.description}
+                        questionsCount={test.questions_count}
+                        estimatedMinutes={test.estimated_minutes}
+                        icon={test.icon || "Circle"}
+                        price={test.price_brl || 29.0}
+                      />
+                    </div>
                   );
                 }
 
@@ -171,6 +194,7 @@ const Cliente = () => {
           </div>
         </div>
       </main>
+      <CartSummary tests={tests || []} />
       <EssentiaConcierge />
     </div>
   );
