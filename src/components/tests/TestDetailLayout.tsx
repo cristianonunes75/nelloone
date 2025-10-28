@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTests } from "@/hooks/useTests";
+import { useTestAccess } from "@/hooks/useTestAccess";
 import { useToast } from "@/hooks/use-toast";
 
 interface TestDetailLayoutProps {
@@ -30,10 +31,13 @@ export const TestDetailLayout = ({
   const navigate = useNavigate();
   const { user } = useAuth();
   const { tests, startTestAsync } = useTests();
+  const { hasPurchased } = useTestAccess();
   const { toast } = useToast();
 
   // Find test by type
   const test = tests?.find(t => t.type === testType);
+  const isFreeTest = test?.is_free || false;
+  const hasAccess = isFreeTest || hasPurchased(test?.id || "");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -112,27 +116,44 @@ export const TestDetailLayout = ({
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             {user && test ? (
-              <Button 
-                size="lg" 
-                variant="hero" 
-                className="w-full sm:w-auto"
-                onClick={async () => {
-                  try {
-                    const userTest = await startTestAsync(test.id);
-                    navigate(`/cliente/test-execution/${test.id}/${userTest.id}`);
-                  } catch (error) {
+              hasAccess ? (
+                <Button 
+                  size="lg" 
+                  variant="default" 
+                  className="w-full sm:w-auto"
+                  onClick={async () => {
+                    try {
+                      const userTest = await startTestAsync(test.id);
+                      navigate(`/cliente/test-execution/${test.id}/${userTest.id}`);
+                    } catch (error) {
+                      toast({
+                        title: "Erro ao iniciar teste",
+                        description: "Tente novamente mais tarde.",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                >
+                  {isFreeTest ? "Começar Teste Gratuito" : "Começar Teste"}
+                </Button>
+              ) : (
+                <Button 
+                  size="lg" 
+                  variant="secondary"
+                  className="w-full sm:w-auto"
+                  onClick={() => {
                     toast({
-                      title: "Erro ao iniciar teste",
-                      description: "Tente novamente mais tarde.",
-                      variant: "destructive",
+                      title: "Teste Bloqueado",
+                      description: "Você precisa adquirir este teste para começar.",
                     });
-                  }
-                }}
-              >
-                Começar Teste
-              </Button>
+                    navigate("/cliente");
+                  }}
+                >
+                  🔒 Adquirir Teste
+                </Button>
+              )
             ) : (
-              <Button asChild size="lg" variant="hero" className="w-full sm:w-auto">
+              <Button asChild size="lg" variant="default" className="w-full sm:w-auto">
                 <Link to="/auth">
                   Fazer Login para Começar
                 </Link>

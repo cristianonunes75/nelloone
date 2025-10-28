@@ -114,8 +114,8 @@ export default function TestExecution() {
 
     const testType = testData?.type;
 
-    // If this is the free version and user finished 12 questions, calculate partial results
-    if (!hasPaidAccess && !isFreeTest && isLastQuestion) {
+    // If this is the freemium version and user finished 5 questions, calculate partial results
+    if (isFreeTest && !hasPaidAccess && isLastQuestion) {
       // Fetch all answers to calculate partial results
       const { data: allAnswers } = await supabase
         .from("test_answers")
@@ -262,7 +262,7 @@ export default function TestExecution() {
     const testDescription = testDetails?.description || "";
     const questionsCount = testDetails?.questions_count || totalQuestions;
     const estimatedMinutes = testDetails?.estimated_minutes || 15;
-    const showFreeMessage = !isFreeTest && !hasPaidAccess;
+    const showFreeMessage = isFreeTest && !hasPaidAccess;
 
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
@@ -295,7 +295,7 @@ export default function TestExecution() {
             </p>
             {showFreeMessage && (
               <p className="text-lg text-foreground/90 leading-relaxed">
-                Comece com 12 perguntas gratuitas e desbloqueie a leitura completa de {questionsCount}.
+                Comece com 5 perguntas gratuitas e desbloqueie a leitura completa de {questionsCount}.
               </p>
             )}
           </div>
@@ -313,7 +313,7 @@ export default function TestExecution() {
             {showFreeMessage && (
               <div className="flex items-center gap-2">
                 <span>🔓</span>
-                <span>Primeiras 12 gratuitas</span>
+                <span>Primeiras 5 gratuitas</span>
               </div>
             )}
           </div>
@@ -332,7 +332,7 @@ export default function TestExecution() {
           {/* Footer Note */}
           {showFreeMessage && (
             <p className="text-xs text-muted-foreground max-w-xl mx-auto leading-relaxed pt-6">
-              Este teste oferece gratuitamente as 12 primeiras perguntas. Após o resultado parcial, você poderá desbloquear o relatório completo com {questionsCount} perguntas e leitura personalizada.
+              Este teste oferece gratuitamente as 5 primeiras perguntas. Após o resultado parcial, você poderá desbloquear o relatório completo com {questionsCount} perguntas e leitura personalizada.
             </p>
           )}
         </div>

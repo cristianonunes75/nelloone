@@ -30,7 +30,7 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   });
 
   const isFreeTest = testInfo?.is_free || false;
-  const hasPaidAccess = isFreeTest || hasPurchased(testId);
+  const hasPaidAccess = hasPurchased(testId);
 
   // Fetch questions for this test
   const { data: allQuestions, isLoading: questionsLoading } = useQuery({
@@ -47,10 +47,11 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
     },
   });
 
-  // Limit questions to first 12 if user hasn't paid for full access
-  const FREE_QUESTION_LIMIT = 12;
-  const questions = !hasPaidAccess && !isFreeTest
-    ? allQuestions?.slice(0, FREE_QUESTION_LIMIT)
+  // For freemium test (Archetypes): limit to 5 questions if not purchased
+  // For paid tests: shouldn't reach here if not purchased (blocked at UI level)
+  const FREEMIUM_QUESTION_LIMIT = 5;
+  const questions = isFreeTest && !hasPaidAccess
+    ? allQuestions?.slice(0, FREEMIUM_QUESTION_LIMIT)
     : allQuestions;
 
   // Fetch existing answers
