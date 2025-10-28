@@ -17,6 +17,8 @@ interface PurchaseTestDialogProps {
   testId: string;
   testName: string;
   price: number;
+  isFreeTest?: boolean;
+  answeredQuestions?: number;
 }
 
 export const PurchaseTestDialog = ({
@@ -25,6 +27,8 @@ export const PurchaseTestDialog = ({
   testId,
   testName,
   price,
+  isFreeTest = false,
+  answeredQuestions = 0,
 }: PurchaseTestDialogProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -69,17 +73,28 @@ export const PurchaseTestDialog = ({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-2xl font-light">
-            Seu resultado está quase completo
+            {isFreeTest && answeredQuestions >= 5
+              ? "Seu resultado está quase completo"
+              : `Desbloquear ${testName}`}
           </DialogTitle>
           <DialogDescription className="text-base pt-2 space-y-3">
-            <p>
-              12 respostas já revelaram muito sobre você — mas as próximas 24 trarão 
-              clareza sobre quem você realmente é.
-            </p>
-            <p>
-              O relatório completo mostra como sua energia muda em diferentes contextos 
-              (vida, trabalho e espiritualidade).
-            </p>
+            {isFreeTest && answeredQuestions >= 5 ? (
+              <>
+                <p>
+                  {answeredQuestions} respostas já revelaram muito sobre você — mas as próximas questões 
+                  trarão clareza sobre quem você realmente é.
+                </p>
+                <p>
+                  O relatório completo mostra como sua energia muda em diferentes contextos 
+                  (vida, trabalho e espiritualidade).
+                </p>
+              </>
+            ) : (
+              <p>
+                Desbloqueie acesso completo ao teste <strong>{testName}</strong> e descubra 
+                insights profundos sobre sua personalidade e comportamento.
+              </p>
+            )}
           </DialogDescription>
         </DialogHeader>
 

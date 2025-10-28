@@ -496,6 +496,8 @@ export default function TestExecution() {
           testId={testId!}
           testName={testDetails?.name || ""}
           price={testDetails?.price_brl ? parseFloat(testDetails.price_brl.toString()) : 29}
+          isFreeTest={isFreeTest}
+          answeredQuestions={currentQuestionIndex}
         />
       </div>
     );

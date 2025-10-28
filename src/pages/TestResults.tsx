@@ -523,6 +523,8 @@ export default function TestResults() {
         testId={userTest.test_id}
         testName={userTest.tests?.name || ""}
         price={userTest.tests?.price_brl ? parseFloat(userTest.tests.price_brl.toString()) : 29}
+        isFreeTest={userTest.tests?.is_free || false}
+        answeredQuestions={answers?.length || 0}
       />
     </div>
   );
