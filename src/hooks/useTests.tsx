@@ -16,6 +16,7 @@ export const useTests = () => {
         .from("tests")
         .select("*")
         .eq("active", true)
+        .order("is_free", { ascending: false })
         .order("created_at");
 
       if (error) throw error;
