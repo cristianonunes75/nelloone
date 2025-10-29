@@ -39,6 +39,8 @@ interface Test {
   price_brl: number;
   questions_count: number;
   estimated_minutes: number;
+  icon?: string | null;
+  stripe_price_id?: string | null;
 }
 
 export const TestsManagement = () => {
@@ -55,6 +57,8 @@ export const TestsManagement = () => {
     questions_count: number;
     estimated_minutes: number;
     price_brl: number;
+    icon: string;
+    stripe_price_id: string;
   }>({
     name: "",
     description: "",
@@ -62,6 +66,8 @@ export const TestsManagement = () => {
     questions_count: 0,
     estimated_minutes: 0,
     price_brl: 29.0,
+    icon: "",
+    stripe_price_id: "",
   });
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
@@ -204,6 +210,8 @@ export const TestsManagement = () => {
         questions_count: test.questions_count,
         estimated_minutes: test.estimated_minutes,
         price_brl: test.price_brl,
+        icon: test.icon || "",
+        stripe_price_id: test.stripe_price_id || "",
       });
     } else {
       setSelectedTest(null);
@@ -214,6 +222,8 @@ export const TestsManagement = () => {
         questions_count: 0,
         estimated_minutes: 0,
         price_brl: 29.0,
+        icon: "",
+        stripe_price_id: "",
       });
     }
     setEditDialogOpen(true);
@@ -246,6 +256,8 @@ export const TestsManagement = () => {
             questions_count: formData.questions_count,
             estimated_minutes: formData.estimated_minutes,
             price_brl: formData.price_brl,
+            icon: formData.icon || null,
+            stripe_price_id: formData.stripe_price_id || null,
             active: true,
             is_free: false,
           }]);
@@ -360,7 +372,19 @@ export const TestsManagement = () => {
                       R$ {test.price_brl.toFixed(2)}
                     </span>
                   </div>
+                  {test.icon && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground">Ícone:</span>
+                      <span className="font-medium text-lg">{test.icon}</span>
+                    </div>
+                  )}
                 </div>
+                
+                {test.stripe_price_id && (
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    <span className="font-medium">Stripe Price ID:</span> {test.stripe_price_id}
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col gap-4 ml-6">
@@ -503,6 +527,29 @@ export const TestsManagement = () => {
                   onChange={(e) => setFormData({ ...formData, estimated_minutes: parseInt(e.target.value) })}
                 />
               </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="icon">Ícone (emoji ou texto)</Label>
+              <Input
+                id="icon"
+                value={formData.icon}
+                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                placeholder="Ex: 🧠, 💼, ❤️"
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="stripe_price_id">Stripe Price ID</Label>
+              <Input
+                id="stripe_price_id"
+                value={formData.stripe_price_id}
+                onChange={(e) => setFormData({ ...formData, stripe_price_id: e.target.value })}
+                placeholder="Ex: price_1SNBIuDjhZZxZELMm3qUtTON"
+              />
+              <p className="text-xs text-muted-foreground">
+                ID do preço criado no Stripe para este teste
+              </p>
             </div>
           </div>
 
