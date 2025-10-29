@@ -100,14 +100,19 @@ const Cliente = () => {
           </div>
 
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold">Seus Testes</h2>
-              {selectedTests.length > 0 && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <ShoppingCart className="w-4 h-4" />
-                  {selectedTests.length} selecionado{selectedTests.length > 1 ? 's' : ''}
-                </div>
-              )}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-2xl font-semibold">Seus Testes</h2>
+                {selectedTests.length > 0 && (
+                  <div className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full">
+                    <ShoppingCart className="w-4 h-4" />
+                    <span className="font-medium">{selectedTests.length} selecionado{selectedTests.length > 1 ? 's' : ''}</span>
+                  </div>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                💡 Selecione múltiplos testes bloqueados para ganhar desconto: 5% em 3+ testes, 10% em 5+ testes
+              </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {tests?.map((test) => {
@@ -116,15 +121,24 @@ const Cliente = () => {
 
                 if (!hasTestAccess) {
                   return (
-                    <div key={test.id} className="relative">
+                    <div key={test.id} className="relative group">
                       {!test.is_free && (
-                        <div className="absolute top-4 left-4 z-10">
-                          <Checkbox
-                            checked={isSelected(test.id)}
-                            onCheckedChange={() => toggleTest(test.id)}
-                            className="bg-background border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                          />
-                        </div>
+                        <label 
+                          htmlFor={`test-${test.id}`}
+                          className="absolute top-3 left-3 z-10 cursor-pointer bg-background/95 backdrop-blur-sm border-2 border-border rounded-xl p-2 shadow-lg hover:bg-primary/5 hover:border-primary transition-all duration-200"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Checkbox
+                              id={`test-${test.id}`}
+                              checked={isSelected(test.id)}
+                              onCheckedChange={() => toggleTest(test.id)}
+                              className="h-5 w-5 border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                            />
+                            <span className="text-xs font-medium whitespace-nowrap">
+                              {isSelected(test.id) ? 'Selecionado' : 'Selecionar'}
+                            </span>
+                          </div>
+                        </label>
                       )}
                       <LockedTestCard
                         id={test.id}
