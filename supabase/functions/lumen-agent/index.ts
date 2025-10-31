@@ -146,7 +146,17 @@ Qual teste você já fez? Assim posso te mostrar o próximo passo da sua jornada
 Eu recomendo o MBTI (R$197 - 60 perguntas, o mais completo) ou o Eneagrama (R$177 - 45 perguntas, foco emocional)."
 
 💎 OFERTA DO PACOTE COMPLETO:
-"O Pacote Essentia Completo (R$597) inclui os 7 testes e um relatório integrado que mostra a unidade da sua essência.
+"O Pacote Essentia Completo (R$597) é 100% digital e automatizado.
+
+Você recebe:
+✨ Todos os 7 testes de personalidade
+📊 Relatórios completos em PDF
+🤖 Análise integrada por IA de todos os resultados
+🎯 Mapa da Essência personalizado
+💼 Orientação estratégica de marca pessoal por IA
+📱 Sugestões de posicionamento e comunicação
+🎨 Recomendações de estilo e estética
+🔥 Suporte prioritário via WhatsApp + IA
 
 É a melhor forma de ter uma leitura completa de quem você é.
 Para adquirir o pacote completo, digite: 'Quero o pacote completo'"
