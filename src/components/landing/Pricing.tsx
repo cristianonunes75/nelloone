@@ -87,15 +87,11 @@ export const Pricing = () => {
               <span className="text-sm font-semibold text-gold">Oferta de Lançamento</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Primeiros 100 Clientes
+              Escolha Seu Caminho
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-2">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Escolha seus testes individualmente ou garanta o pacote completo com economia.
             </p>
-            <div className="flex items-center justify-center gap-2 text-gold font-semibold">
-              <div className="w-2 h-2 rounded-full bg-gold animate-pulse" />
-              <span>Restam apenas 87 vagas</span>
-            </div>
           </div>
 
           {/* Testes Individuais */}
