@@ -11,15 +11,37 @@ interface Message {
   content: string;
 }
 
+interface QuickReply {
+  text: string;
+  action: string;
+}
+
 export const LumenAgent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [quickReplies, setQuickReplies] = useState<QuickReply[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const { tests, userTests } = useTests();
+
+  // Quick replies baseadas no contexto
+  const getInitialQuickReplies = (isReturning: boolean): QuickReply[] => {
+    if (isReturning) {
+      return [
+        { text: "Continuar jornada", action: "continuar" },
+        { text: "Ver todos os testes", action: "ver_testes" },
+        { text: "Fazer novo teste", action: "novo_teste" },
+      ];
+    }
+    return [
+      { text: "Sim, quero começar", action: "comecar" },
+      { text: "Quero entender mais", action: "entender" },
+      { text: "Já fiz um teste", action: "ja_fiz" },
+    ];
+  };
 
   // Detectar se é visitante novo ou recorrente
   useEffect(() => {
@@ -33,10 +55,11 @@ export const LumenAgent = () => {
     // Mensagem inicial baseada no contexto
     if (messages.length === 0) {
       const welcomeMessage = isReturning
-        ? "Olá novamente! Que bom ter você aqui de volta. ✨\n\nComo posso te ajudar hoje? Quer continuar explorando sua essência ou tem alguma dúvida sobre os testes?"
-        : "Olá! Que bom te ver por aqui. 🌿\n\nEu sou o Lumen, o guia do Essentia. Meu papel é te ajudar a descobrir qual teste combina com o momento da sua vida.\n\nPosso te fazer uma pergunta rápida? Você busca entender mais sua mente, suas emoções ou seu propósito?";
+        ? "👋 Olá novamente! Que bom ter você aqui de volta. ✨\n\nComo posso te ajudar hoje?"
+        : "👋 Olá! Seja muito bem-vindo ao Essentia.\nEu sou o Lumen, seu guia nesta jornada de autoconhecimento.\n\nPosso te ajudar a descobrir qual teste combina com o seu momento atual?";
       
       setMessages([{ role: "assistant", content: welcomeMessage }]);
+      setQuickReplies(getInitialQuickReplies(isReturning));
     }
   }, []);
 
@@ -46,12 +69,14 @@ export const LumenAgent = () => {
     }
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!input.trim() || isStreaming) return;
+  const sendMessage = async (messageText?: string) => {
+    const textToSend = messageText || input.trim();
+    if (!textToSend || isStreaming) return;
 
-    const userMessage: Message = { role: "user", content: input };
+    const userMessage: Message = { role: "user", content: textToSend };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
+    setQuickReplies([]); // Limpar quick replies ao enviar mensagem
     setIsStreaming(true);
 
     try {
@@ -153,6 +178,10 @@ export const LumenAgent = () => {
     }
   };
 
+  const handleQuickReply = (reply: QuickReply) => {
+    sendMessage(reply.text);
+  };
+
   if (!isOpen) {
     return (
       <Button
@@ -252,6 +281,23 @@ export const LumenAgent = () => {
         </div>
       </ScrollArea>
 
+      {/* Quick Replies */}
+      {quickReplies.length > 0 && !isStreaming && (
+        <div className="px-4 pb-2 flex flex-wrap gap-2">
+          {quickReplies.map((reply, index) => (
+            <Button
+              key={index}
+              variant="outline"
+              size="sm"
+              onClick={() => handleQuickReply(reply)}
+              className="rounded-full text-xs hover:bg-primary/10 hover:text-primary border-primary/20"
+            >
+              {reply.text}
+            </Button>
+          ))}
+        </div>
+      )}
+
       {/* Input */}
       <div className="p-4 border-t border-border">
         <div className="flex gap-2">
@@ -264,7 +310,7 @@ export const LumenAgent = () => {
             className="flex-1"
           />
           <Button
-            onClick={sendMessage}
+            onClick={() => sendMessage()}
             disabled={isStreaming || !input.trim()}
             size="icon"
             className="bg-gradient-to-br from-primary via-purple-600 to-pink-600 hover:opacity-90"
