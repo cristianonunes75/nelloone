@@ -5,12 +5,13 @@ const InteligenciasMultiplas = () => {
     <TestDetailLayout
       title="Inteligências Múltiplas"
       subtitle="Reconheça seus dons e talentos"
-      storytelling="Cada pessoa tem formas únicas de expressar inteligência: musical, emocional, lógica, corporal, interpessoal…
-Esse teste revela o modo como você manifesta os dons que Deus te confiou."
+      storytelling="Cada pessoa tem uma combinação única de talentos e formas de pensar. O teste das Inteligências Múltiplas mostra quais áreas da sua mente têm mais energia — e como usá-las no trabalho, na vocação e na vida."
       benefits={[
-        "Suas inteligências dominantes",
-        "Como desenvolver talentos ainda ocultos",
-        "Como usar suas habilidades para servir e prosperar",
+        "40 perguntas para revelar como sua mente aprende, cria e realiza",
+        "Relatório de 10 páginas com leitura simbólica + plano de ação pessoal",
+        "Gráfico com suas 8 inteligências mapeadas",
+        "Recomendações personalizadas de desenvolvimento",
+        "Vídeo de orientação + acesso 7 dias à Comunidade Essentia"
       ]}
       audience="Profissionais, educadores, artistas e empreendedores que desejam alinhar talento, propósito e fé."
       testType="inteligencias_multiplas"
