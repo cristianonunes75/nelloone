@@ -1,4 +1,4 @@
-import { Brain, Target, Compass, Star, Thermometer, Lightbulb, Heart, Cross } from "lucide-react";
+import { Brain, Target, Compass, Star, Thermometer, Lightbulb, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -45,12 +45,6 @@ const tests = [
     description: "Comunicação afetiva e relacional (Gary Chapman)",
     link: "/teste-linguagens"
   },
-  { 
-    icon: Cross, 
-    title: "SOLIS", 
-    description: "Simbologia da Luz Interior e de Estilo — expressão fotográfica",
-    link: "/teste-solis"
-  },
 ];
 
 export const Tests = () => {
@@ -60,7 +54,7 @@ export const Tests = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              8 Testes de <span className="text-gold">Autoconhecimento</span>
+              7 Testes de <span className="text-gold">Autoconhecimento</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Ferramentas validadas de análise de personalidade, talentos e comunicação.
