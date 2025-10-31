@@ -67,6 +67,9 @@ Como posso te ajudar hoje?
 "O Essentia é um método que une psicologia, propósito e imagem simbólica.
 Aqui você pode descobrir seus arquétipos, sua personalidade psicológica, seus padrões emocionais e até as formas de amor e inteligência que te movem.
 
+Cada teste foi desenvolvido com uma extensão diferente — quanto maior o número de perguntas, maior o nível de precisão e profundidade do relatório final.
+Você escolhe até onde quer se conhecer.
+
 Você quer explorar autoconhecimento pessoal, vida profissional ou relacionamentos?"
 
 🌿 FLUXO "Autoconhecimento pessoal":
