@@ -4,16 +4,15 @@ const Temperamentos = () => {
   return (
     <TestDetailLayout
       title="Temperamentos"
-      subtitle="As raízes clássicas da personalidade"
-      storytelling="Desde os antigos, o ser humano é estudado por seus temperamentos.
-Sanguíneo, colérico, melancólico ou fleumático — cada um revela uma forma de sentir, agir e servir.
-No Essentia, esse teste conecta sabedoria tradicional e espiritualidade para uma leitura integral da sua personalidade."
+      subtitle="Conheça sua natureza essencial"
+      storytelling="Desde Hipócrates, o ser humano busca entender as quatro formas fundamentais de ser: sanguíneo, colérico, melancólico e fleumático.
+Esse teste revela a base da sua personalidade — e como harmonizar suas tendências naturais com propósito e equilíbrio."
       benefits={[
-        "Seu temperamento predominante",
-        "Como harmonizar emoções e decisões",
-        "Como usar seus dons naturais em missão e convivência",
+        "Seu temperamento dominante e secundário",
+        "Como sua natureza influencia decisões e relacionamentos",
+        "Como desenvolver suas forças e harmonizar suas tendências",
       ]}
-      audience="Quem deseja compreender suas reações e encontrar equilíbrio emocional com base na fé."
+      audience="Líderes, empreendedores, profissionais de saúde e todos que buscam autoconhecimento profundo baseado em tradição milenar."
       testType="temperamentos"
     />
   );

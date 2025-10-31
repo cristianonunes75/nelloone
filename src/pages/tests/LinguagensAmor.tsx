@@ -4,15 +4,15 @@ const LinguagensAmor = () => {
   return (
     <TestDetailLayout
       title="Linguagens do Amor"
-      subtitle="A forma como você dá e recebe amor"
-      storytelling="Todos amam, mas nem todos falam a mesma linguagem.
-Esse teste, inspirado em Gary Chapman, ajuda você a compreender como expressa e percebe amor, seja em relacionamentos, família ou missão."
+      subtitle="Como você ama e se sente amado?"
+      storytelling="Cada pessoa expressa e recebe amor de formas diferentes: palavras, tempo, presentes, ajuda prática ou toque físico.
+Esse teste revela como o amor fala em sua alma — e como você pode comunicar e receber afeto de forma mais verdadeira."
       benefits={[
-        "Sua linguagem principal e as secundárias",
-        "Como comunicar afeto e cuidado de forma verdadeira",
-        "Como fortalecer vínculos com empatia e equilíbrio",
+        "Sua linguagem primária e secundária de amor",
+        "Como melhorar seus relacionamentos afetivos",
+        "Recomendações práticas de comunicação e convivência",
       ]}
-      audience="Casais, pais, líderes e qualquer pessoa que deseja amar melhor."
+      audience="Pessoas em relacionamentos, famílias, profissionais que trabalham com pessoas e todos que desejam aprofundar conexões verdadeiras."
       testType="linguagens_amor"
     />
   );

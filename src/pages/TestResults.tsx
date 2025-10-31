@@ -16,6 +16,8 @@ import { calculateArchetypeScores, getDominantArchetypes } from "@/lib/archetype
 import { getDISCResults, DISC_PROFILES } from "@/lib/disc";
 import { MBTI_PROFILES } from "@/lib/mbti";
 import { ENNEAGRAM_PROFILES } from "@/lib/eneagrama";
+import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
+import { calculateTemperamentos } from "@/lib/temperamentos";
 import { useAuth } from "@/hooks/useAuth";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useTests } from "@/hooks/useTests";
@@ -137,12 +139,16 @@ export default function TestResults() {
   const isDISCTest = userTest.tests?.type === 'disc';
   const isMBTITest = userTest.tests?.type === 'mbti';
   const isEnneagramTest = userTest.tests?.type === 'eneagrama';
+  const isLinguagensAmorTest = userTest.tests?.type === 'linguagens_amor';
+  const isTemperamentosTest = userTest.tests?.type === 'temperamentos';
   const isFreeVersion = userTest.tests?.is_free || false;
   const shouldShowFullResults = isFreeVersion || hasPurchased;
   
   // Cast result_data for MBTI and Enneagram
   const mbtiResultData = isMBTITest ? (userTest.result_data as any) : null;
   const enneagramResultData = isEnneagramTest ? (userTest.result_data as any) : null;
+  const linguagensAmorResultData = isLinguagensAmorTest ? (userTest.result_data as any) : null;
+  const temperamentosResultData = isTemperamentosTest ? (userTest.result_data as any) : null;
 
   // Calculate archetype scores
   let archetypeScoresArray;
@@ -439,52 +445,162 @@ export default function TestResults() {
               </div>
             </CardHeader>
             <CardContent className="pt-8 space-y-8">
-              <div className="space-y-4 text-center max-w-3xl mx-auto">
-                <p className="text-lg leading-relaxed">{discResults.profileData.description}</p>
+...
+              <div className="text-center py-8">
+                <p className="text-lg font-light italic text-muted-foreground">
+                  Essentia — uma jornada de autoconhecimento e verdade interior.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {isLinguagensAmorTest && linguagensAmorResultData && (
+          <Card className="border-none shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
+              <div className="text-center space-y-4">
+                <div className="text-6xl">💕</div>
+                <CardTitle className="text-3xl font-light">Linguagens do Amor</CardTitle>
+                <CardDescription className="text-lg">Como você ama e se sente amado(a)</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-8 space-y-8">
+              <div className="grid md:grid-cols-2 gap-6">
+                <Card className="border-2 border-accent">
+                  <CardHeader>
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      <span className="text-3xl">{linguagensAmorResultData.primary?.symbol?.split(' ')[0]}</span>
+                      Linguagem Principal
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <h3 className="text-lg font-semibold">{linguagensAmorResultData.primary?.name}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{linguagensAmorResultData.primary?.symbol}</p>
+                    </div>
+                    <Badge variant="default" className="text-lg px-4 py-2">
+                      {linguagensAmorResultData.primary?.score} pontos
+                    </Badge>
+                    <p className="text-base leading-relaxed italic">
+                      {linguagensAmorResultData.primary?.essence}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2 border-muted">
+                  <CardHeader>
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      <span className="text-3xl">{linguagensAmorResultData.secondary?.symbol?.split(' ')[0]}</span>
+                      Linguagem Secundária
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <h3 className="text-lg font-semibold">{linguagensAmorResultData.secondary?.name}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{linguagensAmorResultData.secondary?.symbol}</p>
+                    </div>
+                    <Badge variant="outline" className="text-lg px-4 py-2">
+                      {linguagensAmorResultData.secondary?.score} pontos
+                    </Badge>
+                    <p className="text-base leading-relaxed italic">
+                      {linguagensAmorResultData.secondary?.essence}
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
 
-              <Card className="border-2 border-accent/30">
-                <CardHeader>
-                  <CardTitle className="text-xl">Suas Pontuações</CardTitle>
-                  <CardDescription>Distribuição das suas respostas pelos 4 perfis DISC</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {Object.entries(discResults.scores)
-                    .sort(([,a], [,b]) => (Number(b) - Number(a)))
-                    .map(([profile, score]) => {
-                      const profileData = DISC_PROFILES[profile as keyof typeof DISC_PROFILES];
-                      const isMain = profile === discResults.dominantProfile;
-                      return (
-                        <div key={profile} className={`space-y-2 p-4 rounded-lg ${isMain ? 'bg-accent/20 border-2 border-accent' : 'bg-muted/50'}`}>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <span className="text-3xl">{profileData.emoji}</span>
-                              <div>
-                                <h3 className="font-semibold text-lg">{profileData.name}</h3>
-                                {isMain && <Badge variant="default" className="mt-1">Perfil Dominante</Badge>}
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-2xl font-bold">{String(score)}</p>
-                              <p className="text-xs text-muted-foreground">respostas</p>
-                            </div>
-                          </div>
-                          <div className="pl-12">
-                            <p className="text-sm text-muted-foreground">{profileData.traits.join(" • ")}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
+              <Card className="bg-gradient-to-br from-accent/10 to-background border-accent/30">
+                <CardContent className="pt-6 space-y-4">
+                  <div className="flex items-center gap-2 text-lg font-semibold">
+                    <span className="text-2xl">✨</span>
+                    Interpretação Personalizada
+                  </div>
+                  <p className="text-base leading-relaxed pl-8 whitespace-pre-line">
+                    {linguagensAmorResultData.interpretation}
+                  </p>
                 </CardContent>
               </Card>
+
+              <div className="text-center py-8">
+                <p className="text-lg font-light italic text-muted-foreground">
+                  Essentia — uma jornada de autoconhecimento e verdade interior.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {isTemperamentosTest && temperamentosResultData && (
+          <Card className="border-none shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
+              <div className="text-center space-y-4">
+                <div className="text-6xl">⚖️</div>
+                <CardTitle className="text-3xl font-light">Temperamentos</CardTitle>
+                <CardDescription className="text-lg">Sua natureza essencial</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-8 space-y-8">
+              <div className="grid md:grid-cols-2 gap-6">
+                <Card className="border-2 border-accent">
+                  <CardHeader>
+                    <CardTitle className="text-xl">Temperamento Dominante</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <h3 className="text-2xl font-semibold">{temperamentosResultData.primary?.name}</h3>
+                    </div>
+                    <Badge variant="default" className="text-lg px-4 py-2">
+                      {temperamentosResultData.primary?.score} pontos
+                    </Badge>
+                    <p className="text-base leading-relaxed">
+                      {temperamentosResultData.primary?.description}
+                    </p>
+                    <div className="space-y-2 mt-4">
+                      <h4 className="font-semibold text-sm">Características:</h4>
+                      <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                        {temperamentosResultData.primary?.traits?.map((trait: string, idx: number) => (
+                          <li key={idx}>{trait}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2 border-muted">
+                  <CardHeader>
+                    <CardTitle className="text-xl">Temperamento Secundário</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <h3 className="text-2xl font-semibold">{temperamentosResultData.secondary?.name}</h3>
+                    </div>
+                    <Badge variant="outline" className="text-lg px-4 py-2">
+                      {temperamentosResultData.secondary?.score} pontos
+                    </Badge>
+                    <p className="text-base leading-relaxed">
+                      {temperamentosResultData.secondary?.description}
+                    </p>
+                    <div className="space-y-2 mt-4">
+                      <h4 className="font-semibold text-sm">Características:</h4>
+                      <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                        {temperamentosResultData.secondary?.traits?.map((trait: string, idx: number) => (
+                          <li key={idx}>{trait}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
 
               <Card className="bg-gradient-to-br from-accent/10 to-background border-accent/30">
                 <CardContent className="pt-6 space-y-4">
                   <div className="flex items-center gap-2 text-lg font-semibold">
                     <span className="text-2xl">🌱</span>
-                    Seu Caminho de Crescimento
+                    Interpretação Personalizada
                   </div>
-                  <p className="text-base leading-relaxed pl-8">{discResults.profileData.growth}</p>
+                  <p className="text-base leading-relaxed pl-8 whitespace-pre-line">
+                    {temperamentosResultData.interpretation}
+                  </p>
                 </CardContent>
               </Card>
 

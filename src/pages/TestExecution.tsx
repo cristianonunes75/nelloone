@@ -14,6 +14,8 @@ import { calculateArchetypeScores, getDominantArchetypes, ARCHETYPES } from "@/l
 import { getDISCResults } from "@/lib/disc";
 import { getMBTIResults } from "@/lib/mbti";
 import { getEnneagramResults } from "@/lib/eneagrama";
+import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
+import { calculateTemperamentos } from "@/lib/temperamentos";
 import { Badge } from "@/components/ui/badge";
 
 export default function TestExecution() {
@@ -203,6 +205,28 @@ export default function TestExecution() {
           scores,
           dominantArchetypes,
         }));
+      } else if (testType === "linguagens_amor") {
+        const linguagensResults = calculateLinguagensAmor(allAnswers as any);
+        resultData = JSON.parse(JSON.stringify({
+          completed_at: new Date().toISOString(),
+          total_questions: questions?.length || 0,
+          testType: "linguagens_amor",
+          primary: linguagensResults.primary,
+          secondary: linguagensResults.secondary,
+          scores: linguagensResults.scores,
+          interpretation: linguagensResults.interpretation,
+        }));
+      } else if (testType === "temperamentos") {
+        const temperamentosResults = calculateTemperamentos(allAnswers as any);
+        resultData = JSON.parse(JSON.stringify({
+          completed_at: new Date().toISOString(),
+          total_questions: questions?.length || 0,
+          testType: "temperamentos",
+          primary: temperamentosResults.primary,
+          secondary: temperamentosResults.secondary,
+          scores: temperamentosResults.scores,
+          interpretation: temperamentosResults.interpretation,
+        }));
       } else {
         // Default result format for other tests
         resultData = JSON.parse(JSON.stringify({
@@ -245,9 +269,16 @@ export default function TestExecution() {
 
   // Handle both Likert scale and multiple choice formats
   const options = currentQuestion.options as any;
-  const isLikertScale = options && options.scale;
+  const isLikertScale = options && (options.scale || options.type === "likert");
+  const isMultipleChoice = options && options.type === "multiple_choice";
+  
   const displayOptions = isLikertScale 
-    ? options.scale 
+    ? (options.scale || Array.from({ length: options.max - options.min + 1 }, (_, i) => ({
+        value: String(options.min + i),
+        label: options.labels?.[String(options.min + i)] || String(options.min + i)
+      })))
+    : isMultipleChoice
+    ? options.options
     : (Array.isArray(options) 
         ? options.map((opt: any) => ({
             value: String(opt.value),
