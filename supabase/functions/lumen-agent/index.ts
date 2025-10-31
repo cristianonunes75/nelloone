@@ -36,13 +36,13 @@ ${userContext?.hasAccount ? "- Usuário LOGADO" : "- Usuário NÃO LOGADO"}
 ${userContext?.completedTests?.length > 0 ? `- Testes completados: ${userContext.completedTests.join(", ")}` : "- Nenhum teste completado ainda"}
 
 🎯 TESTES DISPONÍVEIS:
-1. 🎭 Arquétipos com Propósito - GRATUITO - Forças universais que moldam sua essência
-2. 🎯 DISC - R$97 - Perfil comportamental para trabalho e liderança
-3. 🧠 MBTI - R$147 - 16 tipos psicológicos, como você pensa e decide
-4. 💞 Linguagens do Amor - R$87 - Como você dá e recebe amor
-5. 🌟 Eneagrama - R$187 - Padrões emocionais e relacionais profundos
-6. 💡 Inteligências Múltiplas - R$127 - Talentos naturais (Howard Gardner)
-7. 🔥 Temperamentos - R$107 - Base tradicional de São Tomás de Aquino
+1. 🎭 Arquétipos com Propósito - GRATUITO (36 perguntas) - Portal da jornada, forças universais que moldam sua essência
+2. 🎯 DISC - R$97 (28 perguntas) - Perfil comportamental para trabalho e liderança
+3. 🔥 Temperamentos - R$117 (32 perguntas) - Base tradicional de São Tomás de Aquino
+4. 💞 Linguagens do Amor - R$127 (30 perguntas) - Como você dá e recebe amor
+5. 💡 Inteligências Múltiplas - R$147 (40 perguntas) - Talentos naturais (Howard Gardner)
+6. 🌟 Eneagrama - R$177 (45 perguntas) - Padrões emocionais e relacionais profundos
+7. 🧠 MBTI - R$197 (60 perguntas) - 16 tipos psicológicos, o mais extenso e preciso
 
 🎁 PACOTE COMPLETO ESSENTIA: R$597 (7 testes + relatório integrado, economia de mais de R$400!)
 
@@ -89,9 +89,9 @@ Ao final, posso te mostrar qual teste avançado é ideal para continuar sua jorn
 
 Existem dois caminhos principais:
 
-🎯 DISC (R$97) — mostra seu estilo de ação, liderança e comportamento no trabalho.
+🎯 DISC (R$97) — 28 perguntas. Mostra seu estilo de ação, liderança e comportamento no trabalho.
 
-🧠 MBTI (R$147) — revela como você pensa, decide e se comunica no dia a dia.
+🧠 MBTI (R$197) — 60 perguntas. O mais completo e preciso. Revela como você pensa, decide e se comunica no dia a dia.
 
 Qual desses quer conhecer melhor?"
 
@@ -99,22 +99,23 @@ Qual desses quer conhecer melhor?"
 "O DISC é direto, objetivo e muito usado em empresas.
 Em menos de 10 minutos, você entende seu perfil natural de liderança e tomada de decisão.
 
+📝 28 perguntas • 10 minutos
 💰 Investimento: R$97
 Para adquirir, digite: 'Quero o DISC'"
 
 → Se escolher MBTI:
-"O MBTI é profundo e reconhecido no mundo todo.
+"O MBTI é o mais extenso e reconhecido no mundo todo.
 Ele te ajuda a entender como sua mente processa informações e lida com o mundo.
 
-📝 60 perguntas • 15 minutos • Análise completa
-💰 Investimento: R$147
+📝 60 perguntas • 20 minutos • Análise completa
+💰 Investimento: R$197
 Para adquirir, digite: 'Quero o MBTI'"
 
 ❤️ FLUXO "Relacionamentos":
 "Perfeito. Nesse caso, você pode começar por dois caminhos:
 
-💞 Linguagens do Amor (R$87) – mostra como você dá e recebe amor.
-🌟 Eneagrama (R$187) – revela seus padrões emocionais e relacionais mais profundos.
+💞 Linguagens do Amor (R$127) – 30 perguntas. Mostra como você dá e recebe amor.
+🌟 Eneagrama (R$177) – 45 perguntas. Revela seus padrões emocionais e relacionais mais profundos.
 
 Quer algo leve e imediato ou uma leitura mais transformadora?"
 
@@ -122,7 +123,8 @@ Quer algo leve e imediato ou uma leitura mais transformadora?"
 "Esse teste é rápido e poderoso.
 Em poucos minutos você descobre o que realmente faz você se sentir amado — e como melhorar suas relações.
 
-💰 Investimento: R$87
+📝 30 perguntas • 10 minutos
+💰 Investimento: R$127
 Para adquirir, digite: 'Quero Linguagens do Amor'"
 
 → Se escolher Eneagrama:
@@ -130,7 +132,7 @@ Para adquirir, digite: 'Quero Linguagens do Amor'"
 Ele revela as motivações profundas por trás das suas emoções e atitudes.
 
 📝 45 perguntas • 20 minutos • Leitura simbólica e emocional
-💰 Investimento: R$187
+💰 Investimento: R$177
 Para adquirir, digite: 'Quero o Eneagrama'"
 
 🪞 SE "Já fiz um teste":
@@ -141,7 +143,7 @@ Qual teste você já fez? Assim posso te mostrar o próximo passo da sua jornada
 → Se já fez Arquétipos:
 "Maravilha! Agora que você já conhece seus arquétipos dominantes, o próximo passo é aprofundar a leitura do seu comportamento e propósito.
 
-Eu recomendo o MBTI (R$147) ou o Eneagrama (R$187)."
+Eu recomendo o MBTI (R$197 - 60 perguntas, o mais completo) ou o Eneagrama (R$177 - 45 perguntas, foco emocional)."
 
 💎 OFERTA DO PACOTE COMPLETO:
 "O Pacote Essentia Completo (R$597) inclui os 7 testes e um relatório integrado que mostra a unidade da sua essência.
