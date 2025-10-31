@@ -164,7 +164,7 @@ export const Pricing = () => {
             <div className="mt-16">
               <div className="text-center mb-8">
                 <h3 className="text-3xl font-bold mb-2">Ou garanta o pacote completo</h3>
-                <p className="text-muted-foreground">A melhor forma de explorar toda sua essência</p>
+                <p className="text-muted-foreground">100% digital e automatizado - A melhor forma de explorar toda sua essência via IA</p>
               </div>
               
               <div className="max-w-4xl mx-auto relative rounded-3xl border-4 border-gold bg-gradient-to-br from-gold/10 via-background to-gold/5 p-8 shadow-2xl">
@@ -176,6 +176,9 @@ export const Pricing = () => {
                 <div className="grid md:grid-cols-2 gap-8 mt-4">
                   <div>
                     <h3 className="text-3xl font-bold mb-4">{essentiaPlan.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      🤖 <strong>100% Digital e Automatizado via IA</strong> - Escalável e entrega instantânea
+                    </p>
                     {essentiaPlan.original_price && (
                       <div className="mb-2">
                         <span className="text-xl text-muted-foreground line-through">
