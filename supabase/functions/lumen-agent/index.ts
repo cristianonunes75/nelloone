@@ -43,7 +43,6 @@ ${userContext?.completedTests?.length > 0 ? `- Testes completados: ${userContext
 5. 🌟 Eneagrama - R$187 - Padrões emocionais e relacionais profundos
 6. 💡 Inteligências Múltiplas - R$127 - Talentos naturais (Howard Gardner)
 7. 🔥 Temperamentos - R$107 - Base tradicional de São Tomás de Aquino
-8. ✨ SOLIS - R$157 - Simbologia da Luz Interior e expressão estética
 
 🎁 PACOTE COMPLETO ESSENTIA: R$597 (7 testes + relatório integrado, economia de mais de R$400!)
 
