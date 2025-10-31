@@ -25,7 +25,6 @@ import Eneagrama from "./pages/tests/Eneagrama";
 import Temperamentos from "./pages/tests/Temperamentos";
 import InteligenciasMultiplas from "./pages/tests/InteligenciasMultiplas";
 import LinguagensAmor from "./pages/tests/LinguagensAmor";
-import SOLIS from "./pages/tests/SOLIS";
 
 const queryClient = new QueryClient();
 
@@ -50,7 +49,6 @@ const App = () => (
             <Route path="/teste-temperamentos" element={<Temperamentos />} />
             <Route path="/teste-inteligencias" element={<InteligenciasMultiplas />} />
             <Route path="/teste-linguagens" element={<LinguagensAmor />} />
-            <Route path="/teste-solis" element={<SOLIS />} />
             <Route
               path="/cliente"
               element={

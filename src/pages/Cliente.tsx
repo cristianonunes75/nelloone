@@ -95,7 +95,7 @@ const Cliente = () => {
               Olá, {user?.user_metadata?.full_name?.split(" ")[0] || "Cliente"}!
             </h1>
             <p className="text-xl text-muted-foreground">
-              Comece pelo <strong>Teste de Arquétipos</strong> — 12 perguntas gratuitas para descobrir sua essência.
+              Comece pelo <strong>Teste de Arquétipos</strong> — 36 perguntas gratuitas para descobrir sua essência.
             </p>
           </div>
 
@@ -155,14 +155,13 @@ const Cliente = () => {
 
                 // Map test types to their specific pages
                 const testPageMap: Record<string, string> = {
-                  'arquetipos': '/teste-arquetipos',
+                  'arquetipos_proposito': '/teste-arquetipos',
                   'disc': '/teste-disc',
                   'mbti': '/teste-mbti',
                   'eneagrama': '/teste-eneagrama',
                   'temperamentos': '/teste-temperamentos',
                   'inteligencias_multiplas': '/teste-inteligencias',
                   'linguagens_amor': '/teste-linguagens',
-                  'solis': '/teste-solis',
                 };
 
                 const testPage = testPageMap[test.type];
