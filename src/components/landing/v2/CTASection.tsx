@@ -11,23 +11,31 @@ export const CTASection = () => {
   return (
     <section className="py-24 md:py-32 relative overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-foreground" />
-      <div className="absolute inset-0 gradient-glow opacity-30" />
+      <div className="absolute inset-0 gradient-miguel" />
+      <div className="absolute inset-0 gradient-glow opacity-20" />
       
       <div ref={ref} className="container px-6 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 
+          <p 
             className={cn(
-              "font-display text-display-md md:text-display-lg text-primary-foreground mb-6 transition-all duration-700",
+              "font-miguel text-xl md:text-2xl text-primary-foreground/80 mb-6 transition-all duration-700",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            Sua essência está esperando
-            <span className="block">para ser revelada.</span>
+            "Sua essência é única. Descubra."
+          </p>
+          <h2 
+            className={cn(
+              "font-display text-display-md md:text-display-lg text-primary-foreground mb-6 transition-all duration-700 delay-100",
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            )}
+          >
+            A resposta que você procura
+            <span className="block">está dentro de você.</span>
           </h2>
           <p 
             className={cn(
-              "text-lg text-primary-foreground/70 mb-10 max-w-xl mx-auto transition-all duration-700 delay-150",
+              "text-base text-primary-foreground/70 mb-10 max-w-xl mx-auto transition-all duration-700 delay-200",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
@@ -36,9 +44,8 @@ export const CTASection = () => {
           </p>
           <Button 
             size="lg" 
-            variant="secondary"
             className={cn(
-              "group h-14 px-8 text-base rounded-full shadow-large hover-lift press-effect transition-all duration-700 delay-300",
+              "group h-14 px-8 text-base rounded-full bg-gold hover:bg-gold-dark text-miguel-midnight shadow-large hover-lift press-effect transition-all duration-700 delay-300",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
             onClick={() => navigate("/auth")}
