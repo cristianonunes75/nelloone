@@ -18,6 +18,7 @@ import ConsultoriaEssentia from "./pages/ConsultoriaEssentia";
 import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Contact from "./pages/Contact";
 import ArquetiposMarca from "./pages/tests/ArquetiposMarca";
 import DISC from "./pages/tests/DISC";
 import MBTI from "./pages/tests/MBTI";
@@ -43,7 +44,10 @@ const App = () => (
             <Route path="/influence" element={<Influence />} />
             <Route path="/consultoria-essentia" element={<ConsultoriaEssentia />} />
             <Route path="/termos" element={<TermsOfService />} />
+            <Route path="/termos-de-servico" element={<TermsOfService />} />
             <Route path="/privacidade" element={<PrivacyPolicy />} />
+            <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
+            <Route path="/contato" element={<Contact />} />
             <Route path="/teste-arquetipos" element={<ArquetiposMarca />} />
             <Route path="/teste-disc" element={<DISC />} />
             <Route path="/teste-mbti" element={<MBTI />} />
