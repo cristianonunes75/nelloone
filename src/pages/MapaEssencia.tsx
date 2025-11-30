@@ -7,6 +7,8 @@ import { ArrowLeft, Download, Sparkles, Loader2, User, Palette, MessageCircle, T
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { generateMapaPDF } from "@/lib/pdfGenerator";
+import { toast } from "sonner";
 
 interface MapSection {
   id: string;
@@ -218,6 +220,23 @@ const MapaEssencia = () => {
 
   const currentSection = sections.find(s => s.id === activeSection);
 
+  const handleDownloadPDF = () => {
+    if (sections.length === 0) return;
+    
+    try {
+      const pdfSections = sections.map(s => ({
+        id: s.id,
+        title: s.title,
+        content: s.content,
+      }));
+      generateMapaPDF(pdfSections, userName);
+      toast.success("PDF baixado com sucesso!");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Erro ao gerar PDF. Tente novamente.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-10">
@@ -229,9 +248,9 @@ const MapaEssencia = () => {
               Voltar
             </Button>
             {hasGenerated && (
-              <Button variant="outline" size="sm" disabled>
+              <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
                 <Download className="w-4 h-4 mr-2" />
-                PDF (em breve)
+                Baixar PDF
               </Button>
             )}
           </div>
