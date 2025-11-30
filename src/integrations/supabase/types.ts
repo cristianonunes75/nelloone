@@ -183,6 +183,33 @@ export type Database = {
         }
         Relationships: []
       }
+      mapa_essencia: {
+        Row: {
+          created_at: string
+          id: string
+          raw_content: string | null
+          sections: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          raw_content?: string | null
+          sections?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          raw_content?: string | null
+          sections?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       photo_galleries: {
         Row: {
           client_id: string | null

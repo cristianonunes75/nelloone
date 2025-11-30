@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
+import { useMapaEssencia } from "@/hooks/useMapaEssencia";
 import { Button } from "@/components/ui/button";
 import { LogoText } from "@/components/LogoText";
-import { ArrowLeft, Download, Sparkles, Loader2, User, Palette, MessageCircle, Target, BookOpen } from "lucide-react";
+import { ArrowLeft, Download, Sparkles, Loader2, User, Palette, MessageCircle, Target, BookOpen, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -48,7 +49,8 @@ const SECTION_CONFIG: Record<string, { title: string; icon: React.ReactNode; col
 
 const MapaEssencia = () => {
   const { profile } = useAuth();
-  const { isJourneyComplete, testResults, completedCount, totalSteps, isLoading } = useJourneyProgress();
+  const { isJourneyComplete, testResults, completedCount, totalSteps, isLoading: journeyLoading } = useJourneyProgress();
+  const { savedMapa, isLoading: mapaLoading, saveMapa, resetMapa, hasSavedMapa } = useMapaEssencia();
   const navigate = useNavigate();
   const [sections, setSections] = useState<MapSection[]>([]);
   const [rawContent, setRawContent] = useState<string>("");
@@ -57,6 +59,7 @@ const MapaEssencia = () => {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const userName = profile?.full_name || "Viajante";
+  const isLoading = journeyLoading || mapaLoading;
 
   // Parse sections from raw content
   const parseSections = useCallback((content: string): MapSection[] => {
@@ -83,9 +86,26 @@ const MapaEssencia = () => {
     return parsed;
   }, []);
 
-  // Update sections when content changes
+  // Load saved mapa if exists
   useEffect(() => {
-    if (rawContent) {
+    if (savedMapa && !hasGenerated) {
+      const parsed = savedMapa.sections.map(s => ({
+        ...s,
+        icon: SECTION_CONFIG[s.id]?.icon || <Sparkles className="w-5 h-5" />,
+        color: SECTION_CONFIG[s.id]?.color || "from-gray-500/20 to-gray-500/20 border-gray-500/30",
+      }));
+      setSections(parsed);
+      setRawContent(savedMapa.raw_content);
+      setHasGenerated(true);
+      if (parsed.length > 0) {
+        setActiveSection(parsed[0].id);
+      }
+    }
+  }, [savedMapa, hasGenerated]);
+
+  // Update sections when content changes during generation
+  useEffect(() => {
+    if (rawContent && !hasSavedMapa) {
       const parsed = parseSections(rawContent);
       if (parsed.length > 0) {
         setSections(parsed);
@@ -94,10 +114,10 @@ const MapaEssencia = () => {
         }
       }
     }
-  }, [rawContent, parseSections, activeSection]);
+  }, [rawContent, parseSections, activeSection, hasSavedMapa]);
 
   const generateMapa = useCallback(async () => {
-    if (isGenerating || hasGenerated) return;
+    if (isGenerating) return;
     
     setIsGenerating(true);
     let content = "";
@@ -161,20 +181,59 @@ const MapaEssencia = () => {
         }
       }
 
+      // Save to database after generation completes
+      const finalSections = parseSections(content);
+      if (finalSections.length > 0) {
+        const sectionsToSave = finalSections.map(s => ({
+          id: s.id,
+          title: s.title,
+          content: s.content,
+        }));
+        await saveMapa(sectionsToSave, content);
+        toast.success("Mapa da Essência salvo com sucesso!");
+      }
+
       setHasGenerated(true);
     } catch (error) {
       console.error("Error generating mapa:", error);
-      setRawContent("Erro ao gerar o Mapa da Essência. Por favor, tente novamente.");
+      toast.error("Erro ao gerar o Mapa da Essência. Por favor, tente novamente.");
     } finally {
       setIsGenerating(false);
     }
-  }, [testResults, userName, isGenerating, hasGenerated]);
+  }, [testResults, userName, isGenerating, parseSections, saveMapa]);
 
+  // Auto-generate if journey complete and no saved map
   useEffect(() => {
-    if (!isLoading && isJourneyComplete && !hasGenerated && !isGenerating) {
+    if (!isLoading && isJourneyComplete && !hasSavedMapa && !hasGenerated && !isGenerating) {
       generateMapa();
     }
-  }, [isLoading, isJourneyComplete, hasGenerated, isGenerating, generateMapa]);
+  }, [isLoading, isJourneyComplete, hasSavedMapa, hasGenerated, isGenerating, generateMapa]);
+
+  const handleRegenerate = async () => {
+    await resetMapa();
+    setHasGenerated(false);
+    setSections([]);
+    setRawContent("");
+    setActiveSection(null);
+    generateMapa();
+  };
+
+  const handleDownloadPDF = () => {
+    if (sections.length === 0) return;
+    
+    try {
+      const pdfSections = sections.map(s => ({
+        id: s.id,
+        title: s.title,
+        content: s.content,
+      }));
+      generateMapaPDF(pdfSections, userName);
+      toast.success("PDF baixado com sucesso!");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Erro ao gerar PDF. Tente novamente.");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -220,23 +279,6 @@ const MapaEssencia = () => {
 
   const currentSection = sections.find(s => s.id === activeSection);
 
-  const handleDownloadPDF = () => {
-    if (sections.length === 0) return;
-    
-    try {
-      const pdfSections = sections.map(s => ({
-        id: s.id,
-        title: s.title,
-        content: s.content,
-      }));
-      generateMapaPDF(pdfSections, userName);
-      toast.success("PDF baixado com sucesso!");
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast.error("Erro ao gerar PDF. Tente novamente.");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-10">
@@ -247,11 +289,17 @@ const MapaEssencia = () => {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar
             </Button>
-            {hasGenerated && (
-              <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
-                <Download className="w-4 h-4 mr-2" />
-                Baixar PDF
-              </Button>
+            {hasGenerated && !isGenerating && (
+              <>
+                <Button variant="outline" size="sm" onClick={handleRegenerate}>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Regenerar
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Baixar PDF
+                </Button>
+              </>
             )}
           </div>
         </div>
@@ -355,7 +403,7 @@ const MapaEssencia = () => {
           )}
 
           {/* All Sections Overview (collapsed) */}
-          {hasGenerated && sections.length > 1 && (
+          {hasGenerated && !isGenerating && sections.length > 1 && (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
               {sections.filter(s => s.id !== activeSection).map((section) => (
                 <button
