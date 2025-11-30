@@ -14,22 +14,23 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
-        serif: ['DM Serif Display', 'Georgia', 'serif'],
-        display: ['DM Serif Display', 'Georgia', 'serif'],
-        body: ['DM Sans', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Inter', 'system-ui', 'sans-serif'],
+        body: ['Inter', 'system-ui', 'sans-serif'],
+        miguel: ['Cormorant Garamond', 'Georgia', 'serif'],
       },
       fontSize: {
-        'display-xl': ['4.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
-        'display-lg': ['3.5rem', { lineHeight: '1.15', letterSpacing: '-0.02em' }],
-        'display-md': ['2.5rem', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
-        'display-sm': ['2rem', { lineHeight: '1.25', letterSpacing: '-0.01em' }],
+        'display-xl': ['4rem', { lineHeight: '1.1', letterSpacing: '-0.025em', fontWeight: '600' }],
+        'display-lg': ['3rem', { lineHeight: '1.15', letterSpacing: '-0.02em', fontWeight: '600' }],
+        'display-md': ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.015em', fontWeight: '600' }],
+        'display-sm': ['1.75rem', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '600' }],
       },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
+        "background-cloud": "hsl(var(--background-cloud))",
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
@@ -56,14 +57,19 @@ export default {
           light: "hsl(var(--gold-light))",
           dark: "hsl(var(--gold-dark))",
         },
-        sage: {
-          DEFAULT: "hsl(var(--sage))",
-          light: "hsl(var(--sage-light))",
+        miguel: {
+          deep: "hsl(var(--miguel-deep))",
+          midnight: "hsl(var(--miguel-midnight))",
+          silver: "hsl(var(--miguel-silver))",
         },
-        blush: {
-          DEFAULT: "hsl(var(--blush))",
-          dark: "hsl(var(--blush-dark))",
+        soul: {
+          sand: "hsl(var(--soul-sand))",
+          amber: "hsl(var(--soul-amber))",
+          light: "hsl(var(--soul-light))",
         },
+        success: "hsl(var(--success))",
+        warning: "hsl(var(--warning))",
+        "error-soft": "hsl(var(--error-soft))",
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -87,8 +93,8 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-        "2xl": "1.5rem",
-        "3xl": "2rem",
+        "2xl": "1.25rem",
+        "3xl": "1.5rem",
       },
       boxShadow: {
         'soft': 'var(--shadow-sm)',
@@ -105,15 +111,15 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "pulse-soft": {
+        "gentle-pulse": {
           "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.7" },
+          "50%": { opacity: "0.85" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "pulse-soft": "pulse-soft 3s ease-in-out infinite",
+        "gentle-pulse": "gentle-pulse 4s ease-in-out infinite",
       },
       spacing: {
         '18': '4.5rem',

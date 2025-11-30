@@ -3,6 +3,7 @@ import { ArrowRight, User, Palette, MessageCircle, Target, BookOpen } from "luci
 import { useNavigate } from "react-router-dom";
 import { useScrollAnimation, getStaggerDelay } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
+import essenceMapImage from "@/assets/essence-map.jpg";
 
 const mapSections = [
   { icon: User, label: "Identidade Central", description: "Quem você é em essência" },
@@ -29,20 +30,23 @@ export const EssenceMapSection = () => {
               "transition-all duration-700",
               isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
             )}>
-              <span className="inline-block text-accent font-medium text-sm tracking-wide uppercase mb-4">
+              <span className="inline-block text-gold font-medium text-sm tracking-wide uppercase mb-4">
                 O Resultado Final
               </span>
               <h2 className="font-display text-display-md md:text-display-lg text-foreground mb-6">
                 Seu Mapa da
-                <span className="text-accent"> Essência</span>
+                <span className="text-gold"> Essência</span>
               </h2>
-              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+              <p className="font-miguel text-lg text-muted-foreground mb-6 leading-relaxed">
+                "Um mapa para quem você é por dentro."
+              </p>
+              <p className="text-muted-foreground mb-8 leading-relaxed">
                 Ao completar os 7 testes, Miguel sintetiza todos os seus resultados 
                 em um documento único e personalizado: o Mapa da Essência. Uma visão 
                 integrada de quem você é, suas forças, desafios e caminhos de evolução.
               </p>
 
-              <div className="space-y-4 mb-10">
+              <div className="space-y-3 mb-10">
                 {mapSections.map((section, index) => (
                   <div 
                     key={section.label} 
@@ -52,12 +56,12 @@ export const EssenceMapSection = () => {
                     )}
                     style={isVisible ? getStaggerDelay(index, 0.1) : {}}
                   >
-                    <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0 group-hover:bg-accent/20 transition-colors duration-300">
-                      <section.icon className="w-5 h-5 text-accent" />
+                    <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gold/15 transition-colors duration-300">
+                      <section.icon className="w-4 h-4 text-gold" strokeWidth={1.5} />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">{section.label}</p>
-                      <p className="text-sm text-muted-foreground">{section.description}</p>
+                      <p className="font-medium text-foreground text-sm">{section.label}</p>
+                      <p className="text-xs text-muted-foreground">{section.description}</p>
                     </div>
                   </div>
                 ))}
@@ -65,11 +69,11 @@ export const EssenceMapSection = () => {
 
               <Button 
                 size="lg" 
-                className="group h-14 px-8 text-base rounded-full hover-lift press-effect"
+                className="group h-12 px-6 text-base rounded-full bg-gold hover:bg-gold-dark text-primary-foreground hover-lift press-effect"
                 onClick={() => navigate("/auth")}
               >
                 Começar Minha Jornada
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
               </Button>
             </div>
 
@@ -80,48 +84,32 @@ export const EssenceMapSection = () => {
             )}>
               <div className="aspect-[4/5] relative">
                 {/* Glow */}
-                <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-sage/20 rounded-3xl blur-3xl subtle-pulse" />
+                <div className="absolute inset-0 bg-gradient-to-br from-gold/15 to-soul-amber/15 rounded-3xl blur-3xl subtle-pulse" />
                 
-                {/* Map preview */}
-                <div className="relative h-full bg-card rounded-3xl border border-border/50 shadow-large overflow-hidden hover:shadow-glow transition-shadow duration-500">
-                  {/* Header */}
-                  <div className="bg-gradient-to-r from-foreground to-foreground/90 text-primary-foreground p-6">
-                    <p className="text-sm opacity-70">ESSENTIA</p>
-                    <p className="font-display text-2xl mt-1">Mapa da Essência</p>
-                  </div>
+                {/* Map image */}
+                <div className="relative h-full rounded-3xl overflow-hidden border border-border/30 shadow-large hover:shadow-glow transition-shadow duration-500">
+                  <img 
+                    src={essenceMapImage} 
+                    alt="Mapa da Essência"
+                    className="w-full h-full object-cover"
+                  />
                   
-                  {/* Content preview */}
-                  <div className="p-6 space-y-4">
-                    {mapSections.map((section, i) => (
-                      <div 
-                        key={section.label}
-                        className={cn(
-                          "flex items-center gap-3 p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors duration-300",
-                          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-                        )}
-                        style={isVisible ? { 
-                          opacity: 1 - i * 0.1,
-                          transitionDelay: `${0.4 + i * 0.1}s`
-                        } : {}}
-                      >
-                        <section.icon className="w-5 h-5 text-accent" />
-                        <div className="flex-1">
-                          <div className="h-2 bg-muted rounded-full w-3/4" />
-                        </div>
-                      </div>
-                    ))}
+                  {/* Overlay with content preview */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+                  
+                  {/* Header overlay */}
+                  <div className="absolute top-0 left-0 right-0 p-6 bg-gradient-to-b from-card/90 to-transparent">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">ESSENTIA</p>
+                    <p className="font-display text-xl text-foreground mt-1">Mapa da Essência</p>
                   </div>
-
-                  {/* Bottom decoration */}
-                  <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-card to-transparent" />
                 </div>
 
                 {/* Floating badge */}
                 <div className={cn(
-                  "absolute -bottom-4 -right-4 bg-accent text-accent-foreground px-4 py-2 rounded-xl shadow-medium font-medium text-sm transition-all duration-500 delay-500",
+                  "absolute -bottom-4 -right-4 bg-card px-4 py-2 rounded-xl shadow-large border border-border/30 transition-all duration-500 delay-500",
                   isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                 )}>
-                  PDF Personalizado
+                  <span className="text-sm font-medium text-gold">PDF Personalizado</span>
                 </div>
               </div>
             </div>
