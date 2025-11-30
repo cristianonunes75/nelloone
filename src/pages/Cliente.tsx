@@ -1,6 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useTests } from "@/hooks/useTests";
-import { useTestAccess } from "@/hooks/useTestAccess";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { Button } from "@/components/ui/button";
 import { JourneyStepCard } from "@/components/cliente/JourneyStepCard";
@@ -15,10 +14,9 @@ import { MiguelAgent } from "@/components/MiguelAgent";
 import { Progress } from "@/components/ui/progress";
 
 const Cliente = () => {
-  const { user, profile, signOut, userRole } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const { startTestAsync } = useTests();
-  const { hasAccess } = useTestAccess();
-  const { 
+  const {
     journeySteps, 
     completedTests, 
     completedCount, 
@@ -72,16 +70,7 @@ const Cliente = () => {
   };
 
   const handleStartTest = async (step: typeof journeySteps[0]) => {
-    const isFree = step.isFree;
-    const canAccess = hasAccess(step.testId, isFree);
-
-    if (!canAccess) {
-      // Navigate to purchase flow
-      navigate(`/cliente/comprar/${step.testId}`);
-      return;
-    }
-
-    // Navigate to test detail page for new tests
+    // Navigate to test detail page
     const testPage = testPageMap[step.testType];
     if (testPage) {
       navigate(testPage);
@@ -175,6 +164,7 @@ const Cliente = () => {
                 step={step}
                 onStart={() => handleStartTest(step)}
                 onContinue={() => handleContinueTest(step)}
+                onPurchase={() => navigate(`/cliente/comprar/${step.testId}`)}
               />
             ))}
           </div>

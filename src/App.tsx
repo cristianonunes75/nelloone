@@ -26,6 +26,7 @@ import Temperamentos from "./pages/tests/Temperamentos";
 import InteligenciasMultiplas from "./pages/tests/InteligenciasMultiplas";
 import LinguagensAmor from "./pages/tests/LinguagensAmor";
 import MapaEssencia from "./pages/MapaEssencia";
+import ComprarTeste from "./pages/ComprarTeste";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["cliente", "admin"]}>
                   <MapaEssencia />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cliente/comprar/:testId"
+              element={
+                <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+                  <ComprarTeste />
                 </ProtectedRoute>
               }
             />
