@@ -70,6 +70,83 @@ export type Database = {
           },
         ]
       }
+      ai_prompts: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          prompt_text: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          prompt_text: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          prompt_text?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      ai_subprompts: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          parent_prompt_id: string | null
+          priority: number
+          prompt_text: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          parent_prompt_id?: string | null
+          priority?: number
+          prompt_text: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          parent_prompt_id?: string | null
+          priority?: number
+          prompt_text?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_subprompts_parent_prompt_id_fkey"
+            columns: ["parent_prompt_id"]
+            isOneToOne: false
+            referencedRelation: "ai_prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -106,6 +183,54 @@ export type Database = {
           table_name?: string | null
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      automations: {
+        Row: {
+          action_config: Json
+          action_type: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          execution_count: number
+          id: string
+          is_active: boolean
+          last_executed_at: string | null
+          name: string
+          trigger_config: Json
+          trigger_event: string
+          updated_at: string
+        }
+        Insert: {
+          action_config?: Json
+          action_type: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          execution_count?: number
+          id?: string
+          is_active?: boolean
+          last_executed_at?: string | null
+          name: string
+          trigger_config?: Json
+          trigger_event: string
+          updated_at?: string
+        }
+        Update: {
+          action_config?: Json
+          action_type?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          execution_count?: number
+          id?: string
+          is_active?: boolean
+          last_executed_at?: string | null
+          name?: string
+          trigger_config?: Json
+          trigger_event?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -180,6 +305,42 @@ export type Database = {
           title?: string | null
           updated_at?: string | null
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      impersonation_sessions: {
+        Row: {
+          admin_id: string
+          ended_at: string | null
+          id: string
+          ip_address: string | null
+          is_active: boolean
+          session_token: string
+          started_at: string
+          target_user_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          admin_id: string
+          ended_at?: string | null
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean
+          session_token: string
+          started_at?: string
+          target_user_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          admin_id?: string
+          ended_at?: string | null
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean
+          session_token?: string
+          started_at?: string
+          target_user_id?: string
+          user_agent?: string | null
         }
         Relationships: []
       }
