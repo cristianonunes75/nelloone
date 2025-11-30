@@ -1,38 +1,30 @@
-import { MessageCircle, Heart, Compass, Lightbulb } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Heart, Compass, Lightbulb } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useScrollAnimation, getStaggerDelay } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
+import miguelImage from "@/assets/miguel-presence.jpg";
 
 const traits = [
-  {
-    icon: Heart,
-    title: "Acolhedor",
-    description: "Miguel recebe você sem julgamentos, com empatia genuína.",
-  },
-  {
-    icon: Compass,
-    title: "Guia Sábio",
-    description: "Conduz sua jornada com profundidade e clareza.",
-  },
-  {
-    icon: Lightbulb,
-    title: "Revelador",
-    description: "Ajuda você a enxergar padrões que ainda não havia percebido.",
-  },
+  { icon: Heart, title: "Acolhedor", description: "Miguel recebe você sem julgamentos, com empatia genuína." },
+  { icon: Compass, title: "Guia Sábio", description: "Conduz sua jornada com profundidade e clareza." },
+  { icon: Lightbulb, title: "Revelador", description: "Ajuda você a enxergar padrões que ainda não havia percebido." },
 ];
 
 export const MiguelSection = () => {
+  const navigate = useNavigate();
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
   const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation();
 
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden">
+    <section className="py-24 md:py-32 gradient-soul">
       <div className="container px-6">
         <div className="max-w-5xl mx-auto">
           {/* Section header */}
           <div ref={headerRef} className="text-center mb-16">
             <span 
               className={cn(
-                "inline-block text-accent font-medium text-sm tracking-wide uppercase mb-4 transition-all duration-500",
+                "inline-block text-gold font-medium text-sm tracking-wide uppercase mb-4 transition-all duration-500",
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
@@ -69,23 +61,30 @@ export const MiguelSection = () => {
             >
               <div className="aspect-square max-w-md mx-auto relative">
                 {/* Glow effect */}
-                <div className="absolute inset-0 bg-accent/10 rounded-full blur-3xl subtle-pulse" />
+                <div className="absolute inset-0 bg-gradient-to-br from-gold/20 to-miguel-deep/20 rounded-full blur-3xl subtle-pulse" />
                 
-                {/* Main circle */}
-                <div className="relative w-full h-full rounded-full bg-gradient-to-br from-secondary to-muted flex items-center justify-center border border-border/50 hover:border-accent/30 transition-colors duration-500">
-                  <div className="text-center p-8">
-                    <MessageCircle className="w-16 h-16 text-accent mx-auto mb-4" />
-                    <p className="font-display text-2xl text-foreground mb-2">Miguel</p>
-                    <p className="text-sm text-muted-foreground">Seu mentor de essência</p>
-                  </div>
+                {/* Miguel image */}
+                <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-large border border-border/30">
+                  <img 
+                    src={miguelImage} 
+                    alt="Miguel - Seu guia de autoconhecimento"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-miguel-midnight/40 to-transparent" />
                 </div>
 
-                {/* Floating elements */}
-                <div className="absolute -top-4 -right-4 w-16 h-16 bg-accent/20 rounded-2xl flex items-center justify-center animate-float">
-                  <span className="text-2xl">✨</span>
-                </div>
-                <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-sage/30 rounded-xl flex items-center justify-center animate-float" style={{ animationDelay: "1s" }}>
-                  <span className="text-xl">🌱</span>
+                {/* Floating icon */}
+                <div className={cn(
+                  "absolute -bottom-4 -right-4 w-16 h-16 bg-card rounded-2xl shadow-large flex items-center justify-center border border-border/30 transition-all duration-500 delay-300",
+                  contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                )}>
+                  <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2C12 2 8 6 8 10c0 2.21 1.79 4 4 4s4-1.79 4-4c0-4-4-8-4-8z" />
+                      <path d="M12 14v8" />
+                      <path d="M9 18h6" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
@@ -97,8 +96,8 @@ export const MiguelSection = () => {
                 contentVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
               )}
             >
-              <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-soft hover:shadow-medium transition-shadow duration-300">
-                <p className="text-foreground leading-relaxed italic font-display text-lg">
+              <div className="bg-card rounded-2xl p-6 border border-border/30 shadow-soft hover:shadow-medium transition-shadow duration-300">
+                <p className="font-miguel text-foreground leading-relaxed text-xl">
                   "Olá, sou Miguel. Estou aqui para guiar você em uma jornada de 
                   autodescoberta. Não tenho pressa, nem respostas prontas. 
                   Tenho perguntas que vão te ajudar a encontrar as suas próprias respostas."
@@ -115,8 +114,8 @@ export const MiguelSection = () => {
                     )}
                     style={contentVisible ? getStaggerDelay(index + 2, 0.1) : {}}
                   >
-                    <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0 group-hover:bg-accent/20 transition-colors duration-300">
-                      <trait.icon className="w-5 h-5 text-accent" />
+                    <div className="w-10 h-10 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
+                      <trait.icon className="w-5 h-5 text-gold" strokeWidth={1.5} />
                     </div>
                     <div>
                       <h3 className="font-medium text-foreground mb-1">{trait.title}</h3>
@@ -125,6 +124,16 @@ export const MiguelSection = () => {
                   </div>
                 ))}
               </div>
+
+              <Button 
+                variant="outline"
+                size="lg" 
+                className="group h-12 px-6 text-base rounded-full border-gold/30 text-foreground hover:bg-gold/5 hover:border-gold/50 press-effect"
+                onClick={() => navigate("/auth")}
+              >
+                Iniciar conversa com Miguel
+                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+              </Button>
             </div>
           </div>
         </div>

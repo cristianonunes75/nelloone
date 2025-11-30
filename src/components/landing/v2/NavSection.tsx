@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { LogoText } from "@/components/LogoText";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sparkles, Map, DollarSign, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { label: "A Jornada", href: "#jornada" },
-  { label: "Testes", href: "#testes" },
-  { label: "Preços", href: "#precos" },
+  { label: "Miguel", href: "#jornada", icon: Sparkles },
+  { label: "Jornada", href: "#testes", icon: Map },
+  { label: "Preços", href: "#precos", icon: DollarSign },
 ];
 
 export const NavSection = () => {
@@ -17,33 +17,28 @@ export const NavSection = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    if (element) element.scrollIntoView({ behavior: "smooth" });
     setIsMobileMenuOpen(false);
   };
 
   return (
     <header 
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-400",
         isScrolled 
-          ? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-soft"
+          ? "bg-background/90 backdrop-blur-xl border-b border-border/30 shadow-soft"
           : "bg-transparent"
       )}
     >
       <div className="container px-6">
-        <nav className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
+        <nav className="flex items-center justify-between h-16 md:h-18">
           <LogoText className="text-xl md:text-2xl" variant="solid" />
 
           {/* Desktop nav */}
@@ -55,25 +50,25 @@ export const NavSection = () => {
                 className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 py-2 group"
               >
                 {link.label}
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+                <span className="absolute bottom-0 left-0 w-full h-px bg-gold scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
               </button>
             ))}
           </div>
 
           {/* CTA */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => navigate("/auth")}
-              className="text-sm hover:bg-secondary/80 transition-colors duration-300"
+              className="text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50"
             >
               Entrar
             </Button>
             <Button 
               size="sm"
               onClick={() => navigate("/auth")}
-              className="rounded-full px-5 press-effect"
+              className="rounded-full px-5 bg-gold hover:bg-gold-dark text-primary-foreground press-effect"
             >
               Começar Grátis
             </Button>
@@ -82,12 +77,12 @@ export const NavSection = () => {
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 hover:bg-secondary/50 rounded-lg transition-colors duration-300"
+            className="md:hidden p-2 hover:bg-secondary/50 rounded-xl transition-colors"
           >
             {isMobileMenuOpen ? (
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5" strokeWidth={1.5} />
             ) : (
-              <Menu className="w-6 h-6" />
+              <Menu className="w-5 h-5" strokeWidth={1.5} />
             )}
           </button>
         </nav>
@@ -100,26 +95,28 @@ export const NavSection = () => {
           isMobileMenuOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
         )}
       >
-        <div className="container px-6 py-4 space-y-4">
+        <div className="container px-6 py-4 space-y-2">
           {navLinks.map((link) => (
             <button
               key={link.label}
               onClick={() => scrollToSection(link.href)}
-              className="block w-full text-left py-2 text-foreground hover:text-accent transition-colors duration-300"
+              className="flex items-center gap-3 w-full text-left py-3 px-4 text-foreground hover:bg-secondary/50 rounded-xl transition-colors"
             >
+              <link.icon className="w-4 h-4 text-gold" strokeWidth={1.5} />
               {link.label}
             </button>
           ))}
           <div className="pt-4 border-t border-border space-y-2">
             <Button 
               variant="outline" 
-              className="w-full"
+              className="w-full rounded-xl border-border"
               onClick={() => navigate("/auth")}
             >
+              <LogIn className="w-4 h-4 mr-2" strokeWidth={1.5} />
               Entrar
             </Button>
             <Button 
-              className="w-full press-effect"
+              className="w-full rounded-xl bg-gold hover:bg-gold-dark text-primary-foreground press-effect"
               onClick={() => navigate("/auth")}
             >
               Começar Grátis
