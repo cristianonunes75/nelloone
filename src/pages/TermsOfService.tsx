@@ -7,110 +7,242 @@ const TermsOfService = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-essentia-white">
       <div className="container max-w-4xl mx-auto px-6 py-12">
         <Button
           variant="ghost"
           onClick={() => navigate("/")}
-          className="mb-8"
+          className="mb-8 text-miguel-deep hover:text-miguel-deep/80"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Voltar
         </Button>
 
         <div className="text-center mb-12">
-          <LogoText variant="default" className="text-4xl mb-4" />
-          <h1 className="text-3xl font-bold">Termos de Uso</h1>
-          <p className="text-muted-foreground mt-2">Última atualização: Janeiro de 2025</p>
+          <LogoText variant="solid" className="text-4xl mb-4" />
+          <h1 className="text-3xl font-semibold text-miguel-deep font-display">
+            Termos de Uso
+          </h1>
+          <p className="text-miguel-silver mt-2">Última atualização: 2025</p>
         </div>
 
-        <div className="prose prose-lg max-w-none space-y-8">
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">1. Aceitação dos Termos</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Ao acessar e utilizar a plataforma Essentia, você concorda com os presentes Termos de Uso. 
-              Se você não concorda com qualquer parte destes termos, não deve utilizar nossos serviços.
-            </p>
-          </section>
+        <div className="bg-white rounded-2xl shadow-apple p-8 md:p-12">
+          <p className="text-miguel-deep leading-relaxed mb-8 text-lg">
+            Bem-vindo ao Essentia, uma plataforma digital de autoconhecimento guiada por inteligência artificial.
+            Ao acessar, utilizar ou criar uma conta, você concorda com estes Termos de Uso.
+          </p>
+          <p className="text-essentia-gold font-medium mb-12">Leia atentamente.</p>
 
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">2. Descrição dos Serviços</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              O Essentia oferece uma experiência completa de autoconhecimento através de:
-            </p>
-            <ul className="list-disc pl-6 text-muted-foreground space-y-2 mt-3">
-              <li>Aplicação de testes de personalidade e análise de perfil</li>
-              <li>Consultoria de imagem profissional personalizada</li>
-              <li>Sessões fotográficas com propósito e direcionamento</li>
-              <li>Atendimento exclusivo em Brasília-DF</li>
-            </ul>
-          </section>
+          <div className="space-y-10">
+            <section>
+              <h2 className="text-xl font-semibold text-miguel-deep mb-4 font-display">
+                1. Sobre o Essentia
+              </h2>
+              <p className="text-miguel-deep/80 leading-relaxed mb-4">
+                O Essentia é uma plataforma de autoconhecimento composta por:
+              </p>
+              <ul className="list-disc pl-6 text-miguel-deep/80 space-y-2 mb-6">
+                <li>testes de avaliação de personalidade, comportamento e perfil emocional;</li>
+                <li>um agente de IA chamado Miguel, que oferece explicações, reflexões e acompanhamentos;</li>
+                <li>ferramentas de análise integradas (Mapa da Essência);</li>
+                <li>conteúdos informacionais e interativos.</li>
+              </ul>
+              <p className="text-miguel-deep/80 leading-relaxed mb-4">
+                O Essentia <strong className="text-miguel-deep">não substitui:</strong>
+              </p>
+              <ul className="list-disc pl-6 text-miguel-deep/80 space-y-2">
+                <li>diagnóstico clínico,</li>
+                <li>aconselhamento psicológico,</li>
+                <li>orientação médica,</li>
+                <li>terapia,</li>
+                <li>consultoria profissional.</li>
+              </ul>
+              <p className="text-miguel-deep/80 leading-relaxed mt-4">
+                É um recurso educativo e reflexivo.
+              </p>
+            </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">3. Uso da Plataforma</h2>
-            <p className="text-muted-foreground leading-relaxed mb-3">
-              Ao criar uma conta no Essentia, você concorda em:
-            </p>
-            <ul className="list-disc pl-6 text-muted-foreground space-y-2">
-              <li>Fornecer informações verdadeiras, precisas e atualizadas</li>
-              <li>Manter a segurança e confidencialidade de sua senha</li>
-              <li>Não utilizar a plataforma para fins ilícitos ou não autorizados</li>
-              <li>Respeitar os direitos de propriedade intelectual do Essentia</li>
-            </ul>
-          </section>
+            <section>
+              <h2 className="text-xl font-semibold text-miguel-deep mb-4 font-display">
+                2. Elegibilidade
+              </h2>
+              <p className="text-miguel-deep/80 leading-relaxed mb-4">
+                Para usar o Essentia, você deve:
+              </p>
+              <ul className="list-disc pl-6 text-miguel-deep/80 space-y-2">
+                <li>ter pelo menos 16 anos;</li>
+                <li>ter capacidade de aceitar estes termos;</li>
+                <li>fornecer informações verdadeiras.</li>
+              </ul>
+              <p className="text-miguel-deep/80 leading-relaxed mt-4">
+                Menores de 16 anos requerem consentimento dos responsáveis.
+              </p>
+            </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">4. Propriedade Intelectual e Uso de Imagens</h2>
-            <p className="text-muted-foreground leading-relaxed mb-3">
-              <strong>IMPORTANTE:</strong> Todas as fotografias produzidas pelo Essentia são propriedade compartilhada entre o cliente e o estúdio:
-            </p>
-            <ul className="list-disc pl-6 text-muted-foreground space-y-2">
-              <li>Você recebe os direitos de uso das imagens para fins pessoais e profissionais</li>
-              <li><strong>Nenhuma imagem será publicada ou divulgada sem sua autorização expressa e por escrito</strong></li>
-              <li>O Essentia pode solicitar autorização para uso em portfólio, redes sociais ou materiais de divulgação</li>
-              <li>Você pode revogar a autorização de uso a qualquer momento mediante solicitação formal</li>
-            </ul>
-          </section>
+            <section>
+              <h2 className="text-xl font-semibold text-miguel-deep mb-4 font-display">
+                3. Conta do Usuário
+              </h2>
+              <p className="text-miguel-deep/80 leading-relaxed mb-4">
+                Ao criar uma conta, você concorda em:
+              </p>
+              <ul className="list-disc pl-6 text-miguel-deep/80 space-y-2 mb-6">
+                <li>manter seus dados atualizados;</li>
+                <li>proteger sua senha;</li>
+                <li>não compartilhar acesso com terceiros;</li>
+                <li>notificar imediatamente qualquer uso indevido.</li>
+              </ul>
+              <p className="text-miguel-deep/80 leading-relaxed mb-4">
+                Nós podemos suspender ou encerrar contas em caso de:
+              </p>
+              <ul className="list-disc pl-6 text-miguel-deep/80 space-y-2">
+                <li>uso inadequado;</li>
+                <li>violação dos termos;</li>
+                <li>fraude;</li>
+                <li>comportamento abusivo.</li>
+              </ul>
+            </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">5. Agendamento e Cancelamento</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              As sessões fotográficas devem ser agendadas com antecedência mínima de 7 dias. 
-              Cancelamentos com menos de 48 horas de antecedência estão sujeitos a taxas conforme política de cada plano contratado.
-            </p>
-          </section>
+            <section>
+              <h2 className="text-xl font-semibold text-miguel-deep mb-4 font-display">
+                4. Uso Permitido
+              </h2>
+              <p className="text-miguel-deep/80 leading-relaxed mb-4">
+                Você pode usar o Essentia para:
+              </p>
+              <ul className="list-disc pl-6 text-miguel-deep/80 space-y-2 mb-6">
+                <li>realizar testes;</li>
+                <li>acessar análises;</li>
+                <li>interagir com o agente Miguel;</li>
+                <li>aprender sobre si mesmo;</li>
+                <li>consultar seu Mapa da Essência.</li>
+              </ul>
+              <p className="text-miguel-deep/80 leading-relaxed mb-4">
+                <strong className="text-miguel-deep">É proibido:</strong>
+              </p>
+              <ul className="list-disc pl-6 text-miguel-deep/80 space-y-2">
+                <li>copiar conteúdo para fins comerciais;</li>
+                <li>manipular o sistema;</li>
+                <li>violar segurança da plataforma;</li>
+                <li>utilizar para fins ilícitos;</li>
+                <li>tentar burlar pagamentos.</li>
+              </ul>
+            </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">6. Limitação de Responsabilidade</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              O Essentia se compromete a fornecer serviços de alta qualidade, porém não se responsabiliza por:
-              resultados subjetivos de autoconhecimento, interpretações pessoais dos testes de personalidade, 
-              ou expectativas não comunicadas previamente.
-            </p>
-          </section>
+            <section>
+              <h2 className="text-xl font-semibold text-miguel-deep mb-4 font-display">
+                5. Pagamentos e Preços
+              </h2>
+              <p className="text-miguel-deep/80 leading-relaxed mb-4">
+                Alguns recursos são pagos. Preços podem mudar sem aviso prévio.
+                Compras são processadas por plataformas terceiras seguras.
+                O Essentia não armazena dados completos de pagamento.
+              </p>
+              <p className="text-miguel-deep/80 leading-relaxed">
+                Compras são não reembolsáveis, exceto nos casos previstos pela legislação aplicável.
+              </p>
+            </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">7. Modificações dos Termos</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Reservamo-nos o direito de modificar estes Termos de Uso a qualquer momento. 
-              Alterações significativas serão comunicadas por email aos usuários cadastrados.
-            </p>
-          </section>
+            <section>
+              <h2 className="text-xl font-semibold text-miguel-deep mb-4 font-display">
+                6. Conteúdos e Interpretações
+              </h2>
+              <p className="text-miguel-deep/80 leading-relaxed mb-4">
+                As interpretações fornecidas por Miguel são geradas por inteligência artificial
+                baseada em dados, padrões e modelos de linguagem.
+              </p>
+              <p className="text-miguel-deep/80 leading-relaxed mb-4">
+                Você entende que:
+              </p>
+              <ul className="list-disc pl-6 text-miguel-deep/80 space-y-2">
+                <li>resultados são simbólicos;</li>
+                <li>análises são sugestões;</li>
+                <li>não constituem diagnóstico;</li>
+                <li>não garantem precisão absoluta.</li>
+              </ul>
+            </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">8. Contato</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Para dúvidas sobre estes Termos de Uso, entre em contato:
-            </p>
-            <p className="text-muted-foreground mt-2">
-              <strong>Email:</strong> contato@essentia.com.br<br />
-              <strong>WhatsApp:</strong> +55 (11) 99999-9999
-            </p>
-          </section>
+            <section>
+              <h2 className="text-xl font-semibold text-miguel-deep mb-4 font-display">
+                7. Privacidade
+              </h2>
+              <p className="text-miguel-deep/80 leading-relaxed">
+                O uso da plataforma implica aceitação da nossa{" "}
+                <button
+                  onClick={() => navigate("/politica-de-privacidade")}
+                  className="text-essentia-gold hover:underline"
+                >
+                  Política de Privacidade
+                </button>.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-miguel-deep mb-4 font-display">
+                8. Modificações da Plataforma
+              </h2>
+              <p className="text-miguel-deep/80 leading-relaxed">
+                Podemos atualizar, alterar, suspender ou remover funcionalidades a qualquer momento,
+                sem obrigação de aviso prévio.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-miguel-deep mb-4 font-display">
+                9. Propriedade Intelectual
+              </h2>
+              <p className="text-miguel-deep/80 leading-relaxed">
+                Todo conteúdo do Essentia — textos, visual, IA, algoritmos, marca e componentes —
+                é protegido por direitos autorais e não pode ser copiado ou redistribuído sem autorização.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-miguel-deep mb-4 font-display">
+                10. Limitação de Responsabilidade
+              </h2>
+              <p className="text-miguel-deep/80 leading-relaxed mb-4">
+                O Essentia não se responsabiliza por:
+              </p>
+              <ul className="list-disc pl-6 text-miguel-deep/80 space-y-2 mb-4">
+                <li>decisões tomadas com base nos resultados;</li>
+                <li>indisponibilidade do sistema;</li>
+                <li>perda de dados causada por terceiros;</li>
+                <li>uso indevido da plataforma.</li>
+              </ul>
+              <p className="text-miguel-deep/80 leading-relaxed">
+                Você utiliza o Essentia por sua própria conta e risco.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-miguel-deep mb-4 font-display">
+                11. Contato
+              </h2>
+              <p className="text-miguel-deep/80 leading-relaxed">
+                Para dúvidas, suporte ou solicitações:
+              </p>
+              <p className="text-essentia-gold mt-2">
+                📧 suporte@essentia.app
+              </p>
+            </section>
+
+            <section className="pt-6 border-t border-soul-sand">
+              <h2 className="text-xl font-semibold text-miguel-deep mb-4 font-display">
+                12. Aceitação
+              </h2>
+              <p className="text-miguel-deep/80 leading-relaxed">
+                Ao utilizar o Essentia, você declara ter lido e concordado integralmente com estes Termos de Uso.
+              </p>
+            </section>
+          </div>
         </div>
 
         <div className="mt-12 text-center">
-          <Button onClick={() => navigate("/")} size="lg">
+          <Button
+            onClick={() => navigate("/")}
+            className="bg-essentia-gold hover:bg-essentia-gold/90 text-white px-8 py-3 rounded-xl shadow-apple"
+          >
             Voltar para o site
           </Button>
         </div>

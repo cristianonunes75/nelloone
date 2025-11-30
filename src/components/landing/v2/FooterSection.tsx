@@ -9,7 +9,7 @@ const footerLinks = {
   ],
   empresa: [
     { label: "Sobre", href: "#jornada" },
-    { label: "Contato", href: "mailto:contato@essentia.app" },
+    { label: "Contato", href: "/contato" },
   ],
   legal: [
     { label: "Termos de Uso", href: "/termos-de-servico" },
@@ -34,27 +34,27 @@ export const FooterSection = () => {
   };
 
   return (
-    <footer className="py-16 bg-soul-light/50 border-t border-border/30">
+    <footer className="py-16 bg-soul-light/50 border-t border-soul-sand/30">
       <div className="container px-6">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             {/* Brand */}
             <div className="md:col-span-1">
               <LogoText className="text-xl mb-4" variant="solid" />
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Autoconhecimento que tem alma.
+              <p className="text-sm text-miguel-deep/60 leading-relaxed">
+                Plataforma de Autoconhecimento Inteligente
               </p>
             </div>
 
             {/* Links */}
             <div>
-              <h4 className="font-medium text-foreground text-sm mb-4">Produto</h4>
+              <h4 className="font-medium text-miguel-deep text-sm mb-4">Produto</h4>
               <ul className="space-y-2">
                 {footerLinks.produto.map((link) => (
                   <li key={link.label}>
                     <button
                       onClick={() => scrollToSection(link.href)}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
+                      className="text-sm text-miguel-deep/60 hover:text-essentia-gold transition-colors duration-300"
                     >
                       {link.label}
                     </button>
@@ -64,13 +64,13 @@ export const FooterSection = () => {
             </div>
 
             <div>
-              <h4 className="font-medium text-foreground text-sm mb-4">Empresa</h4>
+              <h4 className="font-medium text-miguel-deep text-sm mb-4">Empresa</h4>
               <ul className="space-y-2">
                 {footerLinks.empresa.map((link) => (
                   <li key={link.label}>
                     <button
                       onClick={() => scrollToSection(link.href)}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
+                      className="text-sm text-miguel-deep/60 hover:text-essentia-gold transition-colors duration-300"
                     >
                       {link.label}
                     </button>
@@ -80,13 +80,13 @@ export const FooterSection = () => {
             </div>
 
             <div>
-              <h4 className="font-medium text-foreground text-sm mb-4">Legal</h4>
+              <h4 className="font-medium text-miguel-deep text-sm mb-4">Legal</h4>
               <ul className="space-y-2">
                 {footerLinks.legal.map((link) => (
                   <li key={link.label}>
                     <Link
                       to={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
+                      className="text-sm text-miguel-deep/60 hover:text-essentia-gold transition-colors duration-300"
                     >
                       {link.label}
                     </Link>
@@ -97,13 +97,23 @@ export const FooterSection = () => {
           </div>
 
           {/* Bottom */}
-          <div className="pt-8 border-t border-border/30 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Essentia. Todos os direitos reservados.
+          <div className="pt-8 border-t border-soul-sand/30 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-miguel-deep/50">
+              © {new Date().getFullYear()} Essentia — Plataforma de Autoconhecimento Inteligente
             </p>
-            <p className="text-xs text-muted-foreground">
-              Feito com ♡ para quem busca autoconhecimento
-            </p>
+            <div className="flex items-center gap-4 text-xs text-miguel-deep/50">
+              <Link to="/termos-de-servico" className="hover:text-essentia-gold transition-colors">
+                Termos de Uso
+              </Link>
+              <span>•</span>
+              <Link to="/politica-de-privacidade" className="hover:text-essentia-gold transition-colors">
+                Privacidade
+              </Link>
+              <span>•</span>
+              <Link to="/contato" className="hover:text-essentia-gold transition-colors">
+                Contato
+              </Link>
+            </div>
           </div>
         </div>
       </div>
