@@ -1,36 +1,30 @@
-import { Hero } from "@/components/landing/Hero";
-import { About } from "@/components/landing/About";
-import { ForWho } from "@/components/landing/ForWho";
-import { Tests } from "@/components/landing/Tests";
-import { PhotoSession } from "@/components/landing/PhotoSession";
-import { InfluenceModule } from "@/components/landing/InfluenceModule";
-import { Pricing } from "@/components/landing/Pricing";
-import { Testimonials } from "@/components/landing/Testimonials";
-import { FAQ } from "@/components/landing/FAQ";
-import { FinalCTA } from "@/components/landing/FinalCTA";
-import { LandingFooter } from "@/components/landing/LandingFooter";
-import { LandingNav } from "@/components/landing/LandingNav";
+import { NavSection } from "@/components/landing/v2/NavSection";
+import { HeroSection } from "@/components/landing/v2/HeroSection";
+import { MiguelSection } from "@/components/landing/v2/MiguelSection";
+import { JourneySection } from "@/components/landing/v2/JourneySection";
+import { EssenceMapSection } from "@/components/landing/v2/EssenceMapSection";
+import { TestimonialsSection } from "@/components/landing/v2/TestimonialsSection";
+import { PricingSection } from "@/components/landing/v2/PricingSection";
+import { CTASection } from "@/components/landing/v2/CTASection";
+import { FooterSection } from "@/components/landing/v2/FooterSection";
 import { MiguelAgent } from "@/components/MiguelAgent";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen">
-      <LandingNav />
-      <Hero />
-      <About />
-      <ForWho />
+    <div className="min-h-screen bg-background">
+      <NavSection />
+      <HeroSection />
+      <div id="jornada">
+        <MiguelSection />
+      </div>
       <div id="testes">
-        <Tests />
+        <JourneySection />
       </div>
-      <PhotoSession />
-      <InfluenceModule />
-      <div id="planos">
-        <Pricing />
-      </div>
-      <Testimonials />
-      <FAQ />
-      <FinalCTA />
-      <LandingFooter />
+      <EssenceMapSection />
+      <TestimonialsSection />
+      <PricingSection />
+      <CTASection />
+      <FooterSection />
       <MiguelAgent location="landing" />
     </div>
   );
