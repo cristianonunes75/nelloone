@@ -10,7 +10,7 @@ import { FAQ } from "@/components/landing/FAQ";
 import { FinalCTA } from "@/components/landing/FinalCTA";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingNav } from "@/components/landing/LandingNav";
-import { LumenAgent } from "@/components/LumenAgent";
+import { MiguelAgent } from "@/components/MiguelAgent";
 
 const Landing = () => {
   return (
@@ -31,7 +31,7 @@ const Landing = () => {
       <FAQ />
       <FinalCTA />
       <LandingFooter />
-      <LumenAgent />
+      <MiguelAgent location="landing" />
     </div>
   );
 };

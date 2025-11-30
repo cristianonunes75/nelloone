@@ -1,30 +1,37 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useTests } from "@/hooks/useTests";
 import { useTestAccess } from "@/hooks/useTestAccess";
+import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { Button } from "@/components/ui/button";
-import { TestCard } from "@/components/cliente/TestCard";
-import { LockedTestCard } from "@/components/cliente/LockedTestCard";
+import { JourneyStepCard } from "@/components/cliente/JourneyStepCard";
 import { LogoText } from "@/components/LogoText";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
-import { LogOut, User, ShoppingCart } from "lucide-react";
+import { LogOut, User, Sparkles, Map } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import EssentiaConcierge from "@/components/cliente/EssentiaConcierge";
-import { CartSummary } from "@/components/cliente/CartSummary";
-import { useCart } from "@/hooks/useCart";
-import { Checkbox } from "@/components/ui/checkbox";
+import { MiguelAgent } from "@/components/MiguelAgent";
+import { Progress } from "@/components/ui/progress";
 
 const Cliente = () => {
-  const { user, signOut, userRole } = useAuth();
-  const { tests, isLoading, getTestStatus, getTestProgress, startTest, startTestAsync, resetTest } = useTests();
+  const { user, profile, signOut, userRole } = useAuth();
+  const { startTestAsync } = useTests();
   const { hasAccess } = useTestAccess();
+  const { 
+    journeySteps, 
+    completedTests, 
+    completedCount, 
+    totalSteps, 
+    isJourneyComplete,
+    currentStep,
+    testResults,
+    isLoading 
+  } = useJourneyProgress();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { selectedTests, toggleTest, isSelected, clearCart } = useCart();
 
   // Handle payment success callback
   useEffect(() => {
@@ -33,14 +40,12 @@ const Cliente = () => {
     if (paymentStatus === "success") {
       toast({
         title: "Pagamento confirmado! 🎉",
-        description: "Seu teste foi liberado. Você já pode começar!",
+        description: "Seu teste foi liberado. Você já pode continuar sua jornada!",
       });
       
-      // Invalidate queries to refresh test access
       queryClient.invalidateQueries({ queryKey: ["test-purchases"] });
-      clearCart(); // Clear cart after successful purchase
+      queryClient.invalidateQueries({ queryKey: ["user-tests"] });
       
-      // Clean up URL
       searchParams.delete("payment");
       searchParams.delete("test_id");
       setSearchParams(searchParams);
@@ -51,19 +56,60 @@ const Cliente = () => {
         variant: "destructive",
       });
       
-      // Clean up URL
       searchParams.delete("payment");
       setSearchParams(searchParams);
     }
   }, [searchParams, setSearchParams, toast, queryClient]);
 
+  const testPageMap: Record<string, string> = {
+    'arquetipos_proposito': '/teste-arquetipos',
+    'disc': '/teste-disc',
+    'mbti': '/teste-mbti',
+    'eneagrama': '/teste-eneagrama',
+    'temperamentos': '/teste-temperamentos',
+    'inteligencias_multiplas': '/teste-inteligencias',
+    'linguagens_amor': '/teste-linguagens',
+  };
+
+  const handleStartTest = async (step: typeof journeySteps[0]) => {
+    const isFree = step.isFree;
+    const canAccess = hasAccess(step.testId, isFree);
+
+    if (!canAccess) {
+      // Navigate to purchase flow
+      navigate(`/cliente/comprar/${step.testId}`);
+      return;
+    }
+
+    // Navigate to test detail page for new tests
+    const testPage = testPageMap[step.testType];
+    if (testPage) {
+      navigate(testPage);
+    }
+  };
+
+  const handleContinueTest = async (step: typeof journeySteps[0]) => {
+    const userTest = await startTestAsync(step.testId);
+    navigate(`/cliente/test-execution/${step.testId}/${userTest.id}`);
+  };
+
+  const handleGenerateMap = () => {
+    navigate("/cliente/mapa-essencia");
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando sua jornada...</p>
+        </div>
       </div>
     );
   }
+
+  const progressPercentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
+  const userName = profile?.full_name?.split(" ")[0] || user?.user_metadata?.full_name?.split(" ")[0] || "Viajante";
 
   return (
     <div className="min-h-screen bg-background">
@@ -89,126 +135,83 @@ const Cliente = () => {
       </header>
 
       <main className="container px-4 py-12">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-12">
-            <h1 className="text-4xl font-bold mb-4">
-              Olá, {user?.user_metadata?.full_name?.split(" ")[0] || "Cliente"}!
+        <div className="max-w-3xl mx-auto">
+          {/* Header Section */}
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-4">
+              <Map className="w-4 h-4" />
+              <span className="text-sm font-medium">Jornada de Autoconhecimento</span>
+            </div>
+            <h1 className="text-4xl font-bold mb-3">
+              Seu Mapa da Essência
             </h1>
-            <p className="text-xl text-muted-foreground">
-              Comece pelo <strong>Teste de Arquétipos</strong> — 36 perguntas gratuitas para descobrir sua essência.
+            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+              Olá, {userName}! Miguel vai te acompanhar em cada etapa. Basta seguir o caminho no seu ritmo.
             </p>
           </div>
 
-          <div className="mb-8">
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-2xl font-semibold">Seus Testes</h2>
-                {selectedTests.length > 0 && (
-                  <div className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full">
-                    <ShoppingCart className="w-4 h-4" />
-                    <span className="font-medium">{selectedTests.length} selecionado{selectedTests.length > 1 ? 's' : ''}</span>
-                  </div>
-                )}
+          {/* Progress Section */}
+          <div className="bg-card border border-border rounded-2xl p-6 mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium">Progresso da Jornada</span>
+              <span className="text-sm text-muted-foreground">
+                {completedCount} de {totalSteps} etapas
+              </span>
+            </div>
+            <Progress value={progressPercentage} className="h-2 mb-2" />
+            <p className="text-xs text-muted-foreground">
+              {isJourneyComplete 
+                ? "🎉 Parabéns! Sua essência está pronta para ser revelada."
+                : `Etapa atual: ${currentStep} de ${totalSteps}`
+              }
+            </p>
+          </div>
+
+          {/* Journey Steps */}
+          <div className="space-y-4 mb-8">
+            {journeySteps.map((step) => (
+              <JourneyStepCard
+                key={step.testId}
+                step={step}
+                onStart={() => handleStartTest(step)}
+                onContinue={() => handleContinueTest(step)}
+              />
+            ))}
+          </div>
+
+          {/* Final Map Generation */}
+          {isJourneyComplete && (
+            <div className="bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 border border-primary/30 rounded-2xl p-8 text-center">
+              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="w-8 h-8 text-primary" />
               </div>
-              <p className="text-sm text-muted-foreground">
-                💡 Selecione múltiplos testes bloqueados para ganhar desconto: 5% em 3+ testes, 10% em 5+ testes
+              <h2 className="text-2xl font-bold mb-2">Mapa Final</h2>
+              <p className="text-muted-foreground mb-6">
+                Parabéns, {userName}! Sua essência está pronta para ser revelada.
               </p>
+              <Button size="lg" onClick={handleGenerateMap} className="gap-2">
+                <Map className="w-5 h-5" />
+                Gerar Meu Mapa da Essência
+              </Button>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {tests?.map((test) => {
-                const isFree = test.is_free || false;
-                const hasTestAccess = hasAccess(test.id, isFree);
+          )}
 
-                if (!hasTestAccess) {
-                  return (
-                    <div key={test.id} className="relative group">
-                      {!test.is_free && (
-                        <label 
-                          htmlFor={`test-${test.id}`}
-                          className="absolute top-3 left-3 z-10 cursor-pointer bg-background/95 backdrop-blur-sm border-2 border-border rounded-xl p-2 shadow-lg hover:bg-primary/5 hover:border-primary transition-all duration-200"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Checkbox
-                              id={`test-${test.id}`}
-                              checked={isSelected(test.id)}
-                              onCheckedChange={() => toggleTest(test.id)}
-                              className="h-5 w-5 border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                            />
-                            <span className="text-xs font-medium whitespace-nowrap">
-                              {isSelected(test.id) ? 'Selecionado' : 'Selecionar'}
-                            </span>
-                          </div>
-                        </label>
-                      )}
-                      <LockedTestCard
-                        id={test.id}
-                        name={test.name}
-                        description={test.description}
-                        questionsCount={test.questions_count}
-                        estimatedMinutes={test.estimated_minutes}
-                        icon={test.icon || "Circle"}
-                        price={test.price_brl || 29.0}
-                      />
-                    </div>
-                  );
-                }
-
-                // Map test types to their specific pages
-                const testPageMap: Record<string, string> = {
-                  'arquetipos_proposito': '/teste-arquetipos',
-                  'disc': '/teste-disc',
-                  'mbti': '/teste-mbti',
-                  'eneagrama': '/teste-eneagrama',
-                  'temperamentos': '/teste-temperamentos',
-                  'inteligencias_multiplas': '/teste-inteligencias',
-                  'linguagens_amor': '/teste-linguagens',
-                };
-
-                const testPage = testPageMap[test.type];
-                const status = getTestStatus(test.id);
-
-                return (
-                  <TestCard
-                    key={test.id}
-                    id={test.id}
-                    name={test.name}
-                    description={test.description}
-                    questionsCount={test.questions_count}
-                    estimatedMinutes={test.estimated_minutes}
-                    icon={test.icon || "Circle"}
-                    status={status}
-                    progress={getTestProgress(test.id)}
-                    onStart={async () => {
-                      // If test is not started, go to test detail page first
-                      if (status === "not_started" && testPage) {
-                        navigate(testPage);
-                      } else {
-                        // If already in progress, continue directly to execution
-                        const userTest = await startTestAsync(test.id);
-                        navigate(`/cliente/test-execution/${test.id}/${userTest.id}`);
-                      }
-                    }}
-                    onReset={userRole === "admin" ? () => resetTest(test.id) : undefined}
-                    isFree={isFree}
-                  />
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="bg-accent/10 border border-border rounded-2xl p-6 text-center">
-            <p className="text-sm text-muted-foreground mb-2">
-              ⚠️ <strong>Lembrete importante:</strong>
-            </p>
+          {/* Disclaimer */}
+          <div className="bg-accent/10 border border-border rounded-2xl p-6 text-center mt-8">
             <p className="text-sm text-muted-foreground">
-              Os resultados destes testes são simbólicos e servem como ferramentas de autoconhecimento e comunicação. 
+              ⚠️ Os resultados destes testes são simbólicos e servem como ferramentas de autoconhecimento. 
               Eles não representam verdade absoluta, nem substituem oração, discernimento espiritual ou aconselhamento pessoal.
             </p>
           </div>
         </div>
       </main>
-      <CartSummary tests={tests || []} />
-      <EssentiaConcierge />
+
+      <MiguelAgent 
+        location="cliente" 
+        completedTests={completedTests}
+        currentStep={currentStep}
+        testResults={testResults}
+      />
     </div>
   );
 };

@@ -25,6 +25,7 @@ import Eneagrama from "./pages/tests/Eneagrama";
 import Temperamentos from "./pages/tests/Temperamentos";
 import InteligenciasMultiplas from "./pages/tests/InteligenciasMultiplas";
 import LinguagensAmor from "./pages/tests/LinguagensAmor";
+import MapaEssencia from "./pages/MapaEssencia";
 
 const queryClient = new QueryClient();
 
@@ -78,6 +79,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["cliente", "admin"]}>
                   <TestResults />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cliente/mapa-essencia"
+              element={
+                <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+                  <MapaEssencia />
                 </ProtectedRoute>
               }
             />

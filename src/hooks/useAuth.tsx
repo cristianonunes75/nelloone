@@ -5,11 +5,20 @@ import { useToast } from "@/hooks/use-toast";
 
 type UserRole = "admin" | "fotografo" | "cliente";
 
+interface Profile {
+  id: string;
+  full_name: string;
+  phone: string | null;
+  profession: string | null;
+  avatar_url: string | null;
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   userRole: UserRole | null;
   userRoles: UserRole[];
+  profile: Profile | null;
   isLoading: boolean;
   signOut: () => Promise<void>;
   setActiveRole: (role: UserRole) => void;
@@ -20,6 +29,7 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   userRole: null,
   userRoles: [],
+  profile: null,
   isLoading: true,
   signOut: async () => {},
   setActiveRole: () => {},
@@ -30,6 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -44,24 +55,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (session?.user) {
           setTimeout(async () => {
             try {
-              const { data, error } = await supabase
+              // Fetch roles
+              const { data: rolesData, error: rolesError } = await supabase
                 .from("user_roles")
                 .select("role")
                 .eq("user_id", session.user.id)
                 .order("created_at", { ascending: true });
 
-              if (error) throw error;
+              if (rolesError) throw rolesError;
               
-              const roles = (data || []).map((r: any) => r.role as UserRole);
+              const roles = (rolesData || []).map((r: any) => r.role as UserRole);
               setUserRoles(roles);
               
-              // Set primary role based on priority
               const primaryRole = roles.find(r => r === "admin") || 
                                  roles.find(r => r === "fotografo") || 
                                  roles[0] || "cliente";
               setUserRole(primaryRole);
+
+              // Fetch profile
+              const { data: profileData, error: profileError } = await supabase
+                .from("profiles")
+                .select("*")
+                .eq("id", session.user.id)
+                .single();
+
+              if (!profileError && profileData) {
+                setProfile(profileData);
+              }
             } catch (error) {
-              console.error("Error fetching user roles:", error);
+              console.error("Error fetching user data:", error);
               setUserRoles(["cliente"]);
               setUserRole("cliente");
             }
@@ -69,6 +91,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           setUserRole(null);
           setUserRoles([]);
+          setProfile(null);
         }
 
         setIsLoading(false);
@@ -83,24 +106,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (session?.user) {
         setTimeout(async () => {
           try {
-            const { data, error } = await supabase
+            const { data: rolesData, error: rolesError } = await supabase
               .from("user_roles")
               .select("role")
               .eq("user_id", session.user.id)
               .order("created_at", { ascending: true });
 
-            if (error) throw error;
+            if (rolesError) throw rolesError;
             
-            const roles = (data || []).map((r: any) => r.role as UserRole);
+            const roles = (rolesData || []).map((r: any) => r.role as UserRole);
             setUserRoles(roles);
             
-            // Set primary role based on priority
             const primaryRole = roles.find(r => r === "admin") || 
                                roles.find(r => r === "fotografo") || 
                                roles[0] || "cliente";
             setUserRole(primaryRole);
+
+            const { data: profileData, error: profileError } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", session.user.id)
+              .single();
+
+            if (!profileError && profileData) {
+              setProfile(profileData);
+            }
           } catch (error) {
-            console.error("Error fetching user roles:", error);
+            console.error("Error fetching user data:", error);
             setUserRoles(["cliente"]);
             setUserRole("cliente");
           }
@@ -139,7 +171,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
   
   return (
-    <AuthContext.Provider value={{ user, session, userRole, userRoles, isLoading, signOut, setActiveRole }}>
+    <AuthContext.Provider value={{ user, session, userRole, userRoles, profile, isLoading, signOut, setActiveRole }}>
       {children}
     </AuthContext.Provider>
   );

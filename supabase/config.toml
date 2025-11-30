@@ -8,3 +8,9 @@ verify_jwt = false
 
 [functions.lumen-agent]
 verify_jwt = false
+
+[functions.essentia-concierge]
+verify_jwt = false
+
+[functions.miguel-agent]
+verify_jwt = false
