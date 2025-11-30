@@ -38,14 +38,14 @@ export const TestimonialsSection = () => {
   const { ref: benefitsRef, isVisible: benefitsVisible } = useScrollAnimation();
 
   return (
-    <section className="py-24 md:py-32 bg-secondary/30">
+    <section className="py-24 md:py-32 bg-soul-light/30">
       <div className="container px-6">
         <div className="max-w-5xl mx-auto">
           {/* Section header */}
           <div ref={headerRef} className="text-center mb-16">
             <span 
               className={cn(
-                "inline-block text-accent font-medium text-sm tracking-wide uppercase mb-4 transition-all duration-500",
+                "inline-block text-gold font-medium text-sm tracking-wide uppercase mb-4 transition-all duration-500",
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
@@ -68,23 +68,23 @@ export const TestimonialsSection = () => {
               <div 
                 key={testimonial.name}
                 className={cn(
-                  "bg-card rounded-2xl p-6 border border-border/50 shadow-soft hover:shadow-medium hover:border-border transition-all duration-300",
+                  "bg-card rounded-2xl p-6 border border-border/30 shadow-soft hover:shadow-medium hover:border-border/50 transition-all duration-300",
                   cardsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
                 )}
                 style={cardsVisible ? getStaggerDelay(index, 0.15) : {}}
               >
-                <Quote className="w-8 h-8 text-accent/30 mb-4" />
-                <p className="text-foreground mb-6 leading-relaxed">
+                <Quote className="w-7 h-7 text-gold/30 mb-4" strokeWidth={1.5} />
+                <p className="text-foreground mb-6 leading-relaxed text-sm">
                   "{testimonial.content}"
                 </p>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-foreground">{testimonial.name}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                    <p className="font-medium text-foreground text-sm">{testimonial.name}</p>
+                    <p className="text-xs text-muted-foreground">{testimonial.role}</p>
                   </div>
                   <div className="flex gap-0.5">
                     {Array.from({ length: testimonial.rating }).map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-accent fill-accent" />
+                      <Star key={i} className="w-3.5 h-3.5 text-gold fill-gold" />
                     ))}
                   </div>
                 </div>
@@ -96,7 +96,7 @@ export const TestimonialsSection = () => {
           <div 
             ref={benefitsRef}
             className={cn(
-              "bg-card rounded-3xl p-8 md:p-12 border border-border/50 shadow-soft transition-all duration-700",
+              "bg-card rounded-3xl p-8 md:p-12 border border-border/30 shadow-soft transition-all duration-700",
               benefitsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             )}
           >
@@ -108,12 +108,12 @@ export const TestimonialsSection = () => {
                 <div 
                   key={benefit}
                   className={cn(
-                    "flex items-center gap-3 p-4 rounded-xl bg-secondary/50 hover:bg-secondary transition-all duration-300 cursor-default",
+                    "flex items-center gap-3 p-4 rounded-xl bg-soul-light/50 hover:bg-soul-light transition-all duration-300 cursor-default",
                     benefitsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                   )}
                   style={benefitsVisible ? getStaggerDelay(index, 0.08) : {}}
                 >
-                  <div className="w-2 h-2 rounded-full bg-accent flex-shrink-0" />
+                  <div className="w-2 h-2 rounded-full bg-gold flex-shrink-0" />
                   <p className="text-foreground text-sm">{benefit}</p>
                 </div>
               ))}
