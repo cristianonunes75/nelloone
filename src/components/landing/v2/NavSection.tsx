@@ -5,6 +5,8 @@ import { Menu, X, LogIn, User, ChevronDown, FileText, HelpCircle, Map, BarChart3
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +18,7 @@ import {
 export const NavSection = () => {
   const navigate = useNavigate();
   const { user, userRole, signOut, isLoading } = useAuth();
+  const { t, language } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -47,16 +50,15 @@ export const NavSection = () => {
 
   // Links for non-logged users
   const publicLinks = [
-    { label: "Testes", action: () => scrollToSection("#testes"), icon: FileText },
-    { label: "Ajuda", action: () => scrollToSection("#precos"), icon: HelpCircle },
+    { label: t.landing.nav.tests, action: () => scrollToSection("#testes"), icon: FileText },
+    { label: t.landing.nav.pricing, action: () => scrollToSection("#precos"), icon: HelpCircle },
   ];
 
   // Links for logged users
   const authLinks = [
-    { label: "Testes", action: () => handleNavigation("/cliente"), icon: FileText },
-    { label: "Minha Jornada", action: () => handleNavigation("/cliente"), icon: Map },
-    { label: "Resultados", action: () => handleNavigation("/cliente"), icon: BarChart3 },
-    { label: "Ajuda", action: () => scrollToSection("#precos"), icon: HelpCircle },
+    { label: t.landing.nav.tests, action: () => handleNavigation("/cliente"), icon: FileText },
+    { label: language === 'en' ? 'My Journey' : 'Minha Jornada', action: () => handleNavigation("/cliente"), icon: Map },
+    { label: language === 'en' ? 'Results' : 'Resultados', action: () => handleNavigation("/cliente"), icon: BarChart3 },
   ];
 
   const navLinks = isLoggedIn ? authLinks : publicLinks;
@@ -87,13 +89,15 @@ export const NavSection = () => {
                   className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 py-2 group"
                 >
                   {link.label}
-                  <span className="absolute bottom-0 left-0 w-full h-px bg-gold scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+                  <span className="absolute bottom-0 left-0 w-full h-px bg-ink scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
                 </button>
               ))}
             </div>
 
             {/* Desktop CTA / Profile */}
             <div className="hidden md:flex items-center gap-3">
+              <LanguageToggle variant="minimal" />
+              
               {isLoading ? (
                 <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
               ) : isLoggedIn ? (
@@ -104,8 +108,8 @@ export const NavSection = () => {
                       size="sm"
                       className="gap-2 text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                     >
-                      <div className="w-7 h-7 rounded-full bg-gold/20 flex items-center justify-center">
-                        <User className="w-4 h-4 text-gold" strokeWidth={1.5} />
+                      <div className="w-7 h-7 rounded-full bg-ink/10 flex items-center justify-center">
+                        <User className="w-4 h-4 text-ink" strokeWidth={1.5} />
                       </div>
                       <ChevronDown className="w-3 h-3" strokeWidth={1.5} />
                     </Button>
@@ -113,16 +117,16 @@ export const NavSection = () => {
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem onClick={() => navigate("/cliente/perfil")}>
                       <User className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                      Meu Perfil
+                      {language === 'en' ? 'My Profile' : 'Meu Perfil'}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/cliente")}>
                       <Settings className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                      Configurações
+                      {language === 'en' ? 'Settings' : 'Configurações'}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
                       <LogOut className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                      Sair
+                      {language === 'en' ? 'Sign Out' : 'Sair'}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -133,7 +137,7 @@ export const NavSection = () => {
                   onClick={() => navigate("/auth")}
                   className="text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                 >
-                  Entrar
+                  {t.landing.nav.login}
                 </Button>
               )}
             </div>
@@ -156,7 +160,7 @@ export const NavSection = () => {
         <div 
           className={cn(
             "md:hidden bg-background border-b border-border overflow-hidden transition-all duration-300",
-            isMobileMenuOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"
+            isMobileMenuOpen ? "max-h-[450px] opacity-100" : "max-h-0 opacity-0"
           )}
         >
           <div className="container px-4 py-4 space-y-1">
@@ -166,10 +170,15 @@ export const NavSection = () => {
                 onClick={link.action}
                 className="flex items-center gap-3 w-full text-left py-3 px-4 text-foreground hover:bg-secondary/50 rounded-xl transition-colors"
               >
-                <link.icon className="w-4 h-4 text-gold" strokeWidth={1.5} />
+                <link.icon className="w-4 h-4 text-ink" strokeWidth={1.5} />
                 {link.label}
               </button>
             ))}
+
+            {/* Language toggle mobile */}
+            <div className="py-3 px-4">
+              <LanguageToggle />
+            </div>
 
             <div className="pt-4 border-t border-border space-y-2">
               {isLoggedIn ? (
@@ -180,7 +189,7 @@ export const NavSection = () => {
                     onClick={() => handleNavigation("/cliente/perfil")}
                   >
                     <User className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                    Meu Perfil
+                    {language === 'en' ? 'My Profile' : 'Meu Perfil'}
                   </Button>
                   <Button 
                     variant="ghost" 
@@ -188,16 +197,16 @@ export const NavSection = () => {
                     onClick={handleSignOut}
                   >
                     <LogOut className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                    Sair
+                    {language === 'en' ? 'Sign Out' : 'Sair'}
                   </Button>
                   
                   {/* Admin button - mobile */}
                   {isAdmin && (
                     <Button 
-                      className="w-full rounded-xl bg-gold hover:bg-gold-dark text-primary-foreground mt-2"
+                      className="w-full rounded-xl bg-ink hover:bg-ink-deep text-primary-foreground mt-2"
                       onClick={() => handleNavigation("/admin")}
                     >
-                      Painel Admin
+                      {language === 'en' ? 'Admin Panel' : 'Painel Admin'}
                     </Button>
                   )}
                 </>
@@ -208,7 +217,7 @@ export const NavSection = () => {
                   onClick={() => handleNavigation("/auth")}
                 >
                   <LogIn className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                  Entrar
+                  {t.landing.nav.login}
                 </Button>
               )}
             </div>
@@ -222,14 +231,14 @@ export const NavSection = () => {
           onClick={() => navigate("/admin")}
           className={cn(
             "fixed top-3 right-4 z-[60] hidden md:flex items-center gap-2 px-4 py-2 rounded-full",
-            "bg-gold/90 hover:bg-gold text-primary-foreground text-xs font-medium",
+            "bg-ink/90 hover:bg-ink text-primary-foreground text-xs font-medium",
             "shadow-lg backdrop-blur-sm transition-all duration-300",
             "hover:shadow-xl hover:scale-105",
             isScrolled ? "top-2" : "top-3"
           )}
         >
           <Settings className="w-3.5 h-3.5" strokeWidth={1.5} />
-          Painel Admin
+          {language === 'en' ? 'Admin Panel' : 'Painel Admin'}
         </button>
       )}
     </>

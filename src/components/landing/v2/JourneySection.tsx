@@ -1,5 +1,6 @@
 import { Lock, Check } from "lucide-react";
 import { useScrollAnimation, getStaggerDelay } from "@/hooks/useScrollAnimation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 
 // Ícones ultrafinos customizados
@@ -67,61 +68,28 @@ const DiamondIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const tests = [
-  {
-    number: 1,
-    name: "Arquétipos",
-    icon: SunIcon,
-    description: "Descubra os padrões simbólicos que guiam sua personalidade.",
-    isFree: true,
-  },
-  {
-    number: 2,
-    name: "DISC",
-    icon: QuadrantsIcon,
-    description: "Entenda seu estilo de comportamento e comunicação.",
-    isFree: false,
-  },
-  {
-    number: 3,
-    name: "Temperamentos",
-    icon: WavesIcon,
-    description: "Conheça sua base temperamental e como ela influencia suas reações.",
-    isFree: false,
-  },
-  {
-    number: 4,
-    name: "Linguagens do Amor",
-    icon: HeartLayersIcon,
-    description: "Descubra como você expressa e recebe amor.",
-    isFree: false,
-  },
-  {
-    number: 5,
-    name: "Inteligências Múltiplas",
-    icon: BrainIcon,
-    description: "Identifique seus talentos e formas únicas de aprender.",
-    isFree: false,
-  },
-  {
-    number: 6,
-    name: "Eneagrama",
-    icon: EnneagramIcon,
-    description: "Explore suas motivações profundas e padrões emocionais.",
-    isFree: false,
-  },
-  {
-    number: 7,
-    name: "MBTI",
-    icon: DiamondIcon,
-    description: "Entenda como você percebe o mundo e toma decisões.",
-    isFree: false,
-  },
-];
-
 export const JourneySection = () => {
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
   const { ref: timelineRef, isVisible: timelineVisible } = useScrollAnimation({ rootMargin: "0px 0px -100px 0px" });
+  const { t, language } = useLanguage();
+
+  const tests = language === 'en' ? [
+    { number: 1, name: "Archetypes", icon: SunIcon, description: "Discover the symbolic patterns that guide your personality.", isFree: true },
+    { number: 2, name: "DISC", icon: QuadrantsIcon, description: "Understand your behavior and communication style.", isFree: false },
+    { number: 3, name: "Temperaments", icon: WavesIcon, description: "Know your temperamental base and how it influences your reactions.", isFree: false },
+    { number: 4, name: "Love Languages", icon: HeartLayersIcon, description: "Discover how you express and receive love.", isFree: false },
+    { number: 5, name: "Multiple Intelligences", icon: BrainIcon, description: "Identify your talents and unique ways of learning.", isFree: false },
+    { number: 6, name: "Enneagram", icon: EnneagramIcon, description: "Explore your deep motivations and emotional patterns.", isFree: false },
+    { number: 7, name: "MBTI", icon: DiamondIcon, description: "Understand how you perceive the world and make decisions.", isFree: false },
+  ] : [
+    { number: 1, name: "Arquétipos", icon: SunIcon, description: "Descubra os padrões simbólicos que guiam sua personalidade.", isFree: true },
+    { number: 2, name: "DISC", icon: QuadrantsIcon, description: "Entenda seu estilo de comportamento e comunicação.", isFree: false },
+    { number: 3, name: "Temperamentos", icon: WavesIcon, description: "Conheça sua base temperamental e como ela influencia suas reações.", isFree: false },
+    { number: 4, name: "Linguagens do Amor", icon: HeartLayersIcon, description: "Descubra como você expressa e recebe amor.", isFree: false },
+    { number: 5, name: "Inteligências Múltiplas", icon: BrainIcon, description: "Identifique seus talentos e formas únicas de aprender.", isFree: false },
+    { number: 6, name: "Eneagrama", icon: EnneagramIcon, description: "Explore suas motivações profundas e padrões emocionais.", isFree: false },
+    { number: 7, name: "MBTI", icon: DiamondIcon, description: "Entenda como você percebe o mundo e toma decisões.", isFree: false },
+  ];
 
   return (
     <section className="py-16 md:py-24 lg:py-32 bg-bruma-light/50">
@@ -135,7 +103,7 @@ export const JourneySection = () => {
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              Os 7 Testes Profissionais
+              {t.landing.tests.title}
             </span>
             <h2 
               className={cn(
@@ -143,8 +111,17 @@ export const JourneySection = () => {
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              Testes reconhecidos,
-              <span className="block">linguagem acessível</span>
+              {language === 'en' ? (
+                <>
+                  Recognized tests,
+                  <span className="block">accessible language</span>
+                </>
+              ) : (
+                <>
+                  Testes reconhecidos,
+                  <span className="block">linguagem acessível</span>
+                </>
+              )}
             </h2>
             <p 
               className={cn(
@@ -152,8 +129,7 @@ export const JourneySection = () => {
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              Cada teste ilumina uma faceta diferente de quem você é. Juntos, 
-              eles compõem o retrato completo da sua personalidade.
+              {t.landing.tests.description}
             </p>
           </div>
 
@@ -207,7 +183,7 @@ export const JourneySection = () => {
                             <h3 className="font-display text-base md:text-lg text-foreground">{test.name}</h3>
                             {test.isFree ? (
                               <span className="px-2 py-0.5 text-[10px] md:text-xs font-medium bg-ink-blue/10 text-ink-blue rounded-full">
-                                Grátis
+                                {language === 'en' ? 'Free' : 'Grátis'}
                               </span>
                             ) : (
                               <Lock className="w-3 h-3 md:w-3.5 md:h-3.5 text-muted-foreground" strokeWidth={1.5} />
@@ -235,7 +211,11 @@ export const JourneySection = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-full bg-ink-blue/10 text-ink-blue hover:bg-ink-blue/15 transition-colors duration-300">
               <Check className="w-4 h-4 md:w-5 md:h-5" strokeWidth={1.5} />
-              <span className="font-medium text-sm md:text-base">Ao final: seu Mapa NELLO ONE completo</span>
+              <span className="font-medium text-sm md:text-base">
+                {language === 'en' 
+                  ? 'At the end: your complete NELLO ONE Map' 
+                  : 'Ao final: seu Mapa NELLO ONE completo'}
+              </span>
             </div>
           </div>
         </div>

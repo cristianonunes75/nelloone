@@ -1,0 +1,94 @@
+{
+  "hero": {
+    "title": "NELLO ONE",
+    "subtitle": "O caminho começa dentro.",
+    "description": "Um sistema guiado de autoconhecimento impulsionado por ciência de personalidade e IA.",
+    "cta_primary": "Começar Jornada",
+    "cta_secondary": "Explorar Testes"
+  },
+  "what_is": {
+    "title": "O que é o NELLO ONE?",
+    "description": "O NELLO ONE é uma plataforma inteligente de autoconhecimento que combina testes de personalidade cientificamente fundamentados, design emocional e insights guiados por IA para revelar quem você é e como você funciona — com clareza e simplicidade.",
+    "pillars": {
+      "tests": "Testes profissionais de personalidade",
+      "map": "Um mapa integrado de si mesmo",
+      "ai": "Insights guiados por IA",
+      "experience": "Experiência simples, moderna e humana"
+    }
+  },
+  "miguel": {
+    "title": "Conheça o Miguel",
+    "subtitle": "Seu Guia Interior",
+    "description": "Miguel analisa seus resultados de testes, identifica seus padrões centrais, explica suas tendências emocionais e comportamentais, e ajuda você a construir clareza sobre quem você é. Com orientação calma, ele caminha com você durante todo o processo de autoconhecimento.",
+    "cta": "Falar com Miguel"
+  },
+  "tests": {
+    "title": "Os 7 Testes Profissionais",
+    "description": "Testes precisos e profissionais traduzidos em uma experiência visual simples e intuitiva.",
+    "items": {
+      "archetypes": "Arquétipos",
+      "disc": "Avaliação DISC",
+      "mbti": "MBTI (16 Tipos)",
+      "enneagram": "Eneagrama",
+      "temperaments": "Temperamentos",
+      "intelligences": "Inteligências Múltiplas",
+      "love_languages": "Linguagens do Amor"
+    }
+  },
+  "map": {
+    "title": "Seu Mapa, Tudo em Um Lugar",
+    "description": "Um mapa visual integrado que combina todos os seus resultados em uma visão geral simples, profunda e significativa.",
+    "coming_soon": "Em breve na experiência NELLO ONE."
+  },
+  "why": {
+    "title": "Por que NELLO ONE?",
+    "cards": {
+      "clarity": {
+        "title": "Clareza",
+        "description": "Veja-se com explicações simples e objetivas."
+      },
+      "identity": {
+        "title": "Identidade",
+        "description": "Entenda suas tendências, forças e padrões."
+      },
+      "direction": {
+        "title": "Direção",
+        "description": "Receba insights para melhorar relacionamentos, decisões e emoções."
+      },
+      "science": {
+        "title": "Ciência + IA",
+        "description": "O melhor da ciência de personalidade, explicado por uma IA humanizada."
+      },
+      "experience": {
+        "title": "Experiência Bela",
+        "description": "Um design calmo, moderno e minimalista que é bom de usar."
+      },
+      "journey": {
+        "title": "Jornada Guiada",
+        "description": "Autoconhecimento passo a passo com Miguel ao seu lado."
+      }
+    }
+  },
+  "cta": {
+    "title": "Seu caminho começa dentro.",
+    "subtitle": "Comece sua jornada hoje.",
+    "button": "Começar Agora"
+  },
+  "footer": {
+    "brand": "NELLO ONE",
+    "tagline": "O caminho começa dentro.",
+    "links": {
+      "privacy": "Política de Privacidade",
+      "terms": "Termos de Serviço",
+      "contact": "Contato"
+    },
+    "copyright": "© 2024 NELLO ONE. Todos os direitos reservados."
+  },
+  "nav": {
+    "about": "Sobre",
+    "tests": "Testes",
+    "pricing": "Preços",
+    "login": "Entrar",
+    "start": "Começar"
+  }
+}

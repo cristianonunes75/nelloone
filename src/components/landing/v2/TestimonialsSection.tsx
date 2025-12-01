@@ -1,41 +1,62 @@
 import { Star, Quote } from "lucide-react";
 import { useScrollAnimation, getStaggerDelay } from "@/hooks/useScrollAnimation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
-
-const testimonials = [
-  {
-    name: "Mariana S.",
-    role: "Designer",
-    content: "Foi como olhar no espelho pela primeira vez. Miguel fez perguntas que me fizeram parar e pensar profundamente sobre quem eu realmente sou.",
-    rating: 5,
-  },
-  {
-    name: "Rafael M.",
-    role: "Empreendedor",
-    content: "O Mapa NELLO ONE me deu clareza sobre decisões que eu vinha adiando há anos. Agora sei exatamente onde colocar minha energia.",
-    rating: 5,
-  },
-  {
-    name: "Camila L.",
-    role: "Psicóloga",
-    content: "Como profissional de saúde mental, fiquei impressionada com a profundidade e precisão das análises. Uma ferramenta poderosa de autoconhecimento.",
-    rating: 5,
-  },
-];
-
-const benefits = [
-  "Clareza sobre quem você é",
-  "Direção para crescer",
-  "Linguagem simples",
-  "Testes sérios",
-  "IA humana",
-  "Jornada guiada",
-];
 
 export const TestimonialsSection = () => {
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
   const { ref: cardsRef, isVisible: cardsVisible } = useScrollAnimation();
   const { ref: benefitsRef, isVisible: benefitsVisible } = useScrollAnimation();
+  const { t, language } = useLanguage();
+
+  const testimonials = language === 'en' ? [
+    {
+      name: "Mariana S.",
+      role: "Designer",
+      content: "It was like looking in the mirror for the first time. Miguel asked questions that made me stop and think deeply about who I really am.",
+      rating: 5,
+    },
+    {
+      name: "Rafael M.",
+      role: "Entrepreneur",
+      content: "The NELLO ONE Map gave me clarity on decisions I had been putting off for years. Now I know exactly where to focus my energy.",
+      rating: 5,
+    },
+    {
+      name: "Camila L.",
+      role: "Psychologist",
+      content: "As a mental health professional, I was impressed by the depth and accuracy of the analyses. A powerful self-knowledge tool.",
+      rating: 5,
+    },
+  ] : [
+    {
+      name: "Mariana S.",
+      role: "Designer",
+      content: "Foi como olhar no espelho pela primeira vez. Miguel fez perguntas que me fizeram parar e pensar profundamente sobre quem eu realmente sou.",
+      rating: 5,
+    },
+    {
+      name: "Rafael M.",
+      role: "Empreendedor",
+      content: "O Mapa NELLO ONE me deu clareza sobre decisões que eu vinha adiando há anos. Agora sei exatamente onde colocar minha energia.",
+      rating: 5,
+    },
+    {
+      name: "Camila L.",
+      role: "Psicóloga",
+      content: "Como profissional de saúde mental, fiquei impressionada com a profundidade e precisão das análises. Uma ferramenta poderosa de autoconhecimento.",
+      rating: 5,
+    },
+  ];
+
+  const benefits = [
+    t.landing.why.cards.clarity.title,
+    t.landing.why.cards.direction.title,
+    language === 'en' ? 'Simple language' : 'Linguagem simples',
+    language === 'en' ? 'Serious tests' : 'Testes sérios',
+    language === 'en' ? 'Human AI' : 'IA humana',
+    t.landing.why.cards.journey.title,
+  ];
 
   return (
     <section className="py-16 md:py-24 lg:py-32 bg-bruma-light/30">
@@ -49,7 +70,7 @@ export const TestimonialsSection = () => {
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              Transformações Reais
+              {language === 'en' ? 'Real Transformations' : 'Transformações Reais'}
             </span>
             <h2 
               className={cn(
@@ -57,8 +78,17 @@ export const TestimonialsSection = () => {
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              O que dizem quem já
-              <span className="block">descobriu quem é</span>
+              {language === 'en' ? (
+                <>
+                  What they say who already
+                  <span className="block">discovered who they are</span>
+                </>
+              ) : (
+                <>
+                  O que dizem quem já
+                  <span className="block">descobriu quem é</span>
+                </>
+              )}
             </h2>
           </div>
 
@@ -104,7 +134,7 @@ export const TestimonialsSection = () => {
             )}
           >
             <h3 className="font-display text-xl md:text-display-sm text-foreground text-center mb-6 md:mb-10">
-              Por que o NELLO ONE?
+              {t.landing.why.title}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
               {benefits.map((benefit, index) => (
