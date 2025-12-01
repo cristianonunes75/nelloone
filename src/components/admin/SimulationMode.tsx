@@ -155,33 +155,61 @@ export const SimulationMode = () => {
 
   const fetchQuestions = async (testId: string) => {
     try {
-      // Filter questions by simulation language
-      const langFilter = simulationLanguage === 'pt' ? 'pt' : simulationLanguage;
-      
+      // First, try to get questions for the selected test
       const { data, error } = await supabase
         .from("test_questions")
         .select("*")
         .eq("test_id", testId)
-        .eq("language", langFilter)
         .order("question_number");
 
       if (error) throw error;
       
-      // If no questions found for specific language, try without filter
-      if (!data || data.length === 0) {
-        const { data: fallbackData, error: fallbackError } = await supabase
-          .from("test_questions")
-          .select("*")
-          .eq("test_id", testId)
-          .order("question_number");
-        
-        if (fallbackError) throw fallbackError;
-        setQuestions(fallbackData || []);
-        return fallbackData || [];
+      // If questions found, use them
+      if (data && data.length > 0) {
+        setQuestions(data);
+        return data;
       }
       
-      setQuestions(data);
-      return data;
+      // If no questions found (common for EN tests), find equivalent PT test by type
+      // First get the test type
+      const { data: testData, error: testError } = await supabase
+        .from("tests")
+        .select("type")
+        .eq("id", testId)
+        .single();
+      
+      if (testError) throw testError;
+      
+      // Find the PT version of this test type
+      const { data: ptTest, error: ptTestError } = await supabase
+        .from("tests")
+        .select("id")
+        .eq("type", testData.type)
+        .eq("language", "pt")
+        .eq("active", true)
+        .single();
+      
+      if (ptTestError || !ptTest) {
+        toast.error(t('simulation_mode') + ": No questions available for this test");
+        setQuestions([]);
+        return [];
+      }
+      
+      // Get questions from PT test as fallback
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from("test_questions")
+        .select("*")
+        .eq("test_id", ptTest.id)
+        .order("question_number");
+      
+      if (fallbackError) throw fallbackError;
+      
+      if (fallbackData && fallbackData.length > 0) {
+        toast.info("Using Portuguese questions (EN questions not yet available)");
+      }
+      
+      setQuestions(fallbackData || []);
+      return fallbackData || [];
     } catch (error) {
       console.error("Error fetching questions:", error);
       toast.error("Erro ao carregar perguntas");
