@@ -152,21 +152,21 @@ export const TestsJourneysManagement2 = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-4 md:space-y-6 max-w-4xl px-4 md:px-0">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-          <Route className="w-6 h-6" />
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight flex items-center gap-2">
+          <Route className="w-5 h-5 md:w-6 md:h-6" />
           Testes & Jornadas
         </h1>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-muted-foreground text-xs md:text-sm">
           Gerencie os testes e a sequência da jornada Essentia
         </p>
       </div>
 
       {/* Info Card */}
-      <Card className="p-4 bg-muted/50 border-border/50">
-        <p className="text-sm text-muted-foreground">
+      <Card className="p-3 md:p-4 bg-muted/50 border-border/50">
+        <p className="text-xs md:text-sm text-muted-foreground">
           A ordem abaixo define a sequência da jornada. Os usuários progridem linearmente, 
           desbloqueando cada teste ao completar o anterior.
         </p>
@@ -182,8 +182,79 @@ export const TestsJourneysManagement2 = () => {
               key={test.id} 
               className={`border-border/50 transition-opacity ${!test.active ? "opacity-50" : ""}`}
             >
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
+              <CardContent className="p-3 md:p-4">
+                {/* Mobile Layout */}
+                <div className="flex flex-col gap-3 md:hidden">
+                  <div className="flex items-start gap-3">
+                    {/* Position */}
+                    {journeyPosition && (
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-primary shrink-0 text-sm">
+                        {journeyPosition}
+                      </div>
+                    )}
+                    
+                    {/* Icon */}
+                    <div className="text-xl shrink-0">{test.icon || "📝"}</div>
+                    
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-sm truncate">{test.name}</h3>
+                      <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                        <Badge variant="outline" className={`text-xs ${test.active ? STATUS_OPTIONS[0].color : STATUS_OPTIONS[1].color}`}>
+                          {test.active ? "Ativo" : "Inativo"}
+                        </Badge>
+                        {test.is_free && (
+                          <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
+                            Gratuito
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Meta info */}
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground pl-11">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {test.estimated_minutes} min
+                    </span>
+                    <span>{test.questions_count} perguntas</span>
+                    {test.price_brl && (
+                      <span className="flex items-center gap-1">
+                        <DollarSign className="w-3 h-3" />
+                        R$ {test.price_brl}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Mobile Actions */}
+                  <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={test.active}
+                        onCheckedChange={() => toggleTestActive(test)}
+                      />
+                      <span className="text-xs text-muted-foreground">
+                        {test.active ? "Ativo" : "Inativo"}
+                      </span>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="h-9"
+                      onClick={() => {
+                        setEditingTest(test);
+                        setShowEdit(true);
+                      }}
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Editar
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Desktop Layout */}
+                <div className="hidden md:flex items-center gap-4">
                   {/* Position */}
                   {journeyPosition && (
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-primary shrink-0">
@@ -248,13 +319,13 @@ export const TestsJourneysManagement2 = () => {
 
       {/* Edit Dialog */}
       <Dialog open={showEdit} onOpenChange={setShowEdit}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-[95vw] md:max-w-lg mx-4 md:mx-auto">
           <DialogHeader>
             <DialogTitle>Editar Teste</DialogTitle>
           </DialogHeader>
           {editingTest && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Nome</Label>
                   <Input
@@ -295,11 +366,11 @@ export const TestsJourneysManagement2 = () => {
                 />
                 <Label htmlFor="edit-active">Ativo</Label>
               </div>
-              <div className="flex justify-end gap-2 pt-4">
-                <Button variant="outline" onClick={() => setShowEdit(false)}>
+              <div className="flex flex-col-reverse md:flex-row justify-end gap-2 pt-4">
+                <Button variant="outline" onClick={() => setShowEdit(false)} className="w-full md:w-auto">
                   Cancelar
                 </Button>
-                <Button onClick={handleSaveTest} disabled={saving}>
+                <Button onClick={handleSaveTest} disabled={saving} className="w-full md:w-auto">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
                   Salvar
                 </Button>

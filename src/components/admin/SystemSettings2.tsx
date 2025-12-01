@@ -18,7 +18,8 @@ import {
   FileText,
   Shield,
   Key,
-  Upload
+  Upload,
+  Copy
 } from "lucide-react";
 
 interface SystemSetting {
@@ -146,6 +147,11 @@ export const SystemSettings2 = () => {
     }
   };
 
+  const handleCopyKey = () => {
+    navigator.clipboard.writeText("pk_live_••••••••••••••••");
+    toast.success("Chave copiada");
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -155,64 +161,68 @@ export const SystemSettings2 = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-4 md:space-y-6 max-w-3xl px-4 md:px-0">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-          <Settings className="w-6 h-6" />
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight flex items-center gap-2">
+          <Settings className="w-5 h-5 md:w-6 md:h-6" />
           Configurações
         </h1>
-        <p className="text-muted-foreground text-sm">Configurações gerais do sistema</p>
+        <p className="text-muted-foreground text-xs md:text-sm">Configurações gerais do sistema</p>
       </div>
 
-      <Tabs defaultValue="brand" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="brand">Marca</TabsTrigger>
-          <TabsTrigger value="contact">Contato</TabsTrigger>
-          <TabsTrigger value="social">Redes</TabsTrigger>
-          <TabsTrigger value="legal">Legal</TabsTrigger>
+      <Tabs defaultValue="brand" className="space-y-4 md:space-y-6">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
+          <TabsTrigger value="brand" className="text-xs md:text-sm py-2">Marca</TabsTrigger>
+          <TabsTrigger value="contact" className="text-xs md:text-sm py-2">Contato</TabsTrigger>
+          <TabsTrigger value="social" className="text-xs md:text-sm py-2">Redes</TabsTrigger>
+          <TabsTrigger value="legal" className="text-xs md:text-sm py-2">Legal</TabsTrigger>
         </TabsList>
 
         {/* Brand Tab */}
         <TabsContent value="brand" className="space-y-4">
           <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Building className="w-5 h-5" />
+            <CardHeader className="pb-3 md:pb-6">
+              <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                <Building className="w-4 h-4 md:w-5 md:h-5" />
                 Dados da Marca
               </CardTitle>
-              <CardDescription>Informações básicas do Essentia</CardDescription>
+              <CardDescription className="text-xs md:text-sm">Informações básicas do Essentia</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Nome da Marca</Label>
+                <Label className="text-xs md:text-sm">Nome da Marca</Label>
                 <Input
                   value={brandName}
                   onChange={(e) => setBrandName(e.target.value)}
                   placeholder="Essentia"
+                  className="h-10"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Texto do Rodapé</Label>
+                <Label className="text-xs md:text-sm">Texto do Rodapé</Label>
                 <Textarea
                   value={footerText}
                   onChange={(e) => setFooterText(e.target.value)}
                   placeholder="© 2024 Essentia. Todos os direitos reservados."
                   rows={2}
+                  className="text-sm"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Logo</Label>
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
-                    <Upload className="w-6 h-6 text-muted-foreground" />
+                <Label className="text-xs md:text-sm">Logo</Label>
+                <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+                  <div className="w-14 h-14 md:w-16 md:h-16 bg-muted rounded-lg flex items-center justify-center shrink-0">
+                    <Upload className="w-5 h-5 md:w-6 md:h-6 text-muted-foreground" />
                   </div>
-                  <Button variant="outline" size="sm">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload Logo
-                  </Button>
+                  <div className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full md:w-auto">
+                      <Upload className="w-4 h-4 mr-2" />
+                      Upload Logo
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-1.5">PNG ou SVG, máximo 1MB</p>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">PNG ou SVG, máximo 1MB</p>
               </div>
             </CardContent>
           </Card>
@@ -221,29 +231,31 @@ export const SystemSettings2 = () => {
         {/* Contact Tab */}
         <TabsContent value="contact" className="space-y-4">
           <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Mail className="w-5 h-5" />
+            <CardHeader className="pb-3 md:pb-6">
+              <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                <Mail className="w-4 h-4 md:w-5 md:h-5" />
                 Contato
               </CardTitle>
-              <CardDescription>Informações de contato e suporte</CardDescription>
+              <CardDescription className="text-xs md:text-sm">Informações de contato e suporte</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Email de Suporte</Label>
+                <Label className="text-xs md:text-sm">Email de Suporte</Label>
                 <Input
                   type="email"
                   value={supportEmail}
                   onChange={(e) => setSupportEmail(e.target.value)}
                   placeholder="suporte@essentia.com"
+                  className="h-10"
                 />
               </div>
               <div className="space-y-2">
-                <Label>WhatsApp</Label>
+                <Label className="text-xs md:text-sm">WhatsApp</Label>
                 <Input
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
                   placeholder="5511999999999"
+                  className="h-10"
                 />
                 <p className="text-xs text-muted-foreground">Número com código do país, sem espaços</p>
               </div>
@@ -254,28 +266,30 @@ export const SystemSettings2 = () => {
         {/* Social Tab */}
         <TabsContent value="social" className="space-y-4">
           <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Globe className="w-5 h-5" />
+            <CardHeader className="pb-3 md:pb-6">
+              <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                <Globe className="w-4 h-4 md:w-5 md:h-5" />
                 Redes Sociais
               </CardTitle>
-              <CardDescription>Links das redes sociais</CardDescription>
+              <CardDescription className="text-xs md:text-sm">Links das redes sociais</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Instagram</Label>
+                <Label className="text-xs md:text-sm">Instagram</Label>
                 <Input
                   value={instagram}
                   onChange={(e) => setInstagram(e.target.value)}
                   placeholder="https://instagram.com/essentia"
+                  className="h-10"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Facebook</Label>
+                <Label className="text-xs md:text-sm">Facebook</Label>
                 <Input
                   value={facebook}
                   onChange={(e) => setFacebook(e.target.value)}
                   placeholder="https://facebook.com/essentia"
+                  className="h-10"
                 />
               </div>
             </CardContent>
@@ -285,30 +299,32 @@ export const SystemSettings2 = () => {
         {/* Legal Tab */}
         <TabsContent value="legal" className="space-y-4">
           <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <FileText className="w-5 h-5" />
+            <CardHeader className="pb-3 md:pb-6">
+              <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                <FileText className="w-4 h-4 md:w-5 md:h-5" />
                 Documentos Legais
               </CardTitle>
-              <CardDescription>Termos de uso e política de privacidade</CardDescription>
+              <CardDescription className="text-xs md:text-sm">Termos de uso e política de privacidade</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Termos de Uso</Label>
+                <Label className="text-xs md:text-sm">Termos de Uso</Label>
                 <Textarea
                   value={termsOfService}
                   onChange={(e) => setTermsOfService(e.target.value)}
                   placeholder="Digite os termos de uso..."
-                  rows={6}
+                  rows={5}
+                  className="text-sm"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Política de Privacidade</Label>
+                <Label className="text-xs md:text-sm">Política de Privacidade</Label>
                 <Textarea
                   value={privacyPolicy}
                   onChange={(e) => setPrivacyPolicy(e.target.value)}
                   placeholder="Digite a política de privacidade..."
-                  rows={6}
+                  rows={5}
+                  className="text-sm"
                 />
               </div>
             </CardContent>
@@ -316,22 +332,28 @@ export const SystemSettings2 = () => {
 
           {/* API Key Display */}
           <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Key className="w-5 h-5" />
+            <CardHeader className="pb-3 md:pb-6">
+              <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                <Key className="w-4 h-4 md:w-5 md:h-5" />
                 Chave Pública Miguel
               </CardTitle>
-              <CardDescription>Chave de API para integrações (somente leitura)</CardDescription>
+              <CardDescription className="text-xs md:text-sm">Chave de API para integrações (somente leitura)</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col md:flex-row gap-2">
                 <Input
                   value="pk_live_••••••••••••••••"
                   readOnly
-                  className="font-mono text-sm bg-muted"
+                  className="font-mono text-xs md:text-sm bg-muted h-10 flex-1"
                 />
-                <Button variant="outline" size="sm">
-                  Copiar
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-10 w-full md:w-auto"
+                  onClick={handleCopyKey}
+                >
+                  <Copy className="w-4 h-4 mr-2 md:mr-0" />
+                  <span className="md:hidden">Copiar</span>
                 </Button>
               </div>
             </CardContent>
@@ -339,9 +361,14 @@ export const SystemSettings2 = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={saving} size="lg">
+      {/* Save Button - Sticky on mobile */}
+      <div className="sticky bottom-4 md:static">
+        <Button 
+          onClick={handleSave} 
+          disabled={saving} 
+          size="lg" 
+          className="w-full md:w-auto md:float-right shadow-lg md:shadow-none"
+        >
           {saving ? (
             <Loader2 className="w-4 h-4 animate-spin mr-2" />
           ) : (
