@@ -40,17 +40,17 @@ export const testPrices: Record<string, TestPrice> = {
   },
   temperamentos: {
     testType: "temperamentos",
-    brl: { price: 117, priceId: null },
+    brl: { price: 117, priceId: "price_1SZUnqDjhZZxZELMtU9tUMFm" },
     usd: { price: 27, priceId: "price_1SZNXKDjhZZxZELMhOhi8sCL" },
   },
   linguagens_amor: {
     testType: "linguagens_amor",
-    brl: { price: 127, priceId: null },
+    brl: { price: 127, priceId: "price_1SZUoWDjhZZxZELMxEJJKhDn" },
     usd: { price: 17, priceId: "price_1SZNXYDjhZZxZELMtlzZO8Id" },
   },
   inteligencias_multiplas: {
     testType: "inteligencias_multiplas",
-    brl: { price: 147, priceId: null },
+    brl: { price: 147, priceId: "price_1SZUpxDjhZZxZELMAkQlFX11" },
     usd: { price: 29, priceId: "price_1SZNXnDjhZZxZELMuGMkDImQ" },
   },
 };
