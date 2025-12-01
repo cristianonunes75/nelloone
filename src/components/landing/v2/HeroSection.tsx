@@ -2,11 +2,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 
 export const HeroSection = () => {
   const navigate = useNavigate();
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.2 });
+  const { t, language } = useLanguage();
 
   return (
     <section className="relative min-h-[85vh] md:min-h-[92vh] flex items-center justify-center overflow-hidden pt-16 md:pt-0">
@@ -30,7 +32,7 @@ export const HeroSection = () => {
             )}
           >
             <span className="font-display text-sm md:text-base tracking-[0.3em] uppercase text-ink-light">
-              NELLO ONE
+              {t.landing.hero.title}
             </span>
           </div>
 
@@ -41,8 +43,17 @@ export const HeroSection = () => {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            O caminho começa
-            <span className="block text-ink-blue">dentro.</span>
+            {language === 'en' ? (
+              <>
+                The path begins
+                <span className="block text-ink-blue">within.</span>
+              </>
+            ) : (
+              <>
+                O caminho começa
+                <span className="block text-ink-blue">dentro.</span>
+              </>
+            )}
           </h1>
 
           {/* Subheadline - Responsive */}
@@ -52,7 +63,7 @@ export const HeroSection = () => {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            Descubra quem você é através de uma jornada guiada por IA e ciência de personalidade.
+            {t.landing.hero.description}
           </p>
           
           <p 
@@ -61,7 +72,7 @@ export const HeroSection = () => {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            Clareza. Identidade. Propósito.
+            {language === 'en' ? 'Clarity. Identity. Direction.' : 'Clareza. Identidade. Propósito.'}
           </p>
 
           {/* CTA - Full width on mobile */}
@@ -76,7 +87,7 @@ export const HeroSection = () => {
               className="group w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 text-sm md:text-base rounded-full bg-ink-blue hover:bg-ink-deep text-primary-foreground shadow-medium hover:shadow-large hover-lift press-effect"
               onClick={() => navigate("/auth")}
             >
-              Começar Agora
+              {t.landing.hero.cta_primary}
               <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
           </div>
@@ -88,7 +99,9 @@ export const HeroSection = () => {
               isVisible ? "opacity-100" : "opacity-0"
             )}
           >
-            Mais de 2.000 pessoas já iniciaram sua jornada
+            {language === 'en' 
+              ? 'Over 2,000 people have started their journey' 
+              : 'Mais de 2.000 pessoas já iniciaram sua jornada'}
           </p>
         </div>
       </div>

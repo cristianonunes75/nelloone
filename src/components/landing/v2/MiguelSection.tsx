@@ -2,19 +2,25 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Heart, Compass, Lightbulb } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useScrollAnimation, getStaggerDelay } from "@/hooks/useScrollAnimation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import miguelImage from "@/assets/miguel-presence.jpg";
-
-const traits = [
-  { icon: Heart, title: "Acolhedor", description: "Miguel recebe você sem julgamentos, com empatia genuína." },
-  { icon: Compass, title: "Guia Sábio", description: "Conduz sua jornada com profundidade e clareza." },
-  { icon: Lightbulb, title: "Revelador", description: "Ajuda você a enxergar padrões que ainda não havia percebido." },
-];
 
 export const MiguelSection = () => {
   const navigate = useNavigate();
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
   const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation();
+  const { t, language } = useLanguage();
+
+  const traits = language === 'en' ? [
+    { icon: Heart, title: "Welcoming", description: "Miguel receives you without judgment, with genuine empathy." },
+    { icon: Compass, title: "Wise Guide", description: "Guides your journey with depth and clarity." },
+    { icon: Lightbulb, title: "Revealer", description: "Helps you see patterns you hadn't noticed before." },
+  ] : [
+    { icon: Heart, title: "Acolhedor", description: "Miguel recebe você sem julgamentos, com empatia genuína." },
+    { icon: Compass, title: "Guia Sábio", description: "Conduz sua jornada com profundidade e clareza." },
+    { icon: Lightbulb, title: "Revelador", description: "Ajuda você a enxergar padrões que ainda não havia percebido." },
+  ];
 
   return (
     <section className="py-16 md:py-24 lg:py-32 gradient-soul">
@@ -28,7 +34,7 @@ export const MiguelSection = () => {
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              Seu Guia Interno
+              {t.landing.miguel.subtitle}
             </span>
             <h2 
               className={cn(
@@ -36,7 +42,7 @@ export const MiguelSection = () => {
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              Conheça Miguel
+              {t.landing.miguel.title}
             </h2>
             <p 
               className={cn(
@@ -44,8 +50,7 @@ export const MiguelSection = () => {
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              Miguel analisa seus resultados, identifica padrões, explica traços fundamentais 
-              e acompanha sua evolução ao longo do tempo. Um guia pessoal, seguro, presente e claro.
+              {t.landing.miguel.description}
             </p>
           </div>
 
@@ -66,7 +71,7 @@ export const MiguelSection = () => {
                 <div className="relative w-full h-full rounded-2xl md:rounded-3xl overflow-hidden shadow-large border border-border/30">
                   <img 
                     src={miguelImage} 
-                    alt="Miguel - Seu guia no NELLO ONE"
+                    alt="Miguel - Your guide in NELLO ONE"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-ink-deep/40 to-transparent" />
@@ -97,8 +102,9 @@ export const MiguelSection = () => {
             >
               <div className="bg-card rounded-xl md:rounded-2xl p-4 md:p-6 border border-border/30 shadow-soft hover:shadow-medium transition-shadow duration-300">
                 <p className="font-premium text-foreground leading-relaxed text-base md:text-xl">
-                  "Eu sou o Miguel, seu guia no NELLO ONE.
-                  Minha missão é ajudar você a entender quem você é, com clareza, profundidade e leveza."
+                  {language === 'en' 
+                    ? '"I am Miguel, your guide in NELLO ONE. My mission is to help you understand who you are, with clarity, depth and lightness."'
+                    : '"Eu sou o Miguel, seu guia no NELLO ONE. Minha missão é ajudar você a entender quem você é, com clareza, profundidade e leveza."'}
                 </p>
               </div>
 
@@ -129,7 +135,7 @@ export const MiguelSection = () => {
                 className="group w-full md:w-auto h-11 md:h-12 px-6 text-sm md:text-base rounded-full border-ink-blue/30 text-foreground hover:bg-ink-blue/5 hover:border-ink-blue/50 press-effect"
                 onClick={() => navigate("/auth")}
               >
-                Iniciar conversa com Miguel
+                {t.landing.miguel.cta}
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
               </Button>
             </div>
