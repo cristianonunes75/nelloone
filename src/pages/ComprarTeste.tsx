@@ -8,12 +8,15 @@ import { LogoText } from "@/components/LogoText";
 import { ArrowLeft, Clock, HelpCircle, Lock, Loader2, CreditCard, Sparkles } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { getPriceForLanguage, formatPrice } from "@/lib/priceConfig";
 
 const ComprarTeste = () => {
   const { testId } = useParams<{ testId: string }>();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { language } = useLanguage();
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Fetch test details
@@ -38,26 +41,54 @@ const ComprarTeste = () => {
     setIsProcessing(true);
 
     try {
+      // ANTI-CROSSTRADE: Pass language to enforce correct currency
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { testId: test.id },
+        body: { 
+          testId: test.id,
+          language: language, // Enforces currency based on route
+          currency: language === 'en' ? 'usd' : 'brl',
+        },
       });
 
       if (error) throw error;
 
+      // Handle cross-trade block
+      if (data?.code === "CURRENCY_MISMATCH") {
+        toast({
+          title: language === 'en' ? "Currency Error" : "Erro de Moeda",
+          description: data.error,
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+        return;
+      }
+
       if (data?.url) {
         window.location.href = data.url;
       } else {
-        throw new Error("Não foi possível criar a sessão de pagamento");
+        throw new Error(language === 'en' 
+          ? "Could not create payment session" 
+          : "Não foi possível criar a sessão de pagamento");
       }
     } catch (error: any) {
       console.error("Checkout error:", error);
       toast({
-        title: "Erro ao processar pagamento",
-        description: error.message || "Tente novamente mais tarde.",
+        title: language === 'en' ? "Payment Error" : "Erro ao processar pagamento",
+        description: error.message || (language === 'en' ? "Try again later." : "Tente novamente mais tarde."),
         variant: "destructive",
       });
       setIsProcessing(false);
     }
+  };
+
+  // Get correct price based on language (ANTI-CROSSTRADE)
+  const getDisplayPrice = () => {
+    if (!test) return '';
+    const priceInfo = getPriceForLanguage(test.type, language);
+    if (priceInfo) {
+      return formatPrice(priceInfo.price, language);
+    }
+    return formatPrice(test.price_brl || 0, language);
   };
 
   if (isLoading) {
@@ -176,14 +207,18 @@ const ComprarTeste = () => {
                 </ul>
               </div>
 
-              {/* Price */}
+              {/* Price - ANTI-CROSSTRADE: Display correct currency */}
               <div className="bg-accent/20 rounded-xl p-6 text-center">
-                <p className="text-sm text-muted-foreground mb-1">Acesso vitalício</p>
+                <p className="text-sm text-muted-foreground mb-1">
+                  {language === 'en' ? 'Lifetime access' : 'Acesso vitalício'}
+                </p>
                 <div className="text-4xl font-bold text-primary mb-1">
-                  R$ {test.price_brl}
+                  {getDisplayPrice()}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Pagamento único • Resultados integrados ao seu Mapa
+                  {language === 'en' 
+                    ? 'One-time payment • Results integrated to your Map'
+                    : 'Pagamento único • Resultados integrados ao seu Mapa'}
                 </p>
               </div>
 
