@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { SimulationProvider } from "@/contexts/SimulationContext";
 import { LanguageRoute } from "@/components/LanguageRoute";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { GeoRedirect } from "@/components/GeoRedirect";
@@ -208,21 +209,23 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <LanguageProvider>
-          <AuthProvider>
-            {/* GEO-routing: Automatically redirects based on IP location */}
-            <GeoRedirect />
-            <Routes>
-              {/* English routes with /en prefix */}
-              <Route path="/en/*" element={
-                <LanguageRoute>
-                  <AppRoutes />
-                </LanguageRoute>
-              } />
-              
-              {/* Default routes (Portuguese / Brazil) */}
-              <Route path="/*" element={<AppRoutes />} />
-            </Routes>
-          </AuthProvider>
+          <SimulationProvider>
+            <AuthProvider>
+              {/* GEO-routing: Automatically redirects based on IP location */}
+              <GeoRedirect />
+              <Routes>
+                {/* English routes with /en prefix */}
+                <Route path="/en/*" element={
+                  <LanguageRoute>
+                    <AppRoutes />
+                  </LanguageRoute>
+                } />
+                
+                {/* Default routes (Portuguese / Brazil) */}
+                <Route path="/*" element={<AppRoutes />} />
+              </Routes>
+            </AuthProvider>
+          </SimulationProvider>
         </LanguageProvider>
       </BrowserRouter>
     </TooltipProvider>
