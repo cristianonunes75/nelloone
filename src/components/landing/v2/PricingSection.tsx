@@ -5,6 +5,7 @@ import { useScrollAnimation, getStaggerDelay } from "@/hooks/useScrollAnimation"
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocalizedPath } from "@/components/LanguageRoute";
 import { cn } from "@/lib/utils";
+import { testPrices, bundlePrices } from "@/lib/priceConfig";
 
 // Ultrathin custom icons
 const SunIcon = ({ className }: { className?: string }) => (
@@ -70,26 +71,18 @@ const DiamondIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// Test data with prices for both currencies
-const testsData = {
-  en: [
-    { name: "Archetypes", icon: SunIcon, price: 0, questions: 36 },
-    { name: "DISC", icon: QuadrantsIcon, price: 19, questions: 28 },
-    { name: "Temperaments", icon: WavesIcon, price: 27, questions: 32 },
-    { name: "Love Languages", icon: HeartIcon, price: 17, questions: 30 },
-    { name: "Intelligences", icon: BrainIcon, price: 29, questions: 40 },
-    { name: "Enneagram", icon: EnneagramIcon, price: 49, questions: 45 },
-    { name: "MBTI", icon: DiamondIcon, price: 57, questions: 60 },
-  ],
-  pt: [
-    { name: "Arquétipos", icon: SunIcon, price: 0, questions: 36 },
-    { name: "DISC", icon: QuadrantsIcon, price: 97, questions: 28 },
-    { name: "Temperamentos", icon: WavesIcon, price: 117, questions: 32 },
-    { name: "Linguagens", icon: HeartIcon, price: 127, questions: 30 },
-    { name: "Inteligências", icon: BrainIcon, price: 147, questions: 40 },
-    { name: "Eneagrama", icon: EnneagramIcon, price: 177, questions: 45 },
-    { name: "MBTI", icon: DiamondIcon, price: 197, questions: 60 },
-  ],
+// Test data using prices from central priceConfig (ANTI-CROSSTRADE)
+const getTestsData = (language: 'pt' | 'en') => {
+  const isEn = language === 'en';
+  return [
+    { name: isEn ? "Archetypes" : "Arquétipos", icon: SunIcon, price: isEn ? testPrices.arquetipos.usd.price : testPrices.arquetipos.brl.price, questions: 36, isFree: !isEn },
+    { name: "DISC", icon: QuadrantsIcon, price: isEn ? testPrices.disc.usd.price : testPrices.disc.brl.price, questions: 28 },
+    { name: isEn ? "Temperaments" : "Temperamentos", icon: WavesIcon, price: isEn ? testPrices.temperamentos.usd.price : testPrices.temperamentos.brl.price, questions: 32 },
+    { name: isEn ? "Love Languages" : "Linguagens", icon: HeartIcon, price: isEn ? testPrices.linguagens_amor.usd.price : testPrices.linguagens_amor.brl.price, questions: 30 },
+    { name: isEn ? "Intelligences" : "Inteligências", icon: BrainIcon, price: isEn ? testPrices.inteligencias_multiplas.usd.price : testPrices.inteligencias_multiplas.brl.price, questions: 40 },
+    { name: isEn ? "Enneagram" : "Eneagrama", icon: EnneagramIcon, price: isEn ? testPrices.eneagrama.usd.price : testPrices.eneagrama.brl.price, questions: 45 },
+    { name: "MBTI", icon: DiamondIcon, price: isEn ? testPrices.mbti.usd.price : testPrices.mbti.brl.price, questions: 60 },
+  ];
 };
 
 export const PricingSection = () => {
@@ -97,10 +90,12 @@ export const PricingSection = () => {
   const { language, t } = useLanguage();
   const localizedPath = useLocalizedPath();
   
-  const tests = testsData[language];
+  // Use centralized price config (ANTI-CROSSTRADE)
+  const tests = getTestsData(language);
+  const bundle = language === 'en' ? bundlePrices.usd : bundlePrices.brl;
   const pricing = t.landing.pricing;
   const totalIndividual = tests.reduce((sum, test) => sum + test.price, 0);
-  const savings = totalIndividual - pricing.bundle_price;
+  const savings = totalIndividual - bundle.price;
   
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
   const { ref: bundleRef, isVisible: bundleVisible } = useScrollAnimation();
@@ -181,16 +176,16 @@ export const PricingSection = () => {
                 <div className="text-center md:text-right w-full">
                   <div className="mb-4 md:mb-6">
                     <p className="text-xs md:text-sm text-muted-foreground line-through mb-1">
-                      {pricing.from} {pricing.currency} {pricing.bundle_original}
+                      {pricing.from} {bundle.symbol} {bundle.original}
                     </p>
                     <div className="flex items-baseline justify-center md:justify-end gap-2">
                       <span className="text-xs md:text-sm text-muted-foreground">{pricing.now}</span>
                       <span className="font-display text-3xl md:text-4xl text-foreground">
-                        {pricing.currency} {pricing.bundle_price}
+                        {bundle.symbol} {bundle.price}
                       </span>
                     </div>
                     <p className="text-xs md:text-sm text-ink-blue mt-1">
-                      {pricing.save} {pricing.currency} {savings}
+                      {pricing.save} {bundle.symbol} {savings}
                     </p>
                   </div>
                   <Button 
@@ -234,11 +229,11 @@ export const PricingSection = () => {
                     {test.questions} {pricing.questions}
                   </p>
                   <div className="flex items-baseline gap-0.5 md:gap-1">
-                    {test.price === 0 ? (
+                    {test.isFree || test.price === 0 ? (
                       <span className="font-display text-base md:text-lg text-ink-blue">{pricing.free}</span>
                     ) : (
                       <>
-                        <span className="text-[10px] md:text-xs text-muted-foreground">{pricing.currency}</span>
+                        <span className="text-[10px] md:text-xs text-muted-foreground">{bundle.symbol}</span>
                         <span className="font-display text-base md:text-lg text-foreground">{test.price}</span>
                       </>
                     )}
