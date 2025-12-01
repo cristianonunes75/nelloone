@@ -1,6 +1,7 @@
 import { NavSection } from "@/components/landing/v2/NavSection";
 import { HeroSection } from "@/components/landing/v2/HeroSection";
 import { WhyItMattersSection } from "@/components/landing/v2/WhyItMattersSection";
+import { ProblemsSection } from "@/components/landing/v2/ProblemsSection";
 import { MiguelSection } from "@/components/landing/v2/MiguelSection";
 import { JourneySection } from "@/components/landing/v2/JourneySection";
 import { EssenceMapSection } from "@/components/landing/v2/EssenceMapSection";
@@ -18,6 +19,7 @@ const Landing = () => {
       <NavSection />
       <HeroSection />
       <WhyItMattersSection />
+      <ProblemsSection />
       <ValuePropositionSection />
       <div id="jornada">
         <MiguelSection />

@@ -2,52 +2,51 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import { 
-  Heart, 
-  Lightbulb, 
+  Brain, 
   MessageCircle, 
-  Users, 
   Target, 
-  Eye, 
+  Zap, 
+  Heart,
+  Compass,
   Sparkles,
   ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-const improvements = {
-  pt: [
-    { icon: Heart, text: "padrões emocionais" },
-    { icon: Lightbulb, text: "clareza interna" },
-    { icon: MessageCircle, text: "comunicação" },
-    { icon: Users, text: "relacionamentos" },
-    { icon: Target, text: "tomada de decisão" },
-    { icon: Eye, text: "consciência de forças e pontos cegos" },
-    { icon: Sparkles, text: "ações práticas do dia a dia" },
-  ],
-  en: [
-    { icon: Heart, text: "emotional patterns" },
-    { icon: Lightbulb, text: "inner clarity" },
-    { icon: MessageCircle, text: "communication" },
-    { icon: Users, text: "relationships" },
-    { icon: Target, text: "decision-making" },
-    { icon: Eye, text: "strengths and blind spots awareness" },
-    { icon: Sparkles, text: "practical next steps" },
-  ],
-};
+const improvementIcons = [Brain, MessageCircle, Target, Zap, Heart, Compass];
 
 const content = {
   pt: {
-    title: "Por que fazer seus testes no Nello One?",
-    subtitle: "Você só muda aquilo que consegue enxergar.",
-    description: "Cada teste revela exatamente o que está impedindo você de avançar — e como destravar.",
-    improvementsTitle: "Você melhora:",
+    title: "Como o NELLO ONE ajuda você a melhorar",
+    subtitle: "O NELLO ONE não entrega apenas resultados, ele revela caminhos práticos de crescimento pessoal.",
+    description: "Cada teste destaca pontos fortes e mostra onde você pode evoluir, sempre com clareza e objetividade.",
+    improvementsTitle: "Você descobre:",
+    improvements: [
+      "Quais padrões emocionais sabotam o seu dia a dia",
+      "Onde sua comunicação trava e como melhorar",
+      "Como tomar decisões com mais segurança",
+      "Em que áreas sua energia está dispersa",
+      "Como desenvolver maturidade emocional",
+      "Qual direção seguir para ter mais clareza, equilíbrio e propósito"
+    ],
+    closing: "Tudo isso com orientação da IA e um mapa único que traduz sua personalidade, seus talentos e seus desafios — para você usar na vida real.",
     cta: "Começar Agora",
   },
   en: {
-    title: "Why take your tests at Nello One?",
-    subtitle: "You can only change what you can see.",
-    description: "Each test reveals exactly what is holding you back — and how to unlock it.",
-    improvementsTitle: "You improve:",
+    title: "How NELLO ONE Helps You Improve",
+    subtitle: "NELLO ONE doesn't just deliver results — it reveals practical paths for personal growth.",
+    description: "Each test highlights your strengths and shows where you can evolve, always with clarity and objectivity.",
+    improvementsTitle: "You discover:",
+    improvements: [
+      "Which emotional patterns are sabotaging your daily life",
+      "Where your communication breaks down and how to improve",
+      "How to make decisions with more confidence",
+      "In which areas your energy is scattered",
+      "How to develop emotional maturity",
+      "What direction to follow for more clarity, balance and purpose"
+    ],
+    closing: "All of this with AI guidance and a unique map that translates your personality, talents and challenges — for you to use in real life.",
     cta: "Start Now",
   },
 };
@@ -59,7 +58,6 @@ export const WhyItMattersSection = () => {
   
   const lang = language === 'en' ? 'en' : 'pt';
   const t = content[lang];
-  const items = improvements[lang];
 
   return (
     <section className="py-16 md:py-24 bg-gradient-to-br from-bruma/30 to-background relative overflow-hidden">
@@ -94,22 +92,32 @@ export const WhyItMattersSection = () => {
                 {t.improvementsTitle}
               </p>
               <ul className="space-y-3">
-                {items.map((item, index) => (
-                  <li 
-                    key={index}
-                    className={cn(
-                      "flex items-center gap-3 transition-all duration-500",
-                      isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
-                    )}
-                    style={{ transitionDelay: `${150 + index * 50}ms` }}
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-bruma-deep/10 flex items-center justify-center flex-shrink-0">
-                      <item.icon className="w-4 h-4 text-ink-blue" />
-                    </div>
-                    <span className="text-foreground font-medium">✔ {item.text}</span>
-                  </li>
-                ))}
+                {t.improvements.map((item, index) => {
+                  const Icon = improvementIcons[index % improvementIcons.length];
+                  return (
+                    <li 
+                      key={index}
+                      className={cn(
+                        "flex items-start gap-3 transition-all duration-500",
+                        isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+                      )}
+                      style={{ transitionDelay: `${150 + index * 50}ms` }}
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-bruma-deep/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Icon className="w-4 h-4 text-ink-blue" />
+                      </div>
+                      <span className="text-foreground leading-relaxed">✔ {item}</span>
+                    </li>
+                  );
+                })}
               </ul>
+            </div>
+            
+            {/* Closing statement */}
+            <div className="pt-4 border-t border-border/50">
+              <p className="text-muted-foreground italic leading-relaxed">
+                {t.closing}
+              </p>
             </div>
             
             <div className="pt-4">
