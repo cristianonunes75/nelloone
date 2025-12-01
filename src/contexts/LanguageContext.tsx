@@ -44,21 +44,24 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
-    // Check URL path first
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
-      if (path.startsWith('/en')) return 'en';
-      if (path.startsWith('/pt')) return 'pt';
       
-      // Then check localStorage
+      // Check URL path first - /en/ prefix means English
+      if (path.startsWith('/en')) return 'en';
+      
+      // Check localStorage
       const stored = localStorage.getItem('nello-language');
       if (stored === 'en' || stored === 'pt') return stored;
       
-      // Then check browser language
+      // Check browser language
       const browserLang = navigator.language.toLowerCase();
       if (browserLang.startsWith('pt')) return 'pt';
+      
+      // Default: if no /en/ prefix and no preference, default to PT (Brazilian market)
+      return 'pt';
     }
-    return 'en'; // Default to English for global launch
+    return 'pt';
   });
 
   const setLanguage = (lang: Language) => {

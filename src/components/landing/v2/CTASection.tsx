@@ -60,7 +60,7 @@ export const CTASection = () => {
               "group w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 text-sm md:text-base rounded-full bg-background hover:bg-background/90 text-ink-blue shadow-large hover-lift press-effect transition-all duration-700 delay-300",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
-            onClick={() => navigate("/auth")}
+            onClick={() => navigate(language === 'en' ? "/en/auth" : "/auth")}
           >
             {t.landing.cta.button} {language === 'en' ? '(Free)' : '(Grátis)'}
             <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform duration-300" />

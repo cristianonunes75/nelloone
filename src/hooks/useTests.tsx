@@ -2,20 +2,23 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useToast } from "./use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const useTests = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { language, t } = useLanguage();
 
-  // Fetch all available tests
+  // Fetch all available tests filtered by language
   const { data: tests, isLoading: testsLoading } = useQuery({
-    queryKey: ["tests"],
+    queryKey: ["tests", language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tests")
         .select("*")
         .eq("active", true)
+        .eq("language", language)
         .order("is_free", { ascending: false })
         .order("created_at");
 
@@ -24,20 +27,38 @@ export const useTests = () => {
     },
   });
 
-  // Fetch user's test progress
+  // Fetch user's test progress (uses test type to link across languages)
   const { data: userTests, isLoading: userTestsLoading } = useQuery({
-    queryKey: ["user-tests", user?.id],
+    queryKey: ["user-tests", user?.id, language],
     enabled: !!user,
     queryFn: async () => {
       if (!user) return [];
 
+      // First get tests in current language
+      const { data: languageTests } = await supabase
+        .from("tests")
+        .select("id, type")
+        .eq("language", language)
+        .eq("active", true);
+
+      if (!languageTests) return [];
+
+      // Get user tests
       const { data, error } = await supabase
         .from("user_tests")
         .select("*, tests(*)")
         .eq("user_id", user.id);
 
       if (error) throw error;
-      return data;
+
+      // Map user tests to current language tests (by type)
+      return data?.map(ut => {
+        const matchingTest = languageTests.find(lt => lt.type === ut.tests?.type);
+        return {
+          ...ut,
+          test_id: matchingTest?.id || ut.test_id,
+        };
+      }) || [];
     },
   });
 
@@ -65,16 +86,17 @@ export const useTests = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-tests"] });
-      toast({
-        title: "Teste iniciado!",
-        description: "Responda com sinceridade para obter o melhor resultado.",
-      });
+      const messages = language === 'en' 
+        ? { title: "Test started!", description: "Answer honestly for the best results." }
+        : { title: "Teste iniciado!", description: "Responda com sinceridade para obter o melhor resultado." };
+      toast(messages);
     },
     onError: (error: any) => {
+      const title = language === 'en' ? "Error starting test" : "Erro ao iniciar teste";
       toast({
-        title: "Erro ao iniciar teste",
+        title,
         description: error.message,
         variant: "destructive",
       });
@@ -92,7 +114,6 @@ export const useTests = () => {
     const userTest = userTests?.find((ut) => ut.test_id === testId);
     if (!userTest) return 0;
     if (userTest.status === "completed") return 100;
-    // TODO: Calculate based on answered questions
     return 0;
   };
 
@@ -101,7 +122,6 @@ export const useTests = () => {
     mutationFn: async (testId: string) => {
       if (!user) throw new Error("User not authenticated");
 
-      // Find the user_test record
       const { data: userTest } = await supabase
         .from("user_tests")
         .select("id")
@@ -111,13 +131,11 @@ export const useTests = () => {
 
       if (!userTest) throw new Error("Test not found");
 
-      // Delete all answers for this test
       await supabase
         .from("test_answers")
         .delete()
         .eq("user_test_id", userTest.id);
 
-      // Reset the user_test status
       const { error } = await supabase
         .from("user_tests")
         .update({
@@ -132,14 +150,15 @@ export const useTests = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-tests"] });
-      toast({
-        title: "Teste reiniciado!",
-        description: "Você pode começar novamente do zero.",
-      });
+      const messages = language === 'en'
+        ? { title: "Test reset!", description: "You can start again from scratch." }
+        : { title: "Teste reiniciado!", description: "Você pode começar novamente do zero." };
+      toast(messages);
     },
     onError: (error: any) => {
+      const title = language === 'en' ? "Error resetting test" : "Erro ao reiniciar teste";
       toast({
-        title: "Erro ao reiniciar teste",
+        title,
         description: error.message,
         variant: "destructive",
       });

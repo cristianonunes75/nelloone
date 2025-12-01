@@ -38,14 +38,16 @@ export const NavSection = () => {
   };
 
   const handleNavigation = (path: string) => {
-    navigate(path);
+    // Add /en prefix if in English mode
+    const localizedPath = language === 'en' ? `/en${path}` : path;
+    navigate(localizedPath);
     setIsMobileMenuOpen(false);
   };
 
   const handleSignOut = async () => {
     await signOut();
     setIsMobileMenuOpen(false);
-    navigate("/");
+    navigate(language === 'en' ? '/en' : '/');
   };
 
   // Links for non-logged users
@@ -76,7 +78,7 @@ export const NavSection = () => {
         <div className="container px-4 sm:px-6">
           <nav className="flex items-center justify-between h-14 md:h-16">
             {/* Logo */}
-            <button onClick={() => navigate("/")} className="focus:outline-none">
+            <button onClick={() => navigate(language === 'en' ? '/en' : '/')} className="focus:outline-none">
               <LogoText className="text-lg md:text-xl" variant="solid" />
             </button>
 
