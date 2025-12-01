@@ -8,9 +8,19 @@ import ptMiguel from '@/locales/pt/miguel.json';
 
 export type Language = 'en' | 'pt';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface Translations {
   landing: typeof enLanding;
-  miguel: typeof enMiguel;
+  miguel: typeof enMiguel & {
+    quickReplies: {
+      landing: Record<string, string>;
+      cliente: Record<string, string>;
+      afterResponse: {
+        landing: Record<string, string>;
+        cliente: Record<string, string>;
+      };
+    };
+  };
 }
 
 const translations: Record<Language, Translations> = {
