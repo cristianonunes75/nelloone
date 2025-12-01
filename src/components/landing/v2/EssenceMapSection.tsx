@@ -30,20 +30,20 @@ export const EssenceMapSection = () => {
               "transition-all duration-700 order-2 lg:order-1",
               isVisible ? "opacity-100 translate-x-0" : "opacity-0 lg:-translate-x-8"
             )}>
-              <span className="inline-block text-gold font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4">
+              <span className="inline-block text-ink-blue font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4">
                 O Resultado Final
               </span>
               <h2 className="font-display text-2xl sm:text-display-sm md:text-display-md lg:text-display-lg text-foreground mb-4 md:mb-6">
-                Seu Mapa da
-                <span className="text-gold"> Essência</span>
+                Seu Mapa
+                <span className="text-ink-blue"> NELLO ONE</span>
               </h2>
-              <p className="font-miguel text-base md:text-lg text-muted-foreground mb-4 md:mb-6 leading-relaxed">
-                "Um mapa para quem você é por dentro."
+              <p className="font-premium text-base md:text-lg text-muted-foreground mb-4 md:mb-6 leading-relaxed">
+                "Uma única visão integrada da sua essência."
               </p>
               <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8 leading-relaxed">
                 Ao completar os 7 testes, Miguel sintetiza todos os seus resultados 
-                em um documento único e personalizado: o Mapa da Essência. Uma visão 
-                integrada de quem você é, suas forças, desafios e caminhos de evolução.
+                em um documento único e personalizado: o Mapa NELLO ONE. O painel que une 
+                todos os seus resultados em um mapa claro e visual.
               </p>
 
               <div className="space-y-2 md:space-y-3 mb-8 md:mb-10">
@@ -56,8 +56,8 @@ export const EssenceMapSection = () => {
                     )}
                     style={isVisible ? getStaggerDelay(index, 0.1) : {}}
                   >
-                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gold/15 transition-colors duration-300">
-                      <section.icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-gold" strokeWidth={1.5} />
+                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-ink-blue/10 flex items-center justify-center flex-shrink-0 group-hover:bg-ink-blue/15 transition-colors duration-300">
+                      <section.icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-ink-blue" strokeWidth={1.5} />
                     </div>
                     <div>
                       <p className="font-medium text-foreground text-xs md:text-sm">{section.label}</p>
@@ -69,7 +69,7 @@ export const EssenceMapSection = () => {
 
               <Button 
                 size="lg" 
-                className="group w-full sm:w-auto h-11 md:h-12 px-5 md:px-6 text-sm md:text-base rounded-full bg-gold hover:bg-gold-dark text-primary-foreground hover-lift press-effect"
+                className="group w-full sm:w-auto h-11 md:h-12 px-5 md:px-6 text-sm md:text-base rounded-full bg-ink-blue hover:bg-ink-deep text-primary-foreground hover-lift press-effect"
                 onClick={() => navigate("/auth")}
               >
                 Começar Minha Jornada
@@ -84,13 +84,13 @@ export const EssenceMapSection = () => {
             )}>
               <div className="aspect-[4/5] relative">
                 {/* Glow */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gold/15 to-soul-amber/15 rounded-2xl md:rounded-3xl blur-3xl subtle-pulse" />
+                <div className="absolute inset-0 bg-gradient-to-br from-bruma-blue/20 to-lavender/20 rounded-2xl md:rounded-3xl blur-3xl subtle-pulse" />
                 
                 {/* Map image */}
                 <div className="relative h-full rounded-2xl md:rounded-3xl overflow-hidden border border-border/30 shadow-large hover:shadow-glow transition-shadow duration-500">
                   <img 
                     src={essenceMapImage} 
-                    alt="Mapa da Essência"
+                    alt="Mapa NELLO ONE"
                     className="w-full h-full object-cover"
                   />
                   
@@ -99,8 +99,8 @@ export const EssenceMapSection = () => {
                   
                   {/* Header overlay */}
                   <div className="absolute top-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-b from-card/90 to-transparent">
-                    <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-wider">ESSENTIA</p>
-                    <p className="font-display text-base md:text-xl text-foreground mt-1">Mapa da Essência</p>
+                    <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-wider">NELLO ONE</p>
+                    <p className="font-display text-base md:text-xl text-foreground mt-1">Mapa de Personalidade</p>
                   </div>
                 </div>
 
@@ -109,7 +109,7 @@ export const EssenceMapSection = () => {
                   "absolute -bottom-2 -right-2 md:-bottom-4 md:-right-4 bg-card px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl shadow-large border border-border/30 transition-all duration-500 delay-500",
                   isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                 )}>
-                  <span className="text-xs md:text-sm font-medium text-gold">PDF Personalizado</span>
+                  <span className="text-xs md:text-sm font-medium text-ink-blue">PDF Personalizado</span>
                 </div>
               </div>
             </div>

@@ -12,7 +12,7 @@ const testimonials = [
   {
     name: "Rafael M.",
     role: "Empreendedor",
-    content: "O Mapa da Essência me deu clareza sobre decisões que eu vinha adiando há anos. Agora sei exatamente onde colocar minha energia.",
+    content: "O Mapa NELLO ONE me deu clareza sobre decisões que eu vinha adiando há anos. Agora sei exatamente onde colocar minha energia.",
     rating: 5,
   },
   {
@@ -24,12 +24,12 @@ const testimonials = [
 ];
 
 const benefits = [
-  "Clareza sobre seus padrões de comportamento",
-  "Entendimento profundo das suas motivações",
-  "Descoberta dos seus talentos naturais",
-  "Consciência sobre como você se relaciona",
-  "Direção clara para seu desenvolvimento pessoal",
-  "Integração de todas as dimensões de quem você é",
+  "Clareza sobre quem você é",
+  "Direção para crescer",
+  "Linguagem simples",
+  "Testes sérios",
+  "IA humana",
+  "Jornada guiada",
 ];
 
 export const TestimonialsSection = () => {
@@ -38,14 +38,14 @@ export const TestimonialsSection = () => {
   const { ref: benefitsRef, isVisible: benefitsVisible } = useScrollAnimation();
 
   return (
-    <section className="py-16 md:py-24 lg:py-32 bg-soul-light/30">
+    <section className="py-16 md:py-24 lg:py-32 bg-bruma-light/30">
       <div className="container px-4 md:px-6">
         <div className="max-w-5xl mx-auto">
           {/* Section header */}
           <div ref={headerRef} className="text-center mb-10 md:mb-16">
             <span 
               className={cn(
-                "inline-block text-gold font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4 transition-all duration-500",
+                "inline-block text-ink-blue font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4 transition-all duration-500",
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
@@ -58,7 +58,7 @@ export const TestimonialsSection = () => {
               )}
             >
               O que dizem quem já
-              <span className="block">descobriu sua essência</span>
+              <span className="block">descobriu quem é</span>
             </h2>
           </div>
 
@@ -76,7 +76,7 @@ export const TestimonialsSection = () => {
                 )}
                 style={cardsVisible ? getStaggerDelay(index, 0.15) : {}}
               >
-                <Quote className="w-6 h-6 md:w-7 md:h-7 text-gold/30 mb-3 md:mb-4" strokeWidth={1.5} />
+                <Quote className="w-6 h-6 md:w-7 md:h-7 text-ink-blue/30 mb-3 md:mb-4" strokeWidth={1.5} />
                 <p className="text-foreground mb-4 md:mb-6 leading-relaxed text-xs md:text-sm line-clamp-4 md:line-clamp-none">
                   "{testimonial.content}"
                 </p>
@@ -87,7 +87,7 @@ export const TestimonialsSection = () => {
                   </div>
                   <div className="flex gap-0.5">
                     {Array.from({ length: testimonial.rating }).map((_, i) => (
-                      <Star key={i} className="w-3 h-3 md:w-3.5 md:h-3.5 text-gold fill-gold" />
+                      <Star key={i} className="w-3 h-3 md:w-3.5 md:h-3.5 text-ink-blue fill-ink-blue" />
                     ))}
                   </div>
                 </div>
@@ -95,7 +95,7 @@ export const TestimonialsSection = () => {
             ))}
           </div>
 
-          {/* Benefits */}
+          {/* Benefits - Por que o NELLO ONE? */}
           <div 
             ref={benefitsRef}
             className={cn(
@@ -104,19 +104,19 @@ export const TestimonialsSection = () => {
             )}
           >
             <h3 className="font-display text-xl md:text-display-sm text-foreground text-center mb-6 md:mb-10">
-              O que você vai descobrir
+              Por que o NELLO ONE?
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
               {benefits.map((benefit, index) => (
                 <div 
                   key={benefit}
                   className={cn(
-                    "flex items-center gap-3 p-3 md:p-4 rounded-lg md:rounded-xl bg-soul-light/50 hover:bg-soul-light transition-all duration-300 cursor-default",
+                    "flex items-center gap-3 p-3 md:p-4 rounded-lg md:rounded-xl bg-bruma-light/50 hover:bg-bruma-light transition-all duration-300 cursor-default",
                     benefitsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                   )}
                   style={benefitsVisible ? getStaggerDelay(index, 0.08) : {}}
                 >
-                  <div className="w-2 h-2 rounded-full bg-gold flex-shrink-0" />
+                  <div className="w-2 h-2 rounded-full bg-ink-blue flex-shrink-0" />
                   <p className="text-foreground text-xs md:text-sm">{benefit}</p>
                 </div>
               ))}

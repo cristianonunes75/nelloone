@@ -17,7 +17,9 @@ export default {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         display: ['Inter', 'system-ui', 'sans-serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
-        miguel: ['Cormorant Garamond', 'Georgia', 'serif'],
+        premium: ['Satoshi', 'Inter', 'system-ui', 'sans-serif'],
+        miguel: ['Satoshi', 'Inter', 'system-ui', 'sans-serif'],
+        heading: ['Montserrat Alternates', 'Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         'display-xl': ['4rem', { lineHeight: '1.1', letterSpacing: '-0.025em', fontWeight: '600' }],
@@ -52,6 +54,24 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        // NELLO ONE Colors
+        ink: {
+          DEFAULT: "hsl(var(--ink-blue))",
+          blue: "hsl(var(--ink-blue))",
+          deep: "hsl(var(--ink-deep))",
+          light: "hsl(var(--ink-light))",
+        },
+        bruma: {
+          DEFAULT: "hsl(var(--bruma-blue))",
+          blue: "hsl(var(--bruma-blue))",
+          light: "hsl(var(--bruma-light))",
+          deep: "hsl(var(--bruma-deep))",
+        },
+        lavender: {
+          DEFAULT: "hsl(var(--lavender))",
+          deep: "hsl(var(--lavender-deep))",
+        },
+        // Legacy support - maps to new colors
         gold: {
           DEFAULT: "hsl(var(--gold))",
           light: "hsl(var(--gold-light))",
@@ -63,9 +83,9 @@ export default {
           silver: "hsl(var(--miguel-silver))",
         },
         soul: {
-          sand: "hsl(var(--soul-sand))",
-          amber: "hsl(var(--soul-amber))",
-          light: "hsl(var(--soul-light))",
+          sand: "hsl(var(--bruma-blue))",
+          amber: "hsl(var(--bruma-deep))",
+          light: "hsl(var(--bruma-light))",
         },
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",
