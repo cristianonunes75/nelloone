@@ -36,7 +36,7 @@ export const HeroSection = () => {
             </span>
           </div>
 
-          {/* Main headline - Responsive typography */}
+          {/* Main headline - High conversion copy */}
           <h1 
             className={cn(
               "font-display text-[1.75rem] leading-tight sm:text-display-md md:text-display-lg lg:text-display-xl text-foreground mb-4 md:mb-6 transition-all duration-700 delay-100",
@@ -45,34 +45,37 @@ export const HeroSection = () => {
           >
             {language === 'en' ? (
               <>
-                The path begins
-                <span className="block text-ink-blue">within.</span>
+                Know Yourself Clearly.
+                <span className="block text-ink-blue">Change What Matters.</span>
               </>
             ) : (
               <>
-                O caminho começa
-                <span className="block text-ink-blue">dentro.</span>
+                Conheça quem você é.
+                <span className="block text-ink-blue">Transforme o que importa.</span>
               </>
             )}
           </h1>
 
-          {/* Subheadline - Responsive */}
+          {/* Subheadline - Value proposition */}
           <p 
             className={cn(
-              "font-premium text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-6 md:mb-10 leading-relaxed transition-all duration-700 delay-200",
+              "font-premium text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-4 md:mb-6 leading-relaxed transition-all duration-700 delay-200",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
             {t.landing.hero.description}
           </p>
           
+          {/* Tagline */}
           <p 
             className={cn(
               "text-sm md:text-base text-muted-foreground/80 max-w-xl mx-auto mb-8 md:mb-12 leading-relaxed px-2 transition-all duration-700 delay-300",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            {language === 'en' ? 'Clarity. Identity. Direction.' : 'Clareza. Identidade. Propósito.'}
+            {language === 'en' 
+              ? 'Gain clarity, emotional balance and direction to transform your life with confidence.' 
+              : 'Ganhe clareza, equilíbrio emocional e direção para mudar sua vida com segurança.'}
           </p>
 
           {/* CTA - Full width on mobile */}

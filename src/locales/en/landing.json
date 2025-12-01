@@ -1,17 +1,44 @@
 {
   "hero": {
     "title": "NELLO ONE",
-    "subtitle": "The path begins within.",
-    "description": "A guided self-discovery system powered by personality science and AI.",
-    "cta_primary": "Start Your Journey",
+    "subtitle": "Know Yourself Clearly. Change What Matters.",
+    "description": "The complete AI-guided self-knowledge experience — 7 essential tests + your personalized NELLO ONE Map.",
+    "tagline": "Gain clarity, emotional balance and direction to transform your life with confidence.",
+    "cta_primary": "Start free with the Archetypes Test",
     "cta_secondary": "Explore Tests"
   },
   "why_matters": {
-    "title": "Why take your tests at Nello One?",
-    "subtitle": "You can only change what you can see.",
-    "description": "Each test reveals exactly what is holding you back — and how to unlock it.",
-    "improvements_title": "You improve:",
+    "title": "How NELLO ONE Helps You Improve",
+    "subtitle": "NELLO ONE doesn't just deliver results — it reveals practical paths for personal growth.",
+    "description": "Each test highlights your strengths and shows where you can evolve, always with clarity and objectivity.",
+    "improvements_title": "You discover:",
+    "improvements": [
+      "Which emotional patterns are sabotaging your daily life",
+      "Where your communication breaks down and how to improve",
+      "How to make decisions with more confidence",
+      "In which areas your energy is scattered",
+      "How to develop emotional maturity",
+      "What direction to follow for more clarity, balance and purpose"
+    ],
+    "closing": "All of this with AI guidance and a unique map that translates your personality, talents and challenges — for you to use in real life.",
     "cta": "Start Now"
+  },
+  "problems": {
+    "title": "Problems NELLO ONE Solves",
+    "subtitle": "Self-knowledge is powerful, but it's confusing when you don't know where to start.",
+    "description": "NELLO ONE brings clarity, structure and direction by solving the problems that most people face when trying to understand themselves.",
+    "problems_title": "NELLO ONE helps you overcome:",
+    "problems": [
+      "Feeling lost about your direction, purpose or identity",
+      "Struggling with emotional patterns you can't explain",
+      "Difficulty making decisions or staying consistent",
+      "Communication issues in relationships and work",
+      "Lack of focus, discipline or clarity",
+      "Repeating the same mistakes without understanding why",
+      "Knowing your strengths but not knowing how to use them",
+      "Starting a transformation journey but getting stuck along the way"
+    ],
+    "closing": "With NELLO ONE, you finally understand who you are, why you act the way you do and how to change what no longer helps you."
   },
   "value_proposition": {
     "title": "Why Choose NELLO ONE?",

@@ -1,17 +1,44 @@
 {
   "hero": {
     "title": "NELLO ONE",
-    "subtitle": "O caminho começa dentro.",
-    "description": "Um sistema guiado de autoconhecimento impulsionado por ciência de personalidade e IA.",
-    "cta_primary": "Começar Jornada",
+    "subtitle": "Conheça quem você é. Transforme o que importa.",
+    "description": "A experiência completa de autoconhecimento guiado por IA — 7 testes essenciais + seu Mapa NELLO ONE personalizado.",
+    "tagline": "Ganhe clareza, equilíbrio emocional e direção para mudar sua vida com segurança.",
+    "cta_primary": "Comece grátis pelo Teste de Arquétipos",
     "cta_secondary": "Explorar Testes"
   },
   "why_matters": {
-    "title": "Por que fazer seus testes no Nello One?",
-    "subtitle": "Você só muda aquilo que consegue enxergar.",
-    "description": "Cada teste revela exatamente o que está impedindo você de avançar — e como destravar.",
-    "improvements_title": "Você melhora:",
+    "title": "Como o NELLO ONE ajuda você a melhorar",
+    "subtitle": "O NELLO ONE não entrega apenas resultados, ele revela caminhos práticos de crescimento pessoal.",
+    "description": "Cada teste destaca pontos fortes e mostra onde você pode evoluir, sempre com clareza e objetividade.",
+    "improvements_title": "Você descobre:",
+    "improvements": [
+      "Quais padrões emocionais sabotam o seu dia a dia",
+      "Onde sua comunicação trava e como melhorar",
+      "Como tomar decisões com mais segurança",
+      "Em que áreas sua energia está dispersa",
+      "Como desenvolver maturidade emocional",
+      "Qual direção seguir para ter mais clareza, equilíbrio e propósito"
+    ],
+    "closing": "Tudo isso com orientação da IA e um mapa único que traduz sua personalidade, seus talentos e seus desafios — para você usar na vida real.",
     "cta": "Começar Agora"
+  },
+  "problems": {
+    "title": "Problemas que o NELLO ONE resolve",
+    "subtitle": "Autoconhecimento transforma, mas pode ser confuso quando você não sabe por onde começar.",
+    "description": "O NELLO ONE traz clareza, estrutura e direção resolvendo os problemas que a maioria das pessoas enfrenta nessa jornada.",
+    "problems_title": "O NELLO ONE ajuda você a superar:",
+    "problems": [
+      "Sensação de estar perdido, sem direção ou propósito",
+      "Padrões emocionais que se repetem e você não sabe explicar",
+      "Dificuldade de tomar decisões ou manter consistência",
+      "Problemas de comunicação em relacionamentos ou no trabalho",
+      "Falta de foco, disciplina ou clareza mental",
+      "Repetição dos mesmos erros sem entender a raiz",
+      "Saber seus talentos, mas não saber como usá-los",
+      "Começar mudanças e travar no meio do caminho"
+    ],
+    "closing": "Com o NELLO ONE, você entende quem você é, por que age como age e como transformar o que não te serve mais."
   },
   "value_proposition": {
     "title": "Por que escolher o NELLO ONE?",
