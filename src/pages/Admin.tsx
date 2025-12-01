@@ -5,24 +5,19 @@ import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { DashboardStats } from "@/components/admin/DashboardStats";
-import { ViewModeSelector } from "@/components/admin/ViewModeSelector";
-import { PhotographersManagement } from "@/components/admin/PhotographersManagement";
-import { SchedulingManagement } from "@/components/admin/SchedulingManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import logo from "@/assets/logo.png";
 import { Shield, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 
-// Lazy load new modules
+// Lazy load modules
 const UsersManagementV2 = lazy(() => import("@/components/admin/UsersManagementV2").then(m => ({ default: m.UsersManagementV2 })));
-const TestsQuestionsManagement = lazy(() => import("@/components/admin/TestsQuestionsManagement").then(m => ({ default: m.TestsQuestionsManagement })));
-const PaymentsCouponsManagement = lazy(() => import("@/components/admin/PaymentsCouponsManagement").then(m => ({ default: m.PaymentsCouponsManagement })));
+const TestsJourneysManagement = lazy(() => import("@/components/admin/TestsJourneysManagement").then(m => ({ default: m.TestsJourneysManagement })));
+const PlansAndCoupons = lazy(() => import("@/components/admin/PlansAndCoupons").then(m => ({ default: m.PlansAndCoupons })));
 const MiguelAIManagement = lazy(() => import("@/components/admin/MiguelAIManagement").then(m => ({ default: m.MiguelAIManagement })));
-const DynamicContentManagement = lazy(() => import("@/components/admin/DynamicContentManagement").then(m => ({ default: m.DynamicContentManagement })));
-const ReportsPDFManagement = lazy(() => import("@/components/admin/ReportsPDFManagement").then(m => ({ default: m.ReportsPDFManagement })));
-const AutomationsManagement = lazy(() => import("@/components/admin/AutomationsManagement").then(m => ({ default: m.AutomationsManagement })));
-const LogsSecurityManagement = lazy(() => import("@/components/admin/LogsSecurityManagement").then(m => ({ default: m.LogsSecurityManagement })));
+const LandingContentManagement = lazy(() => import("@/components/admin/LandingContentManagement").then(m => ({ default: m.LandingContentManagement })));
+const ReportsManagement = lazy(() => import("@/components/admin/ReportsManagement").then(m => ({ default: m.ReportsManagement })));
 
 const AdminDashboard = () => (
   <div className="space-y-8">
@@ -32,8 +27,6 @@ const AdminDashboard = () => (
     </div>
     
     <DashboardStats />
-    
-    <ViewModeSelector />
     
     <Alert className="border-primary/20 bg-primary/5">
       <Shield className="h-4 w-4 text-primary" />
@@ -81,24 +74,12 @@ const Admin = () => {
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
                 <Route path="/" element={<AdminDashboard />} />
-                
-                {/* Essencial */}
+                <Route path="/conteudo" element={<LandingContentManagement />} />
                 <Route path="/usuarios" element={<UsersManagementV2 />} />
-                <Route path="/testes-perguntas" element={<TestsQuestionsManagement />} />
-                <Route path="/pagamentos-cupons" element={<PaymentsCouponsManagement />} />
-                
-                {/* Inteligência */}
+                <Route path="/testes" element={<TestsJourneysManagement />} />
+                <Route path="/planos" element={<PlansAndCoupons />} />
                 <Route path="/miguel" element={<MiguelAIManagement />} />
-                <Route path="/conteudo" element={<DynamicContentManagement />} />
-                <Route path="/relatorios" element={<ReportsPDFManagement />} />
-                
-                {/* Automação */}
-                <Route path="/automacoes" element={<AutomationsManagement />} />
-                <Route path="/logs" element={<LogsSecurityManagement />} />
-                
-                {/* Legado */}
-                <Route path="/fotografos" element={<PhotographersManagement />} />
-                <Route path="/agendamentos" element={<SchedulingManagement />} />
+                <Route path="/relatorios" element={<ReportsManagement />} />
                 <Route path="/configuracoes" element={<SystemSettings />} />
               </Routes>
             </Suspense>
