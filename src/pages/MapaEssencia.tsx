@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { useMapaEssencia } from "@/hooks/useMapaEssencia";
@@ -10,6 +10,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { generateMapaPDF } from "@/lib/pdfGenerator";
 import { toast } from "sonner";
+import { MapGrowthPointsSection } from "@/components/growth/MapGrowthPointsSection";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface MapSection {
   id: string;
@@ -52,14 +54,58 @@ const MapaEssencia = () => {
   const { isJourneyComplete, testResults, completedCount, totalSteps, isLoading: journeyLoading } = useJourneyProgress();
   const { savedMapa, isLoading: mapaLoading, saveMapa, resetMapa, hasSavedMapa } = useMapaEssencia();
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const [sections, setSections] = useState<MapSection[]>([]);
   const [rawContent, setRawContent] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  const userName = profile?.full_name || "Viajante";
+  const userName = profile?.full_name || (language === 'en' ? "Traveler" : "Viajante");
   const isLoading = journeyLoading || mapaLoading;
+  const lang = language === 'en' ? 'en' : 'pt';
+
+  // Generate growth points from map sections
+  const growthPoints = useMemo(() => {
+    const identidadeSection = sections.find(s => s.id === 'IDENTIDADE_CENTRAL');
+    const propositoSection = sections.find(s => s.id === 'PROPOSITO_ESSENCIAL');
+    
+    const growthTexts = {
+      pt: {
+        mainGrowthPoint: "Integrar sua energia dominante nas decisões diárias, honrando quem você verdadeiramente é.",
+        mainBlindSpot: "Padrões emocionais inconscientes que podem estar limitando sua expressão autêntica.",
+        recommendedAction: "Dedique 10 minutos diários para reflexão sobre como suas ações refletem sua essência."
+      },
+      en: {
+        mainGrowthPoint: "Integrate your dominant energy into daily decisions, honoring who you truly are.",
+        mainBlindSpot: "Unconscious emotional patterns that may be limiting your authentic expression.",
+        recommendedAction: "Dedicate 10 minutes daily to reflect on how your actions reflect your essence."
+      }
+    };
+    
+    // If we have sections, try to extract more specific insights
+    if (identidadeSection?.content) {
+      const content = identidadeSection.content;
+      if (content.includes('Ponto Cego') || content.includes('Blind Spot')) {
+        const blindSpotMatch = content.match(/(?:Ponto Cego|Blind Spot)[^:]*:\s*([^\n]+)/i);
+        if (blindSpotMatch) {
+          growthTexts[lang].mainBlindSpot = blindSpotMatch[1].replace(/\*\*/g, '').trim();
+        }
+      }
+    }
+    
+    if (propositoSection?.content) {
+      const content = propositoSection.content;
+      if (content.includes('Ato de Alinhamento') || content.includes('Alignment Act')) {
+        const actionMatch = content.match(/(?:Ato de Alinhamento|Alignment Act)[^:]*:\s*([^\n]+)/i);
+        if (actionMatch) {
+          growthTexts[lang].recommendedAction = actionMatch[1].replace(/\*\*/g, '').trim();
+        }
+      }
+    }
+    
+    return growthTexts[lang];
+  }, [sections, lang]);
 
   // Parse sections from raw content
   const parseSections = useCallback((content: string): MapSection[] => {
@@ -426,11 +472,21 @@ const MapaEssencia = () => {
             </div>
           )}
 
+          {/* Growth Points Section */}
+          {hasGenerated && !isGenerating && sections.length > 0 && (
+            <MapGrowthPointsSection 
+              growthPoints={growthPoints}
+              className="mb-8"
+            />
+          )}
+
           {/* Disclaimer */}
           <div className="bg-accent/10 border border-border rounded-2xl p-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Este mapa é uma síntese simbólica baseada em suas respostas. Use-o como ferramenta de reflexão e autoconhecimento, 
-              não como verdade absoluta.
+              {lang === 'en' 
+                ? "This map is a symbolic synthesis based on your answers. Use it as a tool for reflection and self-knowledge, not as absolute truth."
+                : "Este mapa é uma síntese simbólica baseada em suas respostas. Use-o como ferramenta de reflexão e autoconhecimento, não como verdade absoluta."
+              }
             </p>
           </div>
         </div>
