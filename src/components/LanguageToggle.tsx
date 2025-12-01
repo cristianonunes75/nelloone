@@ -1,6 +1,7 @@
 import { useLanguage, Language } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Globe } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +16,37 @@ const languages: { code: Language; label: string; flag: string }[] = [
 
 export function LanguageToggle({ variant = 'default' }: { variant?: 'default' | 'minimal' }) {
   const { language, setLanguage } = useLanguage();
+  const navigate = useNavigate();
+  const location = useLocation();
   const current = languages.find(l => l.code === language);
+
+  const handleLanguageChange = (newLang: Language) => {
+    if (newLang === language) return;
+    
+    setLanguage(newLang);
+    
+    // Update URL to reflect language change
+    const currentPath = location.pathname;
+    let newPath: string;
+    
+    if (newLang === 'en') {
+      // Switching to English - add /en prefix
+      if (currentPath.startsWith('/en')) {
+        newPath = currentPath; // Already has /en
+      } else {
+        newPath = `/en${currentPath === '/' ? '' : currentPath}`;
+      }
+    } else {
+      // Switching to Portuguese - remove /en prefix
+      if (currentPath.startsWith('/en')) {
+        newPath = currentPath.replace(/^\/en/, '') || '/';
+      } else {
+        newPath = currentPath;
+      }
+    }
+    
+    navigate(newPath, { replace: true });
+  };
 
   if (variant === 'minimal') {
     return (
@@ -30,7 +61,7 @@ export function LanguageToggle({ variant = 'default' }: { variant?: 'default' | 
           {languages.map((lang) => (
             <DropdownMenuItem
               key={lang.code}
-              onClick={() => setLanguage(lang.code)}
+              onClick={() => handleLanguageChange(lang.code)}
               className={language === lang.code ? 'bg-bruma' : ''}
             >
               <span className="mr-2">{lang.flag}</span>
@@ -54,7 +85,7 @@ export function LanguageToggle({ variant = 'default' }: { variant?: 'default' | 
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
-            onClick={() => setLanguage(lang.code)}
+            onClick={() => handleLanguageChange(lang.code)}
             className={language === lang.code ? 'bg-bruma' : ''}
           >
             <span className="mr-2">{lang.flag}</span>

@@ -85,7 +85,7 @@ export const HeroSection = () => {
             <Button 
               size="lg" 
               className="group w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 text-sm md:text-base rounded-full bg-ink-blue hover:bg-ink-deep text-primary-foreground shadow-medium hover:shadow-large hover-lift press-effect"
-              onClick={() => navigate("/auth")}
+              onClick={() => navigate(language === 'en' ? "/en/auth" : "/auth")}
             >
               {t.landing.hero.cta_primary}
               <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform duration-300" />
