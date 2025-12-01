@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Message {
   role: "user" | "assistant";
@@ -22,32 +23,62 @@ interface MiguelAgentProps {
   testResults?: Record<string, any>;
 }
 
-const INITIAL_QUICK_REPLIES_LANDING: QuickReply[] = [
-  { text: "O que é o NELLO ONE?", action: "O que é o NELLO ONE?" },
-  { text: "Quais testes existem?", action: "Quais testes o NELLO ONE oferece?" },
-  { text: "Quero começar minha jornada", action: "Quero começar a minha jornada de autoconhecimento." },
-  { text: "Como funciona?", action: "Como funciona o processo do NELLO ONE?" },
-];
-
-const INITIAL_QUICK_REPLIES_CLIENTE: QuickReply[] = [
-  { text: "Qual o próximo passo?", action: "Qual é o próximo passo na minha jornada?" },
-  { text: "Explique meus resultados", action: "Pode me ajudar a entender meus resultados?" },
-  { text: "O que significa esse teste?", action: "O que o próximo teste vai revelar sobre mim?" },
-  { text: "Preciso de orientação", action: "Preciso de uma orientação sobre minha personalidade." },
-];
-
 export function MiguelAgent({ location, completedTests = [], currentStep, testResults }: MiguelAgentProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
-  const [quickReplies, setQuickReplies] = useState<QuickReply[]>(
-    location === "landing" ? INITIAL_QUICK_REPLIES_LANDING : INITIAL_QUICK_REPLIES_CLIENTE
-  );
+  const [quickReplies, setQuickReplies] = useState<QuickReply[]>([]);
   const [hasGreeted, setHasGreeted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { user, profile } = useAuth();
+  const { t, language } = useLanguage();
+
+  // Get initial quick replies based on location and language
+  const getInitialQuickReplies = useCallback((): QuickReply[] => {
+    const replies = t.miguel.quickReplies;
+    if (location === "landing") {
+      return [
+        { text: replies.landing.whatIs, action: replies.landing.whatIsAction },
+        { text: replies.landing.whichTests, action: replies.landing.whichTestsAction },
+        { text: replies.landing.startJourney, action: replies.landing.startJourneyAction },
+        { text: replies.landing.howWorks, action: replies.landing.howWorksAction },
+      ];
+    }
+    return [
+      { text: replies.cliente.nextStep, action: replies.cliente.nextStepAction },
+      { text: replies.cliente.explainResults, action: replies.cliente.explainResultsAction },
+      { text: replies.cliente.whatMeans, action: replies.cliente.whatMeansAction },
+      { text: replies.cliente.needGuidance, action: replies.cliente.needGuidanceAction },
+    ];
+  }, [t, location]);
+
+  // Get after-response quick replies
+  const getAfterResponseQuickReplies = useCallback((): QuickReply[] => {
+    const replies = t.miguel.quickReplies.afterResponse;
+    if (location === "landing") {
+      return [
+        { text: replies.landing.signup, action: replies.landing.signupAction },
+        { text: replies.landing.prices, action: replies.landing.pricesAction },
+        { text: replies.landing.startNow, action: replies.landing.startNowAction },
+      ];
+    }
+    return [
+      { text: replies.cliente.nextTest, action: replies.cliente.nextTestAction },
+      { text: replies.cliente.myResults, action: replies.cliente.myResultsAction },
+      { text: replies.cliente.nelloMap, action: replies.cliente.nelloMapAction },
+    ];
+  }, [t, location]);
+
+  // Update quick replies when language changes
+  useEffect(() => {
+    if (!isStreaming && messages.length === 0) {
+      setQuickReplies(getInitialQuickReplies());
+    } else if (!isStreaming && messages.length > 0) {
+      setQuickReplies(getAfterResponseQuickReplies());
+    }
+  }, [language, getInitialQuickReplies, getAfterResponseQuickReplies, isStreaming, messages.length]);
 
   const scrollToBottom = () => {
     if (scrollRef.current) {
@@ -59,22 +90,39 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
     scrollToBottom();
   }, [messages]);
 
+  // Build greeting message
+  const buildGreeting = useCallback(() => {
+    const userName = profile?.full_name?.split(' ')[0];
+    const nameStr = userName ? `, ${userName}` : '';
+
+    if (location === "landing") {
+      return t.miguel.landingGreeting.replace('{name}', nameStr);
+    }
+
+    let progress: string;
+    if (completedTests.length === 0) {
+      progress = t.miguel.clienteGreetingNew;
+    } else if (completedTests.length < 7) {
+      progress = t.miguel.clienteGreetingProgress
+        .replace('{count}', completedTests.length.toString())
+        .replace('{plural}', completedTests.length > 1 ? 's' : '');
+    } else {
+      progress = t.miguel.clienteGreetingComplete;
+    }
+
+    return t.miguel.clienteGreetingIntro
+      .replace('{name}', nameStr)
+      .replace('{progress}', progress);
+  }, [t, location, profile, completedTests]);
+
   // Initial greeting when chat opens
   useEffect(() => {
     if (isOpen && !hasGreeted && messages.length === 0) {
-      const greeting = location === "landing"
-        ? `Oi${profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}! Eu sou o Miguel, seu guia no NELLO ONE.\n\nO NELLO ONE combina ciência de personalidade, design emocional e inteligência artificial para revelar padrões internos que transformam a forma como você se vê, decide e se relaciona.\n\nO caminho começa dentro. Como posso te ajudar hoje?`
-        : `Oi${profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}! Que bom te ver por aqui.\n\n${completedTests.length === 0 
-            ? "Você está no início da sua jornada de autoconhecimento. O primeiro passo é o teste de Arquétipos, que vai revelar a energia que te move. Quando quiser, é só começar!" 
-            : completedTests.length < 7 
-              ? `Você já completou ${completedTests.length} teste${completedTests.length > 1 ? 's' : ''}. Continue sua jornada para descobrir mais sobre quem você é.`
-              : "Parabéns! Você completou todos os testes. Seu Mapa NELLO ONE está pronto para ser revelado!"
-          }\n\nComo posso te ajudar?`;
-
-      setMessages([{ role: "assistant", content: greeting }]);
+      setMessages([{ role: "assistant", content: buildGreeting() }]);
+      setQuickReplies(getInitialQuickReplies());
       setHasGreeted(true);
     }
-  }, [isOpen, hasGreeted, messages.length, location, profile, completedTests]);
+  }, [isOpen, hasGreeted, messages.length, buildGreeting, getInitialQuickReplies]);
 
   const sendMessage = useCallback(async (messageText: string) => {
     if (!messageText.trim() || isStreaming) return;
@@ -109,12 +157,13 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
               isNewUser: messages.length === 0,
             },
             userName: profile?.full_name?.split(' ')[0],
+            language,
           }),
         }
       );
 
       if (!response.ok) {
-        throw new Error("Erro na resposta");
+        throw new Error("Response error");
       }
 
       const reader = response.body?.getReader();
@@ -160,20 +209,7 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
         }
       }
 
-      // Update quick replies based on context
-      if (location === "landing") {
-        setQuickReplies([
-          { text: "Quero me cadastrar", action: "Como faço para me cadastrar?" },
-          { text: "Ver preços", action: "Quais são os preços dos testes?" },
-          { text: "Começar agora", action: "Quero começar minha jornada agora!" },
-        ]);
-      } else {
-        setQuickReplies([
-          { text: "Próximo teste", action: "Me fale sobre o próximo teste." },
-          { text: "Meus resultados", action: "Quero entender melhor meus resultados." },
-          { text: "Mapa NELLO ONE", action: "O que é o Mapa NELLO ONE?" },
-        ]);
-      }
+      setQuickReplies(getAfterResponseQuickReplies());
 
     } catch (error) {
       console.error("Miguel error:", error);
@@ -181,13 +217,13 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
         ...prev,
         {
           role: "assistant",
-          content: "Desculpe, tive um momento de pausa. Pode repetir o que disse?",
+          content: t.miguel.error,
         },
       ]);
     } finally {
       setIsStreaming(false);
     }
-  }, [messages, isStreaming, location, completedTests, currentStep, testResults, profile]);
+  }, [messages, isStreaming, location, completedTests, currentStep, testResults, profile, language, t, getAfterResponseQuickReplies]);
 
   const handleQuickReply = (reply: QuickReply) => {
     sendMessage(reply.action);
@@ -234,7 +270,7 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
           </div>
           <div>
             <h3 className="font-semibold">Miguel</h3>
-            <p className="text-xs opacity-80">Seu guia no NELLO ONE</p>
+            <p className="text-xs opacity-80">{t.miguel.subtitle}</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -318,7 +354,7 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Digite sua mensagem..."
+            placeholder={t.miguel.placeholder}
             disabled={isStreaming}
             className="flex-1 bg-muted border-0 focus-visible:ring-1 focus-visible:ring-ink-blue"
           />
