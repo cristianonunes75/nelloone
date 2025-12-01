@@ -6,6 +6,26 @@
     "cta_primary": "Start Your Journey",
     "cta_secondary": "Explore Tests"
   },
+  "why_matters": {
+    "title": "Why take your tests at Nello One?",
+    "subtitle": "You can only change what you can see.",
+    "description": "Each test reveals exactly what is holding you back — and how to unlock it.",
+    "improvements_title": "You improve:",
+    "cta": "Start Now"
+  },
+  "growth": {
+    "results_title": "What you can improve right now",
+    "results_subtitle": "Based on your patterns, these are your immediate growth points.",
+    "map_title": "Growth Points",
+    "map_subtitle": "Your priority growth focuses",
+    "limiting_pattern": "Limiting Pattern",
+    "balancing_strength": "Balancing Strength",
+    "immediate_action": "Immediate Action",
+    "recommended_evolution": "Recommended Evolution",
+    "main_growth_point": "Your biggest growth point right now",
+    "main_blind_spot": "Your main blind spot",
+    "recommended_action": "Your recommended action"
+  },
   "what_is": {
     "title": "What is NELLO ONE?",
     "description": "NELLO ONE is an intelligent self-discovery platform that combines scientifically grounded personality tests, emotional design and AI-guided insights to reveal who you are and how you function — with clarity and simplicity.",
@@ -118,5 +138,11 @@
     "pricing": "Pricing",
     "login": "Login",
     "start": "Start Now"
+  },
+  "common": {
+    "back": "Back",
+    "back_to_tests": "Back to Tests",
+    "back_to_dashboard": "Back to Dashboard",
+    "next_step": "Next Step"
   }
 }

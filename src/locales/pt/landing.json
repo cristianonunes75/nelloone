@@ -6,6 +6,26 @@
     "cta_primary": "Começar Jornada",
     "cta_secondary": "Explorar Testes"
   },
+  "why_matters": {
+    "title": "Por que fazer seus testes no Nello One?",
+    "subtitle": "Você só muda aquilo que consegue enxergar.",
+    "description": "Cada teste revela exatamente o que está impedindo você de avançar — e como destravar.",
+    "improvements_title": "Você melhora:",
+    "cta": "Começar Agora"
+  },
+  "growth": {
+    "results_title": "O que você pode melhorar agora",
+    "results_subtitle": "Com base nos seus padrões, estes são seus pontos imediatos de evolução.",
+    "map_title": "Pontos de Evolução",
+    "map_subtitle": "Seus focos prioritários de crescimento",
+    "limiting_pattern": "Padrão Limitante",
+    "balancing_strength": "Força que Equilibra",
+    "immediate_action": "Ação Imediata",
+    "recommended_evolution": "Evolução Recomendada",
+    "main_growth_point": "Seu ponto de maior crescimento agora",
+    "main_blind_spot": "Seu principal ponto cego",
+    "recommended_action": "Sua ação recomendada"
+  },
   "what_is": {
     "title": "O que é o NELLO ONE?",
     "description": "O NELLO ONE é uma plataforma inteligente de autoconhecimento que combina testes de personalidade cientificamente fundamentados, design emocional e insights guiados por IA para revelar quem você é e como você funciona — com clareza e simplicidade.",
@@ -118,5 +138,11 @@
     "pricing": "Preços",
     "login": "Entrar",
     "start": "Começar"
+  },
+  "common": {
+    "back": "Voltar",
+    "back_to_tests": "Voltar para Testes",
+    "back_to_dashboard": "Voltar para Dashboard",
+    "next_step": "Próximo Passo"
   }
 }

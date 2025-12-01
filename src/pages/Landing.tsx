@@ -1,5 +1,6 @@
 import { NavSection } from "@/components/landing/v2/NavSection";
 import { HeroSection } from "@/components/landing/v2/HeroSection";
+import { WhyItMattersSection } from "@/components/landing/v2/WhyItMattersSection";
 import { MiguelSection } from "@/components/landing/v2/MiguelSection";
 import { JourneySection } from "@/components/landing/v2/JourneySection";
 import { EssenceMapSection } from "@/components/landing/v2/EssenceMapSection";
@@ -14,6 +15,7 @@ const Landing = () => {
     <div className="min-h-screen bg-background">
       <NavSection />
       <HeroSection />
+      <WhyItMattersSection />
       <div id="jornada">
         <MiguelSection />
       </div>
