@@ -691,6 +691,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          language: string
           options: Json
           question_number: number
           question_text: string
@@ -699,6 +700,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          language?: string
           options: Json
           question_number: number
           question_text: string
@@ -707,6 +709,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          language?: string
           options?: Json
           question_number?: number
           question_text?: string
@@ -731,6 +734,7 @@ export type Database = {
           icon: string | null
           id: string
           is_free: boolean
+          language: string
           name: string
           price_brl: number | null
           questions_count: number
@@ -745,6 +749,7 @@ export type Database = {
           icon?: string | null
           id?: string
           is_free?: boolean
+          language?: string
           name: string
           price_brl?: number | null
           questions_count: number
@@ -759,6 +764,7 @@ export type Database = {
           icon?: string | null
           id?: string
           is_free?: boolean
+          language?: string
           name?: string
           price_brl?: number | null
           questions_count?: number
