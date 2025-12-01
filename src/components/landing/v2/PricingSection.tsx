@@ -2,9 +2,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useScrollAnimation, getStaggerDelay } from "@/hooks/useScrollAnimation";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useLocalizedPath } from "@/components/LanguageRoute";
 import { cn } from "@/lib/utils";
 
-// Ícones ultrafinos customizados
+// Ultrathin custom icons
 const SunIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="4" />
@@ -68,27 +70,37 @@ const DiamondIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const tests = [
-  { name: "Arquétipos", icon: SunIcon, price: 0, questions: 36 },
-  { name: "DISC", icon: QuadrantsIcon, price: 97, questions: 28 },
-  { name: "Temperamentos", icon: WavesIcon, price: 117, questions: 32 },
-  { name: "Linguagens", icon: HeartIcon, price: 127, questions: 30 },
-  { name: "Inteligências", icon: BrainIcon, price: 147, questions: 40 },
-  { name: "Eneagrama", icon: EnneagramIcon, price: 177, questions: 45 },
-  { name: "MBTI", icon: DiamondIcon, price: 197, questions: 60 },
-];
-
-const bundleFeatures = [
-  "Acesso aos 7 testes completos",
-  "Mapa NELLO ONE personalizado",
-  "Análise integrada por IA",
-  "Export em PDF profissional",
-  "Acesso vitalício aos resultados",
-];
+// Test data with prices for both currencies
+const testsData = {
+  en: [
+    { name: "Archetypes", icon: SunIcon, price: 0, questions: 36 },
+    { name: "DISC", icon: QuadrantsIcon, price: 19, questions: 28 },
+    { name: "Temperaments", icon: WavesIcon, price: 27, questions: 32 },
+    { name: "Love Languages", icon: HeartIcon, price: 17, questions: 30 },
+    { name: "Intelligences", icon: BrainIcon, price: 29, questions: 40 },
+    { name: "Enneagram", icon: EnneagramIcon, price: 49, questions: 45 },
+    { name: "MBTI", icon: DiamondIcon, price: 57, questions: 60 },
+  ],
+  pt: [
+    { name: "Arquétipos", icon: SunIcon, price: 0, questions: 36 },
+    { name: "DISC", icon: QuadrantsIcon, price: 97, questions: 28 },
+    { name: "Temperamentos", icon: WavesIcon, price: 117, questions: 32 },
+    { name: "Linguagens", icon: HeartIcon, price: 127, questions: 30 },
+    { name: "Inteligências", icon: BrainIcon, price: 147, questions: 40 },
+    { name: "Eneagrama", icon: EnneagramIcon, price: 177, questions: 45 },
+    { name: "MBTI", icon: DiamondIcon, price: 197, questions: 60 },
+  ],
+};
 
 export const PricingSection = () => {
   const navigate = useNavigate();
-  const totalIndividual = tests.reduce((sum, t) => sum + t.price, 0);
+  const { language, t } = useLanguage();
+  const localizedPath = useLocalizedPath();
+  
+  const tests = testsData[language];
+  const pricing = t.landing.pricing;
+  const totalIndividual = tests.reduce((sum, test) => sum + test.price, 0);
+  const savings = totalIndividual - pricing.bundle_price;
   
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
   const { ref: bundleRef, isVisible: bundleVisible } = useScrollAnimation();
@@ -106,7 +118,7 @@ export const PricingSection = () => {
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              Investimento
+              {pricing.label}
             </span>
             <h2 
               className={cn(
@@ -114,7 +126,7 @@ export const PricingSection = () => {
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              Escolha seu caminho
+              {pricing.title}
             </h2>
             <p 
               className={cn(
@@ -122,8 +134,7 @@ export const PricingSection = () => {
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              Comece gratuitamente com o teste de Arquétipos ou desbloqueie 
-              a jornada completa.
+              {pricing.subtitle}
             </p>
           </div>
 
@@ -139,20 +150,19 @@ export const PricingSection = () => {
             <div className="relative bg-card rounded-2xl md:rounded-3xl border border-ink-blue/20 p-5 md:p-8 lg:p-12 shadow-soft hover:shadow-glow hover:border-ink-blue/30 transition-all duration-500">
               <div className="flex items-center gap-2 mb-3 md:mb-4">
                 <Sparkles className="w-4 h-4 text-ink-blue" strokeWidth={1.5} />
-                <span className="text-xs md:text-sm font-medium text-ink-blue">Jornada Completa</span>
+                <span className="text-xs md:text-sm font-medium text-ink-blue">{pricing.bundle_label}</span>
               </div>
               
               <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8 items-center">
                 <div>
                   <h3 className="font-display text-xl md:text-display-sm text-foreground mb-3 md:mb-4">
-                    NELLO ONE Completo
+                    {pricing.bundle_title}
                   </h3>
                   <p className="text-muted-foreground mb-4 md:mb-6 text-xs md:text-sm">
-                    Todos os 7 testes + Mapa NELLO ONE gerado por IA. 
-                    A experiência completa de autoconhecimento.
+                    {pricing.bundle_description}
                   </p>
                   <ul className="space-y-2 mb-6 md:mb-8">
-                    {bundleFeatures.map((feature, index) => (
+                    {pricing.benefits.map((feature, index) => (
                       <li 
                         key={feature} 
                         className={cn(
@@ -171,22 +181,24 @@ export const PricingSection = () => {
                 <div className="text-center md:text-right w-full">
                   <div className="mb-4 md:mb-6">
                     <p className="text-xs md:text-sm text-muted-foreground line-through mb-1">
-                      De R$ {totalIndividual}
+                      {pricing.from} {pricing.currency} {pricing.bundle_original}
                     </p>
                     <div className="flex items-baseline justify-center md:justify-end gap-2">
-                      <span className="text-xs md:text-sm text-muted-foreground">Por</span>
-                      <span className="font-display text-3xl md:text-4xl text-foreground">R$ 597</span>
+                      <span className="text-xs md:text-sm text-muted-foreground">{pricing.now}</span>
+                      <span className="font-display text-3xl md:text-4xl text-foreground">
+                        {pricing.currency} {pricing.bundle_price}
+                      </span>
                     </div>
                     <p className="text-xs md:text-sm text-ink-blue mt-1">
-                      Economize R$ {totalIndividual - 597}
+                      {pricing.save} {pricing.currency} {savings}
                     </p>
                   </div>
                   <Button 
                     size="lg" 
                     className="group h-11 md:h-12 px-5 md:px-6 text-sm md:text-base rounded-full w-full md:w-auto bg-ink-blue hover:bg-ink-deep text-primary-foreground hover-lift press-effect"
-                    onClick={() => navigate("/auth")}
+                    onClick={() => navigate(localizedPath("/auth"))}
                   >
-                    Começar Jornada Completa
+                    {pricing.cta}
                     <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 </div>
@@ -202,7 +214,7 @@ export const PricingSection = () => {
                 testsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              Ou adquira testes individualmente
+              {pricing.individual_title}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
               {tests.map((test, index) => (
@@ -218,13 +230,15 @@ export const PricingSection = () => {
                     <test.icon className="w-4 h-4 md:w-5 md:h-5 text-ink-blue" />
                   </div>
                   <h4 className="font-medium text-foreground text-xs md:text-sm mb-0.5 md:mb-1">{test.name}</h4>
-                  <p className="text-[10px] md:text-xs text-muted-foreground mb-2 md:mb-3">{test.questions} perguntas</p>
+                  <p className="text-[10px] md:text-xs text-muted-foreground mb-2 md:mb-3">
+                    {test.questions} {pricing.questions}
+                  </p>
                   <div className="flex items-baseline gap-0.5 md:gap-1">
                     {test.price === 0 ? (
-                      <span className="font-display text-base md:text-lg text-ink-blue">Grátis</span>
+                      <span className="font-display text-base md:text-lg text-ink-blue">{pricing.free}</span>
                     ) : (
                       <>
-                        <span className="text-[10px] md:text-xs text-muted-foreground">R$</span>
+                        <span className="text-[10px] md:text-xs text-muted-foreground">{pricing.currency}</span>
                         <span className="font-display text-base md:text-lg text-foreground">{test.price}</span>
                       </>
                     )}

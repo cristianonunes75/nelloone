@@ -69,6 +69,31 @@
       }
     }
   },
+  "pricing": {
+    "label": "Investimento",
+    "title": "Escolha seu caminho",
+    "subtitle": "Comece gratuitamente com o teste de Arquétipos ou desbloqueie a jornada completa.",
+    "bundle_label": "Jornada Completa",
+    "bundle_title": "NELLO ONE Completo",
+    "bundle_description": "Todos os 7 testes + Mapa NELLO ONE gerado por IA. A experiência completa de autoconhecimento.",
+    "benefits": [
+      "Acesso aos 7 testes completos",
+      "Mapa NELLO ONE personalizado",
+      "Análise integrada por IA",
+      "Export em PDF profissional",
+      "Acesso vitalício aos resultados"
+    ],
+    "from": "De",
+    "now": "Por",
+    "save": "Economize",
+    "cta": "Começar Jornada Completa",
+    "individual_title": "Ou adquira testes individualmente",
+    "questions": "perguntas",
+    "free": "Grátis",
+    "currency": "R$",
+    "bundle_original": 862,
+    "bundle_price": 597
+  },
   "cta": {
     "title": "Seu caminho começa dentro.",
     "subtitle": "Comece sua jornada hoje.",
@@ -82,7 +107,10 @@
       "terms": "Termos de Serviço",
       "contact": "Contato"
     },
-    "copyright": "© 2024 NELLO ONE. Todos os direitos reservados."
+    "copyright": "© 2024 NELLO ONE. Todos os direitos reservados.",
+    "payment_secure": "Pagamento 100% seguro via",
+    "payment_methods": "Pix, Cartão ou Boleto",
+    "instant_access": "Após a confirmação do pagamento, você recebe acesso imediato aos testes."
   },
   "nav": {
     "about": "Sobre",

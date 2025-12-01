@@ -69,6 +69,31 @@
       }
     }
   },
+  "pricing": {
+    "label": "Investment",
+    "title": "Choose your path",
+    "subtitle": "Start for free with the Archetypes Test or unlock your complete journey.",
+    "bundle_label": "Full Journey",
+    "bundle_title": "NELLO ONE Complete",
+    "bundle_description": "All 7 tests + your personalized AI-generated NELLO ONE Map. The complete self-knowledge experience.",
+    "benefits": [
+      "Access to all 7 complete tests",
+      "Personalized NELLO ONE Map",
+      "Integrated AI analysis",
+      "Professional PDF export",
+      "Lifetime access to your results"
+    ],
+    "from": "From",
+    "now": "Now",
+    "save": "Save",
+    "cta": "Start Full Journey",
+    "individual_title": "Or purchase tests individually",
+    "questions": "questions",
+    "free": "Free",
+    "currency": "$",
+    "bundle_original": 147,
+    "bundle_price": 97
+  },
   "cta": {
     "title": "Your path begins within.",
     "subtitle": "Start your journey today.",
@@ -82,7 +107,10 @@
       "terms": "Terms of Service",
       "contact": "Contact"
     },
-    "copyright": "© 2024 NELLO ONE. All rights reserved."
+    "copyright": "© 2024 NELLO ONE. All rights reserved.",
+    "payment_secure": "100% secure payment via",
+    "payment_methods": "Credit Card or PayPal",
+    "instant_access": "After payment confirmation, you receive instant access to the tests."
   },
   "nav": {
     "about": "About",
