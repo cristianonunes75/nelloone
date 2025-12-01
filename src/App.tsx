@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { LanguageRoute } from "@/components/LanguageRoute";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { GeoRedirect } from "@/components/GeoRedirect";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Cliente from "./pages/Cliente";
@@ -208,6 +209,8 @@ const App = () => (
       <BrowserRouter>
         <LanguageProvider>
           <AuthProvider>
+            {/* GEO-routing: Automatically redirects based on IP location */}
+            <GeoRedirect />
             <Routes>
               {/* English routes with /en prefix */}
               <Route path="/en/*" element={
@@ -216,7 +219,7 @@ const App = () => (
                 </LanguageRoute>
               } />
               
-              {/* Default routes (Portuguese) */}
+              {/* Default routes (Portuguese / Brazil) */}
               <Route path="/*" element={<AppRoutes />} />
             </Routes>
           </AuthProvider>
