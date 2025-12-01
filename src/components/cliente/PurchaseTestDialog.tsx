@@ -10,6 +10,8 @@ import { CreditCard, ShoppingCart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { formatPrice } from "@/lib/priceConfig";
 
 interface PurchaseTestDialogProps {
   open: boolean;
@@ -32,6 +34,7 @@ export const PurchaseTestDialog = ({
 }: PurchaseTestDialogProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { language } = useLanguage();
 
   const handlePurchase = async () => {
     try {
@@ -43,16 +46,28 @@ export const PurchaseTestDialog = ({
         return;
       }
 
-      // Create checkout session (price is validated server-side)
+      // ANTI-CROSSTRADE: Create checkout session with language/currency
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: {
           testId,
           userId: user.id,
           userEmail: user.email,
+          language: language, // Enforces correct currency
+          currency: language === 'en' ? 'usd' : 'brl',
         },
       });
 
       if (error) throw error;
+
+      // Handle cross-trade block
+      if (data?.code === "CURRENCY_MISMATCH") {
+        toast({
+          title: language === 'en' ? "Currency Error" : "Erro de Moeda",
+          description: data.error,
+          variant: "destructive",
+        });
+        return;
+      }
 
       // Redirect to Stripe checkout
       if (data?.url) {
@@ -61,12 +76,15 @@ export const PurchaseTestDialog = ({
     } catch (error: any) {
       console.error("Purchase error:", error);
       toast({
-        title: "Erro ao processar pagamento",
-        description: error.message || "Tente novamente em alguns instantes.",
+        title: language === 'en' ? "Payment Error" : "Erro ao processar pagamento",
+        description: error.message || (language === 'en' ? "Try again shortly." : "Tente novamente em alguns instantes."),
         variant: "destructive",
       });
     }
   };
+
+  // Format price based on language (ANTI-CROSSTRADE)
+  const displayPrice = formatPrice(price, language);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -101,19 +119,23 @@ export const PurchaseTestDialog = ({
         <div className="space-y-4 py-4">
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="font-medium">Relatório Completo</span>
+              <span className="font-medium">
+                {language === 'en' ? 'Complete Report' : 'Relatório Completo'}
+              </span>
               <span className="text-2xl font-bold text-primary">
-                R$ {price.toFixed(2)}
+                {displayPrice}
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
-              🌟 Desbloqueie sua leitura completa e veja o arquétipo que conduz sua essência
+              {language === 'en' 
+                ? '🌟 Unlock your complete reading and see the archetype that guides your essence'
+                : '🌟 Desbloqueie sua leitura completa e veja o arquétipo que conduz sua essência'}
             </p>
           </div>
 
           <Button onClick={handlePurchase} className="w-full" size="lg">
             <CreditCard className="w-4 h-4 mr-2" />
-            Desbloquear Agora
+            {language === 'en' ? 'Unlock Now' : 'Desbloquear Agora'}
           </Button>
         </div>
 

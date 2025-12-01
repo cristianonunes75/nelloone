@@ -21,30 +21,44 @@ export const CartSummary = ({ tests }: CartSummaryProps) => {
   const { language } = useLanguage();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const cartInfo = calculateCartTotal(tests, selectedTests);
-  const isEN = language === "en";
-  const currency = isEN ? "$" : "R$";
+  // ANTI-CROSSTRADE: Use correct currency based on language
+  const currency = language === "en" ? "usd" : "brl";
+  const currencySymbol = language === "en" ? "$" : "R$";
+  
+  const cartInfo = calculateCartTotal(tests, selectedTests, currency);
 
   if (selectedTests.length === 0) return null;
 
   const handleCheckout = async () => {
     setIsProcessing(true);
     try {
+      // ANTI-CROSSTRADE: Pass both language and explicit currency
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { 
           testIds: selectedTests,
-          language: language // Pass language for currency selection
+          language: language,
+          currency: currency, // Explicit currency for validation
         }
       });
 
       if (error) throw error;
+
+      // Handle cross-trade block
+      if (data?.code === "CURRENCY_MISMATCH") {
+        toast({
+          title: language === 'en' ? "Currency Error" : "Erro de Moeda",
+          description: data.error,
+          variant: "destructive",
+        });
+        return;
+      }
 
       if (data?.url) {
         window.open(data.url, '_blank');
       }
     } catch (error: any) {
       toast({
-        title: isEN ? "Payment error" : "Erro ao processar pagamento",
+        title: language === "en" ? "Payment error" : "Erro ao processar pagamento",
         description: error.message,
         variant: "destructive",
       });
@@ -60,9 +74,9 @@ export const CartSummary = ({ tests }: CartSummaryProps) => {
           <ShoppingCart className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h3 className="font-semibold">{isEN ? "Shopping Cart" : "Carrinho de Compras"}</h3>
+          <h3 className="font-semibold">{language === 'en' ? "Shopping Cart" : "Carrinho de Compras"}</h3>
           <p className="text-sm text-muted-foreground">
-            {cartInfo.quantity} {isEN 
+            {cartInfo.quantity} {language === 'en'
               ? (cartInfo.quantity === 1 ? 'test selected' : 'tests selected')
               : (cartInfo.quantity === 1 ? 'teste selecionado' : 'testes selecionados')
             }
@@ -73,28 +87,28 @@ export const CartSummary = ({ tests }: CartSummaryProps) => {
       <div className="space-y-2 mb-4">
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Subtotal</span>
-          <span>{currency} {cartInfo.subtotal.toFixed(2)}</span>
+          <span>{currencySymbol} {cartInfo.subtotal.toFixed(2)}</span>
         </div>
         
         {cartInfo.discountPercentage > 0 && (
           <div className="flex justify-between text-sm items-center">
             <span className="flex items-center gap-1 text-green-600">
               <Sparkles className="w-3 h-3" />
-              {isEN ? `Discount (${cartInfo.discountPercentage}%)` : `Desconto (${cartInfo.discountPercentage}%)`}
+              {language === 'en' ? `Discount (${cartInfo.discountPercentage}%)` : `Desconto (${cartInfo.discountPercentage}%)`}
             </span>
-            <span className="text-green-600 font-medium">-{currency} {cartInfo.discount.toFixed(2)}</span>
+            <span className="text-green-600 font-medium">-{currencySymbol} {cartInfo.discount.toFixed(2)}</span>
           </div>
         )}
         
         <div className="border-t pt-2 flex justify-between font-bold">
           <span>Total</span>
-          <span className="text-primary">{currency} {cartInfo.total.toFixed(2)}</span>
+          <span className="text-primary">{currencySymbol} {cartInfo.total.toFixed(2)}</span>
         </div>
       </div>
 
       {cartInfo.quantity >= 3 && cartInfo.quantity < 5 && (
         <div className="mb-3 p-2 bg-accent/50 rounded-lg text-xs text-center">
-          {isEN 
+          {language === 'en'
             ? "💡 Buy 2 more tests and get 10% off!"
             : "💡 Compre mais 2 testes e ganhe 10% de desconto!"
           }
@@ -108,7 +122,7 @@ export const CartSummary = ({ tests }: CartSummaryProps) => {
           onClick={clearCart}
           className="flex-1"
         >
-          {isEN ? "Clear" : "Limpar"}
+          {language === 'en' ? "Clear" : "Limpar"}
         </Button>
         <Button
           onClick={handleCheckout}
@@ -116,8 +130,8 @@ export const CartSummary = ({ tests }: CartSummaryProps) => {
           className="flex-1"
         >
           {isProcessing 
-            ? (isEN ? "Processing..." : "Processando...") 
-            : (isEN ? "Checkout" : "Finalizar Compra")
+            ? (language === 'en' ? "Processing..." : "Processando...") 
+            : (language === 'en' ? "Checkout" : "Finalizar Compra")
           }
         </Button>
       </div>
