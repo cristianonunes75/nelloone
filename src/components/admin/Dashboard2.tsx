@@ -94,40 +94,40 @@ export const Dashboard2 = () => {
       value: stats.totalUsers.toString(),
       subtitle: "total cadastrados",
       icon: Users,
-      gradient: "from-blue-500/10 to-blue-600/5",
-      iconColor: "text-blue-600",
+      bgClass: "bg-bruma/50",
+      iconClass: "bg-ink/10 text-ink",
     },
     {
       title: "Testes Hoje",
       value: stats.testsCompletedToday.toString(),
       subtitle: "concluídos",
       icon: FileText,
-      gradient: "from-emerald-500/10 to-emerald-600/5",
-      iconColor: "text-emerald-600",
+      bgClass: "bg-lavender/50",
+      iconClass: "bg-ink/10 text-ink",
     },
     {
       title: "Vendas",
       value: `R$ ${stats.salesLast7Days.toFixed(0)}`,
       subtitle: "últimos 7 dias",
       icon: DollarSign,
-      gradient: "from-violet-500/10 to-violet-600/5",
-      iconColor: "text-violet-600",
+      bgClass: "bg-bruma-deep/30",
+      iconClass: "bg-ink/10 text-ink",
     },
     {
       title: "Conclusão",
       value: `${stats.journeyCompletionRate}%`,
       subtitle: "taxa da jornada",
       icon: Target,
-      gradient: "from-amber-500/10 to-amber-600/5",
-      iconColor: "text-amber-600",
+      bgClass: "bg-lavender-deep/30",
+      iconClass: "bg-ink/10 text-ink",
     },
     {
       title: "Mapas",
       value: stats.mapasGenerated.toString(),
-      subtitle: "da Essência gerados",
+      subtitle: "NELLO ONE gerados",
       icon: Sparkles,
-      gradient: "from-rose-500/10 to-rose-600/5",
-      iconColor: "text-rose-600",
+      bgClass: "bg-bruma/60",
+      iconClass: "bg-ink/10 text-ink",
     },
   ];
 
@@ -135,24 +135,24 @@ export const Dashboard2 = () => {
     <div className="space-y-6 md:space-y-8 max-w-6xl">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground text-xs md:text-sm">Visão geral do Essentia 2.0</p>
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-ink">Dashboard</h1>
+        <p className="text-muted-foreground text-xs md:text-sm">Visão geral do NELLO ONE</p>
       </div>
 
-      {/* Stats Grid - Apple Style - Responsive */}
+      {/* Stats Grid - NELLO ONE Style */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
         {statCards.map((stat, index) => (
           <Card 
             key={index} 
-            className={`p-4 md:p-5 border-0 shadow-sm bg-gradient-to-br ${stat.gradient} hover:shadow-md transition-shadow`}
+            className={`p-4 md:p-5 border-0 shadow-soft ${stat.bgClass} hover:shadow-medium transition-all duration-300 rounded-2xl`}
           >
             <div className="flex items-start justify-between mb-2 md:mb-3">
-              <div className={`p-1.5 md:p-2 rounded-lg bg-background/80 ${stat.iconColor}`}>
-                <stat.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <div className={`p-1.5 md:p-2 rounded-xl ${stat.iconClass}`}>
+                <stat.icon className="w-3.5 h-3.5 md:w-4 md:h-4" strokeWidth={1.5} />
               </div>
             </div>
             <div>
-              <p className="text-xl md:text-2xl font-semibold tracking-tight">
+              <p className="text-xl md:text-2xl font-semibold tracking-tight text-ink">
                 {loading ? "—" : stat.value}
               </p>
               <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">{stat.subtitle}</p>
@@ -162,47 +162,47 @@ export const Dashboard2 = () => {
       </div>
 
       {/* Quick Actions */}
-      <Card className="p-4 md:p-6 border-border/50">
+      <Card className="p-4 md:p-6 border-border/40 rounded-2xl shadow-soft">
         <h3 className="text-xs md:text-sm font-medium text-muted-foreground mb-3 md:mb-4">Ações Rápidas</h3>
         <div className="flex flex-col sm:flex-row flex-wrap gap-2 md:gap-3">
           <Button 
             variant="outline" 
-            className="gap-2 w-full sm:w-auto justify-center"
+            className="gap-2 w-full sm:w-auto justify-center rounded-xl border-border/60 hover:bg-bruma hover:border-bruma-deep transition-colors"
             onClick={() => navigate("/cliente")}
           >
-            <Eye className="w-4 h-4" />
+            <Eye className="w-4 h-4" strokeWidth={1.5} />
             Ver como Cliente
           </Button>
           <Button 
             variant="outline" 
-            className="gap-2 w-full sm:w-auto justify-center"
+            className="gap-2 w-full sm:w-auto justify-center rounded-xl border-border/60 hover:bg-bruma hover:border-bruma-deep transition-colors"
             onClick={() => navigate("/admin/usuarios")}
           >
-            <Users className="w-4 h-4" />
+            <Users className="w-4 h-4" strokeWidth={1.5} />
             Gerenciar Usuários
           </Button>
           <Button 
             variant="outline" 
-            className="gap-2 w-full sm:w-auto justify-center"
+            className="gap-2 w-full sm:w-auto justify-center rounded-xl border-border/60 hover:bg-bruma hover:border-bruma-deep transition-colors"
             onClick={() => navigate("/admin/tools")}
           >
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="w-4 h-4" strokeWidth={1.5} />
             Admin Tools
           </Button>
         </div>
       </Card>
 
-      {/* Info Card */}
-      <Card className="p-4 md:p-6 bg-primary/5 border-primary/10">
+      {/* Info Card - NELLO ONE branded */}
+      <Card className="p-4 md:p-6 bg-ink/5 border-ink/10 rounded-2xl">
         <div className="flex items-start gap-3 md:gap-4">
-          <div className="p-1.5 md:p-2 rounded-lg bg-primary/10">
-            <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+          <div className="p-1.5 md:p-2 rounded-xl bg-ink/10">
+            <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-ink" strokeWidth={1.5} />
           </div>
           <div>
-            <h3 className="font-medium text-sm md:text-base mb-1">Essentia 2.0</h3>
+            <h3 className="font-medium text-sm md:text-base mb-1 text-ink">NELLO ONE</h3>
             <p className="text-xs md:text-sm text-muted-foreground">
-              Painel administrativo redesenhado com foco em simplicidade e eficiência. 
-              Todas as ações são registradas para auditoria.
+              Painel administrativo com foco em clareza e simplicidade. 
+              O caminho começa dentro.
             </p>
           </div>
         </div>
