@@ -11,6 +11,79 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-CHECKOUT] ${step}`, details ? JSON.stringify(details) : '');
 };
 
+// Get client IP from request
+function getClientIP(req: Request): string {
+  // Try Cloudflare header first
+  const cfIP = req.headers.get("cf-connecting-ip");
+  if (cfIP) return cfIP;
+  
+  // Try X-Forwarded-For
+  const xForwardedFor = req.headers.get("x-forwarded-for");
+  if (xForwardedFor) {
+    return xForwardedFor.split(",")[0].trim();
+  }
+  
+  // Try X-Real-IP
+  const xRealIP = req.headers.get("x-real-ip");
+  if (xRealIP) return xRealIP;
+  
+  return "unknown";
+}
+
+// Detect country from IP using ip-api.com (free, no key required)
+async function getCountryFromIP(ip: string): Promise<string | null> {
+  if (ip === "unknown" || ip === "127.0.0.1" || ip.startsWith("192.168.") || ip.startsWith("10.")) {
+    logStep("Local IP detected, skipping geo check", { ip });
+    return null; // Skip validation for local/development IPs
+  }
+  
+  try {
+    const response = await fetch(`http://ip-api.com/json/${ip}?fields=status,countryCode`);
+    const data = await response.json();
+    
+    if (data.status === "success") {
+      logStep("IP geolocation successful", { ip, country: data.countryCode });
+      return data.countryCode;
+    }
+    
+    logStep("IP geolocation failed", { ip, status: data.status });
+    return null;
+  } catch (error) {
+    logStep("IP geolocation error", { ip, error: error instanceof Error ? error.message : String(error) });
+    return null;
+  }
+}
+
+// Validate IP country matches currency (Anti-CrossTrade Protection)
+function validateIPForCurrency(country: string | null, currency: string): { valid: boolean; reason?: string } {
+  // Skip validation if country detection failed
+  if (!country) {
+    logStep("Country detection failed, allowing transaction");
+    return { valid: true };
+  }
+  
+  // BRL can only be used from Brazil
+  if (currency === "brl" && country !== "BR") {
+    logStep("BLOCKED: BRL purchase from non-Brazilian IP", { country, currency });
+    return { 
+      valid: false, 
+      reason: "BRL_FROM_NON_BRAZIL"
+    };
+  }
+  
+  // USD cannot be used from Brazil
+  if (currency === "usd" && country === "BR") {
+    logStep("BLOCKED: USD purchase from Brazilian IP", { country, currency });
+    return { 
+      valid: false, 
+      reason: "USD_FROM_BRAZIL"
+    };
+  }
+  
+  logStep("IP country validation passed", { country, currency });
+  return { valid: true };
+}
+
 // Currency validation error messages
 const CURRENCY_ERROR_MESSAGES = {
   pt: "Você está tentando finalizar uma compra em moeda diferente da sua região. Acesse a versão correta do site.",
@@ -87,6 +160,35 @@ serve(async (req) => {
     
     const currency = validation.expectedCurrency;
     logStep("Currency validated", { language, currency });
+    
+    // IP-BASED CURRENCY PROTECTION: Validate IP country matches currency
+    const clientIP = getClientIP(req);
+    logStep("Client IP detected", { ip: clientIP });
+    
+    const ipCountry = await getCountryFromIP(clientIP);
+    const ipValidation = validateIPForCurrency(ipCountry, currency);
+    
+    if (!ipValidation.valid) {
+      const errorMessage = language === "pt"
+        ? "Sua localização não corresponde à moeda selecionada. Por favor, acesse a versão correta do site para sua região."
+        : "Your location does not match the selected currency. Please access the correct version of the site for your region.";
+      
+      logStep("BLOCKED: IP-currency mismatch", { 
+        ip: clientIP, 
+        country: ipCountry, 
+        currency, 
+        reason: ipValidation.reason 
+      });
+      
+      return new Response(JSON.stringify({ 
+        error: errorMessage,
+        code: "IP_CURRENCY_MISMATCH",
+        reason: ipValidation.reason,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 403,
+      });
+    }
     
     // Support both single test (legacy) and multiple tests (new)
     let testIds: string[];
