@@ -9,7 +9,6 @@ import {
   Route,
   Wrench,
   FlaskConical,
-  ChevronDown
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -70,19 +69,27 @@ export function AdminSidebar() {
 
   const getNavCls = (active: boolean) =>
     cn(
-      "transition-all duration-200 rounded-lg",
+      "transition-all duration-200 rounded-xl",
       active 
-        ? "bg-primary/10 text-primary font-medium" 
-        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+        ? "bg-ink text-primary-foreground font-medium shadow-sm" 
+        : "text-muted-foreground hover:bg-bruma hover:text-ink"
     );
 
   return (
-    <Sidebar className={cn("border-r border-border/50", open ? "w-64" : "w-16")} collapsible="icon">
+    <Sidebar className={cn("border-r border-border/40 bg-background", open ? "w-64" : "w-16")} collapsible="icon">
       <SidebarContent className="py-6 px-3">
+        {/* Logo area when expanded */}
+        {open && (
+          <div className="px-3 mb-8">
+            <h2 className="text-lg font-semibold tracking-tight text-ink">NELLO ONE</h2>
+            <p className="text-[10px] text-muted-foreground mt-0.5">Painel Administrativo</p>
+          </div>
+        )}
+
         {menuSections.map((section, sectionIndex) => (
           <SidebarGroup key={section.label} className={sectionIndex > 0 ? "mt-6" : ""}>
             {open && (
-              <SidebarGroupLabel className="px-3 text-[10px] font-semibold tracking-widest text-muted-foreground/60 uppercase mb-2">
+              <SidebarGroupLabel className="px-3 text-[10px] font-semibold tracking-widest text-muted-foreground/50 uppercase mb-2">
                 {section.label}
               </SidebarGroupLabel>
             )}
@@ -96,7 +103,7 @@ export function AdminSidebar() {
                         end={item.exact}
                         className={({ isActive }) => getNavCls(isActive)}
                       >
-                        <item.icon className="w-4 h-4 shrink-0" />
+                        <item.icon className="w-4 h-4 shrink-0" strokeWidth={1.5} />
                         {open && <span className="ml-3 text-sm">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>

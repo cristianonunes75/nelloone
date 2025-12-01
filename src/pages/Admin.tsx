@@ -4,8 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
-import logo from "@/assets/logo.png";
-import { Shield, Loader2, Menu } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 
 // Lazy load modules
@@ -38,17 +37,20 @@ const Admin = () => {
         <AdminSidebar />
         
         <div className="flex-1 flex flex-col">
-          {/* Header minimalista Apple-style */}
-          <header className="h-14 border-b border-border/50 flex items-center justify-between px-6 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+          {/* Header minimalista NELLO ONE style */}
+          <header className="h-14 border-b border-border/40 flex items-center justify-between px-6 bg-background/90 backdrop-blur-xl sticky top-0 z-50">
             <div className="flex items-center gap-4">
-              <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
-              <div className="h-5 w-px bg-border" />
-              <img src={logo} alt="Essentia" className="h-6 opacity-80" />
+              <SidebarTrigger className="text-muted-foreground hover:text-ink transition-colors" />
+              <div className="h-5 w-px bg-border/60" />
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold tracking-tight text-ink">NELLO ONE</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-bruma text-ink/70 font-medium">Admin</span>
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <RoleSwitcher />
-              <div className="h-5 w-px bg-border" />
-              <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground hover:text-foreground">
+              <div className="h-5 w-px bg-border/60" />
+              <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground hover:text-ink transition-colors">
                 Sair
               </Button>
             </div>
