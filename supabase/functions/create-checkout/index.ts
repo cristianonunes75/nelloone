@@ -11,7 +11,13 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-CHECKOUT] ${step}`, details ? JSON.stringify(details) : '');
 };
 
-// USD Price IDs for EN version
+// Currency validation error messages
+const CURRENCY_ERROR_MESSAGES = {
+  pt: "Você está tentando finalizar uma compra em moeda diferente da sua região. Acesse a versão correta do site.",
+  en: "You are trying to complete a purchase in a different currency than your region. Please access the correct version of the site.",
+};
+
+// USD Price IDs for EN version (Global market)
 const USD_PRICES: Record<string, string> = {
   arquetipos: "price_1SZNW0DjhZZxZELMopbi37cc",
   disc: "price_1SZNWgDjhZZxZELMoEGJMpRt",
@@ -23,12 +29,26 @@ const USD_PRICES: Record<string, string> = {
   bundle: "price_1SZNYXDjhZZxZELMoGVJUZRP",
 };
 
-// BRL Price IDs for PT version
+// BRL Price IDs for PT version (Brazilian market)
 const BRL_PRICES: Record<string, string> = {
   disc: "price_1SNBIuDjhZZxZELMm3qUtTON",
   mbti: "price_1SNBJEDjhZZxZELMY1CuVfIZ",
   eneagrama: "price_1SNBLhDjhZZxZELMhSvpHn8X",
 };
+
+// Validate currency matches language (Anti-CrossTrade Protection)
+function validateCurrencyForLanguage(language: string, requestedCurrency?: string): { valid: boolean; expectedCurrency: string } {
+  const expectedCurrency = language === "en" ? "usd" : "brl";
+  
+  // If no currency specified, use the expected one
+  if (!requestedCurrency) {
+    return { valid: true, expectedCurrency };
+  }
+  
+  // Validate currency matches language
+  const valid = requestedCurrency.toLowerCase() === expectedCurrency;
+  return { valid, expectedCurrency };
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -47,9 +67,26 @@ serve(async (req) => {
     
     // Get language/currency from request (defaults to PT/BRL)
     const language = body.language || "pt";
-    const currency = language === "en" ? "usd" : "brl";
+    const requestedCurrency = body.currency; // Optional: explicit currency from frontend
     
-    logStep("Currency detected", { language, currency });
+    // ANTI-CROSSTRADE PROTECTION: Validate currency matches language
+    const validation = validateCurrencyForLanguage(language, requestedCurrency);
+    if (!validation.valid) {
+      const errorMessage = CURRENCY_ERROR_MESSAGES[language as keyof typeof CURRENCY_ERROR_MESSAGES] || CURRENCY_ERROR_MESSAGES.en;
+      logStep("BLOCKED: Cross-trade attempt detected", { language, requestedCurrency, expected: validation.expectedCurrency });
+      return new Response(JSON.stringify({ 
+        error: errorMessage,
+        code: "CURRENCY_MISMATCH",
+        expected: validation.expectedCurrency,
+        received: requestedCurrency,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+    
+    const currency = validation.expectedCurrency;
+    logStep("Currency validated", { language, currency });
     
     // Support both single test (legacy) and multiple tests (new)
     let testIds: string[];

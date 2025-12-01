@@ -8,6 +8,8 @@ import { TestimonialsSection } from "@/components/landing/v2/TestimonialsSection
 import { PricingSection } from "@/components/landing/v2/PricingSection";
 import { CTASection } from "@/components/landing/v2/CTASection";
 import { FooterSection } from "@/components/landing/v2/FooterSection";
+import { FAQSection } from "@/components/landing/v2/FAQSection";
+import { ValuePropositionSection } from "@/components/landing/v2/ValuePropositionSection";
 import { MiguelAgent } from "@/components/MiguelAgent";
 
 const Landing = () => {
@@ -16,6 +18,7 @@ const Landing = () => {
       <NavSection />
       <HeroSection />
       <WhyItMattersSection />
+      <ValuePropositionSection />
       <div id="jornada">
         <MiguelSection />
       </div>
@@ -25,6 +28,7 @@ const Landing = () => {
       <EssenceMapSection />
       <TestimonialsSection />
       <PricingSection />
+      <FAQSection />
       <CTASection />
       <FooterSection />
       <MiguelAgent location="landing" />

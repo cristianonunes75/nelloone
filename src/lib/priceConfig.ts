@@ -1,4 +1,7 @@
 // Price configuration for NELLO ONE - BRL (Brazil) and USD (Global)
+// ANTI-CROSSTRADE: Prices are strictly tied to locale (/en = USD, /pt = BRL)
+
+export type Currency = 'BRL' | 'USD';
 
 export interface TestPrice {
   testType: string;
@@ -13,6 +16,7 @@ export interface TestPrice {
 }
 
 // Stripe Price IDs for each test by currency
+// PT routes MUST use BRL prices | EN routes MUST use USD prices
 export const testPrices: Record<string, TestPrice> = {
   arquetipos: {
     testType: "arquetipos",
@@ -51,32 +55,56 @@ export const testPrices: Record<string, TestPrice> = {
   },
 };
 
-// Bundle prices
+// Bundle prices - FULL JOURNEY
 export const bundlePrices = {
   brl: {
     original: 862,
     price: 597,
     priceId: null, // Create if needed
-    currency: "BRL",
+    currency: "BRL" as Currency,
     symbol: "R$",
   },
   usd: {
     original: 147,
     price: 97,
     priceId: "price_1SZNYXDjhZZxZELMoGVJUZRP",
-    currency: "USD",
+    currency: "USD" as Currency,
     symbol: "$",
   },
 };
 
-// Helper to get price based on language
+// ANTI-CROSSTRADE: Get currency based on language
+export const getCurrencyForLanguage = (language: "pt" | "en"): Currency => {
+  return language === "en" ? "USD" : "BRL";
+};
+
+// ANTI-CROSSTRADE: Validate that currency matches language
+export const validateCurrencyMatch = (
+  language: "pt" | "en",
+  currency: Currency
+): { valid: boolean; expectedCurrency: Currency; error?: string } => {
+  const expectedCurrency = getCurrencyForLanguage(language);
+  const valid = currency === expectedCurrency;
+  
+  return {
+    valid,
+    expectedCurrency,
+    error: valid ? undefined : (
+      language === "en"
+        ? "Currency mismatch. EN routes must use USD."
+        : "Moeda incorreta. Rotas PT devem usar BRL."
+    ),
+  };
+};
+
+// Helper to get price based on language (ANTI-CROSSTRADE compliant)
 export const getPriceForLanguage = (testType: string, language: "pt" | "en") => {
   const test = testPrices[testType];
   if (!test) return null;
   return language === "en" ? test.usd : test.brl;
 };
 
-// Helper to get bundle price based on language
+// Helper to get bundle price based on language (ANTI-CROSSTRADE compliant)
 export const getBundlePriceForLanguage = (language: "pt" | "en") => {
   return language === "en" ? bundlePrices.usd : bundlePrices.brl;
 };
@@ -97,4 +125,16 @@ export const getPriceIdsForCurrency = (currency: "brl" | "usd") => {
     if (priceId) priceIds.push(priceId);
   });
   return priceIds;
+};
+
+// ANTI-CROSSTRADE: Get price ID strictly based on language
+export const getStrictPriceId = (
+  testType: string,
+  language: "pt" | "en"
+): string | null => {
+  const test = testPrices[testType];
+  if (!test) return null;
+  
+  // Strict enforcement: language determines currency
+  return language === "en" ? test.usd.priceId : test.brl.priceId;
 };
