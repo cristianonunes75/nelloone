@@ -388,20 +388,67 @@ export const SimulationMode = () => {
     if (!simulationResult) return;
     
     setLoadingMiguel(true);
+    setMiguelResponse("");
+    
     try {
-      const { data, error } = await supabase.functions.invoke("miguel-agent", {
-        body: {
-          message: `Analise este resultado de teste simulado e forneça insights detalhados: ${JSON.stringify(simulationResult)}`,
-          context: "simulation_analysis",
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/miguel-agent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            context: "analise_simulacao_admin",
+            simulationResult: simulationResult,
+          }),
+        }
+      );
 
-      if (error) throw error;
-      setMiguelResponse(data?.response || "Sem resposta do Miguel");
+      if (!response.ok) {
+        throw new Error("Erro na resposta do Miguel");
+      }
+
+      // Handle streaming response
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let fullText = "";
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split("\n");
+
+          for (const line of lines) {
+            if (line.startsWith("data: ") && line !== "data: [DONE]") {
+              try {
+                const jsonStr = line.slice(6).trim();
+                if (jsonStr && jsonStr !== "[DONE]") {
+                  const parsed = JSON.parse(jsonStr);
+                  const content = parsed.choices?.[0]?.delta?.content;
+                  if (content) {
+                    fullText += content;
+                    setMiguelResponse(fullText);
+                  }
+                }
+              } catch {
+                // Ignore parse errors for incomplete chunks
+              }
+            }
+          }
+        }
+      }
+
+      if (!fullText) {
+        setMiguelResponse("Não consegui analisar esta simulação agora. Tente novamente.");
+      }
     } catch (error) {
       console.error("Miguel error:", error);
-      toast.error("Erro ao consultar Miguel");
-      setMiguelResponse("Erro ao processar análise");
+      setMiguelResponse("Não consegui analisar esta simulação agora. Tente novamente.");
     } finally {
       setLoadingMiguel(false);
     }
@@ -948,26 +995,37 @@ export const SimulationMode = () => {
               </div>
               <div className="flex-1">
                 <h3 className="font-medium mb-2">Insight do Miguel</h3>
-                {miguelResponse ? (
-                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                    {miguelResponse}
-                  </p>
+                {loadingMiguel && !miguelResponse ? (
+                  <div className="flex items-center gap-3">
+                    <Loader2 className="w-4 h-4 animate-spin text-accent" />
+                    <p className="text-sm text-muted-foreground">
+                      Miguel está analisando a simulação…
+                    </p>
+                  </div>
+                ) : miguelResponse ? (
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                      {miguelResponse}
+                    </p>
+                    {loadingMiguel && (
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground/70">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        <span>Gerando análise...</span>
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <div>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Consulte Miguel para uma análise personalizada do seu resultado.
+                      Consulte Miguel para uma análise personalizada do resultado simulado.
                     </p>
                     <Button 
                       onClick={askMiguel} 
                       disabled={loadingMiguel}
                       className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-xl h-10"
                     >
-                      {loadingMiguel ? (
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      ) : (
-                        <MessageSquare className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                      )}
-                      Consultar Miguel
+                      <MessageSquare className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                      Análise do Miguel
                     </Button>
                   </div>
                 )}

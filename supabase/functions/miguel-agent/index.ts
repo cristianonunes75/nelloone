@@ -78,7 +78,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, context, userName } = await req.json();
+    const { messages, context, userName, simulationResult } = await req.json();
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -88,7 +88,33 @@ serve(async (req) => {
     // Build context-aware system prompt
     let contextualPrompt = MIGUEL_SYSTEM_PROMPT;
     
-    if (context) {
+    // Handle simulation analysis for admin (uses onboarding subprompt style)
+    if (context === "analise_simulacao_admin" && simulationResult) {
+      contextualPrompt = `${MIGUEL_SYSTEM_PROMPT}
+
+CONTEXTO: Você está analisando uma SIMULAÇÃO de teste realizada por um administrador do sistema.
+
+Este é o resultado simulado do teste:
+${JSON.stringify(simulationResult, null, 2)}
+
+Sua tarefa é analisar este resultado como se fosse de um usuário real e fornecer:
+
+1. **Interpretação Geral**: Uma visão acolhedora e humana do que este resultado revela sobre a pessoa
+2. **Pontos Fortes Identificados**: 2-3 características positivas que se destacam
+3. **Áreas de Atenção**: 1-2 aspectos que merecem reflexão ou desenvolvimento
+4. **Insight Profundo**: Uma observação mais profunda sobre o que esses padrões podem significar na vida real
+5. **Próximo Passo Sugerido**: O que essa pessoa poderia fazer para aprofundar o autoconhecimento
+
+IMPORTANTE:
+- Fale diretamente para a pessoa (use "você")
+- Seja acolhedor e encorajador
+- Não mencione que é uma simulação
+- Não mostre dados técnicos ou JSON
+- Mantenha seu tom humano, profundo e inspirador
+- Seja específico baseado nos resultados apresentados`;
+
+      console.log("[MIGUEL] Processing simulation analysis for admin");
+    } else if (context && typeof context === 'object') {
       // Special prompt for Mapa da Essência generation
       if (context.isMapGeneration && context.results) {
         contextualPrompt = `Você é Miguel, o guia espiritual do Essentia. Sua missão agora é criar o MAPA DA ESSÊNCIA completo para ${userName || 'este usuário'}.
@@ -238,7 +264,21 @@ Aqui dentro, a gente caminha junto para revelar a sua essência, com calma, clar
       }
     }
 
-    console.log("[MIGUEL] Processing request with context:", context?.location || 'unknown');
+    const contextLocation = typeof context === 'string' ? context : context?.location || 'unknown';
+    console.log("[MIGUEL] Processing request with context:", contextLocation);
+
+    // Build messages array safely
+    const chatMessages = [
+      { role: "system", content: contextualPrompt },
+    ];
+    
+    // Add user messages if provided
+    if (messages && Array.isArray(messages)) {
+      chatMessages.push(...messages);
+    } else if (context === "analise_simulacao_admin") {
+      // For simulation analysis, add a simple request message
+      chatMessages.push({ role: "user", content: "Analise este resultado de teste e me forneça insights personalizados." });
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -248,10 +288,7 @@ Aqui dentro, a gente caminha junto para revelar a sua essência, com calma, clar
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: contextualPrompt },
-          ...messages,
-        ],
+        messages: chatMessages,
         stream: true,
       }),
     });
