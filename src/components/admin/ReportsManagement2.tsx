@@ -151,74 +151,74 @@ export const ReportsManagement2 = () => {
   const totalSales = salesStats.reduce((sum, s) => sum + s.count, 0);
 
   const chartData = testStats.map(t => ({
-    name: t.testName.length > 15 ? t.testName.substring(0, 15) + '...' : t.testName,
+    name: t.testName.length > 12 ? t.testName.substring(0, 12) + '...' : t.testName,
     value: t.completedCount
   }));
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-4 md:space-y-6 max-w-6xl px-4 md:px-0">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-          <BarChart3 className="w-6 h-6" />
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight flex items-center gap-2">
+          <BarChart3 className="w-5 h-5 md:w-6 md:h-6" />
           Relatórios
         </h1>
-        <p className="text-muted-foreground text-sm">Métricas e análises do Essentia</p>
+        <p className="text-muted-foreground text-xs md:text-sm">Métricas e análises do Essentia</p>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="p-4 border-border/50">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-500/10">
+      {/* Summary Cards - Mobile optimized grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+        <Card className="p-3 md:p-4 border-border/50">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+            <div className="p-2 rounded-lg bg-blue-500/10 w-fit">
               <FileText className="w-4 h-4 text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-semibold">{totalCompleted}</p>
-              <p className="text-xs text-muted-foreground">Testes Concluídos</p>
+              <p className="text-xl md:text-2xl font-semibold">{totalCompleted}</p>
+              <p className="text-xs text-muted-foreground">Testes</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 border-border/50">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-emerald-500/10">
+        <Card className="p-3 md:p-4 border-border/50">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+            <div className="p-2 rounded-lg bg-emerald-500/10 w-fit">
               <TrendingUp className="w-4 h-4 text-emerald-600" />
             </div>
             <div>
-              <p className="text-2xl font-semibold">{totalSales}</p>
+              <p className="text-xl md:text-2xl font-semibold">{totalSales}</p>
               <p className="text-xs text-muted-foreground">Vendas</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 border-border/50">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-violet-500/10">
+        <Card className="p-3 md:p-4 border-border/50">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+            <div className="p-2 rounded-lg bg-violet-500/10 w-fit">
               <DollarSign className="w-4 h-4 text-violet-600" />
             </div>
             <div>
-              <p className="text-2xl font-semibold">R$ {totalRevenue.toFixed(0)}</p>
-              <p className="text-xs text-muted-foreground">Receita Total</p>
+              <p className="text-xl md:text-2xl font-semibold">R$ {totalRevenue.toFixed(0)}</p>
+              <p className="text-xs text-muted-foreground">Receita</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 border-border/50">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-rose-500/10">
+        <Card className="p-3 md:p-4 border-border/50">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+            <div className="p-2 rounded-lg bg-rose-500/10 w-fit">
               <Map className="w-4 h-4 text-rose-600" />
             </div>
             <div>
-              <p className="text-2xl font-semibold">{mapasCount}</p>
-              <p className="text-xs text-muted-foreground">Mapas Gerados</p>
+              <p className="text-xl md:text-2xl font-semibold">{mapasCount}</p>
+              <p className="text-xs text-muted-foreground">Mapas</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 border-border/50">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-amber-500/10">
+        <Card className="p-3 md:p-4 border-border/50 col-span-2 md:col-span-1">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+            <div className="p-2 rounded-lg bg-amber-500/10 w-fit">
               <Users className="w-4 h-4 text-amber-600" />
             </div>
             <div>
-              <p className="text-2xl font-semibold">{totalSales > 0 ? (totalRevenue / totalSales).toFixed(0) : 0}</p>
+              <p className="text-xl md:text-2xl font-semibold">R$ {totalSales > 0 ? (totalRevenue / totalSales).toFixed(0) : 0}</p>
               <p className="text-xs text-muted-foreground">Ticket Médio</p>
             </div>
           </div>
@@ -226,31 +226,32 @@ export const ReportsManagement2 = () => {
       </div>
 
       <Tabs defaultValue="weekly" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="weekly">Vendas Semanais</TabsTrigger>
-          <TabsTrigger value="tests">Por Teste</TabsTrigger>
-          <TabsTrigger value="revenue">Receita</TabsTrigger>
+        <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex">
+          <TabsTrigger value="weekly" className="text-xs md:text-sm">Semanal</TabsTrigger>
+          <TabsTrigger value="tests" className="text-xs md:text-sm">Por Teste</TabsTrigger>
+          <TabsTrigger value="revenue" className="text-xs md:text-sm">Receita</TabsTrigger>
         </TabsList>
 
         {/* Weekly Chart */}
         <TabsContent value="weekly">
           <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg">Vendas por Semana</CardTitle>
-              <CardDescription>Últimos 7 dias</CardDescription>
+            <CardHeader className="pb-2 md:pb-6">
+              <CardTitle className="text-base md:text-lg">Vendas por Semana</CardTitle>
+              <CardDescription className="text-xs md:text-sm">Últimos 7 dias</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-64">
+              <div className="h-48 md:h-64 -ml-4 md:ml-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={weeklyData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="day" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
-                    <YAxis tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                    <XAxis dataKey="day" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" width={40} />
                     <Tooltip 
                       contentStyle={{ 
                         background: 'hsl(var(--card))', 
                         border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px'
+                        borderRadius: '8px',
+                        fontSize: '12px'
                       }} 
                     />
                     <Bar dataKey="sales" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Vendas (R$)" />
@@ -264,29 +265,50 @@ export const ReportsManagement2 = () => {
         {/* Tests Chart */}
         <TabsContent value="tests">
           <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg">Conclusões por Teste</CardTitle>
-              <CardDescription>Total de testes completados</CardDescription>
+            <CardHeader className="pb-2 md:pb-6">
+              <CardTitle className="text-base md:text-lg">Conclusões por Teste</CardTitle>
+              <CardDescription className="text-xs md:text-sm">Total de testes completados</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-64">
+              <div className="h-48 md:h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={chartData}
                       cx="50%"
                       cy="50%"
-                      outerRadius={80}
+                      outerRadius={60}
+                      innerRadius={30}
                       dataKey="value"
-                      label={({ name, value }) => `${name}: ${value}`}
+                      label={({ name, value }) => `${value}`}
+                      labelLine={false}
                     >
                       {chartData.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip 
+                      contentStyle={{ 
+                        fontSize: '12px',
+                        background: 'hsl(var(--card))', 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
+              </div>
+              {/* Legend for mobile */}
+              <div className="flex flex-wrap justify-center gap-2 mt-4">
+                {chartData.map((item, index) => (
+                  <div key={index} className="flex items-center gap-1.5">
+                    <div 
+                      className="w-2.5 h-2.5 rounded-full" 
+                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    />
+                    <span className="text-xs text-muted-foreground">{item.name}</span>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -295,28 +317,30 @@ export const ReportsManagement2 = () => {
         {/* Revenue List */}
         <TabsContent value="revenue">
           <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg">Receita por Teste</CardTitle>
-              <CardDescription>Vendas e receita gerada</CardDescription>
+            <CardHeader className="pb-2 md:pb-6">
+              <CardTitle className="text-base md:text-lg">Receita por Teste</CardTitle>
+              <CardDescription className="text-xs md:text-sm">Vendas e receita gerada</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="space-y-2 md:space-y-3">
                 {salesStats.map((sale, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Badge variant="outline" className="w-6 h-6 rounded-full flex items-center justify-center p-0 text-xs">
+                  <div key={i} className="flex items-center justify-between p-2.5 md:p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <Badge variant="outline" className="w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center p-0 text-xs shrink-0">
                         {i + 1}
                       </Badge>
-                      <div>
-                        <p className="font-medium text-sm">{sale.planName}</p>
+                      <div className="min-w-0">
+                        <p className="font-medium text-xs md:text-sm truncate">{sale.planName}</p>
                         <p className="text-xs text-muted-foreground">{sale.count} vendas</p>
                       </div>
                     </div>
-                    <p className="text-lg font-semibold text-emerald-600">R$ {sale.revenue.toFixed(2)}</p>
+                    <p className="text-sm md:text-lg font-semibold text-emerald-600 shrink-0">
+                      R$ {sale.revenue.toFixed(0)}
+                    </p>
                   </div>
                 ))}
                 {salesStats.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">Nenhuma venda registrada</p>
+                  <p className="text-center text-muted-foreground py-6 md:py-8 text-sm">Nenhuma venda registrada</p>
                 )}
               </div>
             </CardContent>

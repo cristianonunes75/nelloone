@@ -185,72 +185,76 @@ export const MiguelAIManagement2 = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-4 md:space-y-6 max-w-4xl px-4 md:px-0">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-          <Bot className="w-6 h-6" />
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight flex items-center gap-2">
+          <Bot className="w-5 h-5 md:w-6 md:h-6" />
           Miguel – IA
         </h1>
-        <p className="text-muted-foreground text-sm">Configure a persona, prompts e comportamento do Miguel</p>
+        <p className="text-muted-foreground text-xs md:text-sm">Configure a persona, prompts e comportamento do Miguel</p>
       </div>
 
-      <Tabs defaultValue="persona" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="persona">Identidade</TabsTrigger>
-          <TabsTrigger value="prompt">Prompt Base</TabsTrigger>
-          <TabsTrigger value="subprompts">Subprompts</TabsTrigger>
-          <TabsTrigger value="playground">Playground</TabsTrigger>
+      <Tabs defaultValue="persona" className="space-y-4 md:space-y-6">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
+          <TabsTrigger value="persona" className="text-xs md:text-sm py-2">Identidade</TabsTrigger>
+          <TabsTrigger value="prompt" className="text-xs md:text-sm py-2">Prompt</TabsTrigger>
+          <TabsTrigger value="subprompts" className="text-xs md:text-sm py-2">Subprompts</TabsTrigger>
+          <TabsTrigger value="playground" className="text-xs md:text-sm py-2">Playground</TabsTrigger>
         </TabsList>
 
         {/* Persona Tab */}
         <TabsContent value="persona" className="space-y-4">
           <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <User className="w-5 h-5" />
+            <CardHeader className="pb-3 md:pb-6">
+              <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                <User className="w-4 h-4 md:w-5 md:h-5" />
                 Identidade e Persona
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs md:text-sm">
                 Configure como Miguel se apresenta e interage com os usuários
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Título de Apresentação</Label>
+                  <Label className="text-xs md:text-sm">Título de Apresentação</Label>
                   <Input
                     value={personaTitle}
                     onChange={(e) => setPersonaTitle(e.target.value)}
                     placeholder="Miguel"
+                    className="h-10"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Tom de Voz</Label>
+                  <Label className="text-xs md:text-sm">Tom de Voz</Label>
                   <Input
                     value={personaTone}
                     onChange={(e) => setPersonaTone(e.target.value)}
                     placeholder="Acolhedor, profundo, humano"
+                    className="h-10"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Descrição Curta</Label>
+                <Label className="text-xs md:text-sm">Descrição Curta</Label>
                 <Textarea
                   value={personaDescription}
                   onChange={(e) => setPersonaDescription(e.target.value)}
                   rows={2}
+                  className="text-sm"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Mensagem de Boas-vindas</Label>
+                <Label className="text-xs md:text-sm">Mensagem de Boas-vindas</Label>
                 <Textarea
                   value={welcomeMessage}
                   onChange={(e) => setWelcomeMessage(e.target.value)}
                   rows={3}
+                  className="text-sm"
                 />
               </div>
-              <Button className="w-full">
+              <Button className="w-full h-10 md:h-11">
                 <Save className="w-4 h-4 mr-2" />
                 Salvar Identidade
               </Button>
@@ -262,32 +266,32 @@ export const MiguelAIManagement2 = () => {
         <TabsContent value="prompt" className="space-y-4">
           {editingPrompt && (
             <Card className="border-border/50">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{editingPrompt.name}</CardTitle>
+              <CardHeader className="pb-3 md:pb-6">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                  <CardTitle className="text-base md:text-lg">{editingPrompt.name}</CardTitle>
                   <Switch
                     checked={editingPrompt.is_active}
                     onCheckedChange={(checked) => setEditingPrompt({ ...editingPrompt, is_active: checked })}
                   />
                 </div>
-                <CardDescription>{editingPrompt.description}</CardDescription>
+                <CardDescription className="text-xs md:text-sm">{editingPrompt.description}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Prompt Principal</Label>
+                  <Label className="text-xs md:text-sm">Prompt Principal</Label>
                   <Textarea
                     value={editingPrompt.prompt_text}
                     onChange={(e) => setEditingPrompt({ ...editingPrompt, prompt_text: e.target.value })}
-                    rows={12}
-                    className="font-mono text-sm"
+                    rows={10}
+                    className="font-mono text-xs md:text-sm"
                   />
                 </div>
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={fetchPrompts}>
+                <div className="flex flex-col-reverse md:flex-row justify-end gap-2">
+                  <Button variant="outline" onClick={fetchPrompts} className="w-full md:w-auto">
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Resetar
                   </Button>
-                  <Button onClick={handleSavePrompt} disabled={saving}>
+                  <Button onClick={handleSavePrompt} disabled={saving} className="w-full md:w-auto">
                     {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
                     Salvar
                   </Button>
@@ -298,14 +302,14 @@ export const MiguelAIManagement2 = () => {
         </TabsContent>
 
         {/* Subprompts Tab */}
-        <TabsContent value="subprompts" className="space-y-4">
+        <TabsContent value="subprompts" className="space-y-3 md:space-y-4">
           {subprompts.map((sp) => (
             <Card key={sp.id} className="border-border/50">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <CardTitle className="text-base">{sp.name}</CardTitle>
-                    <Badge variant="outline" className={getCategoryBadge(sp.category)}>
+              <CardHeader className="pb-2 md:pb-3">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle className="text-sm md:text-base">{sp.name}</CardTitle>
+                    <Badge variant="outline" className={`text-xs ${getCategoryBadge(sp.category)}`}>
                       {sp.category}
                     </Badge>
                   </div>
@@ -325,12 +329,13 @@ export const MiguelAIManagement2 = () => {
                     setSubprompts(prev => prev.map(s => s.id === sp.id ? { ...s, prompt_text: e.target.value } : s));
                   }}
                   rows={4}
-                  className="font-mono text-sm"
+                  className="font-mono text-xs md:text-sm"
                 />
                 <div className="flex justify-end mt-3">
                   <Button 
                     size="sm" 
                     variant="outline"
+                    className="w-full md:w-auto"
                     onClick={() => handleSaveSubprompt(subprompts.find(s => s.id === sp.id) || sp)}
                   >
                     <Save className="w-3 h-3 mr-1" />
@@ -341,7 +346,7 @@ export const MiguelAIManagement2 = () => {
             </Card>
           ))}
           {subprompts.length === 0 && (
-            <Card className="p-8 text-center text-muted-foreground border-border/50">
+            <Card className="p-6 md:p-8 text-center text-muted-foreground border-border/50 text-sm">
               Nenhum subprompt cadastrado
             </Card>
           )}
@@ -350,24 +355,25 @@ export const MiguelAIManagement2 = () => {
         {/* Playground Tab */}
         <TabsContent value="playground" className="space-y-4">
           <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Sparkles className="w-5 h-5" />
+            <CardHeader className="pb-3 md:pb-6">
+              <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
                 Playground do Miguel
               </CardTitle>
-              <CardDescription>Teste prompts em tempo real</CardDescription>
+              <CardDescription className="text-xs md:text-sm">Teste prompts em tempo real</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Sua mensagem de teste</Label>
+                <Label className="text-xs md:text-sm">Sua mensagem de teste</Label>
                 <Textarea
                   placeholder="Digite uma mensagem para testar o Miguel..."
                   value={playgroundInput}
                   onChange={(e) => setPlaygroundInput(e.target.value)}
                   rows={4}
+                  className="text-sm"
                 />
               </div>
-              <Button onClick={handlePlayground} disabled={playgroundLoading} className="w-full">
+              <Button onClick={handlePlayground} disabled={playgroundLoading} className="w-full h-10 md:h-11">
                 {playgroundLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
                 ) : (
@@ -377,9 +383,9 @@ export const MiguelAIManagement2 = () => {
               </Button>
               {playgroundOutput && (
                 <div className="space-y-2">
-                  <Label>Resposta do Miguel</Label>
-                  <div className="p-4 bg-muted/50 rounded-lg border border-border/50">
-                    <p className="whitespace-pre-wrap text-sm">{playgroundOutput}</p>
+                  <Label className="text-xs md:text-sm">Resposta do Miguel</Label>
+                  <div className="p-3 md:p-4 bg-muted/50 rounded-lg border border-border/50">
+                    <p className="whitespace-pre-wrap text-xs md:text-sm">{playgroundOutput}</p>
                   </div>
                 </div>
               )}
