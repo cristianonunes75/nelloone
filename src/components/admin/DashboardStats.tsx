@@ -1,21 +1,21 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
-import { Users, Calendar, FileText, Image } from "lucide-react";
+import { Users, FileText, DollarSign, Target } from "lucide-react";
 
 interface Stats {
   totalUsers: number;
-  totalSessions: number;
-  totalTests: number;
-  totalGalleries: number;
+  testsCompletedToday: number;
+  salesLast7Days: number;
+  journeyCompletionRate: number;
 }
 
 export const DashboardStats = () => {
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
-    totalSessions: 0,
-    totalTests: 0,
-    totalGalleries: 0,
+    testsCompletedToday: 0,
+    salesLast7Days: 0,
+    journeyCompletionRate: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -25,18 +25,57 @@ export const DashboardStats = () => {
 
   const fetchStats = async () => {
     try {
-      const [usersResult, sessionsResult, testsResult, galleriesResult] = await Promise.all([
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayISO = today.toISOString();
+      
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const sevenDaysAgoISO = sevenDaysAgo.toISOString();
+
+      const [
+        usersResult,
+        testsCompletedTodayResult,
+        salesResult,
+        userTestsResult,
+      ] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }),
-        supabase.from("photo_sessions").select("id", { count: "exact", head: true }),
-        supabase.from("user_tests").select("id", { count: "exact", head: true }),
-        supabase.from("photo_galleries").select("id", { count: "exact", head: true }),
+        supabase
+          .from("user_tests")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "completed")
+          .gte("completed_at", todayISO),
+        supabase
+          .from("test_purchases")
+          .select("price_paid")
+          .eq("payment_status", "completed")
+          .gte("purchased_at", sevenDaysAgoISO),
+        supabase
+          .from("user_tests")
+          .select("user_id, status"),
       ]);
+
+      // Calculate journey completion rate
+      // A user completes the journey when they have 7 completed tests
+      const userTestCounts: Record<string, number> = {};
+      (userTestsResult.data || []).forEach((ut: any) => {
+        if (ut.status === "completed") {
+          userTestCounts[ut.user_id] = (userTestCounts[ut.user_id] || 0) + 1;
+        }
+      });
+      
+      const usersWithTests = Object.keys(userTestCounts).length;
+      const usersCompletedJourney = Object.values(userTestCounts).filter(count => count >= 7).length;
+      const completionRate = usersWithTests > 0 ? Math.round((usersCompletedJourney / usersWithTests) * 100) : 0;
+
+      // Calculate total sales
+      const totalSales = (salesResult.data || []).reduce((sum, p) => sum + Number(p.price_paid || 0), 0);
 
       setStats({
         totalUsers: usersResult.count || 0,
-        totalSessions: sessionsResult.count || 0,
-        totalTests: testsResult.count || 0,
-        totalGalleries: galleriesResult.count || 0,
+        testsCompletedToday: testsCompletedTodayResult.count || 0,
+        salesLast7Days: totalSales,
+        journeyCompletionRate: completionRate,
       });
     } catch (error) {
       console.error("Error fetching stats:", error);
@@ -47,30 +86,30 @@ export const DashboardStats = () => {
 
   const statCards = [
     {
-      title: "Usuários Cadastrados",
-      value: stats.totalUsers,
+      title: "Total de Usuários",
+      value: stats.totalUsers.toString(),
       icon: Users,
       color: "text-blue-500",
       bgColor: "bg-blue-500/10",
     },
     {
-      title: "Sessões Agendadas",
-      value: stats.totalSessions,
-      icon: Calendar,
+      title: "Testes Concluídos Hoje",
+      value: stats.testsCompletedToday.toString(),
+      icon: FileText,
       color: "text-green-500",
       bgColor: "bg-green-500/10",
     },
     {
-      title: "Testes Realizados",
-      value: stats.totalTests,
-      icon: FileText,
+      title: "Vendas (7 dias)",
+      value: `R$ ${stats.salesLast7Days.toFixed(2)}`,
+      icon: DollarSign,
       color: "text-purple-500",
       bgColor: "bg-purple-500/10",
     },
     {
-      title: "Galerias Criadas",
-      value: stats.totalGalleries,
-      icon: Image,
+      title: "Taxa de Conclusão",
+      value: `${stats.journeyCompletionRate}%`,
+      icon: Target,
       color: "text-gold",
       bgColor: "bg-gold/10",
     },
