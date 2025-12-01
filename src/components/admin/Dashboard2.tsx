@@ -132,42 +132,42 @@ export const Dashboard2 = () => {
   ];
 
   return (
-    <div className="space-y-8 max-w-6xl">
+    <div className="space-y-6 md:space-y-8 max-w-6xl">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground text-sm">Visão geral do Essentia 2.0</p>
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground text-xs md:text-sm">Visão geral do Essentia 2.0</p>
       </div>
 
-      {/* Stats Grid - Apple Style */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      {/* Stats Grid - Apple Style - Responsive */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
         {statCards.map((stat, index) => (
           <Card 
             key={index} 
-            className={`p-5 border-0 shadow-sm bg-gradient-to-br ${stat.gradient} hover:shadow-md transition-shadow`}
+            className={`p-4 md:p-5 border-0 shadow-sm bg-gradient-to-br ${stat.gradient} hover:shadow-md transition-shadow`}
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className={`p-2 rounded-lg bg-background/80 ${stat.iconColor}`}>
-                <stat.icon className="w-4 h-4" />
+            <div className="flex items-start justify-between mb-2 md:mb-3">
+              <div className={`p-1.5 md:p-2 rounded-lg bg-background/80 ${stat.iconColor}`}>
+                <stat.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
               </div>
             </div>
             <div>
-              <p className="text-2xl font-semibold tracking-tight">
+              <p className="text-xl md:text-2xl font-semibold tracking-tight">
                 {loading ? "—" : stat.value}
               </p>
-              <p className="text-xs text-muted-foreground mt-0.5">{stat.subtitle}</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">{stat.subtitle}</p>
             </div>
           </Card>
         ))}
       </div>
 
       {/* Quick Actions */}
-      <Card className="p-6 border-border/50">
-        <h3 className="text-sm font-medium text-muted-foreground mb-4">Ações Rápidas</h3>
-        <div className="flex flex-wrap gap-3">
+      <Card className="p-4 md:p-6 border-border/50">
+        <h3 className="text-xs md:text-sm font-medium text-muted-foreground mb-3 md:mb-4">Ações Rápidas</h3>
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2 md:gap-3">
           <Button 
             variant="outline" 
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto justify-center"
             onClick={() => navigate("/cliente")}
           >
             <Eye className="w-4 h-4" />
@@ -175,7 +175,7 @@ export const Dashboard2 = () => {
           </Button>
           <Button 
             variant="outline" 
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto justify-center"
             onClick={() => navigate("/admin/usuarios")}
           >
             <Users className="w-4 h-4" />
@@ -183,7 +183,7 @@ export const Dashboard2 = () => {
           </Button>
           <Button 
             variant="outline" 
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto justify-center"
             onClick={() => navigate("/admin/tools")}
           >
             <Sparkles className="w-4 h-4" />
@@ -193,14 +193,14 @@ export const Dashboard2 = () => {
       </Card>
 
       {/* Info Card */}
-      <Card className="p-6 bg-primary/5 border-primary/10">
-        <div className="flex items-start gap-4">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Sparkles className="w-5 h-5 text-primary" />
+      <Card className="p-4 md:p-6 bg-primary/5 border-primary/10">
+        <div className="flex items-start gap-3 md:gap-4">
+          <div className="p-1.5 md:p-2 rounded-lg bg-primary/10">
+            <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary" />
           </div>
           <div>
-            <h3 className="font-medium mb-1">Essentia 2.0</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-medium text-sm md:text-base mb-1">Essentia 2.0</h3>
+            <p className="text-xs md:text-sm text-muted-foreground">
               Painel administrativo redesenhado com foco em simplicidade e eficiência. 
               Todas as ações são registradas para auditoria.
             </p>

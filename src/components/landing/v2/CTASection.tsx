@@ -9,16 +9,16 @@ export const CTASection = () => {
   const { ref, isVisible } = useScrollAnimation();
 
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden">
+    <section className="py-16 md:py-24 lg:py-32 relative overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 gradient-miguel" />
       <div className="absolute inset-0 gradient-glow opacity-20" />
       
-      <div ref={ref} className="container px-6 relative z-10">
+      <div ref={ref} className="container px-4 md:px-6 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
           <p 
             className={cn(
-              "font-miguel text-xl md:text-2xl text-primary-foreground/80 mb-6 transition-all duration-700",
+              "font-miguel text-lg md:text-xl lg:text-2xl text-primary-foreground/80 mb-4 md:mb-6 transition-all duration-700",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
@@ -26,7 +26,7 @@ export const CTASection = () => {
           </p>
           <h2 
             className={cn(
-              "font-display text-display-md md:text-display-lg text-primary-foreground mb-6 transition-all duration-700 delay-100",
+              "font-display text-2xl sm:text-display-sm md:text-display-md lg:text-display-lg text-primary-foreground mb-4 md:mb-6 transition-all duration-700 delay-100",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
@@ -35,7 +35,7 @@ export const CTASection = () => {
           </h2>
           <p 
             className={cn(
-              "text-base text-primary-foreground/70 mb-10 max-w-xl mx-auto transition-all duration-700 delay-200",
+              "text-sm md:text-base text-primary-foreground/70 mb-8 md:mb-10 max-w-xl mx-auto px-2 transition-all duration-700 delay-200",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
@@ -45,13 +45,13 @@ export const CTASection = () => {
           <Button 
             size="lg" 
             className={cn(
-              "group h-14 px-8 text-base rounded-full bg-gold hover:bg-gold-dark text-miguel-midnight shadow-large hover-lift press-effect transition-all duration-700 delay-300",
+              "group w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 text-sm md:text-base rounded-full bg-gold hover:bg-gold-dark text-miguel-midnight shadow-large hover-lift press-effect transition-all duration-700 delay-300",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
             onClick={() => navigate("/auth")}
           >
             Começar Teste de Arquétipos (Grátis)
-            <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+            <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform duration-300" />
           </Button>
         </div>
       </div>

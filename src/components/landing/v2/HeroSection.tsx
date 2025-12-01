@@ -10,7 +10,7 @@ export const HeroSection = () => {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.2 });
 
   return (
-    <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[85vh] md:min-h-[92vh] flex items-center justify-center overflow-hidden pt-16 md:pt-0">
       {/* Background image with overlay */}
       <div className="absolute inset-0">
         <img 
@@ -21,15 +21,15 @@ export const HeroSection = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
       </div>
       
-      {/* Subtle glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] gradient-glow opacity-50 subtle-pulse" />
+      {/* Subtle glow - smaller on mobile */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[280px] h-[280px] md:w-[500px] md:h-[500px] gradient-glow opacity-50 subtle-pulse" />
       
-      <div ref={ref} className="container relative z-10 px-6 py-24">
+      <div ref={ref} className="container relative z-10 px-4 md:px-6 py-12 md:py-24">
         <div className="max-w-3xl mx-auto text-center">
-          {/* Main headline */}
+          {/* Main headline - Responsive typography */}
           <h1 
             className={cn(
-              "font-display text-display-lg md:text-display-xl text-foreground mb-6 transition-all duration-700 delay-100",
+              "font-display text-[1.75rem] leading-tight sm:text-display-md md:text-display-lg lg:text-display-xl text-foreground mb-4 md:mb-6 transition-all duration-700 delay-100",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
@@ -37,10 +37,10 @@ export const HeroSection = () => {
             <span className="block text-gold">está dentro de você.</span>
           </h1>
 
-          {/* Subheadline - Miguel quote style */}
+          {/* Subheadline - Responsive */}
           <p 
             className={cn(
-              "font-miguel text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed transition-all duration-700 delay-200",
+              "font-miguel text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-6 md:mb-10 leading-relaxed transition-all duration-700 delay-200",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
@@ -49,7 +49,7 @@ export const HeroSection = () => {
           
           <p 
             className={cn(
-              "text-base md:text-lg text-muted-foreground max-w-xl mx-auto mb-12 leading-relaxed transition-all duration-700 delay-300",
+              "text-sm md:text-base lg:text-lg text-muted-foreground max-w-xl mx-auto mb-8 md:mb-12 leading-relaxed px-2 transition-all duration-700 delay-300",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
@@ -57,28 +57,28 @@ export const HeroSection = () => {
             através de 7 dimensões do autoconhecimento.
           </p>
 
-          {/* CTA */}
+          {/* CTA - Full width on mobile */}
           <div 
             className={cn(
-              "flex flex-col sm:flex-row items-center justify-center gap-4 transition-all duration-700 delay-400",
+              "flex flex-col items-center justify-center gap-4 px-4 md:px-0 transition-all duration-700 delay-400",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
             <Button 
               size="lg" 
-              className="group h-14 px-8 text-base rounded-full bg-gold hover:bg-gold-dark text-primary-foreground shadow-medium hover:shadow-large hover-lift press-effect"
+              className="group w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 text-sm md:text-base rounded-full bg-gold hover:bg-gold-dark text-primary-foreground shadow-medium hover:shadow-large hover-lift press-effect"
               onClick={() => navigate("/auth")}
             >
               Começar Teste de Arquétipos
               <span className="ml-2 opacity-80">(Grátis)</span>
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+              <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
           </div>
 
           {/* Trust indicator */}
           <p 
             className={cn(
-              "mt-10 text-sm text-muted-foreground transition-all duration-700 delay-500",
+              "mt-8 md:mt-10 text-xs md:text-sm text-muted-foreground transition-all duration-700 delay-500",
               isVisible ? "opacity-100" : "opacity-0"
             )}
           >
@@ -88,7 +88,7 @@ export const HeroSection = () => {
       </div>
 
       {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-20 md:h-32 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 };

@@ -38,14 +38,14 @@ export const TestimonialsSection = () => {
   const { ref: benefitsRef, isVisible: benefitsVisible } = useScrollAnimation();
 
   return (
-    <section className="py-24 md:py-32 bg-soul-light/30">
-      <div className="container px-6">
+    <section className="py-16 md:py-24 lg:py-32 bg-soul-light/30">
+      <div className="container px-4 md:px-6">
         <div className="max-w-5xl mx-auto">
           {/* Section header */}
-          <div ref={headerRef} className="text-center mb-16">
+          <div ref={headerRef} className="text-center mb-10 md:mb-16">
             <span 
               className={cn(
-                "inline-block text-gold font-medium text-sm tracking-wide uppercase mb-4 transition-all duration-500",
+                "inline-block text-gold font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4 transition-all duration-500",
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
@@ -53,7 +53,7 @@ export const TestimonialsSection = () => {
             </span>
             <h2 
               className={cn(
-                "font-display text-display-md md:text-display-lg text-foreground mb-6 transition-all duration-500 delay-100",
+                "font-display text-2xl sm:text-display-sm md:text-display-md lg:text-display-lg text-foreground mb-4 md:mb-6 transition-all duration-500 delay-100",
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
@@ -62,29 +62,32 @@ export const TestimonialsSection = () => {
             </h2>
           </div>
 
-          {/* Testimonials */}
-          <div ref={cardsRef} className="grid md:grid-cols-3 gap-6 mb-20">
+          {/* Testimonials - Horizontal scroll on mobile */}
+          <div 
+            ref={cardsRef} 
+            className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 mb-12 md:mb-20 overflow-x-auto pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory md:snap-none scrollbar-hide"
+          >
             {testimonials.map((testimonial, index) => (
               <div 
                 key={testimonial.name}
                 className={cn(
-                  "bg-card rounded-2xl p-6 border border-border/30 shadow-soft hover:shadow-medium hover:border-border/50 transition-all duration-300",
+                  "bg-card rounded-xl md:rounded-2xl p-4 md:p-6 border border-border/30 shadow-soft hover:shadow-medium hover:border-border/50 transition-all duration-300 min-w-[280px] md:min-w-0 snap-center flex-shrink-0 md:flex-shrink",
                   cardsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
                 )}
                 style={cardsVisible ? getStaggerDelay(index, 0.15) : {}}
               >
-                <Quote className="w-7 h-7 text-gold/30 mb-4" strokeWidth={1.5} />
-                <p className="text-foreground mb-6 leading-relaxed text-sm">
+                <Quote className="w-6 h-6 md:w-7 md:h-7 text-gold/30 mb-3 md:mb-4" strokeWidth={1.5} />
+                <p className="text-foreground mb-4 md:mb-6 leading-relaxed text-xs md:text-sm line-clamp-4 md:line-clamp-none">
                   "{testimonial.content}"
                 </p>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-foreground text-sm">{testimonial.name}</p>
-                    <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                    <p className="font-medium text-foreground text-xs md:text-sm">{testimonial.name}</p>
+                    <p className="text-[10px] md:text-xs text-muted-foreground">{testimonial.role}</p>
                   </div>
                   <div className="flex gap-0.5">
                     {Array.from({ length: testimonial.rating }).map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 text-gold fill-gold" />
+                      <Star key={i} className="w-3 h-3 md:w-3.5 md:h-3.5 text-gold fill-gold" />
                     ))}
                   </div>
                 </div>
@@ -96,25 +99,25 @@ export const TestimonialsSection = () => {
           <div 
             ref={benefitsRef}
             className={cn(
-              "bg-card rounded-3xl p-8 md:p-12 border border-border/30 shadow-soft transition-all duration-700",
+              "bg-card rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-12 border border-border/30 shadow-soft transition-all duration-700",
               benefitsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             )}
           >
-            <h3 className="font-display text-display-sm text-foreground text-center mb-10">
+            <h3 className="font-display text-xl md:text-display-sm text-foreground text-center mb-6 md:mb-10">
               O que você vai descobrir
             </h3>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
               {benefits.map((benefit, index) => (
                 <div 
                   key={benefit}
                   className={cn(
-                    "flex items-center gap-3 p-4 rounded-xl bg-soul-light/50 hover:bg-soul-light transition-all duration-300 cursor-default",
+                    "flex items-center gap-3 p-3 md:p-4 rounded-lg md:rounded-xl bg-soul-light/50 hover:bg-soul-light transition-all duration-300 cursor-default",
                     benefitsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                   )}
                   style={benefitsVisible ? getStaggerDelay(index, 0.08) : {}}
                 >
                   <div className="w-2 h-2 rounded-full bg-gold flex-shrink-0" />
-                  <p className="text-foreground text-sm">{benefit}</p>
+                  <p className="text-foreground text-xs md:text-sm">{benefit}</p>
                 </div>
               ))}
             </div>

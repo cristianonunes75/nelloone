@@ -124,14 +124,14 @@ export const JourneySection = () => {
   const { ref: timelineRef, isVisible: timelineVisible } = useScrollAnimation({ rootMargin: "0px 0px -100px 0px" });
 
   return (
-    <section className="py-24 md:py-32 bg-soul-light/50">
-      <div className="container px-6">
+    <section className="py-16 md:py-24 lg:py-32 bg-soul-light/50">
+      <div className="container px-4 md:px-6">
         <div className="max-w-5xl mx-auto">
           {/* Section header */}
-          <div ref={headerRef} className="text-center mb-16">
+          <div ref={headerRef} className="text-center mb-10 md:mb-16">
             <span 
               className={cn(
-                "inline-block text-gold font-medium text-sm tracking-wide uppercase mb-4 transition-all duration-500",
+                "inline-block text-gold font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4 transition-all duration-500",
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
@@ -139,7 +139,7 @@ export const JourneySection = () => {
             </span>
             <h2 
               className={cn(
-                "font-display text-display-md md:text-display-lg text-foreground mb-6 transition-all duration-500 delay-100",
+                "font-display text-2xl sm:text-display-sm md:text-display-md lg:text-display-lg text-foreground mb-4 md:mb-6 transition-all duration-500 delay-100",
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
@@ -148,7 +148,7 @@ export const JourneySection = () => {
             </h2>
             <p 
               className={cn(
-                "text-lg text-muted-foreground max-w-2xl mx-auto transition-all duration-500 delay-200",
+                "text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2 transition-all duration-500 delay-200",
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
@@ -157,28 +157,29 @@ export const JourneySection = () => {
             </p>
           </div>
 
-          {/* Journey timeline */}
+          {/* Journey timeline - Vertical cards on mobile */}
           <div ref={timelineRef} className="relative">
-            {/* Connection line */}
+            {/* Connection line - Desktop only */}
             <div 
               className={cn(
-                "hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-border -translate-x-1/2 origin-top transition-transform duration-1000",
+                "hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-border -translate-x-1/2 origin-top transition-transform duration-1000",
                 timelineVisible ? "scale-y-100" : "scale-y-0"
               )}
             />
 
-            <div className="space-y-6 md:space-y-0">
+            {/* Mobile: Simple vertical stack */}
+            <div className="space-y-3 md:space-y-4 lg:space-y-0">
               {tests.map((test, index) => (
                 <div 
                   key={test.name}
-                  className={`relative md:grid md:grid-cols-2 md:gap-8 ${
-                    index % 2 === 0 ? "" : "md:direction-rtl"
+                  className={`relative lg:grid lg:grid-cols-2 lg:gap-8 ${
+                    index % 2 === 0 ? "" : "lg:direction-rtl"
                   }`}
                 >
-                  {/* Timeline dot */}
+                  {/* Timeline dot - Desktop only */}
                   <div 
                     className={cn(
-                      "hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-background rounded-full border border-border items-center justify-center z-10 transition-all duration-500",
+                      "hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-background rounded-full border border-border items-center justify-center z-10 transition-all duration-500",
                       timelineVisible ? "opacity-100 scale-100" : "opacity-0 scale-75"
                     )}
                     style={timelineVisible ? { transitionDelay: `${index * 0.1}s` } : {}}
@@ -189,37 +190,37 @@ export const JourneySection = () => {
                   {/* Card */}
                   <div 
                     className={cn(
-                      index % 2 === 0 ? "md:pr-16" : "md:pl-16 md:col-start-2",
+                      index % 2 === 0 ? "lg:pr-16" : "lg:pl-16 lg:col-start-2",
                       "transition-all duration-500",
                       timelineVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
                     )}
                     style={timelineVisible ? { transitionDelay: `${index * 0.1 + 0.2}s` } : {}}
                   >
-                    <div className="group bg-card rounded-2xl p-6 border border-border/50 shadow-soft hover:shadow-medium hover:border-border transition-all duration-300">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gold/15 transition-colors duration-300">
-                          <test.icon className="w-6 h-6 text-gold" />
+                    <div className="group bg-card rounded-xl md:rounded-2xl p-4 md:p-6 border border-border/50 shadow-soft hover:shadow-medium hover:border-border transition-all duration-300">
+                      <div className="flex items-start gap-3 md:gap-4">
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gold/15 transition-colors duration-300">
+                          <test.icon className="w-5 h-5 md:w-6 md:h-6 text-gold" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="md:hidden text-sm text-muted-foreground">#{test.number}</span>
-                            <h3 className="font-display text-lg text-foreground">{test.name}</h3>
+                          <div className="flex items-center gap-2 mb-1 md:mb-2 flex-wrap">
+                            <span className="lg:hidden text-xs md:text-sm text-muted-foreground">#{test.number}</span>
+                            <h3 className="font-display text-base md:text-lg text-foreground">{test.name}</h3>
                             {test.isFree ? (
-                              <span className="px-2 py-0.5 text-xs font-medium bg-gold/10 text-gold rounded-full">
+                              <span className="px-2 py-0.5 text-[10px] md:text-xs font-medium bg-gold/10 text-gold rounded-full">
                                 Grátis
                               </span>
                             ) : (
-                              <Lock className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={1.5} />
+                              <Lock className="w-3 h-3 md:w-3.5 md:h-3.5 text-muted-foreground" strokeWidth={1.5} />
                             )}
                           </div>
-                          <p className="text-muted-foreground text-sm">{test.description}</p>
+                          <p className="text-muted-foreground text-xs md:text-sm line-clamp-2 md:line-clamp-none">{test.description}</p>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Spacer for alternating layout */}
-                  {index % 2 === 0 && <div className="hidden md:block" />}
+                  {/* Spacer for alternating layout - Desktop only */}
+                  {index % 2 === 0 && <div className="hidden lg:block" />}
                 </div>
               ))}
             </div>
@@ -228,13 +229,13 @@ export const JourneySection = () => {
           {/* Journey result preview */}
           <div 
             className={cn(
-              "mt-16 text-center transition-all duration-500 delay-700",
+              "mt-10 md:mt-16 text-center transition-all duration-500 delay-700",
               timelineVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
-            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gold/10 text-gold hover:bg-gold/15 transition-colors duration-300">
-              <Check className="w-5 h-5" strokeWidth={1.5} />
-              <span className="font-medium">Ao final: seu Mapa da Essência completo</span>
+            <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-full bg-gold/10 text-gold hover:bg-gold/15 transition-colors duration-300">
+              <Check className="w-4 h-4 md:w-5 md:h-5" strokeWidth={1.5} />
+              <span className="font-medium text-sm md:text-base">Ao final: seu Mapa da Essência completo</span>
             </div>
           </div>
         </div>
