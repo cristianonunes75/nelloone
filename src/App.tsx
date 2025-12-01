@@ -9,6 +9,7 @@ import { SimulationProvider } from "@/contexts/SimulationContext";
 import { LanguageRoute } from "@/components/LanguageRoute";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { GeoRedirect } from "@/components/GeoRedirect";
+import { CurrencyProtection } from "@/components/CurrencyProtection";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Cliente from "./pages/Cliente";
@@ -213,17 +214,20 @@ const App = () => (
             <AuthProvider>
               {/* GEO-routing: Automatically redirects based on IP location */}
               <GeoRedirect />
-              <Routes>
-                {/* English routes with /en prefix */}
-                <Route path="/en/*" element={
-                  <LanguageRoute>
-                    <AppRoutes />
-                  </LanguageRoute>
-                } />
-                
-                {/* Default routes (Portuguese / Brazil) */}
-                <Route path="/*" element={<AppRoutes />} />
-              </Routes>
+              {/* Currency Protection: Prevents cross-trade between BRL and USD */}
+              <CurrencyProtection>
+                <Routes>
+                  {/* English routes with /en prefix */}
+                  <Route path="/en/*" element={
+                    <LanguageRoute>
+                      <AppRoutes />
+                    </LanguageRoute>
+                  } />
+                  
+                  {/* Default routes (Portuguese / Brazil) */}
+                  <Route path="/*" element={<AppRoutes />} />
+                </Routes>
+              </CurrencyProtection>
             </AuthProvider>
           </SimulationProvider>
         </LanguageProvider>

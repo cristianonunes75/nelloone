@@ -13,6 +13,32 @@
     "improvements_title": "You improve:",
     "cta": "Start Now"
   },
+  "value_proposition": {
+    "title": "Why Choose NELLO ONE?",
+    "subtitle": "The world's smartest self-knowledge system powered by AI",
+    "intro": "Most people know parts of themselves. Very few know the whole picture.",
+    "description": "NELLO ONE was created to solve exactly this. Instead of doing isolated personality tests without context, NELLO ONE combines 7 internationally validated assessments and integrates all results into a single AI-generated Personal Map.",
+    "benefits_title": "What does this help you improve?",
+    "benefits": [
+      "Clarity about who you are",
+      "Strengths you can leverage",
+      "Blind spots that hold you back",
+      "Emotional patterns that repeat",
+      "How to communicate better",
+      "How to make decisions with confidence",
+      "How to stop self-sabotage",
+      "How to grow personally, professionally and spiritually"
+    ],
+    "includes_title": "What you get with the Full Journey",
+    "includes": [
+      "Access to all 7 complete tests",
+      "Your personalized NELLO ONE Map",
+      "AI-integrated interpretation of all results",
+      "Professional PDF export",
+      "Lifetime access to your profile and insights"
+    ],
+    "closing": "And the most important part: You finally understand yourself with clarity, depth and direction."
+  },
   "growth": {
     "results_title": "What you can improve right now",
     "results_subtitle": "Based on your patterns, these are your immediate growth points.",
@@ -25,6 +51,17 @@
     "main_growth_point": "Your biggest growth point right now",
     "main_blind_spot": "Your main blind spot",
     "recommended_action": "Your recommended action"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "pricing": {
+      "question": "Why are the prices different in Real and in Dollar?",
+      "answer": "NELLO ONE serves people from all over the world. To offer fair prices for each region, we use two policies: Local Pricing — in Brazil, we apply values suited to the local economic reality. Global Pricing — for international users, we use the currency and pricing standards of the global market. This way, everyone can access the same level of quality, with balanced and transparent conditions."
+    },
+    "currency": {
+      "question": "Can I buy in another country's currency?",
+      "answer": "No. NELLO ONE automatically blocks attempts to purchase in an incorrect currency to prevent errors, fraud, and unfair price differences. You will always pay in the currency corresponding to the language and region you are browsing: Brazil → Real (R$), Global → Dollar (US$). This ensures equality, security and a better experience."
+    }
   },
   "what_is": {
     "title": "What is NELLO ONE?",
