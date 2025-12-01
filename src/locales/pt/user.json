@@ -1,0 +1,85 @@
+{
+  "sidebar": {
+    "profile": "Perfil",
+    "my_tests": "Meus Testes",
+    "map": "Mapa Nello One",
+    "history": "Histórico de Resultados",
+    "billing": "Pagamentos e Faturas",
+    "settings": "Configurações",
+    "logout": "Sair"
+  },
+  "profile": {
+    "title": "Perfil",
+    "subtitle": "Bem-vindo à sua área pessoal",
+    "description": "Aqui você acompanha sua jornada no Nello One.",
+    "details": "Dados do Perfil",
+    "full_name": "Nome completo",
+    "email": "Email",
+    "phone": "WhatsApp",
+    "profession": "Profissão",
+    "language": "Idioma da Conta",
+    "created_at": "Membro desde",
+    "edit_profile": "Editar Perfil",
+    "change_password": "Alterar Senha",
+    "save_changes": "Salvar alterações",
+    "saving": "Salvando...",
+    "email_readonly": "O email não pode ser alterado",
+    "success": "Perfil atualizado!",
+    "success_description": "Suas informações foram salvas com sucesso.",
+    "error": "Erro ao salvar",
+    "back": "Voltar"
+  },
+  "tests": {
+    "title": "Meus Testes",
+    "subtitle": "Seus testes concluídos",
+    "empty": "Você ainda não completou nenhum teste.",
+    "start_journey": "Começar sua jornada",
+    "status": {
+      "completed": "Concluído",
+      "in_progress": "Em andamento",
+      "not_started": "Não iniciado"
+    },
+    "view_result": "Ver Resultado",
+    "continue": "Continuar",
+    "completed_on": "Concluído em"
+  },
+  "map": {
+    "title": "Mapa Nello One",
+    "subtitle": "Mapa Essencial",
+    "description": "Seu mapa integrado de autoconhecimento combinando todos os resultados dos testes.",
+    "not_generated": "Seu mapa ainda não foi gerado.",
+    "complete_tests": "Complete os 7 testes para desbloquear seu mapa personalizado.",
+    "generate": "Gerar novo mapa",
+    "export_pdf": "Exportar PDF profissional",
+    "share": "Compartilhar",
+    "view_map": "Ver Mapa"
+  },
+  "history": {
+    "title": "Histórico de Resultados",
+    "subtitle": "Resultados anteriores",
+    "empty": "Nenhum resultado encontrado.",
+    "view_details": "Ver detalhes"
+  },
+  "billing": {
+    "title": "Pagamentos e Faturas",
+    "subtitle": "Gerencie sua assinatura e pagamentos",
+    "subscription": "Assinatura",
+    "active_subscription": "Assinatura ativa",
+    "no_subscription": "Você não possui assinaturas ativas",
+    "next_payment": "Próximo pagamento",
+    "plan": "Plano",
+    "status": "Status",
+    "invoices": "Faturas",
+    "no_invoices": "Nenhuma fatura encontrada",
+    "view_invoice": "Visualizar fatura",
+    "change_plan": "Alterar plano",
+    "cancel_subscription": "Cancelar assinatura",
+    "manage": "Gerenciar Pagamentos"
+  },
+  "nav": {
+    "my_profile": "Meu Perfil",
+    "my_journey": "Minha Jornada",
+    "admin_panel": "Painel Admin",
+    "logout": "Sair"
+  }
+}

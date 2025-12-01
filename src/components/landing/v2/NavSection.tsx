@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { LogoText } from "@/components/LogoText";
-import { Menu, X, LogIn, User, ChevronDown, FileText, HelpCircle, Map, BarChart3, Settings, LogOut } from "lucide-react";
+import { Menu, X, LogIn, User, ChevronDown, FileText, HelpCircle, Map, BarChart3, Settings, LogOut, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -66,183 +66,181 @@ export const NavSection = () => {
   const navLinks = isLoggedIn ? authLinks : publicLinks;
 
   return (
-    <>
-      <header 
-        className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-400",
-          isScrolled 
-            ? "bg-background/90 backdrop-blur-xl border-b border-border/30 shadow-soft"
-            : "bg-transparent"
-        )}
-      >
-        <div className="container px-4 sm:px-6">
-          <nav className="flex items-center justify-between h-14 md:h-16">
-            {/* Logo */}
-            <button onClick={() => navigate(language === 'en' ? '/en' : '/')} className="focus:outline-none">
-              <LogoText className="text-lg md:text-xl" variant="solid" />
-            </button>
+    <header 
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-400",
+        isScrolled 
+          ? "bg-background/90 backdrop-blur-xl border-b border-border/30 shadow-soft"
+          : "bg-transparent"
+      )}
+    >
+      <div className="container px-4 sm:px-6">
+        <nav className="flex items-center justify-between h-14 md:h-16">
+          {/* Logo */}
+          <button onClick={() => navigate(language === 'en' ? '/en' : '/')} className="focus:outline-none">
+            <LogoText className="text-lg md:text-xl" variant="solid" />
+          </button>
 
-            {/* Desktop nav */}
-            <div className="hidden md:flex items-center gap-6 lg:gap-8">
-              {navLinks.map((link) => (
-                <button
-                  key={link.label}
-                  onClick={link.action}
-                  className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 py-2 group"
-                >
-                  {link.label}
-                  <span className="absolute bottom-0 left-0 w-full h-px bg-ink scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-                </button>
-              ))}
-            </div>
-
-            {/* Desktop CTA / Profile */}
-            <div className="hidden md:flex items-center gap-3">
-              <LanguageToggle variant="minimal" />
-              
-              {isLoading ? (
-                <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
-              ) : isLoggedIn ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      className="gap-2 text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                    >
-                      <div className="w-7 h-7 rounded-full bg-ink/10 flex items-center justify-center">
-                        <User className="w-4 h-4 text-ink" strokeWidth={1.5} />
-                      </div>
-                      <ChevronDown className="w-3 h-3" strokeWidth={1.5} />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={() => navigate("/cliente/perfil")}>
-                      <User className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                      {language === 'en' ? 'My Profile' : 'Meu Perfil'}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate("/cliente")}>
-                      <Settings className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                      {language === 'en' ? 'Settings' : 'Configurações'}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
-                      <LogOut className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                      {language === 'en' ? 'Sign Out' : 'Sair'}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => navigate("/auth")}
-                  className="text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                >
-                  {t.landing.nav.login}
-                </Button>
-              )}
-            </div>
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 hover:bg-secondary/50 rounded-xl transition-colors"
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-5 h-5" strokeWidth={1.5} />
-              ) : (
-                <Menu className="w-5 h-5" strokeWidth={1.5} />
-              )}
-            </button>
-          </nav>
-        </div>
-
-        {/* Mobile menu */}
-        <div 
-          className={cn(
-            "md:hidden bg-background border-b border-border overflow-hidden transition-all duration-300",
-            isMobileMenuOpen ? "max-h-[450px] opacity-100" : "max-h-0 opacity-0"
-          )}
-        >
-          <div className="container px-4 py-4 space-y-1">
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-6 lg:gap-8">
             {navLinks.map((link) => (
               <button
                 key={link.label}
                 onClick={link.action}
-                className="flex items-center gap-3 w-full text-left py-3 px-4 text-foreground hover:bg-secondary/50 rounded-xl transition-colors"
+                className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 py-2 group"
               >
-                <link.icon className="w-4 h-4 text-ink" strokeWidth={1.5} />
                 {link.label}
+                <span className="absolute bottom-0 left-0 w-full h-px bg-ink scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
               </button>
             ))}
+          </div>
 
-            {/* Language toggle mobile */}
-            <div className="py-3 px-4">
-              <LanguageToggle />
-            </div>
+          {/* Desktop CTA / Profile */}
+          <div className="hidden md:flex items-center gap-3">
+            <LanguageToggle variant="minimal" />
+            
+            {isLoading ? (
+              <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
+            ) : isLoggedIn ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="gap-2 text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-ink/10 flex items-center justify-center">
+                      <User className="w-4 h-4 text-ink" strokeWidth={1.5} />
+                    </div>
+                    <ChevronDown className="w-3 h-3" strokeWidth={1.5} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => handleNavigation("/me")}>
+                    <User className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                    {language === 'en' ? 'My Profile' : 'Meu Perfil'}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleNavigation("/cliente")}>
+                    <Map className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                    {language === 'en' ? 'My Journey' : 'Minha Jornada'}
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate("/admin")}>
+                        <Shield className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                        {language === 'en' ? 'Admin Panel' : 'Painel Admin'}
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+                    <LogOut className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                    {language === 'en' ? 'Sign Out' : 'Sair'}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate("/auth")}
+                className="text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+              >
+                {t.landing.nav.login}
+              </Button>
+            )}
+          </div>
 
-            <div className="pt-4 border-t border-border space-y-2">
-              {isLoggedIn ? (
-                <>
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2 hover:bg-secondary/50 rounded-xl transition-colors"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-5 h-5" strokeWidth={1.5} />
+            ) : (
+              <Menu className="w-5 h-5" strokeWidth={1.5} />
+            )}
+          </button>
+        </nav>
+      </div>
+
+      {/* Mobile menu */}
+      <div 
+        className={cn(
+          "md:hidden bg-background border-b border-border overflow-hidden transition-all duration-300",
+          isMobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+        )}
+      >
+        <div className="container px-4 py-4 space-y-1">
+          {navLinks.map((link) => (
+            <button
+              key={link.label}
+              onClick={link.action}
+              className="flex items-center gap-3 w-full text-left py-3 px-4 text-foreground hover:bg-secondary/50 rounded-xl transition-colors"
+            >
+              <link.icon className="w-4 h-4 text-ink" strokeWidth={1.5} />
+              {link.label}
+            </button>
+          ))}
+
+          {/* Language toggle mobile */}
+          <div className="py-3 px-4">
+            <LanguageToggle />
+          </div>
+
+          <div className="pt-4 border-t border-border space-y-2">
+            {isLoggedIn ? (
+              <>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start rounded-xl"
+                  onClick={() => handleNavigation("/me")}
+                >
+                  <User className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                  {language === 'en' ? 'My Profile' : 'Meu Perfil'}
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start rounded-xl"
+                  onClick={() => handleNavigation("/cliente")}
+                >
+                  <Map className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                  {language === 'en' ? 'My Journey' : 'Minha Jornada'}
+                </Button>
+                {isAdmin && (
                   <Button 
                     variant="ghost" 
                     className="w-full justify-start rounded-xl"
-                    onClick={() => handleNavigation("/cliente/perfil")}
+                    onClick={() => navigate("/admin")}
                   >
-                    <User className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                    {language === 'en' ? 'My Profile' : 'Meu Perfil'}
+                    <Shield className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                    {language === 'en' ? 'Admin Panel' : 'Painel Admin'}
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start rounded-xl text-destructive hover:text-destructive"
-                    onClick={handleSignOut}
-                  >
-                    <LogOut className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                    {language === 'en' ? 'Sign Out' : 'Sair'}
-                  </Button>
-                  
-                  {/* Admin button - mobile */}
-                  {isAdmin && (
-                    <Button 
-                      className="w-full rounded-xl bg-ink hover:bg-ink-deep text-primary-foreground mt-2"
-                      onClick={() => handleNavigation("/admin")}
-                    >
-                      {language === 'en' ? 'Admin Panel' : 'Painel Admin'}
-                    </Button>
-                  )}
-                </>
-              ) : (
+                )}
                 <Button 
-                  variant="outline" 
-                  className="w-full rounded-xl border-border"
-                  onClick={() => handleNavigation("/auth")}
+                  variant="ghost" 
+                  className="w-full justify-start rounded-xl text-destructive hover:text-destructive"
+                  onClick={handleSignOut}
                 >
-                  <LogIn className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                  {t.landing.nav.login}
+                  <LogOut className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                  {language === 'en' ? 'Sign Out' : 'Sair'}
                 </Button>
-              )}
-            </div>
+              </>
+            ) : (
+              <Button 
+                variant="outline" 
+                className="w-full rounded-xl border-border"
+                onClick={() => handleNavigation("/auth")}
+              >
+                <LogIn className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                {t.landing.nav.login}
+              </Button>
+            )}
           </div>
         </div>
-      </header>
-
-      {/* Floating Admin Button - Desktop only */}
-      {isAdmin && !isMobileMenuOpen && (
-        <button
-          onClick={() => navigate("/admin")}
-          className={cn(
-            "fixed top-3 right-4 z-[60] hidden md:flex items-center gap-2 px-4 py-2 rounded-full",
-            "bg-ink/90 hover:bg-ink text-primary-foreground text-xs font-medium",
-            "shadow-lg backdrop-blur-sm transition-all duration-300",
-            "hover:shadow-xl hover:scale-105",
-            isScrolled ? "top-2" : "top-3"
-          )}
-        >
-          <Settings className="w-3.5 h-3.5" strokeWidth={1.5} />
-          {language === 'en' ? 'Admin Panel' : 'Painel Admin'}
-        </button>
-      )}
-    </>
+      </div>
+    </header>
   );
 };

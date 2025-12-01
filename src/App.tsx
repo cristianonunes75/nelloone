@@ -11,6 +11,7 @@ import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Cliente from "./pages/Cliente";
 import ClientePerfil from "./pages/ClientePerfil";
+import UserArea from "./pages/UserArea";
 import TestExecution from "./pages/TestExecution";
 import TestResults from "./pages/TestResults";
 import Fotografo from "./pages/Fotografo";
@@ -92,6 +93,14 @@ const AppRoutes = () => (
       }
     />
     <Route
+      path="/me"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <UserArea />
+        </ProtectedRoute>
+      }
+    />
+    <Route
       path="/cliente/perfil"
       element={
         <ProtectedRoute allowedRoles={["cliente", "admin"]}>
@@ -103,7 +112,7 @@ const AppRoutes = () => (
       path="/profile"
       element={
         <ProtectedRoute allowedRoles={["cliente", "admin"]}>
-          <ClientePerfil />
+          <UserArea />
         </ProtectedRoute>
       }
     />
