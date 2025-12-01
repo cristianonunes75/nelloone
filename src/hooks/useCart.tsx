@@ -5,6 +5,7 @@ interface Test {
   id: string;
   name: string;
   price_brl: number;
+  price_usd?: number;
 }
 
 interface CartStore {
@@ -34,14 +35,17 @@ export const useCart = create<CartStore>()(
       },
     }),
     {
-      name: 'essentia-cart-storage',
+      name: 'nello-cart-storage',
     }
   )
 );
 
-export const calculateCartTotal = (tests: Test[], selectedIds: string[]) => {
+export const calculateCartTotal = (tests: Test[], selectedIds: string[], currency: 'brl' | 'usd' = 'brl') => {
   const selectedTests = tests.filter(t => selectedIds.includes(t.id));
-  const subtotal = selectedTests.reduce((sum, test) => sum + Number(test.price_brl), 0);
+  const subtotal = selectedTests.reduce((sum, test) => {
+    const price = currency === 'usd' ? (test.price_usd || test.price_brl / 5) : test.price_brl;
+    return sum + Number(price);
+  }, 0);
   
   let discountPercentage = 0;
   if (selectedTests.length >= 5) {
