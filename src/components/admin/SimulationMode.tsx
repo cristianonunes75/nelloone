@@ -29,7 +29,8 @@ import {
   Eye,
   Settings2,
   Sparkles,
-  ArrowLeft
+  ArrowLeft,
+  Globe
 } from "lucide-react";
 import { calculateArchetypeScores, getDominantArchetypes, ARCHETYPES } from "@/lib/archetypes";
 import { getDISCResults, DISC_PROFILES } from "@/lib/disc";
@@ -37,6 +38,9 @@ import { getMBTIResults } from "@/lib/mbti";
 import { getEnneagramResults } from "@/lib/eneagrama";
 import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
+import { useSimulation, SimulationLanguage, SIMULATION_LANGUAGES } from "@/contexts/SimulationContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { SimulationLanguageDialog } from "./SimulationLanguageDialog";
 
 interface Test {
   id: string;
@@ -84,6 +88,9 @@ const ScoreBar = ({ label, score, maxScore = 50, color = "hsl(40 50% 60%)" }: { 
 };
 
 export const SimulationMode = () => {
+  const { simulationLanguage, isSimulationActive, startSimulation: activateSimulation, endSimulation, getSimulationLabel } = useSimulation();
+  const { language: appLanguage } = useLanguage();
+  
   const [tests, setTests] = useState<Test[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTest, setSelectedTest] = useState<Test | null>(null);
@@ -100,22 +107,44 @@ export const SimulationMode = () => {
   const [miguelResponse, setMiguelResponse] = useState<string>("");
   const [loadingMiguel, setLoadingMiguel] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("clean");
+  const [showLanguageDialog, setShowLanguageDialog] = useState(false);
+  const [pendingAction, setPendingAction] = useState<{ type: 'test' | 'journey'; test?: Test } | null>(null);
+
+  // Get label in current simulation language
+  const t = (key: string) => getSimulationLabel(key);
 
   useEffect(() => {
     fetchTests();
-  }, []);
+  }, [simulationLanguage]);
 
   const fetchTests = async () => {
     try {
       setLoading(true);
+      // Filter tests by simulation language
+      const langFilter = simulationLanguage === 'pt' ? 'pt' : simulationLanguage;
+      
       const { data, error } = await supabase
         .from("tests")
         .select("*")
         .eq("active", true)
+        .eq("language", langFilter)
         .order("created_at");
 
       if (error) throw error;
-      setTests(data || []);
+      
+      // If no tests found for specific language, try without filter (fallback to pt)
+      if (!data || data.length === 0) {
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from("tests")
+          .select("*")
+          .eq("active", true)
+          .order("created_at");
+        
+        if (fallbackError) throw fallbackError;
+        setTests(fallbackData || []);
+      } else {
+        setTests(data);
+      }
     } catch (error) {
       console.error("Error fetching tests:", error);
       toast.error("Erro ao carregar testes");
@@ -126,15 +155,33 @@ export const SimulationMode = () => {
 
   const fetchQuestions = async (testId: string) => {
     try {
+      // Filter questions by simulation language
+      const langFilter = simulationLanguage === 'pt' ? 'pt' : simulationLanguage;
+      
       const { data, error } = await supabase
         .from("test_questions")
         .select("*")
         .eq("test_id", testId)
+        .eq("language", langFilter)
         .order("question_number");
 
       if (error) throw error;
-      setQuestions(data || []);
-      return data || [];
+      
+      // If no questions found for specific language, try without filter
+      if (!data || data.length === 0) {
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from("test_questions")
+          .select("*")
+          .eq("test_id", testId)
+          .order("question_number");
+        
+        if (fallbackError) throw fallbackError;
+        setQuestions(fallbackData || []);
+        return fallbackData || [];
+      }
+      
+      setQuestions(data);
+      return data;
     } catch (error) {
       console.error("Error fetching questions:", error);
       toast.error("Erro ao carregar perguntas");
@@ -142,7 +189,42 @@ export const SimulationMode = () => {
     }
   };
 
-  const startSimulation = async (test: Test) => {
+  // Handle language selection and start simulation
+  const handleLanguageSelected = async (language: SimulationLanguage) => {
+    activateSimulation(language, appLanguage);
+    setShowLanguageDialog(false);
+    
+    // Execute pending action
+    if (pendingAction) {
+      if (pendingAction.type === 'test' && pendingAction.test) {
+        await executeStartSimulation(pendingAction.test);
+      } else if (pendingAction.type === 'journey') {
+        await executeJourneySimulation();
+      }
+      setPendingAction(null);
+    }
+  };
+
+  // Request language selection before starting
+  const requestSimulation = (test: Test) => {
+    if (!isSimulationActive) {
+      setPendingAction({ type: 'test', test });
+      setShowLanguageDialog(true);
+    } else {
+      executeStartSimulation(test);
+    }
+  };
+
+  const requestJourneySimulation = () => {
+    if (!isSimulationActive) {
+      setPendingAction({ type: 'journey' });
+      setShowLanguageDialog(true);
+    } else {
+      executeJourneySimulation();
+    }
+  };
+
+  const executeStartSimulation = async (test: Test) => {
     setSelectedTest(test);
     const loadedQuestions = await fetchQuestions(test.id);
     if (loadedQuestions.length > 0) {
@@ -151,8 +233,49 @@ export const SimulationMode = () => {
       setSelectedAnswer("");
       setPhase("executing");
       setSimulationResult(null);
-      await logSimulationAction("simulation_started", { testId: test.id, testName: test.name });
+      await logSimulationAction("simulation_started", { testId: test.id, testName: test.name, language: simulationLanguage });
     }
+  };
+
+  const executeJourneySimulation = async () => {
+    setIsRunningJourney(true);
+    setJourneyResults([]);
+    const journeyOrder = ["arquetipos_proposito", "disc", "inteligencias_multiplas", "linguagens_amor", "mbti", "eneagrama", "temperamentos"];
+    const orderedTests = journeyOrder.map(type => tests.find(t => t.type === type)).filter(Boolean) as Test[];
+    
+    for (let i = 0; i < orderedTests.length; i++) {
+      const test = orderedTests[i];
+      setJourneyProgress(((i + 1) / orderedTests.length) * 100);
+      
+      const qs = await fetchQuestions(test.id);
+      const randomAnswers = qs.map(q => ({
+        questionId: q.id,
+        questionNumber: q.question_number,
+        answer: { value: Math.floor(Math.random() * 5) + 1 }
+      }));
+      
+      const answersForCalc = randomAnswers.map(a => ({ question_id: a.questionId, answer: a.answer }));
+      let result: any = { testName: test.name, testType: test.type };
+      
+      if (test.type === "disc") {
+        result = { ...result, ...getDISCResults(answersForCalc as any) };
+      } else if (test.type === "arquetipos_proposito") {
+        const scores = calculateArchetypeScores(answersForCalc);
+        result = { ...result, scores, dominantArchetypes: getDominantArchetypes(scores) };
+      }
+      
+      setJourneyResults(prev => [...prev, result]);
+      await new Promise(r => setTimeout(r, 500));
+    }
+    
+    setIsRunningJourney(false);
+    toast.success(t('journey_results'));
+    logSimulationAction("journey_completed", { results: journeyResults, language: simulationLanguage });
+  };
+
+  // Main simulation entry point - shows language dialog first if not active
+  const startSimulation = async (test: Test) => {
+    requestSimulation(test);
   };
 
   const logSimulationAction = async (action: string, data: any) => {
@@ -382,6 +505,8 @@ export const SimulationMode = () => {
     setSimulationResult(null);
     setMiguelResponse("");
     setViewMode("clean");
+    // End simulation mode when resetting
+    endSimulation();
   };
 
   const askMiguel = async () => {
@@ -402,6 +527,7 @@ export const SimulationMode = () => {
           body: JSON.stringify({
             context: "analise_simulacao_admin",
             simulationResult: simulationResult,
+            language: simulationLanguage, // Pass simulation language to Miguel
           }),
         }
       );
@@ -475,16 +601,23 @@ export const SimulationMode = () => {
     <div className="space-y-8">
       {/* Breadcrumbs */}
       <div className="text-[13px] text-muted-foreground">
-        Simulação
+        {t('simulation_mode')}
       </div>
 
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
-          Modo Simulação
-        </h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
+            {t('simulation_mode')}
+          </h1>
+          {isSimulationActive && currentLangInfo && (
+            <Badge variant="outline" className="text-xs bg-accent/10 border-accent/20">
+              {currentLangInfo.flag} {currentLangInfo.code.toUpperCase()}
+            </Badge>
+          )}
+        </div>
         <p className="text-muted-foreground text-sm max-w-xl">
-          Execute testes como um cliente para validar cálculos e resultados, sem afetar dados reais.
+          {t('sandbox_description')}
         </p>
       </div>
 
@@ -493,9 +626,9 @@ export const SimulationMode = () => {
         <div className="flex items-start gap-3">
           <FlaskConical className="w-5 h-5 text-accent shrink-0 mt-0.5" strokeWidth={1.5} />
           <div>
-            <p className="font-medium text-sm text-foreground">Ambiente Sandbox</p>
+            <p className="font-medium text-sm text-foreground">{t('sandbox_environment')}</p>
             <p className="text-muted-foreground text-xs mt-1">
-              Todas as simulações são executadas em memória. Nenhum dado é salvo no banco real.
+              {t('sandbox_description')}
             </p>
           </div>
         </div>
@@ -505,10 +638,10 @@ export const SimulationMode = () => {
       <Tabs defaultValue="individual" className="space-y-6">
         <TabsList className="bg-muted/50 p-1 h-auto rounded-xl">
           <TabsTrigger value="individual" className="text-sm rounded-lg py-2 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            Teste Individual
+            {t('individual_test')}
           </TabsTrigger>
           <TabsTrigger value="journey" className="text-sm rounded-lg py-2 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            Jornada Completa
+            {t('complete_journey')}
           </TabsTrigger>
         </TabsList>
 
@@ -525,7 +658,7 @@ export const SimulationMode = () => {
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium">{test.name}</h3>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {test.questions_count} perguntas • {test.estimated_minutes} min
+                        {test.questions_count} {t('questions')} • {test.estimated_minutes} {t('minutes')}
                       </p>
                     </div>
                   </div>
@@ -536,7 +669,7 @@ export const SimulationMode = () => {
                       className="flex-1 md:flex-none bg-foreground text-background hover:bg-foreground/90 rounded-xl h-10"
                     >
                       <Play className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                      Simular
+                      {t('simulate')}
                     </Button>
                     <Button
                       variant="outline"
@@ -544,7 +677,7 @@ export const SimulationMode = () => {
                       className="flex-1 md:flex-none rounded-xl h-10 border-border/50"
                     >
                       <Zap className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                      Auto
+                      {t('auto')}
                     </Button>
                   </div>
                 </div>
@@ -559,9 +692,9 @@ export const SimulationMode = () => {
               <div className="flex items-center gap-3">
                 <Route className="w-5 h-5 text-muted-foreground" strokeWidth={1.5} />
                 <div>
-                  <h3 className="font-medium">Simular Jornada Completa</h3>
+                  <h3 className="font-medium">{t('simulate_complete_journey')}</h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Execute automaticamente todos os 7 testes e gere o Mapa da Essência
+                    {t('journey_description')}
                   </p>
                 </div>
               </div>
@@ -570,50 +703,16 @@ export const SimulationMode = () => {
                 <div className="space-y-4 pt-4">
                   <Progress value={journeyProgress} className="h-2" />
                   <p className="text-sm text-center text-muted-foreground">
-                    Processando jornada... {Math.round(journeyProgress)}%
+                    {t('processing_journey')} {Math.round(journeyProgress)}%
                   </p>
                 </div>
               ) : (
                 <Button
                   className="w-full bg-foreground text-background hover:bg-foreground/90 rounded-xl h-12 mt-4"
-                  onClick={async () => {
-                    setIsRunningJourney(true);
-                    setJourneyResults([]);
-                    const journeyOrder = ["arquetipos_proposito", "disc", "inteligencias_multiplas", "linguagens_amor", "mbti", "eneagrama", "temperamentos"];
-                    const orderedTests = journeyOrder.map(type => tests.find(t => t.type === type)).filter(Boolean) as Test[];
-                    
-                    for (let i = 0; i < orderedTests.length; i++) {
-                      const test = orderedTests[i];
-                      setJourneyProgress(((i + 1) / orderedTests.length) * 100);
-                      
-                      const qs = await fetchQuestions(test.id);
-                      const randomAnswers = qs.map(q => ({
-                        questionId: q.id,
-                        questionNumber: q.question_number,
-                        answer: { value: Math.floor(Math.random() * 5) + 1 }
-                      }));
-                      
-                      const answersForCalc = randomAnswers.map(a => ({ question_id: a.questionId, answer: a.answer }));
-                      let result: any = { testName: test.name, testType: test.type };
-                      
-                      if (test.type === "disc") {
-                        result = { ...result, ...getDISCResults(answersForCalc as any) };
-                      } else if (test.type === "arquetipos_proposito") {
-                        const scores = calculateArchetypeScores(answersForCalc);
-                        result = { ...result, scores, dominantArchetypes: getDominantArchetypes(scores) };
-                      }
-                      
-                      setJourneyResults(prev => [...prev, result]);
-                      await new Promise(r => setTimeout(r, 500));
-                    }
-                    
-                    setIsRunningJourney(false);
-                    toast.success("Jornada simulada completa!");
-                    logSimulationAction("journey_completed", { results: journeyResults });
-                  }}
+                  onClick={() => requestJourneySimulation()}
                 >
                   <Route className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                  Iniciar Jornada Simulada
+                  {t('start_simulated_journey')}
                 </Button>
               )}
               
@@ -1129,8 +1228,40 @@ export const SimulationMode = () => {
     );
   }
 
+  // Get current simulation language info
+  const currentLangInfo = SIMULATION_LANGUAGES.find(l => l.code === simulationLanguage);
+
   return (
     <div className="max-w-4xl">
+      {/* Language Selection Dialog */}
+      <SimulationLanguageDialog
+        open={showLanguageDialog}
+        onOpenChange={setShowLanguageDialog}
+        onSelectLanguage={handleLanguageSelected}
+      />
+
+      {/* Active Simulation Language Badge */}
+      {isSimulationActive && (
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-2 px-3 py-2 bg-accent/10 rounded-lg border border-accent/20">
+            <Globe className="w-4 h-4 text-accent" strokeWidth={1.5} />
+            <span className="text-sm font-medium">
+              {t('simulation_mode')}: {currentLangInfo?.flag} {currentLangInfo?.name}
+            </span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              resetSimulation();
+            }}
+            className="text-xs rounded-lg"
+          >
+            {t('end_simulation')}
+          </Button>
+        </div>
+      )}
+
       {phase === "select" && renderTestSelector()}
       {phase === "executing" && renderExecution()}
       {phase === "results" && renderResults()}
