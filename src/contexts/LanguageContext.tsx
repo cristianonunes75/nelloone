@@ -5,6 +5,8 @@ import enLanding from '@/locales/en/landing.json';
 import ptLanding from '@/locales/pt/landing.json';
 import enMiguel from '@/locales/en/miguel.json';
 import ptMiguel from '@/locales/pt/miguel.json';
+import enUser from '@/locales/en/user.json';
+import ptUser from '@/locales/pt/user.json';
 
 export type Language = 'en' | 'pt';
 
@@ -56,14 +58,16 @@ interface Translations {
   };
 }
 
-const translations: Record<Language, Translations> = {
+const translations: Record<Language, Translations & { user: typeof enUser }> = {
   en: {
     landing: enLanding,
     miguel: enMiguel,
+    user: enUser,
   },
   pt: {
     landing: ptLanding,
     miguel: ptMiguel,
+    user: ptUser,
   },
 };
 

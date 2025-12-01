@@ -1,0 +1,85 @@
+{
+  "sidebar": {
+    "profile": "Profile",
+    "my_tests": "My Tests",
+    "map": "Nello One Map",
+    "history": "Results History",
+    "billing": "Billing & Invoices",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Welcome to your personal dashboard",
+    "description": "Here you can track your Nello One journey.",
+    "details": "Profile Details",
+    "full_name": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "profession": "Profession",
+    "language": "Account Language",
+    "created_at": "Member since",
+    "edit_profile": "Edit Profile",
+    "change_password": "Change Password",
+    "save_changes": "Save Changes",
+    "saving": "Saving...",
+    "email_readonly": "Email cannot be changed",
+    "success": "Profile updated!",
+    "success_description": "Your information has been saved successfully.",
+    "error": "Error saving",
+    "back": "Back"
+  },
+  "tests": {
+    "title": "My Tests",
+    "subtitle": "Your completed tests",
+    "empty": "You haven't completed any tests yet.",
+    "start_journey": "Start your journey",
+    "status": {
+      "completed": "Completed",
+      "in_progress": "In Progress",
+      "not_started": "Not Started"
+    },
+    "view_result": "View Result",
+    "continue": "Continue",
+    "completed_on": "Completed on"
+  },
+  "map": {
+    "title": "Nello One Map",
+    "subtitle": "Essential Map",
+    "description": "Your integrated self-knowledge map combining all test results.",
+    "not_generated": "Your map hasn't been generated yet.",
+    "complete_tests": "Complete all 7 tests to unlock your personalized map.",
+    "generate": "Generate new map",
+    "export_pdf": "Download professional PDF",
+    "share": "Share",
+    "view_map": "View Map"
+  },
+  "history": {
+    "title": "Results History",
+    "subtitle": "Previous results",
+    "empty": "No results found.",
+    "view_details": "View details"
+  },
+  "billing": {
+    "title": "Billing & Invoices",
+    "subtitle": "Manage your subscription and payments",
+    "subscription": "Subscription",
+    "active_subscription": "Active subscription",
+    "no_subscription": "You have no active subscriptions",
+    "next_payment": "Next Payment",
+    "plan": "Plan",
+    "status": "Status",
+    "invoices": "Invoices",
+    "no_invoices": "No invoices found",
+    "view_invoice": "View invoice",
+    "change_plan": "Change plan",
+    "cancel_subscription": "Cancel subscription",
+    "manage": "Manage Billing"
+  },
+  "nav": {
+    "my_profile": "My Profile",
+    "my_journey": "My Journey",
+    "admin_panel": "Admin Panel",
+    "logout": "Sign Out"
+  }
+}
