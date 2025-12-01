@@ -9,25 +9,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Shield, Camera, User, ChevronDown } from "lucide-react";
+import { Shield, User, ChevronDown } from "lucide-react";
 
 type UserRole = "admin" | "fotografo" | "cliente";
 
-const roleIcons: Record<UserRole, React.ReactNode> = {
+const roleIcons: Record<string, React.ReactNode> = {
   admin: <Shield className="w-4 h-4" />,
-  fotografo: <Camera className="w-4 h-4" />,
   cliente: <User className="w-4 h-4" />,
 };
 
-const roleNames: Record<UserRole, string> = {
+const roleNames: Record<string, string> = {
   admin: "Administrador",
-  fotografo: "Fotógrafo",
   cliente: "Cliente",
 };
 
-const roleRoutes: Record<UserRole, string> = {
+const roleRoutes: Record<string, string> = {
   admin: "/admin",
-  fotografo: "/fotografo",
   cliente: "/cliente",
 };
 
@@ -35,8 +32,11 @@ export const RoleSwitcher = () => {
   const { userRoles, userRole, setActiveRole } = useAuth();
   const navigate = useNavigate();
 
-  // Only show switcher if user has multiple roles
-  if (!userRoles || userRoles.length <= 1) {
+  // Filter out fotografo role - only show admin and cliente
+  const availableRoles = userRoles?.filter(role => role === "admin" || role === "cliente") || [];
+
+  // Only show switcher if user has admin role (can switch between admin/cliente)
+  if (!availableRoles.includes("admin")) {
     return null;
   }
 
@@ -45,28 +45,31 @@ export const RoleSwitcher = () => {
     navigate(roleRoutes[role]);
   };
 
+  // Determine current display role (map fotografo to cliente for display)
+  const displayRole = userRole === "fotografo" ? "cliente" : userRole;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
-          {userRole && roleIcons[userRole]}
-          {userRole && roleNames[userRole]}
+          {displayRole && roleIcons[displayRole]}
+          {displayRole && roleNames[displayRole]}
           <ChevronDown className="w-4 h-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>Alternar Perfil</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {userRoles.map((role) => (
+        {["admin", "cliente"].map((role) => (
           <DropdownMenuItem
             key={role}
-            onClick={() => handleRoleSwitch(role)}
+            onClick={() => handleRoleSwitch(role as UserRole)}
             className="gap-2 cursor-pointer"
-            disabled={role === userRole}
+            disabled={displayRole === role}
           >
             {roleIcons[role]}
             <span>{roleNames[role]}</span>
-            {role === userRole && (
+            {displayRole === role && (
               <span className="ml-auto text-xs text-muted-foreground">Atual</span>
             )}
           </DropdownMenuItem>
