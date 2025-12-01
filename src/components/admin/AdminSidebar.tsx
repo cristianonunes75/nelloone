@@ -8,6 +8,7 @@ import {
   FileEdit,
   Route,
   Wrench,
+  FlaskConical,
   ChevronDown
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -43,10 +44,16 @@ const menuSections = [
     ]
   },
   {
+    label: "FERRAMENTAS",
+    items: [
+      { title: "Modo Simulação", url: "/admin/simulador", icon: FlaskConical },
+      { title: "Admin Tools", url: "/admin/tools", icon: Wrench },
+    ]
+  },
+  {
     label: "SISTEMA",
     items: [
       { title: "Configurações", url: "/admin/configuracoes", icon: Settings },
-      { title: "Admin Tools", url: "/admin/tools", icon: Wrench },
     ]
   }
 ];
