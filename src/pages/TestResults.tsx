@@ -21,6 +21,9 @@ import { calculateTemperamentos } from "@/lib/temperamentos";
 import { useAuth } from "@/hooks/useAuth";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useTests } from "@/hooks/useTests";
+import { GrowthInsightsCard } from "@/components/growth/GrowthInsightsCard";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { getGrowthInsights } from "@/lib/growthInsights";
 
 export default function TestResults() {
   const { userTestId } = useParams();
@@ -29,7 +32,9 @@ export default function TestResults() {
   const { user, userRole } = useAuth();
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   const { resetTest } = useTests();
+  const { language } = useLanguage();
   const isAdmin = userRole === "admin";
+  const lang = language === 'en' ? 'en' : 'pt';
 
   const { data: userTest, isLoading } = useQuery({
     queryKey: ["user-test-result", userTestId],
@@ -614,10 +619,17 @@ export default function TestResults() {
         )}
       </div>
 
+      {/* Growth Insights Card - Before CTA */}
+      {userTest.tests?.type && (
+        <GrowthInsightsCard 
+          insights={getGrowthInsights(userTest.tests.type, lang)} 
+        />
+      )}
+
       <div className="flex gap-4">
         <Button onClick={handleDownloadPDF} className="flex-1">
           <Download className="mr-2 h-4 w-4" />
-          Baixar PDF
+          {lang === 'en' ? 'Download PDF' : 'Baixar PDF'}
         </Button>
       </div>
 
