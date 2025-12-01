@@ -192,136 +192,189 @@ export const UsersManagement2 = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-4 md:space-y-6 max-w-6xl">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Usuários</h1>
-        <p className="text-muted-foreground text-sm">Gerencie todos os usuários da plataforma</p>
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Usuários</h1>
+        <p className="text-muted-foreground text-xs md:text-sm">Gerencie todos os usuários da plataforma</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
-        <Card className="p-4 border-border/50">
-          <p className="text-2xl font-semibold">{stats.total}</p>
-          <p className="text-xs text-muted-foreground">Total</p>
+      {/* Stats - Scrollable on mobile */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+        <Card className="p-3 md:p-4 border-border/50">
+          <p className="text-lg md:text-2xl font-semibold">{stats.total}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Total</p>
         </Card>
-        <Card className="p-4 border-border/50">
-          <p className="text-2xl font-semibold text-blue-600">{stats.active}</p>
-          <p className="text-xs text-muted-foreground">Ativos</p>
+        <Card className="p-3 md:p-4 border-border/50">
+          <p className="text-lg md:text-2xl font-semibold text-blue-600">{stats.active}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Ativos</p>
         </Card>
-        <Card className="p-4 border-border/50">
-          <p className="text-2xl font-semibold text-emerald-600">{stats.paying}</p>
-          <p className="text-xs text-muted-foreground">Pagantes</p>
+        <Card className="p-3 md:p-4 border-border/50">
+          <p className="text-lg md:text-2xl font-semibold text-emerald-600">{stats.paying}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Pagantes</p>
         </Card>
-        <Card className="p-4 border-border/50">
-          <p className="text-2xl font-semibold text-violet-600">{stats.completed}</p>
-          <p className="text-xs text-muted-foreground">Jornada Completa</p>
+        <Card className="p-3 md:p-4 border-border/50">
+          <p className="text-lg md:text-2xl font-semibold text-violet-600">{stats.completed}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Jornada Completa</p>
         </Card>
       </div>
 
       {/* Filters */}
       <Card className="border-border/50">
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-sm">
+        <CardHeader className="pb-3 md:pb-4 px-4 md:px-6">
+          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar por nome..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-sm"
               />
             </div>
-            <Tabs value={filter} onValueChange={setFilter}>
-              <TabsList>
-                <TabsTrigger value="all">Todos</TabsTrigger>
-                <TabsTrigger value="active">Ativos</TabsTrigger>
-                <TabsTrigger value="paying">Pagantes</TabsTrigger>
-                <TabsTrigger value="completed">Completos</TabsTrigger>
-                <TabsTrigger value="pending">Pendentes</TabsTrigger>
+            <Tabs value={filter} onValueChange={setFilter} className="w-full md:w-auto">
+              <TabsList className="w-full md:w-auto grid grid-cols-3 md:flex md:grid-cols-none">
+                <TabsTrigger value="all" className="text-xs md:text-sm">Todos</TabsTrigger>
+                <TabsTrigger value="active" className="text-xs md:text-sm">Ativos</TabsTrigger>
+                <TabsTrigger value="paying" className="text-xs md:text-sm">Pagantes</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
         </CardHeader>
-        <CardContent className="pt-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead>Usuário</TableHead>
-                <TableHead className="text-center">Jornada</TableHead>
-                <TableHead className="text-center">Compras</TableHead>
-                <TableHead className="text-center">Mapa</TableHead>
-                <TableHead>Desde</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id} className="group">
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{user.full_name}</p>
-                      <p className="text-xs text-muted-foreground">{user.phone || "—"}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <div className="flex gap-0.5">
-                        {[...Array(7)].map((_, i) => (
-                          <div 
-                            key={i} 
-                            className={`w-2 h-2 rounded-full ${i < user.test_progress ? 'bg-primary' : 'bg-muted'}`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-xs text-muted-foreground ml-1">{user.test_progress}/7</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Badge variant="outline" className={user.purchases_count > 0 ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : ""}>
-                      {user.purchases_count}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {user.has_mapa ? (
-                      <Map className="w-4 h-4 text-violet-600 mx-auto" />
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {format(new Date(user.created_at), "dd/MM/yy", { locale: ptBR })}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setShowDetails(true);
-                        }}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleImpersonate(user)}
-                        disabled={impersonating === user.id || user.roles.includes('admin')}
-                      >
-                        {impersonating === user.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <UserCog className="w-4 h-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </TableCell>
+        <CardContent className="pt-0 px-4 md:px-6">
+          {/* Desktop Table */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead>Usuário</TableHead>
+                  <TableHead className="text-center">Jornada</TableHead>
+                  <TableHead className="text-center">Compras</TableHead>
+                  <TableHead className="text-center">Mapa</TableHead>
+                  <TableHead>Desde</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map((user) => (
+                  <TableRow key={user.id} className="group">
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{user.full_name}</p>
+                        <p className="text-xs text-muted-foreground">{user.phone || "—"}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <div className="flex gap-0.5">
+                          {[...Array(7)].map((_, i) => (
+                            <div 
+                              key={i} 
+                              className={`w-2 h-2 rounded-full ${i < user.test_progress ? 'bg-primary' : 'bg-muted'}`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs text-muted-foreground ml-1">{user.test_progress}/7</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge variant="outline" className={user.purchases_count > 0 ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : ""}>
+                        {user.purchases_count}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {user.has_mapa ? (
+                        <Map className="w-4 h-4 text-violet-600 mx-auto" />
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {format(new Date(user.created_at), "dd/MM/yy", { locale: ptBR })}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setShowDetails(true);
+                          }}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleImpersonate(user)}
+                          disabled={impersonating === user.id || user.roles.includes('admin')}
+                        >
+                          {impersonating === user.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <UserCog className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-3">
+            {filteredUsers.map((user) => (
+              <Card key={user.id} className="p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <p className="font-medium text-sm">{user.full_name}</p>
+                    <p className="text-xs text-muted-foreground">{user.phone || "Sem telefone"}</p>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {format(new Date(user.created_at), "dd/MM/yy", { locale: ptBR })}
+                  </span>
+                </div>
+                <div className="flex items-center gap-4 mb-3 text-xs">
+                  <div className="flex items-center gap-1">
+                    <span className="text-muted-foreground">Jornada:</span>
+                    <span className="font-medium">{user.test_progress}/7</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-muted-foreground">Compras:</span>
+                    <span className="font-medium">{user.purchases_count}</span>
+                  </div>
+                  {user.has_mapa && <Map className="w-3.5 h-3.5 text-violet-600" />}
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => {
+                      setSelectedUser(user);
+                      setShowDetails(true);
+                    }}
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    Ver
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => handleImpersonate(user)}
+                    disabled={impersonating === user.id || user.roles.includes('admin')}
+                  >
+                    <UserCog className="w-4 h-4 mr-1" />
+                    Simular
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
