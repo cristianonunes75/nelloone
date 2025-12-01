@@ -23,17 +23,17 @@ interface MiguelAgentProps {
 }
 
 const INITIAL_QUICK_REPLIES_LANDING: QuickReply[] = [
-  { text: "O que é o Essentia?", action: "O que é o Essentia?" },
-  { text: "Quais testes existem?", action: "Quais testes o Essentia oferece?" },
+  { text: "O que é o NELLO ONE?", action: "O que é o NELLO ONE?" },
+  { text: "Quais testes existem?", action: "Quais testes o NELLO ONE oferece?" },
   { text: "Quero começar minha jornada", action: "Quero começar a minha jornada de autoconhecimento." },
-  { text: "Como funciona?", action: "Como funciona o processo do Essentia?" },
+  { text: "Como funciona?", action: "Como funciona o processo do NELLO ONE?" },
 ];
 
 const INITIAL_QUICK_REPLIES_CLIENTE: QuickReply[] = [
   { text: "Qual o próximo passo?", action: "Qual é o próximo passo na minha jornada?" },
   { text: "Explique meus resultados", action: "Pode me ajudar a entender meus resultados?" },
   { text: "O que significa esse teste?", action: "O que o próximo teste vai revelar sobre mim?" },
-  { text: "Preciso de orientação", action: "Preciso de uma orientação sobre minha essência." },
+  { text: "Preciso de orientação", action: "Preciso de uma orientação sobre minha personalidade." },
 ];
 
 export function MiguelAgent({ location, completedTests = [], currentStep, testResults }: MiguelAgentProps) {
@@ -63,12 +63,12 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
   useEffect(() => {
     if (isOpen && !hasGreeted && messages.length === 0) {
       const greeting = location === "landing"
-        ? `Oi${profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}! Eu sou o Miguel. Fico feliz que você está aqui.\n\nA sua história importa e eu estou aqui para te ajudar a enxergar o que talvez você ainda não percebeu sobre si mesmo.\n\nAqui dentro, a gente caminha junto para revelar a sua essência, com calma, clareza e verdade.\n\nComo posso te ajudar hoje?`
+        ? `Oi${profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}! Eu sou o Miguel, seu guia no NELLO ONE.\n\nO NELLO ONE combina ciência de personalidade, design emocional e inteligência artificial para revelar padrões internos que transformam a forma como você se vê, decide e se relaciona.\n\nO caminho começa dentro. Como posso te ajudar hoje?`
         : `Oi${profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}! Que bom te ver por aqui.\n\n${completedTests.length === 0 
             ? "Você está no início da sua jornada de autoconhecimento. O primeiro passo é o teste de Arquétipos, que vai revelar a energia que te move. Quando quiser, é só começar!" 
             : completedTests.length < 7 
-              ? `Você já completou ${completedTests.length} teste${completedTests.length > 1 ? 's' : ''}. Continue sua jornada para descobrir mais sobre sua essência.`
-              : "Parabéns! Você completou todos os testes. Seu Mapa da Essência está pronto para ser revelado!"
+              ? `Você já completou ${completedTests.length} teste${completedTests.length > 1 ? 's' : ''}. Continue sua jornada para descobrir mais sobre quem você é.`
+              : "Parabéns! Você completou todos os testes. Seu Mapa NELLO ONE está pronto para ser revelado!"
           }\n\nComo posso te ajudar?`;
 
       setMessages([{ role: "assistant", content: greeting }]);
@@ -171,7 +171,7 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
         setQuickReplies([
           { text: "Próximo teste", action: "Me fale sobre o próximo teste." },
           { text: "Meus resultados", action: "Quero entender melhor meus resultados." },
-          { text: "Mapa da Essência", action: "O que é o Mapa da Essência?" },
+          { text: "Mapa NELLO ONE", action: "O que é o Mapa NELLO ONE?" },
         ]);
       }
 
@@ -197,7 +197,7 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-primary shadow-lg hover:bg-primary/90 hover:scale-105 transition-all duration-300"
+        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-ink-blue shadow-lg hover:bg-ink-deep hover:scale-105 transition-all duration-300"
         size="icon"
       >
         <Sparkles className="h-6 w-6" />
@@ -212,10 +212,10 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
         onClick={() => setIsMinimized(false)}
       >
         <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
+          <Sparkles className="h-5 w-5 text-ink-blue" />
           <span className="text-sm font-medium">Miguel</span>
           {messages.length > 0 && (
-            <span className="bg-primary text-primary-foreground text-xs rounded-full px-2">
+            <span className="bg-ink-blue text-primary-foreground text-xs rounded-full px-2">
               {messages.length}
             </span>
           )}
@@ -227,14 +227,14 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
   return (
     <div className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] h-[500px] max-h-[calc(100vh-6rem)] bg-card border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
+      <div className="bg-ink-blue text-primary-foreground p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
             <h3 className="font-semibold">Miguel</h3>
-            <p className="text-xs opacity-80">Seu guia no Essentia</p>
+            <p className="text-xs opacity-80">Seu guia no NELLO ONE</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -268,7 +268,7 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                   message.role === "user"
-                    ? "bg-primary text-primary-foreground rounded-br-md"
+                    ? "bg-ink-blue text-primary-foreground rounded-br-md"
                     : "bg-muted text-foreground rounded-bl-md"
                 }`}
               >
@@ -320,13 +320,13 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
             onChange={(e) => setInput(e.target.value)}
             placeholder="Digite sua mensagem..."
             disabled={isStreaming}
-            className="flex-1 bg-muted border-0 focus-visible:ring-1 focus-visible:ring-primary"
+            className="flex-1 bg-muted border-0 focus-visible:ring-1 focus-visible:ring-ink-blue"
           />
           <Button
             type="submit"
             size="icon"
             disabled={!input.trim() || isStreaming}
-            className="shrink-0"
+            className="shrink-0 bg-ink-blue hover:bg-ink-deep"
           >
             <Send className="h-4 w-4" />
           </Button>

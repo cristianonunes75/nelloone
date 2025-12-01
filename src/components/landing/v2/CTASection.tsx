@@ -18,11 +18,11 @@ export const CTASection = () => {
         <div className="max-w-3xl mx-auto text-center">
           <p 
             className={cn(
-              "font-miguel text-lg md:text-xl lg:text-2xl text-primary-foreground/80 mb-4 md:mb-6 transition-all duration-700",
+              "font-premium text-lg md:text-xl lg:text-2xl text-primary-foreground/80 mb-4 md:mb-6 transition-all duration-700",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            "Sua essência é única. Descubra."
+            "Seu próximo passo começa dentro."
           </p>
           <h2 
             className={cn(
@@ -30,8 +30,8 @@ export const CTASection = () => {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            A resposta que você procura
-            <span className="block">está dentro de você.</span>
+            O caminho começa
+            <span className="block">dentro.</span>
           </h2>
           <p 
             className={cn(
@@ -45,12 +45,12 @@ export const CTASection = () => {
           <Button 
             size="lg" 
             className={cn(
-              "group w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 text-sm md:text-base rounded-full bg-gold hover:bg-gold-dark text-miguel-midnight shadow-large hover-lift press-effect transition-all duration-700 delay-300",
+              "group w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 text-sm md:text-base rounded-full bg-background hover:bg-background/90 text-ink-blue shadow-large hover-lift press-effect transition-all duration-700 delay-300",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
             onClick={() => navigate("/auth")}
           >
-            Começar Teste de Arquétipos (Grátis)
+            Iniciar Agora (Grátis)
             <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform duration-300" />
           </Button>
         </div>

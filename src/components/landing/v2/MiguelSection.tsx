@@ -24,11 +24,11 @@ export const MiguelSection = () => {
           <div ref={headerRef} className="text-center mb-10 md:mb-16">
             <span 
               className={cn(
-                "inline-block text-gold font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4 transition-all duration-500",
+                "inline-block text-ink-blue font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4 transition-all duration-500",
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              Seu Guia na Jornada
+              Seu Guia Interno
             </span>
             <h2 
               className={cn(
@@ -44,9 +44,8 @@ export const MiguelSection = () => {
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              Um mentor de IA criado para acompanhar você em cada passo da sua 
-              jornada de autodescoberta, com a sabedoria de um conselheiro e 
-              a presença de um amigo.
+              Miguel analisa seus resultados, identifica padrões, explica traços fundamentais 
+              e acompanha sua evolução ao longo do tempo. Um guia pessoal, seguro, presente e claro.
             </p>
           </div>
 
@@ -61,16 +60,16 @@ export const MiguelSection = () => {
             >
               <div className="aspect-square max-w-[280px] md:max-w-md mx-auto relative">
                 {/* Glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gold/20 to-miguel-deep/20 rounded-full blur-3xl subtle-pulse" />
+                <div className="absolute inset-0 bg-gradient-to-br from-bruma-blue/30 to-ink-blue/20 rounded-full blur-3xl subtle-pulse" />
                 
                 {/* Miguel image */}
                 <div className="relative w-full h-full rounded-2xl md:rounded-3xl overflow-hidden shadow-large border border-border/30">
                   <img 
                     src={miguelImage} 
-                    alt="Miguel - Seu guia de autoconhecimento"
+                    alt="Miguel - Seu guia no NELLO ONE"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-miguel-midnight/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink-deep/40 to-transparent" />
                 </div>
 
                 {/* Floating icon - Smaller on mobile */}
@@ -78,8 +77,8 @@ export const MiguelSection = () => {
                   "absolute -bottom-3 -right-3 md:-bottom-4 md:-right-4 w-12 h-12 md:w-16 md:h-16 bg-card rounded-xl md:rounded-2xl shadow-large flex items-center justify-center border border-border/30 transition-all duration-500 delay-300",
                   contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                 )}>
-                  <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-gold/20 flex items-center justify-center">
-                    <svg className="w-3 h-3 md:w-4 md:h-4 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-bruma-blue/30 flex items-center justify-center">
+                    <svg className="w-3 h-3 md:w-4 md:h-4 text-ink-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M12 2C12 2 8 6 8 10c0 2.21 1.79 4 4 4s4-1.79 4-4c0-4-4-8-4-8z" />
                       <path d="M12 14v8" />
                       <path d="M9 18h6" />
@@ -97,10 +96,9 @@ export const MiguelSection = () => {
               )}
             >
               <div className="bg-card rounded-xl md:rounded-2xl p-4 md:p-6 border border-border/30 shadow-soft hover:shadow-medium transition-shadow duration-300">
-                <p className="font-miguel text-foreground leading-relaxed text-base md:text-xl">
-                  "Olá, sou Miguel. Estou aqui para guiar você em uma jornada de 
-                  autodescoberta. Não tenho pressa, nem respostas prontas. 
-                  Tenho perguntas que vão te ajudar a encontrar as suas próprias respostas."
+                <p className="font-premium text-foreground leading-relaxed text-base md:text-xl">
+                  "Eu sou o Miguel, seu guia no NELLO ONE.
+                  Minha missão é ajudar você a entender quem você é, com clareza, profundidade e leveza."
                 </p>
               </div>
 
@@ -114,8 +112,8 @@ export const MiguelSection = () => {
                     )}
                     style={contentVisible ? getStaggerDelay(index + 2, 0.1) : {}}
                   >
-                    <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
-                      <trait.icon className="w-4 h-4 md:w-5 md:h-5 text-gold" strokeWidth={1.5} />
+                    <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-ink-blue/10 flex items-center justify-center flex-shrink-0">
+                      <trait.icon className="w-4 h-4 md:w-5 md:h-5 text-ink-blue" strokeWidth={1.5} />
                     </div>
                     <div>
                       <h3 className="font-medium text-foreground text-sm md:text-base mb-0.5 md:mb-1">{trait.title}</h3>
@@ -128,7 +126,7 @@ export const MiguelSection = () => {
               <Button 
                 variant="outline"
                 size="lg" 
-                className="group w-full md:w-auto h-11 md:h-12 px-6 text-sm md:text-base rounded-full border-gold/30 text-foreground hover:bg-gold/5 hover:border-gold/50 press-effect"
+                className="group w-full md:w-auto h-11 md:h-12 px-6 text-sm md:text-base rounded-full border-ink-blue/30 text-foreground hover:bg-ink-blue/5 hover:border-ink-blue/50 press-effect"
                 onClick={() => navigate("/auth")}
               >
                 Iniciar conversa com Miguel

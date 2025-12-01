@@ -2,7 +2,7 @@ import { Lock, Check } from "lucide-react";
 import { useScrollAnimation, getStaggerDelay } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
 
-// Ícones ultrafinos customizados conforme especificação
+// Ícones ultrafinos customizados
 const SunIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="4" />
@@ -124,18 +124,18 @@ export const JourneySection = () => {
   const { ref: timelineRef, isVisible: timelineVisible } = useScrollAnimation({ rootMargin: "0px 0px -100px 0px" });
 
   return (
-    <section className="py-16 md:py-24 lg:py-32 bg-soul-light/50">
+    <section className="py-16 md:py-24 lg:py-32 bg-bruma-light/50">
       <div className="container px-4 md:px-6">
         <div className="max-w-5xl mx-auto">
           {/* Section header */}
           <div ref={headerRef} className="text-center mb-10 md:mb-16">
             <span 
               className={cn(
-                "inline-block text-gold font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4 transition-all duration-500",
+                "inline-block text-ink-blue font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4 transition-all duration-500",
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              A Jornada Completa
+              Os 7 Testes Profissionais
             </span>
             <h2 
               className={cn(
@@ -143,8 +143,8 @@ export const JourneySection = () => {
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              7 dimensões para revelar
-              <span className="block">sua essência</span>
+              Testes reconhecidos,
+              <span className="block">linguagem acessível</span>
             </h2>
             <p 
               className={cn(
@@ -198,15 +198,15 @@ export const JourneySection = () => {
                   >
                     <div className="group bg-card rounded-xl md:rounded-2xl p-4 md:p-6 border border-border/50 shadow-soft hover:shadow-medium hover:border-border transition-all duration-300">
                       <div className="flex items-start gap-3 md:gap-4">
-                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gold/15 transition-colors duration-300">
-                          <test.icon className="w-5 h-5 md:w-6 md:h-6 text-gold" />
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-ink-blue/10 flex items-center justify-center flex-shrink-0 group-hover:bg-ink-blue/15 transition-colors duration-300">
+                          <test.icon className="w-5 h-5 md:w-6 md:h-6 text-ink-blue" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 md:mb-2 flex-wrap">
                             <span className="lg:hidden text-xs md:text-sm text-muted-foreground">#{test.number}</span>
                             <h3 className="font-display text-base md:text-lg text-foreground">{test.name}</h3>
                             {test.isFree ? (
-                              <span className="px-2 py-0.5 text-[10px] md:text-xs font-medium bg-gold/10 text-gold rounded-full">
+                              <span className="px-2 py-0.5 text-[10px] md:text-xs font-medium bg-ink-blue/10 text-ink-blue rounded-full">
                                 Grátis
                               </span>
                             ) : (
@@ -233,9 +233,9 @@ export const JourneySection = () => {
               timelineVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
-            <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-full bg-gold/10 text-gold hover:bg-gold/15 transition-colors duration-300">
+            <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-full bg-ink-blue/10 text-ink-blue hover:bg-ink-blue/15 transition-colors duration-300">
               <Check className="w-4 h-4 md:w-5 md:h-5" strokeWidth={1.5} />
-              <span className="font-medium text-sm md:text-base">Ao final: seu Mapa da Essência completo</span>
+              <span className="font-medium text-sm md:text-base">Ao final: seu Mapa NELLO ONE completo</span>
             </div>
           </div>
         </div>

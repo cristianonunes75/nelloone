@@ -8,12 +8,12 @@ interface LogoTextProps {
 
 export const LogoText = ({ className = "", variant = "default", clickable = true }: LogoTextProps) => {
   const navigate = useNavigate();
-  const baseStyles = "font-serif font-light tracking-[0.3em] uppercase";
+  const baseStyles = "font-sans font-semibold tracking-[0.15em] uppercase";
   
   const variantStyles = {
     default: "text-foreground",
     outline: "text-transparent [-webkit-text-stroke:1.5px_currentColor] stroke-current",
-    solid: "text-gold",
+    solid: "text-ink-blue",
   };
 
   const handleClick = () => {
@@ -28,7 +28,8 @@ export const LogoText = ({ className = "", variant = "default", clickable = true
       className={`${baseStyles} ${variantStyles[variant]} ${clickable ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''} ${className}`}
       onClick={handleClick}
     >
-      <span>Essentia</span>
+      <span className="font-semibold">NELLO</span>
+      <span className="font-light ml-1 opacity-70">ONE</span>
     </div>
   );
 };

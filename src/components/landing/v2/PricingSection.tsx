@@ -80,7 +80,7 @@ const tests = [
 
 const bundleFeatures = [
   "Acesso aos 7 testes completos",
-  "Mapa da Essência personalizado",
+  "Mapa NELLO ONE personalizado",
   "Análise integrada por IA",
   "Export em PDF profissional",
   "Acesso vitalício aos resultados",
@@ -102,7 +102,7 @@ export const PricingSection = () => {
           <div ref={headerRef} className="text-center mb-10 md:mb-16">
             <span 
               className={cn(
-                "inline-block text-gold font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4 transition-all duration-500",
+                "inline-block text-ink-blue font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4 transition-all duration-500",
                 headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
@@ -135,20 +135,20 @@ export const PricingSection = () => {
               bundleVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             )}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-gold/10 to-soul-amber/10 rounded-2xl md:rounded-3xl blur-xl subtle-pulse" />
-            <div className="relative bg-card rounded-2xl md:rounded-3xl border border-gold/20 p-5 md:p-8 lg:p-12 shadow-soft hover:shadow-glow hover:border-gold/30 transition-all duration-500">
+            <div className="absolute inset-0 bg-gradient-to-r from-bruma-blue/20 to-lavender/20 rounded-2xl md:rounded-3xl blur-xl subtle-pulse" />
+            <div className="relative bg-card rounded-2xl md:rounded-3xl border border-ink-blue/20 p-5 md:p-8 lg:p-12 shadow-soft hover:shadow-glow hover:border-ink-blue/30 transition-all duration-500">
               <div className="flex items-center gap-2 mb-3 md:mb-4">
-                <Sparkles className="w-4 h-4 text-gold" strokeWidth={1.5} />
-                <span className="text-xs md:text-sm font-medium text-gold">Jornada Completa</span>
+                <Sparkles className="w-4 h-4 text-ink-blue" strokeWidth={1.5} />
+                <span className="text-xs md:text-sm font-medium text-ink-blue">Jornada Completa</span>
               </div>
               
               <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8 items-center">
                 <div>
                   <h3 className="font-display text-xl md:text-display-sm text-foreground mb-3 md:mb-4">
-                    Essentia Completo
+                    NELLO ONE Completo
                   </h3>
                   <p className="text-muted-foreground mb-4 md:mb-6 text-xs md:text-sm">
-                    Todos os 7 testes + Mapa da Essência gerado por IA. 
+                    Todos os 7 testes + Mapa NELLO ONE gerado por IA. 
                     A experiência completa de autoconhecimento.
                   </p>
                   <ul className="space-y-2 mb-6 md:mb-8">
@@ -161,7 +161,7 @@ export const PricingSection = () => {
                         )}
                         style={bundleVisible ? getStaggerDelay(index, 0.1) : {}}
                       >
-                        <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-gold flex-shrink-0" strokeWidth={1.5} />
+                        <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-ink-blue flex-shrink-0" strokeWidth={1.5} />
                         <span className="text-foreground text-xs md:text-sm">{feature}</span>
                       </li>
                     ))}
@@ -177,13 +177,13 @@ export const PricingSection = () => {
                       <span className="text-xs md:text-sm text-muted-foreground">Por</span>
                       <span className="font-display text-3xl md:text-4xl text-foreground">R$ 597</span>
                     </div>
-                    <p className="text-xs md:text-sm text-gold mt-1">
+                    <p className="text-xs md:text-sm text-ink-blue mt-1">
                       Economize R$ {totalIndividual - 597}
                     </p>
                   </div>
                   <Button 
                     size="lg" 
-                    className="group h-11 md:h-12 px-5 md:px-6 text-sm md:text-base rounded-full w-full md:w-auto bg-gold hover:bg-gold-dark text-primary-foreground hover-lift press-effect"
+                    className="group h-11 md:h-12 px-5 md:px-6 text-sm md:text-base rounded-full w-full md:w-auto bg-ink-blue hover:bg-ink-deep text-primary-foreground hover-lift press-effect"
                     onClick={() => navigate("/auth")}
                   >
                     Começar Jornada Completa
@@ -214,14 +214,14 @@ export const PricingSection = () => {
                   )}
                   style={testsVisible ? getStaggerDelay(index, 0.08) : {}}
                 >
-                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gold/10 flex items-center justify-center mb-3 md:mb-4">
-                    <test.icon className="w-4 h-4 md:w-5 md:h-5 text-gold" />
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-ink-blue/10 flex items-center justify-center mb-3 md:mb-4">
+                    <test.icon className="w-4 h-4 md:w-5 md:h-5 text-ink-blue" />
                   </div>
                   <h4 className="font-medium text-foreground text-xs md:text-sm mb-0.5 md:mb-1">{test.name}</h4>
                   <p className="text-[10px] md:text-xs text-muted-foreground mb-2 md:mb-3">{test.questions} perguntas</p>
                   <div className="flex items-baseline gap-0.5 md:gap-1">
                     {test.price === 0 ? (
-                      <span className="font-display text-base md:text-lg text-gold">Grátis</span>
+                      <span className="font-display text-base md:text-lg text-ink-blue">Grátis</span>
                     ) : (
                       <>
                         <span className="text-[10px] md:text-xs text-muted-foreground">R$</span>
