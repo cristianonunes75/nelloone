@@ -216,17 +216,9 @@ const App = () => (
               <GeoRedirect />
               {/* Currency Protection: Prevents cross-trade between BRL and USD */}
               <CurrencyProtection>
-                <Routes>
-                  {/* English routes with /en prefix */}
-                  <Route path="/en/*" element={
-                    <LanguageRoute>
-                      <AppRoutes />
-                    </LanguageRoute>
-                  } />
-                  
-                  {/* Default routes (Portuguese / Brazil) */}
-                  <Route path="/*" element={<AppRoutes />} />
-                </Routes>
+                <LanguageRoute>
+                  <AppRoutes />
+                </LanguageRoute>
               </CurrencyProtection>
             </AuthProvider>
           </SimulationProvider>
