@@ -44,106 +44,86 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
+  const fetchUserData = async (userId: string) => {
+    try {
+      // Fetch roles
+      const { data: rolesData, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: true });
+
+      if (rolesError) throw rolesError;
+      
+      const roles = (rolesData || []).map((r: any) => r.role as UserRole);
+      setUserRoles(roles);
+      
+      // Prioritize admin role
+      const primaryRole = roles.find(r => r === "admin") || 
+                         roles.find(r => r === "fotografo") || 
+                         roles[0] || "cliente";
+      setUserRole(primaryRole);
+
+      // Fetch profile
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (!profileError && profileData) {
+        setProfile(profileData);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setUserRoles(["cliente"]);
+      setUserRole("cliente");
+    }
+  };
+
   useEffect(() => {
+    let mounted = true;
+
+    // Check for existing session first
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!mounted) return;
+      
+      setSession(session);
+      setUser(session?.user ?? null);
+
+      if (session?.user) {
+        await fetchUserData(session.user.id);
+      }
+      
+      setIsLoading(false);
+    });
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!mounted) return;
+
         setSession(session);
         setUser(session?.user ?? null);
 
-        // Fetch user roles after state updates
         if (session?.user) {
+          // Use setTimeout to avoid deadlock
           setTimeout(async () => {
-            try {
-              // Fetch roles
-              const { data: rolesData, error: rolesError } = await supabase
-                .from("user_roles")
-                .select("role")
-                .eq("user_id", session.user.id)
-                .order("created_at", { ascending: true });
-
-              if (rolesError) throw rolesError;
-              
-              const roles = (rolesData || []).map((r: any) => r.role as UserRole);
-              setUserRoles(roles);
-              
-              const primaryRole = roles.find(r => r === "admin") || 
-                                 roles.find(r => r === "fotografo") || 
-                                 roles[0] || "cliente";
-              setUserRole(primaryRole);
-
-              // Fetch profile
-              const { data: profileData, error: profileError } = await supabase
-                .from("profiles")
-                .select("*")
-                .eq("id", session.user.id)
-                .single();
-
-              if (!profileError && profileData) {
-                setProfile(profileData);
-              }
-            } catch (error) {
-              console.error("Error fetching user data:", error);
-              setUserRoles(["cliente"]);
-              setUserRole("cliente");
-            }
+            if (!mounted) return;
+            await fetchUserData(session.user.id);
           }, 0);
         } else {
           setUserRole(null);
           setUserRoles([]);
           setProfile(null);
         }
-
-        setIsLoading(false);
       }
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        setTimeout(async () => {
-          try {
-            const { data: rolesData, error: rolesError } = await supabase
-              .from("user_roles")
-              .select("role")
-              .eq("user_id", session.user.id)
-              .order("created_at", { ascending: true });
-
-            if (rolesError) throw rolesError;
-            
-            const roles = (rolesData || []).map((r: any) => r.role as UserRole);
-            setUserRoles(roles);
-            
-            const primaryRole = roles.find(r => r === "admin") || 
-                               roles.find(r => r === "fotografo") || 
-                               roles[0] || "cliente";
-            setUserRole(primaryRole);
-
-            const { data: profileData, error: profileError } = await supabase
-              .from("profiles")
-              .select("*")
-              .eq("id", session.user.id)
-              .single();
-
-            if (!profileError && profileData) {
-              setProfile(profileData);
-            }
-          } catch (error) {
-            console.error("Error fetching user data:", error);
-            setUserRoles(["cliente"]);
-            setUserRole("cliente");
-          }
-          setIsLoading(false);
-        }, 0);
-      } else {
-        setIsLoading(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
