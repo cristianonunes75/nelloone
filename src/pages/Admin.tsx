@@ -18,6 +18,7 @@ const LandingContentManagement2 = lazy(() => import("@/components/admin/LandingC
 const ReportsManagement2 = lazy(() => import("@/components/admin/ReportsManagement2").then(m => ({ default: m.ReportsManagement2 })));
 const SystemSettings2 = lazy(() => import("@/components/admin/SystemSettings2").then(m => ({ default: m.SystemSettings2 })));
 const AdminTools = lazy(() => import("@/components/admin/AdminTools").then(m => ({ default: m.AdminTools })));
+const SimulationMode = lazy(() => import("@/components/admin/SimulationMode").then(m => ({ default: m.SimulationMode })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -65,6 +66,7 @@ const Admin = () => {
                 <Route path="/relatorios" element={<ReportsManagement2 />} />
                 <Route path="/configuracoes" element={<SystemSettings2 />} />
                 <Route path="/tools" element={<AdminTools />} />
+                <Route path="/simulador" element={<SimulationMode />} />
               </Routes>
             </Suspense>
           </main>
