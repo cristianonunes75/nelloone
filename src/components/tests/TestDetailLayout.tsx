@@ -2,12 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingFooter } from "@/components/landing/LandingFooter";
-import { ArrowLeft } from "lucide-react";
+import { BackButton } from "@/components/ui/back-button";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTests } from "@/hooks/useTests";
 import { useTestAccess } from "@/hooks/useTestAccess";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { TestImprovementsCard } from "@/components/growth/TestImprovementsCard";
 
 interface TestDetailLayoutProps {
   title: string;
@@ -15,7 +17,7 @@ interface TestDetailLayoutProps {
   storytelling: string;
   benefits: string[];
   audience: string;
-  testType: string; // Use test type instead of testId
+  testType: string;
   price?: string;
 }
 
@@ -33,18 +35,28 @@ export const TestDetailLayout = ({
   const { tests, startTestAsync } = useTests();
   const { hasPurchased } = useTestAccess();
   const { toast } = useToast();
+  const { language } = useLanguage();
 
-  // Find test by type
   const test = tests?.find(t => t.type === testType);
   const isFreeTest = test?.is_free || false;
   const hasAccess = isFreeTest || hasPurchased(test?.id || "");
+  
+  const backLabel = language === 'en' ? 'Back to Tests' : 'Voltar para Testes';
+  const discoverTitle = language === 'en' ? 'You will discover:' : 'Você vai descobrir:';
+  const audienceTitle = language === 'en' ? 'Recommended for:' : 'Indicado para:';
+  const startFreeText = language === 'en' ? 'Start Free Test' : 'Começar Teste Gratuito';
+  const startText = language === 'en' ? 'Start Test' : 'Começar Teste';
+  const lockedText = language === 'en' ? '🔒 Purchase Test' : '🔒 Adquirir Teste';
+  const loginText = language === 'en' ? 'Login to Start' : 'Fazer Login para Começar';
+  const bundleText = language === 'en' ? 'See Full Bundle' : 'Ver Pacote Completo';
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   const handleBackClick = () => {
-    navigate("/");
+    const basePath = language === 'en' ? '/en' : '';
+    navigate(basePath || '/');
     setTimeout(() => {
       const testesSection = document.getElementById("testes");
       if (testesSection) {
@@ -60,14 +72,9 @@ export const TestDetailLayout = ({
       <main className="pt-24 pb-16">
         <div className="container max-w-4xl mx-auto px-4">
           {/* Back Button */}
-          <Button 
-            onClick={handleBackClick}
-            variant="ghost" 
-            className="mb-8 -ml-2 hover:bg-transparent hover:text-primary"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar para Testes
-          </Button>
+          <div className="mb-8 -ml-2">
+            <BackButton onClick={handleBackClick} label={backLabel} />
+          </div>
 
           {/* Header */}
           <div className="text-center mb-12 animate-fade-in">
@@ -88,10 +95,13 @@ export const TestDetailLayout = ({
             ))}
           </div>
 
+          {/* What you improve - Growth Card */}
+          <TestImprovementsCard testType={testType} className="mb-12" />
+
           {/* Benefits */}
           <div className="bg-card rounded-lg p-8 mb-12 shadow-sm border border-border">
             <h2 className="text-2xl font-semibold mb-6 text-foreground">
-              Você vai descobrir:
+              {discoverTitle}
             </h2>
             <ul className="space-y-3">
               {benefits.map((benefit, index) => (
@@ -106,7 +116,7 @@ export const TestDetailLayout = ({
           {/* Audience */}
           <div className="mb-12">
             <h3 className="text-xl font-semibold mb-3 text-foreground">
-              Indicado para:
+              {audienceTitle}
             </h3>
             <p className="text-foreground/90 leading-relaxed">
               {audience}
@@ -127,14 +137,14 @@ export const TestDetailLayout = ({
                       navigate(`/cliente/test-execution/${test.id}/${userTest.id}`);
                     } catch (error) {
                       toast({
-                        title: "Erro ao iniciar teste",
-                        description: "Tente novamente mais tarde.",
+                        title: language === 'en' ? "Error starting test" : "Erro ao iniciar teste",
+                        description: language === 'en' ? "Please try again later." : "Tente novamente mais tarde.",
                         variant: "destructive",
                       });
                     }
                   }}
                 >
-                  {isFreeTest ? "Começar Teste Gratuito" : "Começar Teste"}
+                  {isFreeTest ? startFreeText : startText}
                 </Button>
               ) : (
                 <Button 
@@ -143,26 +153,26 @@ export const TestDetailLayout = ({
                   className="w-full sm:w-auto"
                   onClick={() => {
                     toast({
-                      title: "Teste Bloqueado",
-                      description: "Você precisa adquirir este teste para começar.",
+                      title: language === 'en' ? "Locked Test" : "Teste Bloqueado",
+                      description: language === 'en' ? "You need to purchase this test to begin." : "Você precisa adquirir este teste para começar.",
                     });
                     navigate("/cliente");
                   }}
                 >
-                  🔒 Adquirir Teste
+                  {lockedText}
                 </Button>
               )
             ) : (
               <Button asChild size="lg" variant="default" className="w-full sm:w-auto">
-                <Link to="/auth">
-                  Fazer Login para Começar
+                <Link to={language === 'en' ? "/en/auth" : "/auth"}>
+                  {loginText}
                 </Link>
               </Button>
             )}
             
             <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
-              <Link to="/#pricing">
-                Ver Pacote Completo
+              <Link to={language === 'en' ? "/en#pricing" : "/#pricing"}>
+                {bundleText}
               </Link>
             </Button>
           </div>
