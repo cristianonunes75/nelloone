@@ -273,11 +273,14 @@ const MapaEssencia = () => {
         title: s.title,
         content: s.content,
       }));
-      generateMapaPDF(pdfSections, userName);
-      toast.success("PDF baixado com sucesso!");
+      generateMapaPDF(pdfSections, userName, {
+        language: lang,
+        growthPoints: growthPoints,
+      });
+      toast.success(lang === 'en' ? "PDF downloaded successfully!" : "PDF baixado com sucesso!");
     } catch (error) {
       console.error("Error generating PDF:", error);
-      toast.error("Erro ao gerar PDF. Tente novamente.");
+      toast.error(lang === 'en' ? "Error generating PDF. Try again." : "Erro ao gerar PDF. Tente novamente.");
     }
   };
 
