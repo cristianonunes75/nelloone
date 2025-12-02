@@ -211,24 +211,8 @@
       {
         "question": "Funciona se estiver emocionalmente perdido?",
         "answer": "Especialmente. O NELLO ONE foi feito para momentos de confusão. Organiza o que sentes em clareza e direção."
-      },
-      {
-        "question": "Porque é que os preços são diferentes em Real e em Euro?",
-        "answer": "O NELLO ONE serve pessoas de todo o mundo. Para oferecer preços justos para cada região, usamos duas políticas: Preço Local no Brasil e Preço Global para utilizadores internacionais. Isto garante que todos podem aceder à mesma qualidade com condições equilibradas."
-      },
-      {
-        "question": "Posso comprar na moeda de outro país?",
-        "answer": "Não. O NELLO ONE bloqueia automaticamente compras em moedas incorretas para prevenir erros, fraude e diferenças de preço injustas. Pagas sempre na moeda correspondente à região de navegação."
       }
-    ],
-    "pricing": {
-      "question": "Porque é que os preços são diferentes em Real e em Euro?",
-      "answer": "O NELLO ONE serve pessoas de todo o mundo. Para oferecer preços justos para cada região, usamos duas políticas: Preço Local — no Brasil, aplicamos valores adequados à realidade económica local. Preço Global — para utilizadores internacionais, usamos a moeda e padrões de preço do mercado global. Desta forma, todos podem aceder ao mesmo nível de qualidade, com condições equilibradas e transparentes."
-    },
-    "currency": {
-      "question": "Posso comprar na moeda de outro país?",
-      "answer": "Não. O NELLO ONE bloqueia automaticamente tentativas de compra em moeda incorreta para prevenir erros, fraude e diferenças de preço injustas. Irás sempre pagar na moeda correspondente ao idioma e região em que navegas: Brasil → Real (R$), Global → Dólar (US$), Portugal → Euro (€). Isto garante igualdade, segurança e uma melhor experiência."
-    }
+    ]
   },
   "what_is": {
     "title": "O que é o NELLO ONE?",

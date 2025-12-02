@@ -211,24 +211,8 @@
       {
         "question": "Does it work if I'm emotionally lost?",
         "answer": "Especially. NELLO ONE was made for moments of confusion. It organizes what you feel into clarity and direction."
-      },
-      {
-        "question": "Why are prices different in Real and Dollar?",
-        "answer": "NELLO ONE serves people worldwide. To offer fair prices for each region, we use two policies: Local Pricing in Brazil and Global Pricing for international users. This ensures everyone can access the same quality with balanced conditions."
-      },
-      {
-        "question": "Can I buy in another country's currency?",
-        "answer": "No. NELLO ONE automatically blocks purchases in incorrect currencies to prevent errors, fraud and unfair price differences. You always pay in the currency matching your browsing region."
       }
-    ],
-    "pricing": {
-      "question": "Why are the prices different in Real and in Dollar?",
-      "answer": "NELLO ONE serves people from all over the world. To offer fair prices for each region, we use two policies: Local Pricing — in Brazil, we apply values suited to the local economic reality. Global Pricing — for international users, we use the currency and pricing standards of the global market. This way, everyone can access the same level of quality, with balanced and transparent conditions."
-    },
-    "currency": {
-      "question": "Can I buy in another country's currency?",
-      "answer": "No. NELLO ONE automatically blocks attempts to purchase in an incorrect currency to prevent errors, fraud, and unfair price differences. You will always pay in the currency corresponding to the language and region you are browsing: Brazil → Real (R$), Global → Dollar (US$). This ensures equality, security and a better experience."
-    }
+    ]
   },
   "what_is": {
     "title": "What is NELLO ONE?",
