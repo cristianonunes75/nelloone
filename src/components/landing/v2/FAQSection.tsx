@@ -66,20 +66,6 @@ export function FAQSection() {
           ))}
         </Accordion>
 
-        {/* Currency Protection Notice */}
-        <div 
-          className={cn(
-            "mt-8 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl transition-all duration-700 delay-500",
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-          )}
-        >
-          <p className="text-sm text-center text-amber-700 dark:text-amber-300">
-            {language === 'en' 
-              ? '🔒 Your region: Global (USD). Prices are shown in US Dollars.'
-              : '🔒 Sua região: Brasil (BRL). Preços exibidos em Reais.'
-            }
-          </p>
-        </div>
       </div>
     </section>
   );
