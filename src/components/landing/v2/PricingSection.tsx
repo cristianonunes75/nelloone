@@ -110,24 +110,24 @@ export const PricingSection = () => {
           <div ref={headerRef} className="text-center mb-10 md:mb-16">
             <span 
               className={cn(
-                "inline-block text-ink-blue font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4 transition-all duration-500",
-                headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                "inline-block text-ink-blue font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4 transition-all duration-700",
+                headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               )}
             >
               {pricing.label}
             </span>
             <h2 
               className={cn(
-                "font-display text-2xl sm:text-display-sm md:text-display-md lg:text-display-lg text-foreground mb-4 md:mb-6 transition-all duration-500 delay-100",
-                headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                "font-display text-2xl sm:text-display-sm md:text-display-md lg:text-display-lg text-foreground mb-4 md:mb-6 transition-all duration-700 delay-100",
+                headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               )}
             >
               {pricing.title}
             </h2>
             <p 
               className={cn(
-                "text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2 transition-all duration-500 delay-200",
-                headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                "text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2 transition-all duration-700 delay-200",
+                headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               )}
             >
               {pricing.subtitle}
@@ -206,8 +206,8 @@ export const PricingSection = () => {
           <div ref={testsRef}>
             <h3 
               className={cn(
-                "font-display text-base md:text-lg text-foreground text-center mb-6 md:mb-8 transition-all duration-500",
-                testsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                "font-display text-base md:text-lg text-foreground text-center mb-6 md:mb-8 transition-all duration-700",
+                testsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               )}
             >
               {pricing.individual_title}

@@ -80,7 +80,7 @@ export const ProblemsSection = () => {
           <div 
             className={cn(
               "text-center mb-12 md:mb-16 transition-all duration-700",
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
             <h2 className="font-display text-2xl md:text-3xl lg:text-4xl text-foreground mb-4">
@@ -98,7 +98,7 @@ export const ProblemsSection = () => {
           <div 
             className={cn(
               "mb-12 transition-all duration-700 delay-200",
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
             <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground mb-6 text-center">
@@ -112,10 +112,10 @@ export const ProblemsSection = () => {
                   <div
                     key={index}
                     className={cn(
-                      "group flex items-start gap-4 p-4 rounded-xl bg-white/60 dark:bg-white/5 border border-border/50 hover:border-ink-blue/30 hover:shadow-sm transition-all duration-300",
-                      isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                      "group flex items-start gap-4 p-4 rounded-xl bg-white/60 dark:bg-white/5 border border-border/50 hover:border-ink-blue/30 hover:shadow-sm transition-all duration-500",
+                      isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
                     )}
-                    style={{ transitionDelay: `${200 + index * 75}ms` }}
+                    style={{ transitionDelay: `${200 + index * 80}ms` }}
                   >
                     <div className="w-10 h-10 rounded-lg bg-destructive/10 group-hover:bg-ink-blue/10 flex items-center justify-center flex-shrink-0 transition-colors duration-300">
                       <Icon className="w-5 h-5 text-destructive/70 group-hover:text-ink-blue transition-colors duration-300" />
@@ -133,7 +133,7 @@ export const ProblemsSection = () => {
           <div 
             className={cn(
               "text-center transition-all duration-700 delay-500",
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
             <div className="inline-flex items-start gap-3 bg-gradient-to-r from-ink-blue/10 via-bruma-deep/10 to-ice-lavender/20 rounded-2xl p-6 md:p-8 border border-ink-blue/10">

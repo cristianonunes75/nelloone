@@ -50,7 +50,7 @@ export function FAQSection() {
                 "bg-background border border-border/50 rounded-xl px-6 shadow-sm transition-all duration-500",
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
               )}
-              style={{ transitionDelay: `${index * 50}ms` }}
+              style={{ transitionDelay: `${index * 80}ms` }}
             >
               <AccordionTrigger className="py-5 text-left hover:no-underline">
                 <span className="font-medium text-foreground text-sm md:text-base pr-4">

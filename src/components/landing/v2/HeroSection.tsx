@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export const HeroSection = () => {
   const navigate = useNavigate();
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.2 });
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
   const { t, language } = useLanguage();
 
   return (
