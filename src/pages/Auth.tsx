@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { LogoText } from "@/components/LogoText";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { z } from "zod";
 import { Info } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -32,15 +33,73 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
+  const { language, t } = useLanguage();
   const [searchParams] = useSearchParams();
   
   // Check if user came from a purchase attempt
   const redirectToPurchase = searchParams.get("redirect") === "purchase";
 
+  // Helper to get localized path
+  const getLocalizedPath = (path: string) => {
+    if (language === 'en') return `/en${path}`;
+    if (language === 'pt-pt') return `/pt-pt${path}`;
+    return path;
+  };
+
+  // Helper to get home path
+  const getHomePath = () => {
+    if (language === 'en') return '/en';
+    if (language === 'pt-pt') return '/pt-pt';
+    return '/';
+  };
+
+  // Localized text
+  const texts = {
+    login: language === 'en' ? 'Sign In' : 'Entrar',
+    createAccount: language === 'en' ? 'Create Account' : 'Criar Conta',
+    accessArea: language === 'en' ? 'Access your reserved area' : (language === 'pt-pt' ? 'Aceda à sua área reservada' : 'Acesse sua área reservada'),
+    startJourney: language === 'en' ? 'Start your NELLO ONE journey' : (language === 'pt-pt' ? 'Comece a sua jornada NELLO ONE' : 'Comece sua jornada NELLO ONE'),
+    validationError: language === 'en' ? 'Validation Error' : 'Erro de validação',
+    loginSuccess: language === 'en' ? 'Login successful!' : 'Login realizado!',
+    welcomeBack: language === 'en' ? 'Welcome back to NELLO ONE.' : (language === 'pt-pt' ? 'Bem-vindo de volta ao NELLO ONE.' : 'Bem-vindo de volta ao NELLO ONE.'),
+    accountCreated: language === 'en' ? 'Account created!' : 'Conta criada!',
+    welcomeNew: language === 'en' ? 'Welcome to NELLO ONE. You can now sign in.' : (language === 'pt-pt' ? 'Bem-vindo ao NELLO ONE. Já pode fazer login.' : 'Bem-vindo ao NELLO ONE. Você já pode fazer login.'),
+    invalidCredentials: language === 'en' ? 'Invalid email or password' : 'Email ou senha incorretos',
+    alreadyRegistered: language === 'en' ? 'This email is already registered. Please sign in.' : (language === 'pt-pt' ? 'Este email já está registado. Faça login.' : 'Este email já está cadastrado. Faça login.'),
+    error: language === 'en' ? 'Error' : 'Erro',
+    tryAgain: language === 'en' ? 'An error occurred. Please try again.' : 'Ocorreu um erro. Tente novamente.',
+    fullName: language === 'en' ? 'Full name' : 'Nome completo',
+    yourName: language === 'en' ? 'Your name' : 'Seu nome',
+    whatsapp: language === 'en' ? 'WhatsApp (optional)' : 'WhatsApp (opcional)',
+    minChars: language === 'en' ? 'Minimum 6 characters' : 'Mínimo 6 caracteres',
+    loading: language === 'en' ? 'Loading...' : 'Carregando...',
+    noAccount: language === 'en' ? "Don't have an account? Sign up" : (language === 'pt-pt' ? 'Não tem conta? Registe-se' : 'Não tem conta? Cadastre-se'),
+    hasAccount: language === 'en' ? 'Already have an account? Sign in' : (language === 'pt-pt' ? 'Já tem conta? Faça login' : 'Já tem conta? Faça login'),
+    backToSite: language === 'en' ? '← Back to site' : '← Voltar para o site',
+    termsText: language === 'en' 
+      ? 'By proceeding, you agree to the use of your data exclusively for image analysis and delivery of the photography session proposal.' 
+      : (language === 'pt-pt' 
+        ? 'Ao prosseguir, concorda com o uso dos seus dados exclusivamente para fins de análise de imagem e entrega da proposta de ensaio fotográfico.'
+        : 'Ao prosseguir, você concorda com o uso de seus dados exclusivamente para fins de análise de imagem e entrega da proposta de ensaio fotográfico.'),
+    termsOfUse: language === 'en' ? 'Terms of Use' : 'Termos de Uso',
+    privacyPolicy: language === 'en' ? 'Privacy Policy' : 'Política de Privacidade',
+    purchaseRedirectLogin: language === 'en' 
+      ? 'To complete your purchase, please sign in or create an account.'
+      : (language === 'pt-pt'
+        ? 'Para concluir a sua compra, faça login ou crie uma conta.'
+        : 'Para concluir sua compra, faça login ou crie uma conta.'),
+    purchaseRedirectSignup: language === 'en'
+      ? 'To purchase and take the tests, you need to create an account. Your results will be saved for future reference.'
+      : (language === 'pt-pt'
+        ? 'Para comprar e realizar os testes, é necessário criar uma conta. Os seus resultados ficarão guardados para consulta futura.'
+        : 'Para comprar e realizar os testes, é necessário criar uma conta. Seus resultados ficarão salvos para consulta futura.'),
+  };
+
   // Redirect if already logged in
   if (user) {
-    navigate("/cliente");
+    navigate(getLocalizedPath("/cliente"));
     return null;
   }
 
@@ -60,7 +119,7 @@ const Auth = () => {
 
       if (!validation.success) {
         toast({
-          title: "Erro de validação",
+          title: texts.validationError,
           description: validation.error.errors[0].message,
           variant: "destructive",
         });
@@ -76,14 +135,14 @@ const Auth = () => {
 
         if (error) {
           if (error.message.includes("Invalid login credentials")) {
-            throw new Error("Email ou senha incorretos");
+            throw new Error(texts.invalidCredentials);
           }
           throw error;
         }
 
         toast({
-          title: "Login realizado!",
-          description: "Bem-vindo de volta ao Essentia.",
+          title: texts.loginSuccess,
+          description: texts.welcomeBack,
         });
         
         // Wait for roles to be fetched before redirecting
@@ -103,7 +162,7 @@ const Auth = () => {
           } else if (primaryRole === "fotografo") {
             navigate("/fotografo");
           } else {
-            navigate("/cliente");
+            navigate(getLocalizedPath("/cliente"));
           }
         }, 500);
       } else {
@@ -115,20 +174,20 @@ const Auth = () => {
               full_name: fullName,
               phone: phone,
             },
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: `${window.location.origin}${getHomePath()}`,
           },
         });
 
         if (error) {
           if (error.message.includes("already registered")) {
-            throw new Error("Este email já está cadastrado. Faça login.");
+            throw new Error(texts.alreadyRegistered);
           }
           throw error;
         }
 
         toast({
-          title: "Conta criada!",
-          description: "Bem-vindo ao Essentia. Você já pode fazer login.",
+          title: texts.accountCreated,
+          description: texts.welcomeNew,
         });
 
         // Auto login after signup
@@ -157,7 +216,7 @@ const Auth = () => {
             } else if (primaryRole === "fotografo") {
               navigate("/fotografo");
             } else {
-              navigate("/cliente");
+              navigate(getLocalizedPath("/cliente"));
             }
           }, 500);
         }
@@ -165,8 +224,8 @@ const Auth = () => {
     } catch (error: any) {
       console.error("Auth error:", error);
       toast({
-        title: "Erro",
-        description: error.message || "Ocorreu um erro. Tente novamente.",
+        title: texts.error,
+        description: error.message || texts.tryAgain,
         variant: "destructive",
       });
     } finally {
@@ -180,21 +239,16 @@ const Auth = () => {
         <div className="text-center mb-8">
           <LogoText className="text-4xl mb-6" />
           <h1 className="text-3xl font-bold mb-2">
-            {isLogin ? "Entrar" : "Criar Conta"}
+            {isLogin ? texts.login : texts.createAccount}
           </h1>
           <p className="text-muted-foreground mb-4">
-            {isLogin
-              ? "Acesse sua área reservada"
-              : "Comece sua jornada Essentia"}
+            {isLogin ? texts.accessArea : texts.startJourney}
           </p>
           {redirectToPurchase && (
             <Alert className="text-left mb-4">
               <Info className="h-4 w-4" />
               <AlertDescription>
-                {isLogin 
-                  ? "Para concluir sua compra, faça login ou crie uma conta."
-                  : "Para comprar e realizar os testes, é necessário criar uma conta. Seus resultados ficarão salvos para consulta futura."
-                }
+                {isLogin ? texts.purchaseRedirectLogin : texts.purchaseRedirectSignup}
               </AlertDescription>
             </Alert>
           )}
@@ -204,18 +258,18 @@ const Auth = () => {
           {!isLogin && (
             <>
               <div>
-                <Label htmlFor="fullName">Nome completo</Label>
+                <Label htmlFor="fullName">{texts.fullName}</Label>
                 <Input
                   id="fullName"
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required={!isLogin}
-                  placeholder="Seu nome"
+                  placeholder={texts.yourName}
                 />
               </div>
               <div>
-                <Label htmlFor="phone">WhatsApp (opcional)</Label>
+                <Label htmlFor="phone">{texts.whatsapp}</Label>
                 <Input
                   id="phone"
                   type="tel"
@@ -240,14 +294,14 @@ const Auth = () => {
           </div>
 
           <div>
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password">{language === 'en' ? 'Password' : 'Senha'}</Label>
             <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              placeholder="Mínimo 6 caracteres"
+              placeholder={texts.minChars}
             />
           </div>
 
@@ -264,22 +318,21 @@ const Auth = () => {
                   htmlFor="terms"
                   className="text-sm leading-relaxed cursor-pointer"
                 >
-                  Ao prosseguir, você concorda com o uso de seus dados exclusivamente para fins de 
-                  análise de imagem e entrega da proposta de ensaio fotográfico. Leia nossos{" "}
+                  {texts.termsText}{" "}
                   <button
                     type="button"
-                    onClick={() => window.open("/termos", "_blank")}
+                    onClick={() => window.open(getLocalizedPath("/termos"), "_blank")}
                     className="text-gold hover:underline font-semibold"
                   >
-                    Termos de Uso
+                    {texts.termsOfUse}
                   </button>
-                  {" "}e{" "}
+                  {" "}{language === 'en' ? 'and' : 'e'}{" "}
                   <button
                     type="button"
-                    onClick={() => window.open("/privacidade", "_blank")}
+                    onClick={() => window.open(getLocalizedPath("/privacidade"), "_blank")}
                     className="text-gold hover:underline font-semibold"
                   >
-                    Política de Privacidade
+                    {texts.privacyPolicy}
                   </button>
                   .
                 </label>
@@ -294,10 +347,10 @@ const Auth = () => {
             disabled={isLoading || (!isLogin && !termsAccepted)}
           >
             {isLoading
-              ? "Carregando..."
+              ? texts.loading
               : isLogin
-              ? "Entrar"
-              : "Criar conta"}
+              ? texts.login
+              : texts.createAccount}
           </Button>
         </form>
 
@@ -307,19 +360,18 @@ const Auth = () => {
             onClick={() => setIsLogin(!isLogin)}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            {isLogin
-              ? "Não tem conta? Cadastre-se"
-              : "Já tem conta? Faça login"}
+            {isLogin ? texts.noAccount : texts.hasAccount}
           </button>
         </div>
 
         <div className="mt-8 text-center">
-          <a
-            href="/"
+          <button
+            type="button"
+            onClick={() => navigate(getHomePath())}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            ← Voltar para o site
-          </a>
+            {texts.backToSite}
+          </button>
         </div>
       </div>
     </div>
