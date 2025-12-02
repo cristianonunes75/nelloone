@@ -40,6 +40,8 @@ export const CouponsManagement = () => {
   const [currency, setCurrency] = useState("brl");
   const [duration, setDuration] = useState<"once" | "repeating" | "forever">("once");
   const [durationInMonths, setDurationInMonths] = useState("");
+  const [maxRedemptions, setMaxRedemptions] = useState("");
+  const [validityMonths, setValidityMonths] = useState("");
 
   const fetchCoupons = async () => {
     setLoading(true);
@@ -91,6 +93,8 @@ export const CouponsManagement = () => {
           currency: discountType === "amount" ? currency : undefined,
           duration,
           duration_in_months: duration === "repeating" ? parseInt(durationInMonths) : undefined,
+          max_redemptions: maxRedemptions ? parseInt(maxRedemptions) : undefined,
+          redeem_by_months: validityMonths ? parseInt(validityMonths) : undefined,
         }
       });
 
@@ -116,6 +120,8 @@ export const CouponsManagement = () => {
     setCurrency("brl");
     setDuration("once");
     setDurationInMonths("");
+    setMaxRedemptions("");
+    setValidityMonths("");
   };
 
   const copyCheckoutLink = (couponId: string) => {
@@ -301,6 +307,37 @@ export const CouponsManagement = () => {
                     />
                   </div>
                 )}
+
+                <div className="border-t pt-4 space-y-4">
+                  <p className="text-sm font-medium text-muted-foreground">Limites (opcional)</p>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="maxRedemptions">Limite de Resgates</Label>
+                    <Input
+                      id="maxRedemptions"
+                      type="number"
+                      min="1"
+                      placeholder="Ex: 10 (deixe vazio para ilimitado)"
+                      value={maxRedemptions}
+                      onChange={(e) => setMaxRedemptions(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="validityMonths">Validade (meses)</Label>
+                    <Input
+                      id="validityMonths"
+                      type="number"
+                      min="1"
+                      placeholder="Ex: 12 (deixe vazio para sem expiração)"
+                      value={validityMonths}
+                      onChange={(e) => setValidityMonths(e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      O cupom expirará após este período
+                    </p>
+                  </div>
+                </div>
 
                 <Button 
                   onClick={handleCreateCoupon} 
