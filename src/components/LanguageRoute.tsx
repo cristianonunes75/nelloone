@@ -3,7 +3,7 @@ import { useLocation, Navigate } from 'react-router-dom';
 import { useLanguage, Language } from '@/contexts/LanguageContext';
 
 // Feature flags to control language version availability
-const ENGLISH_VERSION_ENABLED = false;
+const ENGLISH_VERSION_ENABLED = true;
 const PT_PT_VERSION_ENABLED = true; // Enable PT-PT (Portugal)
 
 interface LanguageRouteProps {
