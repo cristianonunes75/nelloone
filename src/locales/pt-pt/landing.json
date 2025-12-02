@@ -1,0 +1,353 @@
+{
+  "hero": {
+    "title": "NELLO ONE",
+    "subtitle": "Descobre quem és. Transforma o que importa.",
+    "description": "O NELLO ONE é o sistema completo de autoconhecimento guiado por IA que revela os teus padrões, forças, desafios e caminhos de evolução — com profundidade e simplicidade.",
+    "tagline": "Começa em menos de 2 minutos.",
+    "cta_primary": "Começar Agora (Grátis)",
+    "cta_secondary": "Explorar Testes"
+  },
+  "mirror": {
+    "title": "Se isto te descreve, o NELLO ONE foi feito para o teu momento:",
+    "items": [
+      "Sinto que estou a viver abaixo do meu potencial",
+      "Tenho força, mas falta-me clareza",
+      "Tomo decisões que não refletem quem realmente sou",
+      "Repito padrões emocionais sem entender porquê",
+      "Sei que tenho talento mas não sei como usá-lo",
+      "A minha comunicação não corresponde ao que sinto",
+      "Perco-me a tentar agradar a toda a gente",
+      "Quero mudar, mas não sei por onde começar"
+    ]
+  },
+  "improvements": {
+    "title": "O NELLO ONE revela:",
+    "items": [
+      "Os teus padrões emocionais",
+      "As tuas forças centrais",
+      "O que te sabota",
+      "Como tomar decisões com confiança",
+      "O teu estilo de comunicação",
+      "Como te relacionares melhor",
+      "Como focar a tua energia",
+      "Como crescer sem te perderes"
+    ]
+  },
+  "social_proof": {
+    "title": "O que dizem sobre o NELLO ONE",
+    "testimonials": [
+      {
+        "quote": "Pela primeira vez percebi porque repito os mesmos erros. Agora sei como mudar.",
+        "author": "Ana Paula, 34"
+      },
+      {
+        "quote": "O Mapa NELLO ONE deu-me uma clareza que anos de terapia não conseguiram.",
+        "author": "Rafael, 29"
+      },
+      {
+        "quote": "É como ter um espelho que mostra não só quem és, mas quem podes tornar-te.",
+        "author": "Camila, 41"
+      }
+    ],
+    "technical": {
+      "title": "Baseado em ciência real",
+      "items": [
+        "Baseado em metodologias reconhecidas",
+        "IA treinada em psicologia aplicada e comportamento",
+        "+2.000 utilizadores em beta",
+        "Usado por líderes, coaches e profissionais"
+      ]
+    }
+  },
+  "personal_branding": {
+    "title": "Transforma Autoconhecimento em Marca Pessoal",
+    "description": "O teu Mapa NELLO ONE não revela apenas quem és — mostra-te como te apresentares ao mundo. Os teus resultados orientam o teu posicionamento profissional, estilo de comunicação e criação de conteúdo.",
+    "subtitle": "Usa o teu Mapa NELLO ONE para:",
+    "items": [
+      "Construir a tua marca pessoal",
+      "Definir uma narrativa profissional estratégica",
+      "Fortalecer a tua autoridade",
+      "Comunicar com autenticidade",
+      "Descobrir o teu estilo ideal de conteúdo"
+    ]
+  },
+  "problems": {
+    "title": "Problemas que o NELLO ONE Resolve",
+    "subtitle": "O autoconhecimento é poderoso, mas é confuso quando não sabes por onde começar.",
+    "description": "O NELLO ONE traz clareza, estrutura e direção ao resolver os problemas que a maioria das pessoas enfrenta ao tentar compreender-se.",
+    "problems_title": "O NELLO ONE ajuda-te a superar:",
+    "problems": [
+      "Sentires-te perdido quanto à tua direção, propósito ou identidade",
+      "Lutares com padrões emocionais que não consegues explicar",
+      "Dificuldade em tomar decisões ou manter consistência",
+      "Problemas de comunicação em relacionamentos e trabalho",
+      "Falta de foco, disciplina ou clareza",
+      "Repetir os mesmos erros sem entender porquê",
+      "Conhecer as tuas forças mas não saber como usá-las",
+      "Começar uma jornada de transformação mas ficares preso pelo caminho"
+    ],
+    "closing": "Com o NELLO ONE, finalmente percebes quem és, porque ages como ages e como mudar o que já não te ajuda."
+  },
+  "transformation": {
+    "title": "A Tua Jornada de Transformação",
+    "steps": [
+      {
+        "number": "1",
+        "title": "Clareza",
+        "description": "Compreende quem és, com precisão."
+      },
+      {
+        "number": "2",
+        "title": "Consciência",
+        "description": "Compreende porque ages como ages."
+      },
+      {
+        "number": "3",
+        "title": "Transformação",
+        "description": "Aprende como mudar o que já não te serve."
+      }
+    ]
+  },
+  "what_you_get": {
+    "title": "Por dentro do que recebes",
+    "subtitle": "Tudo o que recebes no NELLO ONE:",
+    "items": [
+      "7 testes profissionais",
+      "Mapa de identidade completo",
+      "Insights personalizados por IA",
+      "Recomendações práticas",
+      "Crescimento contínuo"
+    ]
+  },
+  "not_for_you": {
+    "title_not": "O NELLO ONE não é para ti se:",
+    "items_not": [
+      "Queres respostas mágicas",
+      "Queres atalhos sem reflexão",
+      "Não queres melhorar"
+    ],
+    "title_for": "O NELLO ONE é para ti se:",
+    "items_for": [
+      "Queres clareza real",
+      "Queres maturidade emocional",
+      "Queres crescimento prático",
+      "Queres saber quem realmente és"
+    ]
+  },
+  "why_matters": {
+    "title": "Como o NELLO ONE Te Ajuda a Melhorar",
+    "subtitle": "O NELLO ONE não entrega apenas resultados — revela caminhos práticos para o crescimento pessoal.",
+    "description": "Cada teste destaca as tuas forças e mostra onde podes evoluir, sempre com clareza e objetividade.",
+    "improvements_title": "Descobres:",
+    "improvements": [
+      "Que padrões emocionais estão a sabotar o teu dia a dia",
+      "Onde a tua comunicação falha e como melhorar",
+      "Como tomar decisões com mais confiança",
+      "Em que áreas a tua energia está dispersa",
+      "Como desenvolver maturidade emocional",
+      "Que direção seguir para mais clareza, equilíbrio e propósito"
+    ],
+    "closing": "Tudo isto com orientação de IA e um mapa único que traduz a tua personalidade, talentos e desafios — para usares na vida real.",
+    "cta": "Começar Agora"
+  },
+  "value_proposition": {
+    "title": "Porquê Escolher o NELLO ONE?",
+    "subtitle": "O sistema de autoconhecimento mais inteligente do mundo, alimentado por IA",
+    "intro": "A maioria das pessoas conhece partes de si mesmas. Muito poucas conhecem o quadro completo.",
+    "description": "O NELLO ONE foi criado para resolver exatamente isto. Em vez de fazeres testes de personalidade isolados sem contexto, o NELLO ONE combina 7 avaliações validadas internacionalmente e integra todos os resultados num único Mapa Pessoal gerado por IA.",
+    "benefits_title": "No que é que isto te ajuda a melhorar?",
+    "benefits": [
+      "Clareza sobre quem és",
+      "Forças que podes aproveitar",
+      "Pontos cegos que te travam",
+      "Padrões emocionais que se repetem",
+      "Como comunicar melhor",
+      "Como tomar decisões com confiança",
+      "Como parar a auto-sabotagem",
+      "Como crescer pessoal, profissional e espiritualmente"
+    ],
+    "includes_title": "O que recebes com a Jornada Completa",
+    "includes": [
+      "Acesso a todos os 7 testes completos",
+      "O teu Mapa NELLO ONE personalizado",
+      "Interpretação integrada por IA de todos os resultados",
+      "Exportação profissional em PDF",
+      "Acesso vitalício ao teu perfil e insights"
+    ],
+    "closing": "E a parte mais importante: Finalmente compreendes-te com clareza, profundidade e direção."
+  },
+  "growth": {
+    "results_title": "O que podes melhorar agora",
+    "results_subtitle": "Com base nos teus padrões, estes são os teus pontos de crescimento imediato.",
+    "map_title": "Pontos de Crescimento",
+    "map_subtitle": "Os teus focos prioritários de crescimento",
+    "limiting_pattern": "Padrão Limitante",
+    "balancing_strength": "Força Equilibradora",
+    "immediate_action": "Ação Imediata",
+    "recommended_evolution": "Evolução Recomendada",
+    "main_growth_point": "O teu maior ponto de crescimento agora",
+    "main_blind_spot": "O teu principal ponto cego",
+    "recommended_action": "A tua ação recomendada"
+  },
+  "faq": {
+    "title": "Perguntas Frequentes",
+    "items": [
+      {
+        "question": "Como sei que isto funciona para mim?",
+        "answer": "O NELLO ONE usa metodologias validadas internacionalmente (DISC, MBTI, Eneagrama, etc.) combinadas com IA para criar insights personalizados. Se queres clareza sobre quem és e como melhorar, funciona para ti."
+      },
+      {
+        "question": "Preciso de perceber de psicologia?",
+        "answer": "Não. O NELLO ONE traduz conceitos complexos numa linguagem simples e prática. O Miguel, a nossa IA, explica tudo de forma clara e acessível."
+      },
+      {
+        "question": "É mesmo diferente dos outros testes?",
+        "answer": "Sim. Outros testes dão-te resultados isolados. O NELLO ONE integra 7 avaliações num único mapa, mostrando como os teus padrões se conectam e como podes evoluir."
+      },
+      {
+        "question": "Que resultados posso esperar?",
+        "answer": "Clareza sobre os teus padrões emocionais, forças, pontos cegos, estilo de comunicação e direção de crescimento. Tudo num mapa visual e prático."
+      },
+      {
+        "question": "Funciona se estiver emocionalmente perdido?",
+        "answer": "Especialmente. O NELLO ONE foi feito para momentos de confusão. Organiza o que sentes em clareza e direção."
+      },
+      {
+        "question": "Porque é que os preços são diferentes em Real e em Euro?",
+        "answer": "O NELLO ONE serve pessoas de todo o mundo. Para oferecer preços justos para cada região, usamos duas políticas: Preço Local no Brasil e Preço Global para utilizadores internacionais. Isto garante que todos podem aceder à mesma qualidade com condições equilibradas."
+      },
+      {
+        "question": "Posso comprar na moeda de outro país?",
+        "answer": "Não. O NELLO ONE bloqueia automaticamente compras em moedas incorretas para prevenir erros, fraude e diferenças de preço injustas. Pagas sempre na moeda correspondente à região de navegação."
+      }
+    ],
+    "pricing": {
+      "question": "Porque é que os preços são diferentes em Real e em Euro?",
+      "answer": "O NELLO ONE serve pessoas de todo o mundo. Para oferecer preços justos para cada região, usamos duas políticas: Preço Local — no Brasil, aplicamos valores adequados à realidade económica local. Preço Global — para utilizadores internacionais, usamos a moeda e padrões de preço do mercado global. Desta forma, todos podem aceder ao mesmo nível de qualidade, com condições equilibradas e transparentes."
+    },
+    "currency": {
+      "question": "Posso comprar na moeda de outro país?",
+      "answer": "Não. O NELLO ONE bloqueia automaticamente tentativas de compra em moeda incorreta para prevenir erros, fraude e diferenças de preço injustas. Irás sempre pagar na moeda correspondente ao idioma e região em que navegas: Brasil → Real (R$), Global → Dólar (US$), Portugal → Euro (€). Isto garante igualdade, segurança e uma melhor experiência."
+    }
+  },
+  "what_is": {
+    "title": "O que é o NELLO ONE?",
+    "description": "O NELLO ONE é uma plataforma inteligente de autodescoberta que combina testes de personalidade cientificamente fundamentados, design emocional e insights guiados por IA para revelar quem és e como funcionas — com clareza e simplicidade.",
+    "pillars": {
+      "tests": "Testes de personalidade profissionais",
+      "map": "Um mapa integrado de ti mesmo",
+      "ai": "Insights guiados por IA",
+      "experience": "Experiência simples, moderna e humana"
+    }
+  },
+  "miguel": {
+    "title": "Conhece o Miguel",
+    "subtitle": "O Teu Guia Interior",
+    "description": "O Miguel analisa os resultados dos teus testes, identifica os teus padrões centrais, explica as tuas tendências emocionais e comportamentais, e ajuda-te a construir clareza sobre quem és. Com orientação calma, ele acompanha-te durante todo o teu processo de autodescoberta.",
+    "cta": "Falar com o Miguel"
+  },
+  "tests": {
+    "title": "Os 7 Testes Profissionais",
+    "description": "Testes precisos e profissionais traduzidos numa experiência visual simples e intuitiva.",
+    "items": {
+      "archetypes": "Arquétipos",
+      "disc": "Avaliação DISC",
+      "mbti": "MBTI (16 Tipos)",
+      "enneagram": "Eneagrama",
+      "temperaments": "Temperamentos",
+      "intelligences": "Inteligências Múltiplas",
+      "love_languages": "Linguagens do Amor"
+    }
+  },
+  "map": {
+    "title": "O Teu Mapa Pessoal, Tudo num Só Lugar",
+    "description": "Um mapa visual integrado que combina todos os teus resultados numa visão geral simples, profunda e significativa.",
+    "coming_soon": "Em breve na experiência NELLO ONE."
+  },
+  "why": {
+    "title": "Porquê o NELLO ONE?",
+    "cards": {
+      "clarity": {
+        "title": "Clareza",
+        "description": "Vê-te a ti mesmo com explicações simples e objetivas."
+      },
+      "identity": {
+        "title": "Identidade",
+        "description": "Compreende as tuas tendências, forças e padrões."
+      },
+      "direction": {
+        "title": "Direção",
+        "description": "Recebe insights para melhorar relacionamentos, decisões e emoções."
+      },
+      "science": {
+        "title": "Ciência + IA",
+        "description": "O melhor da ciência da personalidade, explicado por uma IA humanizada."
+      },
+      "experience": {
+        "title": "Experiência Bela",
+        "description": "Um design calmo, moderno e minimalista que é agradável de usar."
+      },
+      "journey": {
+        "title": "Jornada Guiada",
+        "description": "Autodescoberta passo a passo com o Miguel ao teu lado."
+      }
+    }
+  },
+  "pricing": {
+    "label": "Investimento",
+    "title": "Escolhe o teu caminho",
+    "subtitle": "Começa grátis com o Teste de Arquétipos ou desbloqueia a tua jornada completa.",
+    "bundle_label": "Jornada Completa",
+    "bundle_title": "NELLO ONE Completo",
+    "bundle_description": "Todos os 7 testes + o teu Mapa NELLO ONE personalizado gerado por IA. A experiência completa de autoconhecimento.",
+    "benefits": [
+      "Acesso a todos os 7 testes completos",
+      "Mapa NELLO ONE personalizado",
+      "Análise integrada por IA",
+      "Exportação profissional em PDF",
+      "Acesso vitalício aos teus resultados"
+    ],
+    "from": "De",
+    "now": "Agora",
+    "save": "Poupa",
+    "cta": "Iniciar Jornada Completa",
+    "individual_title": "Ou compra testes individualmente",
+    "questions": "perguntas",
+    "free": "Grátis",
+    "currency": "€",
+    "bundle_original": 127,
+    "bundle_price": 87,
+    "microcopy": "Já estás a pagar o preço da confusão. É aqui que a transformas."
+  },
+  "cta": {
+    "title": "Começa agora — descobre o teu arquétipo em 2 minutos.",
+    "subtitle": "Sem risco, sem pressão. Apenas clareza.",
+    "button": "Começar Agora (Grátis)"
+  },
+  "footer": {
+    "brand": "NELLO ONE",
+    "tagline": "O caminho começa por dentro.",
+    "links": {
+      "privacy": "Política de Privacidade",
+      "terms": "Termos de Serviço",
+      "contact": "Contacto"
+    },
+    "copyright": "© 2024 NELLO ONE. Todos os direitos reservados.",
+    "payment_secure": "Pagamento 100% seguro via",
+    "payment_methods": "Cartão de Crédito ou PayPal",
+    "instant_access": "Após confirmação do pagamento, recebes acesso instantâneo aos testes."
+  },
+  "nav": {
+    "about": "Sobre",
+    "tests": "Testes",
+    "pricing": "Preços",
+    "login": "Entrar",
+    "start": "Começar Agora"
+  },
+  "common": {
+    "back": "Voltar",
+    "back_to_tests": "Voltar aos Testes",
+    "back_to_dashboard": "Voltar ao Painel",
+    "next_step": "Próximo Passo"
+  }
+}

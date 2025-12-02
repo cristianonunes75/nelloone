@@ -1,9 +1,9 @@
 // Currency Protection Hook - Prevents cross-trade between currencies
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage, Language } from '@/contexts/LanguageContext';
 
-export type Currency = 'BRL' | 'USD';
+export type Currency = 'BRL' | 'USD' | 'EUR';
 
 interface CurrencyConfig {
   currency: Currency;
@@ -11,9 +11,10 @@ interface CurrencyConfig {
   locale: string;
 }
 
-const CURRENCY_MAP: Record<'pt' | 'en', CurrencyConfig> = {
+const CURRENCY_MAP: Record<Language, CurrencyConfig> = {
   pt: { currency: 'BRL', symbol: 'R$', locale: 'pt-BR' },
   en: { currency: 'USD', symbol: '$', locale: 'en-US' },
+  'pt-pt': { currency: 'EUR', symbol: '€', locale: 'pt-PT' },
 };
 
 // Routes that require currency protection
@@ -35,20 +36,27 @@ export function useCurrencyProtection() {
   useEffect(() => {
     const path = location.pathname;
     
-    // Check if user is trying to access wrong locale route
+    // Check route language prefix
     const isEnRoute = path.startsWith('/en');
-    const isPtRoute = !isEnRoute; // Default is PT
+    const isPtPtRoute = path.startsWith('/pt-pt');
+    const isPtRoute = !isEnRoute && !isPtPtRoute;
     
-    // If language is EN but trying to access PT route with /pt prefix
-    if (language === 'en' && path.startsWith('/pt')) {
-      const newPath = path.replace('/pt', '/en');
+    // If language is EN but trying to access PT-PT route
+    if (language === 'en' && isPtPtRoute) {
+      const newPath = path.replace('/pt-pt', '/en');
+      navigate(newPath, { replace: true });
+      return;
+    }
+    
+    // If language is PT-PT but trying to access EN route
+    if (language === 'pt-pt' && isEnRoute) {
+      const newPath = path.replace('/en', '/pt-pt');
       navigate(newPath, { replace: true });
       return;
     }
     
     // If language is PT but trying to access EN route
     if (language === 'pt' && isEnRoute) {
-      // Redirect EN routes to PT equivalents
       const routeMap: Record<string, string> = {
         '/en/tests': '/testes',
         '/en/pricing': '/precos',
@@ -62,6 +70,13 @@ export function useCurrencyProtection() {
         navigate(mappedRoute[1], { replace: true });
         return;
       }
+    }
+    
+    // If language is PT but trying to access PT-PT route
+    if (language === 'pt' && isPtPtRoute) {
+      const newPath = path.replace('/pt-pt', '');
+      navigate(newPath || '/', { replace: true });
+      return;
     }
   }, [location.pathname, language, navigate]);
 
@@ -84,16 +99,20 @@ export function useCurrencyProtection() {
 // Validate currency matches route - for checkout validation
 export function validateCurrencyForRoute(
   requestedCurrency: Currency, 
-  routeLanguage: 'pt' | 'en'
+  routeLanguage: Language
 ): { valid: boolean; error?: string } {
   const expectedCurrency = CURRENCY_MAP[routeLanguage].currency;
   
   if (requestedCurrency !== expectedCurrency) {
+    const errorMessages: Record<Language, string> = {
+      en: 'Currency mismatch. Please access the correct version of the site for your region.',
+      pt: 'Moeda incorreta. Acesse a versão correta do site para sua região.',
+      'pt-pt': 'Moeda incorreta. Acede à versão correta do site para a tua região.',
+    };
+    
     return {
       valid: false,
-      error: routeLanguage === 'en'
-        ? 'Currency mismatch. Please access the correct version of the site for your region.'
-        : 'Moeda incorreta. Acesse a versão correta do site para sua região.',
+      error: errorMessages[routeLanguage],
     };
   }
   
@@ -101,7 +120,7 @@ export function validateCurrencyForRoute(
 }
 
 // Get correct price ID based on language
-export function getPriceIdForLanguage(testType: string, language: 'pt' | 'en'): string | null {
+export function getPriceIdForLanguage(testType: string, language: Language): string | null {
   const USD_PRICES: Record<string, string> = {
     arquetipos: "price_1SZNW0DjhZZxZELMopbi37cc",
     disc: "price_1SZNWgDjhZZxZELMoEGJMpRt",
@@ -117,10 +136,46 @@ export function getPriceIdForLanguage(testType: string, language: 'pt' | 'en'): 
     disc: "price_1SNBIuDjhZZxZELMm3qUtTON",
     mbti: "price_1SNBJEDjhZZxZELMY1CuVfIZ",
     eneagrama: "price_1SNBLhDjhZZxZELMhSvpHn8X",
+    temperamentos: "price_1SZUnqDjhZZxZELMtU9tUMFm",
+    linguagens_amor: "price_1SZUoWDjhZZxZELMxEJJKhDn",
+    inteligencias_multiplas: "price_1SZUpxDjhZZxZELMAkQlFX11",
   };
 
-  if (language === 'en') {
-    return USD_PRICES[testType] || null;
+  // EUR prices - to be filled with actual Stripe price IDs
+  const EUR_PRICES: Record<string, string> = {
+    // These will be filled when user provides EUR price IDs
+  };
+
+  switch (language) {
+    case 'en':
+      return USD_PRICES[testType] || null;
+    case 'pt-pt':
+      return EUR_PRICES[testType] || null;
+    case 'pt':
+    default:
+      return BRL_PRICES[testType] || null;
   }
-  return BRL_PRICES[testType] || null;
+}
+
+// Get currency error messages for anti-crosstrade protection
+export function getCurrencyErrorMessage(userLanguage: Language, attemptedCurrency: Currency): string {
+  const messages: Record<Language, Record<Currency, string>> = {
+    pt: {
+      USD: "Pagamentos no Brasil devem ser feitos em Reais (R$).",
+      EUR: "Pagamentos no Brasil devem ser feitos em Reais (R$).",
+      BRL: "",
+    },
+    en: {
+      BRL: "Payments in the United States must be processed in USD.",
+      EUR: "Payments in the United States must be processed in USD.",
+      USD: "",
+    },
+    "pt-pt": {
+      BRL: "Os pagamentos em Portugal devem ser realizados em Euros (€) para garantir conformidade e suporte regional.",
+      USD: "Os pagamentos em Portugal devem ser realizados em Euros (€) para garantir conformidade e suporte regional.",
+      EUR: "",
+    },
+  };
+  
+  return messages[userLanguage][attemptedCurrency] || "Currency mismatch error.";
 }
