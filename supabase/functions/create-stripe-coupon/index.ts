@@ -48,9 +48,9 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { name, percent_off, amount_off, currency, duration, duration_in_months } = body;
+    const { name, percent_off, amount_off, currency, duration, duration_in_months, max_redemptions, redeem_by_months } = body;
 
-    console.log("[CREATE-COUPON] Creating coupon:", { name, percent_off, amount_off, currency, duration });
+    console.log("[CREATE-COUPON] Creating coupon:", { name, percent_off, amount_off, currency, duration, max_redemptions, redeem_by_months });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
@@ -68,6 +68,18 @@ serve(async (req) => {
 
     if (duration === "repeating" && duration_in_months) {
       couponParams.duration_in_months = duration_in_months;
+    }
+
+    // Add max redemptions limit
+    if (max_redemptions) {
+      couponParams.max_redemptions = max_redemptions;
+    }
+
+    // Add expiration date (redeem_by_months converts to Unix timestamp)
+    if (redeem_by_months) {
+      const redeemByDate = new Date();
+      redeemByDate.setMonth(redeemByDate.getMonth() + redeem_by_months);
+      couponParams.redeem_by = Math.floor(redeemByDate.getTime() / 1000);
     }
 
     // Use the name as the coupon ID for easy reference
