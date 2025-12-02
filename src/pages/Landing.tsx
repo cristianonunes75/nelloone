@@ -14,6 +14,7 @@ import { CTASection } from "@/components/landing/v2/CTASection";
 import { FooterSection } from "@/components/landing/v2/FooterSection";
 import { MiguelAgent } from "@/components/MiguelAgent";
 import { MiguelSection } from "@/components/landing/v2/MiguelSection";
+import { MobileStickyCtA } from "@/components/landing/v2/MobileStickyCtA";
 
 const Landing = () => {
   return (
@@ -67,6 +68,7 @@ const Landing = () => {
       
       <FooterSection />
       <MiguelAgent location="landing" />
+      <MobileStickyCtA />
     </div>
   );
 };

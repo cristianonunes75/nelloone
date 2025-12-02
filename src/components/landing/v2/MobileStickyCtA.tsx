@@ -1,0 +1,44 @@
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useEffect, useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+
+export const MobileStickyCtA = () => {
+  const navigate = useNavigate();
+  const { t, language } = useLanguage();
+  const isMobile = useIsMobile();
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show after scrolling past the hero section (approximately 500px)
+      setIsVisible(window.scrollY > 500);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  if (!isMobile) return null;
+
+  return (
+    <div
+      className={cn(
+        "fixed bottom-0 left-0 right-0 z-50 p-4 bg-background/95 backdrop-blur-md border-t border-border/50 shadow-large transition-transform duration-300",
+        isVisible ? "translate-y-0" : "translate-y-full"
+      )}
+    >
+      <Button
+        size="lg"
+        className="w-full h-14 text-base rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-medium group"
+        onClick={() => navigate(language === "en" ? "/en/auth" : "/auth")}
+      >
+        {t.landing.hero.cta_primary}
+        <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+      </Button>
+    </div>
+  );
+};
