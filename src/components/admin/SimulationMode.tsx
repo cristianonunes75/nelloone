@@ -579,7 +579,7 @@ export const SimulationMode = () => {
       eneagrama: "Eneagrama",
       arquetipos: "Arquétipos",
       arquetipos_proposito: "Arquétipos",
-      linguagens_amor: "Linguagens do Amor",
+      linguagens_amor: "Estilos de Conexão Afetiva",
       inteligencias_multiplas: "Inteligências Múltiplas"
     };
     return names[selectedTest.type] || selectedTest.name;

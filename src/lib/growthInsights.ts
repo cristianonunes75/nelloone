@@ -68,16 +68,16 @@ const insightsData: Record<TestType, Record<'pt' | 'en', GrowthInsight>> = {
   },
   linguagens_amor: {
     pt: {
-      limitingPattern: "Expectativa de que outros expressem amor da mesma forma que você, gerando frustração nos relacionamentos.",
-      balancingStrength: "Clareza sobre como você melhor recebe e expressa cuidado e conexão emocional.",
-      immediateAction: "Hoje, expresse cuidado a alguém importante usando a linguagem do amor DELE, não a sua.",
-      recommendedEvolution: "Aprender a ser fluente em todas as linguagens do amor para relacionamentos mais ricos."
+      limitingPattern: "Expectativa de que outros se conectem emocionalmente da mesma forma que você, gerando frustração nos relacionamentos.",
+      balancingStrength: "Clareza sobre seu estilo de conexão afetiva e como cultivar relacionamentos mais profundos.",
+      immediateAction: "Hoje, conecte-se com alguém importante usando o estilo de conexão DELE, não o seu.",
+      recommendedEvolution: "Aprender a ser fluente em todos os estilos de conexão para relacionamentos mais ricos."
     },
     en: {
-      limitingPattern: "Expectation that others express love the same way you do, generating frustration in relationships.",
-      balancingStrength: "Clarity about how you best receive and express care and emotional connection.",
-      immediateAction: "Today, express care to someone important using THEIR love language, not yours.",
-      recommendedEvolution: "Learn to be fluent in all love languages for richer relationships."
+      limitingPattern: "Expectation that others connect emotionally the same way you do, generating frustration in relationships.",
+      balancingStrength: "Clarity about your affection connection style and how to cultivate deeper relationships.",
+      immediateAction: "Today, connect with someone important using THEIR connection style, not yours.",
+      recommendedEvolution: "Learn to be fluent in all connection styles for richer relationships."
     }
   },
   temperamentos: {
