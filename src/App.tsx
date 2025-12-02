@@ -60,6 +60,121 @@ const AppRoutes = () => (
     {/* Test detail pages - EN (new semantic routes) */}
     <Route path="/en/tests/:slug" element={<TestDetailPage />} />
     
+    {/* EN Landing and Auth */}
+    <Route path="/en" element={<Landing />} />
+    <Route path="/en/auth" element={<Auth />} />
+    
+    {/* Legal pages - EN with prefix */}
+    <Route path="/en/terms" element={<TermsOfService />} />
+    <Route path="/en/privacy" element={<PrivacyPolicy />} />
+    <Route path="/en/contact" element={<Contact />} />
+    
+    {/* Protected client routes - EN */}
+    <Route
+      path="/en/cliente"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <Cliente />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/dashboard"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <Cliente />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/me"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <UserArea />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/profile"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <UserArea />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/cliente/perfil"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <ClientePerfil />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/cliente/test-execution/:testId/:userTestId"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <TestExecution />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/test-execution/:testId/:userTestId"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <TestExecution />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/cliente/test-results/:userTestId"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <TestResults />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/test-results/:userTestId"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <TestResults />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/cliente/mapa-essencia"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <MapaEssencia />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/essence-map"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <MapaEssencia />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/cliente/comprar/:testId"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <ComprarTeste />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/purchase/:testId"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <ComprarTeste />
+        </ProtectedRoute>
+      }
+    />
+    
     {/* Test detail pages - PT-PT (European Portuguese) */}
     <Route path="/pt-pt/testes/:slug" element={<TestDetailPage />} />
     
