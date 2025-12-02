@@ -16,47 +16,76 @@ export function CurrencyProtection({ children }: CurrencyProtectionProps) {
   useEffect(() => {
     const path = location.pathname;
     const isEnRoute = path.startsWith('/en');
+    const isPtPtRoute = path.startsWith('/pt-pt');
     
     // Enforce language based on route
     if (isEnRoute && language !== 'en') {
       setLanguage('en');
-    } else if (!isEnRoute && language === 'en' && !path.startsWith('/en')) {
-      // If user is on PT route but has EN language, keep them on PT
-      // This prevents cross-trade
+    } else if (isPtPtRoute && language !== 'pt-pt') {
+      setLanguage('pt-pt');
+    } else if (!isEnRoute && !isPtPtRoute && language !== 'pt') {
+      // Root routes default to PT-BR
+      if (language === 'en' || language === 'pt-pt') {
+        // Only redirect if explicitly on wrong route, not just different preference
+      }
     }
 
     // Cross-trade protection: Redirect if accessing wrong currency routes
-    const crossTradeRedirects: Record<string, string> = {
-      // PT user trying EN routes
-      '/en/tests': '/testes',
-      '/en/pricing': '/precos',
-      '/en/checkout': '/comprar',
-      '/en/dashboard': '/cliente',
-      // EN user trying PT routes
-      '/pt/testes': '/en/tests',
-      '/pt/precos': '/en/pricing',
-      '/pt/comprar': '/en/checkout',
-      '/pt/cliente': '/en/dashboard',
-    };
-
-    // Check for cross-trade attempts
+    // PT-BR users should stay on / routes (BRL)
+    // EN users should stay on /en routes (USD)
+    // PT-PT users should stay on /pt-pt routes (EUR)
+    
+    // Check for cross-trade attempts from PT-BR to EN (BRL → USD)
     if (language === 'pt' && isEnRoute) {
-      const redirectTo = crossTradeRedirects[path];
-      if (redirectTo) {
-        toast.error('Você está sendo redirecionado para a versão brasileira do site.');
-        navigate(redirectTo, { replace: true });
+      toast.error('Você está sendo redirecionado para a versão brasileira do site.');
+      const ptPath = path.replace('/en/tests', '/testes').replace('/en', '') || '/';
+      navigate(ptPath, { replace: true });
+      return;
+    }
+
+    // Check for cross-trade attempts from PT-BR to PT-PT (BRL → EUR)
+    if (language === 'pt' && isPtPtRoute) {
+      toast.error('Você está sendo redirecionado para a versão brasileira do site.');
+      const ptPath = path.replace('/pt-pt/testes', '/testes').replace('/pt-pt', '') || '/';
+      navigate(ptPath, { replace: true });
+      return;
+    }
+
+    // Check for cross-trade attempts from EN to PT-BR (USD → BRL)
+    if (language === 'en' && !isEnRoute && !isPtPtRoute && path !== '/') {
+      // Allow root path for language detection, but protect other routes
+      if (path.startsWith('/testes') || path.startsWith('/cliente') || path.startsWith('/comprar')) {
+        toast.error('You are being redirected to the global version of the site.');
+        const enPath = '/en' + path.replace('/testes', '/tests');
+        navigate(enPath, { replace: true });
         return;
       }
     }
 
-    // If somehow user on EN language tries to access PT routes directly
-    if (language === 'en' && path.startsWith('/pt')) {
-      const redirectTo = crossTradeRedirects[path];
-      if (redirectTo) {
-        toast.error('You are being redirected to the global version of the site.');
-        navigate(redirectTo, { replace: true });
+    // Check for cross-trade attempts from PT-PT to PT-BR (EUR → BRL)
+    if (language === 'pt-pt' && !isPtPtRoute && !isEnRoute) {
+      if (path.startsWith('/testes') || path.startsWith('/cliente') || path.startsWith('/comprar')) {
+        toast.error('Está a ser redirecionado para a versão portuguesa do site.');
+        const ptPtPath = '/pt-pt' + path;
+        navigate(ptPtPath, { replace: true });
         return;
       }
+    }
+
+    // Check for cross-trade attempts from PT-PT to EN (EUR → USD)
+    if (language === 'pt-pt' && isEnRoute) {
+      toast.error('Está a ser redirecionado para a versão portuguesa do site.');
+      const ptPtPath = path.replace('/en/tests', '/pt-pt/testes').replace('/en', '/pt-pt');
+      navigate(ptPtPath, { replace: true });
+      return;
+    }
+
+    // Check for cross-trade attempts from EN to PT-PT (USD → EUR)
+    if (language === 'en' && isPtPtRoute) {
+      toast.error('You are being redirected to the global version of the site.');
+      const enPath = path.replace('/pt-pt/testes', '/en/tests').replace('/pt-pt', '/en');
+      navigate(enPath, { replace: true });
+      return;
     }
   }, [location.pathname, language, navigate, setLanguage]);
 

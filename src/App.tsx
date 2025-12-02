@@ -60,6 +60,74 @@ const AppRoutes = () => (
     {/* Test detail pages - EN (new semantic routes) */}
     <Route path="/en/tests/:slug" element={<TestDetailPage />} />
     
+    {/* Test detail pages - PT-PT (European Portuguese) */}
+    <Route path="/pt-pt/testes/:slug" element={<TestDetailPage />} />
+    
+    {/* Legal pages - PT-PT */}
+    <Route path="/pt-pt/termos" element={<TermsOfService />} />
+    <Route path="/pt-pt/privacidade" element={<PrivacyPolicy />} />
+    <Route path="/pt-pt/contato" element={<Contact />} />
+    
+    {/* Protected client routes - PT-PT */}
+    <Route
+      path="/pt-pt/cliente"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <Cliente />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/pt-pt/me"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <UserArea />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/pt-pt/cliente/perfil"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <ClientePerfil />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/pt-pt/cliente/test-execution/:testId/:userTestId"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <TestExecution />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/pt-pt/cliente/test-results/:userTestId"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <TestResults />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/pt-pt/cliente/mapa-essencia"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <MapaEssencia />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/pt-pt/cliente/comprar/:testId"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <ComprarTeste />
+        </ProtectedRoute>
+      }
+    />
+    <Route path="/pt-pt/auth" element={<Auth />} />
+    <Route path="/pt-pt" element={<Landing />} />
+    
     {/* Protected client routes */}
     <Route
       path="/cliente"
