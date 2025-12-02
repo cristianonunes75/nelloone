@@ -1,27 +1,75 @@
 {
   "hero": {
     "title": "NELLO ONE",
-    "subtitle": "Know Yourself Clearly. Change What Matters.",
-    "description": "The complete AI-guided self-knowledge experience — 7 essential tests + your personalized NELLO ONE Map.",
-    "tagline": "Gain clarity, emotional balance and direction to transform your life with confidence.",
-    "cta_primary": "Start free with the Archetypes Test",
+    "subtitle": "Know who you are. Transform what matters.",
+    "description": "NELLO ONE is the complete AI-guided self-knowledge system that reveals your patterns, strengths, challenges and growth pathways — with depth and simplicity.",
+    "tagline": "Takes less than 2 minutes to start.",
+    "cta_primary": "Start Now (Free)",
     "cta_secondary": "Explore Tests"
   },
-  "why_matters": {
-    "title": "How NELLO ONE Helps You Improve",
-    "subtitle": "NELLO ONE doesn't just deliver results — it reveals practical paths for personal growth.",
-    "description": "Each test highlights your strengths and shows where you can evolve, always with clarity and objectivity.",
-    "improvements_title": "You discover:",
-    "improvements": [
-      "Which emotional patterns are sabotaging your daily life",
-      "Where your communication breaks down and how to improve",
-      "How to make decisions with more confidence",
-      "In which areas your energy is scattered",
-      "How to develop emotional maturity",
-      "What direction to follow for more clarity, balance and purpose"
+  "mirror": {
+    "title": "If this describes you, NELLO ONE was made for your moment:",
+    "items": [
+      "I feel like I'm living below my potential",
+      "I have strength, but lack clarity",
+      "I make decisions that don't reflect who I truly am",
+      "I repeat emotional patterns without understanding why",
+      "I know I have talent but don't know how to use it",
+      "My communication doesn't match what I feel",
+      "I lose myself trying to please everyone",
+      "I want to change, but don't know where to start"
+    ]
+  },
+  "improvements": {
+    "title": "NELLO ONE reveals:",
+    "items": [
+      "Your emotional patterns",
+      "Your core strengths",
+      "What sabotages you",
+      "How to make confident decisions",
+      "Your communication style",
+      "How to relate better",
+      "How to focus your energy",
+      "How to grow without losing yourself"
+    ]
+  },
+  "social_proof": {
+    "title": "What people say about NELLO ONE",
+    "testimonials": [
+      {
+        "quote": "For the first time I understood why I repeat the same mistakes. Now I know how to change.",
+        "author": "Ana Paula, 34"
+      },
+      {
+        "quote": "The NELLO ONE Map gave me clarity that years of therapy couldn't.",
+        "author": "Rafael, 29"
+      },
+      {
+        "quote": "It's like having a mirror that shows not only who you are, but who you can become.",
+        "author": "Camila, 41"
+      }
     ],
-    "closing": "All of this with AI guidance and a unique map that translates your personality, talents and challenges — for you to use in real life.",
-    "cta": "Start Now"
+    "technical": {
+      "title": "Based on real science",
+      "items": [
+        "Based on recognized methodologies",
+        "AI trained in applied psychology and behavior",
+        "+2,000 users in beta",
+        "Used by leaders, coaches and professionals"
+      ]
+    }
+  },
+  "personal_branding": {
+    "title": "Turn Self-Knowledge Into Personal Branding",
+    "description": "Your NELLO ONE Map doesn't only reveal who you are — it shows you how to present yourself to the world. Your results guide your professional positioning, communication style and content creation.",
+    "subtitle": "Use your NELLO ONE Map to:",
+    "items": [
+      "Build your personal brand",
+      "Define a strategic professional narrative",
+      "Strengthen your authority",
+      "Communicate with authenticity",
+      "Discover your ideal content style"
+    ]
   },
   "problems": {
     "title": "Problems NELLO ONE Solves",
@@ -39,6 +87,68 @@
       "Starting a transformation journey but getting stuck along the way"
     ],
     "closing": "With NELLO ONE, you finally understand who you are, why you act the way you do and how to change what no longer helps you."
+  },
+  "transformation": {
+    "title": "Your Transformation Journey",
+    "steps": [
+      {
+        "number": "1",
+        "title": "Clarity",
+        "description": "Understand who you are, with precision."
+      },
+      {
+        "number": "2",
+        "title": "Awareness",
+        "description": "Understand why you act the way you act."
+      },
+      {
+        "number": "3",
+        "title": "Transformation",
+        "description": "Learn how to change what no longer serves you."
+      }
+    ]
+  },
+  "what_you_get": {
+    "title": "Inside what you receive",
+    "subtitle": "Everything you get inside NELLO ONE:",
+    "items": [
+      "7 professional tests",
+      "Full identity map",
+      "Personalized AI insights",
+      "Practical recommendations",
+      "Continuous growth"
+    ]
+  },
+  "not_for_you": {
+    "title_not": "NELLO ONE is not for you if:",
+    "items_not": [
+      "You want magical answers",
+      "You want shortcuts without reflection",
+      "You don't want to improve"
+    ],
+    "title_for": "NELLO ONE is for you if:",
+    "items_for": [
+      "You want real clarity",
+      "You want emotional maturity",
+      "You want practical growth",
+      "You want to know who you truly are"
+    ]
+  },
+  "why_matters": {
+    "title": "How NELLO ONE Helps You Improve",
+    "subtitle": "NELLO ONE doesn't just deliver results — it reveals practical paths for personal growth.",
+    "description": "Each test highlights your strengths and shows where you can evolve, always with clarity and objectivity.",
+    "improvements_title": "You discover:",
+    "improvements": [
+      "Which emotional patterns are sabotaging your daily life",
+      "Where your communication breaks down and how to improve",
+      "How to make decisions with more confidence",
+      "In which areas your energy is scattered",
+      "How to develop emotional maturity",
+      "What direction to follow for more clarity, balance and purpose"
+    ],
+    "closing": "All of this with AI guidance and a unique map that translates your personality, talents and challenges — for you to use in real life.",
+    "cta": "Start Now"
   },
   "value_proposition": {
     "title": "Why Choose NELLO ONE?",
@@ -81,6 +191,36 @@
   },
   "faq": {
     "title": "Frequently Asked Questions",
+    "items": [
+      {
+        "question": "How do I know this works for me?",
+        "answer": "NELLO ONE uses internationally validated methodologies (DISC, MBTI, Enneagram, etc.) combined with AI to create personalized insights. If you want clarity about who you are and how to improve, it works for you."
+      },
+      {
+        "question": "Do I need to understand psychology?",
+        "answer": "No. NELLO ONE translates complex concepts into simple, practical language. Miguel, our AI, explains everything clearly and accessibly."
+      },
+      {
+        "question": "Is it really different from other tests?",
+        "answer": "Yes. Other tests give you isolated results. NELLO ONE integrates 7 assessments into a single map, showing how your patterns connect and how you can evolve."
+      },
+      {
+        "question": "What results can I expect?",
+        "answer": "Clarity about your emotional patterns, strengths, blind spots, communication style and growth direction. All in a visual and practical map."
+      },
+      {
+        "question": "Does it work if I'm emotionally lost?",
+        "answer": "Especially. NELLO ONE was made for moments of confusion. It organizes what you feel into clarity and direction."
+      },
+      {
+        "question": "Why are prices different in Real and Dollar?",
+        "answer": "NELLO ONE serves people worldwide. To offer fair prices for each region, we use two policies: Local Pricing in Brazil and Global Pricing for international users. This ensures everyone can access the same quality with balanced conditions."
+      },
+      {
+        "question": "Can I buy in another country's currency?",
+        "answer": "No. NELLO ONE automatically blocks purchases in incorrect currencies to prevent errors, fraud and unfair price differences. You always pay in the currency matching your browsing region."
+      }
+    ],
     "pricing": {
       "question": "Why are the prices different in Real and in Dollar?",
       "answer": "NELLO ONE serves people from all over the world. To offer fair prices for each region, we use two policies: Local Pricing — in Brazil, we apply values suited to the local economic reality. Global Pricing — for international users, we use the currency and pricing standards of the global market. This way, everyone can access the same level of quality, with balanced and transparent conditions."
@@ -176,12 +316,13 @@
     "free": "Free",
     "currency": "$",
     "bundle_original": 147,
-    "bundle_price": 97
+    "bundle_price": 97,
+    "microcopy": "You're already paying the price of confusion. This is where you transform it."
   },
   "cta": {
-    "title": "Your path begins within.",
-    "subtitle": "Start your journey today.",
-    "button": "Begin Now"
+    "title": "Start now — discover your archetype in 2 minutes.",
+    "subtitle": "No risk, no pressure. Just clarity.",
+    "button": "Begin Now (Free)"
   },
   "footer": {
     "brand": "NELLO ONE",

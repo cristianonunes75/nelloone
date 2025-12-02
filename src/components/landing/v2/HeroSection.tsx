@@ -45,8 +45,8 @@ export const HeroSection = () => {
           >
             {language === 'en' ? (
               <>
-                Know Yourself Clearly.
-                <span className="block text-ink-blue">Change What Matters.</span>
+                Know who you are.
+                <span className="block text-ink-blue">Transform what matters.</span>
               </>
             ) : (
               <>
@@ -59,23 +59,21 @@ export const HeroSection = () => {
           {/* Subheadline - Value proposition */}
           <p 
             className={cn(
-              "font-premium text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-4 md:mb-6 leading-relaxed transition-all duration-700 delay-200",
+              "font-premium text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 md:mb-6 leading-relaxed transition-all duration-700 delay-200",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
             {t.landing.hero.description}
           </p>
           
-          {/* Tagline */}
+          {/* Tagline / Microcopy */}
           <p 
             className={cn(
-              "text-sm md:text-base text-muted-foreground/80 max-w-xl mx-auto mb-8 md:mb-12 leading-relaxed px-2 transition-all duration-700 delay-300",
+              "text-sm md:text-base text-muted-foreground/80 max-w-xl mx-auto mb-8 md:mb-10 leading-relaxed px-2 transition-all duration-700 delay-300",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            {language === 'en' 
-              ? 'Gain clarity, emotional balance and direction to transform your life with confidence.' 
-              : 'Ganhe clareza, equilíbrio emocional e direção para mudar sua vida com segurança.'}
+            {t.landing.hero.tagline}
           </p>
 
           {/* CTA - Full width on mobile */}
@@ -87,11 +85,11 @@ export const HeroSection = () => {
           >
             <Button 
               size="lg" 
-              className="group w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 text-sm md:text-base rounded-full bg-ink-blue hover:bg-ink-deep text-primary-foreground shadow-medium hover:shadow-large hover-lift press-effect"
+              className="group w-full sm:w-auto h-14 md:h-16 px-8 md:px-10 text-base md:text-lg rounded-full bg-ink-blue hover:bg-ink-deep text-primary-foreground shadow-large hover:shadow-xl hover-lift press-effect"
               onClick={() => navigate(language === 'en' ? "/en/auth" : "/auth")}
             >
               {t.landing.hero.cta_primary}
-              <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform duration-300" />
+              <ArrowRight className="ml-2 w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
           </div>
 
@@ -103,8 +101,8 @@ export const HeroSection = () => {
             )}
           >
             {language === 'en' 
-              ? 'Over 2,000 people have started their journey' 
-              : 'Mais de 2.000 pessoas já iniciaram sua jornada'}
+              ? '✓ Over 2,000 people have started their journey' 
+              : '✓ Mais de 2.000 pessoas já iniciaram sua jornada'}
           </p>
         </div>
       </div>
