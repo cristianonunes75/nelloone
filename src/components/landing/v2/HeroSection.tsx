@@ -43,17 +43,13 @@ export const HeroSection = () => {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            {language === 'en' ? (
-              <>
-                Know who you are.
-                <span className="block text-ink-blue">Transform what matters.</span>
-              </>
-            ) : (
-              <>
-                Conheça quem você é.
-                <span className="block text-ink-blue">Transforme o que importa.</span>
-              </>
-            )}
+            {t.landing.hero.subtitle.split('.').filter(Boolean).map((part, index) => (
+              index === 0 ? (
+                <span key={index}>{part.trim()}.</span>
+              ) : (
+                <span key={index} className="block text-ink-blue">{part.trim()}.</span>
+              )
+            ))}
           </h1>
 
           {/* Subheadline - Value proposition */}
@@ -86,7 +82,7 @@ export const HeroSection = () => {
             <Button 
               size="lg" 
               className="group w-full sm:w-auto h-14 md:h-16 px-8 md:px-10 text-base md:text-lg rounded-full bg-ink-blue hover:bg-ink-deep text-primary-foreground shadow-large hover:shadow-xl hover-lift press-effect"
-              onClick={() => navigate(language === 'en' ? "/en/auth" : "/auth")}
+              onClick={() => navigate(language === 'en' ? "/en/auth" : language === 'pt-pt' ? "/pt-pt/auth" : "/auth")}
             >
               {t.landing.hero.cta_primary}
               <ArrowRight className="ml-2 w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform duration-300" />
@@ -102,6 +98,8 @@ export const HeroSection = () => {
           >
             {language === 'en' 
               ? '✓ Over 2,000 people have started their journey' 
+              : language === 'pt-pt'
+              ? '✓ Mais de 2.000 pessoas já iniciaram a sua jornada'
               : '✓ Mais de 2.000 pessoas já iniciaram sua jornada'}
           </p>
         </div>
