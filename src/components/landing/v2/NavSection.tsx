@@ -38,8 +38,10 @@ export const NavSection = () => {
   };
 
   const handleNavigation = (path: string) => {
-    // Add /en prefix if in English mode
-    const localizedPath = language === 'en' ? `/en${path}` : path;
+    // Add language prefix based on current language
+    let localizedPath = path;
+    if (language === 'en') localizedPath = `/en${path}`;
+    else if (language === 'pt-pt') localizedPath = `/pt-pt${path}`;
     navigate(localizedPath);
     setIsMobileMenuOpen(false);
   };
@@ -47,7 +49,21 @@ export const NavSection = () => {
   const handleSignOut = async () => {
     await signOut();
     setIsMobileMenuOpen(false);
-    navigate(language === 'en' ? '/en' : '/');
+    if (language === 'en') navigate('/en');
+    else if (language === 'pt-pt') navigate('/pt-pt');
+    else navigate('/');
+  };
+
+  const getHomePath = () => {
+    if (language === 'en') return '/en';
+    if (language === 'pt-pt') return '/pt-pt';
+    return '/';
+  };
+
+  const getAuthPath = () => {
+    if (language === 'en') return '/en/auth';
+    if (language === 'pt-pt') return '/pt-pt/auth';
+    return '/auth';
   };
 
   // Links for non-logged users
@@ -77,7 +93,7 @@ export const NavSection = () => {
       <div className="container px-4 sm:px-6">
         <nav className="flex items-center justify-between h-14 md:h-16">
           {/* Logo */}
-          <button onClick={() => navigate(language === 'en' ? '/en' : '/')} className="focus:outline-none">
+          <button onClick={() => navigate(getHomePath())} className="focus:outline-none">
             <LogoText className="text-lg md:text-xl" variant="solid" />
           </button>
 
@@ -144,7 +160,7 @@ export const NavSection = () => {
               <Button 
                 variant="ghost" 
                 size="sm"
-                onClick={() => navigate("/auth")}
+                onClick={() => navigate(getAuthPath())}
                 className="text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               >
                 {t.landing.nav.login}
