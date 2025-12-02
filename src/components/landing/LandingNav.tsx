@@ -2,12 +2,36 @@ import { Button } from "@/components/ui/button";
 import { LogoText } from "@/components/LogoText";
 import { useNavigate } from "react-router-dom";
 import { Home, LogIn } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 export const LandingNav = () => {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
+  const { user, userRole } = useAuth();
+
+  const isAdmin = userRole === "admin";
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const getHomePath = () => {
+    if (language === 'en') return '/en';
+    if (language === 'pt-pt') return '/pt-pt';
+    return '/';
+  };
+
+  const getAuthPath = () => {
+    if (language === 'en') return '/en/auth';
+    if (language === 'pt-pt') return '/pt-pt/auth';
+    return '/auth';
+  };
+
+  const handleHomeClick = () => {
+    navigate(getHomePath());
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
   };
 
   return (
@@ -16,7 +40,7 @@ export const LandingNav = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div 
-            onClick={scrollToTop}
+            onClick={handleHomeClick}
             className="cursor-pointer hover:opacity-80 transition-opacity"
           >
             <LogoText 
@@ -30,48 +54,37 @@ export const LandingNav = () => {
             <Button
               variant="ghost"
               size="default"
-              onClick={scrollToTop}
+              onClick={handleHomeClick}
               className="gap-2"
             >
               <Home className="w-4 h-4" />
               <span className="hidden sm:inline">Home</span>
             </Button>
             
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/influence")}
-              className="hidden lg:inline-flex text-xs"
-            >
-              Influence
-            </Button>
+            {/* Admin only buttons - hidden for regular users */}
+            {isAdmin && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/admin")}
+                  className="hidden md:inline-flex text-xs"
+                >
+                  Admin
+                </Button>
+              </>
+            )}
             
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/fotografo")}
-              className="hidden md:inline-flex text-xs"
-            >
-              Fotógrafo
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/admin")}
-              className="hidden md:inline-flex text-xs"
-            >
-              Admin
-            </Button>
+            <LanguageToggle variant="minimal" />
             
             <Button
               variant="default"
               size="default"
-              onClick={() => navigate("/auth")}
-              className="gap-2 bg-gold hover:bg-gold-dark"
+              onClick={() => navigate(getAuthPath())}
+              className="gap-2 bg-ink hover:bg-ink/90"
             >
               <LogIn className="w-4 h-4" />
-              <span>Entrar</span>
+              <span>{t.landing.nav.login}</span>
             </Button>
           </div>
         </div>
