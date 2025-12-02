@@ -28,7 +28,7 @@ export const testSlugs = {
   linguagens_amor: { pt: 'estilos-conexao-afetiva', en: 'affection-connection-styles' },
   inteligencias_multiplas: { pt: 'inteligencias', en: 'intelligences' },
   eneagrama: { pt: 'eneagrama', en: 'enneagram' },
-  mbti: { pt: 'mbti', en: 'mbti' },
+  mbti: { pt: 'nello-16-personalidades', en: '16-personality-map' },
 };
 
 export const testContent: Record<string, TestContentMap> = {
@@ -388,52 +388,88 @@ In NELLO ONE, it is a key to inner freedom.`,
   },
   mbti: {
     pt: {
-      title: "MBTI",
-      subtitle: "Compreenda sua forma única de pensar e decidir",
-      storytelling: `Descubra como você percebe o mundo, toma decisões e se relaciona com a vida. Este teste identifica o seu tipo psicológico segundo a teoria dos tipos de Carl Jung e adapta-o à linguagem simbólica do NELLO ONE.`,
+      title: "Nello 16 Personality Map",
+      subtitle: "Descubra seu perfil psicológico em 4 letras",
+      storytelling: `O Nello 16 Personality Map é um sistema exclusivo do Nello One que traduz as teorias de Carl Jung em um modelo moderno de 16 perfis psicológicos.
+
+Ele identifica como você percebe o mundo, processa informações, toma decisões e se relaciona com diferentes ambientes.
+
+Em poucos minutos, você descobre seus pontos fortes naturais, seus desafios emocionais, suas tendências de comportamento, como você reage sob pressão, o tipo de ambiente em que você evolui e como melhorar comunicação, carreira e relacionamentos.`,
       benefits: [
-        "Seu tipo psicológico (ex: INFP, ESTJ etc.)",
-        "Como equilibrar razão, emoção e propósito",
-        "Como se posicionar com clareza em decisões profissionais e pessoais",
+        "Seu tipo psicológico em 4 letras (ex: INFP, ESTJ)",
+        "Como seu comportamento molda suas relações e decisões",
+        "Mapa visual com forças, desafios e orientações práticas",
       ],
-      audience: "Quem busca autoconhecimento profundo e alinhamento entre mente, emoção e propósito.",
+      audience: "Quem busca autoconhecimento profundo e clareza sobre como pensa, decide e se relaciona.",
       howItWorks: {
-        step1: "Você responde 60 perguntas sobre preferências cognitivas",
-        step2: "Miguel identifica seu tipo entre os 16 perfis MBTI",
-        step3: "Você entende como sua mente processa informações e decide",
+        step1: "Você responde 24 perguntas sobre comportamento e preferências",
+        step2: "Miguel identifica seu tipo entre os 16 perfis Nello",
+        step3: "Você recebe seu perfil completo com forças, desafios e aplicações práticas",
       },
       whatItHelps: [
-        "Compreender seu estilo cognitivo",
-        "Melhorar tomada de decisões",
-        "Escolher carreiras alinhadas",
-        "Entender dinâmicas de equipe",
-        "Desenvolver áreas menos dominantes",
+        "Compreender como você se comunica",
+        "Identificar onde você trava",
+        "Entender como você cresce",
+        "Descobrir que ambientes te drenam",
+        "Organizar sua vida em direção ao que funciona para você",
       ],
       ctaText: "Começar Teste",
     },
     en: {
-      title: "MBTI",
-      subtitle: "Understand your unique way of thinking and deciding",
-      storytelling: `Discover how you perceive the world, make decisions and relate to life. This test identifies your psychological type according to Carl Jung's type theory and adapts it to NELLO ONE's symbolic language.`,
+      title: "Nello 16 Personality Map",
+      subtitle: "Discover your 4-letter psychological type",
+      storytelling: `The Nello 16 Personality Map is a proprietary Nello One system inspired by Carl Jung's psychological type theory and redesigned for the modern world.
+
+It helps you understand how you perceive reality, process information, make decisions, and interact with different environments.
+
+In just a few minutes, you'll discover your natural strengths, your emotional challenges, your behavioral tendencies, how you react under pressure, your ideal environment for growth, and how to improve communication, career and relationships.`,
       benefits: [
-        "Your psychological type (e.g., INFP, ESTJ, etc.)",
-        "How to balance reason, emotion and purpose",
-        "How to position yourself clearly in professional and personal decisions",
+        "Your 4-letter psychological type (e.g., INFP, ESTJ)",
+        "How your behavior shapes your relationships and decisions",
+        "Visual map with strengths, challenges and practical guidance",
       ],
-      audience: "Those who seek deep self-knowledge and alignment between mind, emotion and purpose.",
+      audience: "Those who seek deep self-knowledge and clarity on how they think, decide and relate.",
       howItWorks: {
-        step1: "You answer 60 questions about cognitive preferences",
-        step2: "Miguel identifies your type among the 16 MBTI profiles",
-        step3: "You understand how your mind processes information and decides",
+        step1: "You answer 24 questions about behavior and preferences",
+        step2: "Miguel identifies your type among the 16 Nello profiles",
+        step3: "You receive your complete profile with strengths, challenges and practical applications",
       },
       whatItHelps: [
-        "Understand your cognitive style",
-        "Improve decision making",
-        "Choose aligned careers",
-        "Understand team dynamics",
-        "Develop less dominant areas",
+        "Understand how you communicate",
+        "Identify where you get stuck",
+        "Understand how you grow",
+        "Discover which environments drain you",
+        "Align your life with what truly energizes you",
       ],
       ctaText: "Start Test",
+    },
+    'pt-pt': {
+      title: "Mapa das 16 Personalidades Nello",
+      subtitle: "Descubra o seu perfil psicológico em 4 letras",
+      storytelling: `O Mapa das 16 Personalidades Nello é um sistema exclusivo do Nello One que transforma as teorias de Carl Jung num modelo moderno composto por 16 perfis psicológicos.
+
+Ele identifica a forma como percebe o mundo, processa informação, toma decisões e se adapta a diferentes contextos.
+
+Em poucos minutos irá descobrir os seus pontos fortes naturais, os desafios emocionais que mais aparecem, as suas tendências comportamentais, a forma como reage sob pressão, o tipo de ambiente onde mais se desenvolve e como melhorar comunicação, carreira e relações.`,
+      benefits: [
+        "O seu tipo psicológico em 4 letras (ex: INFP, ESTJ)",
+        "Como o seu comportamento influencia relações e decisões",
+        "Mapa visual com forças, desafios e orientações práticas",
+      ],
+      audience: "Quem procura autoconhecimento profundo e clareza sobre como pensa, decide e se relaciona.",
+      howItWorks: {
+        step1: "Responde a 24 perguntas sobre comportamento e preferências",
+        step2: "O Miguel identifica o seu tipo entre os 16 perfis Nello",
+        step3: "Recebe o seu perfil completo com forças, desafios e aplicações práticas",
+      },
+      whatItHelps: [
+        "Compreender como comunica",
+        "Identificar onde sente bloqueios",
+        "Entender como evolui",
+        "Descobrir que ambientes o desgastam",
+        "Alinhar a sua vida ao que realmente funciona consigo",
+      ],
+      ctaText: "Começar Teste",
     },
   },
 };

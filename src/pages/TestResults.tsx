@@ -14,7 +14,7 @@ import PhotoSessionBooking from "@/components/cliente/PhotoSessionBooking";
 import ArchetypeResults from "@/components/cliente/ArchetypeResults";
 import { calculateArchetypeScores, getDominantArchetypes } from "@/lib/archetypes";
 import { getDISCResults, DISC_PROFILES } from "@/lib/disc";
-import { MBTI_PROFILES } from "@/lib/mbti";
+import { NELLO_16_PROFILES } from "@/lib/nello16Personality";
 import { ENNEAGRAM_PROFILES } from "@/lib/eneagrama";
 import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
@@ -308,7 +308,7 @@ export default function TestResults() {
           </Card>
         )}
 
-        {/* MBTI Results */}
+        {/* Nello 16 Personality Map Results */}
         {isMBTITest && mbtiResultData?.type && (
           <Card className="border-none shadow-lg">
             <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
@@ -316,21 +316,21 @@ export default function TestResults() {
                 <div className="text-6xl">🧠</div>
                 <CardTitle className="text-3xl font-light">{mbtiResultData.type}</CardTitle>
                 <CardDescription className="text-lg">
-                  {MBTI_PROFILES[mbtiResultData.type]?.name || "Seu Tipo Psicológico"}
+                  {NELLO_16_PROFILES[mbtiResultData.type]?.name?.[lang] || "Seu Tipo Psicológico"}
                 </CardDescription>
               </div>
             </CardHeader>
             <CardContent className="pt-8 space-y-8">
               <div className="space-y-4 text-center max-w-3xl mx-auto">
                 <p className="text-lg leading-relaxed">
-                  {MBTI_PROFILES[mbtiResultData.type]?.description}
+                  {NELLO_16_PROFILES[mbtiResultData.type]?.description?.[lang]}
                 </p>
               </div>
 
               <Card className="border-2 border-accent/30">
                 <CardHeader>
-                  <CardTitle className="text-xl">Suas Dimensões</CardTitle>
-                  <CardDescription>Como você se posiciona nas 4 dimensões do MBTI</CardDescription>
+                  <CardTitle className="text-xl">{lang === 'en' ? 'Your Dimensions' : 'Suas Dimensões'}</CardTitle>
+                  <CardDescription>{lang === 'en' ? 'How you position yourself in the 4 dimensions' : 'Como você se posiciona nas 4 dimensões'}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* E vs I */}
