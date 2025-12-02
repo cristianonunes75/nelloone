@@ -141,9 +141,16 @@ export function getPriceIdForLanguage(testType: string, language: Language): str
     inteligencias_multiplas: "price_1SZUpxDjhZZxZELMAkQlFX11",
   };
 
-  // EUR prices - to be filled with actual Stripe price IDs
+  // EUR prices for Portugal
   const EUR_PRICES: Record<string, string> = {
-    // These will be filled when user provides EUR price IDs
+    arquetipos: "price_1SZywzDjhZZxZELMZfCg6fSd",
+    disc: "price_1SZyxMDjhZZxZELMkolH98fK",
+    mbti: "price_1SZz6TDjhZZxZELMXzDUT8kk",
+    eneagrama: "price_1SZz5ADjhZZxZELMauUUwZSQ",
+    temperamentos: "price_1SZyxYDjhZZxZELMATbPpg7h",
+    linguagens_amor: "price_1SZyykDjhZZxZELM9mlhNwLh",
+    inteligencias_multiplas: "price_1SZz0nDjhZZxZELMVagCtoXs",
+    bundle: "price_1SZz6vDjhZZxZELMQsZuLKah",
   };
 
   switch (language) {
