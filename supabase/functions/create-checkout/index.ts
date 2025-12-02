@@ -13,17 +13,14 @@ const logStep = (step: string, details?: any) => {
 
 // Get client IP from request
 function getClientIP(req: Request): string {
-  // Try Cloudflare header first
   const cfIP = req.headers.get("cf-connecting-ip");
   if (cfIP) return cfIP;
   
-  // Try X-Forwarded-For
   const xForwardedFor = req.headers.get("x-forwarded-for");
   if (xForwardedFor) {
     return xForwardedFor.split(",")[0].trim();
   }
   
-  // Try X-Real-IP
   const xRealIP = req.headers.get("x-real-ip");
   if (xRealIP) return xRealIP;
   
@@ -34,7 +31,7 @@ function getClientIP(req: Request): string {
 async function getCountryFromIP(ip: string): Promise<string | null> {
   if (ip === "unknown" || ip === "127.0.0.1" || ip.startsWith("192.168.") || ip.startsWith("10.")) {
     logStep("Local IP detected, skipping geo check", { ip });
-    return null; // Skip validation for local/development IPs
+    return null;
   }
   
   try {
@@ -54,9 +51,14 @@ async function getCountryFromIP(ip: string): Promise<string | null> {
   }
 }
 
+// EU countries that can use EUR
+const EU_COUNTRIES = [
+  "PT", "ES", "FR", "DE", "IT", "NL", "BE", "AT", "IE", "FI", 
+  "GR", "LU", "MT", "CY", "SK", "SI", "EE", "LV", "LT", "HR"
+];
+
 // Validate IP country matches currency (Anti-CrossTrade Protection)
 function validateIPForCurrency(country: string | null, currency: string): { valid: boolean; reason?: string } {
-  // Skip validation if country detection failed
   if (!country) {
     logStep("Country detection failed, allowing transaction");
     return { valid: true };
@@ -71,12 +73,21 @@ function validateIPForCurrency(country: string | null, currency: string): { vali
     };
   }
   
-  // USD cannot be used from Brazil
-  if (currency === "usd" && country === "BR") {
-    logStep("BLOCKED: USD purchase from Brazilian IP", { country, currency });
+  // USD cannot be used from Brazil or EU
+  if (currency === "usd" && (country === "BR" || EU_COUNTRIES.includes(country))) {
+    logStep("BLOCKED: USD purchase from Brazil/EU IP", { country, currency });
     return { 
       valid: false, 
-      reason: "USD_FROM_BRAZIL"
+      reason: "USD_FROM_BRAZIL_OR_EU"
+    };
+  }
+  
+  // EUR can only be used from EU countries (primarily Portugal)
+  if (currency === "eur" && !EU_COUNTRIES.includes(country)) {
+    logStep("BLOCKED: EUR purchase from non-EU IP", { country, currency });
+    return { 
+      valid: false, 
+      reason: "EUR_FROM_NON_EU"
     };
   }
   
@@ -85,9 +96,10 @@ function validateIPForCurrency(country: string | null, currency: string): { vali
 }
 
 // Currency validation error messages
-const CURRENCY_ERROR_MESSAGES = {
+const CURRENCY_ERROR_MESSAGES: Record<string, string> = {
   pt: "Você está tentando finalizar uma compra em moeda diferente da sua região. Acesse a versão correta do site.",
   en: "You are trying to complete a purchase in a different currency than your region. Please access the correct version of the site.",
+  "pt-pt": "Está a tentar finalizar uma compra numa moeda diferente da sua região. Aceda à versão correta do site.",
 };
 
 // USD Price IDs for EN version (Global market)
@@ -107,20 +119,60 @@ const BRL_PRICES: Record<string, string> = {
   disc: "price_1SNBIuDjhZZxZELMm3qUtTON",
   mbti: "price_1SNBJEDjhZZxZELMY1CuVfIZ",
   eneagrama: "price_1SNBLhDjhZZxZELMhSvpHn8X",
+  temperamentos: "price_1SZUnqDjhZZxZELMtU9tUMFm",
+  linguagens_amor: "price_1SZUoWDjhZZxZELMxEJJKhDn",
+  inteligencias_multiplas: "price_1SZUpxDjhZZxZELMAkQlFX11",
+  bundle: "price_1SZNYXDjhZZxZELMoGVJUZRP", // Using USD bundle as fallback
 };
+
+// EUR Price IDs for PT-PT version (Portugal/European market)
+const EUR_PRICES: Record<string, string> = {
+  arquetipos: "price_1SZywzDjhZZxZELMZfCg6fSd",
+  disc: "price_1SZyxMDjhZZxZELMkolH98fK",
+  mbti: "price_1SZz6TDjhZZxZELMXzDUT8kk",
+  eneagrama: "price_1SZz5ADjhZZxZELMauUUwZSQ",
+  temperamentos: "price_1SZyxYDjhZZxZELMATbPpg7h",
+  linguagens_amor: "price_1SZyykDjhZZxZELM9mlhNwLh",
+  inteligencias_multiplas: "price_1SZz0nDjhZZxZELMVagCtoXs",
+  bundle: "price_1SZz6vDjhZZxZELMQsZuLKah",
+};
+
+// Get expected currency based on language
+function getExpectedCurrency(language: string): string {
+  switch (language) {
+    case "en":
+      return "usd";
+    case "pt-pt":
+      return "eur";
+    case "pt":
+    default:
+      return "brl";
+  }
+}
 
 // Validate currency matches language (Anti-CrossTrade Protection)
 function validateCurrencyForLanguage(language: string, requestedCurrency?: string): { valid: boolean; expectedCurrency: string } {
-  const expectedCurrency = language === "en" ? "usd" : "brl";
+  const expectedCurrency = getExpectedCurrency(language);
   
-  // If no currency specified, use the expected one
   if (!requestedCurrency) {
     return { valid: true, expectedCurrency };
   }
   
-  // Validate currency matches language
   const valid = requestedCurrency.toLowerCase() === expectedCurrency;
   return { valid, expectedCurrency };
+}
+
+// Get price map based on currency
+function getPriceMap(currency: string): Record<string, string> {
+  switch (currency) {
+    case "usd":
+      return USD_PRICES;
+    case "eur":
+      return EUR_PRICES;
+    case "brl":
+    default:
+      return BRL_PRICES;
+  }
 }
 
 serve(async (req) => {
@@ -140,12 +192,12 @@ serve(async (req) => {
     
     // Get language/currency from request (defaults to PT/BRL)
     const language = body.language || "pt";
-    const requestedCurrency = body.currency; // Optional: explicit currency from frontend
+    const requestedCurrency = body.currency;
     
     // ANTI-CROSSTRADE PROTECTION: Validate currency matches language
     const validation = validateCurrencyForLanguage(language, requestedCurrency);
     if (!validation.valid) {
-      const errorMessage = CURRENCY_ERROR_MESSAGES[language as keyof typeof CURRENCY_ERROR_MESSAGES] || CURRENCY_ERROR_MESSAGES.en;
+      const errorMessage = CURRENCY_ERROR_MESSAGES[language] || CURRENCY_ERROR_MESSAGES.en;
       logStep("BLOCKED: Cross-trade attempt detected", { language, requestedCurrency, expected: validation.expectedCurrency });
       return new Response(JSON.stringify({ 
         error: errorMessage,
@@ -169,9 +221,17 @@ serve(async (req) => {
     const ipValidation = validateIPForCurrency(ipCountry, currency);
     
     if (!ipValidation.valid) {
-      const errorMessage = language === "pt"
-        ? "Sua localização não corresponde à moeda selecionada. Por favor, acesse a versão correta do site para sua região."
-        : "Your location does not match the selected currency. Please access the correct version of the site for your region.";
+      let errorMessage: string;
+      switch (language) {
+        case "pt-pt":
+          errorMessage = "A sua localização não corresponde à moeda selecionada. Por favor, aceda à versão correta do site para a sua região.";
+          break;
+        case "en":
+          errorMessage = "Your location does not match the selected currency. Please access the correct version of the site for your region.";
+          break;
+        default:
+          errorMessage = "Sua localização não corresponde à moeda selecionada. Por favor, acesse a versão correta do site para sua região.";
+      }
       
       logStep("BLOCKED: IP-currency mismatch", { 
         ip: clientIP, 
@@ -207,7 +267,7 @@ serve(async (req) => {
       throw new Error("At least one test ID is required");
     }
     
-    logStep("Request data", { testIds, count: testIds.length, isBundle, language });
+    logStep("Request data", { testIds, count: testIds.length, isBundle, language, currency });
 
     // Get user (optional - supports guest checkout)
     let user = null;
@@ -240,36 +300,51 @@ serve(async (req) => {
     }
 
     let lineItems: any[] = [];
+    const priceMap = getPriceMap(currency);
     
     if (isBundle) {
       // Bundle purchase
-      const bundlePriceId = currency === "usd" ? USD_PRICES.bundle : null;
-      
-      if (!bundlePriceId && currency === "usd") {
-        throw new Error("Bundle price not configured for USD");
-      }
+      const bundlePriceId = priceMap.bundle;
       
       if (bundlePriceId) {
         lineItems = [{
           price: bundlePriceId,
           quantity: 1,
         }];
+        logStep("Bundle line item created with price ID", { currency, priceId: bundlePriceId });
       } else {
-        // BRL bundle - create price_data
+        // Fallback: create price_data for bundle
+        const bundleAmounts: Record<string, number> = {
+          brl: 59700, // R$ 597
+          usd: 14700, // $147
+          eur: 8900,  // €89
+        };
+        
+        const bundleNames: Record<string, { name: string; description: string }> = {
+          brl: {
+            name: "NELLO ONE Completo",
+            description: "Todos os 7 testes + Mapa NELLO ONE gerado por IA",
+          },
+          usd: {
+            name: "NELLO ONE Complete",
+            description: "All 7 tests + AI-generated NELLO ONE Map",
+          },
+          eur: {
+            name: "NELLO ONE Completo",
+            description: "Todos os 7 testes + Mapa NELLO ONE gerado por IA",
+          },
+        };
+        
         lineItems = [{
           price_data: {
-            currency: "brl",
-            product_data: {
-              name: "NELLO ONE Completo",
-              description: "Todos os 7 testes + Mapa NELLO ONE gerado por IA",
-            },
-            unit_amount: 59700, // R$ 597
+            currency: currency,
+            product_data: bundleNames[currency] || bundleNames.usd,
+            unit_amount: bundleAmounts[currency] || bundleAmounts.usd,
           },
           quantity: 1,
         }];
+        logStep("Bundle line item created with price_data", { currency });
       }
-      
-      logStep("Bundle line item created", { currency });
     } else {
       // Individual tests purchase
       const { data: tests, error: testsError } = await supabaseClient
@@ -284,7 +359,6 @@ serve(async (req) => {
 
       // Build line items based on currency
       lineItems = tests.map(test => {
-        const priceMap = currency === "usd" ? USD_PRICES : BRL_PRICES;
         const priceId = priceMap[test.type] || test.stripe_price_id;
         
         if (priceId) {
@@ -293,19 +367,30 @@ serve(async (req) => {
             quantity: 1,
           };
         } else {
-          // Fallback for tests without stripe_price_id
-          const unitAmount = currency === "usd" 
-            ? Math.round(parseFloat(test.price_brl.toString()) * 100 / 5) // Approximate USD
-            : Math.round(parseFloat(test.price_brl.toString()) * 100);
+          // Fallback for tests without configured price ID
+          const conversionRates: Record<string, number> = {
+            brl: 1,
+            usd: 0.2, // ~5:1 BRL to USD
+            eur: 0.18, // ~5.5:1 BRL to EUR
+          };
+          
+          const rate = conversionRates[currency] || 1;
+          const unitAmount = Math.round(parseFloat(test.price_brl.toString()) * 100 * rate);
+          
+          const testLabels: Record<string, { prefix: string; accessText: string }> = {
+            brl: { prefix: "Teste", accessText: "Acesso vitalício ao teste" },
+            usd: { prefix: "Test", accessText: "Lifetime access to" },
+            eur: { prefix: "Teste", accessText: "Acesso vitalício ao teste" },
+          };
+          
+          const labels = testLabels[currency] || testLabels.usd;
           
           return {
             price_data: {
               currency: currency,
               product_data: {
-                name: currency === "usd" ? `Test: ${test.name}` : `Teste: ${test.name}`,
-                description: currency === "usd" 
-                  ? `Lifetime access to ${test.name} test`
-                  : `Acesso vitalício ao teste ${test.name}`,
+                name: `${labels.prefix}: ${test.name}`,
+                description: `${labels.accessText} ${test.name}`,
               },
               unit_amount: unitAmount,
             },
@@ -327,12 +412,22 @@ serve(async (req) => {
 
     // Set success/cancel URLs based on language
     const origin = req.headers.get("origin") || "";
-    const successUrl = language === "en" 
-      ? `${origin}/en/dashboard?payment=success`
-      : `${origin}/cliente?payment=success`;
-    const cancelUrl = language === "en"
-      ? `${origin}/en/dashboard?payment=cancelled`
-      : `${origin}/cliente?payment=cancelled`;
+    let successUrl: string;
+    let cancelUrl: string;
+    
+    switch (language) {
+      case "en":
+        successUrl = `${origin}/en/dashboard?payment=success`;
+        cancelUrl = `${origin}/en/dashboard?payment=cancelled`;
+        break;
+      case "pt-pt":
+        successUrl = `${origin}/pt-pt/cliente?payment=success`;
+        cancelUrl = `${origin}/pt-pt/cliente?payment=cancelled`;
+        break;
+      default:
+        successUrl = `${origin}/cliente?payment=success`;
+        cancelUrl = `${origin}/cliente?payment=cancelled`;
+    }
 
     // Create checkout session
     const sessionParams: any = {
@@ -346,6 +441,7 @@ serve(async (req) => {
         test_ids: JSON.stringify(testIds),
         user_id: user?.id || body.userId || "guest",
         language: language,
+        currency: currency,
         is_bundle: isBundle ? "true" : "false",
       },
       customer_creation: customerId ? undefined : "always",
@@ -353,14 +449,16 @@ serve(async (req) => {
 
     // Add discount if applicable
     if (discountPercentage > 0) {
-      const couponName = language === "en" 
-        ? `${discountPercentage}% Off - ${testIds.length} tests`
-        : `Desconto ${discountPercentage}% - ${testIds.length} testes`;
+      const couponNames: Record<string, string> = {
+        pt: `Desconto ${discountPercentage}% - ${testIds.length} testes`,
+        en: `${discountPercentage}% Off - ${testIds.length} tests`,
+        "pt-pt": `Desconto ${discountPercentage}% - ${testIds.length} testes`,
+      };
       
       const coupon = await stripe.coupons.create({
         percent_off: discountPercentage,
         duration: "once",
-        name: couponName,
+        name: couponNames[language] || couponNames.en,
       });
       
       sessionParams.discounts = [{ coupon: coupon.id }];
@@ -369,7 +467,7 @@ serve(async (req) => {
 
     const session = await stripe.checkout.sessions.create(sessionParams);
     
-    logStep("Checkout session created", { sessionId: session.id, url: session.url, currency });
+    logStep("Checkout session created", { sessionId: session.id, url: session.url, currency, language });
 
     return new Response(JSON.stringify({ 
       sessionId: session.id,
