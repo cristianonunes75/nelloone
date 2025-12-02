@@ -34,37 +34,37 @@ export const testPrices: Record<string, TestPrice> = {
     testType: "disc",
     brl: { price: 97, priceId: "price_1SNBIuDjhZZxZELMm3qUtTON" },
     usd: { price: 47, priceId: "price_1SZNWgDjhZZxZELMoEGJMpRt" },
-    eur: { price: 47, priceId: null }, // TODO: Add EUR price ID
+    eur: { price: 17.90, priceId: "price_1SZyxMDjhZZxZELMkolH98fK" },
   },
   mbti: {
     testType: "mbti",
     brl: { price: 197, priceId: "price_1SNBJEDjhZZxZELMY1CuVfIZ" },
     usd: { price: 57, priceId: "price_1SZNWuDjhZZxZELMXezDuVOz" },
-    eur: { price: 57, priceId: null }, // TODO: Add EUR price ID
+    eur: { price: 52.90, priceId: "price_1SZz6TDjhZZxZELMXzDUT8kk" },
   },
   eneagrama: {
     testType: "eneagrama",
     brl: { price: 177, priceId: "price_1SNBLhDjhZZxZELMhSvpHn8X" },
     usd: { price: 49, priceId: "price_1SZNX8DjhZZxZELMZhLy7W6b" },
-    eur: { price: 49, priceId: null }, // TODO: Add EUR price ID
+    eur: { price: 44.90, priceId: "price_1SZz5ADjhZZxZELMauUUwZSQ" },
   },
   temperamentos: {
     testType: "temperamentos",
     brl: { price: 117, priceId: "price_1SZUnqDjhZZxZELMtU9tUMFm" },
     usd: { price: 27, priceId: "price_1SZNXKDjhZZxZELMhOhi8sCL" },
-    eur: { price: 27, priceId: null }, // TODO: Add EUR price ID
+    eur: { price: 24.90, priceId: "price_1SZyxYDjhZZxZELMATbPpg7h" },
   },
   linguagens_amor: {
     testType: "linguagens_amor",
     brl: { price: 127, priceId: "price_1SZUoWDjhZZxZELMxEJJKhDn" },
     usd: { price: 17, priceId: "price_1SZNXYDjhZZxZELMtlzZO8Id" },
-    eur: { price: 17, priceId: null }, // TODO: Add EUR price ID
+    eur: { price: 15.90, priceId: "price_1SZyykDjhZZxZELM9mlhNwLh" },
   },
   inteligencias_multiplas: {
     testType: "inteligencias_multiplas",
     brl: { price: 147, priceId: "price_1SZUpxDjhZZxZELMAkQlFX11" },
     usd: { price: 29, priceId: "price_1SZNXnDjhZZxZELMuGMkDImQ" },
-    eur: { price: 29, priceId: null }, // TODO: Add EUR price ID
+    eur: { price: 27.90, priceId: "price_1SZz0nDjhZZxZELMVagCtoXs" },
   },
 };
 
@@ -85,9 +85,9 @@ export const bundlePrices = {
     symbol: "$",
   },
   eur: {
-    original: 147,
-    price: 97,
-    priceId: null, // TODO: Add EUR bundle price ID
+    original: 184,
+    price: 89,
+    priceId: "price_1SZz6vDjhZZxZELMQsZuLKah",
     currency: "EUR" as Currency,
     symbol: "€",
   },
