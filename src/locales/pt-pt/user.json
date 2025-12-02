@@ -1,0 +1,85 @@
+{
+  "sidebar": {
+    "profile": "Perfil",
+    "my_tests": "Os Meus Testes",
+    "map": "Mapa Nello One",
+    "history": "Histórico de Resultados",
+    "billing": "Faturação",
+    "settings": "Definições",
+    "logout": "Sair"
+  },
+  "profile": {
+    "title": "Perfil",
+    "subtitle": "Bem-vindo ao teu painel pessoal",
+    "description": "Aqui podes acompanhar a tua jornada Nello One.",
+    "details": "Detalhes do Perfil",
+    "full_name": "Nome Completo",
+    "email": "Email",
+    "phone": "Telefone",
+    "profession": "Profissão",
+    "language": "Idioma da Conta",
+    "created_at": "Membro desde",
+    "edit_profile": "Editar Perfil",
+    "change_password": "Alterar Palavra-passe",
+    "save_changes": "Guardar Alterações",
+    "saving": "A guardar...",
+    "email_readonly": "O email não pode ser alterado",
+    "success": "Perfil atualizado!",
+    "success_description": "As tuas informações foram guardadas com sucesso.",
+    "error": "Erro ao guardar",
+    "back": "Voltar"
+  },
+  "tests": {
+    "title": "Os Meus Testes",
+    "subtitle": "Os teus testes concluídos",
+    "empty": "Ainda não completaste nenhum teste.",
+    "start_journey": "Inicia a tua jornada",
+    "status": {
+      "completed": "Concluído",
+      "in_progress": "Em Progresso",
+      "not_started": "Por Iniciar"
+    },
+    "view_result": "Ver Resultado",
+    "continue": "Continuar",
+    "completed_on": "Concluído em"
+  },
+  "map": {
+    "title": "Mapa Nello One",
+    "subtitle": "Mapa Essencial",
+    "description": "O teu mapa integrado de autoconhecimento que combina todos os resultados dos testes.",
+    "not_generated": "O teu mapa ainda não foi gerado.",
+    "complete_tests": "Completa todos os 7 testes para desbloquear o teu mapa personalizado.",
+    "generate": "Gerar novo mapa",
+    "export_pdf": "Descarregar PDF profissional",
+    "share": "Partilhar",
+    "view_map": "Ver Mapa"
+  },
+  "history": {
+    "title": "Histórico de Resultados",
+    "subtitle": "Resultados anteriores",
+    "empty": "Nenhum resultado encontrado.",
+    "view_details": "Ver detalhes"
+  },
+  "billing": {
+    "title": "Faturação",
+    "subtitle": "Gere a tua subscrição e pagamentos",
+    "subscription": "Subscrição",
+    "active_subscription": "Subscrição ativa",
+    "no_subscription": "Não tens subscrições ativas",
+    "next_payment": "Próximo Pagamento",
+    "plan": "Plano",
+    "status": "Estado",
+    "invoices": "Faturas",
+    "no_invoices": "Nenhuma fatura encontrada",
+    "view_invoice": "Ver fatura",
+    "change_plan": "Alterar plano",
+    "cancel_subscription": "Cancelar subscrição",
+    "manage": "Gerir Faturação"
+  },
+  "nav": {
+    "my_profile": "O Meu Perfil",
+    "my_journey": "A Minha Jornada",
+    "admin_panel": "Painel Admin",
+    "logout": "Terminar Sessão"
+  }
+}

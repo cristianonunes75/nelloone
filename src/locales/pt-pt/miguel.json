@@ -1,0 +1,53 @@
+{
+  "greeting": "Olá, sou o Miguel — o teu guia interior no NELLO ONE.",
+  "intro": "O meu propósito é ajudar-te a compreenderes-te com clareza, profundidade e leveza. Juntos, exploramos os teus padrões, forças, pontos cegos e potencial. Estou aqui para te ajudar a crescer de dentro para fora.",
+  "placeholder": "Escreve a tua mensagem...",
+  "typing": "O Miguel está a pensar...",
+  "error": "Desculpa, tive um momento de pausa. Podes repetir o que disseste?",
+  "subtitle": "O teu guia no NELLO ONE",
+  "landingGreeting": "Olá{name}! Sou o Miguel, o teu guia no NELLO ONE.\n\nO NELLO ONE combina ciência da personalidade, design emocional e IA para revelar padrões internos que transformam a forma como te vês, decides e relacionas.\n\nO caminho começa por dentro. Como posso ajudar-te hoje?",
+  "clienteGreetingNew": "Estás no início da tua jornada de autodescoberta. O primeiro passo é o teste de Arquétipos, que irá revelar a energia que te move. Quando estiveres pronto, é só começar!",
+  "clienteGreetingProgress": "Completaste {count} teste{plural}. Continua a tua jornada para descobrires mais sobre quem és.",
+  "clienteGreetingComplete": "Parabéns! Completaste todos os testes. O teu Mapa NELLO ONE está pronto para ser revelado!",
+  "clienteGreetingIntro": "Olá{name}! Que bom ver-te aqui.\n\n{progress}\n\nComo posso ajudar-te?",
+  "quickReplies": {
+    "landing": {
+      "whatIs": "O que é o NELLO ONE?",
+      "whatIsAction": "O que é o NELLO ONE?",
+      "whichTests": "Que testes existem?",
+      "whichTestsAction": "Que testes oferece o NELLO ONE?",
+      "startJourney": "Quero iniciar a minha jornada",
+      "startJourneyAction": "Quero iniciar a minha jornada de autodescoberta.",
+      "howWorks": "Como funciona?",
+      "howWorksAction": "Como funciona o processo NELLO ONE?"
+    },
+    "cliente": {
+      "nextStep": "Qual é o próximo passo?",
+      "nextStepAction": "Qual é o próximo passo na minha jornada?",
+      "explainResults": "Explica os meus resultados",
+      "explainResultsAction": "Podes ajudar-me a compreender os meus resultados?",
+      "whatMeans": "O que significa este teste?",
+      "whatMeansAction": "O que irá revelar o próximo teste sobre mim?",
+      "needGuidance": "Preciso de orientação",
+      "needGuidanceAction": "Preciso de orientação sobre a minha personalidade."
+    },
+    "afterResponse": {
+      "landing": {
+        "signup": "Quero registar-me",
+        "signupAction": "Como me registo?",
+        "prices": "Ver preços",
+        "pricesAction": "Quais são os preços dos testes?",
+        "startNow": "Começar agora",
+        "startNowAction": "Quero começar a minha jornada agora!"
+      },
+      "cliente": {
+        "nextTest": "Próximo teste",
+        "nextTestAction": "Fala-me sobre o próximo teste.",
+        "myResults": "Os meus resultados",
+        "myResultsAction": "Quero compreender melhor os meus resultados.",
+        "nelloMap": "Mapa NELLO ONE",
+        "nelloMapAction": "O que é o Mapa NELLO ONE?"
+      }
+    }
+  }
+}
