@@ -1,3 +1,4 @@
+import { SEOHead } from "@/components/SEOHead";
 import { NavSection } from "@/components/landing/v2/NavSection";
 import { HeroSection } from "@/components/landing/v2/HeroSection";
 import { MirrorSection } from "@/components/landing/v2/MirrorSection";
@@ -19,6 +20,7 @@ import { MobileStickyCtA } from "@/components/landing/v2/MobileStickyCtA";
 const Landing = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead page="landing" />
       <NavSection />
       
       {/* SEÇÃO 1 - Hero de Alta Conversão */}
