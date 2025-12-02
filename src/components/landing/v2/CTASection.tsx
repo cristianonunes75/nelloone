@@ -18,52 +18,37 @@ export const CTASection = () => {
       
       <div ref={ref} className="container px-4 md:px-6 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
-          <p 
-            className={cn(
-              "font-premium text-lg md:text-xl lg:text-2xl text-primary-foreground/80 mb-4 md:mb-6 transition-all duration-700",
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-            )}
-          >
-            "{language === 'en' ? 'Your next step begins within.' : 'Seu próximo passo começa dentro.'}"
-          </p>
+          {/* Main CTA Title */}
           <h2 
             className={cn(
-              "font-display text-2xl sm:text-display-sm md:text-display-md lg:text-display-lg text-primary-foreground mb-4 md:mb-6 transition-all duration-700 delay-100",
+              "font-display text-2xl sm:text-display-sm md:text-display-md lg:text-display-lg text-primary-foreground mb-4 md:mb-6 transition-all duration-700",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            {language === 'en' ? (
-              <>
-                The path begins
-                <span className="block">within.</span>
-              </>
-            ) : (
-              <>
-                O caminho começa
-                <span className="block">dentro.</span>
-              </>
-            )}
+            {t.landing.cta.title}
           </h2>
+
+          {/* Microcopy */}
           <p 
             className={cn(
-              "text-sm md:text-base text-primary-foreground/70 mb-8 md:mb-10 max-w-xl mx-auto px-2 transition-all duration-700 delay-200",
+              "text-base md:text-lg text-primary-foreground/80 mb-8 md:mb-10 max-w-xl mx-auto transition-all duration-700 delay-100",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            {language === 'en' 
-              ? 'Start now with the free Archetypes test and take the first step in your self-discovery journey.'
-              : 'Comece agora com o teste gratuito de Arquétipos e dê o primeiro passo na sua jornada de autodescoberta.'}
+            {t.landing.cta.subtitle}
           </p>
+
+          {/* CTA Button */}
           <Button 
             size="lg" 
             className={cn(
-              "group w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 text-sm md:text-base rounded-full bg-background hover:bg-background/90 text-ink-blue shadow-large hover-lift press-effect transition-all duration-700 delay-300",
+              "group w-full sm:w-auto h-14 md:h-16 px-8 md:px-10 text-base md:text-lg rounded-full bg-background hover:bg-background/90 text-ink-blue shadow-large hover-lift press-effect transition-all duration-700 delay-200",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
             onClick={() => navigate(language === 'en' ? "/en/auth" : "/auth")}
           >
-            {t.landing.cta.button} {language === 'en' ? '(Free)' : '(Grátis)'}
-            <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform duration-300" />
+            {t.landing.cta.button}
+            <ArrowRight className="ml-2 w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform duration-300" />
           </Button>
         </div>
       </div>
