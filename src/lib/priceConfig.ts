@@ -54,7 +54,15 @@ export const testPrices: Record<string, TestPrice> = {
     usd: { price: 27, priceId: "price_1SZNXKDjhZZxZELMhOhi8sCL" },
     eur: { price: 24.90, priceId: "price_1SZyxYDjhZZxZELMATbPpg7h" },
   },
+  // Estilos de Conexão Afetiva (formerly Linguagens do Amor)
   linguagens_amor: {
+    testType: "linguagens_amor",
+    brl: { price: 127, priceId: "price_1SZUoWDjhZZxZELMxEJJKhDn" },
+    usd: { price: 17, priceId: "price_1SZNXYDjhZZxZELMtlzZO8Id" },
+    eur: { price: 15.90, priceId: "price_1SZyykDjhZZxZELM9mlhNwLh" },
+  },
+  // Alias for new name
+  estilos_conexao_afetiva: {
     testType: "linguagens_amor",
     brl: { price: 127, priceId: "price_1SZUoWDjhZZxZELMxEJJKhDn" },
     usd: { price: 17, priceId: "price_1SZNXYDjhZZxZELMtlzZO8Id" },

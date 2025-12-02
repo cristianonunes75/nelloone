@@ -17,6 +17,7 @@ export interface TestContent {
 export interface TestContentMap {
   pt: TestContent;
   en: TestContent;
+  'pt-pt'?: TestContent;
 }
 
 // Test slugs for routing
@@ -24,7 +25,7 @@ export const testSlugs = {
   arquetipos: { pt: 'arquetipos', en: 'archetypes' },
   disc: { pt: 'disc', en: 'disc' },
   temperamentos: { pt: 'temperamentos', en: 'temperaments' },
-  linguagens_amor: { pt: 'linguagens-do-amor', en: 'love-languages' },
+  linguagens_amor: { pt: 'estilos-conexao-afetiva', en: 'affection-connection-styles' },
   inteligencias_multiplas: { pt: 'inteligencias', en: 'intelligences' },
   eneagrama: { pt: 'eneagrama', en: 'enneagram' },
   mbti: { pt: 'mbti', en: 'mbti' },
@@ -201,56 +202,82 @@ This test reveals the foundation of your personality — and how to harmonize yo
   },
   linguagens_amor: {
     pt: {
-      title: "Linguagens do Amor",
-      subtitle: "Como você ama e se sente amado?",
-      storytelling: `Cada pessoa expressa e recebe amor de formas diferentes: palavras, tempo, presentes, ajuda prática ou toque físico.
+      title: "Mapa dos Estilos de Conexão Afetiva",
+      subtitle: "Como você se conecta emocionalmente?",
+      storytelling: `Cada pessoa se conecta emocionalmente de formas diferentes: através da presença, das palavras, do cuidado prático, de gestos simbólicos ou do contato físico.
 
-Esse teste revela como o amor fala em sua alma — e como você pode comunicar e receber afeto de forma mais verdadeira.`,
+Este teste revela seu estilo primário de conexão afetiva — e como você pode cultivar relacionamentos mais profundos e autênticos.`,
       benefits: [
-        "Sua linguagem primária e secundária de amor",
-        "Como melhorar seus relacionamentos afetivos",
-        "Recomendações práticas de comunicação e convivência",
+        "Seu estilo primário e secundário de conexão afetiva",
+        "Como fortalecer seus relacionamentos",
+        "Recomendações práticas para conexões mais profundas",
       ],
-      audience: "Pessoas em relacionamentos, famílias, profissionais que trabalham com pessoas e todos que desejam aprofundar conexões verdadeiras.",
+      audience: "Pessoas em relacionamentos, famílias, profissionais que trabalham com pessoas e todos que desejam cultivar conexões mais verdadeiras.",
       howItWorks: {
-        step1: "Você responde 30 perguntas sobre preferências afetivas",
-        step2: "Miguel identifica suas linguagens de amor dominantes",
-        step3: "Você aprende a dar e receber amor de forma mais eficaz",
+        step1: "Você responde 30 perguntas sobre como se conecta emocionalmente",
+        step2: "Miguel identifica seus estilos de conexão dominantes",
+        step3: "Você aprende a cultivar relacionamentos mais profundos",
       },
       whatItHelps: [
+        "Compreender seu estilo de conexão emocional",
         "Melhorar a comunicação em relacionamentos",
-        "Entender as necessidades do parceiro",
-        "Fortalecer vínculos familiares",
-        "Resolver conflitos afetivos",
-        "Criar conexões mais profundas",
+        "Entender as necessidades afetivas do parceiro",
+        "Fortalecer vínculos familiares e profissionais",
+        "Criar conexões mais autênticas e profundas",
       ],
       ctaText: "Começar Teste",
     },
     en: {
-      title: "Love Languages",
-      subtitle: "How do you love and feel loved?",
-      storytelling: `Each person expresses and receives love in different ways: words, time, gifts, acts of service or physical touch.
+      title: "Affection Connection Styles",
+      subtitle: "How do you emotionally connect?",
+      storytelling: `Each person connects emotionally in different ways: through presence, words, practical care, symbolic gestures or physical contact.
 
-This test reveals how love speaks to your soul — and how you can communicate and receive affection more authentically.`,
+This test reveals your primary affection connection style — and how you can cultivate deeper and more authentic relationships.`,
       benefits: [
-        "Your primary and secondary love language",
-        "How to improve your affective relationships",
-        "Practical recommendations for communication and connection",
+        "Your primary and secondary connection style",
+        "How to strengthen your relationships",
+        "Practical recommendations for deeper connections",
       ],
-      audience: "People in relationships, families, professionals who work with people and all who want to deepen genuine connections.",
+      audience: "People in relationships, families, professionals who work with people and all who want to cultivate more genuine connections.",
       howItWorks: {
-        step1: "You answer 30 questions about affective preferences",
-        step2: "Miguel identifies your dominant love languages",
-        step3: "You learn to give and receive love more effectively",
+        step1: "You answer 30 questions about how you emotionally connect",
+        step2: "Miguel identifies your dominant connection styles",
+        step3: "You learn to cultivate deeper relationships",
       },
       whatItHelps: [
+        "Understand your emotional connection style",
         "Improve communication in relationships",
-        "Understand your partner's needs",
-        "Strengthen family bonds",
-        "Resolve affective conflicts",
-        "Create deeper connections",
+        "Understand your partner's affective needs",
+        "Strengthen family and professional bonds",
+        "Create more authentic and deeper connections",
       ],
       ctaText: "Start Test",
+    },
+    'pt-pt': {
+      title: "Mapa dos Estilos de Conexão Afetiva",
+      subtitle: "Como te conectas emocionalmente?",
+      storytelling: `Cada pessoa conecta-se emocionalmente de formas diferentes: através da presença, das palavras, do cuidado prático, de gestos simbólicos ou do contacto físico.
+
+Este teste revela o teu estilo primário de conexão afetiva — e como podes cultivar relacionamentos mais profundos e autênticos.`,
+      benefits: [
+        "O teu estilo primário e secundário de conexão afetiva",
+        "Como fortalecer os teus relacionamentos",
+        "Recomendações práticas para conexões mais profundas",
+      ],
+      audience: "Pessoas em relacionamentos, famílias, profissionais que trabalham com pessoas e todos que desejam cultivar conexões mais verdadeiras.",
+      howItWorks: {
+        step1: "Respondes a 30 perguntas sobre como te conectas emocionalmente",
+        step2: "O Miguel identifica os teus estilos de conexão dominantes",
+        step3: "Aprendes a cultivar relacionamentos mais profundos",
+      },
+      whatItHelps: [
+        "Compreender o teu estilo de conexão emocional",
+        "Melhorar a comunicação em relacionamentos",
+        "Entender as necessidades afetivas do parceiro",
+        "Fortalecer vínculos familiares e profissionais",
+        "Criar conexões mais autênticas e profundas",
+      ],
+      ctaText: "Começar Teste",
     },
   },
   inteligencias_multiplas: {

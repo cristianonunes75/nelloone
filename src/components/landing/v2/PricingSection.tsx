@@ -80,7 +80,7 @@ const getTestsData = (language: Language) => {
     { name: isEn ? "Archetypes" : "Arquétipos", icon: SunIcon, price: getPriceForLanguage('arquetipos', language)?.price || 0, questions: 36, isFree: !isEn, testType: 'arquetipos' },
     { name: "DISC", icon: QuadrantsIcon, price: getPriceForLanguage('disc', language)?.price || 0, questions: 28, testType: 'disc' },
     { name: isEn ? "Temperaments" : "Temperamentos", icon: WavesIcon, price: getPriceForLanguage('temperamentos', language)?.price || 0, questions: 32, testType: 'temperamentos' },
-    { name: isEn ? "Love Languages" : (isPtPt ? "Linguagens" : "Linguagens"), icon: HeartIcon, price: getPriceForLanguage('linguagens_amor', language)?.price || 0, questions: 30, testType: 'linguagens_amor' },
+    { name: isEn ? "Connection Styles" : "Estilos de Conexão", icon: HeartIcon, price: getPriceForLanguage('linguagens_amor', language)?.price || 0, questions: 30, testType: 'linguagens_amor' },
     { name: isEn ? "Intelligences" : "Inteligências", icon: BrainIcon, price: getPriceForLanguage('inteligencias_multiplas', language)?.price || 0, questions: 40, testType: 'inteligencias_multiplas' },
     { name: isEn ? "Enneagram" : "Eneagrama", icon: EnneagramIcon, price: getPriceForLanguage('eneagrama', language)?.price || 0, questions: 45, testType: 'eneagrama' },
     { name: "MBTI", icon: DiamondIcon, price: getPriceForLanguage('mbti', language)?.price || 0, questions: 60, testType: 'mbti' },

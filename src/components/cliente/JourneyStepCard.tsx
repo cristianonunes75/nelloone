@@ -19,7 +19,7 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase }: Journ
   const stepDescriptions: Record<string, string> = {
     arquetipos_proposito: "Descubra a energia que te move",
     inteligencias_multiplas: "Entenda como sua mente funciona",
-    linguagens_amor: "Como você expressa e recebe cuidado",
+    linguagens_amor: "Como você se conecta emocionalmente",
     mbti: "Como você toma decisões e percebe o mundo",
     disc: "Seu ritmo, sua energia e sua postura",
     eneagrama: "A raiz dos seus comportamentos",

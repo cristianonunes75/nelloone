@@ -465,8 +465,8 @@ export default function TestResults() {
             <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
               <div className="text-center space-y-4">
                 <div className="text-6xl">💕</div>
-                <CardTitle className="text-3xl font-light">Linguagens do Amor</CardTitle>
-                <CardDescription className="text-lg">Como você ama e se sente amado(a)</CardDescription>
+                <CardTitle className="text-3xl font-light">Estilos de Conexão Afetiva</CardTitle>
+                <CardDescription className="text-lg">Como você se conecta emocionalmente</CardDescription>
               </div>
             </CardHeader>
             <CardContent className="pt-8 space-y-8">

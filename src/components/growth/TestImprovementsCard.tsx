@@ -143,21 +143,21 @@ const testImprovements = {
     pt: {
       title: "O que você melhora com este teste",
       items: [
-        "Consciência de como expressa amor",
-        "Entendimento de como recebe cuidado",
-        "Melhoria nos relacionamentos afetivos",
+        "Consciência de como se conecta emocionalmente",
+        "Entendimento do seu estilo de conexão afetiva",
+        "Melhoria nos relacionamentos interpessoais",
         "Comunicação emocional mais clara",
-        "Conexões mais profundas e satisfatórias"
+        "Conexões mais profundas e autênticas"
       ]
     },
     en: {
       title: "What you improve with this test",
       items: [
-        "Awareness of how you express love",
-        "Understanding how you receive care",
-        "Improvement in affective relationships",
+        "Awareness of how you emotionally connect",
+        "Understanding your affection connection style",
+        "Improvement in interpersonal relationships",
         "Clearer emotional communication",
-        "Deeper and more satisfying connections"
+        "Deeper and more authentic connections"
       ]
     },
     icon: Heart,
