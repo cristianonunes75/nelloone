@@ -315,8 +315,8 @@
     "questions": "perguntas",
     "free": "Grátis",
     "currency": "€",
-    "bundle_original": 127,
-    "bundle_price": 87,
+    "bundle_original": 184,
+    "bundle_price": 89,
     "microcopy": "Já estás a pagar o preço da confusão. É aqui que a transformas."
   },
   "cta": {
@@ -334,7 +334,7 @@
     },
     "copyright": "© 2024 NELLO ONE. Todos os direitos reservados.",
     "payment_secure": "Pagamento 100% seguro via",
-    "payment_methods": "Cartão de Crédito ou PayPal",
+    "payment_methods": "Cartão de Crédito, MBWay ou PayPal",
     "instant_access": "Após confirmação do pagamento, recebes acesso instantâneo aos testes."
   },
   "nav": {
