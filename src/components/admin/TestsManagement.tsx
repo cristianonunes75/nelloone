@@ -486,7 +486,7 @@ export const TestsManagement = () => {
                   <option value="mbti">MBTI</option>
                   <option value="disc">DISC</option>
                   <option value="eneagrama">Eneagrama</option>
-                  <option value="solis">SOLIS</option>
+                  
                   <option value="temperamentos">Temperamentos</option>
                   <option value="linguagens_amor">Linguagens do Amor</option>
                   <option value="inteligencias_multiplas">Inteligências Múltiplas</option>
