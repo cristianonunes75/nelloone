@@ -73,9 +73,9 @@ const translations: Record<Language, Translations & { user: typeof enUser }> = {
     user: ptUser,
   },
   'pt-pt': {
-    landing: ptPtLanding as typeof enLanding,
-    miguel: ptPtMiguel as typeof enMiguel,
-    user: ptPtUser as typeof enUser,
+    landing: ptPtLanding,
+    miguel: ptPtMiguel,
+    user: ptPtUser,
   },
 };
 
