@@ -25,13 +25,7 @@ import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
-import ArquetiposMarca from "./pages/tests/ArquetiposMarca";
-import DISC from "./pages/tests/DISC";
-import MBTI from "./pages/tests/MBTI";
-import Eneagrama from "./pages/tests/Eneagrama";
-import Temperamentos from "./pages/tests/Temperamentos";
-import InteligenciasMultiplas from "./pages/tests/InteligenciasMultiplas";
-import LinguagensAmor from "./pages/tests/LinguagensAmor";
+import { TestDetailPage } from "./components/tests/TestDetailPage";
 import MapaEssencia from "./pages/MapaEssencia";
 import ComprarTeste from "./pages/ComprarTeste";
 
@@ -60,23 +54,11 @@ const AppRoutes = () => (
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
     <Route path="/contact" element={<Contact />} />
     
-    {/* Test detail pages - PT */}
-    <Route path="/teste-arquetipos" element={<ArquetiposMarca />} />
-    <Route path="/teste-disc" element={<DISC />} />
-    <Route path="/teste-mbti" element={<MBTI />} />
-    <Route path="/teste-eneagrama" element={<Eneagrama />} />
-    <Route path="/teste-temperamentos" element={<Temperamentos />} />
-    <Route path="/teste-inteligencias" element={<InteligenciasMultiplas />} />
-    <Route path="/teste-linguagens" element={<LinguagensAmor />} />
+    {/* Test detail pages - PT (new semantic routes) */}
+    <Route path="/testes/:slug" element={<TestDetailPage />} />
     
-    {/* Test detail pages - EN */}
-    <Route path="/test-archetypes" element={<ArquetiposMarca />} />
-    <Route path="/test-disc" element={<DISC />} />
-    <Route path="/test-mbti" element={<MBTI />} />
-    <Route path="/test-enneagram" element={<Eneagrama />} />
-    <Route path="/test-temperaments" element={<Temperamentos />} />
-    <Route path="/test-intelligences" element={<InteligenciasMultiplas />} />
-    <Route path="/test-love-languages" element={<LinguagensAmor />} />
+    {/* Test detail pages - EN (new semantic routes) */}
+    <Route path="/en/tests/:slug" element={<TestDetailPage />} />
     
     {/* Protected client routes */}
     <Route
