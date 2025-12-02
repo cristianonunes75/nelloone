@@ -11,7 +11,8 @@ import {
 
 const languages: { code: Language; label: string; flag: string }[] = [
   { code: 'en', label: 'English', flag: '🇺🇸' },
-  { code: 'pt', label: 'Português', flag: '🇧🇷' },
+  { code: 'pt', label: 'Português (BR)', flag: '🇧🇷' },
+  { code: 'pt-pt', label: 'Português (PT)', flag: '🇵🇹' },
 ];
 
 export function LanguageToggle({ variant = 'default' }: { variant?: 'default' | 'minimal' }) {
@@ -27,22 +28,23 @@ export function LanguageToggle({ variant = 'default' }: { variant?: 'default' | 
     
     // Update URL to reflect language change
     const currentPath = location.pathname;
-    let newPath: string;
+    let basePath = currentPath;
     
+    // Remove any existing language prefix
+    if (currentPath.startsWith('/en')) {
+      basePath = currentPath.replace(/^\/en/, '') || '/';
+    } else if (currentPath.startsWith('/pt-pt')) {
+      basePath = currentPath.replace(/^\/pt-pt/, '') || '/';
+    }
+    
+    let newPath: string;
     if (newLang === 'en') {
-      // Switching to English - add /en prefix
-      if (currentPath.startsWith('/en')) {
-        newPath = currentPath; // Already has /en
-      } else {
-        newPath = `/en${currentPath === '/' ? '' : currentPath}`;
-      }
+      newPath = `/en${basePath === '/' ? '' : basePath}`;
+    } else if (newLang === 'pt-pt') {
+      newPath = `/pt-pt${basePath === '/' ? '' : basePath}`;
     } else {
-      // Switching to Portuguese - remove /en prefix
-      if (currentPath.startsWith('/en')) {
-        newPath = currentPath.replace(/^\/en/, '') || '/';
-      } else {
-        newPath = currentPath;
-      }
+      // PT-BR uses root path
+      newPath = basePath;
     }
     
     navigate(newPath, { replace: true });
