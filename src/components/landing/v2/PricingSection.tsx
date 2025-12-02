@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Check, Sparkles } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useScrollAnimation, getStaggerDelay } from "@/hooks/useScrollAnimation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocalizedPath } from "@/components/LanguageRoute";
 import { cn } from "@/lib/utils";
 import { testPrices, bundlePrices } from "@/lib/priceConfig";
+import { getTestPath } from "@/lib/testContent";
 
 // Ultrathin custom icons
 const SunIcon = ({ className }: { className?: string }) => (
@@ -75,13 +76,13 @@ const DiamondIcon = ({ className }: { className?: string }) => (
 const getTestsData = (language: 'pt' | 'en') => {
   const isEn = language === 'en';
   return [
-    { name: isEn ? "Archetypes" : "Arquétipos", icon: SunIcon, price: isEn ? testPrices.arquetipos.usd.price : testPrices.arquetipos.brl.price, questions: 36, isFree: !isEn },
-    { name: "DISC", icon: QuadrantsIcon, price: isEn ? testPrices.disc.usd.price : testPrices.disc.brl.price, questions: 28 },
-    { name: isEn ? "Temperaments" : "Temperamentos", icon: WavesIcon, price: isEn ? testPrices.temperamentos.usd.price : testPrices.temperamentos.brl.price, questions: 32 },
-    { name: isEn ? "Love Languages" : "Linguagens", icon: HeartIcon, price: isEn ? testPrices.linguagens_amor.usd.price : testPrices.linguagens_amor.brl.price, questions: 30 },
-    { name: isEn ? "Intelligences" : "Inteligências", icon: BrainIcon, price: isEn ? testPrices.inteligencias_multiplas.usd.price : testPrices.inteligencias_multiplas.brl.price, questions: 40 },
-    { name: isEn ? "Enneagram" : "Eneagrama", icon: EnneagramIcon, price: isEn ? testPrices.eneagrama.usd.price : testPrices.eneagrama.brl.price, questions: 45 },
-    { name: "MBTI", icon: DiamondIcon, price: isEn ? testPrices.mbti.usd.price : testPrices.mbti.brl.price, questions: 60 },
+    { name: isEn ? "Archetypes" : "Arquétipos", icon: SunIcon, price: isEn ? testPrices.arquetipos.usd.price : testPrices.arquetipos.brl.price, questions: 36, isFree: !isEn, testType: 'arquetipos' },
+    { name: "DISC", icon: QuadrantsIcon, price: isEn ? testPrices.disc.usd.price : testPrices.disc.brl.price, questions: 28, testType: 'disc' },
+    { name: isEn ? "Temperaments" : "Temperamentos", icon: WavesIcon, price: isEn ? testPrices.temperamentos.usd.price : testPrices.temperamentos.brl.price, questions: 32, testType: 'temperamentos' },
+    { name: isEn ? "Love Languages" : "Linguagens", icon: HeartIcon, price: isEn ? testPrices.linguagens_amor.usd.price : testPrices.linguagens_amor.brl.price, questions: 30, testType: 'linguagens_amor' },
+    { name: isEn ? "Intelligences" : "Inteligências", icon: BrainIcon, price: isEn ? testPrices.inteligencias_multiplas.usd.price : testPrices.inteligencias_multiplas.brl.price, questions: 40, testType: 'inteligencias_multiplas' },
+    { name: isEn ? "Enneagram" : "Eneagrama", icon: EnneagramIcon, price: isEn ? testPrices.eneagrama.usd.price : testPrices.eneagrama.brl.price, questions: 45, testType: 'eneagrama' },
+    { name: "MBTI", icon: DiamondIcon, price: isEn ? testPrices.mbti.usd.price : testPrices.mbti.brl.price, questions: 60, testType: 'mbti' },
   ];
 };
 
@@ -213,18 +214,19 @@ export const PricingSection = () => {
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
               {tests.map((test, index) => (
-                <div 
+                <Link 
                   key={test.name}
+                  to={getTestPath(test.testType, language)}
                   className={cn(
-                    "bg-card rounded-xl md:rounded-2xl p-3 md:p-5 border border-border/30 shadow-soft hover:shadow-medium hover:border-border/50 transition-all duration-300 cursor-default",
+                    "bg-card rounded-xl md:rounded-2xl p-3 md:p-5 border border-border/30 shadow-soft hover:shadow-medium hover:border-ink-blue/30 transition-all duration-300 cursor-pointer group",
                     testsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
                   )}
                   style={testsVisible ? getStaggerDelay(index, 0.08) : {}}
                 >
-                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-ink-blue/10 flex items-center justify-center mb-3 md:mb-4">
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-ink-blue/10 flex items-center justify-center mb-3 md:mb-4 group-hover:bg-ink-blue/20 transition-colors">
                     <test.icon className="w-4 h-4 md:w-5 md:h-5 text-ink-blue" />
                   </div>
-                  <h4 className="font-medium text-foreground text-xs md:text-sm mb-0.5 md:mb-1">{test.name}</h4>
+                  <h4 className="font-medium text-foreground text-xs md:text-sm mb-0.5 md:mb-1 group-hover:text-ink-blue transition-colors">{test.name}</h4>
                   <p className="text-[10px] md:text-xs text-muted-foreground mb-2 md:mb-3">
                     {test.questions} {pricing.questions}
                   </p>
@@ -238,7 +240,11 @@ export const PricingSection = () => {
                       </>
                     )}
                   </div>
-                </div>
+                  <div className="mt-2 flex items-center gap-1 text-[10px] md:text-xs text-ink-blue opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span>{language === 'en' ? 'Learn more' : 'Saiba mais'}</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
