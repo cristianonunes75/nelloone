@@ -2,10 +2,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useScrollAnimation, getStaggerDelay } from "@/hooks/useScrollAnimation";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage, type Language } from "@/contexts/LanguageContext";
 import { useLocalizedPath } from "@/components/LanguageRoute";
 import { cn } from "@/lib/utils";
-import { testPrices, bundlePrices } from "@/lib/priceConfig";
+import { getPriceForLanguage, getBundlePriceForLanguage } from "@/lib/priceConfig";
 import { getTestPath } from "@/lib/testContent";
 
 // Ultrathin custom icons
@@ -73,16 +73,17 @@ const DiamondIcon = ({ className }: { className?: string }) => (
 );
 
 // Test data using prices from central priceConfig (ANTI-CROSSTRADE)
-const getTestsData = (language: 'pt' | 'en') => {
+const getTestsData = (language: Language) => {
   const isEn = language === 'en';
+  const isPtPt = language === 'pt-pt';
   return [
-    { name: isEn ? "Archetypes" : "Arquétipos", icon: SunIcon, price: isEn ? testPrices.arquetipos.usd.price : testPrices.arquetipos.brl.price, questions: 36, isFree: !isEn, testType: 'arquetipos' },
-    { name: "DISC", icon: QuadrantsIcon, price: isEn ? testPrices.disc.usd.price : testPrices.disc.brl.price, questions: 28, testType: 'disc' },
-    { name: isEn ? "Temperaments" : "Temperamentos", icon: WavesIcon, price: isEn ? testPrices.temperamentos.usd.price : testPrices.temperamentos.brl.price, questions: 32, testType: 'temperamentos' },
-    { name: isEn ? "Love Languages" : "Linguagens", icon: HeartIcon, price: isEn ? testPrices.linguagens_amor.usd.price : testPrices.linguagens_amor.brl.price, questions: 30, testType: 'linguagens_amor' },
-    { name: isEn ? "Intelligences" : "Inteligências", icon: BrainIcon, price: isEn ? testPrices.inteligencias_multiplas.usd.price : testPrices.inteligencias_multiplas.brl.price, questions: 40, testType: 'inteligencias_multiplas' },
-    { name: isEn ? "Enneagram" : "Eneagrama", icon: EnneagramIcon, price: isEn ? testPrices.eneagrama.usd.price : testPrices.eneagrama.brl.price, questions: 45, testType: 'eneagrama' },
-    { name: "MBTI", icon: DiamondIcon, price: isEn ? testPrices.mbti.usd.price : testPrices.mbti.brl.price, questions: 60, testType: 'mbti' },
+    { name: isEn ? "Archetypes" : "Arquétipos", icon: SunIcon, price: getPriceForLanguage('arquetipos', language)?.price || 0, questions: 36, isFree: !isEn, testType: 'arquetipos' },
+    { name: "DISC", icon: QuadrantsIcon, price: getPriceForLanguage('disc', language)?.price || 0, questions: 28, testType: 'disc' },
+    { name: isEn ? "Temperaments" : "Temperamentos", icon: WavesIcon, price: getPriceForLanguage('temperamentos', language)?.price || 0, questions: 32, testType: 'temperamentos' },
+    { name: isEn ? "Love Languages" : (isPtPt ? "Linguagens" : "Linguagens"), icon: HeartIcon, price: getPriceForLanguage('linguagens_amor', language)?.price || 0, questions: 30, testType: 'linguagens_amor' },
+    { name: isEn ? "Intelligences" : "Inteligências", icon: BrainIcon, price: getPriceForLanguage('inteligencias_multiplas', language)?.price || 0, questions: 40, testType: 'inteligencias_multiplas' },
+    { name: isEn ? "Enneagram" : "Eneagrama", icon: EnneagramIcon, price: getPriceForLanguage('eneagrama', language)?.price || 0, questions: 45, testType: 'eneagrama' },
+    { name: "MBTI", icon: DiamondIcon, price: getPriceForLanguage('mbti', language)?.price || 0, questions: 60, testType: 'mbti' },
   ];
 };
 
@@ -93,7 +94,7 @@ export const PricingSection = () => {
   
   // Use centralized price config (ANTI-CROSSTRADE)
   const tests = getTestsData(language);
-  const bundle = language === 'en' ? bundlePrices.usd : bundlePrices.brl;
+  const bundle = getBundlePriceForLanguage(language);
   const pricing = t.landing.pricing;
   const totalIndividual = tests.reduce((sum, test) => sum + test.price, 0);
   const savings = totalIndividual - bundle.price;

@@ -412,13 +412,23 @@ In NELLO ONE, it is a key to inner freedom.`,
 };
 
 // Helper to get test path based on language
-export const getTestPath = (testType: string, language: 'pt' | 'en'): string => {
+export const getTestPath = (testType: string, language: 'pt' | 'en' | 'pt-pt'): string => {
   const slugs = testSlugs[testType as keyof typeof testSlugs];
-  if (!slugs) return language === 'en' ? '/en' : '/';
+  if (!slugs) {
+    if (language === 'en') return '/en';
+    if (language === 'pt-pt') return '/pt-pt';
+    return '/';
+  }
   
-  return language === 'en' 
-    ? `/en/tests/${slugs.en}`
-    : `/testes/${slugs.pt}`;
+  switch (language) {
+    case 'en':
+      return `/en/tests/${slugs.en}`;
+    case 'pt-pt':
+      return `/pt-pt/testes/${slugs.pt}`;
+    case 'pt':
+    default:
+      return `/testes/${slugs.pt}`;
+  }
 };
 
 // Helper to get test type from slug

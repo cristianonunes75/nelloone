@@ -10,8 +10,8 @@ import { CreditCard, ShoppingCart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { formatPrice } from "@/lib/priceConfig";
+import { useLanguage, Language } from "@/contexts/LanguageContext";
+import { formatPrice, getCurrencyForLanguage } from "@/lib/priceConfig";
 
 interface PurchaseTestDialogProps {
   open: boolean;
@@ -47,13 +47,14 @@ export const PurchaseTestDialog = ({
       }
 
       // ANTI-CROSSTRADE: Create checkout session with language/currency
+      const currency = getCurrencyForLanguage(language).toLowerCase();
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: {
           testId,
           userId: user.id,
           userEmail: user.email,
           language: language, // Enforces correct currency
-          currency: language === 'en' ? 'usd' : 'brl',
+          currency: currency,
         },
       });
 

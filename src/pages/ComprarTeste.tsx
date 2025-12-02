@@ -8,8 +8,8 @@ import { LogoText } from "@/components/LogoText";
 import { ArrowLeft, Clock, HelpCircle, Lock, Loader2, CreditCard, Sparkles } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { getPriceForLanguage, formatPrice } from "@/lib/priceConfig";
+import { useLanguage, Language } from "@/contexts/LanguageContext";
+import { getPriceForLanguage, formatPrice, getCurrencyForLanguage } from "@/lib/priceConfig";
 
 const ComprarTeste = () => {
   const { testId } = useParams<{ testId: string }>();
@@ -42,11 +42,12 @@ const ComprarTeste = () => {
 
     try {
       // ANTI-CROSSTRADE: Pass language to enforce correct currency
+      const currency = getCurrencyForLanguage(language).toLowerCase();
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: { 
           testId: test.id,
           language: language, // Enforces currency based on route
-          currency: language === 'en' ? 'usd' : 'brl',
+          currency: currency,
         },
       });
 
