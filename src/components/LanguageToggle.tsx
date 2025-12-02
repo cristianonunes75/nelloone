@@ -11,8 +11,8 @@ import {
 
 const languages: { code: Language; label: string; flag: string }[] = [
   { code: 'en', label: 'English', flag: '🇺🇸' },
-  { code: 'pt', label: 'Português (BR)', flag: '🇧🇷' },
-  { code: 'pt-pt', label: 'Português (PT)', flag: '🇵🇹' },
+  { code: 'pt', label: 'Brasil', flag: '🇧🇷' },
+  { code: 'pt-pt', label: 'Portugal', flag: '🇵🇹' },
 ];
 
 export function LanguageToggle({ variant = 'default' }: { variant?: 'default' | 'minimal' }) {
