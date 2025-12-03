@@ -67,7 +67,7 @@ export const ForWhoContentManagement = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Editar "Para Quem é o Essentia"</CardTitle>
+        <CardTitle>Editar "Para Quem é o NELLO ONE"</CardTitle>
         <CardDescription>
           Gerencie os perfis de público-alvo exibidos nesta seção
         </CardDescription>

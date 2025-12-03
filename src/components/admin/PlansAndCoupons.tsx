@@ -172,7 +172,7 @@ export const PlansAndCoupons = () => {
       <Alert className="bg-yellow-500/10 border-yellow-500/20">
         <Info className="h-4 w-4 text-yellow-600" />
         <AlertDescription className="text-yellow-800">
-          Alterar estes valores muda o que aparece na vitrine de planos do Essentia. Revise com cuidado antes de salvar.
+          Alterar estes valores muda o que aparece na vitrine de planos do NELLO ONE. Revise com cuidado antes de salvar.
         </AlertDescription>
       </Alert>
 

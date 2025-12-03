@@ -32,14 +32,14 @@ const SECTION_CONFIG: Record<string, { label: string; icon: string; description:
     description: "Título principal, subtítulo e botões de ação da home" 
   },
   about: { 
-    label: "O que é o Essentia", 
+    label: "O que é o NELLO ONE", 
     icon: "ℹ️", 
-    description: "Seção explicativa sobre o que é o Essentia" 
+    description: "Seção explicativa sobre o que é o NELLO ONE" 
   },
   "for-who": { 
     label: "Para Quem É", 
     icon: "👥", 
-    description: "Perfis de público-alvo do Essentia" 
+    description: "Perfis de público-alvo do NELLO ONE" 
   },
   testimonials: { 
     label: "Depoimentos", 
@@ -49,7 +49,7 @@ const SECTION_CONFIG: Record<string, { label: string; icon: string; description:
   faq: { 
     label: "Perguntas Frequentes", 
     icon: "❓", 
-    description: "Perguntas e respostas sobre o Essentia" 
+    description: "Perguntas e respostas sobre o NELLO ONE" 
   },
 };
 
@@ -477,7 +477,7 @@ export const LandingContentManagement = () => {
       <Alert className="bg-primary/5 border-primary/20">
         <Info className="h-4 w-4" />
         <AlertDescription>
-          Tudo que você alterar aqui atualiza a landing page do Essentia. Revise com cuidado antes de salvar.
+          Tudo que você alterar aqui atualiza a landing page do NELLO ONE. Revise com cuidado antes de salvar.
         </AlertDescription>
       </Alert>
 

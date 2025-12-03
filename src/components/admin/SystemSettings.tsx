@@ -18,7 +18,7 @@ interface Setting {
 
 // Default settings structure
 const DEFAULT_SETTINGS = {
-  brand_name: { value: "Essentia", category: "general", description: "Nome da marca" },
+  brand_name: { value: "NELLO ONE", category: "general", description: "Nome da marca" },
   support_email: { value: "", category: "contact", description: "E-mail de suporte" },
   whatsapp_number: { value: "", category: "contact", description: "Número do WhatsApp" },
   instagram_url: { value: "", category: "social", description: "Link do Instagram" },
@@ -153,7 +153,7 @@ export const SystemSettings = () => {
               <Globe className="w-5 h-5" />
               Dados da Marca
             </CardTitle>
-            <CardDescription>Informações principais sobre a marca Essentia</CardDescription>
+            <CardDescription>Informações principais sobre a marca NELLO ONE</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -162,7 +162,7 @@ export const SystemSettings = () => {
                 <Input
                   value={formData.brand_name || ""}
                   onChange={(e) => updateField("brand_name", e.target.value)}
-                  placeholder="Essentia"
+                  placeholder="NELLO ONE"
                 />
               </div>
               <div className="space-y-2">
@@ -170,7 +170,7 @@ export const SystemSettings = () => {
                 <Input
                   value={formData.footer_text || ""}
                   onChange={(e) => updateField("footer_text", e.target.value)}
-                  placeholder="© 2024 Essentia. Todos os direitos reservados."
+                  placeholder="© 2024 NELLO ONE. Todos os direitos reservados."
                 />
               </div>
             </div>
@@ -194,7 +194,7 @@ export const SystemSettings = () => {
                   type="email"
                   value={formData.support_email || ""}
                   onChange={(e) => updateField("support_email", e.target.value)}
-                  placeholder="contato@essentia.com"
+                  placeholder="contato@nelloone.com"
                 />
               </div>
               <div className="space-y-2">
@@ -225,7 +225,7 @@ export const SystemSettings = () => {
                 <Input
                   value={formData.instagram_url || ""}
                   onChange={(e) => updateField("instagram_url", e.target.value)}
-                  placeholder="https://instagram.com/essentia"
+                  placeholder="https://instagram.com/nelloone.app"
                 />
               </div>
               <div className="space-y-2">
@@ -233,7 +233,7 @@ export const SystemSettings = () => {
                 <Input
                   value={formData.facebook_url || ""}
                   onChange={(e) => updateField("facebook_url", e.target.value)}
-                  placeholder="https://facebook.com/essentia"
+                  placeholder="https://facebook.com/nelloone"
                 />
               </div>
               <div className="space-y-2">
@@ -241,7 +241,7 @@ export const SystemSettings = () => {
                 <Input
                   value={formData.linkedin_url || ""}
                   onChange={(e) => updateField("linkedin_url", e.target.value)}
-                  placeholder="https://linkedin.com/company/essentia"
+                  placeholder="https://linkedin.com/company/nelloone"
                 />
               </div>
             </div>
