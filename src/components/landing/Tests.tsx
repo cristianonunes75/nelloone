@@ -17,9 +17,9 @@ const tests = [
   },
   { 
     icon: Brain, 
-    title: "MBTI", 
-    description: "Tipos psicológicos e preferências cognitivas",
-    link: "/teste-mbti"
+    title: "Nello 16", 
+    description: "Mapa das 16 personalidades e perfis psicológicos",
+    link: "/testes/nello-16-personalidades"
   },
   { 
     icon: Compass, 
@@ -41,9 +41,9 @@ const tests = [
   },
   { 
     icon: Heart, 
-    title: "Linguagens do Amor", 
-    description: "Comunicação afetiva e relacional (Gary Chapman)",
-    link: "/teste-linguagens"
+    title: "Estilos de Conexão", 
+    description: "Descubra como você se conecta emocionalmente",
+    link: "/testes/estilos-de-conexao"
   },
 ];
 
