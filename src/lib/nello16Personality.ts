@@ -373,14 +373,18 @@ export const QUADRANT_LABELS = {
   }
 };
 
+interface Nello16Option {
+  dimension?: string; // e.g., 'E_I', 'S_N', 'T_F', 'J_P'
+  direction?: string; // e.g., 'E', 'I', 'S', 'N', 'T', 'F', 'J', 'P'
+  text?: string;
+  label?: string;
+  value: string; // 'A', 'B' for PT/PT-PT or 'E', 'e', 'i', 'I' etc for EN
+}
+
 interface Nello16Answer {
-  answer: { value: string }; // 'A' or 'B'
+  answer: { value: string };
   test_questions: {
-    options: {
-      dimension: string; // e.g., 'E_I', 'S_N', 'T_F', 'J_P'
-      A_favors: string; // e.g., 'E'
-      B_favors: string; // e.g., 'I'
-    };
+    options: Nello16Option[];
   };
 }
 
@@ -404,15 +408,30 @@ export function getNello16Results(answers: Nello16Answer[], language: 'pt' | 'en
 
   // Calculate scores based on answers
   answers.forEach((answer) => {
-    if (answer.test_questions && answer.test_questions.options) {
-      const { A_favors, B_favors } = answer.test_questions.options;
-      const value = answer.answer?.value;
+    if (answer.test_questions && answer.test_questions.options && Array.isArray(answer.test_questions.options)) {
+      const options = answer.test_questions.options;
+      const answerValue = answer.answer?.value;
       
-      // Add the score to the appropriate dimension
-      if (value === 'A' && A_favors) {
-        scores[A_favors]++;
-      } else if (value === 'B' && B_favors) {
-        scores[B_favors]++;
+      // Find the selected option
+      const selectedOption = options.find(opt => opt.value === answerValue);
+      
+      if (selectedOption) {
+        // PT/PT-PT format: options have 'direction' field (e.g., 'E', 'I', 'S', 'N')
+        if (selectedOption.direction) {
+          const direction = selectedOption.direction.toUpperCase();
+          if (scores[direction] !== undefined) {
+            scores[direction]++;
+          }
+        }
+        // EN format: value itself is the direction (e.g., 'E', 'e', 'i', 'I')
+        // Uppercase = strong preference (+2), lowercase = mild preference (+1)
+        else if (answerValue && /^[EISNTFJPeisnstfjp]$/.test(answerValue)) {
+          const isStrong = answerValue === answerValue.toUpperCase();
+          const direction = answerValue.toUpperCase();
+          if (scores[direction] !== undefined) {
+            scores[direction] += isStrong ? 2 : 1;
+          }
+        }
       }
     }
   });
