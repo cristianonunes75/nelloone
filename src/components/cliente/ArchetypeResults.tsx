@@ -36,7 +36,7 @@ export default function ArchetypeResults({
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: 'Meu Arquétipo Essentia',
+        title: 'Meu Arquétipo NELLO ONE',
         text: `Descobri que meu arquétipo dominante é ${primaryData.name}! Descubra o seu também.`,
         url: window.location.href
       });
@@ -64,7 +64,7 @@ export default function ArchetypeResults({
             <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground mt-8">
               <div>Data: {new Date().toLocaleDateString("pt-BR")}</div>
               <div className="w-1 h-1 rounded-full bg-muted-foreground/50" />
-              <div>Relatório Essentia</div>
+              <div>Relatório NELLO ONE</div>
             </div>
           </div>
         </CardContent>

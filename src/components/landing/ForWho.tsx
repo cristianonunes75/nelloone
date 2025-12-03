@@ -36,7 +36,7 @@ export const ForWho = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              {content?.title || "Para quem é o"} <span className="text-gold">Essentia</span>?
+              {content?.title || "Para quem é o"} <span className="text-gold">NELLO ONE</span>?
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               {(content?.content as any)?.description || "Para todos que buscam uma imagem autêntica, alinhada com quem realmente são e com o impacto que desejam gerar no mundo."}
