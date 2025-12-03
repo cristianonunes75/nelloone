@@ -12,6 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { MiguelAgent } from "@/components/MiguelAgent";
 import { Progress } from "@/components/ui/progress";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { testSlugs } from "@/lib/testContent";
 
 const Cliente = () => {
   const { user, profile, signOut } = useAuth();
@@ -30,6 +32,7 @@ const Cliente = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { language } = useLanguage();
 
   // Handle payment success callback
   useEffect(() => {
@@ -59,31 +62,57 @@ const Cliente = () => {
     }
   }, [searchParams, setSearchParams, toast, queryClient]);
 
-  const testPageMap: Record<string, string> = {
-    'arquetipos_proposito': '/teste-arquetipos',
-    'disc': '/teste-disc',
-    'mbti': '/teste-mbti',
-    'eneagrama': '/teste-eneagrama',
-    'temperamentos': '/teste-temperamentos',
-    'inteligencias_multiplas': '/teste-inteligencias',
-    'linguagens_amor': '/teste-linguagens',
+  // Map test types to their keys in testSlugs
+  const testTypeToSlugKey: Record<string, keyof typeof testSlugs> = {
+    'arquetipos': 'arquetipos',
+    'arquetipos_proposito': 'arquetipos',
+    'disc': 'disc',
+    'mbti': 'mbti',
+    'eneagrama': 'eneagrama',
+    'temperamentos': 'temperamentos',
+    'inteligencias_multiplas': 'inteligencias_multiplas',
+    'linguagens_amor': 'linguagens_amor',
+  };
+
+  // Get the correct route based on language
+  const getTestRoute = (testType: string) => {
+    const slugKey = testTypeToSlugKey[testType];
+    if (!slugKey || !testSlugs[slugKey]) return null;
+    
+    const langKey = language === 'pt-pt' ? 'pt' : language;
+    const slug = testSlugs[slugKey][langKey as 'pt' | 'en'] || testSlugs[slugKey].pt;
+    
+    if (language === 'en') {
+      return `/en/tests/${slug}`;
+    } else if (language === 'pt-pt') {
+      return `/pt-pt/testes/${slug}`;
+    }
+    return `/testes/${slug}`;
+  };
+
+  const getBasePath = () => {
+    if (language === 'en') return '/en';
+    if (language === 'pt-pt') return '/pt-pt';
+    return '';
   };
 
   const handleStartTest = async (step: typeof journeySteps[0]) => {
-    // Navigate to test detail page
-    const testPage = testPageMap[step.testType];
-    if (testPage) {
-      navigate(testPage);
+    // Navigate to test detail page using semantic routes
+    const testRoute = getTestRoute(step.testType);
+    if (testRoute) {
+      navigate(testRoute);
     }
   };
 
   const handleContinueTest = async (step: typeof journeySteps[0]) => {
     const userTest = await startTestAsync(step.testId);
-    navigate(`/cliente/test-execution/${step.testId}/${userTest.id}`);
+    const basePath = getBasePath();
+    navigate(`${basePath}/cliente/test-execution/${step.testId}/${userTest.id}`);
   };
 
   const handleGenerateMap = () => {
-    navigate("/cliente/mapa-essencia");
+    const basePath = getBasePath();
+    navigate(`${basePath}/cliente/mapa-essencia`);
   };
 
   if (isLoading) {
@@ -111,7 +140,7 @@ const Cliente = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/cliente/perfil")}
+              onClick={() => navigate(`${getBasePath()}/cliente/perfil`)}
               className="hidden sm:flex"
             >
               <User className="w-4 h-4 mr-2" />
@@ -120,7 +149,7 @@ const Cliente = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate("/cliente/perfil")}
+              onClick={() => navigate(`${getBasePath()}/cliente/perfil`)}
               className="sm:hidden"
             >
               <User className="w-4 h-4" />
@@ -177,7 +206,7 @@ const Cliente = () => {
                 step={step}
                 onStart={() => handleStartTest(step)}
                 onContinue={() => handleContinueTest(step)}
-                onPurchase={() => navigate(`/cliente/comprar/${step.testId}`)}
+                onPurchase={() => navigate(`${getBasePath()}/cliente/comprar/${step.testId}`)}
               />
             ))}
           </div>

@@ -1,53 +1,72 @@
 import { Brain, Target, Compass, Star, Thermometer, Lightbulb, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { testSlugs } from "@/lib/testContent";
 
 const tests = [
   { 
     icon: Star, 
     title: "Arquétipos de Marca", 
     description: "Padrões simbólicos para comunicação e branding pessoal",
-    link: "/teste-arquetipos"
+    testKey: "arquetipos"
   },
   { 
     icon: Target, 
     title: "DISC", 
     description: "Perfil comportamental e estilo de comunicação",
-    link: "/teste-disc"
+    testKey: "disc"
   },
   { 
     icon: Brain, 
     title: "Nello 16", 
     description: "Mapa das 16 personalidades e perfis psicológicos",
-    link: "/testes/nello-16-personalidades"
+    testKey: "mbti"
   },
   { 
     icon: Compass, 
     title: "Eneagrama", 
     description: "Motivações profundas com abordagem psicológica",
-    link: "/teste-eneagrama"
+    testKey: "eneagrama"
   },
   { 
     icon: Thermometer, 
     title: "Temperamentos", 
     description: "Base tradicional (São Tomás de Aquino)",
-    link: "/teste-temperamentos"
+    testKey: "temperamentos"
   },
   { 
     icon: Lightbulb, 
     title: "Inteligências Múltiplas", 
     description: "Reconheça seus talentos únicos (Howard Gardner)",
-    link: "/teste-inteligencias"
+    testKey: "inteligencias_multiplas"
   },
   { 
     icon: Heart, 
     title: "Estilos de Conexão", 
     description: "Descubra como você se conecta emocionalmente",
-    link: "/testes/estilos-de-conexao"
+    testKey: "linguagens_amor"
   },
 ];
 
 export const Tests = () => {
+  const { language } = useLanguage();
+
+  const getTestLink = (testKey: string) => {
+    const slugData = testSlugs[testKey as keyof typeof testSlugs];
+    if (!slugData) return '/testes';
+    
+    const langKey = language === 'pt-pt' ? 'pt' : language;
+    const slug = slugData[langKey as 'pt' | 'en'] || slugData.pt;
+    
+    if (language === 'en') {
+      return `/en/tests/${slug}`;
+    } else if (language === 'pt-pt') {
+      return `/pt-pt/testes/${slug}`;
+    }
+    return `/testes/${slug}`;
+  };
+
   return (
     <section className="py-24 bg-background">
       <div className="container px-6">
@@ -75,7 +94,7 @@ export const Tests = () => {
                   <h3 className="text-xl font-semibold mb-2">{test.title}</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed mb-4 flex-grow">{test.description}</p>
                   <Link 
-                    to={test.link}
+                    to={getTestLink(test.testKey)}
                     className="text-gold text-sm font-medium hover:text-gold-dark transition-colors"
                   >
                     Saiba mais →
