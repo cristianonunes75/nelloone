@@ -80,7 +80,7 @@ export const JourneySection = () => {
     { number: 4, name: "Connection Styles", icon: HeartLayersIcon, description: "Discover how you emotionally connect with others.", isFree: false },
     { number: 5, name: "Multiple Intelligences", icon: BrainIcon, description: "Identify your talents and unique ways of learning.", isFree: false },
     { number: 6, name: "Enneagram", icon: EnneagramIcon, description: "Explore your deep motivations and emotional patterns.", isFree: false },
-    { number: 7, name: "MBTI", icon: DiamondIcon, description: "Understand how you perceive the world and make decisions.", isFree: false },
+    { number: 7, name: "Nello 16", icon: DiamondIcon, description: "Understand how you perceive the world and make decisions.", isFree: false },
   ] : [
     { number: 1, name: "Arquétipos", icon: SunIcon, description: "Descubra os padrões simbólicos que guiam sua personalidade.", isFree: true },
     { number: 2, name: "DISC", icon: QuadrantsIcon, description: "Entenda seu estilo de comportamento e comunicação.", isFree: false },
@@ -88,7 +88,7 @@ export const JourneySection = () => {
     { number: 4, name: "Estilos de Conexão", icon: HeartLayersIcon, description: "Descubra como você se conecta emocionalmente.", isFree: false },
     { number: 5, name: "Inteligências Múltiplas", icon: BrainIcon, description: "Identifique seus talentos e formas únicas de aprender.", isFree: false },
     { number: 6, name: "Eneagrama", icon: EnneagramIcon, description: "Explore suas motivações profundas e padrões emocionais.", isFree: false },
-    { number: 7, name: "MBTI", icon: DiamondIcon, description: "Entenda como você percebe o mundo e toma decisões.", isFree: false },
+    { number: 7, name: "Nello 16", icon: DiamondIcon, description: "Entenda como você percebe o mundo e toma decisões.", isFree: false },
   ];
 
   return (

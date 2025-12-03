@@ -83,7 +83,7 @@ const getTestsData = (language: Language) => {
     { name: isEn ? "Connection Styles" : "Estilos de Conexão", icon: HeartIcon, price: getPriceForLanguage('linguagens_amor', language)?.price || 0, questions: 30, testType: 'linguagens_amor' },
     { name: isEn ? "Intelligences" : "Inteligências", icon: BrainIcon, price: getPriceForLanguage('inteligencias_multiplas', language)?.price || 0, questions: 40, testType: 'inteligencias_multiplas' },
     { name: isEn ? "Enneagram" : "Eneagrama", icon: EnneagramIcon, price: getPriceForLanguage('eneagrama', language)?.price || 0, questions: 45, testType: 'eneagrama' },
-    { name: "MBTI", icon: DiamondIcon, price: getPriceForLanguage('mbti', language)?.price || 0, questions: 60, testType: 'mbti' },
+    { name: "Nello 16", icon: DiamondIcon, price: getPriceForLanguage('mbti', language)?.price || 0, questions: 48, testType: 'mbti' },
   ];
 };
 
