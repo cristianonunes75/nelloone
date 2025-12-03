@@ -77,7 +77,8 @@ export const PlansAndCoupons2 = () => {
       const [plansRes, combosRes, testsRes] = await Promise.all([
         supabase.from("pricing_plans").select("*").order("display_order"),
         supabase.from("test_combos").select("*").order("test_count"),
-        supabase.from("tests").select("id, name, price_brl, is_free, active"),
+        // Filtrar apenas testes PT (oficiais) no admin
+        supabase.from("tests").select("id, name, price_brl, is_free, active").eq("language", "pt").neq("type", "solis"),
       ]);
 
       if (plansRes.error) throw plansRes.error;
@@ -359,10 +360,10 @@ export const PlansAndCoupons2 = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
                 <div className="space-y-2">
                   <Label className="text-xs md:text-sm">Código</Label>
-                  <Input placeholder="ESSENTIA20" className="h-10" />
+                  <Input placeholder="NELLOONE20" className="h-10" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-xs md:text-sm">Desconto (%)</Label>
