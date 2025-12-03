@@ -257,7 +257,7 @@ export const AdminTools = () => {
                   <Label>Email</Label>
                   <Input
                     type="email"
-                    placeholder="teste@essentia.com"
+                    placeholder="teste@nelloone.com"
                     value={newUserEmail}
                     onChange={(e) => setNewUserEmail(e.target.value)}
                   />

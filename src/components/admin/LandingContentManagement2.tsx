@@ -31,7 +31,7 @@ const SECTION_CONFIG: Record<string, { label: string; icon: string; description:
     description: "Título principal e chamada para ação" 
   },
   about: { 
-    label: "O que é o Essentia", 
+    label: "O que é o NELLO ONE", 
     icon: "✨", 
     description: "Descrição do produto" 
   },
@@ -454,7 +454,7 @@ export const LandingContentManagement2 = () => {
       {/* Info */}
       <Card className="p-4 bg-amber-500/5 border-amber-500/20">
         <p className="text-sm text-amber-800">
-          Tudo que você alterar aqui atualiza a landing page do Essentia. Revise com cuidado antes de salvar.
+          Tudo que você alterar aqui atualiza a landing page do NELLO ONE. Revise com cuidado antes de salvar.
         </p>
       </Card>
 

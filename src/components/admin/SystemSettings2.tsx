@@ -36,7 +36,7 @@ export const SystemSettings2 = () => {
   const [saving, setSaving] = useState(false);
 
   // Form states
-  const [brandName, setBrandName] = useState("Essentia");
+  const [brandName, setBrandName] = useState("NELLO ONE");
   const [supportEmail, setSupportEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [instagram, setInstagram] = useState("");
@@ -65,7 +65,7 @@ export const SystemSettings2 = () => {
         const val = setting.value as Record<string, any>;
         switch (setting.key) {
           case 'brand_name':
-            setBrandName(val?.text || "Essentia");
+            setBrandName(val?.text || "NELLO ONE");
             break;
           case 'support_email':
             setSupportEmail(val?.email || "");
@@ -187,7 +187,7 @@ export const SystemSettings2 = () => {
                 <Building className="w-4 h-4 md:w-5 md:h-5" />
                 Dados da Marca
               </CardTitle>
-              <CardDescription className="text-xs md:text-sm">Informações básicas do Essentia</CardDescription>
+              <CardDescription className="text-xs md:text-sm">Informações básicas do NELLO ONE</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -195,7 +195,7 @@ export const SystemSettings2 = () => {
                 <Input
                   value={brandName}
                   onChange={(e) => setBrandName(e.target.value)}
-                  placeholder="Essentia"
+                  placeholder="NELLO ONE"
                   className="h-10"
                 />
               </div>
@@ -204,7 +204,7 @@ export const SystemSettings2 = () => {
                 <Textarea
                   value={footerText}
                   onChange={(e) => setFooterText(e.target.value)}
-                  placeholder="© 2024 Essentia. Todos os direitos reservados."
+                  placeholder="© 2024 NELLO ONE. Todos os direitos reservados."
                   rows={2}
                   className="text-sm"
                 />
@@ -245,7 +245,7 @@ export const SystemSettings2 = () => {
                   type="email"
                   value={supportEmail}
                   onChange={(e) => setSupportEmail(e.target.value)}
-                  placeholder="suporte@essentia.com"
+                  placeholder="suporte@nelloone.com"
                   className="h-10"
                 />
               </div>
@@ -279,7 +279,7 @@ export const SystemSettings2 = () => {
                 <Input
                   value={instagram}
                   onChange={(e) => setInstagram(e.target.value)}
-                  placeholder="https://instagram.com/essentia"
+                  placeholder="https://instagram.com/nelloone"
                   className="h-10"
                 />
               </div>
@@ -288,7 +288,7 @@ export const SystemSettings2 = () => {
                 <Input
                   value={facebook}
                   onChange={(e) => setFacebook(e.target.value)}
-                  placeholder="https://facebook.com/essentia"
+                  placeholder="https://facebook.com/nelloone"
                   className="h-10"
                 />
               </div>

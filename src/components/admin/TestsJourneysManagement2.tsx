@@ -67,9 +67,12 @@ export const TestsJourneysManagement2 = () => {
   const fetchTests = async () => {
     try {
       setLoading(true);
+      // Buscar apenas testes PT (oficiais) - não mostrar EN nem duplicados
       const { data, error } = await supabase
         .from("tests")
         .select("*")
+        .eq("language", "pt")
+        .neq("type", "solis") // Excluir SOLIS
         .order("created_at", { ascending: true });
 
       if (error) throw error;
@@ -160,7 +163,7 @@ export const TestsJourneysManagement2 = () => {
           Testes & Jornadas
         </h1>
         <p className="text-muted-foreground text-xs md:text-sm">
-          Gerencie os testes e a sequência da jornada Essentia
+          Gerencie os testes e a sequência da jornada NELLO ONE
         </p>
       </div>
 

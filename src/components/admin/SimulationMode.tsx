@@ -69,7 +69,7 @@ interface SimulatedAnswer {
 type SimulationPhase = "select" | "executing" | "results";
 type ViewMode = "clean" | "technical";
 
-// Score bar component for Essentia 2.0
+// Score bar component for NELLO ONE
 const ScoreBar = ({ label, score, maxScore = 50, color = "hsl(40 50% 60%)" }: { label: string; score: number; maxScore?: number; color?: string }) => {
   const percentage = Math.min((score / maxScore) * 100, 100);
   
@@ -585,7 +585,7 @@ export const SimulationMode = () => {
     return names[selectedTest.type] || selectedTest.name;
   };
 
-  // Render test selector with Essentia 2.0 design
+  // Render test selector with NELLO ONE design
   const renderTestSelector = () => (
     <div className="space-y-8">
       {/* Breadcrumbs */}
@@ -723,7 +723,7 @@ export const SimulationMode = () => {
     </div>
   );
 
-  // Render test execution with Essentia 2.0 design
+  // Render test execution with NELLO ONE design
   const renderExecution = () => {
     const currentQ = questions[currentQuestionIndex];
     if (!currentQ) return null;
@@ -911,7 +911,7 @@ export const SimulationMode = () => {
     );
   };
 
-  // Render results with Essentia 2.0 design - Clean and Technical views
+  // Render results with NELLO ONE design - Clean and Technical views
   const renderResults = () => {
     if (!simulationResult) return null;
 

@@ -163,7 +163,7 @@ export const ReportsManagement2 = () => {
           <BarChart3 className="w-5 h-5 md:w-6 md:h-6" />
           Relatórios
         </h1>
-        <p className="text-muted-foreground text-xs md:text-sm">Métricas e análises do Essentia</p>
+        <p className="text-muted-foreground text-xs md:text-sm">Métricas e análises do NELLO ONE</p>
       </div>
 
       {/* Summary Cards - Mobile optimized grid */}
