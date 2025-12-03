@@ -20,7 +20,6 @@ import TestResults from "./pages/TestResults";
 import Fotografo from "./pages/Fotografo";
 import Admin from "./pages/Admin";
 import Influence from "./pages/Influence";
-import ConsultoriaEssentia from "./pages/ConsultoriaEssentia";
 import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -38,7 +37,6 @@ const AppRoutes = () => (
     <Route path="/" element={<Landing />} />
     <Route path="/auth" element={<Auth />} />
     <Route path="/influence" element={<Influence />} />
-    <Route path="/consultoria-essentia" element={<ConsultoriaEssentia />} />
     
     {/* Legal pages - PT */}
     <Route path="/termos" element={<TermsOfService />} />

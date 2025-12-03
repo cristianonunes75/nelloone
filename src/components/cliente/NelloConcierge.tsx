@@ -8,7 +8,7 @@ import { MessageCircle, Send, X, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
-export default function EssentiaConcierge() {
+export default function NelloConcierge() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -50,7 +50,7 @@ export default function EssentiaConcierge() {
     if (data) {
       setConversationId(data.id);
     } else {
-      createConversation("Conversa com Essentia", {
+      createConversation("Conversa com NELLO ONE", {
         onSuccess: (conv) => setConversationId(conv.id),
       });
     }
@@ -102,7 +102,7 @@ export default function EssentiaConcierge() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5" />
-            <CardTitle className="text-lg">Essentia Concierge</CardTitle>
+            <CardTitle className="text-lg">NELLO ONE Concierge</CardTitle>
           </div>
           <Button
             variant="ghost"
@@ -119,9 +119,9 @@ export default function EssentiaConcierge() {
           {displayMessages.length === 0 && (
             <div className="text-center text-muted-foreground py-8">
               <Sparkles className="h-12 w-12 mx-auto mb-4 text-primary" />
-              <p className="font-medium mb-2">Olá! Sou o Essentia Concierge</p>
+              <p className="font-medium mb-2">Olá! Sou o NELLO ONE Concierge</p>
               <p className="text-sm">
-                Estou aqui para ajudar você a entender seus resultados e planejar sua sessão fotográfica perfeita!
+                Estou aqui para ajudar você a entender seus resultados e guiar sua jornada de autoconhecimento!
               </p>
             </div>
           )}

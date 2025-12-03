@@ -31,7 +31,7 @@ export const About = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
           <div className="order-2 lg:order-1">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              O que é o <span className="text-gold">Essentia?</span>
+              O que é o <span className="text-gold">NELLO ONE?</span>
             </h2>
             <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
               {content?.content.paragraphs.map((paragraph, index) => (
@@ -51,7 +51,7 @@ export const About = () => {
             <div className="relative rounded-3xl overflow-hidden shadow-2xl">
               <img 
                 src={conceptImage} 
-                alt="Conceito Essentia" 
+                alt="Conceito NELLO ONE" 
                 className="w-full h-auto"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />

@@ -41,7 +41,7 @@ export const FAQ = () => {
               {content?.title || "Perguntas"} <span className="text-gold">Frequentes</span>
             </h2>
             <p className="text-xl text-muted-foreground">
-              {(content?.content as any)?.description || "Tire suas dúvidas sobre o Essentia"}
+              {(content?.content as any)?.description || "Tire suas dúvidas sobre o NELLO ONE"}
             </p>
           </div>
 

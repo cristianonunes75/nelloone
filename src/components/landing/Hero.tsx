@@ -13,7 +13,7 @@ export const Hero = () => {
     return (
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0 z-0">
-          <img src={heroImage} alt="Essentia" className="w-full h-full object-cover" />
+          <img src={heroImage} alt="NELLO ONE" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60" />
         </div>
         <div className="container relative z-10 px-6 py-24 md:py-32 text-center">
@@ -33,7 +33,7 @@ export const Hero = () => {
       <div className="absolute inset-0 z-0">
         <img 
           src={heroImage} 
-          alt="Essentia - Sua imagem com propósito" 
+          alt="NELLO ONE - Autoconhecimento com propósito" 
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60" />
@@ -62,7 +62,7 @@ export const Hero = () => {
               className="text-lg px-8 py-6 bg-gold hover:bg-gold-dark text-white"
               onClick={() => navigate("/auth")}
             >
-              {(content?.content as any)?.primaryButtonText || "Comece sua jornada Essentia"}
+              {(content?.content as any)?.primaryButtonText || "Comece sua jornada NELLO ONE"}
             </Button>
             <Button 
               size="lg" 
@@ -71,7 +71,7 @@ export const Hero = () => {
                 document.getElementById('sobre')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              {(content?.content as any)?.secondaryButtonText || "Conheça o Essentia"}
+              {(content?.content as any)?.secondaryButtonText || "Conheça o NELLO ONE"}
             </Button>
           </div>
         </div>
