@@ -139,14 +139,21 @@ const styleData = {
   }
 };
 
-// Mapping from old values to new style keys
+// Mapping from old values to new style keys (PT, EN, and new values)
 const valueMapping: Record<string, keyof typeof styleData> = {
+  // Old PT values
   palavras_afirmacao: 'expressao_verbal',
   tempo_qualidade: 'presenca_ativa',
   presentes: 'gestos_simbolicos',
   atos_servico: 'cuidado_pratico',
   toque_fisico: 'conexao_fisica',
-  // New style values (for future questions)
+  // Old EN values
+  words_of_affirmation: 'expressao_verbal',
+  quality_time: 'presenca_ativa',
+  receiving_gifts: 'gestos_simbolicos',
+  acts_of_service: 'cuidado_pratico',
+  physical_touch: 'conexao_fisica',
+  // New standardized values (all languages)
   presenca_ativa: 'presenca_ativa',
   expressao_verbal: 'expressao_verbal',
   cuidado_pratico: 'cuidado_pratico',
