@@ -458,7 +458,7 @@ export const PricingManagement = () => {
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Ex: Essentia Completo"
+                placeholder="Ex: NELLO ONE Completo"
               />
             </div>
 

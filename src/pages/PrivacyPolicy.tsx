@@ -7,7 +7,7 @@ const PrivacyPolicy = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-essentia-white">
+    <div className="min-h-screen bg-background">
       <div className="container max-w-4xl mx-auto px-6 py-12">
         <Button
           variant="ghost"
@@ -122,8 +122,8 @@ const PrivacyPolicy = () => {
               <p className="text-miguel-deep/80 leading-relaxed">
                 Basta enviar solicitação para:
               </p>
-              <p className="text-essentia-gold mt-2">
-                📧 privacidade@essentia.app
+              <p className="text-primary mt-2">
+                📧 privacidade@nelloone.app
               </p>
             </section>
 
@@ -181,8 +181,8 @@ const PrivacyPolicy = () => {
               <p className="text-miguel-deep/80 leading-relaxed">
                 Para dúvidas:
               </p>
-              <p className="text-essentia-gold mt-2">
-                📧 privacidade@essentia.app
+              <p className="text-primary mt-2">
+                📧 privacidade@nelloone.app
               </p>
             </section>
           </div>
@@ -191,7 +191,7 @@ const PrivacyPolicy = () => {
         <div className="mt-12 text-center">
           <Button
             onClick={() => navigate("/")}
-            className="bg-essentia-gold hover:bg-essentia-gold/90 text-white px-8 py-3 rounded-xl shadow-apple"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-xl shadow-apple"
           >
             Voltar para o site
           </Button>

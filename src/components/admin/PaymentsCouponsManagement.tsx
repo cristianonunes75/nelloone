@@ -157,7 +157,7 @@ export const PaymentsCouponsManagement = () => {
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <Label>Código do Cupom</Label>
-                <Input placeholder="EX: ESSENTIA20" />
+                <Input placeholder="EX: NELLOONE20" />
               </div>
               <div className="space-y-2">
                 <Label>Desconto (%)</Label>

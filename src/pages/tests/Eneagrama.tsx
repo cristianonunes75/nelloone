@@ -5,7 +5,7 @@ const Eneagrama = () => {
     <TestDetailLayout
       title="Eneagrama"
       subtitle="O mapa das motivações da alma"
-      storytelling="Por trás de cada atitude, existe uma motivação. O Eneagrama revela o que move seu coração — as virtudes e desafios que moldam seu modo de amar, trabalhar e viver. No Essentia, ele é uma chave para a liberdade interior."
+      storytelling="Por trás de cada atitude, existe uma motivação. O Eneagrama revela o que move seu coração — as virtudes e desafios que moldam seu modo de amar, trabalhar e viver. No NELLO ONE, ele é uma chave para a liberdade interior."
       benefits={[
         "Seu tipo de personalidade entre os 9 perfis do Eneagrama",
         "Como transformar feridas em virtudes através do autoconhecimento",

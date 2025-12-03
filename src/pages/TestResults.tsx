@@ -301,7 +301,7 @@ export default function TestResults() {
 
               <div className="text-center py-8">
                 <p className="text-lg font-light italic text-muted-foreground">
-                  Essentia — uma jornada de autoconhecimento e verdade interior.
+                  NELLO ONE — uma jornada de autoconhecimento e verdade interior.
                 </p>
               </div>
             </CardContent>
@@ -421,7 +421,7 @@ export default function TestResults() {
 
               <div className="text-center py-8">
                 <p className="text-lg font-light italic text-muted-foreground">
-                  Essentia — uma jornada de autoconhecimento e verdade interior.
+                  NELLO ONE — uma jornada de autoconhecimento e verdade interior.
                 </p>
               </div>
             </CardContent>
@@ -453,7 +453,7 @@ export default function TestResults() {
 ...
               <div className="text-center py-8">
                 <p className="text-lg font-light italic text-muted-foreground">
-                  Essentia — uma jornada de autoconhecimento e verdade interior.
+                  NELLO ONE — uma jornada de autoconhecimento e verdade interior.
                 </p>
               </div>
             </CardContent>
@@ -528,7 +528,7 @@ export default function TestResults() {
 
               <div className="text-center py-8">
                 <p className="text-lg font-light italic text-muted-foreground">
-                  Essentia — uma jornada de autoconhecimento e verdade interior.
+                  NELLO ONE — uma jornada de autoconhecimento e verdade interior.
                 </p>
               </div>
             </CardContent>
@@ -611,7 +611,7 @@ export default function TestResults() {
 
               <div className="text-center py-8">
                 <p className="text-lg font-light italic text-muted-foreground">
-                  Essentia — uma jornada de autoconhecimento e verdade interior.
+                  NELLO ONE — uma jornada de autoconhecimento e verdade interior.
                 </p>
               </div>
             </CardContent>

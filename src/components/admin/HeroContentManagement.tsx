@@ -94,7 +94,7 @@ export const HeroContentManagement = () => {
               id="primaryBtn"
               value={primaryButtonText}
               onChange={(e) => setPrimaryButtonText(e.target.value)}
-              placeholder="Comece sua jornada Essentia"
+              placeholder="Comece sua jornada NELLO ONE"
             />
           </div>
 
@@ -104,7 +104,7 @@ export const HeroContentManagement = () => {
               id="secondaryBtn"
               value={secondaryButtonText}
               onChange={(e) => setSecondaryButtonText(e.target.value)}
-              placeholder="Conheça o Essentia"
+              placeholder="Conheça o NELLO ONE"
             />
           </div>
         </div>

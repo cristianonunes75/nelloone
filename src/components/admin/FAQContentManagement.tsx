@@ -89,7 +89,7 @@ export const FAQContentManagement = () => {
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Tire suas dúvidas sobre o Essentia"
+              placeholder="Tire suas dúvidas sobre o NELLO ONE"
             />
           </div>
         </div>

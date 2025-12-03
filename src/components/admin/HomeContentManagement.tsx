@@ -64,7 +64,7 @@ export const HomeContentManagement = () => {
       <CardHeader>
         <CardTitle>Editar Conteúdo da Home</CardTitle>
         <CardDescription>
-          Gerencie o texto exibido na seção "O que é o Essentia?" da página inicial
+          Gerencie o texto exibido na seção "O que é o NELLO ONE?" da página inicial
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -77,7 +77,7 @@ export const HomeContentManagement = () => {
             placeholder="O que é o"
           />
           <p className="text-xs text-muted-foreground">
-            O texto "Essentia" em dourado será adicionado automaticamente após o título
+            O texto "NELLO ONE" em dourado será adicionado automaticamente após o título
           </p>
         </div>
 

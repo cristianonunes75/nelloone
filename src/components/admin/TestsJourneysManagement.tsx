@@ -154,7 +154,7 @@ export const TestsJourneysManagement = () => {
             <Route className="w-8 h-8" />
             Testes e Jornadas
           </h2>
-          <p className="text-muted-foreground">Gerencie os testes e a ordem da jornada Essentia</p>
+          <p className="text-muted-foreground">Gerencie os testes e a ordem da jornada NELLO ONE</p>
         </div>
         <Badge variant="outline" className="text-lg px-4 py-2">
           <FileText className="w-4 h-4 mr-2" />

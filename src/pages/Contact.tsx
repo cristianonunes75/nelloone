@@ -7,7 +7,7 @@ const Contact = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-essentia-white">
+    <div className="min-h-screen bg-background">
       <div className="container max-w-4xl mx-auto px-6 py-12">
         <Button
           variant="ghost"
@@ -24,7 +24,7 @@ const Contact = () => {
             Estamos aqui para você.
           </h1>
           <p className="text-miguel-deep/70 mt-4 max-w-xl mx-auto leading-relaxed">
-            Para dúvidas, suporte ou solicitações sobre sua experiência no Essentia, 
+            Para dúvidas, suporte ou solicitações sobre sua experiência no NELLO ONE, 
             entre em contato com nossa equipe.
           </p>
         </div>
@@ -33,8 +33,8 @@ const Contact = () => {
           <div className="space-y-8">
             {/* Suporte */}
             <div className="flex items-start gap-4 p-6 rounded-xl bg-soul-light/50 border border-soul-sand/30">
-              <div className="w-12 h-12 rounded-full bg-essentia-gold/10 flex items-center justify-center flex-shrink-0">
-                <Mail className="w-5 h-5 text-essentia-gold" strokeWidth={1.5} />
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Mail className="w-5 h-5 text-primary" strokeWidth={1.5} />
               </div>
               <div>
                 <h3 className="font-medium text-miguel-deep mb-1">Suporte Geral</h3>
@@ -42,10 +42,10 @@ const Contact = () => {
                   Dúvidas sobre a plataforma, testes, pagamentos ou sua conta.
                 </p>
                 <a 
-                  href="mailto:suporte@essentia.app"
-                  className="text-essentia-gold hover:underline font-medium"
+                  href="mailto:suporte@nelloone.app"
+                  className="text-primary hover:underline font-medium"
                 >
-                  suporte@essentia.app
+                  suporte@nelloone.app
                 </a>
               </div>
             </div>
@@ -72,10 +72,10 @@ const Contact = () => {
                   Solicitações sobre seus dados, exclusão de conta ou direitos de privacidade.
                 </p>
                 <a 
-                  href="mailto:privacidade@essentia.app"
-                  className="text-essentia-gold hover:underline font-medium"
+                  href="mailto:privacidade@nelloone.app"
+                  className="text-primary hover:underline font-medium"
                 >
-                  privacidade@essentia.app
+                  privacidade@nelloone.app
                 </a>
               </div>
             </div>
@@ -93,7 +93,7 @@ const Contact = () => {
         <div className="mt-12 text-center">
           <Button
             onClick={() => navigate("/")}
-            className="bg-essentia-gold hover:bg-essentia-gold/90 text-white px-8 py-3 rounded-xl shadow-apple"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-xl shadow-apple"
           >
             Voltar para o site
           </Button>

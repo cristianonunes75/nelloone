@@ -11,8 +11,8 @@ const Influence = () => {
   const sections = [
     {
       icon: Sparkles,
-      title: "🌿 O que é o Essentia Influence",
-      content: "O Essentia Influence é um módulo que ensina pessoas e marcas a comunicarem sua essência com propósito, unindo autoconhecimento, estética e estratégia. Aqui, o marketing deixa de ser autopromoção e se torna expressão da verdade interior. É o elo entre o espiritual e o estratégico — uma comunicação que nasce da alma e gera resultados concretos."
+      title: "🌿 O que é o NELLO ONE Influence",
+      content: "O NELLO ONE Influence é um módulo que ensina pessoas e marcas a comunicarem sua essência com propósito, unindo autoconhecimento, estética e estratégia. Aqui, o marketing deixa de ser autopromoção e se torna expressão da verdade interior. É o elo entre o espiritual e o estratégico — uma comunicação que nasce da alma e gera resultados concretos."
     },
     {
       icon: BookOpen,
@@ -22,7 +22,7 @@ const Influence = () => {
     {
       icon: Palette,
       title: "🎨 Guia de Linguagem Visual por Arquétipo",
-      content: "PDF semipersonalizado que traduz o resultado do teste Essentia em expressão visual. Inclui paleta de cores, símbolos, estilo e mini moodboard. Permite ao cliente enxergar sua essência traduzida em imagem."
+      content: "PDF semipersonalizado que traduz o resultado do teste NELLO ONE em expressão visual. Inclui paleta de cores, símbolos, estilo e mini moodboard. Permite ao cliente enxergar sua essência traduzida em imagem."
     },
     {
       icon: Compass,
@@ -32,12 +32,12 @@ const Influence = () => {
     {
       icon: Video,
       title: "🎥 Vídeo: Comunicar é Servir",
-      content: "Uma mensagem exclusiva de Cris Nunes sobre o papel espiritual da comunicação e o poder de transformar presença em missão. Mostra que influenciar é servir e que a verdade convence sem esforço."
+      content: "Uma mensagem exclusiva sobre o papel espiritual da comunicação e o poder de transformar presença em missão. Mostra que influenciar é servir e que a verdade convence sem esforço."
     },
     {
       icon: Calendar,
-      title: "📅 Mini Plano de Conteúdo Essentia",
-      content: "Guia leve e prático com sugestões de postagens, legendas e tipos de conteúdo por arquétipo. Inclui ideias de temas de valor e modelo de biografia cristã autêntica. Ajuda o cliente a aplicar imediatamente o aprendizado."
+      title: "📅 Mini Plano de Conteúdo NELLO ONE",
+      content: "Guia leve e prático com sugestões de postagens, legendas e tipos de conteúdo por arquétipo. Inclui ideias de temas de valor e modelo de biografia autêntica. Ajuda o cliente a aplicar imediatamente o aprendizado."
     }
   ];
 
@@ -49,18 +49,18 @@ const Influence = () => {
       <section className="pt-32 pb-20 px-6 bg-gradient-to-br from-background via-gold/5 to-background">
         <div className="container max-w-5xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Essentia <span className="text-gold">Influence</span>
+            NELLO ONE <span className="text-gold">Influence</span>
           </h1>
           <p className="text-2xl md:text-3xl text-gold mb-8 font-light">
             Marketing com Propósito e Verdade
           </p>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed">
-            Transforme fé, propósito e verdade em influência real, com ética, beleza e coerência espiritual.
+            Transforme propósito e verdade em influência real, com ética, beleza e coerência.
           </p>
           <Button 
             size="lg"
             className="text-lg px-12 py-6 bg-gold hover:bg-gold-dark text-foreground font-semibold"
-            onClick={() => navigate("/consultoria-essentia")}
+            onClick={() => navigate("/auth")}
           >
             Quero comunicar com verdade
           </Button>
@@ -113,7 +113,7 @@ const Influence = () => {
                 <Compass className="w-8 h-8 text-gold" />
               </div>
               <h3 className="font-semibold mb-2">Tom Inspiracional</h3>
-              <p className="text-sm text-muted-foreground">Estratégico e espiritual</p>
+              <p className="text-sm text-muted-foreground">Estratégico e autêntico</p>
             </div>
           </div>
         </div>
@@ -132,7 +132,7 @@ const Influence = () => {
             <Button 
               size="lg"
               className="text-lg px-12 py-6 bg-gold hover:bg-gold-dark text-foreground font-semibold"
-              onClick={() => navigate("/consultoria-essentia")}
+              onClick={() => navigate("/auth")}
             >
               Quero comunicar com verdade
             </Button>
@@ -142,7 +142,7 @@ const Influence = () => {
               className="text-lg px-12 py-6 border-gold text-gold hover:bg-gold/10 font-semibold"
               onClick={() => navigate("/auth")}
             >
-              Começar pelo Essentia
+              Começar pelo NELLO ONE
             </Button>
           </div>
         </div>

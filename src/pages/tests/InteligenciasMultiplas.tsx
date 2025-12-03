@@ -11,7 +11,7 @@ const InteligenciasMultiplas = () => {
         "Relatório de 10 páginas com leitura simbólica + plano de ação pessoal",
         "Gráfico com suas 8 inteligências mapeadas",
         "Recomendações personalizadas de desenvolvimento",
-        "Vídeo de orientação + acesso 7 dias à Comunidade Essentia"
+        "Acesso completo ao seu perfil de inteligências"
       ]}
       audience="Profissionais, educadores, artistas e empreendedores que desejam alinhar talento, propósito e fé."
       testType="inteligencias_multiplas"
