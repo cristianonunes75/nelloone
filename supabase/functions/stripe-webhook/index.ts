@@ -135,6 +135,49 @@ serve(async (req) => {
         count: newTestIds.length,
         testIds: newTestIds 
       });
+
+      // Send confirmation email
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", userId)
+          .single();
+
+        const { data: userAuth } = await supabase.auth.admin.getUserById(userId);
+        const userEmail = userAuth?.user?.email;
+
+        if (userEmail) {
+          const language = session.metadata?.language || "pt";
+          const currency = session.metadata?.currency === "USD" ? "$" : 
+                          session.metadata?.currency === "EUR" ? "€" : "R$";
+
+          // Send purchase confirmation
+          await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${supabaseServiceKey}`,
+            },
+            body: JSON.stringify({
+              type: "purchase_confirmation",
+              to: userEmail,
+              data: {
+                name: profile?.full_name || userEmail.split("@")[0],
+                testNames: tests.map(t => t.name),
+                amount: amountPaid,
+                currency,
+                language,
+              },
+            }),
+          });
+
+          logStep("Confirmation email sent", { userEmail });
+        }
+      } catch (emailError) {
+        logStep("WARN: Failed to send email", { error: emailError });
+        // Don't fail the webhook for email errors
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), {
