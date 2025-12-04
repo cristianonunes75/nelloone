@@ -17,9 +17,7 @@ import ClientePerfil from "./pages/ClientePerfil";
 import UserArea from "./pages/UserArea";
 import TestExecution from "./pages/TestExecution";
 import TestResults from "./pages/TestResults";
-import Fotografo from "./pages/Fotografo";
 import Admin from "./pages/Admin";
-import Influence from "./pages/Influence";
 import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -36,7 +34,6 @@ const AppRoutes = () => (
     {/* Public routes */}
     <Route path="/" element={<Landing />} />
     <Route path="/auth" element={<Auth />} />
-    <Route path="/influence" element={<Influence />} />
     
     {/* Legal pages - PT */}
     <Route path="/termos" element={<TermsOfService />} />
@@ -343,14 +340,6 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute allowedRoles={["cliente", "admin"]}>
           <ComprarTeste />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/fotografo"
-      element={
-        <ProtectedRoute allowedRoles={["fotografo", "admin"]}>
-          <Fotografo />
         </ProtectedRoute>
       }
     />

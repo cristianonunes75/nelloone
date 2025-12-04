@@ -58,7 +58,7 @@ export const PhotoSession = () => {
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <img 
                   src={archetypeImage} 
-                  alt="Sessão fotográfica Essentia" 
+                  alt="Sessão fotográfica NELLO ONE" 
                   className="w-full h-auto"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />

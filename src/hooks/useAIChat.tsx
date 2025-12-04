@@ -106,7 +106,7 @@ export const useAIChat = (conversationId?: string) => {
         })) || [];
 
         const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/essentia-concierge`,
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nello-concierge`,
           {
             method: "POST",
             headers: {
