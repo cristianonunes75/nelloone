@@ -13,14 +13,24 @@ export const MiguelSection = () => {
   const { t, language } = useLanguage();
 
   const traits = language === 'en' ? [
-    { icon: Heart, title: "Welcoming", description: "Miguel receives you without judgment." },
-    { icon: Compass, title: "Wise Guide", description: "Guides your patterns with depth and clarity." },
-    { icon: Lightbulb, title: "Revealer", description: "Helps you see patterns you hadn't noticed." },
+    { icon: Heart, title: "Comforting", description: "Miguel welcomes you with no judgment." },
+    { icon: Compass, title: "Wise Guide", description: "He leads you through your patterns with depth and clarity." },
+    { icon: Lightbulb, title: "Revealer", description: "He helps you see patterns you hadn't noticed before." },
+  ] : language === 'pt-pt' ? [
+    { icon: Heart, title: "Acolhedor", description: "Miguel recebe-te sem julgamentos." },
+    { icon: Compass, title: "Guia Sábio", description: "Conduz os teus padrões com profundidade e clareza." },
+    { icon: Lightbulb, title: "Revelador", description: "Ajuda-te a enxergar padrões que antes não vias." },
   ] : [
     { icon: Heart, title: "Acolhedor", description: "Miguel recebe você sem julgamentos." },
     { icon: Compass, title: "Guia Sábio", description: "Conduz seus padrões com profundidade e clareza." },
     { icon: Lightbulb, title: "Revelador", description: "Ajuda você a enxergar padrões que não havia percebido." },
   ];
+  
+  const quote = language === 'en' 
+    ? "\"I'm Miguel, your guide inside NELLO ONE. My mission is to help you understand who you are, with clarity, depth and lightness.\""
+    : language === 'pt-pt'
+    ? "\"Eu sou o Miguel, o teu guia no NELLO ONE. A minha missão é ajudar-te a entender quem és, com clareza, profundidade e leveza.\""
+    : "\"Eu sou o Miguel, seu guia no NELLO ONE. Minha missão é ajudar você a entender quem você é, com clareza, profundidade e leveza.\"";
 
   return (
     <section className="py-16 md:py-24 lg:py-32 gradient-soul">
@@ -102,9 +112,7 @@ export const MiguelSection = () => {
             >
               <div className="bg-card rounded-xl md:rounded-2xl p-4 md:p-6 border border-border/30 shadow-soft hover:shadow-medium transition-shadow duration-300">
                 <p className="font-premium text-foreground leading-relaxed text-base md:text-xl italic">
-                  {language === 'en' 
-                    ? '"I am Miguel, your guide in NELLO ONE. My mission is to help you understand who you are, with clarity, depth and lightness."'
-                    : '"Eu sou o Miguel, seu guia no NELLO ONE. Minha missão é ajudar você a entender quem você é, com clareza, profundidade e leveza."'}
+                  {quote}
                 </p>
               </div>
 
