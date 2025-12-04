@@ -5,6 +5,7 @@ import { useAuth } from "./useAuth";
 import { useToast } from "./use-toast";
 import { useNavigate } from "react-router-dom";
 import { useTestAccess } from "./useTestAccess";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const useTestExecution = (testId: string, userTestId?: string) => {
   const { user } = useAuth();
@@ -13,6 +14,9 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   const navigate = useNavigate();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const { hasPurchased } = useTestAccess();
+  const { language } = useLanguage();
+  
+  const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
 
   // Get test info to check if it's paid
   const { data: testInfo } = useQuery({
@@ -133,11 +137,11 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["user-tests"] });
-      toast({
-        title: "Teste concluído!",
-        description: "Seus resultados estão prontos.",
-      });
-      navigate(`/cliente/test-results/${userTestId}`);
+      const messages = language === 'en'
+        ? { title: "Test completed!", description: "Your results are ready." }
+        : { title: "Teste concluído!", description: "Seus resultados estão prontos." };
+      toast(messages);
+      navigate(`${basePath}/cliente/test-results/${userTestId}`);
     },
     onError: (error: any) => {
       toast({

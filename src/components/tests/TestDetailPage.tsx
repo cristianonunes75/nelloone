@@ -70,7 +70,7 @@ export const TestDetailPage = () => {
     if (!test) return;
     try {
       const userTest = await startTestAsync(test.id);
-      const basePath = language === 'en' ? '/en' : '';
+      const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
       navigate(`${basePath}/cliente/test-execution/${test.id}/${userTest.id}`);
     } catch (error) {
       toast({
