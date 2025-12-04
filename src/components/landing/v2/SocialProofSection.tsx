@@ -1,71 +1,77 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
-import { Quote, Shield, Brain, Users, Award } from "lucide-react";
+import { Shield, Brain, Users, Award } from "lucide-react";
 
-const technicalIcons = [Shield, Brain, Users, Award];
+const icons = [Shield, Brain, Users, Award];
 
 export const SocialProofSection = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
-  const socialProof = (t.landing as any).social_proof;
+  
+  const content = {
+    pt: {
+      title: "Baseado em Ciência Real",
+      items: [
+        "Baseado em metodologias reconhecidas",
+        "IA treinada em psicologia aplicada ao comportamento",
+        "Mais de 2.000 análises no beta",
+        "Usado por líderes, pais, jovens e profissionais"
+      ]
+    },
+    'pt-pt': {
+      title: "Baseado em Ciência Real",
+      items: [
+        "Baseado em metodologias reconhecidas",
+        "IA treinada em psicologia aplicada ao comportamento",
+        "Mais de 2.000 análises no beta",
+        "Usado por líderes, pais, jovens e profissionais"
+      ]
+    },
+    en: {
+      title: "Based on Real Science",
+      items: [
+        "Based on recognized methodologies",
+        "AI trained in applied behavioral psychology",
+        "Over 2,000 analyses in beta",
+        "Used by leaders, parents, youth and professionals"
+      ]
+    }
+  };
 
-  if (!socialProof) return null;
+  const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
+  const data = content[lang];
 
   return (
-    <section className="py-16 md:py-24 bg-muted/30 relative overflow-hidden">
+    <section className="py-20 md:py-28 lg:py-32 bg-muted/30 relative overflow-hidden">
       <div ref={ref} className="container px-4 md:px-6">
-        <h2 
-          className={cn(
-            "font-display text-2xl sm:text-3xl md:text-4xl text-center text-foreground mb-12 md:mb-16 transition-all duration-700",
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-          )}
-        >
-          {socialProof.title}
-        </h2>
+        <div className="max-w-4xl mx-auto">
+          <h2 
+            className={cn(
+              "font-display text-2xl sm:text-3xl md:text-4xl text-center text-foreground mb-12 md:mb-16 transition-all duration-700",
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            )}
+          >
+            {data.title}
+          </h2>
 
-        {/* Testimonials */}
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
-          {socialProof.testimonials?.map((testimonial: any, index: number) => (
-            <div
-              key={index}
-              className={cn(
-                "relative bg-background rounded-2xl p-6 md:p-8 border border-border/50 shadow-sm transition-all duration-500",
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
-              )}
-              style={{ transitionDelay: `${index * 100}ms` }}
-            >
-              <Quote className="w-8 h-8 text-ink-blue/20 absolute top-4 right-4" />
-              <p className="text-foreground/80 text-base md:text-lg leading-relaxed mb-4 italic">
-                "{testimonial.quote}"
-              </p>
-              <p className="text-sm text-muted-foreground font-medium">
-                — {testimonial.author}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Technical Proof */}
-        <div 
-          className={cn(
-            "max-w-3xl mx-auto transition-all duration-700 delay-300",
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-          )}
-        >
-          <h3 className="font-display text-lg md:text-xl text-center text-foreground mb-6">
-            {socialProof.technical?.title}
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {socialProof.technical?.items?.map((item: string, index: number) => {
-              const IconComponent = technicalIcons[index % technicalIcons.length];
+          {/* 4 horizontal cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {data.items.map((item, index) => {
+              const IconComponent = icons[index % icons.length];
               return (
                 <div
                   key={index}
-                  className="flex flex-col items-center text-center p-4 bg-background rounded-xl border border-border/30"
+                  className={cn(
+                    "flex flex-col items-center text-center p-5 md:p-6 bg-background rounded-xl border border-border/30 shadow-sm transition-all duration-500",
+                    isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
+                  )}
+                  style={{ transitionDelay: `${index * 80}ms` }}
                 >
-                  <IconComponent className="w-5 h-5 text-ink-blue mb-2" />
-                  <span className="text-xs md:text-sm text-muted-foreground">
+                  <div className="w-12 h-12 rounded-xl bg-ink-blue/10 flex items-center justify-center mb-4">
+                    <IconComponent className="w-5 h-5 text-ink-blue" strokeWidth={1.5} />
+                  </div>
+                  <span className="text-sm md:text-base text-foreground/80 leading-snug">
                     {item}
                   </span>
                 </div>
