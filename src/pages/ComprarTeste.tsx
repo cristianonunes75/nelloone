@@ -110,7 +110,7 @@ const ComprarTeste = () => {
         </header>
         <main className="container px-4 py-12 text-center">
           <h1 className="text-2xl font-bold mb-4">Teste não encontrado</h1>
-          <Button onClick={() => navigate("/cliente")}>Voltar</Button>
+          <Button onClick={() => navigate(language === 'en' ? '/en/cliente' : language === 'pt-pt' ? '/pt-pt/cliente' : '/cliente')}>Voltar</Button>
         </main>
       </div>
     );
@@ -163,7 +163,7 @@ const ComprarTeste = () => {
       <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-10">
         <div className="container px-4 py-4 flex items-center justify-between">
           <LogoText className="text-2xl" variant="solid" />
-          <Button variant="ghost" size="sm" onClick={() => navigate("/cliente")}>
+          <Button variant="ghost" size="sm" onClick={() => navigate(language === 'en' ? '/en/cliente' : language === 'pt-pt' ? '/pt-pt/cliente' : '/cliente')}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>

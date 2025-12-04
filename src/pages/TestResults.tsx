@@ -35,6 +35,7 @@ export default function TestResults() {
   const { language } = useLanguage();
   const isAdmin = userRole === "admin";
   const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
+  const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
 
   const { data: userTest, isLoading } = useQuery({
     queryKey: ["user-test-result", userTestId],
@@ -112,7 +113,7 @@ export default function TestResults() {
   const handleResetTest = () => {
     if (userTest?.test_id) {
       resetTest(userTest.test_id);
-      navigate("/cliente");
+      navigate(`${basePath}/cliente`);
     }
   };
 
@@ -131,7 +132,7 @@ export default function TestResults() {
           <CardContent className="pt-6">
             <p className="text-center text-muted-foreground">Resultados não encontrados.</p>
             <div className="flex justify-center mt-4">
-              <Button onClick={() => navigate("/cliente")}>Voltar para Dashboard</Button>
+              <Button onClick={() => navigate(`${basePath}/cliente`)}>Voltar para Dashboard</Button>
             </div>
           </CardContent>
         </Card>
@@ -185,7 +186,7 @@ export default function TestResults() {
               Reiniciar Teste
             </Button>
           )}
-          <Button onClick={() => navigate("/cliente")}>Voltar para Dashboard</Button>
+          <Button onClick={() => navigate(`${basePath}/cliente`)}>Voltar para Dashboard</Button>
         </div>
       </div>
 
