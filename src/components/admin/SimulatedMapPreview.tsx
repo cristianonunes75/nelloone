@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { generateMapaPDF } from "@/lib/pdfGenerator";
+import { toast } from "sonner";
 import { 
   User, 
   Palette, 
@@ -305,6 +307,30 @@ export const SimulatedMapPreview = ({
       : "Dedique 10 minutos diários para reflexão sobre como suas ações refletem sua essência."
   };
 
+  const handleDownloadPDF = () => {
+    try {
+      const pdfSections = sections.map(s => ({
+        id: s.id,
+        title: s.title,
+        content: s.content,
+      }));
+      
+      const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
+      
+      generateMapaPDF(pdfSections, isEn ? "Simulated User" : "Usuário Simulado", {
+        language: lang,
+        growthPoints: growthPoints,
+      });
+      
+      toast.success(isEn ? "PDF downloaded successfully!" : "PDF baixado com sucesso!", {
+        description: isEn ? "Simulated map for visual validation" : "Mapa simulado para validação visual"
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error(isEn ? "Error generating PDF" : "Erro ao gerar PDF");
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0">
@@ -323,9 +349,20 @@ export const SimulatedMapPreview = ({
                 </p>
               </div>
             </div>
-            <Badge variant="outline" className="bg-amber-500/10 text-amber-700 border-amber-500/20">
-              {isEn ? 'SIMULATION' : 'SIMULAÇÃO'}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDownloadPDF}
+                className="rounded-lg h-8"
+              >
+                <Download className="w-4 h-4 mr-1.5" />
+                {isEn ? 'Download PDF' : 'Baixar PDF'}
+              </Button>
+              <Badge variant="outline" className="bg-amber-500/10 text-amber-700 border-amber-500/20">
+                {isEn ? 'SIMULATION' : 'SIMULAÇÃO'}
+              </Badge>
+            </div>
           </div>
         </DialogHeader>
 
