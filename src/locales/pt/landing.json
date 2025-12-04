@@ -2,11 +2,11 @@
   "hero": {
     "title": "NELLO ONE",
     "subtitle": "Conheça quem você é. Transforme o que importa.",
-    "description": "O NELLO ONE é o sistema completo de autoconhecimento guiado por IA que revela seus padrões, forças, desafios e caminhos de evolução com profundidade e simplicidade.",
+    "description": "O Nello One é o sistema completo de autoconhecimento guiado por IA que revela seus padrões, forças, desafios e caminhos de evolução, com profundidade e simplicidade.",
     "tagline": "Leva menos de 2 minutos para iniciar.",
     "cta_primary": "Começar Agora (Grátis)",
     "cta_secondary": "Explorar Testes",
-    "social_proof": "Mais de 2.000 pessoas já iniciaram sua jornada"
+    "social_proof": "✓ Pessoas reais já estão transformando suas escolhas com o Nello One"
   },
   "mirror": {
     "title": "Se isso descreve você, o NELLO ONE foi feito exatamente para o seu momento:",
@@ -55,8 +55,8 @@
       "items": [
         "Baseado em metodologias reconhecidas",
         "IA treinada em psicologia aplicada ao comportamento",
-        "Mais de 2.000 análises no beta",
-        "Usado por líderes, pais, jovens e profissionais"
+        "Testado e aprimorado em ciclos reais durante o desenvolvimento",
+        "Escolhido por líderes, pais, jovens e profissionais que buscam clareza emocional"
       ]
     }
   },
@@ -95,17 +95,17 @@
       {
         "number": "1",
         "title": "Clareza",
-        "description": "Você entende quem você é, com precisão."
+        "description": "Você entende quem você é com precisão."
       },
       {
         "number": "2",
         "title": "Consciência",
-        "description": "Você entende por que age como age."
+        "description": "Você entende porque age como age."
       },
       {
         "number": "3",
         "title": "Transformação",
-        "description": "Você aprende como mudar o que não te serve mais."
+        "description": "Você aprende como mudar o que não serve mais."
       }
     ]
   },
@@ -124,22 +124,22 @@
   "miguel": {
     "title": "Conheça o Miguel",
     "subtitle": "Seu Guia Interior",
-    "description": "Miguel analisa seus resultados de testes, identifica seus padrões centrais, explica suas tendências emocionais e comportamentais e te ajuda a construir clareza sobre quem você é. Ele caminha com você durante todo o processo de autoconhecimento.",
+    "description": "Miguel analisa seus resultados de testes, identifica seus padrões centrais e explica suas tendências emocionais e comportamentais. Ele te ajuda a construir clareza sobre quem você é. Com orientação calma, ele caminha com você durante todo o processo de autoconhecimento.",
     "cta": "Falar com Miguel"
   },
   "not_for_you": {
-    "title_not": "O NELLO ONE não é para você se:",
+    "title_not": "O Nello One não é para você se:",
     "items_not": [
-      "Você quer respostas mágicas",
-      "Busca atalhos sem reflexão",
-      "Não quer melhorar"
+      "Quer soluções mágicas",
+      "Quer resultados sem reflexão",
+      "Não deseja mudar padrões internos"
     ],
-    "title_for": "O NELLO ONE é para você se:",
+    "title_for": "O Nello One é para você se:",
     "items_for": [
-      "Quer clareza real",
-      "Quer maturidade emocional",
-      "Quer evolução prática",
-      "Quer saber quem você é"
+      "Quer clareza emocional",
+      "Quer maturidade prática",
+      "Quer evolução real",
+      "Quer um caminho seguro para entender quem é"
     ]
   },
   "why_matters": {
@@ -284,30 +284,30 @@
     "title": "Perguntas Frequentes",
     "items": [
       {
-        "question": "Como sei que isso funciona para mim?",
-        "answer": "O NELLO ONE usa metodologias validadas internacionalmente (DISC, Nello 16, Eneagrama, etc.) combinadas com IA para criar insights personalizados. Se você quer clareza sobre quem é e como melhorar, funciona para você."
+        "question": "Como sei se isto funciona para mim?",
+        "answer": "O Nello One foi criado para qualquer pessoa que deseja clareza emocional e autoconhecimento. Se você quer entender seus padrões e melhorar suas escolhas, vai funcionar para você."
       },
       {
         "question": "Preciso entender psicologia?",
-        "answer": "Não. O NELLO ONE traduz conceitos complexos em linguagem simples e prática. Miguel, nossa IA, explica tudo de forma clara e acessível."
+        "answer": "Não. O sistema traduz tudo com simplicidade, em linguagem clara e prática."
       },
       {
-        "question": "É realmente diferente de outros testes?",
-        "answer": "Sim. Outros testes te dão resultados isolados. O NELLO ONE integra 7 avaliações em um mapa único, mostrando como seus padrões se conectam e como você pode evoluir."
+        "question": "Em que o Nello One é diferente de outros testes?",
+        "answer": "Ele combina múltiplas metodologias, IA comportamental e análises cruzadas. O resultado é um mapa profundo que mostra quem você é — não só um rótulo."
       },
       {
-        "question": "Quais resultados posso esperar?",
-        "answer": "Clareza sobre seus padrões emocionais, forças, pontos cegos, estilo de comunicação e direção de evolução. Tudo em um mapa visual e prático."
+        "question": "Que resultados posso esperar?",
+        "answer": "Clareza sobre padrões, força emocional, consciência sobre decisões e direção prática para evoluir."
       },
       {
-        "question": "Funciona se eu estiver perdido emocionalmente?",
-        "answer": "Especialmente. O NELLO ONE foi feito exatamente para momentos de confusão. Ele organiza o que você sente em clareza e direção."
+        "question": "Funciona mesmo que eu esteja emocionalmente perdido?",
+        "answer": "Sim. O Nello One foi criado justamente para quem precisa de clareza quando tudo parece confuso."
       }
     ]
   },
   "cta": {
-    "title": "Comece agora e descubra seu arquétipo em 2 minutos.",
-    "subtitle": "Sem risco. Sem compromisso. Só clareza.",
+    "title": "Comece agora — descubra seu arquétipo em 2 minutos.",
+    "subtitle": "Sem risco, sem compromisso. Só clareza.",
     "button": "Começar Agora (Grátis)"
   },
   "footer": {

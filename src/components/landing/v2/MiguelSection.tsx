@@ -13,24 +13,24 @@ export const MiguelSection = () => {
   const { t, language } = useLanguage();
 
   const traits = language === 'en' ? [
-    { icon: Heart, title: "Comforting", description: "Miguel welcomes you with no judgment." },
-    { icon: Compass, title: "Wise Guide", description: "He leads you through your patterns with depth and clarity." },
-    { icon: Lightbulb, title: "Revealer", description: "He helps you see patterns you hadn't noticed before." },
+    { icon: Heart, title: "Welcoming", description: "Receives you with empathy and kindness." },
+    { icon: Compass, title: "Wise Guide", description: "Reveals your patterns with clarity and precision." },
+    { icon: Lightbulb, title: "Revealer", description: "Shows what you couldn't see before." },
   ] : language === 'pt-pt' ? [
-    { icon: Heart, title: "Acolhedor", description: "Miguel recebe-te sem julgamentos." },
-    { icon: Compass, title: "Guia Sábio", description: "Conduz os teus padrões com profundidade e clareza." },
-    { icon: Lightbulb, title: "Revelador", description: "Ajuda-te a enxergar padrões que antes não vias." },
+    { icon: Heart, title: "Acolhedor", description: "Recebe-o com empatia." },
+    { icon: Compass, title: "Guia Sábio", description: "Revela os seus padrões com clareza." },
+    { icon: Lightbulb, title: "Revelador", description: "Mostra o que antes não conseguia ver." },
   ] : [
-    { icon: Heart, title: "Acolhedor", description: "Miguel recebe você sem julgamentos." },
-    { icon: Compass, title: "Guia Sábio", description: "Conduz seus padrões com profundidade e clareza." },
-    { icon: Lightbulb, title: "Revelador", description: "Ajuda você a enxergar padrões que não havia percebido." },
+    { icon: Heart, title: "Acolhedor", description: "Miguel recebe você com empatia e gentileza." },
+    { icon: Compass, title: "Guia Sábio", description: "Ele revela seus padrões com precisão e clareza." },
+    { icon: Lightbulb, title: "Revelador", description: "Miguel te mostra o que antes você não percebia." },
   ];
   
   const quote = language === 'en' 
-    ? "\"I'm Miguel, your guide inside NELLO ONE. My mission is to help you understand who you are, with clarity, depth and lightness.\""
+    ? "\"I am Miguel, your guide inside Nello One. My mission is to help you see who you truly are, with clarity, depth and lightness.\""
     : language === 'pt-pt'
-    ? "\"Eu sou o Miguel, o teu guia no NELLO ONE. A minha missão é ajudar-te a entender quem és, com clareza, profundidade e leveza.\""
-    : "\"Eu sou o Miguel, seu guia no NELLO ONE. Minha missão é ajudar você a entender quem você é, com clareza, profundidade e leveza.\"";
+    ? "\"Eu sou o Miguel, o seu guia no Nello One. A minha missão é ajudá-lo a ver quem realmente é, com clareza, profundidade e leveza.\""
+    : "\"Eu sou o Miguel, seu guia no Nello One. Minha missão é ajudar você a enxergar quem realmente é, com clareza, profundidade e leveza.\"";
 
   return (
     <section className="py-16 md:py-24 lg:py-32 gradient-soul">

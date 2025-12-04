@@ -1,11 +1,12 @@
 {
   "hero": {
     "title": "NELLO ONE",
-    "subtitle": "Know who you are. Transform what matters.",
-    "description": "NELLO ONE is the complete AI-guided self-knowledge system that reveals your patterns, strengths, challenges and growth pathways — with depth and simplicity.",
+    "subtitle": "Discover who you are. Transform what matters.",
+    "description": "Nello One is a complete AI-guided self-knowledge system that reveals your patterns, strengths, challenges and paths of growth, with depth and simplicity.",
     "tagline": "Takes less than 2 minutes to start.",
     "cta_primary": "Start Now (Free)",
-    "cta_secondary": "Explore Tests"
+    "cta_secondary": "Explore Tests",
+    "social_proof": "✓ Real people are already transforming their choices with Nello One"
   },
   "mirror": {
     "title": "If this describes you, NELLO ONE was made for your moment:",
@@ -53,9 +54,9 @@
       "title": "Based on real science",
       "items": [
         "Based on recognized methodologies",
-        "AI trained in applied psychology and behavior",
-        "+2,000 users in beta",
-        "Used by leaders, coaches and professionals"
+        "AI trained in applied behavioral psychology",
+        "Tested and refined through real development cycles",
+        "Chosen by leaders, parents, young adults and professionals seeking emotional clarity"
       ]
     }
   },
@@ -94,7 +95,7 @@
       {
         "number": "1",
         "title": "Clarity",
-        "description": "You understand who you are, with precision."
+        "description": "You understand who you truly are with precision."
       },
       {
         "number": "2",
@@ -119,19 +120,25 @@
       "Continuous growth"
     ]
   },
+  "miguel": {
+    "title": "Meet Miguel",
+    "subtitle": "Your Inner Guide",
+    "description": "Miguel analyzes your results, identifies core patterns and explains your emotional and behavioral tendencies. With gentle guidance, he walks with you through your entire self-knowledge journey.",
+    "cta": "Talk to Miguel"
+  },
   "not_for_you": {
-    "title_not": "NELLO ONE is not for you if:",
+    "title_not": "Nello One is not for you if:",
     "items_not": [
-      "You want magical answers",
-      "You seek shortcuts without reflection",
-      "You don't want to grow"
+      "You want magical solutions",
+      "You want results without reflection",
+      "You don't want to change internal patterns"
     ],
-    "title_for": "NELLO ONE is for you if:",
+    "title_for": "Nello One is for you if:",
     "items_for": [
-      "You want real clarity",
-      "You want emotional maturity",
-      "You want practical evolution",
-      "You want to know who you truly are"
+      "You want emotional clarity",
+      "You want practical maturity",
+      "You want real evolution",
+      "You want a safe path to understand who you are"
     ]
   },
   "why_matters": {
@@ -194,23 +201,23 @@
     "items": [
       {
         "question": "How do I know if this works for me?",
-        "answer": "NELLO ONE uses internationally validated methodologies (DISC, Nello 16, Enneagram, etc.) combined with AI to create personalized insights. If you want clarity about who you are and how to improve, it works for you."
+        "answer": "Nello One was created for anyone who wants emotional clarity and self-knowledge. If you want to understand your patterns and improve your choices, it will work for you."
       },
       {
-        "question": "Do I need to understand psychology to use NELLO ONE?",
-        "answer": "No. NELLO ONE translates complex concepts into simple, practical language. Miguel, our AI, explains everything clearly and accessibly."
+        "question": "Do I need to understand psychology?",
+        "answer": "No. The system translates everything simply, in clear and practical language."
       },
       {
-        "question": "Is it really different from other tests?",
-        "answer": "Yes. Other tests give you isolated results. NELLO ONE integrates 7 assessments into a single map, showing how your patterns connect and how you can evolve."
+        "question": "How is Nello One different from other tests?",
+        "answer": "It combines multiple methodologies, behavioral AI and cross-analysis. The result is a deep map that shows who you are — not just a label."
       },
       {
         "question": "What kind of results can I expect?",
-        "answer": "Clarity about your emotional patterns, strengths, blind spots, communication style and growth direction. All in a visual and practical map."
+        "answer": "Clarity about patterns, emotional strength, awareness about decisions and practical direction for growth."
       },
       {
         "question": "Will it work if I feel emotionally lost?",
-        "answer": "Especially. NELLO ONE was made for moments of confusion. It organizes what you feel into clarity and direction."
+        "answer": "Yes. Nello One was created precisely for those who need clarity when everything seems confusing."
       }
     ]
   },
@@ -223,12 +230,6 @@
       "ai": "AI-guided insights",
       "experience": "Simple, modern and human experience"
     }
-  },
-  "miguel": {
-    "title": "Meet Miguel",
-    "subtitle": "Your Inner Guide",
-    "description": "Miguel analyzes your test results, identifies your core patterns, explains your emotional and behavioral tendencies, and helps you build clarity about who you are. With calm guidance, he walks with you through your entire self-discovery process.",
-    "cta": "Talk to Miguel"
   },
   "tests": {
     "title": "The 7 Professional Tests",
@@ -304,8 +305,8 @@
     "microcopy": "You're already paying the price of confusion. This is where you transform it."
   },
   "cta": {
-    "title": "Start now and discover your archetype in 2 minutes.",
-    "subtitle": "No risk. No commitment. Just clarity.",
+    "title": "Start now — discover your archetype in 2 minutes.",
+    "subtitle": "No risk, no commitment. Only clarity.",
     "button": "Start Now (Free)"
   },
   "footer": {
