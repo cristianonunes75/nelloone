@@ -501,7 +501,7 @@ export default function TestExecution() {
               <div className="flex flex-col gap-4 max-w-md mx-auto">
                 <Button
                   onClick={() => {
-                    setShowUpgradeDialog(false);
+                    navigate(`${basePath}/purchase/${testId}`);
                   }}
                   size="lg"
                   className="w-full h-14 text-lg font-light bg-foreground text-background hover:bg-foreground/90"
