@@ -1,11 +1,12 @@
 {
   "hero": {
     "title": "NELLO ONE",
-    "subtitle": "Descobre quem és. Transforma o que importa.",
-    "description": "O NELLO ONE é o sistema completo de autoconhecimento guiado por IA que revela os teus padrões, forças, desafios e caminhos de evolução — com profundidade e simplicidade.",
+    "subtitle": "Conheça quem você é. Transforme o que realmente importa.",
+    "description": "O Nello One é um sistema completo de autoconhecimento guiado por IA que revela os seus padrões, forças, desafios e caminhos de evolução, com profundidade e simplicidade.",
     "tagline": "Começa em menos de 2 minutos.",
     "cta_primary": "Começar Agora (Grátis)",
-    "cta_secondary": "Explorar Testes"
+    "cta_secondary": "Explorar Testes",
+    "social_proof": "✓ Pessoas reais já estão a transformar as suas escolhas com o Nello One"
   },
   "mirror": {
     "title": "Se isto te descreve, o NELLO ONE foi feito para o teu momento:",
@@ -53,9 +54,9 @@
       "title": "Baseado em ciência real",
       "items": [
         "Baseado em metodologias reconhecidas",
-        "IA treinada em psicologia aplicada e comportamento",
-        "+2.000 utilizadores em beta",
-        "Usado por líderes, coaches e profissionais"
+        "IA treinada em psicologia aplicada ao comportamento",
+        "Testado e aperfeiçoado em ciclos reais de desenvolvimento",
+        "Escolhido por líderes, pais, jovens e profissionais que procuram clareza emocional"
       ]
     }
   },
@@ -94,17 +95,17 @@
       {
         "number": "1",
         "title": "Clareza",
-        "description": "Percebe quem és, com precisão."
+        "description": "Percebe quem realmente é, com precisão."
       },
       {
         "number": "2",
         "title": "Consciência",
-        "description": "Compreende porque ages da forma como ages."
+        "description": "Entende porque age como age."
       },
       {
         "number": "3",
         "title": "Transformação",
-        "description": "Aprende como mudar o que já não te serve."
+        "description": "Aprende a mudar o que já não serve."
       }
     ]
   },
@@ -119,19 +120,25 @@
       "Crescimento contínuo"
     ]
   },
+  "miguel": {
+    "title": "Conhece o Miguel",
+    "subtitle": "O Teu Guia Interior",
+    "description": "Miguel analisa os seus resultados, identifica padrões centrais e explica tendências emocionais e comportamentais. Com orientação tranquila, acompanha-o em toda a jornada.",
+    "cta": "Falar com o Miguel"
+  },
   "not_for_you": {
-    "title_not": "O NELLO ONE não é para ti se:",
+    "title_not": "O Nello One não é para si se:",
     "items_not": [
-      "Queres respostas mágicas",
-      "Buscas atalhos sem reflexão",
-      "Não tens intenção de melhorar"
+      "Procura soluções mágicas",
+      "Quer resultados sem reflexão",
+      "Não deseja mudar padrões internos"
     ],
-    "title_for": "O NELLO ONE é para ti se:",
+    "title_for": "O Nello One é para si se:",
     "items_for": [
-      "Queres clareza real",
-      "Queres maturidade emocional",
-      "Queres evolução prática",
-      "Queres descobrir quem és"
+      "Procura clareza emocional",
+      "Quer maturidade prática",
+      "Deseja evolução real",
+      "Quer compreender quem é"
     ]
   },
   "why_matters": {
@@ -194,23 +201,23 @@
     "items": [
       {
         "question": "Como sei se isto funciona para mim?",
-        "answer": "O NELLO ONE usa metodologias validadas internacionalmente (DISC, Nello 16, Eneagrama, etc.) combinadas com IA para criar insights personalizados. Se queres clareza sobre quem és e como melhorar, funciona para ti."
+        "answer": "O Nello One foi criado para qualquer pessoa que deseja clareza emocional e autoconhecimento. Se quer entender os seus padrões e melhorar as suas escolhas, vai funcionar para si."
       },
       {
-        "question": "Preciso de entender psicologia para usar o NELLO ONE?",
-        "answer": "Não. O NELLO ONE traduz conceitos complexos numa linguagem simples e prática. O Miguel, a nossa IA, explica tudo de forma clara e acessível."
+        "question": "Preciso de entender psicologia?",
+        "answer": "Não. O sistema traduz tudo com simplicidade, em linguagem clara e prática."
       },
       {
-        "question": "É realmente diferente de outros testes?",
-        "answer": "Sim. Outros testes dão-te resultados isolados. O NELLO ONE integra 7 avaliações num único mapa, mostrando como os teus padrões se conectam e como podes evoluir."
+        "question": "Em que o Nello One é diferente de outros testes?",
+        "answer": "Combina múltiplas metodologias, IA comportamental e análises cruzadas. O resultado é um mapa profundo que mostra quem é — não apenas um rótulo."
       },
       {
         "question": "Que resultados posso esperar?",
-        "answer": "Clareza sobre os teus padrões emocionais, forças, pontos cegos, estilo de comunicação e direção de crescimento. Tudo num mapa visual e prático."
+        "answer": "Clareza sobre padrões, força emocional, consciência sobre decisões e direção prática para evoluir."
       },
       {
         "question": "Funciona se eu estiver emocionalmente perdido?",
-        "answer": "Especialmente. O NELLO ONE foi feito para momentos de confusão. Organiza o que sentes em clareza e direção."
+        "answer": "Sim. O Nello One foi criado justamente para quem precisa de clareza quando tudo parece confuso."
       }
     ]
   },
@@ -223,12 +230,6 @@
       "ai": "Insights guiados por IA",
       "experience": "Experiência simples, moderna e humana"
     }
-  },
-  "miguel": {
-    "title": "Conhece o Miguel",
-    "subtitle": "O Teu Guia Interior",
-    "description": "O Miguel analisa os resultados dos teus testes, identifica os teus padrões centrais, explica as tuas tendências emocionais e comportamentais, e ajuda-te a construir clareza sobre quem és. Com orientação calma, ele acompanha-te durante todo o teu processo de autodescoberta.",
-    "cta": "Falar com o Miguel"
   },
   "tests": {
     "title": "Os 7 Testes Profissionais",
@@ -304,8 +305,8 @@
     "microcopy": "Já estás a pagar o preço da confusão. É aqui que a transformas."
   },
   "cta": {
-    "title": "Começa agora e descobre o teu arquétipo em 2 minutos.",
-    "subtitle": "Sem risco. Sem compromisso. Só clareza.",
+    "title": "Comece agora — descubra o seu arquétipo em 2 minutos.",
+    "subtitle": "Sem risco, sem compromisso. Só clareza.",
     "button": "Começar Agora (Grátis)"
   },
   "footer": {
