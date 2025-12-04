@@ -30,7 +30,8 @@ import {
   Settings2,
   Sparkles,
   ArrowLeft,
-  Globe
+  Globe,
+  Map
 } from "lucide-react";
 import { calculateArchetypeScores, getDominantArchetypes, ARCHETYPES } from "@/lib/archetypes";
 import { getDISCResults, DISC_PROFILES } from "@/lib/disc";
@@ -41,6 +42,7 @@ import { calculateTemperamentos } from "@/lib/temperamentos";
 import { useSimulation, SimulationLanguage, SIMULATION_LANGUAGES } from "@/contexts/SimulationContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SimulationLanguageDialog } from "./SimulationLanguageDialog";
+import { SimulatedMapPreview } from "./SimulatedMapPreview";
 
 interface Test {
   id: string;
@@ -109,6 +111,7 @@ export const SimulationMode = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("clean");
   const [showLanguageDialog, setShowLanguageDialog] = useState(false);
   const [pendingAction, setPendingAction] = useState<{ type: 'test' | 'journey'; test?: Test } | null>(null);
+  const [showMapPreview, setShowMapPreview] = useState(false);
 
   // Get label in current simulation language
   const t = (key: string) => getSimulationLabel(key);
@@ -720,7 +723,7 @@ export const SimulationMode = () => {
                     <div className="pt-4 border-t border-border/50">
                       <div className="bg-[#F8F8F4] rounded-xl p-5">
                         <div className="flex items-center gap-3 mb-3">
-                          <Sparkles className="w-5 h-5 text-accent" strokeWidth={1.5} />
+                          <Map className="w-5 h-5 text-accent" strokeWidth={1.5} />
                           <div>
                             <h4 className="font-medium">Mapa Nello One Disponível</h4>
                             <p className="text-xs text-muted-foreground">
@@ -730,13 +733,9 @@ export const SimulationMode = () => {
                         </div>
                         <Button
                           className="w-full bg-accent text-accent-foreground hover:bg-accent/90 rounded-xl h-11"
-                          onClick={() => {
-                            toast.success("Simulação: Mapa Nello One seria gerado aqui", {
-                              description: "Em produção, o usuário seria redirecionado para gerar o mapa personalizado com base nos resultados dos 7 testes."
-                            });
-                          }}
+                          onClick={() => setShowMapPreview(true)}
                         >
-                          <Sparkles className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                          <Map className="w-4 h-4 mr-2" strokeWidth={1.5} />
                           Ver Mapa Nello One (Simulação)
                         </Button>
                       </div>
@@ -1255,6 +1254,14 @@ export const SimulationMode = () => {
         open={showLanguageDialog}
         onOpenChange={setShowLanguageDialog}
         onSelectLanguage={handleLanguageSelected}
+      />
+
+      {/* Simulated Map Preview Dialog */}
+      <SimulatedMapPreview
+        open={showMapPreview}
+        onOpenChange={setShowMapPreview}
+        journeyResults={journeyResults}
+        language={simulationLanguage}
       />
 
       {/* Active Simulation Language Badge */}
