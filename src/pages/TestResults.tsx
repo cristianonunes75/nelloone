@@ -34,7 +34,7 @@ export default function TestResults() {
   const { resetTest } = useTests();
   const { language } = useLanguage();
   const isAdmin = userRole === "admin";
-  const lang = language === 'en' ? 'en' : 'pt';
+  const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
 
   const { data: userTest, isLoading } = useQuery({
     queryKey: ["user-test-result", userTestId],
@@ -622,7 +622,7 @@ export default function TestResults() {
       {/* Growth Insights Card - Before CTA */}
       {userTest.tests?.type && (
         <GrowthInsightsCard 
-          insights={getGrowthInsights(userTest.tests.type, lang)} 
+          insights={getGrowthInsights(userTest.tests.type, lang === 'pt-pt' ? 'pt' : lang)} 
         />
       )}
 
