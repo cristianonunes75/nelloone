@@ -213,7 +213,40 @@ export const PricingSection = () => {
             >
               {pricing.individual_title}
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+            {/* Mobile: horizontal scroll with snap */}
+            <div className="flex md:hidden gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
+              {tests.map((test, index) => (
+                <Link 
+                  key={test.name}
+                  to={getTestPath(test.testType, language)}
+                  className={cn(
+                    "flex-shrink-0 w-[140px] bg-card rounded-xl p-3 border border-border/30 shadow-soft hover:shadow-medium hover:border-ink-blue/30 transition-all duration-300 cursor-pointer group snap-start",
+                    testsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                  )}
+                  style={testsVisible ? getStaggerDelay(index, 0.08) : {}}
+                >
+                  <div className="w-8 h-8 rounded-lg bg-ink-blue/10 flex items-center justify-center mb-3 group-hover:bg-ink-blue/20 transition-colors">
+                    <test.icon className="w-4 h-4 text-ink-blue" />
+                  </div>
+                  <h4 className="font-medium text-foreground text-xs mb-0.5 group-hover:text-ink-blue transition-colors">{test.name}</h4>
+                  <p className="text-[10px] text-muted-foreground mb-2">
+                    {test.questions} {pricing.questions}
+                  </p>
+                  <div className="flex items-baseline gap-0.5">
+                    {test.isFree || test.price === 0 ? (
+                      <span className="font-display text-base text-ink-blue">{pricing.free}</span>
+                    ) : (
+                      <>
+                        <span className="text-[10px] text-muted-foreground">{bundle.symbol}</span>
+                        <span className="font-display text-base text-foreground">{test.price}</span>
+                      </>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+            {/* Desktop: grid layout */}
+            <div className="hidden md:grid grid-cols-3 lg:grid-cols-4 gap-4">
               {tests.map((test, index) => (
                 <Link 
                   key={test.name}

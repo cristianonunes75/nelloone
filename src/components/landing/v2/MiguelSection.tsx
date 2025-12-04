@@ -13,13 +13,13 @@ export const MiguelSection = () => {
   const { t, language } = useLanguage();
 
   const traits = language === 'en' ? [
-    { icon: Heart, title: "Welcoming", description: "Miguel receives you without judgment, with genuine empathy." },
-    { icon: Compass, title: "Wise Guide", description: "Guides your journey with depth and clarity." },
-    { icon: Lightbulb, title: "Revealer", description: "Helps you see patterns you hadn't noticed before." },
+    { icon: Heart, title: "Welcoming", description: "Miguel receives you without judgment." },
+    { icon: Compass, title: "Wise Guide", description: "Guides your patterns with depth and clarity." },
+    { icon: Lightbulb, title: "Revealer", description: "Helps you see patterns you hadn't noticed." },
   ] : [
-    { icon: Heart, title: "Acolhedor", description: "Miguel recebe você sem julgamentos, com empatia genuína." },
-    { icon: Compass, title: "Guia Sábio", description: "Conduz sua jornada com profundidade e clareza." },
-    { icon: Lightbulb, title: "Revelador", description: "Ajuda você a enxergar padrões que ainda não havia percebido." },
+    { icon: Heart, title: "Acolhedor", description: "Miguel recebe você sem julgamentos." },
+    { icon: Compass, title: "Guia Sábio", description: "Conduz seus padrões com profundidade e clareza." },
+    { icon: Lightbulb, title: "Revelador", description: "Ajuda você a enxergar padrões que não havia percebido." },
   ];
 
   return (
@@ -101,7 +101,7 @@ export const MiguelSection = () => {
               )}
             >
               <div className="bg-card rounded-xl md:rounded-2xl p-4 md:p-6 border border-border/30 shadow-soft hover:shadow-medium transition-shadow duration-300">
-                <p className="font-premium text-foreground leading-relaxed text-base md:text-xl">
+                <p className="font-premium text-foreground leading-relaxed text-base md:text-xl italic">
                   {language === 'en' 
                     ? '"I am Miguel, your guide in NELLO ONE. My mission is to help you understand who you are, with clarity, depth and lightness."'
                     : '"Eu sou o Miguel, seu guia no NELLO ONE. Minha missão é ajudar você a entender quem você é, com clareza, profundidade e leveza."'}

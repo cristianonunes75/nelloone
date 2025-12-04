@@ -217,4 +217,8 @@
   .gradient-soul { background: linear-gradient(180deg, hsl(var(--bruma-light)) 0%, hsl(var(--background)) 100%); }
   .gradient-miguel { background: linear-gradient(135deg, hsl(var(--ink-blue)) 0%, hsl(var(--ink-deep)) 100%); }
   .gradient-nello { background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--bruma-light)) 50%, hsl(var(--background)) 100%); }
+  
+  /* Scrollbar hide utility */
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
 }
