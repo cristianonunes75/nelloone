@@ -30,6 +30,16 @@ const content = {
       recommendedEvolution: "Evolução Recomendada"
     }
   },
+  'pt-pt': {
+    title: "O que pode melhorar agora",
+    subtitle: "Com base nos seus padrões, estes são os seus pontos imediatos de evolução.",
+    labels: {
+      limitingPattern: "Padrão Limitante",
+      balancingStrength: "Força que Equilibra",
+      immediateAction: "Ação Imediata",
+      recommendedEvolution: "Evolução Recomendada"
+    }
+  },
   en: {
     title: "What you can improve right now",
     subtitle: "Based on your patterns, these are your immediate growth points.",
@@ -51,7 +61,7 @@ const insightConfig = [
 
 export const GrowthInsightsCard = ({ insights, className }: GrowthInsightsCardProps) => {
   const { language } = useLanguage();
-  const lang = language === 'en' ? 'en' : 'pt';
+  const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   const t = content[lang];
   
   return (
