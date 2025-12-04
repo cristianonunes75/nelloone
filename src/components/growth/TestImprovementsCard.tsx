@@ -30,6 +30,16 @@ const testImprovements = {
         "Alinhamento entre quem você é e como age"
       ]
     },
+    'pt-pt': {
+      title: "O que melhora com este teste",
+      items: [
+        "Clareza sobre a sua energia dominante",
+        "Consciência do que o move e paralisa",
+        "Entendimento dos padrões inconscientes",
+        "Direção para expressão autêntica",
+        "Alinhamento entre quem é e como age"
+      ]
+    },
     en: {
       title: "What you improve with this test",
       items: [
@@ -51,6 +61,16 @@ const testImprovements = {
         "Entendimento do seu estilo de liderança",
         "Melhoria na comunicação profissional",
         "Gestão de conflitos e relacionamentos",
+        "Autoconhecimento comportamental"
+      ]
+    },
+    'pt-pt': {
+      title: "O que melhora com este teste",
+      items: [
+        "Consciência do seu ritmo natural",
+        "Entendimento do seu estilo de liderança",
+        "Melhoria na comunicação profissional",
+        "Gestão de conflitos e relações",
         "Autoconhecimento comportamental"
       ]
     },
@@ -78,6 +98,16 @@ const testImprovements = {
         "Direcionamento de carreira alinhado"
       ]
     },
+    'pt-pt': {
+      title: "O que melhora com este teste",
+      items: [
+        "Clareza sobre como toma decisões",
+        "Entendimento da sua energia social",
+        "Consciência de como processa informações",
+        "Melhoria nas relações interpessoais",
+        "Direcionamento de carreira alinhado"
+      ]
+    },
     en: {
       title: "What you improve with this test",
       items: [
@@ -102,6 +132,16 @@ const testImprovements = {
         "Compaixão consigo mesmo e outros"
       ]
     },
+    'pt-pt': {
+      title: "O que melhora com este teste",
+      items: [
+        "Consciência das motivações profundas",
+        "Entendimento dos medos centrais",
+        "Clareza sobre padrões de autossabotagem",
+        "Caminho de crescimento pessoal",
+        "Compaixão consigo próprio e com os outros"
+      ]
+    },
     en: {
       title: "What you improve with this test",
       items: [
@@ -118,6 +158,16 @@ const testImprovements = {
   temperamentos: {
     pt: {
       title: "O que você melhora com este teste",
+      items: [
+        "Entendimento do seu modo natural de ser",
+        "Consciência de reações emocionais",
+        "Melhoria na gestão de energia",
+        "Clareza sobre necessidades básicas",
+        "Harmonização dos temperamentos"
+      ]
+    },
+    'pt-pt': {
+      title: "O que melhora com este teste",
       items: [
         "Entendimento do seu modo natural de ser",
         "Consciência de reações emocionais",
@@ -150,6 +200,16 @@ const testImprovements = {
         "Conexões mais profundas e autênticas"
       ]
     },
+    'pt-pt': {
+      title: "O que melhora com este teste",
+      items: [
+        "Consciência de como se liga emocionalmente",
+        "Entendimento do seu estilo de conexão afetiva",
+        "Melhoria nas relações interpessoais",
+        "Comunicação emocional mais clara",
+        "Ligações mais profundas e autênticas"
+      ]
+    },
     en: {
       title: "What you improve with this test",
       items: [
@@ -174,6 +234,16 @@ const testImprovements = {
         "Desenvolvimento de pontos fortes"
       ]
     },
+    'pt-pt': {
+      title: "O que melhora com este teste",
+      items: [
+        "Clareza sobre as suas formas de aprender",
+        "Entendimento dos seus talentos naturais",
+        "Direcionamento de carreira e estudos",
+        "Aproveitamento máximo das capacidades",
+        "Desenvolvimento de pontos fortes"
+      ]
+    },
     en: {
       title: "What you improve with this test",
       items: [
@@ -191,7 +261,7 @@ const testImprovements = {
 
 export const TestImprovementsCard = ({ testType, className }: TestImprovementsCardProps) => {
   const { language } = useLanguage();
-  const lang = language === 'en' ? 'en' : 'pt';
+  const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   
   const data = testImprovements[testType as keyof typeof testImprovements];
   if (!data) return null;

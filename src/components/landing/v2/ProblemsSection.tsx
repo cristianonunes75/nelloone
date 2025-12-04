@@ -42,6 +42,23 @@ const content = {
     ],
     closing: "Com o NELLO ONE, você entende quem você é, por que age como age e como transformar o que não te serve mais."
   },
+  'pt-pt': {
+    title: "Problemas que o NELLO ONE resolve",
+    subtitle: "O autoconhecimento transforma, mas pode ser confuso quando não sabe por onde começar.",
+    description: "O NELLO ONE traz clareza, estrutura e direção ao resolver os problemas que a maioria das pessoas enfrenta nesta jornada.",
+    problemsTitle: "O NELLO ONE ajuda-o a superar:",
+    problems: [
+      "Sensação de estar perdido, sem direção ou propósito",
+      "Padrões emocionais que se repetem e não sabe explicar",
+      "Dificuldade em tomar decisões ou manter consistência",
+      "Problemas de comunicação nas relações ou no trabalho",
+      "Falta de foco, disciplina ou clareza mental",
+      "Repetição dos mesmos erros sem entender a raiz",
+      "Saber os seus talentos, mas não saber como usá-los",
+      "Começar mudanças e bloquear a meio do caminho"
+    ],
+    closing: "Com o NELLO ONE, entende quem é, por que age como age e como transformar o que já não o serve."
+  },
   en: {
     title: "Problems NELLO ONE Solves",
     subtitle: "Self-knowledge is powerful, but it's confusing when you don't know where to start.",
@@ -65,7 +82,7 @@ export const ProblemsSection = () => {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
   const { language } = useLanguage();
   
-  const lang = language === 'en' ? 'en' : 'pt';
+  const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   const t = content[lang];
 
   return (

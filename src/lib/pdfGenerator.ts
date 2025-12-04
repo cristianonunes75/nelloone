@@ -13,7 +13,7 @@ interface GrowthPoints {
 }
 
 interface PDFOptions {
-  language?: 'pt' | 'en';
+  language?: 'pt' | 'pt-pt' | 'en';
   growthPoints?: GrowthPoints;
 }
 
@@ -43,7 +43,8 @@ export const generateMapaPDF = (
   userName: string,
   options?: PDFOptions
 ): void => {
-  const lang = options?.language || 'pt';
+  // Normalize pt-pt to pt for PDF generation (similar content)
+  const lang = options?.language === 'en' ? 'en' : 'pt';
   const growthPoints = options?.growthPoints;
   const doc = new jsPDF({
     orientation: "portrait",
