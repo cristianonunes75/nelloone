@@ -97,10 +97,17 @@ const Cliente = () => {
   };
 
   const handleStartTest = async (step: typeof journeySteps[0]) => {
-    // Navigate to test detail page using semantic routes
-    const testRoute = getTestRoute(step.testType);
-    if (testRoute) {
-      navigate(testRoute);
+    // Start test directly and navigate to test execution
+    try {
+      const userTest = await startTestAsync(step.testId);
+      const basePath = getBasePath();
+      navigate(`${basePath}/cliente/test-execution/${step.testId}/${userTest.id}`);
+    } catch (error) {
+      toast({
+        title: "Erro ao iniciar teste",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
     }
   };
 
