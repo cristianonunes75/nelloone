@@ -61,20 +61,25 @@ const MapaEssencia = () => {
   const [hasGenerated, setHasGenerated] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  const userName = profile?.full_name || (language === 'en' ? "Traveler" : "Viajante");
+  const userName = profile?.full_name || (language === 'en' ? "Traveler" : language === 'pt-pt' ? "Viajante" : "Viajante");
   const isLoading = journeyLoading || mapaLoading;
-  const lang = language === 'en' ? 'en' : 'pt';
+  const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
 
   // Generate growth points from map sections
   const growthPoints = useMemo(() => {
     const identidadeSection = sections.find(s => s.id === 'IDENTIDADE_CENTRAL');
     const propositoSection = sections.find(s => s.id === 'PROPOSITO_ESSENCIAL');
     
-    const growthTexts = {
+    const growthTexts: Record<'pt' | 'pt-pt' | 'en', { mainGrowthPoint: string; mainBlindSpot: string; recommendedAction: string }> = {
       pt: {
         mainGrowthPoint: "Integrar sua energia dominante nas decisões diárias, honrando quem você verdadeiramente é.",
         mainBlindSpot: "Padrões emocionais inconscientes que podem estar limitando sua expressão autêntica.",
         recommendedAction: "Dedique 10 minutos diários para reflexão sobre como suas ações refletem sua essência."
+      },
+      'pt-pt': {
+        mainGrowthPoint: "Integrar a sua energia dominante nas decisões diárias, honrando quem verdadeiramente é.",
+        mainBlindSpot: "Padrões emocionais inconscientes que podem estar a limitar a sua expressão autêntica.",
+        recommendedAction: "Dedique 10 minutos diários a refletir sobre como as suas ações refletem a sua essência."
       },
       en: {
         mainGrowthPoint: "Integrate your dominant energy into daily decisions, honoring who you truly are.",
@@ -82,6 +87,8 @@ const MapaEssencia = () => {
         recommendedAction: "Dedicate 10 minutes daily to reflect on how your actions reflect your essence."
       }
     };
+    
+    const currentLang = lang === 'pt-pt' ? 'pt-pt' : lang === 'en' ? 'en' : 'pt';
     
     // If we have sections, try to extract more specific insights
     if (identidadeSection?.content) {

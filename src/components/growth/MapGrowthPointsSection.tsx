@@ -27,6 +27,15 @@ const content = {
       recommendedAction: "Sua ação recomendada"
     }
   },
+  'pt-pt': {
+    title: "Pontos de Evolução",
+    subtitle: "Os seus focos prioritários de crescimento",
+    labels: {
+      mainGrowthPoint: "O seu ponto de maior crescimento agora",
+      mainBlindSpot: "O seu principal ponto cego",
+      recommendedAction: "A sua ação recomendada"
+    }
+  },
   en: {
     title: "Growth Points",
     subtitle: "Your priority growth focuses",
@@ -64,7 +73,7 @@ const pointsConfig = [
 
 export const MapGrowthPointsSection = ({ growthPoints, className }: MapGrowthPointsSectionProps) => {
   const { language } = useLanguage();
-  const lang = language === 'en' ? 'en' : 'pt';
+  const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   const t = content[lang];
   
   return (

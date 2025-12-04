@@ -33,6 +33,22 @@ const content = {
     closing: "Tudo isso com orientação da IA e um mapa único que traduz sua personalidade, seus talentos e seus desafios — para você usar na vida real.",
     cta: "Começar Agora",
   },
+  'pt-pt': {
+    title: "Como o NELLO ONE o ajuda a melhorar",
+    subtitle: "O NELLO ONE não entrega apenas resultados, revela caminhos práticos de crescimento pessoal.",
+    description: "Cada teste destaca pontos fortes e mostra onde pode evoluir, sempre com clareza e objetividade.",
+    improvementsTitle: "Descobre:",
+    improvements: [
+      "Que padrões emocionais sabotam o seu dia a dia",
+      "Onde a sua comunicação bloqueia e como melhorar",
+      "Como tomar decisões com mais segurança",
+      "Em que áreas a sua energia está dispersa",
+      "Como desenvolver maturidade emocional",
+      "Que direção seguir para ter mais clareza, equilíbrio e propósito"
+    ],
+    closing: "Tudo isto com orientação da IA e um mapa único que traduz a sua personalidade, os seus talentos e os seus desafios — para usar na vida real.",
+    cta: "Começar Agora",
+  },
   en: {
     title: "How NELLO ONE Helps You Improve",
     subtitle: "NELLO ONE doesn't just deliver results — it reveals practical paths for personal growth.",
@@ -56,7 +72,7 @@ export const WhyItMattersSection = () => {
   const { language } = useLanguage();
   const navigate = useNavigate();
   
-  const lang = language === 'en' ? 'en' : 'pt';
+  const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   const t = content[lang];
 
   return (
