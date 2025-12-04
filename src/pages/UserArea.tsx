@@ -164,7 +164,8 @@ const UserArea = () => {
   };
 
   const handleNavigation = (path: string) => {
-    const localizedPath = language === "en" ? `/en${path}` : path;
+    const basePath = language === "en" ? "/en" : language === "pt-pt" ? "/pt-pt" : "";
+    const localizedPath = `${basePath}${path}`;
     navigate(localizedPath);
   };
 

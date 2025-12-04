@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type TestStatus = "not_started" | "in_progress" | "completed";
 
@@ -39,8 +40,10 @@ export const TestCard = ({
 }: TestCardProps) => {
   const navigate = useNavigate();
   const { user, userRole } = useAuth();
+  const { language } = useLanguage();
   const IconComponent = (Icons as any)[icon] || Icons.Circle;
   const isAdmin = userRole === "admin";
+  const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
 
   // Get user test ID for this test
   const { data: userTest } = useQuery({
@@ -69,7 +72,7 @@ export const TestCard = ({
       button: {
         label: "Continuar",
         icon: Play,
-        action: () => userTest && navigate(`/cliente/test-execution/${id}/${userTest.id}`),
+        action: () => userTest && navigate(`${basePath}/cliente/test-execution/${id}/${userTest.id}`),
       },
     },
     completed: {
@@ -77,7 +80,7 @@ export const TestCard = ({
       button: {
         label: "Ver resultado",
         icon: CheckCircle,
-        action: () => userTest && navigate(`/cliente/test-results/${userTest.id}`),
+        action: () => userTest && navigate(`${basePath}/cliente/test-results/${userTest.id}`),
       },
     },
   };

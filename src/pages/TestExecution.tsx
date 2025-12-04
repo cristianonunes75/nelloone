@@ -510,7 +510,7 @@ export default function TestExecution() {
                 </Button>
                 <Button
                   variant="ghost"
-                  onClick={() => navigate(`/cliente/test-results/${userTestId}`)}
+                  onClick={() => navigate(`${basePath}/cliente/test-results/${userTestId}`)}
                   className="w-full font-light"
                 >
                   Ver Depois
