@@ -15,50 +15,8 @@ export type Language = 'en' | 'pt' | 'pt-pt';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface Translations {
-  landing: typeof enLanding & {
-    pricing: {
-      label: string;
-      title: string;
-      subtitle: string;
-      bundle_label: string;
-      bundle_title: string;
-      bundle_description: string;
-      benefits: string[];
-      from: string;
-      now: string;
-      save: string;
-      cta: string;
-      individual_title: string;
-      questions: string;
-      free: string;
-      currency: string;
-      bundle_original: number;
-      bundle_price: number;
-    };
-    footer: {
-      brand: string;
-      tagline: string;
-      links: {
-        privacy: string;
-        terms: string;
-        contact: string;
-      };
-      copyright: string;
-      payment_secure: string;
-      payment_methods: string;
-      instant_access: string;
-    };
-  };
-  miguel: typeof enMiguel & {
-    quickReplies: {
-      landing: Record<string, string>;
-      cliente: Record<string, string>;
-      afterResponse: {
-        landing: Record<string, string>;
-        cliente: Record<string, string>;
-      };
-    };
-  };
+  landing: typeof enLanding & Record<string, any>;
+  miguel: typeof enMiguel & Record<string, any>;
 }
 
 const translations: Record<Language, Translations & { user: typeof enUser }> = {

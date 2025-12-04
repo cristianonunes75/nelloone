@@ -10,69 +10,70 @@ export const HeroSection = () => {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
   const { t, language } = useLanguage();
 
+  const getAuthPath = () => {
+    if (language === 'en') return "/en/auth";
+    if (language === 'pt-pt') return "/pt-pt/auth";
+    return "/auth";
+  };
+
   return (
-    <section className="relative min-h-[85vh] md:min-h-[92vh] flex items-center justify-center overflow-hidden pt-16 md:pt-0">
-      {/* Background gradient - NELLO ONE style */}
+    <section className="relative min-h-[90vh] md:min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background gradient */}
       <div className="absolute inset-0 gradient-nello" />
       
-      {/* Subtle glow - smaller on mobile */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[280px] h-[280px] md:w-[500px] md:h-[500px] gradient-glow opacity-40 subtle-pulse" />
+      {/* Subtle glow */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] gradient-glow opacity-30 subtle-pulse" />
       
-      {/* Portal/Circle decoration */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[600px] md:h-[600px] border border-bruma-deep/20 rounded-full opacity-30" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[450px] md:h-[450px] border border-bruma-deep/15 rounded-full opacity-20" />
+      {/* Portal circles */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] md:w-[700px] md:h-[700px] border border-bruma-deep/15 rounded-full opacity-20" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] md:w-[500px] md:h-[500px] border border-bruma-deep/10 rounded-full opacity-15" />
       
-      <div ref={ref} className="container relative z-10 px-4 md:px-6 py-12 md:py-24">
-        <div className="max-w-3xl mx-auto text-center">
+      <div ref={ref} className="container relative z-10 px-4 md:px-6 py-20 md:py-32">
+        <div className="max-w-4xl mx-auto text-center">
           {/* Brand name */}
           <div 
             className={cn(
-              "mb-6 md:mb-8 transition-all duration-700",
+              "mb-8 md:mb-10 transition-all duration-700",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            <span className="font-display text-sm md:text-base tracking-[0.3em] uppercase text-ink-light">
+            <span className="font-display text-xs md:text-sm tracking-[0.4em] uppercase text-ink-light/80">
               {t.landing.hero.title}
             </span>
           </div>
 
-          {/* Main headline - High conversion copy */}
+          {/* Main headline - 60-72px desktop, 36-42px mobile */}
           <h1 
             className={cn(
-              "font-display text-[1.75rem] leading-tight sm:text-display-md md:text-display-lg lg:text-display-xl text-foreground mb-4 md:mb-6 transition-all duration-700 delay-100",
+              "font-display text-[2.25rem] leading-[1.1] sm:text-5xl md:text-6xl lg:text-[4.5rem] text-foreground mb-6 md:mb-8 transition-all duration-700 delay-100",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            {t.landing.hero.subtitle.split('.').filter(Boolean).map((part, index) => (
-              index === 0 ? (
-                <span key={index}>{part.trim()}.</span>
-              ) : (
-                <span key={index} className="block text-ink-blue">{part.trim()}.</span>
-              )
-            ))}
+            <span className="block">{t.landing.hero.subtitle.split('.')[0]}.</span>
+            <span className="block text-ink-blue">{t.landing.hero.subtitle.split('.')[1]?.trim()}.</span>
           </h1>
 
-          {/* Subheadline - Value proposition */}
+          {/* Subheadline - 22-26px */}
           <p 
             className={cn(
-              "font-premium text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 md:mb-6 leading-relaxed transition-all duration-700 delay-200",
+              "font-body text-lg md:text-[1.375rem] lg:text-2xl text-muted-foreground max-w-3xl mx-auto mb-5 md:mb-6 leading-relaxed transition-all duration-700 delay-200",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
             {t.landing.hero.description}
           </p>
           
-          {/* Tagline / Microcopy */}
+          {/* Tagline */}
           <p 
             className={cn(
-              "text-sm md:text-base text-muted-foreground/80 max-w-xl mx-auto mb-8 md:mb-10 leading-relaxed px-2 transition-all duration-700 delay-300",
+              "text-sm md:text-base text-muted-foreground/70 max-w-xl mx-auto mb-10 md:mb-12 transition-all duration-700 delay-300",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
             {t.landing.hero.tagline}
           </p>
 
-          {/* CTA - Full width on mobile */}
+          {/* CTA Button - Large */}
           <div 
             className={cn(
               "flex flex-col items-center justify-center gap-4 px-4 md:px-0 transition-all duration-700 delay-400",
@@ -81,32 +82,32 @@ export const HeroSection = () => {
           >
             <Button 
               size="lg" 
-              className="group w-full sm:w-auto h-14 md:h-16 px-8 md:px-10 text-base md:text-lg rounded-full bg-ink-blue hover:bg-ink-deep text-primary-foreground shadow-large hover:shadow-xl hover-lift press-effect"
-              onClick={() => navigate(language === 'en' ? "/en/auth" : language === 'pt-pt' ? "/pt-pt/auth" : "/auth")}
+              className="group w-full sm:w-auto h-14 md:h-16 px-10 md:px-12 text-base md:text-lg rounded-full bg-ink-blue hover:bg-ink-deep text-primary-foreground shadow-lg hover:shadow-xl hover-lift press-effect"
+              onClick={() => navigate(getAuthPath())}
             >
               {t.landing.hero.cta_primary}
               <ArrowRight className="ml-2 w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
           </div>
 
-          {/* Trust indicator */}
+          {/* Social proof */}
           <p 
             className={cn(
-              "mt-8 md:mt-10 text-xs md:text-sm text-muted-foreground transition-all duration-700 delay-500",
+              "mt-10 md:mt-12 text-xs md:text-sm text-muted-foreground/80 transition-all duration-700 delay-500",
               isVisible ? "opacity-100" : "opacity-0"
             )}
           >
-            {language === 'en' 
-              ? '✓ Over 2,000 people have started their journey' 
+            ✓ {(t.landing.hero as any).social_proof || (language === 'en' 
+              ? 'Over 2,000 people have started their journey' 
               : language === 'pt-pt'
-              ? '✓ Mais de 2.000 pessoas já iniciaram a sua jornada'
-              : '✓ Mais de 2.000 pessoas já iniciaram sua jornada'}
+              ? 'Mais de 2.000 pessoas já iniciaram a sua jornada'
+              : 'Mais de 2.000 pessoas já iniciaram sua jornada')}
           </p>
         </div>
       </div>
 
       {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-20 md:h-32 bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 md:h-32 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 };

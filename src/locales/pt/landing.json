@@ -2,10 +2,11 @@
   "hero": {
     "title": "NELLO ONE",
     "subtitle": "Conheça quem você é. Transforme o que importa.",
-    "description": "O NELLO ONE é o sistema completo de autoconhecimento guiado por IA que revela seus padrões, forças, desafios e caminhos de evolução — com profundidade e simplicidade.",
+    "description": "O NELLO ONE é o sistema completo de autoconhecimento guiado por IA que revela seus padrões, forças, desafios e caminhos de evolução com profundidade e simplicidade.",
     "tagline": "Leva menos de 2 minutos para iniciar.",
     "cta_primary": "Começar Agora (Grátis)",
-    "cta_secondary": "Explorar Testes"
+    "cta_secondary": "Explorar Testes",
+    "social_proof": "Mais de 2.000 pessoas já iniciaram sua jornada"
   },
   "mirror": {
     "title": "Se isso descreve você, o NELLO ONE foi feito exatamente para o seu momento:",
@@ -14,14 +15,14 @@
       "Tenho força, mas falta clareza",
       "Tomo decisões que não refletem quem eu realmente sou",
       "Repito padrões emocionais sem entender por quê",
-      "Sei que tenho talento, mas não sei canalizar",
+      "Sei que tenho talentos, mas não sei canalizar",
       "Minha comunicação não transmite o que eu sinto",
       "Me perco tentando agradar todo mundo",
       "Quero mudar, mas não sei por onde começar"
     ]
   },
   "improvements": {
-    "title": "O NELLO ONE revela:",
+    "title": "O NELLO ONE revela",
     "items": [
       "Seus padrões emocionais",
       "Suas forças mais claras",
@@ -34,7 +35,7 @@
     ]
   },
   "social_proof": {
-    "title": "O que dizem sobre o NELLO ONE",
+    "title": "Baseado em Ciência Real",
     "testimonials": [
       {
         "quote": "Pela primeira vez eu entendi por que repito os mesmos erros. Agora sei como mudar.",
@@ -53,40 +54,40 @@
       "title": "Baseado em ciência real",
       "items": [
         "Baseado em metodologias reconhecidas",
-        "IA treinada em psicologia aplicada e comportamento",
-        "+2.000 usuários no beta",
-        "Usado por líderes, coaches e profissionais"
+        "IA treinada em psicologia aplicada ao comportamento",
+        "Mais de 2.000 análises no beta",
+        "Usado por líderes, pais, jovens e profissionais"
       ]
     }
   },
   "personal_branding": {
-    "title": "Transforme Autoconhecimento em Marketing Pessoal",
-    "description": "O Mapa NELLO ONE não apenas revela quem você é — ele também te mostra como se apresentar ao mundo. Seus resultados podem orientar seu posicionamento profissional, sua comunicação, seu tom de voz e até sua criação de conteúdo nas redes.",
-    "subtitle": "Use seu Mapa NELLO ONE para:",
+    "title": "Transforme Autoconhecimento em Direção Real",
+    "description": "O Mapa NELLO ONE não apenas revela quem você é. Ele também mostra como aplicar seu autoconhecimento na vida prática. Seus resultados podem orientar sua direção pessoal, comunicação, maturidade emocional e tomada de decisões.",
+    "subtitle": "Use seu Mapa para:",
     "items": [
-      "Construir sua marca pessoal",
-      "Definir uma narrativa profissional estratégica",
-      "Fortalecer sua autoridade",
+      "Construir sua jornada pessoal",
+      "Definir um caminho com intenção",
+      "Fortalecer sua segurança emocional",
       "Comunicar-se com autenticidade",
-      "Escolher seu estilo ideal de conteúdo"
+      "Fazer escolhas alinhadas ao que Deus sonhou para você"
     ]
   },
   "problems": {
-    "title": "Problemas que o NELLO ONE resolve",
+    "title": "Desafios que o NELLO ONE ilumina",
     "subtitle": "Autoconhecimento transforma, mas pode ser confuso quando você não sabe por onde começar.",
     "description": "O NELLO ONE traz clareza, estrutura e direção resolvendo os problemas que a maioria das pessoas enfrenta nessa jornada.",
     "problems_title": "O NELLO ONE ajuda você a superar:",
     "problems": [
       "Sensação de estar perdido, sem direção ou propósito",
-      "Padrões emocionais que se repetem e você não sabe explicar",
-      "Dificuldade de tomar decisões ou manter consistência",
-      "Problemas de comunicação em relacionamentos ou no trabalho",
-      "Falta de foco, disciplina ou clareza mental",
-      "Repetição dos mesmos erros sem entender a raiz",
+      "Padrões emocionais que se repetem sem explicação",
+      "Dificuldade de tomar decisões",
+      "Problemas de comunicação",
+      "Falta de foco e clareza mental",
+      "Repetição dos mesmos erros",
       "Saber seus talentos, mas não saber como usá-los",
-      "Começar mudanças e travar no meio do caminho"
+      "Insegurança sobre qual passo dar primeiro"
     ],
-    "closing": "Com o NELLO ONE, você entende quem você é, por que age como age e como transformar o que não te serve mais."
+    "closing": "Com o NELLO ONE, você entende quem você é, por que age como age e como transformar o que já não serve mais."
   },
   "transformation": {
     "title": "Sua Jornada de Transformação",
@@ -116,15 +117,22 @@
       "Mapa completo de identidade",
       "Insights personalizados via IA",
       "Recomendações práticas",
-      "Evolução contínua"
+      "Evolução contínua",
+      "Acesso vitalício"
     ]
+  },
+  "miguel": {
+    "title": "Conheça o Miguel",
+    "subtitle": "Seu Guia Interior",
+    "description": "Miguel analisa seus resultados de testes, identifica seus padrões centrais, explica suas tendências emocionais e comportamentais e te ajuda a construir clareza sobre quem você é. Ele caminha com você durante todo o processo de autoconhecimento.",
+    "cta": "Falar com Miguel"
   },
   "not_for_you": {
     "title_not": "O NELLO ONE não é para você se:",
     "items_not": [
       "Você quer respostas mágicas",
-      "Você busca atalhos sem reflexão",
-      "Você não quer melhorar"
+      "Busca atalhos sem reflexão",
+      "Não quer melhorar"
     ],
     "title_for": "O NELLO ONE é para você se:",
     "items_for": [
@@ -189,31 +197,6 @@
     "main_blind_spot": "Seu principal ponto cego",
     "recommended_action": "Sua ação recomendada"
   },
-  "faq": {
-    "title": "Perguntas Frequentes",
-    "items": [
-      {
-        "question": "Como sei que isso funciona para mim?",
-        "answer": "O NELLO ONE usa metodologias validadas internacionalmente (DISC, Nello 16, Eneagrama, etc.) combinadas com IA para criar insights personalizados. Se você quer clareza sobre quem é e como melhorar, funciona para você."
-      },
-      {
-        "question": "Preciso entender psicologia?",
-        "answer": "Não. O NELLO ONE traduz conceitos complexos em linguagem simples e prática. Miguel, nossa IA, explica tudo de forma clara e acessível."
-      },
-      {
-        "question": "É realmente diferente de outros testes?",
-        "answer": "Sim. Outros testes te dão resultados isolados. O NELLO ONE integra 7 avaliações em um mapa único, mostrando como seus padrões se conectam e como você pode evoluir."
-      },
-      {
-        "question": "Quais resultados posso esperar?",
-        "answer": "Clareza sobre seus padrões emocionais, forças, pontos cegos, estilo de comunicação e direção de evolução. Tudo em um mapa visual e prático."
-      },
-      {
-        "question": "Funciona se eu estiver perdido emocionalmente?",
-        "answer": "Especialmente. O NELLO ONE foi feito exatamente para momentos de confusão. Ele organiza o que você sente em clareza e direção."
-      }
-    ]
-  },
   "what_is": {
     "title": "O que é o NELLO ONE?",
     "description": "O NELLO ONE é uma plataforma inteligente de autoconhecimento que combina testes de personalidade cientificamente fundamentados, design emocional e insights guiados por IA para revelar quem você é e como você funciona — com clareza e simplicidade.",
@@ -223,12 +206,6 @@
       "ai": "Insights guiados por IA",
       "experience": "Experiência simples, moderna e humana"
     }
-  },
-  "miguel": {
-    "title": "Conheça o Miguel",
-    "subtitle": "Seu Guia Interior",
-    "description": "Miguel analisa seus resultados de testes, identifica seus padrões centrais, explica suas tendências emocionais e comportamentais, e ajuda você a construir clareza sobre quem você é. Com orientação calma, ele caminha com você durante todo o processo de autoconhecimento.",
-    "cta": "Falar com Miguel"
   },
   "tests": {
     "title": "Os 7 Testes Profissionais",
@@ -288,14 +265,14 @@
       "Acesso aos 7 testes completos",
       "Mapa NELLO ONE personalizado",
       "Análise integrada por IA",
-      "Export em PDF profissional",
-      "Acesso vitalício aos resultados"
+      "PDF profissional",
+      "Acesso vitalício"
     ],
     "from": "De",
     "now": "Por",
     "save": "Economize",
     "cta": "Começar Jornada Completa",
-    "individual_title": "Ou adquira testes individualmente",
+    "individual_title": "Testes individuais",
     "questions": "perguntas",
     "free": "Grátis",
     "currency": "R$",
@@ -303,9 +280,34 @@
     "bundle_price": 597,
     "microcopy": "Você já está pagando o preço da falta de clareza. Aqui você investe em transformar isso."
   },
+  "faq": {
+    "title": "Perguntas Frequentes",
+    "items": [
+      {
+        "question": "Como sei que isso funciona para mim?",
+        "answer": "O NELLO ONE usa metodologias validadas internacionalmente (DISC, Nello 16, Eneagrama, etc.) combinadas com IA para criar insights personalizados. Se você quer clareza sobre quem é e como melhorar, funciona para você."
+      },
+      {
+        "question": "Preciso entender psicologia?",
+        "answer": "Não. O NELLO ONE traduz conceitos complexos em linguagem simples e prática. Miguel, nossa IA, explica tudo de forma clara e acessível."
+      },
+      {
+        "question": "É realmente diferente de outros testes?",
+        "answer": "Sim. Outros testes te dão resultados isolados. O NELLO ONE integra 7 avaliações em um mapa único, mostrando como seus padrões se conectam e como você pode evoluir."
+      },
+      {
+        "question": "Quais resultados posso esperar?",
+        "answer": "Clareza sobre seus padrões emocionais, forças, pontos cegos, estilo de comunicação e direção de evolução. Tudo em um mapa visual e prático."
+      },
+      {
+        "question": "Funciona se eu estiver perdido emocionalmente?",
+        "answer": "Especialmente. O NELLO ONE foi feito exatamente para momentos de confusão. Ele organiza o que você sente em clareza e direção."
+      }
+    ]
+  },
   "cta": {
-    "title": "Comece agora — descubra seu arquétipo em 2 minutos.",
-    "subtitle": "Sem risco, sem compromisso. Só clareza.",
+    "title": "Comece agora e descubra seu arquétipo em 2 minutos.",
+    "subtitle": "Sem risco. Sem compromisso. Só clareza.",
     "button": "Começar Agora (Grátis)"
   },
   "footer": {
