@@ -94,17 +94,17 @@
       {
         "number": "1",
         "title": "Clarity",
-        "description": "Understand who you are, with precision."
+        "description": "You understand who you are, with precision."
       },
       {
         "number": "2",
         "title": "Awareness",
-        "description": "Understand why you act the way you act."
+        "description": "You understand why you act the way you do."
       },
       {
         "number": "3",
         "title": "Transformation",
-        "description": "Learn how to change what no longer serves you."
+        "description": "You learn how to change what no longer serves you."
       }
     ]
   },
@@ -123,14 +123,14 @@
     "title_not": "NELLO ONE is not for you if:",
     "items_not": [
       "You want magical answers",
-      "You want shortcuts without reflection",
-      "You don't want to improve"
+      "You seek shortcuts without reflection",
+      "You don't want to grow"
     ],
     "title_for": "NELLO ONE is for you if:",
     "items_for": [
       "You want real clarity",
       "You want emotional maturity",
-      "You want practical growth",
+      "You want practical evolution",
       "You want to know who you truly are"
     ]
   },
@@ -193,11 +193,11 @@
     "title": "Frequently Asked Questions",
     "items": [
       {
-        "question": "How do I know this works for me?",
+        "question": "How do I know if this works for me?",
         "answer": "NELLO ONE uses internationally validated methodologies (DISC, Nello 16, Enneagram, etc.) combined with AI to create personalized insights. If you want clarity about who you are and how to improve, it works for you."
       },
       {
-        "question": "Do I need to understand psychology?",
+        "question": "Do I need to understand psychology to use NELLO ONE?",
         "answer": "No. NELLO ONE translates complex concepts into simple, practical language. Miguel, our AI, explains everything clearly and accessibly."
       },
       {
@@ -205,11 +205,11 @@
         "answer": "Yes. Other tests give you isolated results. NELLO ONE integrates 7 assessments into a single map, showing how your patterns connect and how you can evolve."
       },
       {
-        "question": "What results can I expect?",
+        "question": "What kind of results can I expect?",
         "answer": "Clarity about your emotional patterns, strengths, blind spots, communication style and growth direction. All in a visual and practical map."
       },
       {
-        "question": "Does it work if I'm emotionally lost?",
+        "question": "Will it work if I feel emotionally lost?",
         "answer": "Especially. NELLO ONE was made for moments of confusion. It organizes what you feel into clarity and direction."
       }
     ]
@@ -304,9 +304,9 @@
     "microcopy": "You're already paying the price of confusion. This is where you transform it."
   },
   "cta": {
-    "title": "Start now — discover your archetype in 2 minutes.",
-    "subtitle": "No risk, no pressure. Just clarity.",
-    "button": "Begin Now (Free)"
+    "title": "Start now and discover your archetype in 2 minutes.",
+    "subtitle": "No risk. No commitment. Just clarity.",
+    "button": "Start Now (Free)"
   },
   "footer": {
     "brand": "NELLO ONE",
