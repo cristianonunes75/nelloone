@@ -81,6 +81,14 @@ export const JourneySection = () => {
     { number: 5, name: "Multiple Intelligences", icon: BrainIcon, description: "Identify your talents and unique ways of learning.", isFree: false },
     { number: 6, name: "Enneagram", icon: EnneagramIcon, description: "Explore your deep motivations and emotional patterns.", isFree: false },
     { number: 7, name: "Nello 16", icon: DiamondIcon, description: "Understand how you perceive the world and make decisions.", isFree: false },
+  ] : language === 'pt-pt' ? [
+    { number: 1, name: "Arquétipos", icon: SunIcon, description: "Descubra os padrões simbólicos que orientam a sua personalidade.", isFree: true },
+    { number: 2, name: "DISC", icon: QuadrantsIcon, description: "Compreenda o seu estilo de comportamento e comunicação.", isFree: false },
+    { number: 3, name: "Temperamentos", icon: WavesIcon, description: "Conheça a sua base temperamental e como influencia as suas reações.", isFree: false },
+    { number: 4, name: "Estilos de Conexão", icon: HeartLayersIcon, description: "Descubra como se liga emocionalmente.", isFree: false },
+    { number: 5, name: "Inteligências Múltiplas", icon: BrainIcon, description: "Identifique os seus talentos e formas únicas de aprender.", isFree: false },
+    { number: 6, name: "Eneagrama", icon: EnneagramIcon, description: "Explore as suas motivações profundas e padrões emocionais.", isFree: false },
+    { number: 7, name: "Nello 16", icon: DiamondIcon, description: "Entenda como percebe o mundo e toma decisões.", isFree: false },
   ] : [
     { number: 1, name: "Arquétipos", icon: SunIcon, description: "Descubra os padrões simbólicos que guiam sua personalidade.", isFree: true },
     { number: 2, name: "DISC", icon: QuadrantsIcon, description: "Entenda seu estilo de comportamento e comunicação.", isFree: false },
@@ -115,6 +123,11 @@ export const JourneySection = () => {
                 <>
                   Recognized tests,
                   <span className="block">accessible language</span>
+                </>
+              ) : language === 'pt-pt' ? (
+                <>
+                  Testes reconhecidos,
+                  <span className="block">linguagem acessível</span>
                 </>
               ) : (
                 <>
@@ -214,6 +227,8 @@ export const JourneySection = () => {
               <span className="font-medium text-sm md:text-base">
                 {language === 'en' 
                   ? 'At the end: your complete NELLO ONE Map' 
+                  : language === 'pt-pt'
+                  ? 'No final: o seu Mapa NELLO ONE completo'
                   : 'Ao final: seu Mapa NELLO ONE completo'}
               </span>
             </div>

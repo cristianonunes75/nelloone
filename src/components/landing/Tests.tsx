@@ -4,53 +4,122 @@ import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { testSlugs } from "@/lib/testContent";
 
-const tests = [
-  { 
-    icon: Star, 
-    title: "Arquétipos de Marca", 
-    description: "Padrões simbólicos para comunicação e branding pessoal",
-    testKey: "arquetipos"
+const getTestsData = (language: string) => {
+  const isEn = language === 'en';
+  const isPtPt = language === 'pt-pt';
+  
+  return [
+    { 
+      icon: Star, 
+      title: isEn ? "Brand Archetypes" : "Arquétipos de Marca", 
+      description: isEn 
+        ? "Symbolic patterns for communication and personal branding"
+        : isPtPt 
+        ? "Padrões simbólicos para comunicação e branding pessoal"
+        : "Padrões simbólicos para comunicação e branding pessoal",
+      testKey: "arquetipos"
+    },
+    { 
+      icon: Target, 
+      title: "DISC", 
+      description: isEn 
+        ? "Behavioral profile and communication style"
+        : isPtPt 
+        ? "Perfil comportamental e estilo de comunicação"
+        : "Perfil comportamental e estilo de comunicação",
+      testKey: "disc"
+    },
+    { 
+      icon: Brain, 
+      title: "Nello 16", 
+      description: isEn 
+        ? "Map of 16 personalities and psychological profiles"
+        : isPtPt 
+        ? "Mapa das 16 personalidades e perfis psicológicos"
+        : "Mapa das 16 personalidades e perfis psicológicos",
+      testKey: "mbti"
+    },
+    { 
+      icon: Compass, 
+      title: isEn ? "Enneagram" : "Eneagrama", 
+      description: isEn 
+        ? "Deep motivations with psychological approach"
+        : isPtPt 
+        ? "Motivações profundas com abordagem psicológica"
+        : "Motivações profundas com abordagem psicológica",
+      testKey: "eneagrama"
+    },
+    { 
+      icon: Thermometer, 
+      title: isEn ? "Temperaments" : "Temperamentos", 
+      description: isEn 
+        ? "Traditional base (St. Thomas Aquinas)"
+        : isPtPt 
+        ? "Base tradicional (São Tomás de Aquino)"
+        : "Base tradicional (São Tomás de Aquino)",
+      testKey: "temperamentos"
+    },
+    { 
+      icon: Lightbulb, 
+      title: isEn ? "Multiple Intelligences" : "Inteligências Múltiplas", 
+      description: isEn 
+        ? "Recognize your unique talents (Howard Gardner)"
+        : isPtPt 
+        ? "Reconheça os seus talentos únicos (Howard Gardner)"
+        : "Reconheça seus talentos únicos (Howard Gardner)",
+      testKey: "inteligencias_multiplas"
+    },
+    { 
+      icon: Heart, 
+      title: isEn ? "Connection Styles" : "Estilos de Conexão", 
+      description: isEn 
+        ? "Discover how you emotionally connect"
+        : isPtPt 
+        ? "Descubra como se liga emocionalmente"
+        : "Descubra como você se conecta emocionalmente",
+      testKey: "linguagens_amor"
+    },
+  ];
+};
+
+const content = {
+  pt: {
+    title: "7 Testes de",
+    titleHighlight: "Autoconhecimento",
+    subtitle: "Ferramentas validadas de análise de personalidade, talentos e comunicação.",
+    learnMore: "Saiba mais →",
+    footer: "Todos os testes com",
+    footerHighlight: "relatórios em PDF personalizados",
+    footerSuffix: "e entrega visual profissional.",
+    disclaimer: "Os resultados são simbólicos e servem como ferramentas de autoconhecimento e comunicação. Não substituem oração, discernimento espiritual ou aconselhamento pessoal."
   },
-  { 
-    icon: Target, 
-    title: "DISC", 
-    description: "Perfil comportamental e estilo de comunicação",
-    testKey: "disc"
+  'pt-pt': {
+    title: "7 Testes de",
+    titleHighlight: "Autoconhecimento",
+    subtitle: "Ferramentas validadas de análise de personalidade, talentos e comunicação.",
+    learnMore: "Saiba mais →",
+    footer: "Todos os testes com",
+    footerHighlight: "relatórios em PDF personalizados",
+    footerSuffix: "e entrega visual profissional.",
+    disclaimer: "Os resultados são simbólicos e servem como ferramentas de autoconhecimento e comunicação. Não substituem oração, discernimento espiritual ou aconselhamento pessoal."
   },
-  { 
-    icon: Brain, 
-    title: "Nello 16", 
-    description: "Mapa das 16 personalidades e perfis psicológicos",
-    testKey: "mbti"
-  },
-  { 
-    icon: Compass, 
-    title: "Eneagrama", 
-    description: "Motivações profundas com abordagem psicológica",
-    testKey: "eneagrama"
-  },
-  { 
-    icon: Thermometer, 
-    title: "Temperamentos", 
-    description: "Base tradicional (São Tomás de Aquino)",
-    testKey: "temperamentos"
-  },
-  { 
-    icon: Lightbulb, 
-    title: "Inteligências Múltiplas", 
-    description: "Reconheça seus talentos únicos (Howard Gardner)",
-    testKey: "inteligencias_multiplas"
-  },
-  { 
-    icon: Heart, 
-    title: "Estilos de Conexão", 
-    description: "Descubra como você se conecta emocionalmente",
-    testKey: "linguagens_amor"
-  },
-];
+  en: {
+    title: "7",
+    titleHighlight: "Self-Knowledge Tests",
+    subtitle: "Validated tools for personality, talent, and communication analysis.",
+    learnMore: "Learn more →",
+    footer: "All tests include",
+    footerHighlight: "personalized PDF reports",
+    footerSuffix: "with professional visual delivery.",
+    disclaimer: "Results are symbolic and serve as self-knowledge and communication tools. They do not replace prayer, spiritual discernment, or personal counseling."
+  }
+};
 
 export const Tests = () => {
   const { language } = useLanguage();
+  const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
+  const t = content[lang];
+  const tests = getTestsData(language);
 
   const getTestLink = (testKey: string) => {
     const slugData = testSlugs[testKey as keyof typeof testSlugs];
@@ -73,10 +142,10 @@ export const Tests = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              7 Testes de <span className="text-gold">Autoconhecimento</span>
+              {t.title} <span className="text-gold">{t.titleHighlight}</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Ferramentas validadas de análise de personalidade, talentos e comunicação.
+              {t.subtitle}
             </p>
           </div>
 
@@ -97,7 +166,7 @@ export const Tests = () => {
                     to={getTestLink(test.testKey)}
                     className="text-gold text-sm font-medium hover:text-gold-dark transition-colors"
                   >
-                    Saiba mais →
+                    {t.learnMore}
                   </Link>
                 </div>
               );
@@ -106,11 +175,10 @@ export const Tests = () => {
 
           <div className="text-center mt-12">
             <p className="text-lg text-muted-foreground mb-4">
-              Todos os testes com <strong className="text-foreground">relatórios em PDF personalizados</strong> e entrega visual profissional.
+              {t.footer} <strong className="text-foreground">{t.footerHighlight}</strong> {t.footerSuffix}
             </p>
             <p className="text-sm text-muted-foreground italic max-w-2xl mx-auto">
-              Os resultados são simbólicos e servem como ferramentas de autoconhecimento e comunicação. 
-              Não substituem oração, discernimento espiritual ou aconselhamento pessoal.
+              {t.disclaimer}
             </p>
           </div>
         </div>
