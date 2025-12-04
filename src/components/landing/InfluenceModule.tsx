@@ -15,7 +15,7 @@ export const InfluenceModule = () => {
               <span className="text-sm font-medium text-gold">Novo Módulo</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Essentia <span className="text-gold">Influence</span>
+              NELLO ONE <span className="text-gold">Influence</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Marketing com Propósito e Verdade

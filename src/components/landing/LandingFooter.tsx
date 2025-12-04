@@ -1,9 +1,14 @@
 import logo from "@/assets/logo.png";
-import { Instagram, Mail } from "lucide-react";
+import { Instagram } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const LandingFooter = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  
+  const isEn = language === 'en';
+  const isPtPt = language === 'pt-pt';
 
   return (
     <footer className="bg-primary text-primary-foreground py-16">
@@ -14,21 +19,25 @@ export const LandingFooter = () => {
             <div className="md:col-span-2">
               <img 
                 src={logo} 
-                alt="Essentia" 
+                alt="NELLO ONE" 
                 className="h-12 w-auto mb-6 brightness-0 invert opacity-90"
               />
               <p className="text-primary-foreground/80 leading-relaxed mb-6">
-                Imagem com propósito.<br />
-                Identidade revelada.<br />
-                Beleza com fé.
+                {isEn ? (
+                  <>The path begins within.<br />Clarity. Identity. Purpose.</>
+                ) : isPtPt ? (
+                  <>O caminho começa dentro.<br />Clareza. Identidade. Propósito.</>
+                ) : (
+                  <>O caminho começa dentro.<br />Clareza. Identidade. Propósito.</>
+                )}
               </p>
               <div className="flex gap-4">
                 <a
-                  href="https://instagram.com/essentiaimagem"
+                  href="https://instagram.com/nelloone.app"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 flex items-center justify-center transition-colors"
-                  aria-label="Instagram Essentia"
+                  aria-label="Instagram NELLO ONE"
                 >
                   <Instagram className="w-5 h-5" />
                 </a>
@@ -37,14 +46,16 @@ export const LandingFooter = () => {
 
             {/* Links */}
             <div>
-              <h4 className="font-semibold mb-4">Navegação</h4>
+              <h4 className="font-semibold mb-4">
+                {isEn ? 'Navigation' : 'Navegação'}
+              </h4>
               <ul className="space-y-3 text-primary-foreground/80">
                 <li>
                   <button
                     onClick={() => document.getElementById('sobre')?.scrollIntoView({ behavior: 'smooth' })}
                     className="hover:text-gold transition-colors"
                   >
-                    Sobre
+                    {isEn ? 'About' : 'Sobre'}
                   </button>
                 </li>
                 <li>
@@ -52,7 +63,7 @@ export const LandingFooter = () => {
                     onClick={() => document.getElementById('testes')?.scrollIntoView({ behavior: 'smooth' })}
                     className="hover:text-gold transition-colors"
                   >
-                    Testes
+                    {isEn ? 'Tests' : 'Testes'}
                   </button>
                 </li>
                 <li>
@@ -60,15 +71,15 @@ export const LandingFooter = () => {
                     onClick={() => document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' })}
                     className="hover:text-gold transition-colors"
                   >
-                    Planos
+                    {isEn ? 'Plans' : 'Planos'}
                   </button>
                 </li>
                 <li>
                   <button
-                    onClick={() => navigate("/auth")}
+                    onClick={() => navigate(isEn ? "/en/auth" : isPtPt ? "/pt-pt/auth" : "/auth")}
                     className="hover:text-gold transition-colors font-semibold"
                   >
-                    Área do Cliente
+                    {isEn ? 'Client Area' : 'Área do Cliente'}
                   </button>
                 </li>
               </ul>
@@ -76,7 +87,9 @@ export const LandingFooter = () => {
 
             {/* Contact */}
             <div>
-              <h4 className="font-semibold mb-4">Contato</h4>
+              <h4 className="font-semibold mb-4">
+                {isEn ? 'Contact' : 'Contato'}
+              </h4>
               <ul className="space-y-3 text-primary-foreground/80">
                 <li>
                   <a 
@@ -90,12 +103,12 @@ export const LandingFooter = () => {
                 </li>
                 <li className="pt-2">
                   <a 
-                    href="https://instagram.com/essentiaimagem" 
+                    href="https://instagram.com/nelloone.app" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="hover:text-gold transition-colors"
                   >
-                    @essentiaimagem
+                    @nelloone.app
                   </a>
                 </li>
               </ul>
@@ -105,19 +118,19 @@ export const LandingFooter = () => {
           {/* Bottom */}
           <div className="pt-8 border-t border-primary-foreground/20">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-primary-foreground/60">
-              <p>&copy; 2025 Essentia. Todos os direitos reservados.</p>
+              <p>&copy; 2025 NELLO ONE. {isEn ? 'All rights reserved.' : 'Todos os direitos reservados.'}</p>
               <div className="flex gap-6">
                 <button 
-                  onClick={() => navigate("/termos")}
+                  onClick={() => navigate(isEn ? "/en/terms" : isPtPt ? "/pt-pt/termos" : "/termos")}
                   className="hover:text-primary-foreground/80 transition-colors"
                 >
-                  Termos de Uso
+                  {isEn ? 'Terms of Use' : 'Termos de Uso'}
                 </button>
                 <button 
-                  onClick={() => navigate("/privacidade")}
+                  onClick={() => navigate(isEn ? "/en/privacy" : isPtPt ? "/pt-pt/privacidade" : "/privacidade")}
                   className="hover:text-primary-foreground/80 transition-colors"
                 >
-                  Política de Privacidade
+                  {isEn ? 'Privacy Policy' : 'Política de Privacidade'}
                 </button>
               </div>
             </div>
