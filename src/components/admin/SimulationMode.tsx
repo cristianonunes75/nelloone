@@ -706,7 +706,7 @@ export const SimulationMode = () => {
               )}
               
               {journeyResults.length > 0 && (
-                <div className="space-y-2 pt-4 border-t border-border/50">
+                <div className="space-y-4 pt-4 border-t border-border/50">
                   <p className="text-sm font-medium">Resultados da Jornada:</p>
                   {journeyResults.map((r, i) => (
                     <div key={i} className="flex items-center justify-between text-sm p-3 bg-muted/30 rounded-lg">
@@ -714,6 +714,34 @@ export const SimulationMode = () => {
                       <Badge variant="outline" className="text-xs bg-background">Concluído</Badge>
                     </div>
                   ))}
+                  
+                  {/* Mapa Nello One Button - appears when journey is complete */}
+                  {journeyResults.length === 7 && (
+                    <div className="pt-4 border-t border-border/50">
+                      <div className="bg-[#F8F8F4] rounded-xl p-5">
+                        <div className="flex items-center gap-3 mb-3">
+                          <Sparkles className="w-5 h-5 text-accent" strokeWidth={1.5} />
+                          <div>
+                            <h4 className="font-medium">Mapa Nello One Disponível</h4>
+                            <p className="text-xs text-muted-foreground">
+                              Todos os 7 testes foram concluídos. O Mapa Nello One pode ser gerado.
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          className="w-full bg-accent text-accent-foreground hover:bg-accent/90 rounded-xl h-11"
+                          onClick={() => {
+                            toast.success("Simulação: Mapa Nello One seria gerado aqui", {
+                              description: "Em produção, o usuário seria redirecionado para gerar o mapa personalizado com base nos resultados dos 7 testes."
+                            });
+                          }}
+                        >
+                          <Sparkles className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                          Ver Mapa Nello One (Simulação)
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
