@@ -63,7 +63,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
                 Acesse sua conta para iniciar sua jornada de autoconhecimento.
               </p>
               
-              <a href="https://nelloone.app/cliente" 
+              <a href="https://nello.one/cliente" 
                  style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
                 Acessar Minha Conta
               </a>
@@ -107,7 +107,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
                 Ao completar todos os testes, você receberá seu <strong>Mapa Nello One</strong> personalizado.
               </p>
               
-              <a href="https://nelloone.app/cliente" 
+              <a href="https://nello.one/cliente" 
                  style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
                 Começar Jornada
               </a>
@@ -136,7 +136,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
               <div style="margin: 24px 0;">
                 <div style="display: flex; align-items: flex-start; margin-bottom: 16px;">
                   <span style="background: #1F2E4B; color: white; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; margin-right: 12px; flex-shrink: 0;">1</span>
-                  <p style="color: #444; font-size: 15px; margin: 0; line-height: 1.6;">Acesse <a href="https://nelloone.app/cliente" style="color: #1F2E4B;">nelloone.app/cliente</a></p>
+                  <p style="color: #444; font-size: 15px; margin: 0; line-height: 1.6;">Acesse <a href="https://nello.one/cliente" style="color: #1F2E4B;">nello.one/cliente</a></p>
                 </div>
                 <div style="display: flex; align-items: flex-start; margin-bottom: 16px;">
                   <span style="background: #1F2E4B; color: white; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; margin-right: 12px; flex-shrink: 0;">2</span>
@@ -152,7 +152,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
                 </div>
               </div>
               
-              <a href="https://nelloone.app/cliente" 
+              <a href="https://nello.one/cliente" 
                  style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
                 Acessar Minha Conta
               </a>
@@ -188,7 +188,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
                 Continue sua jornada completando os próximos testes para desbloquear seu Mapa Nello One completo.
               </p>
               
-              <a href="https://nelloone.app/cliente" 
+              <a href="https://nello.one/cliente" 
                  style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
                 Ver Resultados
               </a>
@@ -231,7 +231,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
                 <li>Seu plano de vida essencial</li>
               </ul>
               
-              <a href="https://nelloone.app/cliente" 
+              <a href="https://nello.one/cliente" 
                  style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
                 Ver Meu Mapa
               </a>
@@ -274,7 +274,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
                 Access your account to start your self-discovery journey.
               </p>
               
-              <a href="https://nelloone.app/en/cliente" 
+              <a href="https://nello.one/en/cliente" 
                  style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
                 Access My Account
               </a>
@@ -318,7 +318,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
                 After completing all tests, you'll receive your personalized <strong>Nello One Map</strong>.
               </p>
               
-              <a href="https://nelloone.app/en/cliente" 
+              <a href="https://nello.one/en/cliente" 
                  style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
                 Start Journey
               </a>
@@ -347,7 +347,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
               <div style="margin: 24px 0;">
                 <div style="display: flex; align-items: flex-start; margin-bottom: 16px;">
                   <span style="background: #1F2E4B; color: white; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; margin-right: 12px; flex-shrink: 0;">1</span>
-                  <p style="color: #444; font-size: 15px; margin: 0; line-height: 1.6;">Go to <a href="https://nelloone.app/en/cliente" style="color: #1F2E4B;">nelloone.app/en/cliente</a></p>
+                  <p style="color: #444; font-size: 15px; margin: 0; line-height: 1.6;">Go to <a href="https://nello.one/en/cliente" style="color: #1F2E4B;">nello.one/en/cliente</a></p>
                 </div>
                 <div style="display: flex; align-items: flex-start; margin-bottom: 16px;">
                   <span style="background: #1F2E4B; color: white; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; margin-right: 12px; flex-shrink: 0;">2</span>
@@ -363,7 +363,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
                 </div>
               </div>
               
-              <a href="https://nelloone.app/en/cliente" 
+              <a href="https://nello.one/en/cliente" 
                  style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
                 Access My Account
               </a>
@@ -399,7 +399,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
                 Continue your journey by completing the remaining tests to unlock your complete Nello One Map.
               </p>
               
-              <a href="https://nelloone.app/en/cliente" 
+              <a href="https://nello.one/en/cliente" 
                  style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
                 View Results
               </a>
@@ -442,7 +442,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
                 <li>Your essential life plan</li>
               </ul>
               
-              <a href="https://nelloone.app/en/cliente" 
+              <a href="https://nello.one/en/cliente" 
                  style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
                 View My Map
               </a>
@@ -488,7 +488,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const emailResponse = await resend.emails.send({
-      from: "NELLO ONE <noreply@nelloone.app>",
+      from: "NELLO ONE <noreply@nello.one>",
       to: [to],
       subject: emailContent.subject,
       html: emailContent.html,
