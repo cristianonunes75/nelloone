@@ -622,7 +622,7 @@ export default function TestResults() {
       {/* Growth Insights Card - Before CTA */}
       {userTest.tests?.type && (
         <GrowthInsightsCard 
-          insights={getGrowthInsights(userTest.tests.type, lang === 'pt-pt' ? 'pt' : lang)} 
+          insights={getGrowthInsights(userTest.tests.type, lang)}
         />
       )}
 
