@@ -17,11 +17,14 @@ import { getEnneagramResults } from "@/lib/eneagrama";
 import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function TestExecution() {
   const { testId, userTestId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { language } = useLanguage();
+  const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
@@ -257,7 +260,7 @@ export default function TestExecution() {
               Nenhuma pergunta encontrada para este teste.
             </p>
             <div className="flex justify-center mt-4">
-              <Button onClick={() => navigate("/cliente")}>
+              <Button onClick={() => navigate(`${basePath}/cliente`)}>
                 Voltar para Dashboard
               </Button>
             </div>
@@ -541,7 +544,7 @@ export default function TestExecution() {
           <div className="flex items-center justify-between mb-6">
             <Button
               variant="ghost"
-              onClick={() => navigate("/cliente")}
+              onClick={() => navigate(`${basePath}/cliente`)}
               size="sm"
               className="font-light"
             >

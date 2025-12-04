@@ -134,7 +134,8 @@ export const TestDetailLayout = ({
                   onClick={async () => {
                     try {
                       const userTest = await startTestAsync(test.id);
-                      navigate(`/cliente/test-execution/${test.id}/${userTest.id}`);
+                      const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
+                      navigate(`${basePath}/cliente/test-execution/${test.id}/${userTest.id}`);
                     } catch (error) {
                       toast({
                         title: language === 'en' ? "Error starting test" : "Erro ao iniciar teste",
@@ -156,7 +157,7 @@ export const TestDetailLayout = ({
                       title: language === 'en' ? "Locked Test" : "Teste Bloqueado",
                       description: language === 'en' ? "You need to purchase this test to begin." : "Você precisa adquirir este teste para começar.",
                     });
-                    navigate("/cliente");
+                    navigate(language === 'en' ? '/en/cliente' : language === 'pt-pt' ? '/pt-pt/cliente' : '/cliente');
                   }}
                 >
                   {lockedText}

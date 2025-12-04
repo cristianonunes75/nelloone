@@ -9,11 +9,14 @@ import { ArrowLeft, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ClientePerfil = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -69,7 +72,7 @@ const ClientePerfil = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate("/cliente")}
+            onClick={() => navigate(`${basePath}/cliente`)}
             className="mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

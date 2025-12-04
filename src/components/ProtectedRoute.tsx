@@ -13,15 +13,24 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
   const { user, userRole, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Detect language from current path
+  const getBasePath = () => {
+    if (location.pathname.startsWith('/en/')) return '/en';
+    if (location.pathname.startsWith('/pt-pt/')) return '/pt-pt';
+    return '';
+  };
 
   useEffect(() => {
+    const basePath = getBasePath();
+    
     if (!isLoading && !user) {
       const currentPath = location.pathname;
       // Check if user is trying to access a test or purchase flow
       if (currentPath.includes("/cliente/test-execution") || currentPath.includes("/purchase")) {
-        navigate("/auth?redirect=purchase");
+        navigate(`${basePath}/auth?redirect=purchase`);
       } else {
-        navigate("/auth");
+        navigate(`${basePath}/auth`);
       }
     }
 
@@ -35,10 +44,10 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
           navigate("/fotografo");
           break;
         case "cliente":
-          navigate("/cliente");
+          navigate(`${basePath}/cliente`);
           break;
         default:
-          navigate("/");
+          navigate(basePath || "/");
       }
     }
   }, [user, userRole, isLoading, allowedRoles, navigate, location.pathname]);

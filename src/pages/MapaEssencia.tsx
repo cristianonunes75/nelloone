@@ -64,6 +64,7 @@ const MapaEssencia = () => {
   const userName = profile?.full_name || (language === 'en' ? "Traveler" : language === 'pt-pt' ? "Viajante" : "Viajante");
   const isLoading = journeyLoading || mapaLoading;
   const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
+  const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
 
   // Generate growth points from map sections
   const growthPoints = useMemo(() => {
@@ -308,7 +309,7 @@ const MapaEssencia = () => {
         <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-10">
           <div className="container px-4 py-4 flex items-center justify-between">
             <LogoText className="text-2xl" variant="solid" />
-            <Button variant="ghost" size="sm" onClick={() => navigate("/cliente")}>
+            <Button variant="ghost" size="sm" onClick={() => navigate(`${basePath}/cliente`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar
             </Button>
@@ -324,7 +325,7 @@ const MapaEssencia = () => {
             <p className="text-muted-foreground mb-6">
               Você completou {completedCount} de {totalSteps} testes. Complete todos os testes para revelar seu Mapa da Essência completo.
             </p>
-            <Button onClick={() => navigate("/cliente")}>
+            <Button onClick={() => navigate(`${basePath}/cliente`)}>
               Continuar Jornada
             </Button>
           </div>
@@ -341,7 +342,7 @@ const MapaEssencia = () => {
         <div className="container px-4 py-4 flex items-center justify-between">
           <LogoText className="text-2xl" variant="solid" />
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/cliente")}>
+            <Button variant="ghost" size="sm" onClick={() => navigate(`${basePath}/cliente`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar
             </Button>
