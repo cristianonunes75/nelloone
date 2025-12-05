@@ -105,6 +105,7 @@ const CURRENCY_ERROR_MESSAGES: Record<string, string> = {
 // USD Price IDs for EN version (Global market)
 const USD_PRICES: Record<string, string> = {
   arquetipos: "price_1SZNW0DjhZZxZELMopbi37cc",
+  arquetipos_proposito: "price_1SZNW0DjhZZxZELMopbi37cc",
   disc: "price_1SZNWgDjhZZxZELMoEGJMpRt",
   mbti: "price_1SZNWuDjhZZxZELMXezDuVOz",
   eneagrama: "price_1SZNX8DjhZZxZELMZhLy7W6b",
@@ -115,7 +116,9 @@ const USD_PRICES: Record<string, string> = {
 };
 
 // BRL Price IDs for PT version (Brazilian market)
+// NOTE: For arquetipos, create a product in Stripe called "Arquétipos com Propósito – Acesso Completo NELLO ONE"
 const BRL_PRICES: Record<string, string> = {
+  // arquetipos/arquetipos_proposito: TODO - Create price in Stripe for BRL (R$47)
   disc: "price_1SNBIuDjhZZxZELMm3qUtTON",
   mbti: "price_1SNBJEDjhZZxZELMY1CuVfIZ",
   eneagrama: "price_1SNBLhDjhZZxZELMhSvpHn8X",
@@ -128,6 +131,7 @@ const BRL_PRICES: Record<string, string> = {
 // EUR Price IDs for PT-PT version (Portugal/European market)
 const EUR_PRICES: Record<string, string> = {
   arquetipos: "price_1SZywzDjhZZxZELMZfCg6fSd",
+  arquetipos_proposito: "price_1SZywzDjhZZxZELMZfCg6fSd",
   disc: "price_1SZyxMDjhZZxZELMkolH98fK",
   mbti: "price_1SZz6TDjhZZxZELMXzDUT8kk",
   eneagrama: "price_1SZz5ADjhZZxZELMauUUwZSQ",
@@ -173,6 +177,83 @@ function getPriceMap(currency: string): Record<string, string> {
     default:
       return BRL_PRICES;
   }
+}
+
+// ============================================================================
+// NELLO ONE PRODUCT NAMING - Always use "NELLO ONE" branding, never "Essentia"
+// ============================================================================
+const PRODUCT_NAMES: Record<string, Record<string, { name: string; description: string }>> = {
+  arquetipos: {
+    pt: { 
+      name: "Arquétipos com Propósito – Acesso Completo NELLO ONE", 
+      description: "Desbloqueie todas as 36 perguntas e o relatório completo dos 12 arquétipos" 
+    },
+    en: { 
+      name: "Archetypes with Purpose – Full Access NELLO ONE", 
+      description: "Unlock all 36 questions and the complete 12 archetypes report" 
+    },
+    "pt-pt": { 
+      name: "Arquétipos com Propósito – Acesso Completo NELLO ONE", 
+      description: "Desbloqueie todas as 36 perguntas e o relatório completo dos 12 arquétipos" 
+    },
+  },
+  arquetipos_proposito: {
+    pt: { 
+      name: "Arquétipos com Propósito – Acesso Completo NELLO ONE", 
+      description: "Desbloqueie todas as 36 perguntas e o relatório completo dos 12 arquétipos" 
+    },
+    en: { 
+      name: "Archetypes with Purpose – Full Access NELLO ONE", 
+      description: "Unlock all 36 questions and the complete 12 archetypes report" 
+    },
+    "pt-pt": { 
+      name: "Arquétipos com Propósito – Acesso Completo NELLO ONE", 
+      description: "Desbloqueie todas as 36 perguntas e o relatório completo dos 12 arquétipos" 
+    },
+  },
+  disc: {
+    pt: { name: "Teste DISC – NELLO ONE", description: "Acesso vitalício ao teste DISC" },
+    en: { name: "DISC Test – NELLO ONE", description: "Lifetime access to DISC test" },
+    "pt-pt": { name: "Teste DISC – NELLO ONE", description: "Acesso vitalício ao teste DISC" },
+  },
+  mbti: {
+    pt: { name: "Nello 16 Personality Map – NELLO ONE", description: "Acesso vitalício ao mapa das 16 personalidades" },
+    en: { name: "Nello 16 Personality Map – NELLO ONE", description: "Lifetime access to 16 personalities map" },
+    "pt-pt": { name: "Mapa das 16 Personalidades Nello – NELLO ONE", description: "Acesso vitalício ao mapa das 16 personalidades" },
+  },
+  eneagrama: {
+    pt: { name: "Eneagrama Essencial – NELLO ONE", description: "Acesso vitalício ao teste de Eneagrama" },
+    en: { name: "Essential Enneagram – NELLO ONE", description: "Lifetime access to Enneagram test" },
+    "pt-pt": { name: "Eneagrama Essencial – NELLO ONE", description: "Acesso vitalício ao teste de Eneagrama" },
+  },
+  temperamentos: {
+    pt: { name: "Teste de Temperamentos – NELLO ONE", description: "Acesso vitalício ao teste de Temperamentos" },
+    en: { name: "Temperaments Test – NELLO ONE", description: "Lifetime access to Temperaments test" },
+    "pt-pt": { name: "Teste de Temperamentos – NELLO ONE", description: "Acesso vitalício ao teste de Temperamentos" },
+  },
+  linguagens_amor: {
+    pt: { name: "Mapa dos Estilos de Conexão Afetiva – NELLO ONE", description: "Acesso vitalício ao teste de estilos de conexão" },
+    en: { name: "Affection Connection Styles – NELLO ONE", description: "Lifetime access to connection styles test" },
+    "pt-pt": { name: "Mapa dos Estilos de Conexão Afetiva – NELLO ONE", description: "Acesso vitalício ao teste de estilos de conexão" },
+  },
+  inteligencias_multiplas: {
+    pt: { name: "Inteligências Múltiplas – NELLO ONE", description: "Acesso vitalício ao teste de Inteligências Múltiplas" },
+    en: { name: "Multiple Intelligences – NELLO ONE", description: "Lifetime access to Multiple Intelligences test" },
+    "pt-pt": { name: "Inteligências Múltiplas – NELLO ONE", description: "Acesso vitalício ao teste de Inteligências Múltiplas" },
+  },
+};
+
+// Get product name based on test type and language
+function getProductName(testType: string, language: string): { name: string; description: string } {
+  const productNames = PRODUCT_NAMES[testType];
+  if (productNames) {
+    return productNames[language] || productNames.pt;
+  }
+  // Fallback - always use NELLO ONE branding
+  return {
+    name: `Teste – NELLO ONE`,
+    description: `Acesso vitalício ao teste`,
+  };
 }
 
 serve(async (req) => {
@@ -313,7 +394,7 @@ serve(async (req) => {
         }];
         logStep("Bundle line item created with price ID", { currency, priceId: bundlePriceId });
       } else {
-        // Fallback: create price_data for bundle
+        // Fallback: create price_data for bundle - ALWAYS use NELLO ONE branding
         const bundleAmounts: Record<string, number> = {
           brl: 59700, // R$ 597
           usd: 14700, // $147
@@ -367,7 +448,7 @@ serve(async (req) => {
             quantity: 1,
           };
         } else {
-          // Fallback for tests without configured price ID
+          // Fallback for tests without configured price ID - ALWAYS use NELLO ONE branding
           const conversionRates: Record<string, number> = {
             brl: 1,
             usd: 0.2, // ~5:1 BRL to USD
@@ -377,20 +458,15 @@ serve(async (req) => {
           const rate = conversionRates[currency] || 1;
           const unitAmount = Math.round(parseFloat(test.price_brl.toString()) * 100 * rate);
           
-          const testLabels: Record<string, { prefix: string; accessText: string }> = {
-            brl: { prefix: "Teste", accessText: "Acesso vitalício ao teste" },
-            usd: { prefix: "Test", accessText: "Lifetime access to" },
-            eur: { prefix: "Teste", accessText: "Acesso vitalício ao teste" },
-          };
-          
-          const labels = testLabels[currency] || testLabels.usd;
+          // Get proper product name with NELLO ONE branding
+          const productInfo = getProductName(test.type, language);
           
           return {
             price_data: {
               currency: currency,
               product_data: {
-                name: `${labels.prefix}: ${test.name}`,
-                description: `${labels.accessText} ${test.name}`,
+                name: productInfo.name,
+                description: productInfo.description,
               },
               unit_amount: unitAmount,
             },
@@ -417,8 +493,8 @@ serve(async (req) => {
     
     switch (language) {
       case "en":
-        successUrl = `${origin}/en/dashboard?payment=success`;
-        cancelUrl = `${origin}/en/dashboard?payment=cancelled`;
+        successUrl = `${origin}/en/cliente?payment=success`;
+        cancelUrl = `${origin}/en/cliente?payment=cancelled`;
         break;
       case "pt-pt":
         successUrl = `${origin}/pt-pt/cliente?payment=success`;

@@ -1,4 +1,4 @@
-import { Check, Lock, Play, Clock, HelpCircle, CreditCard } from "lucide-react";
+import { Check, Lock, Play, Clock, HelpCircle, CreditCard, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { JourneyStep } from "@/hooks/useJourneyProgress";
@@ -26,21 +26,134 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase }: Journ
     temperamentos: "O seu modo natural de agir",
   };
 
-  const isCompleted = step.status === "completed";
-  const isInProgress = step.status === "in_progress";
+  // Use extended status for more accurate UI
+  const extendedStatus = step.extendedStatus;
+  const isCompleted = extendedStatus === "completed";
+  const isAwaitingPayment = extendedStatus === "awaiting_payment";
+  const needsContinuation = step.needsContinuation || extendedStatus === "full_version_available";
+  const isInProgress = step.status === "in_progress" && !isAwaitingPayment && !needsContinuation;
   const isSequentiallyLocked = !step.isUnlocked;
   const canAccess = hasAccess(step.testId, step.isFree);
-  const needsPurchase = step.isUnlocked && !canAccess && !step.isFree;
+  const needsPurchase = step.isUnlocked && !canAccess && !step.isFree && !isAwaitingPayment;
+
+  // Determine what action button to show
+  const getActionButton = () => {
+    if (isCompleted) {
+      return (
+        <div className="flex items-center justify-center sm:justify-start gap-2 text-primary text-xs sm:text-sm font-medium py-2 sm:py-0">
+          <Check className="w-4 h-4" />
+          Concluído
+        </div>
+      );
+    }
+    
+    if (isSequentiallyLocked) {
+      return (
+        <div className="flex items-center justify-center sm:justify-start gap-2 text-muted-foreground text-xs sm:text-sm py-2 sm:py-0">
+          <Lock className="w-4 h-4" />
+          Bloqueado
+        </div>
+      );
+    }
+    
+    // User completed free version, needs to pay for full
+    if (isAwaitingPayment) {
+      return (
+        <Button size="sm" onClick={onPurchase} variant="default" className="w-full sm:w-auto bg-primary hover:bg-primary/90">
+          <CreditCard className="w-4 h-4 mr-1" />
+          Liberar Completo
+        </Button>
+      );
+    }
+    
+    // User paid, can continue to full version
+    if (needsContinuation) {
+      return (
+        <Button size="sm" onClick={onContinue} variant="default" className="w-full sm:w-auto bg-green-600 hover:bg-green-700">
+          <ArrowRight className="w-4 h-4 mr-1" />
+          Continuar Teste
+        </Button>
+      );
+    }
+    
+    // Regular paid test that needs purchase
+    if (needsPurchase) {
+      return (
+        <Button size="sm" onClick={onPurchase} variant="outline" className="w-full sm:w-auto border-amber-500 text-amber-600 hover:bg-amber-500/10">
+          <CreditCard className="w-4 h-4 mr-1" />
+          Liberar
+        </Button>
+      );
+    }
+    
+    // Test in progress
+    if (isInProgress) {
+      return (
+        <Button size="sm" onClick={onContinue} className="w-full sm:w-auto">
+          <Play className="w-4 h-4 mr-1" />
+          Continuar
+        </Button>
+      );
+    }
+    
+    // Ready to start
+    return (
+      <Button 
+        size="sm" 
+        onClick={onStart}
+        variant={step.isCurrentStep ? "default" : "outline"}
+        className="w-full sm:w-auto"
+      >
+        <Play className="w-4 h-4 mr-1" />
+        Começar
+      </Button>
+    );
+  };
+
+  // Get status badge
+  const getStatusBadge = () => {
+    if (isAwaitingPayment) {
+      return (
+        <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded-full font-medium">
+          Aguardando Liberação
+        </span>
+      );
+    }
+    if (needsContinuation) {
+      return (
+        <span className="text-[10px] bg-green-500/20 text-green-600 px-1.5 py-0.5 rounded-full font-medium">
+          Liberado ✓
+        </span>
+      );
+    }
+    if (step.isFree) {
+      return (
+        <span className="text-[10px] bg-green-500/20 text-green-600 px-1.5 py-0.5 rounded-full font-medium">
+          Grátis
+        </span>
+      );
+    }
+    if (needsPurchase) {
+      return (
+        <span className="text-[10px] bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full font-medium">
+          R$ {step.price}
+        </span>
+      );
+    }
+    return null;
+  };
 
   return (
     <div
       className={cn(
         "relative flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl sm:rounded-2xl border transition-all duration-300",
         isCompleted && "bg-primary/5 border-primary/30",
-        step.isCurrentStep && !isCompleted && canAccess && "bg-accent/50 border-primary shadow-lg shadow-primary/10",
-        step.isCurrentStep && needsPurchase && "bg-accent/30 border-amber-500/50",
+        needsContinuation && "bg-green-500/10 border-green-500/40 shadow-lg shadow-green-500/10",
+        isAwaitingPayment && "bg-primary/10 border-primary/40 shadow-lg shadow-primary/10",
+        step.isCurrentStep && !isCompleted && !isAwaitingPayment && !needsContinuation && canAccess && "bg-accent/50 border-primary shadow-lg shadow-primary/10",
+        step.isCurrentStep && needsPurchase && !isAwaitingPayment && "bg-accent/30 border-amber-500/50",
         isSequentiallyLocked && "bg-muted/30 border-border/50 opacity-60",
-        !isCompleted && !isSequentiallyLocked && !step.isCurrentStep && "bg-card border-border hover:border-primary/50"
+        !isCompleted && !isSequentiallyLocked && !step.isCurrentStep && !isAwaitingPayment && !needsContinuation && "bg-card border-border hover:border-primary/50"
       )}
     >
       {/* Step Number & Icon Row for Mobile */}
@@ -49,10 +162,12 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase }: Journ
           className={cn(
             "w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm transition-all flex-shrink-0",
             isCompleted && "bg-primary text-primary-foreground",
-            step.isCurrentStep && !isCompleted && canAccess && "bg-primary text-primary-foreground animate-pulse",
-            step.isCurrentStep && needsPurchase && "bg-amber-500 text-white",
+            needsContinuation && "bg-green-600 text-white animate-pulse",
+            isAwaitingPayment && "bg-primary text-primary-foreground",
+            step.isCurrentStep && !isCompleted && !isAwaitingPayment && !needsContinuation && canAccess && "bg-primary text-primary-foreground animate-pulse",
+            step.isCurrentStep && needsPurchase && !isAwaitingPayment && "bg-amber-500 text-white",
             isSequentiallyLocked && "bg-muted text-muted-foreground",
-            !isCompleted && !isSequentiallyLocked && !step.isCurrentStep && "bg-secondary text-secondary-foreground"
+            !isCompleted && !isSequentiallyLocked && !step.isCurrentStep && !isAwaitingPayment && !needsContinuation && "bg-secondary text-secondary-foreground"
           )}
         >
           {isCompleted ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : step.step}
@@ -64,6 +179,8 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase }: Journ
             <IconComponent className={cn(
               "w-4 h-4",
               isCompleted && "text-primary",
+              needsContinuation && "text-green-600",
+              isAwaitingPayment && "text-primary",
               isSequentiallyLocked && "text-muted-foreground"
             )} />
             <h3 className={cn(
@@ -72,16 +189,7 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase }: Journ
             )}>
               {step.name}
             </h3>
-            {step.isFree && (
-              <span className="text-[10px] bg-green-500/20 text-green-600 px-1.5 py-0.5 rounded-full font-medium">
-                Grátis
-              </span>
-            )}
-            {needsPurchase && (
-              <span className="text-[10px] bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full font-medium">
-                R$ {step.price}
-              </span>
-            )}
+            {getStatusBadge()}
           </div>
         </div>
       </div>
@@ -95,6 +203,8 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase }: Journ
               <IconComponent className={cn(
                 "w-5 h-5",
                 isCompleted && "text-primary",
+                needsContinuation && "text-green-600",
+                isAwaitingPayment && "text-primary",
                 isSequentiallyLocked && "text-muted-foreground"
               )} />
               <h3 className={cn(
@@ -103,16 +213,7 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase }: Journ
               )}>
                 {step.name}
               </h3>
-              {step.isFree && (
-                <span className="text-xs bg-green-500/20 text-green-600 px-2 py-0.5 rounded-full font-medium">
-                  Gratuito
-                </span>
-              )}
-              {needsPurchase && (
-                <span className="text-xs bg-amber-500/20 text-amber-600 px-2 py-0.5 rounded-full font-medium">
-                  R$ {step.price}
-                </span>
-              )}
+              {getStatusBadge()}
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3">
               {stepDescriptions[step.testType] || step.description}
@@ -131,37 +232,7 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase }: Journ
 
           {/* Action - Full width on mobile */}
           <div className="shrink-0 w-full sm:w-auto">
-            {isCompleted ? (
-              <div className="flex items-center justify-center sm:justify-start gap-2 text-primary text-xs sm:text-sm font-medium py-2 sm:py-0">
-                <Check className="w-4 h-4" />
-                Concluído
-              </div>
-            ) : isSequentiallyLocked ? (
-              <div className="flex items-center justify-center sm:justify-start gap-2 text-muted-foreground text-xs sm:text-sm py-2 sm:py-0">
-                <Lock className="w-4 h-4" />
-                Bloqueado
-              </div>
-            ) : needsPurchase ? (
-              <Button size="sm" onClick={onPurchase} variant="outline" className="w-full sm:w-auto border-amber-500 text-amber-600 hover:bg-amber-500/10">
-                <CreditCard className="w-4 h-4 mr-1" />
-                Liberar
-              </Button>
-            ) : isInProgress ? (
-              <Button size="sm" onClick={onContinue} className="w-full sm:w-auto">
-                <Play className="w-4 h-4 mr-1" />
-                Continuar
-              </Button>
-            ) : (
-              <Button 
-                size="sm" 
-                onClick={onStart}
-                variant={step.isCurrentStep ? "default" : "outline"}
-                className="w-full sm:w-auto"
-              >
-                <Play className="w-4 h-4 mr-1" />
-                Começar
-              </Button>
-            )}
+            {getActionButton()}
           </div>
         </div>
       </div>
