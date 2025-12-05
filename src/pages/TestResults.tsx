@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Download, CheckCircle, Lock, RotateCcw } from "lucide-react";
+import { Download, CheckCircle, Lock, RotateCcw, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ARCHETYPES } from "@/lib/archetypes";
@@ -18,6 +18,8 @@ import { NELLO_16_PROFILES } from "@/lib/nello16Personality";
 import { ENNEAGRAM_PROFILES } from "@/lib/eneagrama";
 import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
+import { getInteligenciasResults, INTELLIGENCES, InteligenciasResult } from "@/lib/inteligenciasMultiplas";
+import { generateInteligenciasPremiumPDF } from "@/lib/pdfInteligenciasMultiplas";
 import { useAuth } from "@/hooks/useAuth";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useTests } from "@/hooks/useTests";
@@ -147,8 +149,22 @@ export default function TestResults() {
   const isEnneagramTest = userTest.tests?.type === 'eneagrama';
   const isLinguagensAmorTest = userTest.tests?.type === 'linguagens_amor';
   const isTemperamentosTest = userTest.tests?.type === 'temperamentos';
+  const isInteligenciasTest = userTest.tests?.type === 'inteligencias_multiplas';
   const isFreeVersion = userTest.tests?.is_free || false;
   const shouldShowFullResults = isFreeVersion || hasPurchased;
+
+  // Calculate Inteligencias Multiplas results
+  let inteligenciasResults: InteligenciasResult | null = null;
+  if (isInteligenciasTest && answers && answers.length > 0) {
+    inteligenciasResults = getInteligenciasResults(answers as any);
+  }
+
+  const handleDownloadInteligenciasPDF = () => {
+    if (inteligenciasResults) {
+      const userName = user?.email?.split('@')[0] || 'Usuario';
+      generateInteligenciasPremiumPDF(inteligenciasResults, userName, { language: lang as 'pt' | 'en' });
+    }
+  };
   
   // Cast result_data for MBTI and Enneagram
   const mbtiResultData = isMBTITest ? (userTest.result_data as any) : null;
