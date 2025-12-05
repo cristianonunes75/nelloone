@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   Wrench, 
   UserPlus, 
@@ -20,11 +21,24 @@ import {
   Loader2,
   AlertTriangle,
   CheckCircle2,
-  User
+  User,
+  RefreshCw,
+  FileText
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+interface UserTest {
+  id: string;
+  test_id: string;
+  status: string;
+  completed_at: string | null;
+  test: {
+    name: string;
+    type: string;
+  };
+}
 
 interface AuditLog {
   id: string;
@@ -44,7 +58,76 @@ export const AdminTools = () => {
   const [createLoading, setCreateLoading] = useState(false);
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
+  const [myTests, setMyTests] = useState<UserTest[]>([]);
+  const [myTestsLoading, setMyTestsLoading] = useState(false);
+  const [resettingTestId, setResettingTestId] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      fetchMyTests();
+    }
+  }, [user]);
+
+  const fetchMyTests = async () => {
+    if (!user) return;
+    setMyTestsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("user_tests")
+        .select(`
+          id,
+          test_id,
+          status,
+          completed_at,
+          test:tests(name, type)
+        `)
+        .eq("user_id", user.id)
+        .order("completed_at", { ascending: false });
+
+      if (error) throw error;
+      setMyTests(data as unknown as UserTest[] || []);
+    } catch (error) {
+      console.error("Error fetching my tests:", error);
+      toast.error("Erro ao carregar seus testes");
+    } finally {
+      setMyTestsLoading(false);
+    }
+  };
+
+  const handleResetMyTest = async (userTestId: string, testName: string) => {
+    setResettingTestId(userTestId);
+    try {
+      // Delete test answers first
+      await supabase
+        .from("test_answers")
+        .delete()
+        .eq("user_test_id", userTestId);
+
+      // Delete user test record
+      await supabase
+        .from("user_tests")
+        .delete()
+        .eq("id", userTestId);
+
+      // Log the action
+      await supabase.rpc('log_audit', {
+        p_action: 'reset_own_test',
+        p_table_name: 'user_tests',
+        p_record_id: userTestId,
+        p_new_data: { test_name: testName }
+      });
+
+      toast.success(`Teste "${testName}" resetado com sucesso`);
+      fetchMyTests();
+    } catch (error) {
+      console.error("Error resetting test:", error);
+      toast.error("Erro ao resetar teste");
+    } finally {
+      setResettingTestId(null);
+    }
+  };
 
   const handleResetUser = async () => {
     if (!resetUserId.trim()) {
@@ -167,13 +250,110 @@ export const AdminTools = () => {
         <p className="text-muted-foreground text-sm">Ferramentas exclusivas para administradores</p>
       </div>
 
-      <Tabs defaultValue="modes" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="mytests" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="mytests" onClick={fetchMyTests}>Meus Testes</TabsTrigger>
           <TabsTrigger value="modes">Modos</TabsTrigger>
           <TabsTrigger value="users">Usuários</TabsTrigger>
           <TabsTrigger value="reset">Reset</TabsTrigger>
           <TabsTrigger value="logs" onClick={fetchLogs}>Logs</TabsTrigger>
         </TabsList>
+
+        {/* Meus Testes Tab */}
+        <TabsContent value="mytests" className="space-y-4">
+          <Card className="border-border/50">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Meus Testes Completados
+              </CardTitle>
+              <CardDescription>
+                Visualize e resete testes que você já completou para refazê-los
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {myTestsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : myTests.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Você ainda não completou nenhum teste
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {myTests.map((userTest) => (
+                    <div 
+                      key={userTest.id} 
+                      className="flex items-center justify-between p-4 bg-muted/50 rounded-lg"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-full ${
+                          userTest.status === 'completed' 
+                            ? 'bg-emerald-500/10' 
+                            : userTest.status === 'in_progress'
+                            ? 'bg-amber-500/10'
+                            : 'bg-muted'
+                        }`}>
+                          {userTest.status === 'completed' ? (
+                            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                          ) : userTest.status === 'in_progress' ? (
+                            <RefreshCw className="w-5 h-5 text-amber-600" />
+                          ) : (
+                            <FileText className="w-5 h-5 text-muted-foreground" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium">{userTest.test?.name || 'Teste'}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {userTest.status === 'completed' && userTest.completed_at
+                              ? `Completado em ${format(new Date(userTest.completed_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`
+                              : userTest.status === 'in_progress'
+                              ? 'Em andamento'
+                              : 'Não iniciado'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleResetMyTest(userTest.id, userTest.test?.name || 'Teste')}
+                        disabled={resettingTestId === userTest.id}
+                        className="gap-2"
+                      >
+                        {resettingTestId === userTest.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <RotateCcw className="w-4 h-4" />
+                        )}
+                        Refazer
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              <Button 
+                variant="outline" 
+                className="w-full gap-2"
+                onClick={fetchMyTests}
+                disabled={myTestsLoading}
+              >
+                <RefreshCw className={`w-4 h-4 ${myTestsLoading ? 'animate-spin' : ''}`} />
+                Atualizar Lista
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Alert className="bg-amber-500/10 border-amber-500/20">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-amber-800">
+              Ao refazer um teste, todas as respostas anteriores serão apagadas. 
+              Esta ação não pode ser desfeita.
+            </AlertDescription>
+          </Alert>
+        </TabsContent>
 
         {/* Modos Tab */}
         <TabsContent value="modes" className="space-y-4">
