@@ -634,6 +634,113 @@ export default function TestResults() {
             </CardContent>
           </Card>
         )}
+
+        {/* Inteligências Múltiplas Results */}
+        {isInteligenciasTest && inteligenciasResults && (
+          <Card className="border-none shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
+              <div className="text-center space-y-4">
+                <div className="text-6xl">🧠</div>
+                <CardTitle className="text-3xl font-light">
+                  {lang === 'en' ? 'Multiple Intelligences' : 'Inteligências Múltiplas'}
+                </CardTitle>
+                <CardDescription className="text-lg">
+                  {lang === 'en' ? 'Your unique cognitive profile' : 'Seu perfil cognitivo único'}
+                </CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-8 space-y-8">
+              {/* Top 3 Intelligences */}
+              <div className="grid md:grid-cols-3 gap-4">
+                {inteligenciasResults.ranking.slice(0, 3).map((item, idx) => {
+                  const intel = INTELLIGENCES[item.key];
+                  const badges = ['🥇', '🥈', '🥉'];
+                  return (
+                    <Card key={item.key} className={`border-2 ${idx === 0 ? 'border-accent bg-accent/10' : 'border-muted'}`}>
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-3xl">{intel.emoji}</span>
+                          <span className="text-2xl">{badges[idx]}</span>
+                        </div>
+                        <CardTitle className="text-lg">{intel.name[lang] || intel.name.pt}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <Badge variant={idx === 0 ? "default" : "outline"}>{item.percentage}%</Badge>
+                            <span className="text-sm text-muted-foreground">{item.score}/25 pts</span>
+                          </div>
+                          <Progress value={item.percentage} className={idx === 0 ? "h-3" : "h-2"} />
+                          <p className="text-xs text-muted-foreground mt-2 line-clamp-3">
+                            {intel.description[lang] || intel.description.pt}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              {/* Full Ranking */}
+              <Card className="border-2 border-accent/30">
+                <CardHeader>
+                  <CardTitle className="text-xl">
+                    {lang === 'en' ? 'Complete Ranking' : 'Ranking Completo'}
+                  </CardTitle>
+                  <CardDescription>
+                    {lang === 'en' ? 'Your 8 intelligences in order' : 'Suas 8 inteligências em ordem'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {inteligenciasResults.ranking.map((item, idx) => {
+                    const intel = INTELLIGENCES[item.key];
+                    return (
+                      <div key={item.key} className={`flex items-center gap-4 p-3 rounded-lg ${idx < 3 ? 'bg-accent/10' : 'bg-muted/30'}`}>
+                        <span className="text-2xl w-10">{intel.emoji}</span>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-medium">{intel.name[lang] || intel.name.pt}</span>
+                            <span className="text-sm font-bold">{item.percentage}%</span>
+                          </div>
+                          <Progress value={item.percentage} className="h-2" />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+
+              {/* Lowest Intelligence Alert */}
+              <Card className="bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <span>⚠️</span>
+                    {lang === 'en' ? 'Area for Development' : 'Área para Desenvolvimento'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-4">
+                    <span className="text-3xl">{INTELLIGENCES[inteligenciasResults.lowest].emoji}</span>
+                    <div>
+                      <p className="font-semibold">{INTELLIGENCES[inteligenciasResults.lowest].name[lang] || INTELLIGENCES[inteligenciasResults.lowest].name.pt}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {lang === 'en' 
+                          ? 'This is your area with most growth potential. Small daily practices can activate this intelligence.'
+                          : 'Esta é sua área com maior potencial de crescimento. Pequenas práticas diárias podem ativar esta inteligência.'}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="text-center py-8">
+                <p className="text-lg font-light italic text-muted-foreground">
+                  NELLO ONE — {lang === 'en' ? 'a journey of self-knowledge and inner truth.' : 'uma jornada de autoconhecimento e verdade interior.'}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Growth Insights Card - Before CTA */}
@@ -644,10 +751,17 @@ export default function TestResults() {
       )}
 
       <div className="flex gap-4">
-        <Button onClick={handleDownloadPDF} className="flex-1">
-          <Download className="mr-2 h-4 w-4" />
-          {lang === 'en' ? 'Download PDF' : 'Baixar PDF'}
-        </Button>
+        {isInteligenciasTest && inteligenciasResults ? (
+          <Button onClick={handleDownloadInteligenciasPDF} className="flex-1">
+            <FileText className="mr-2 h-4 w-4" />
+            {lang === 'en' ? 'Download Premium Report (13 pages)' : 'Baixar Relatório Premium (13 páginas)'}
+          </Button>
+        ) : (
+          <Button onClick={handleDownloadPDF} className="flex-1">
+            <Download className="mr-2 h-4 w-4" />
+            {lang === 'en' ? 'Download PDF' : 'Baixar PDF'}
+          </Button>
+        )}
       </div>
 
       <Card>
