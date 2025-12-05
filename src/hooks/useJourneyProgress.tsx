@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { useTests } from "./useTests";
+import { useTestAccess } from "./useTestAccess";
 
-// Define the sequential order of tests in the Essentia journey
+// Define the sequential order of tests in the NELLO ONE journey
 const JOURNEY_ORDER = [
   "arquetipos_proposito",
   "inteligencias_multiplas",
@@ -13,6 +14,14 @@ const JOURNEY_ORDER = [
 ] as const;
 
 export type TestType = typeof JOURNEY_ORDER[number];
+
+// Extended test status to handle freemium flow
+export type ExtendedTestStatus = 
+  | "not_started" 
+  | "in_progress" 
+  | "awaiting_payment" // Free version done, waiting for payment
+  | "full_version_available" // Paid, can continue to full version
+  | "completed";
 
 export interface JourneyStep {
   step: number;
@@ -26,12 +35,15 @@ export interface JourneyStep {
   price: number | null;
   isFree: boolean;
   status: "not_started" | "in_progress" | "completed";
+  extendedStatus: ExtendedTestStatus; // New detailed status
   isUnlocked: boolean;
   isCurrentStep: boolean;
+  needsContinuation: boolean; // User paid, needs to continue full version
 }
 
 export function useJourneyProgress() {
   const { tests, userTests, getTestStatus, isLoading } = useTests();
+  const { hasPurchased } = useTestAccess();
 
   const journeySteps = useMemo<JourneyStep[]>(() => {
     if (!tests) return [];
@@ -46,15 +58,76 @@ export function useJourneyProgress() {
       const test = testByType.get(testType);
       if (!test) return null;
 
-      const status = getTestStatus(test.id);
+      const baseStatus = getTestStatus(test.id);
+      const isPurchased = hasPurchased(test.id);
+      
+      // Find the user_test record to check result_data
+      const userTest = userTests?.find(ut => ut.test_id === test.id);
+      const resultData = userTest?.result_data as any;
+      
+      // Determine extended status for freemium tests
+      let extendedStatus: ExtendedTestStatus = baseStatus;
+      let needsContinuation = false;
+      
+      if (test.is_free && resultData) {
+        // Check if this is a freemium test awaiting payment
+        if (resultData.awaiting_full_version && !isPurchased) {
+          extendedStatus = "awaiting_payment";
+        }
+        // Check if user paid and can now continue
+        else if (resultData.awaiting_full_version && isPurchased) {
+          extendedStatus = "full_version_available";
+          needsContinuation = true;
+        }
+        // Check if test is truly completed (not partial)
+        else if (baseStatus === "completed" && !resultData.partial) {
+          extendedStatus = "completed";
+        }
+        // If partial and completed but no awaiting flag (legacy), treat as awaiting payment
+        else if (baseStatus === "completed" && resultData.partial && !isPurchased) {
+          extendedStatus = "awaiting_payment";
+        }
+        // If partial, completed, and purchased - needs continuation
+        else if (baseStatus === "completed" && resultData.partial && isPurchased) {
+          extendedStatus = "full_version_available";
+          needsContinuation = true;
+        }
+      }
+      
+      // For journey progression, consider "awaiting_payment" and "full_version_available" as "in_progress"
+      const effectiveStatus = extendedStatus === "awaiting_payment" || extendedStatus === "full_version_available"
+        ? "in_progress"
+        : baseStatus;
+      
       const previousCompleted = index === 0 || 
         JOURNEY_ORDER.slice(0, index).every(prevType => {
           const prevTest = testByType.get(prevType);
-          return prevTest && getTestStatus(prevTest.id) === "completed";
+          if (!prevTest) return true;
+          
+          const prevStatus = getTestStatus(prevTest.id);
+          const prevUserTest = userTests?.find(ut => ut.test_id === prevTest.id);
+          const prevResultData = prevUserTest?.result_data as any;
+          const prevIsPurchased = hasPurchased(prevTest.id);
+          
+          // A freemium test is "completed" for journey purposes if:
+          // 1. It's truly completed (not partial), OR
+          // 2. It completed free version AND user has access to continue (purchased)
+          if (prevTest.is_free && prevResultData?.partial) {
+            // If purchased, user can continue - consider it "in progress" not blocking
+            // If not purchased, they're waiting - still doesn't block journey
+            // For journey progression, free version completion is enough
+            return prevResultData.free_questions_completed || prevStatus === "completed";
+          }
+          
+          return prevStatus === "completed";
         });
 
       const isUnlocked = previousCompleted;
-      const isCurrentStep = !currentStepFound && status !== "completed" && isUnlocked;
+      
+      // Current step is the first incomplete/in-progress test that's unlocked
+      const isCurrentStep = !currentStepFound && 
+        (effectiveStatus !== "completed" || needsContinuation) && 
+        isUnlocked;
       
       if (isCurrentStep) {
         currentStepFound = true;
@@ -71,15 +144,19 @@ export function useJourneyProgress() {
         icon: test.icon || "Circle",
         price: test.price_brl,
         isFree: test.is_free,
-        status,
+        status: baseStatus,
+        extendedStatus,
         isUnlocked,
         isCurrentStep,
+        needsContinuation,
       };
     }).filter(Boolean) as JourneyStep[];
-  }, [tests, userTests, getTestStatus]);
+  }, [tests, userTests, getTestStatus, hasPurchased]);
 
   const completedTests = useMemo(() => {
-    return journeySteps.filter(step => step.status === "completed").map(s => s.name);
+    return journeySteps.filter(step => 
+      step.extendedStatus === "completed"
+    ).map(s => s.name);
   }, [journeySteps]);
 
   const completedCount = completedTests.length;

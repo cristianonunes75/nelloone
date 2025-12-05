@@ -52,8 +52,11 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   });
 
   // For freemium test (Archetypes): limit to 5 questions if not purchased
+  // If user has paid, show ALL questions (full version)
   // For paid tests: shouldn't reach here if not purchased (blocked at UI level)
   const FREEMIUM_QUESTION_LIMIT = 5;
+  
+  // If user has purchased, they get full access regardless of is_free flag
   const questions = isFreeTest && !hasPaidAccess
     ? allQuestions?.slice(0, FREEMIUM_QUESTION_LIMIT)
     : allQuestions;
@@ -177,6 +180,7 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
 
   return {
     questions,
+    allQuestions, // Export all questions for reference
     currentQuestion: questions?.[currentQuestionIndex],
     currentQuestionIndex,
     isLoading: questionsLoading || answersLoading,

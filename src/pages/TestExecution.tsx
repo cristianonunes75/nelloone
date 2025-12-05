@@ -36,6 +36,7 @@ export default function TestExecution() {
 
   const {
     questions,
+    allQuestions,
     currentQuestion,
     currentQuestionIndex,
     isLoading,
@@ -119,7 +120,9 @@ export default function TestExecution() {
 
     const testType = testData?.type;
 
-    // If this is the freemium version and user finished 5 questions, calculate partial results
+    // If this is the freemium version and user finished free questions, calculate partial results
+    // IMPORTANT: Do NOT mark as "completed" - mark as "in_progress" with partial: true
+    // This allows the user to continue after payment
     if (isFreeTest && !hasPaidAccess && isLastQuestion) {
       // Fetch all answers to calculate partial results
       const { data: allAnswers } = await supabase
@@ -128,24 +131,27 @@ export default function TestExecution() {
         .eq("user_test_id", userTestId!);
 
       if (allAnswers && allAnswers.length > 0) {
-        // Calculate archetype scores from the 12 questions
+        // Calculate archetype scores from the free questions
         const scores = calculateArchetypeScores(allAnswers);
         const dominantArchetypes = getDominantArchetypes(scores);
 
         // Store for display in upgrade dialog
         setPartialArchetypes(dominantArchetypes);
 
-        // Save partial results as JSON
+        // Save partial results as JSON - STATUS REMAINS "in_progress"
+        // The test is NOT completed, user is awaiting payment for full version
         await supabase
           .from("user_tests")
           .update({
-            status: "completed",
-            completed_at: new Date().toISOString(),
+            status: "in_progress", // Keep as in_progress, NOT completed
             result_data: JSON.parse(JSON.stringify({
-              partial: true,
+              partial: true, // This flag indicates free version was completed
+              awaiting_full_version: true, // User needs to pay for full access
+              free_questions_completed: true,
               scores,
               dominantArchetypes,
-              total_questions: questions?.length || 0,
+              free_questions_count: questions?.length || 0,
+              total_questions_available: allQuestions?.length || 0, // From useTestExecution
             })),
           })
           .eq("id", userTestId!);

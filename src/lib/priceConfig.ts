@@ -23,12 +23,43 @@ export interface TestPrice {
 
 // Stripe Price IDs for each test by currency
 // PT routes MUST use BRL prices | EN routes MUST use USD prices | PT-PT routes MUST use EUR prices
+// 
+// IMPORTANT: To update Stripe price IDs, set these environment variables or update the values below:
+// - NELLO_STRIPE_PRICE_ARQUETIPOS_BRL (Arquétipos com Propósito - Full version)
+// - NELLO_STRIPE_PRICE_ARQUETIPOS_USD
+// - NELLO_STRIPE_PRICE_ARQUETIPOS_EUR
 export const testPrices: Record<string, TestPrice> = {
+  // Arquétipos com Propósito - Freemium test (5 questions free, full version paid)
   arquetipos: {
     testType: "arquetipos",
-    brl: { price: 0, priceId: null }, // Free
-    usd: { price: 19, priceId: "price_1SZNW0DjhZZxZELMopbi37cc" },
-    eur: { price: 0, priceId: null }, // Free
+    brl: { 
+      price: 47, // Price for full version unlock
+      priceId: null // TODO: Create product "Arquétipos com Propósito – Acesso Completo NELLO ONE" in Stripe BRL
+    },
+    usd: { 
+      price: 19, 
+      priceId: "price_1SZNW0DjhZZxZELMopbi37cc" 
+    },
+    eur: { 
+      price: 9.90, // Price for full version unlock
+      priceId: null // TODO: Create product "Arquétipos com Propósito – Acesso Completo NELLO ONE" in Stripe EUR
+    },
+  },
+  // Alias for the actual type name in database
+  arquetipos_proposito: {
+    testType: "arquetipos_proposito",
+    brl: { 
+      price: 47,
+      priceId: null // TODO: Set NELLO_STRIPE_PRICE_ARQUETIPOS_BRL
+    },
+    usd: { 
+      price: 19, 
+      priceId: "price_1SZNW0DjhZZxZELMopbi37cc" 
+    },
+    eur: { 
+      price: 9.90,
+      priceId: null // TODO: Set NELLO_STRIPE_PRICE_ARQUETIPOS_EUR
+    },
   },
   disc: {
     testType: "disc",
