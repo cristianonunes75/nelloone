@@ -33,24 +33,8 @@ export const testPrices: Record<string, TestPrice> = {
   arquetipos: {
     testType: "arquetipos",
     brl: { 
-      price: 47, // Price for full version unlock
-      priceId: null // TODO: Create product "Arquétipos com Propósito – Acesso Completo NELLO ONE" in Stripe BRL
-    },
-    usd: { 
-      price: 19, 
-      priceId: "price_1SZNW0DjhZZxZELMopbi37cc" 
-    },
-    eur: { 
-      price: 9.90, // Price for full version unlock
-      priceId: null // TODO: Create product "Arquétipos com Propósito – Acesso Completo NELLO ONE" in Stripe EUR
-    },
-  },
-  // Alias for the actual type name in database
-  arquetipos_proposito: {
-    testType: "arquetipos_proposito",
-    brl: { 
       price: 47,
-      priceId: null // TODO: Set NELLO_STRIPE_PRICE_ARQUETIPOS_BRL
+      priceId: "price_1SayAYDjhZZxZELM9kEZiiF4"
     },
     usd: { 
       price: 19, 
@@ -58,7 +42,23 @@ export const testPrices: Record<string, TestPrice> = {
     },
     eur: { 
       price: 9.90,
-      priceId: null // TODO: Set NELLO_STRIPE_PRICE_ARQUETIPOS_EUR
+      priceId: "price_1SayKNDjhZZxZELMhCJ6Na9m"
+    },
+  },
+  // Alias for the actual type name in database
+  arquetipos_proposito: {
+    testType: "arquetipos_proposito",
+    brl: { 
+      price: 47,
+      priceId: "price_1SayAYDjhZZxZELM9kEZiiF4"
+    },
+    usd: { 
+      price: 19, 
+      priceId: "price_1SZNW0DjhZZxZELMopbi37cc" 
+    },
+    eur: { 
+      price: 9.90,
+      priceId: "price_1SayKNDjhZZxZELMhCJ6Na9m"
     },
   },
   disc: {
