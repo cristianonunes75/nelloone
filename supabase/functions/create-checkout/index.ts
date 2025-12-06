@@ -116,9 +116,9 @@ const USD_PRICES: Record<string, string> = {
 };
 
 // BRL Price IDs for PT version (Brazilian market)
-// NOTE: For arquetipos, create a product in Stripe called "Arquétipos com Propósito – Acesso Completo NELLO ONE"
 const BRL_PRICES: Record<string, string> = {
-  // arquetipos/arquetipos_proposito: TODO - Create price in Stripe for BRL (R$47)
+  arquetipos: "price_1SayAYDjhZZxZELM9kEZiiF4",
+  arquetipos_proposito: "price_1SayAYDjhZZxZELM9kEZiiF4",
   disc: "price_1SNBIuDjhZZxZELMm3qUtTON",
   mbti: "price_1SNBJEDjhZZxZELMY1CuVfIZ",
   eneagrama: "price_1SNBLhDjhZZxZELMhSvpHn8X",
