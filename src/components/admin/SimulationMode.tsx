@@ -39,6 +39,8 @@ import { getMBTIResults } from "@/lib/mbti";
 import { getEnneagramResults } from "@/lib/eneagrama";
 import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
+import { INTELLIGENCES } from "@/lib/inteligenciasMultiplas";
+import { getNello16Results, NELLO_16_PROFILES } from "@/lib/nello16Personality";
 import { useSimulation, SimulationLanguage, SIMULATION_LANGUAGES } from "@/contexts/SimulationContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SimulationLanguageDialog } from "./SimulationLanguageDialog";
@@ -70,6 +72,45 @@ interface SimulatedAnswer {
 
 type SimulationPhase = "select" | "executing" | "results";
 type ViewMode = "clean" | "technical";
+
+// Intelligence to question number mapping for Inteligências Múltiplas
+const IM_QUESTION_MAP: Record<number, string> = {
+  1: "linguistica", 2: "logico_matematica", 3: "espacial", 4: "musical", 5: "corporal_cinestesica",
+  6: "interpessoal", 7: "intrapessoal", 8: "naturalista",
+  9: "linguistica", 10: "logico_matematica", 11: "espacial", 12: "musical", 13: "corporal_cinestesica",
+  14: "interpessoal", 15: "intrapessoal", 16: "naturalista",
+  17: "linguistica", 18: "logico_matematica", 19: "espacial", 20: "musical", 21: "corporal_cinestesica",
+  22: "interpessoal", 23: "intrapessoal", 24: "naturalista",
+  25: "linguistica", 26: "logico_matematica", 27: "espacial", 28: "musical", 29: "corporal_cinestesica",
+  30: "interpessoal", 31: "intrapessoal", 32: "naturalista",
+  33: "linguistica", 34: "logico_matematica", 35: "espacial", 36: "musical", 37: "corporal_cinestesica",
+  38: "interpessoal", 39: "intrapessoal", 40: "naturalista"
+};
+
+const calculateInteligenciasScores = (answers: SimulatedAnswer[], questions: Question[]) => {
+  const scores: Record<string, number> = {
+    linguistica: 0, logico_matematica: 0, espacial: 0, musical: 0,
+    corporal_cinestesica: 0, interpessoal: 0, intrapessoal: 0, naturalista: 0
+  };
+  
+  answers.forEach(a => {
+    const intelligence = IM_QUESTION_MAP[a.questionNumber];
+    if (intelligence) {
+      const value = typeof a.answer === 'object' ? (a.answer?.value || 0) : (a.answer || 0);
+      scores[intelligence] += Number(value);
+    }
+  });
+  
+  const maxScore = 25; // 5 questions × 5 max points
+  const percentages: Record<string, number> = {};
+  Object.keys(scores).forEach(k => { percentages[k] = Math.round((scores[k] / maxScore) * 100); });
+  
+  const ranking = Object.entries(scores)
+    .map(([key, score]) => ({ key, score, percentage: percentages[key] }))
+    .sort((a, b) => b.score - a.score);
+  
+  return { scores, percentages, ranking };
+};
 
 // Score bar component for NELLO ONE
 const ScoreBar = ({ label, score, maxScore = 50, color = "hsl(40 50% 60%)" }: { label: string; score: number; maxScore?: number; color?: string }) => {
@@ -417,6 +458,9 @@ export const SimulationMode = () => {
     } else if (testType === "temperamentos") {
       const temperamentosResults = calculateTemperamentos(answersForCalc as any);
       result = { testType: "temperamentos", primary: temperamentosResults.primary, secondary: temperamentosResults.secondary, scores: temperamentosResults.scores, interpretation: temperamentosResults.interpretation, rawAnswers: simulatedAnswers };
+    } else if (testType === "inteligencias_multiplas") {
+      const imScores = calculateInteligenciasScores(simulatedAnswers, questions);
+      result = { testType: "inteligencias_multiplas", scores: imScores.scores, percentages: imScores.percentages, ranking: imScores.ranking, primary: imScores.ranking[0]?.key, rawAnswers: simulatedAnswers };
     } else {
       result = { testType, rawAnswers: simulatedAnswers, message: "Cálculo específico não implementado para este teste" };
     }
@@ -476,6 +520,9 @@ export const SimulationMode = () => {
     } else if (testType === "temperamentos") {
       const temperamentosResults = calculateTemperamentos(answersForCalc as any);
       result = { testType: "temperamentos", primary: temperamentosResults.primary, secondary: temperamentosResults.secondary, scores: temperamentosResults.scores, interpretation: temperamentosResults.interpretation, rawAnswers: answers };
+    } else if (testType === "inteligencias_multiplas") {
+      const imScores = calculateInteligenciasScores(answers, qs);
+      result = { testType: "inteligencias_multiplas", scores: imScores.scores, percentages: imScores.percentages, ranking: imScores.ranking, primary: imScores.ranking[0]?.key, rawAnswers: answers };
     } else {
       result = { testType, rawAnswers: answers, message: "Cálculo específico não implementado" };
     }
@@ -1010,6 +1057,17 @@ export const SimulationMode = () => {
             interpretation: null
           };
         }
+        if (testType === "inteligencias_multiplas" && simulationResult.ranking?.length > 0) {
+          const topIntelligence = simulationResult.ranking[0];
+          const profile = INTELLIGENCES[topIntelligence.key];
+          return {
+            title: "Sua inteligência predominante é:",
+            name: profile?.name?.pt || topIntelligence.key,
+            score: topIntelligence.score,
+            interpretation: profile?.description?.pt,
+            emoji: profile?.emoji
+          };
+        }
         return null;
       };
 
@@ -1043,6 +1101,22 @@ export const SimulationMode = () => {
             presentes: "Presentes",
             atos_servico: "Atos",
             toque_fisico: "Toque"
+          };
+          return Object.entries(simulationResult.scores).map(([key, value]) => ({
+            label: labels[key] || key,
+            score: Number(value)
+          }));
+        }
+        if (testType === "inteligencias_multiplas" && simulationResult.scores) {
+          const labels: Record<string, string> = {
+            linguistica: "Linguística",
+            logico_matematica: "Lógico-Mat.",
+            espacial: "Espacial",
+            musical: "Musical",
+            corporal_cinestesica: "Corporal",
+            interpessoal: "Interpessoal",
+            intrapessoal: "Intrapessoal",
+            naturalista: "Naturalista"
           };
           return Object.entries(simulationResult.scores).map(([key, value]) => ({
             label: labels[key] || key,
