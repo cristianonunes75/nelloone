@@ -1327,150 +1327,343 @@ export const SimulationMode = () => {
       const chartScores = getScoresForChart();
       const maxScore = Math.max(...chartScores.map(s => s.score), 30);
 
-      // Fallback message when no specific handler exists
-      if (!primaryResult && chartScores.length === 0) {
-        return (
-          <div className="space-y-6">
-            <div className="bg-[#F8F8F4] rounded-2xl p-6 md:p-8">
-              <p className="text-sm text-muted-foreground mb-4">Resultado da Simulação:</p>
-              <div className="flex items-center gap-4">
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-semibold">{testType || "Teste"}</h2>
-                  <p className="text-muted-foreground text-sm mt-1">Simulação concluída com sucesso</p>
-                </div>
-              </div>
+      // Render specific test result views like real TestResults page
+      const renderTestSpecificView = () => {
+        // Inteligências Múltiplas - Full view like real page
+        if (testType === "inteligencias_multiplas" && simulationResult.ranking) {
+          const ranking = simulationResult.ranking;
+          return (
+            <div className="space-y-6">
+              <Card className="border-none shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
+                  <div className="text-center space-y-4">
+                    <div className="text-6xl">🧠</div>
+                    <CardTitle className="text-3xl font-light">Inteligências Múltiplas</CardTitle>
+                    <CardDescription className="text-lg">Seu perfil cognitivo único</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-8 space-y-8">
+                  {/* Top 3 Cards */}
+                  <div className="grid md:grid-cols-3 gap-4">
+                    {ranking.slice(0, 3).map((item: any, idx: number) => {
+                      const intel = INTELLIGENCES[item.key];
+                      const badges = ['🥇', '🥈', '🥉'];
+                      return (
+                        <Card key={item.key} className={`border-2 ${idx === 0 ? 'border-accent bg-accent/10' : 'border-muted'}`}>
+                          <CardHeader className="pb-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-3xl">{intel?.emoji}</span>
+                              <span className="text-2xl">{badges[idx]}</span>
+                            </div>
+                            <CardTitle className="text-lg">{intel?.name?.pt || item.key}</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <Badge variant={idx === 0 ? "default" : "outline"}>{item.percentage}%</Badge>
+                                <span className="text-sm text-muted-foreground">{item.score}/25 pts</span>
+                              </div>
+                              <Progress value={item.percentage} className={idx === 0 ? "h-3" : "h-2"} />
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Full Ranking */}
+                  <Card className="border-2 border-accent/30">
+                    <CardHeader>
+                      <CardTitle className="text-xl">Ranking Completo</CardTitle>
+                      <CardDescription>Suas 8 inteligências em ordem</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {ranking.map((item: any, idx: number) => {
+                        const intel = INTELLIGENCES[item.key];
+                        return (
+                          <div key={item.key} className={`flex items-center gap-4 p-3 rounded-lg ${idx < 3 ? 'bg-accent/10' : 'bg-muted/30'}`}>
+                            <span className="text-2xl w-10">{intel?.emoji}</span>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="font-medium">{intel?.name?.pt || item.key}</span>
+                                <span className="text-sm font-bold">{item.percentage}%</span>
+                              </div>
+                              <Progress value={item.percentage} className="h-2" />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
             </div>
-            <div className="bg-background rounded-2xl border border-border/50 p-6">
-              <h3 className="font-medium mb-4">Dados do Resultado</h3>
-              <pre className="text-xs text-muted-foreground whitespace-pre-wrap overflow-auto">
-                {JSON.stringify(simulationResult, null, 2)}
-              </pre>
+          );
+        }
+
+        // Eneagrama - Full view with all 9 types
+        if (testType === "eneagrama" && simulationResult.primaryType) {
+          return (
+            <div className="space-y-6">
+              <Card className="border-none shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
+                  <div className="text-center space-y-4">
+                    <div className="text-6xl">🌿</div>
+                    <CardTitle className="text-3xl font-light">Tipo {simulationResult.primaryType}</CardTitle>
+                    <CardDescription className="text-lg">
+                      {ENNEAGRAM_PROFILES[simulationResult.primaryType]?.name || "Seu Tipo do Eneagrama"}
+                    </CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-8 space-y-8">
+                  <div className="space-y-4 text-center max-w-3xl mx-auto">
+                    <p className="text-lg leading-relaxed">
+                      {ENNEAGRAM_PROFILES[simulationResult.primaryType]?.description}
+                    </p>
+                  </div>
+                  
+                  <Card className="border-2 border-accent/30">
+                    <CardHeader>
+                      <CardTitle className="text-xl">Pontuação por Tipo</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {Object.entries(simulationResult.scores || {})
+                        .sort(([,a], [,b]) => Number(b) - Number(a))
+                        .map(([type, score]) => {
+                          const isPrimary = type === simulationResult.primaryType;
+                          const profileData = ENNEAGRAM_PROFILES[type];
+                          const scoreValue = Number(score);
+                          const percentage = simulationResult.percentages?.[type] || Math.round((scoreValue / 25) * 100);
+                          return (
+                            <div key={type} className={`space-y-2 p-4 rounded-lg ${isPrimary ? 'bg-accent/20 border-2 border-accent' : 'bg-muted/50'}`}>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <span className="text-2xl">🌿</span>
+                                  <div>
+                                    <h4 className={`font-medium ${isPrimary ? 'text-accent' : ''}`}>
+                                      Tipo {type} - {profileData?.name}
+                                    </h4>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <span className={`text-lg font-bold ${isPrimary ? 'text-accent' : ''}`}>
+                                    {scoreValue}/25
+                                  </span>
+                                  <p className="text-xs text-muted-foreground">{percentage}%</p>
+                                </div>
+                              </div>
+                              <Progress value={percentage} className={isPrimary ? "h-3" : "h-2"} />
+                            </div>
+                          );
+                        })}
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
             </div>
-          </div>
-        );
-      }
+          );
+        }
+
+        // Nello 16 / MBTI - Show dimensions
+        if (testType === "mbti" && simulationResult.type) {
+          const scores = simulationResult.scores || {};
+          const dimensions = [
+            { label: "Energia", pairs: [{ key: "E", name: "Extroversão" }, { key: "I", name: "Introversão" }] },
+            { label: "Percepção", pairs: [{ key: "S", name: "Sensação" }, { key: "N", name: "Intuição" }] },
+            { label: "Julgamento", pairs: [{ key: "T", name: "Pensamento" }, { key: "F", name: "Sentimento" }] },
+            { label: "Estilo de Vida", pairs: [{ key: "J", name: "Julgamento" }, { key: "P", name: "Percepção" }] }
+          ];
+          
+          return (
+            <div className="space-y-6">
+              <Card className="border-none shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
+                  <div className="text-center space-y-4">
+                    <div className="text-6xl">🧠</div>
+                    <CardTitle className="text-3xl font-light">{simulationResult.type}</CardTitle>
+                    <CardDescription className="text-lg">
+                      {NELLO_16_PROFILES[simulationResult.type]?.name?.pt || "Seu Tipo Psicológico"}
+                    </CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-8 space-y-8">
+                  <div className="space-y-4 text-center max-w-3xl mx-auto">
+                    <p className="text-lg leading-relaxed">
+                      {NELLO_16_PROFILES[simulationResult.type]?.description?.pt}
+                    </p>
+                  </div>
+                  
+                  <Card className="border-2 border-accent/30">
+                    <CardHeader>
+                      <CardTitle className="text-xl">Suas Dimensões</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {dimensions.map((dim, idx) => {
+                        const [a, b] = dim.pairs;
+                        const total = (scores[a.key] || 0) + (scores[b.key] || 0);
+                        const isDominantA = simulationResult.type[idx] === a.key;
+                        return (
+                          <div key={dim.label} className="space-y-3">
+                            <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">{dim.label}</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className={`p-4 rounded-lg border-2 ${isDominantA ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="font-medium">{a.name} ({a.key})</span>
+                                  <span className="text-lg font-bold">{scores[a.key] || 0}</span>
+                                </div>
+                                <Progress value={total > 0 ? (scores[a.key] / total) * 100 : 0} className="h-2" />
+                              </div>
+                              <div className={`p-4 rounded-lg border-2 ${!isDominantA ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="font-medium">{b.name} ({b.key})</span>
+                                  <span className="text-lg font-bold">{scores[b.key] || 0}</span>
+                                </div>
+                                <Progress value={total > 0 ? (scores[b.key] / total) * 100 : 0} className="h-2" />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
+            </div>
+          );
+        }
+
+        // Default view for other tests (DISC, Temperamentos, Estilos, Arquétipos)
+        return null;
+      };
+
+      const specificView = renderTestSpecificView();
+      if (specificView) return specificView;
 
       return (
         <div className="space-y-6">
-          {/* Primary Result Card */}
+          {/* Primary Result Card with Top 3 */}
           {primaryResult && (
-            <div className="bg-[#F8F8F4] rounded-2xl p-6 md:p-8">
-              <p className="text-sm text-muted-foreground mb-4">{primaryResult.title}</p>
-              
-              {/* Top 3 Archetypes Display */}
-              {primaryResult.topThree && primaryResult.topThree.length > 0 ? (
-                <div className="space-y-4">
-                  {primaryResult.topThree.map((arch: any, index: number) => (
-                    <div key={index} className={`flex items-center gap-4 ${index > 0 ? 'opacity-80' : ''}`}>
-                      {arch.emoji && (
-                        <span className={index === 0 ? "text-5xl" : "text-3xl"}>{arch.emoji}</span>
-                      )}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                            index === 0 ? 'bg-accent text-accent-foreground' : 
-                            index === 1 ? 'bg-muted text-muted-foreground' : 
-                            'bg-muted/50 text-muted-foreground'
-                          }`}>
-                            {index === 0 ? '1º' : index === 1 ? '2º' : '3º'}
-                          </span>
-                          <h2 className={index === 0 ? "text-2xl md:text-3xl font-semibold" : "text-lg md:text-xl font-medium"}>
-                            {arch.name}
-                          </h2>
-                        </div>
-                        <p className="text-muted-foreground text-sm mt-1">{arch.score} pontos</p>
-                      </div>
-                    </div>
-                  ))}
+            <Card className="border-none shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
+                <div className="text-center space-y-4">
+                  {primaryResult.emoji && <div className="text-6xl">{primaryResult.emoji}</div>}
+                  <CardTitle className="text-3xl font-light">{primaryResult.name}</CardTitle>
+                  <CardDescription className="text-lg">{primaryResult.title}</CardDescription>
                 </div>
-              ) : (
-                <div className="flex items-center gap-4">
-                  {primaryResult.emoji && (
-                    <span className="text-5xl">{primaryResult.emoji}</span>
-                  )}
-                  <div>
-                    <h2 className="text-2xl md:text-3xl font-semibold">{primaryResult.name}</h2>
-                    {primaryResult.score !== null && (
-                      <p className="text-muted-foreground text-sm mt-1">{primaryResult.score} pontos</p>
-                    )}
+              </CardHeader>
+              <CardContent className="pt-8 space-y-8">
+                {/* Top 3 Display */}
+                {primaryResult.topThree && primaryResult.topThree.length > 0 && (
+                  <div className="grid md:grid-cols-3 gap-4">
+                    {primaryResult.topThree.map((item: any, idx: number) => {
+                      const badges = ['🥇', '🥈', '🥉'];
+                      return (
+                        <Card key={idx} className={`border-2 ${idx === 0 ? 'border-accent bg-accent/10' : 'border-muted'}`}>
+                          <CardHeader className="pb-2">
+                            <div className="flex items-center justify-between">
+                              {item.emoji && <span className="text-3xl">{item.emoji}</span>}
+                              <span className="text-2xl">{badges[idx]}</span>
+                            </div>
+                            <CardTitle className="text-lg">{item.name}</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <Badge variant={idx === 0 ? "default" : "outline"}>{item.score} pts</Badge>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+
+                {/* Score Bars */}
+                {chartScores.length > 0 && (
+                  <Card className="border-2 border-accent/30">
+                    <CardHeader>
+                      <CardTitle className="text-xl">Pontuações Completas</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {chartScores.sort((a, b) => b.score - a.score).map((item, i) => (
+                        <div key={i} className={`flex items-center gap-4 p-3 rounded-lg ${i < 3 ? 'bg-accent/10' : 'bg-muted/30'}`}>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-medium">{item.label}</span>
+                              <span className="text-sm font-bold">{item.score}</span>
+                            </div>
+                            <Progress value={(item.score / maxScore) * 100} className="h-2" />
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Interpretation */}
+                {primaryResult.interpretation && (
+                  <Card className="bg-gradient-to-br from-accent/10 to-background border-accent/30">
+                    <CardContent className="pt-6 space-y-4">
+                      <div className="flex items-center gap-2 text-lg font-semibold">
+                        <span className="text-2xl">✨</span>
+                        Interpretação
+                      </div>
+                      <p className="text-base leading-relaxed pl-8">
+                        {primaryResult.interpretation}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </CardContent>
+            </Card>
           )}
 
-          {/* Score Bars */}
-          {chartScores.length > 0 && (
-            <div className="bg-background rounded-2xl border border-border/50 p-6">
-              <h3 className="font-medium mb-6">Pontuações</h3>
-              <div className="space-y-4">
-                {chartScores.sort((a, b) => b.score - a.score).map((item, i) => (
-                  <ScoreBar 
-                    key={i} 
-                    label={item.label} 
-                    score={item.score} 
-                    maxScore={maxScore}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Interpretation Section */}
-          {primaryResult?.interpretation && (
-            <div className="bg-background rounded-2xl border border-border/50 p-6">
-              <h3 className="font-medium mb-4">Interpretação</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                {primaryResult.interpretation}
-              </p>
-            </div>
+          {/* Fallback if no primary result */}
+          {!primaryResult && chartScores.length === 0 && (
+            <Card className="border-2 border-border">
+              <CardContent className="pt-6">
+                <p className="text-muted-foreground">Dados do resultado:</p>
+                <pre className="text-xs mt-4 whitespace-pre-wrap">
+                  {JSON.stringify(simulationResult, null, 2)}
+                </pre>
+              </CardContent>
+            </Card>
           )}
 
           {/* Miguel Insight Box */}
-          <div className="bg-[#FFF9E8] rounded-2xl p-6 border border-accent/20">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
-                <Sparkles className="w-5 h-5 text-accent" strokeWidth={1.5} />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-medium mb-2">Insight do Miguel</h3>
-                {loadingMiguel && !miguelResponse ? (
-                  <div className="flex items-center gap-3">
-                    <Loader2 className="w-4 h-4 animate-spin text-accent" />
-                    <p className="text-sm text-muted-foreground">
-                      Miguel está analisando a simulação…
-                    </p>
-                  </div>
-                ) : miguelResponse ? (
-                  <div className="space-y-4">
+          <Card className="bg-[#FFF9E8] border-accent/20">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-5 h-5 text-accent" strokeWidth={1.5} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium mb-2">Insight do Miguel</h3>
+                  {loadingMiguel && !miguelResponse ? (
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="w-4 h-4 animate-spin text-accent" />
+                      <p className="text-sm text-muted-foreground">Miguel está analisando…</p>
+                    </div>
+                  ) : miguelResponse ? (
                     <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
                       {miguelResponse}
                     </p>
-                    {loadingMiguel && (
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground/70">
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                        <span>Gerando análise...</span>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Consulte Miguel para uma análise personalizada do resultado simulado.
-                    </p>
-                    <Button 
-                      onClick={askMiguel} 
-                      disabled={loadingMiguel}
-                      className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-xl h-10"
-                    >
-                      <MessageSquare className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                      Análise do Miguel
-                    </Button>
-                  </div>
-                )}
+                  ) : (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Consulte Miguel para uma análise personalizada.
+                      </p>
+                      <Button 
+                        onClick={askMiguel} 
+                        disabled={loadingMiguel}
+                        className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-xl h-10"
+                      >
+                        <MessageSquare className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                        Análise do Miguel
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       );
     };
