@@ -1046,13 +1046,21 @@ export const SimulationMode = () => {
           };
         }
         if (testType === "arquetipos" && simulationResult.dominantArchetypes?.primary) {
-          const archetype = ARCHETYPES[simulationResult.dominantArchetypes.primary.archetype];
+          const primary = simulationResult.dominantArchetypes.primary;
+          const secondary = simulationResult.dominantArchetypes.secondary;
+          const tertiary = simulationResult.dominantArchetypes.tertiary;
+          const archetype = ARCHETYPES[primary.archetype];
           return {
-            title: "Seu arquétipo dominante é:",
-            name: archetype?.name || simulationResult.dominantArchetypes.primary.archetype,
-            score: simulationResult.dominantArchetypes.primary.score,
+            title: "Seus arquétipos dominantes são:",
+            name: archetype?.name || primary.archetype,
+            score: primary.score,
             interpretation: archetype?.description,
-            emoji: archetype?.emoji
+            emoji: archetype?.emoji,
+            topThree: [
+              { name: ARCHETYPES[primary.archetype]?.name || primary.archetype, score: primary.score, emoji: ARCHETYPES[primary.archetype]?.emoji },
+              secondary ? { name: ARCHETYPES[secondary.archetype]?.name || secondary.archetype, score: secondary.score, emoji: ARCHETYPES[secondary.archetype]?.emoji } : null,
+              tertiary ? { name: ARCHETYPES[tertiary.archetype]?.name || tertiary.archetype, score: tertiary.score, emoji: ARCHETYPES[tertiary.archetype]?.emoji } : null
+            ].filter(Boolean)
           };
         }
         if (testType === "linguagens_amor" && simulationResult.primary) {
@@ -1188,17 +1196,46 @@ export const SimulationMode = () => {
           {primaryResult && (
             <div className="bg-[#F8F8F4] rounded-2xl p-6 md:p-8">
               <p className="text-sm text-muted-foreground mb-4">{primaryResult.title}</p>
-              <div className="flex items-center gap-4">
-                {primaryResult.emoji && (
-                  <span className="text-5xl">{primaryResult.emoji}</span>
-                )}
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-semibold">{primaryResult.name}</h2>
-                  {primaryResult.score !== null && (
-                    <p className="text-muted-foreground text-sm mt-1">{primaryResult.score} pontos</p>
-                  )}
+              
+              {/* Top 3 Archetypes Display */}
+              {primaryResult.topThree && primaryResult.topThree.length > 0 ? (
+                <div className="space-y-4">
+                  {primaryResult.topThree.map((arch: any, index: number) => (
+                    <div key={index} className={`flex items-center gap-4 ${index > 0 ? 'opacity-80' : ''}`}>
+                      {arch.emoji && (
+                        <span className={index === 0 ? "text-5xl" : "text-3xl"}>{arch.emoji}</span>
+                      )}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                            index === 0 ? 'bg-accent text-accent-foreground' : 
+                            index === 1 ? 'bg-muted text-muted-foreground' : 
+                            'bg-muted/50 text-muted-foreground'
+                          }`}>
+                            {index === 0 ? '1º' : index === 1 ? '2º' : '3º'}
+                          </span>
+                          <h2 className={index === 0 ? "text-2xl md:text-3xl font-semibold" : "text-lg md:text-xl font-medium"}>
+                            {arch.name}
+                          </h2>
+                        </div>
+                        <p className="text-muted-foreground text-sm mt-1">{arch.score} pontos</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              ) : (
+                <div className="flex items-center gap-4">
+                  {primaryResult.emoji && (
+                    <span className="text-5xl">{primaryResult.emoji}</span>
+                  )}
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-semibold">{primaryResult.name}</h2>
+                    {primaryResult.score !== null && (
+                      <p className="text-muted-foreground text-sm mt-1">{primaryResult.score} pontos</p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
