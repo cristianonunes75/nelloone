@@ -41,6 +41,7 @@ import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
 import { INTELLIGENCES } from "@/lib/inteligenciasMultiplas";
 import { getNello16Results, NELLO_16_PROFILES } from "@/lib/nello16Personality";
+import { calculateEstilosConexaoAfetiva, getStyleData } from "@/lib/estilosConexaoAfetiva";
 import { useSimulation, SimulationLanguage, SIMULATION_LANGUAGES } from "@/contexts/SimulationContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SimulationLanguageDialog } from "./SimulationLanguageDialog";
@@ -453,8 +454,18 @@ export const SimulationMode = () => {
       const dominantArchetypes = getDominantArchetypes(scores);
       result = { testType: "arquetipos", scores, dominantArchetypes, rawAnswers: simulatedAnswers };
     } else if (testType === "linguagens_amor") {
-      const linguagensResults = calculateLinguagensAmor(answersForCalc as any);
-      result = { testType: "linguagens_amor", primary: linguagensResults.primary, secondary: linguagensResults.secondary, scores: linguagensResults.scores, interpretation: linguagensResults.interpretation, rawAnswers: simulatedAnswers };
+      // Use new Estilos de Conexão Afetiva calculation
+      const estilosResults = calculateEstilosConexaoAfetiva(answersForCalc as any);
+      result = { 
+        testType: "linguagens_amor", 
+        primary: estilosResults.primary.style, 
+        secondary: estilosResults.secondary.style, 
+        scores: estilosResults.scores, 
+        interpretation: estilosResults.interpretation.pt,
+        primaryData: estilosResults.primary,
+        secondaryData: estilosResults.secondary,
+        rawAnswers: simulatedAnswers 
+      };
     } else if (testType === "temperamentos") {
       const temperamentosResults = calculateTemperamentos(answersForCalc as any);
       result = { testType: "temperamentos", primary: temperamentosResults.primary, secondary: temperamentosResults.secondary, scores: temperamentosResults.scores, interpretation: temperamentosResults.interpretation, rawAnswers: simulatedAnswers };
@@ -515,8 +526,18 @@ export const SimulationMode = () => {
       const dominantArchetypes = getDominantArchetypes(scores);
       result = { testType: "arquetipos", scores, dominantArchetypes, rawAnswers: answers };
     } else if (testType === "linguagens_amor") {
-      const linguagensResults = calculateLinguagensAmor(answersForCalc as any);
-      result = { testType: "linguagens_amor", primary: linguagensResults.primary, secondary: linguagensResults.secondary, scores: linguagensResults.scores, interpretation: linguagensResults.interpretation, rawAnswers: answers };
+      // Use new Estilos de Conexão Afetiva calculation
+      const estilosResults = calculateEstilosConexaoAfetiva(answersForCalc as any);
+      result = { 
+        testType: "linguagens_amor", 
+        primary: estilosResults.primary.style, 
+        secondary: estilosResults.secondary.style, 
+        scores: estilosResults.scores, 
+        interpretation: estilosResults.interpretation.pt,
+        primaryData: estilosResults.primary,
+        secondaryData: estilosResults.secondary,
+        rawAnswers: answers 
+      };
     } else if (testType === "temperamentos") {
       const temperamentosResults = calculateTemperamentos(answersForCalc as any);
       result = { testType: "temperamentos", primary: temperamentosResults.primary, secondary: temperamentosResults.secondary, scores: temperamentosResults.scores, interpretation: temperamentosResults.interpretation, rawAnswers: answers };
@@ -1035,18 +1056,27 @@ export const SimulationMode = () => {
           };
         }
         if (testType === "linguagens_amor" && simulationResult.primary) {
-          const linguagemNames: Record<string, string> = {
-            palavras_afirmacao: "Palavras de Afirmação",
-            tempo_qualidade: "Tempo de Qualidade",
-            presentes: "Presentes",
-            atos_servico: "Atos de Serviço",
-            toque_fisico: "Toque Físico"
+          const estiloNames: Record<string, string> = {
+            presenca_ativa: "Presença Ativa",
+            expressao_verbal: "Expressão Verbal",
+            cuidado_pratico: "Cuidado Prático",
+            gestos_simbolicos: "Gestos Simbólicos",
+            conexao_fisica: "Conexão Física",
+            // Legacy names fallback
+            palavras_afirmacao: "Expressão Verbal",
+            tempo_qualidade: "Presença Ativa",
+            presentes: "Gestos Simbólicos",
+            atos_servico: "Cuidado Prático",
+            toque_fisico: "Conexão Física"
           };
+          const styleInfo = getStyleData();
+          const primaryStyle = styleInfo[simulationResult.primary as keyof typeof styleInfo];
           return {
-            title: "Sua linguagem do amor principal é:",
-            name: linguagemNames[simulationResult.primary] || simulationResult.primary,
+            title: "Seu estilo de conexão afetiva é:",
+            name: estiloNames[simulationResult.primary] || simulationResult.primaryData?.name?.pt || simulationResult.primary,
             score: simulationResult.scores?.[simulationResult.primary] || 0,
-            interpretation: simulationResult.interpretation
+            interpretation: simulationResult.interpretation,
+            emoji: primaryStyle?.symbol
           };
         }
         if (testType === "eneagrama" && simulationResult.primaryType) {
@@ -1096,11 +1126,11 @@ export const SimulationMode = () => {
         }
         if (testType === "linguagens_amor" && simulationResult.scores) {
           const labels: Record<string, string> = {
-            palavras_afirmacao: "Palavras",
-            tempo_qualidade: "Tempo",
-            presentes: "Presentes",
-            atos_servico: "Atos",
-            toque_fisico: "Toque"
+            presenca_ativa: "Presença",
+            expressao_verbal: "Expressão",
+            cuidado_pratico: "Cuidado",
+            gestos_simbolicos: "Gestos",
+            conexao_fisica: "Conexão"
           };
           return Object.entries(simulationResult.scores).map(([key, value]) => ({
             label: labels[key] || key,
