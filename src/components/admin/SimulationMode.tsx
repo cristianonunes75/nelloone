@@ -1129,6 +1129,29 @@ export const SimulationMode = () => {
       const chartScores = getScoresForChart();
       const maxScore = Math.max(...chartScores.map(s => s.score), 30);
 
+      // Fallback message when no specific handler exists
+      if (!primaryResult && chartScores.length === 0) {
+        return (
+          <div className="space-y-6">
+            <div className="bg-[#F8F8F4] rounded-2xl p-6 md:p-8">
+              <p className="text-sm text-muted-foreground mb-4">Resultado da Simulação:</p>
+              <div className="flex items-center gap-4">
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-semibold">{testType || "Teste"}</h2>
+                  <p className="text-muted-foreground text-sm mt-1">Simulação concluída com sucesso</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-background rounded-2xl border border-border/50 p-6">
+              <h3 className="font-medium mb-4">Dados do Resultado</h3>
+              <pre className="text-xs text-muted-foreground whitespace-pre-wrap overflow-auto">
+                {JSON.stringify(simulationResult, null, 2)}
+              </pre>
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className="space-y-6">
           {/* Primary Result Card */}
