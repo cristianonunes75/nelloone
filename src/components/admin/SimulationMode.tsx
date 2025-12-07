@@ -31,8 +31,14 @@ import {
   Sparkles,
   ArrowLeft,
   Globe,
-  Map
+  Map,
+  Download,
+  FileText
 } from "lucide-react";
+import { ENNEAGRAM_PROFILES } from "@/lib/eneagrama";
+
+import { generateInteligenciasPremiumPDF } from "@/lib/pdfInteligenciasMultiplas";
+import jsPDF from "jspdf";
 import { calculateArchetypeScores, getDominantArchetypes, ARCHETYPES } from "@/lib/archetypes";
 import { getDISCResults, DISC_PROFILES } from "@/lib/disc";
 import { getMBTIResults } from "@/lib/mbti";
@@ -1006,6 +1012,104 @@ export const SimulationMode = () => {
     );
   };
 
+  // Generate PDF for simulation results
+  const downloadSimulationPDF = () => {
+    if (!simulationResult) return;
+    
+    const testType = simulationResult.testType;
+    
+    // For Inteligências Múltiplas, use the premium PDF generator
+    if (testType === "inteligencias_multiplas" && simulationResult.ranking) {
+      const results = {
+        scores: simulationResult.scores,
+        percentages: simulationResult.percentages,
+        ranking: simulationResult.ranking,
+        primary: { key: simulationResult.ranking[0]?.key, ...INTELLIGENCES[simulationResult.ranking[0]?.key] }
+      };
+      generateInteligenciasPremiumPDF(results as any, "Simulação Admin", { language: 'pt' });
+      toast.success("PDF de Inteligências Múltiplas gerado!");
+      return;
+    }
+    
+    // Generic PDF for other tests
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    
+    // Header
+    doc.setFillColor(31, 46, 75);
+    doc.rect(0, 0, pageWidth, 40, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("Resultado da Simulação", pageWidth / 2, 25, { align: "center" });
+    
+    // Test name
+    doc.setTextColor(50, 50, 50);
+    doc.setFontSize(16);
+    doc.text(selectedTest?.name || "Teste", margin, 55);
+    
+    // Results section
+    let yPos = 70;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Resultados:", margin, yPos);
+    yPos += 10;
+    
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    
+    // Get primary result info
+    const getResultText = () => {
+      if (testType === "disc") {
+        return `Perfil Dominante: ${DISC_PROFILES[simulationResult.dominantProfile]?.name || simulationResult.dominantProfile}`;
+      }
+      if (testType === "mbti") {
+        return `Tipo: ${simulationResult.type}`;
+      }
+      if (testType === "eneagrama") {
+        return `Tipo: ${simulationResult.primaryType} - ${ENNEAGRAM_PROFILES[simulationResult.primaryType]?.name || ''}`;
+      }
+      if (testType === "arquetipos") {
+        const primary = simulationResult.dominantArchetypes?.primary;
+        return `Arquétipo Primário: ${ARCHETYPES[primary?.archetype]?.name || primary?.archetype}`;
+      }
+      if (testType === "linguagens_amor") {
+        return `Estilo Principal: ${simulationResult.primaryData?.name?.pt || simulationResult.primary}`;
+      }
+      if (testType === "temperamentos") {
+        const names: Record<string, string> = { sanguineo: "Sanguíneo", colerico: "Colérico", melancolico: "Melancólico", fleumatico: "Fleumático" };
+        return `Temperamento: ${names[simulationResult.primary] || simulationResult.primary}`;
+      }
+      return "Resultado processado com sucesso";
+    };
+    
+    doc.text(getResultText(), margin, yPos);
+    yPos += 15;
+    
+    // Scores section
+    if (simulationResult.scores) {
+      doc.setFont("helvetica", "bold");
+      doc.text("Pontuações:", margin, yPos);
+      yPos += 8;
+      doc.setFont("helvetica", "normal");
+      
+      Object.entries(simulationResult.scores).forEach(([key, value]) => {
+        doc.text(`${key}: ${value}`, margin + 5, yPos);
+        yPos += 6;
+      });
+    }
+    
+    // Footer
+    doc.setFontSize(9);
+    doc.setTextColor(150, 150, 150);
+    doc.text("NELLO ONE - Simulação Administrativa", pageWidth / 2, 280, { align: "center" });
+    doc.text(new Date().toLocaleDateString("pt-BR"), pageWidth / 2, 286, { align: "center" });
+    
+    doc.save(`simulacao-${testType}-${Date.now()}.pdf`);
+    toast.success("PDF gerado com sucesso!");
+  };
+
   // Render results with NELLO ONE design - Clean and Technical views
   const renderResults = () => {
     if (!simulationResult) return null;
@@ -1013,7 +1117,7 @@ export const SimulationMode = () => {
     const renderCleanView = () => {
       const testType = simulationResult.testType;
       
-      // Get result details based on test type
+      // Get result details based on test type - with top 3 for all tests
       const getPrimaryResult = () => {
         if (testType === "temperamentos" && simulationResult.primary) {
           const temperamentNames: Record<string, string> = {
@@ -1022,27 +1126,57 @@ export const SimulationMode = () => {
             colerico: "Colérico",
             melancolico: "Melancólico"
           };
+          const temperamentEmojis: Record<string, string> = {
+            sanguineo: "☀️",
+            colerico: "🔥",
+            melancolico: "🌙",
+            fleumatico: "💧"
+          };
+          // Build top 3 from scores
+          const sortedScores = Object.entries(simulationResult.scores || {})
+            .sort(([,a], [,b]) => Number(b) - Number(a))
+            .slice(0, 3);
           return {
-            title: "Seu temperamento predominante é:",
+            title: "Seus temperamentos são:",
             name: temperamentNames[simulationResult.primary] || simulationResult.primary,
             score: simulationResult.scores?.[simulationResult.primary] || 0,
-            interpretation: simulationResult.interpretation
+            interpretation: simulationResult.interpretation,
+            emoji: temperamentEmojis[simulationResult.primary],
+            topThree: sortedScores.map(([key, score], i) => ({
+              name: temperamentNames[key] || key,
+              score: Number(score),
+              emoji: temperamentEmojis[key]
+            }))
           };
         }
         if (testType === "disc" && simulationResult.dominantProfile) {
+          const discLabels: Record<string, string> = { D: "Dominância", I: "Influência", S: "Estabilidade", C: "Conformidade" };
+          const discEmojis: Record<string, string> = { D: "🎯", I: "⭐", S: "🤝", C: "📊" };
+          const sortedScores = Object.entries(simulationResult.scores || {})
+            .sort(([,a], [,b]) => Number(b) - Number(a))
+            .slice(0, 3);
           return {
-            title: "Seu perfil DISC predominante é:",
+            title: "Seu perfil DISC é:",
             name: DISC_PROFILES[simulationResult.dominantProfile]?.name || simulationResult.dominantProfile,
             score: simulationResult.scores?.[simulationResult.dominantProfile] || 0,
-            interpretation: DISC_PROFILES[simulationResult.dominantProfile]?.description
+            interpretation: DISC_PROFILES[simulationResult.dominantProfile]?.description,
+            emoji: DISC_PROFILES[simulationResult.dominantProfile]?.emoji,
+            topThree: sortedScores.map(([key, score]) => ({
+              name: discLabels[key] || key,
+              score: Number(score),
+              emoji: discEmojis[key]
+            }))
           };
         }
         if (testType === "mbti" && simulationResult.type) {
+          const profile = NELLO_16_PROFILES[simulationResult.type];
           return {
-            title: "Seu tipo MBTI é:",
+            title: "Seu tipo Nello 16 é:",
             name: simulationResult.type,
             score: null,
-            interpretation: simulationResult.profileData?.description
+            interpretation: profile?.description?.pt,
+            emoji: "🧠",
+            secondaryInfo: profile?.name?.pt
           };
         }
         if (testType === "arquetipos" && simulationResult.dominantArchetypes?.primary) {
@@ -1069,41 +1203,67 @@ export const SimulationMode = () => {
             expressao_verbal: "Expressão Verbal",
             cuidado_pratico: "Cuidado Prático",
             gestos_simbolicos: "Gestos Simbólicos",
-            conexao_fisica: "Conexão Física",
-            // Legacy names fallback
-            palavras_afirmacao: "Expressão Verbal",
-            tempo_qualidade: "Presença Ativa",
-            presentes: "Gestos Simbólicos",
-            atos_servico: "Cuidado Prático",
-            toque_fisico: "Conexão Física"
+            conexao_fisica: "Conexão Física"
           };
-          const styleInfo = getStyleData();
-          const primaryStyle = styleInfo[simulationResult.primary as keyof typeof styleInfo];
+          const estiloEmojis: Record<string, string> = {
+            presenca_ativa: "👁️",
+            expressao_verbal: "💬",
+            cuidado_pratico: "🛠️",
+            gestos_simbolicos: "🎁",
+            conexao_fisica: "🤗"
+          };
+          const sortedScores = Object.entries(simulationResult.scores || {})
+            .sort(([,a], [,b]) => Number(b) - Number(a))
+            .slice(0, 3);
           return {
-            title: "Seu estilo de conexão afetiva é:",
-            name: estiloNames[simulationResult.primary] || simulationResult.primaryData?.name?.pt || simulationResult.primary,
+            title: "Seus estilos de conexão são:",
+            name: estiloNames[simulationResult.primary] || simulationResult.primary,
             score: simulationResult.scores?.[simulationResult.primary] || 0,
             interpretation: simulationResult.interpretation,
-            emoji: primaryStyle?.symbol
+            emoji: estiloEmojis[simulationResult.primary],
+            topThree: sortedScores.map(([key, score]) => ({
+              name: estiloNames[key] || key,
+              score: Number(score),
+              emoji: estiloEmojis[key]
+            }))
           };
         }
         if (testType === "eneagrama" && simulationResult.primaryType) {
+          const eneagramaEmojis: Record<string, string> = {
+            "1": "⚖️", "2": "❤️", "3": "🏆", "4": "🎭", "5": "🔬",
+            "6": "🛡️", "7": "🎉", "8": "💪", "9": "☮️"
+          };
+          const sortedScores = Object.entries(simulationResult.scores || {})
+            .sort(([,a], [,b]) => Number(b) - Number(a))
+            .slice(0, 3);
           return {
             title: "Seu tipo do Eneagrama é:",
-            name: `Tipo ${simulationResult.primaryType}`,
+            name: `Tipo ${simulationResult.primaryType} - ${ENNEAGRAM_PROFILES[simulationResult.primaryType]?.name || ''}`,
             score: simulationResult.scores?.[simulationResult.primaryType] || 0,
-            interpretation: null
+            interpretation: ENNEAGRAM_PROFILES[simulationResult.primaryType]?.description,
+            emoji: eneagramaEmojis[simulationResult.primaryType],
+            topThree: sortedScores.map(([key, score]) => ({
+              name: `Tipo ${key} - ${ENNEAGRAM_PROFILES[key]?.name || ''}`,
+              score: Number(score),
+              emoji: eneagramaEmojis[key]
+            }))
           };
         }
         if (testType === "inteligencias_multiplas" && simulationResult.ranking?.length > 0) {
-          const topIntelligence = simulationResult.ranking[0];
+          const top3 = simulationResult.ranking.slice(0, 3);
+          const topIntelligence = top3[0];
           const profile = INTELLIGENCES[topIntelligence.key];
           return {
-            title: "Sua inteligência predominante é:",
+            title: "Suas inteligências predominantes são:",
             name: profile?.name?.pt || topIntelligence.key,
             score: topIntelligence.score,
             interpretation: profile?.description?.pt,
-            emoji: profile?.emoji
+            emoji: profile?.emoji,
+            topThree: top3.map((item: any) => ({
+              name: INTELLIGENCES[item.key]?.name?.pt || item.key,
+              score: item.score,
+              emoji: INTELLIGENCES[item.key]?.emoji
+            }))
           };
         }
         return null;
@@ -1363,6 +1523,13 @@ export const SimulationMode = () => {
             </div>
             
             <div className="flex flex-wrap gap-2">
+              <Button 
+                onClick={downloadSimulationPDF}
+                className="rounded-xl h-10 bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <Download className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                Baixar PDF
+              </Button>
               {viewMode === "clean" ? (
                 <Button 
                   variant="outline"
