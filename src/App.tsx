@@ -57,6 +57,11 @@ const AppRoutes = () => (
     {/* Código da Essência Sales - PT */}
     <Route path="/codigo-da-essencia" element={<CodigoEssenciaVenda />} />
     <Route path="/codigo-da-essencia/checkout" element={<CodigoEssenciaCheckout />} />
+    <Route path="/codigo-da-essencia/view" element={
+      <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+        <CodigoEssencia />
+      </ProtectedRoute>
+    } />
     
     {/* Test detail pages - EN (new semantic routes) */}
     <Route path="/en/tests/:slug" element={<TestDetailPage />} />
@@ -64,6 +69,11 @@ const AppRoutes = () => (
     {/* Essence Code Sales - EN */}
     <Route path="/en/essence-code-premium" element={<CodigoEssenciaVenda />} />
     <Route path="/en/essence-code/checkout" element={<CodigoEssenciaCheckout />} />
+    <Route path="/en/essence-code/view" element={
+      <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+        <CodigoEssencia />
+      </ProtectedRoute>
+    } />
     
     {/* EN Landing and Auth */}
     <Route path="/en" element={<Landing />} />
@@ -186,6 +196,11 @@ const AppRoutes = () => (
     {/* Código da Essência Sales - PT-PT */}
     <Route path="/pt-pt/codigo-da-essencia" element={<CodigoEssenciaVenda />} />
     <Route path="/pt-pt/codigo-da-essencia/checkout" element={<CodigoEssenciaCheckout />} />
+    <Route path="/pt-pt/codigo-da-essencia/view" element={
+      <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+        <CodigoEssencia />
+      </ProtectedRoute>
+    } />
     
     {/* Legal pages - PT-PT */}
     <Route path="/pt-pt/termos" element={<TermsOfService />} />

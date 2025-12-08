@@ -20,17 +20,20 @@ export type JourneyTestsStatus = {
 };
 
 // Map database test types to journey slugs
-const TEST_TYPE_TO_SLUG: Record<string, JourneyTestSlug> = {
+// This mapping ensures backward compatibility with legacy test types
+export const TEST_TYPE_TO_SLUG: Record<string, JourneyTestSlug> = {
+  // Official slugs (1:1 mapping)
   'arquetipos_proposito': 'arquetipos_proposito',
-  'arquetipos': 'arquetipos_proposito',
   'inteligencias_multiplas': 'inteligencias_multiplas',
-  'linguagens_amor': 'estilos_conexao', // Renamed test
   'estilos_conexao': 'estilos_conexao',
-  'mbti': 'nello16', // Renamed test
   'nello16': 'nello16',
   'disc': 'disc',
   'eneagrama': 'eneagrama',
   'temperamentos': 'temperamentos',
+  // Legacy mappings for backward compatibility
+  'arquetipos': 'arquetipos_proposito',
+  'linguagens_amor': 'estilos_conexao', // Old name for Estilos de Conexão
+  'mbti': 'nello16', // Old name for Nello 16
 };
 
 /**

@@ -1,13 +1,15 @@
 import { useMemo } from "react";
 import { useTests } from "./useTests";
 import { useTestAccess } from "./useTestAccess";
+import { TEST_TYPE_TO_SLUG } from "@/utils/journey";
 
 // Define the sequential order of tests in the NELLO ONE journey
+// OFFICIAL SLUGS: These are the canonical identifiers for the journey
 const JOURNEY_ORDER = [
   "arquetipos_proposito",
   "inteligencias_multiplas",
-  "linguagens_amor",
-  "mbti",
+  "estilos_conexao",
+  "nello16",
   "disc",
   "eneagrama",
   "temperamentos",
@@ -49,13 +51,24 @@ export function useJourneyProgress() {
     if (!tests) return [];
 
     // Create a map of test type to test data
-    const testByType = new Map(tests.map(t => [t.type, t]));
+    // Support both old and new slugs by normalizing test types
+    const testByType = new Map<string, typeof tests[0]>();
+    tests.forEach(t => {
+      // Store under original type
+      testByType.set(t.type, t);
+      // Also store under normalized slug for journey lookup
+      const slug = TEST_TYPE_TO_SLUG[t.type];
+      if (slug && slug !== t.type) {
+        testByType.set(slug, t);
+      }
+    });
 
     // Track which step we're on (first incomplete test)
     let currentStepFound = false;
 
-    return JOURNEY_ORDER.map((testType, index) => {
-      const test = testByType.get(testType);
+    return JOURNEY_ORDER.map((journeySlug, index) => {
+      // Find the test by either the journey slug or the original database type
+      const test = testByType.get(journeySlug);
       if (!test) return null;
 
       const baseStatus = getTestStatus(test.id);
@@ -100,8 +113,8 @@ export function useJourneyProgress() {
         : baseStatus;
       
       const previousCompleted = index === 0 || 
-        JOURNEY_ORDER.slice(0, index).every(prevType => {
-          const prevTest = testByType.get(prevType);
+        JOURNEY_ORDER.slice(0, index).every(prevSlug => {
+          const prevTest = testByType.get(prevSlug);
           if (!prevTest) return true;
           
           const prevStatus = getTestStatus(prevTest.id);
@@ -135,7 +148,7 @@ export function useJourneyProgress() {
 
       return {
         step: index + 1,
-        testType,
+        testType: journeySlug, // Use the canonical journey slug, not the database type
         testId: test.id,
         name: test.name,
         description: test.description,

@@ -11,6 +11,14 @@ interface Profile {
   phone: string | null;
   profession: string | null;
   avatar_url: string | null;
+  // Journey tracking fields
+  journey_status?: string;
+  journey_total_tests?: number;
+  journey_completed_tests?: number;
+  journey_tests_status?: Record<string, string> | null;
+  journey_started_at?: string | null;
+  journey_completed_at?: string | null;
+  codigo_essencia_unlocked?: boolean | null;
 }
 
 interface AuthContextType {
@@ -72,7 +80,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .single();
 
       if (!profileError && profileData) {
-        setProfile(profileData);
+        // Cast profile data to Profile type, handling Json -> Record conversion
+        setProfile({
+          ...profileData,
+          journey_tests_status: profileData.journey_tests_status as Record<string, string> | null,
+        } as Profile);
       }
     } catch (error) {
       console.error("Error fetching user data:", error);

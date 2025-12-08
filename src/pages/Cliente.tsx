@@ -16,6 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { testSlugs } from "@/lib/testContent";
 import { JornadaNelloCard } from "@/components/cliente/JornadaNelloCard";
+import { TEST_TYPE_TO_SLUG } from "@/utils/journey";
 
 const Cliente = () => {
   const { user, profile, signOut } = useAuth();
@@ -236,12 +237,19 @@ const Cliente = () => {
           </div>
 
           {/* Jornada Nello Card - Progress Overview */}
+          {/* Use profile journey_status as source of truth when available */}
           <JornadaNelloCard
-            status={isJourneyComplete ? 'completed' : completedCount > 0 ? 'in_progress' : 'not_started'}
-            totalTests={totalSteps}
-            completedTests={completedCount}
+            status={
+              profile?.journey_status === 'completed' ? 'completed' :
+              profile?.journey_status === 'in_progress' ? 'in_progress' :
+              (isJourneyComplete ? 'completed' : completedCount > 0 ? 'in_progress' : 'not_started')
+            }
+            totalTests={profile?.journey_total_tests ?? totalSteps}
+            completedTests={profile?.journey_completed_tests ?? completedCount}
             testsStatus={journeySteps.reduce((acc, step) => {
-              acc[step.testType] = step.status;
+              // Map testType to official journey slug for consistency
+              const slug = TEST_TYPE_TO_SLUG[step.testType] ?? step.testType;
+              acc[slug] = step.status;
               return acc;
             }, {} as Record<string, string>)}
             hasCodigoEssencia={hasCodigoUnlocked}
