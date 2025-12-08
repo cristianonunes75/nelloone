@@ -15,6 +15,7 @@ import { MiguelAgent } from "@/components/MiguelAgent";
 import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { testSlugs } from "@/lib/testContent";
+import { JornadaNelloCard } from "@/components/cliente/JornadaNelloCard";
 
 const Cliente = () => {
   const { user, profile, signOut } = useAuth();
@@ -233,6 +234,24 @@ const Cliente = () => {
               }
             </p>
           </div>
+
+          {/* Jornada Nello Card - Progress Overview */}
+          <JornadaNelloCard
+            status={isJourneyComplete ? 'completed' : completedCount > 0 ? 'in_progress' : 'not_started'}
+            totalTests={totalSteps}
+            completedTests={completedCount}
+            testsStatus={journeySteps.reduce((acc, step) => {
+              acc[step.testType] = step.status;
+              return acc;
+            }, {} as Record<string, string>)}
+            hasCodigoEssencia={hasCodigoUnlocked}
+            onContinueJourney={() => {
+              const currentStepData = journeySteps.find(s => s.isCurrentStep);
+              if (currentStepData) handleStartTest(currentStepData);
+            }}
+            onViewCodigo={handleGenerateCode}
+            onPurchaseCodigo={handlePurchaseCodigo}
+          />
 
           {/* Journey Steps */}
           <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">

@@ -35,6 +35,7 @@ import { GrowthInsightsCard } from "@/components/growth/GrowthInsightsCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getGrowthInsights } from "@/lib/growthInsights";
 import { usePDFEmail } from "@/hooks/usePDFEmail";
+import { updateJourneyProgress, getJourneySlugFromTestType } from "@/utils/journey";
 
 export default function TestResults() {
   const { userTestId } = useParams();
@@ -59,6 +60,15 @@ export default function TestResults() {
         .single();
 
       if (error) throw error;
+      
+      // Update journey progress when test is completed
+      if (data && data.status === 'completed' && user?.id && data.tests?.type) {
+        const journeySlug = getJourneySlugFromTestType(data.tests.type);
+        if (journeySlug) {
+          updateJourneyProgress(user.id, journeySlug, 'completed').catch(console.error);
+        }
+      }
+      
       return data;
     },
   });

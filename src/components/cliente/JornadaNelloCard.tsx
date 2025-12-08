@@ -15,12 +15,15 @@ import { cn } from "@/lib/utils";
 import { JourneyTestsStatus, JourneyTestSlug, JOURNEY_TEST_SLUGS } from "@/utils/journey";
 
 interface JornadaNelloCardProps {
-  status: 'not_started' | 'in_progress' | 'completed';
+  status: string;
   totalTests: number;
   completedTests: number;
-  testsStatus: JourneyTestsStatus;
+  testsStatus: Record<string, string>;
   hasCodigoEssencia: boolean;
   userName?: string;
+  onContinueJourney?: () => void;
+  onViewCodigo?: () => void;
+  onPurchaseCodigo?: () => void;
 }
 
 const TRANSLATIONS = {
@@ -147,6 +150,9 @@ export function JornadaNelloCard({
   testsStatus,
   hasCodigoEssencia,
   userName = "Viajante",
+  onContinueJourney,
+  onViewCodigo,
+  onPurchaseCodigo,
 }: JornadaNelloCardProps) {
   const navigate = useNavigate();
   const { language } = useLanguage();
@@ -159,20 +165,32 @@ export function JornadaNelloCard({
   const remainingTests = totalTests - completedTests;
 
   const handleNavigateToJourney = () => {
-    navigate(`${basePath}/cliente`);
+    if (onContinueJourney) {
+      onContinueJourney();
+    } else {
+      navigate(`${basePath}/cliente`);
+    }
   };
 
   const handleNavigateToCodigo = () => {
     if (hasCodigoEssencia) {
-      navigate(`${basePath}/cliente/codigo-essencia`);
-    } else {
-      // Navigate to sales page
-      if (language === 'en') {
-        navigate('/en/essence-code-premium');
-      } else if (language === 'pt-pt') {
-        navigate('/pt-pt/codigo-da-essencia');
+      if (onViewCodigo) {
+        onViewCodigo();
       } else {
-        navigate('/codigo-da-essencia');
+        navigate(`${basePath}/cliente/codigo-essencia`);
+      }
+    } else {
+      if (onPurchaseCodigo) {
+        onPurchaseCodigo();
+      } else {
+        // Navigate to sales page
+        if (language === 'en') {
+          navigate('/en/essence-code-premium');
+        } else if (language === 'pt-pt') {
+          navigate('/pt-pt/codigo-da-essencia');
+        } else {
+          navigate('/codigo-da-essencia');
+        }
       }
     }
   };
@@ -228,8 +246,8 @@ export function JornadaNelloCard({
         {/* Tests status list */}
         <div className="space-y-2 mb-4">
           {JOURNEY_TEST_SLUGS.map((slug) => {
-            const testStatus = testsStatus[slug];
-            const testName = t.tests[slug];
+            const testStatus = testsStatus[slug] || 'not_started';
+            const testName = t.tests[slug as keyof typeof t.tests];
             
             return (
               <div 
