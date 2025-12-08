@@ -276,12 +276,15 @@ const content = {
 
 const CodigoEssenciaVenda = () => {
   const { language } = useLanguage();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { hasUnlocked, allTestsCompleted, isLoading } = useCodigoEssenciaAccess();
 
   const langKey = language === "pt-pt" ? "pt-pt" : language === "en" ? "en" : "pt";
   const t = content[langKey];
+
+  // Use profile journey_status as source of truth when available
+  const journeyCompleted = profile?.journey_status === 'completed' || allTestsCompleted;
 
   const handlePurchase = () => {
     if (!user) {
@@ -307,6 +310,13 @@ const CodigoEssenciaVenda = () => {
     navigate(authPath);
   };
 
+  const handleBackToJourney = () => {
+    const basePath = language === "en" ? "/en/cliente" : 
+                    language === "pt-pt" ? "/pt-pt/cliente" : 
+                    "/cliente";
+    navigate(basePath);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -319,6 +329,46 @@ const CodigoEssenciaVenda = () => {
   useEffect(() => {
     document.title = langKey === "en" ? "Essence Code - Premium Report | NELLO ONE" : "Código da Essência - Relatório Premium | NELLO ONE";
   }, [langKey]);
+
+  // Block access if journey is not completed - show simple message
+  if (!journeyCompleted) {
+    const incompleteContent = {
+      pt: {
+        title: "Complete sua Jornada primeiro",
+        description: "Para desbloquear o Código da Essência, primeiro conclua os 7 testes da Jornada Nello One.",
+        button: "Voltar para Minha Jornada"
+      },
+      "pt-pt": {
+        title: "Completa a tua Jornada primeiro",
+        description: "Para desbloquear o Código da Essência, primeiro conclui os 7 testes da Jornada Nello One.",
+        button: "Voltar para a Minha Jornada"
+      },
+      en: {
+        title: "Complete your Journey first",
+        description: "To unlock the Essence Code, first complete all 7 tests of the Nello One Journey.",
+        button: "Back to My Journey"
+      }
+    };
+    const incompleteT = incompleteContent[langKey];
+
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-md w-full text-center">
+          <CardContent className="pt-8 pb-8 space-y-6">
+            <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto">
+              <Lock className="w-8 h-8 text-amber-600" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">{incompleteT.title}</h1>
+            <p className="text-muted-foreground">{incompleteT.description}</p>
+            <Button onClick={handleBackToJourney} className="w-full">
+              <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+              {incompleteT.button}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <>
