@@ -163,7 +163,7 @@ const TRANSLATIONS = {
 const CodigoEssencia = () => {
   const { profile, user } = useAuth();
   const { isJourneyComplete, testResults, completedCount, totalSteps, isLoading: journeyLoading } = useJourneyProgress();
-  const { hasSavedCodigo, savedCodigo, resetCodigo, isLoading: codigoLoading } = useCodigoEssencia();
+  const { hasSavedCodigo, savedCodigo, saveCodigo, resetCodigo, isLoading: codigoLoading } = useCodigoEssencia();
   const { hasUnlocked, canGenerateCode, canPurchase, isLoading: accessLoading } = useCodigoEssenciaAccess();
   const navigate = useNavigate();
   const { language } = useLanguage();
@@ -172,6 +172,7 @@ const CodigoEssencia = () => {
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
+  const [generatedSections, setGeneratedSections] = useState<any[]>([]);
 
   const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   const t = TRANSLATIONS[lang];
@@ -193,11 +194,46 @@ const CodigoEssencia = () => {
 
   // Load saved codigo
   useEffect(() => {
-    if (savedCodigo && !hasGenerated) {
+    if (savedCodigo && savedCodigo.sections && savedCodigo.sections.length > 0 && !hasGenerated) {
       setHasGenerated(true);
-      // Parse saved sections if any
+      setGeneratedSections(savedCodigo.sections);
     }
   }, [savedCodigo, hasGenerated]);
+
+  // Generate Codigo da Essencia via Miguel AI endpoint
+  const handleGenerateCodigo = async () => {
+    if (!user?.id) return;
+    
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('miguel-codigo-essencia', {
+        body: {
+          user_id: user.id,
+          locale: lang === 'en' ? 'en' : lang === 'pt-pt' ? 'pt-pt' : 'pt-br'
+        }
+      });
+
+      if (error) throw error;
+      
+      if (data?.error === 'journey_not_completed') {
+        toast.error(lang === 'en' ? 'Please complete all 7 tests first.' : 'Complete todos os 7 testes primeiro.');
+        return;
+      }
+
+      if (data?.sections) {
+        setGeneratedSections(data.sections);
+        setHasGenerated(true);
+        // Save to database
+        await saveCodigo(data.sections, JSON.stringify(data));
+        toast.success(lang === 'en' ? 'Your Essence Code has been generated!' : 'Seu Código da Essência foi gerado!');
+      }
+    } catch (error) {
+      console.error('Error generating codigo:', error);
+      toast.error(lang === 'en' ? 'Error generating report. Please try again.' : 'Erro ao gerar relatório. Tente novamente.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleDownloadPDF = () => {
     try {
@@ -404,26 +440,69 @@ const CodigoEssencia = () => {
             </span>
           </div>
 
-          {/* Generate Button */}
-          {canGenerate && (
+          {/* Generate Button - when not yet generated */}
+          {!hasGenerated && canGenerate && (
             <div className="bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 border border-primary/20 rounded-2xl p-8 text-center mb-8">
               <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
               <h2 className="text-2xl font-bold mb-4">{t.generateCode}</h2>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                 {lang === 'en' 
-                  ? 'Your complete premium report with deep cross-analysis of all 7 tests is ready to be generated.'
-                  : 'Seu relatório premium completo com cruzamento profundo dos 7 testes está pronto para ser gerado.'
+                  ? 'Miguel will analyze all 7 tests and generate your personalized Essence Code report.'
+                  : 'Miguel vai analisar todos os 7 testes e gerar seu relatório personalizado do Código da Essência.'
                 }
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" onClick={handleDownloadPDF} className="gap-2">
-                  <Download className="w-5 h-5" />
+              <Button size="lg" onClick={handleGenerateCodigo} disabled={isGenerating} className="gap-2">
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    {t.generating}
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    {t.generateCode}
+                  </>
+                )}
+              </Button>
+              {isGenerating && (
+                <p className="text-sm text-muted-foreground mt-4">{t.generatingSubtext}</p>
+              )}
+            </div>
+          )}
+
+          {/* Generated Report Display */}
+          {hasGenerated && generatedSections.length > 0 && (
+            <div className="space-y-6 mb-8">
+              {/* Actions */}
+              <div className="flex flex-wrap gap-3 justify-center mb-6">
+                <Button onClick={handleDownloadPDF} className="gap-2">
+                  <Download className="w-4 h-4" />
                   {t.downloadPDF}
                 </Button>
-                <Button size="lg" variant="outline" onClick={handleSendEmail} disabled={isSendingEmail} className="gap-2">
-                  <Mail className="w-5 h-5" />
+                <Button variant="outline" onClick={handleSendEmail} disabled={isSendingEmail} className="gap-2">
+                  <Mail className="w-4 h-4" />
                   {t.sendEmail}
                 </Button>
+              </div>
+
+              {/* Sections */}
+              {generatedSections.map((section: any, index: number) => (
+                <div 
+                  key={section.id || index}
+                  className="bg-card border border-border rounded-xl p-6"
+                >
+                  <h3 className="text-xl font-bold mb-4 text-primary">{section.title}</h3>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    {section.paragraphs?.map((paragraph: string, pIndex: number) => (
+                      <p key={pIndex}>{paragraph}</p>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              {/* Disclaimer */}
+              <div className="bg-muted/50 rounded-xl p-4 text-center">
+                <p className="text-sm text-muted-foreground">{t.disclaimer}</p>
               </div>
             </div>
           )}
