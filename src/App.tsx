@@ -24,6 +24,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
 import { TestDetailPage } from "./components/tests/TestDetailPage";
 import CodigoEssencia from "./pages/CodigoEssencia";
+import CodigoEssenciaVenda from "./pages/CodigoEssenciaVenda";
+import CodigoEssenciaCheckout from "./pages/CodigoEssenciaCheckout";
 import ComprarTeste from "./pages/ComprarTeste";
 
 const queryClient = new QueryClient();
@@ -52,8 +54,16 @@ const AppRoutes = () => (
     {/* Test detail pages - PT (new semantic routes) */}
     <Route path="/testes/:slug" element={<TestDetailPage />} />
     
+    {/* Código da Essência Sales - PT */}
+    <Route path="/codigo-da-essencia" element={<CodigoEssenciaVenda />} />
+    <Route path="/codigo-da-essencia/checkout" element={<CodigoEssenciaCheckout />} />
+    
     {/* Test detail pages - EN (new semantic routes) */}
     <Route path="/en/tests/:slug" element={<TestDetailPage />} />
+    
+    {/* Essence Code Sales - EN */}
+    <Route path="/en/essence-code-premium" element={<CodigoEssenciaVenda />} />
+    <Route path="/en/essence-code/checkout" element={<CodigoEssenciaCheckout />} />
     
     {/* EN Landing and Auth */}
     <Route path="/en" element={<Landing />} />
@@ -172,6 +182,10 @@ const AppRoutes = () => (
     
     {/* Test detail pages - PT-PT (European Portuguese) */}
     <Route path="/pt-pt/testes/:slug" element={<TestDetailPage />} />
+    
+    {/* Código da Essência Sales - PT-PT */}
+    <Route path="/pt-pt/codigo-da-essencia" element={<CodigoEssenciaVenda />} />
+    <Route path="/pt-pt/codigo-da-essencia/checkout" element={<CodigoEssenciaCheckout />} />
     
     {/* Legal pages - PT-PT */}
     <Route path="/pt-pt/termos" element={<TermsOfService />} />
