@@ -23,7 +23,7 @@ import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
 import { TestDetailPage } from "./components/tests/TestDetailPage";
-import MapaEssencia from "./pages/MapaEssencia";
+import CodigoEssencia from "./pages/CodigoEssencia";
 import ComprarTeste from "./pages/ComprarTeste";
 
 const queryClient = new QueryClient();
@@ -138,18 +138,18 @@ const AppRoutes = () => (
       }
     />
     <Route
-      path="/en/cliente/mapa-essencia"
+      path="/en/cliente/codigo-essencia"
       element={
         <ProtectedRoute allowedRoles={["cliente", "admin"]}>
-          <MapaEssencia />
+          <CodigoEssencia />
         </ProtectedRoute>
       }
     />
     <Route
-      path="/en/essence-map"
+      path="/en/essence-code"
       element={
         <ProtectedRoute allowedRoles={["cliente", "admin"]}>
-          <MapaEssencia />
+          <CodigoEssencia />
         </ProtectedRoute>
       }
     />
@@ -220,10 +220,10 @@ const AppRoutes = () => (
       }
     />
     <Route
-      path="/pt-pt/cliente/mapa-essencia"
+      path="/pt-pt/cliente/codigo-essencia"
       element={
         <ProtectedRoute allowedRoles={["cliente", "admin"]}>
-          <MapaEssencia />
+          <CodigoEssencia />
         </ProtectedRoute>
       }
     />
@@ -312,18 +312,18 @@ const AppRoutes = () => (
       }
     />
     <Route
-      path="/cliente/mapa-essencia"
+      path="/cliente/codigo-essencia"
       element={
         <ProtectedRoute allowedRoles={["cliente", "admin"]}>
-          <MapaEssencia />
+          <CodigoEssencia />
         </ProtectedRoute>
       }
     />
     <Route
-      path="/essence-map"
+      path="/essence-code"
       element={
         <ProtectedRoute allowedRoles={["cliente", "admin"]}>
-          <MapaEssencia />
+          <CodigoEssencia />
         </ProtectedRoute>
       }
     />

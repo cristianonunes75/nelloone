@@ -1,0 +1,464 @@
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useJourneyProgress } from "@/hooks/useJourneyProgress";
+import { useCodigoEssencia } from "@/hooks/useCodigoEssencia";
+import { useTestAccess } from "@/hooks/useTestAccess";
+import { Button } from "@/components/ui/button";
+import { LogoText } from "@/components/LogoText";
+import { 
+  ArrowLeft, 
+  Download, 
+  Sparkles, 
+  Loader2, 
+  User, 
+  Brain, 
+  Heart, 
+  Target, 
+  BookOpen, 
+  RefreshCw,
+  Lock,
+  CheckCircle2,
+  AlertCircle,
+  Mail
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { generateCodigoEssenciaPDF, canGenerateCodigoEssencia, getMissingTests } from "@/lib/pdfCodigoEssencia";
+import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { Progress } from "@/components/ui/progress";
+
+interface Section {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  content: string;
+  color: string;
+}
+
+const SECTION_CONFIG: Record<string, { title: Record<string, string>; icon: React.ReactNode; color: string }> = {
+  PANEL: { 
+    title: { pt: "Painel dos 7 Resultados", 'pt-pt': "Painel dos 7 Resultados", en: "7 Results Panel" },
+    icon: <User className="w-5 h-5" />,
+    color: "from-violet-500/20 to-purple-500/20 border-violet-500/30"
+  },
+  STRUCTURE: { 
+    title: { pt: "Engenharia da Essência", 'pt-pt': "Engenharia da Essência", en: "Essence Engineering" },
+    icon: <Brain className="w-5 h-5" />,
+    color: "from-blue-500/20 to-cyan-500/20 border-blue-500/30"
+  },
+  PATTERNS: { 
+    title: { pt: "3 Padrões de Comportamento", 'pt-pt': "3 Padrões de Comportamento", en: "3 Behavior Patterns" },
+    icon: <Target className="w-5 h-5" />,
+    color: "from-amber-500/20 to-orange-500/20 border-amber-500/30"
+  },
+  TALENTS: { 
+    title: { pt: "3 Talentos e Dons", 'pt-pt': "3 Talentos e Dons", en: "3 Talents and Gifts" },
+    icon: <Sparkles className="w-5 h-5" />,
+    color: "from-emerald-500/20 to-green-500/20 border-emerald-500/30"
+  },
+  PAINS: { 
+    title: { pt: "3 Dores e Raízes", 'pt-pt': "3 Dores e Raízes", en: "3 Pains and Roots" },
+    icon: <Heart className="w-5 h-5" />,
+    color: "from-pink-500/20 to-rose-500/20 border-pink-500/30"
+  },
+  PURPOSE: { 
+    title: { pt: "Propósito Natural", 'pt-pt': "Propósito Natural", en: "Natural Purpose" },
+    icon: <Target className="w-5 h-5" />,
+    color: "from-indigo-500/20 to-blue-500/20 border-indigo-500/30"
+  },
+  MATURITY: { 
+    title: { pt: "Caminho de Maturidade", 'pt-pt': "Caminho de Maturidade", en: "Maturity Path" },
+    icon: <BookOpen className="w-5 h-5" />,
+    color: "from-teal-500/20 to-cyan-500/20 border-teal-500/30"
+  },
+};
+
+const TRANSLATIONS = {
+  pt: {
+    title: "Código da Essência",
+    subtitle: "Relatório Final Premium",
+    description: "seu código interior está pronto para ser revelado.",
+    loading: "Carregando seus resultados...",
+    generating: "Miguel está preparando seu código...",
+    generatingSubtext: "Isso pode levar alguns segundos",
+    journeyIncomplete: "Jornada Incompleta",
+    journeyIncompleteDesc: "Complete todos os 7 testes para desbloquear seu Código da Essência.",
+    completedOf: "de",
+    testsCompleted: "testes completos",
+    continueJourney: "Continuar Jornada",
+    back: "Voltar",
+    regenerate: "Regenerar",
+    downloadPDF: "Baixar PDF",
+    sendEmail: "Enviar por Email",
+    locked: "Premium Bloqueado",
+    lockedDesc: "O Código da Essência é um produto premium. Adquira para desbloquear seu relatório completo.",
+    purchase: "Desbloquear Código da Essência",
+    missingTests: "Testes faltando:",
+    disclaimer: "⚠️ Este código é uma síntese simbólica baseada nos seus 7 testes. Use-o como ferramenta de reflexão e autoconhecimento.",
+    emailSent: "PDF enviado para seu email!",
+    emailError: "Erro ao enviar email. Tente novamente.",
+    pdfDownloaded: "PDF baixado com sucesso!",
+    pdfError: "Erro ao gerar PDF. Tente novamente.",
+    generateCode: "Gerar meu Código da Essência",
+  },
+  'pt-pt': {
+    title: "Código da Essência",
+    subtitle: "Relatório Final Premium",
+    description: "o teu código interior está pronto para ser revelado.",
+    loading: "A carregar os teus resultados...",
+    generating: "O Miguel está a preparar o teu código...",
+    generatingSubtext: "Isto pode demorar alguns segundos",
+    journeyIncomplete: "Jornada Incompleta",
+    journeyIncompleteDesc: "Completa todos os 7 testes para desbloquear o teu Código da Essência.",
+    completedOf: "de",
+    testsCompleted: "testes completos",
+    continueJourney: "Continuar Jornada",
+    back: "Voltar",
+    regenerate: "Regenerar",
+    downloadPDF: "Transferir PDF",
+    sendEmail: "Enviar por Email",
+    locked: "Premium Bloqueado",
+    lockedDesc: "O Código da Essência é um produto premium. Adquire para desbloquear o teu relatório completo.",
+    purchase: "Desbloquear Código da Essência",
+    missingTests: "Testes em falta:",
+    disclaimer: "⚠️ Este código é uma síntese simbólica baseada nos teus 7 testes. Usa-o como ferramenta de reflexão e autoconhecimento.",
+    emailSent: "PDF enviado para o teu email!",
+    emailError: "Erro ao enviar email. Tenta novamente.",
+    pdfDownloaded: "PDF transferido com sucesso!",
+    pdfError: "Erro ao gerar PDF. Tenta novamente.",
+    generateCode: "Gerar o meu Código da Essência",
+  },
+  en: {
+    title: "Essence Code",
+    subtitle: "Premium Final Report",
+    description: "your inner code is ready to be revealed.",
+    loading: "Loading your results...",
+    generating: "Miguel is preparing your code...",
+    generatingSubtext: "This may take a few seconds",
+    journeyIncomplete: "Journey Incomplete",
+    journeyIncompleteDesc: "Complete all 7 tests to unlock your Essence Code.",
+    completedOf: "of",
+    testsCompleted: "tests completed",
+    continueJourney: "Continue Journey",
+    back: "Back",
+    regenerate: "Regenerate",
+    downloadPDF: "Download PDF",
+    sendEmail: "Send via Email",
+    locked: "Premium Locked",
+    lockedDesc: "The Essence Code is a premium product. Purchase to unlock your complete report.",
+    purchase: "Unlock Essence Code",
+    missingTests: "Missing tests:",
+    disclaimer: "⚠️ This code is a symbolic synthesis based on your 7 tests. Use it as a tool for reflection and self-knowledge.",
+    emailSent: "PDF sent to your email!",
+    emailError: "Error sending email. Try again.",
+    pdfDownloaded: "PDF downloaded successfully!",
+    pdfError: "Error generating PDF. Try again.",
+    generateCode: "Generate my Essence Code",
+  },
+};
+
+const CodigoEssencia = () => {
+  const { profile, user } = useAuth();
+  const { isJourneyComplete, testResults, completedCount, totalSteps, isLoading: journeyLoading } = useJourneyProgress();
+  const { hasSavedCodigo, savedCodigo, resetCodigo, saveCodigo, isLoading: codigoLoading } = useCodigoEssencia();
+  const { hasPurchased } = useTestAccess();
+  const navigate = useNavigate();
+  const { language } = useLanguage();
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [hasGenerated, setHasGenerated] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [sections, setSections] = useState<Section[]>([]);
+
+  const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
+  const t = TRANSLATIONS[lang];
+  const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
+  const userName = profile?.full_name || (lang === 'en' ? "Traveler" : "Viajante");
+  const isLoading = journeyLoading || codigoLoading;
+
+  // Check if user has access to Código da Essência (premium product)
+  // For now, allow access if journey is complete - purchase flow can be added later
+  const hasAccess = true; // TODO: Check for codigo_da_essencia purchase
+
+  // Check if all tests are completed
+  const canGenerate = useMemo(() => {
+    return canGenerateCodigoEssencia(testResults);
+  }, [testResults]);
+
+  const missingTests = useMemo(() => {
+    return getMissingTests(testResults, lang);
+  }, [testResults, lang]);
+
+  // Load saved codigo
+  useEffect(() => {
+    if (savedCodigo && !hasGenerated) {
+      setHasGenerated(true);
+      // Parse saved sections if any
+    }
+  }, [savedCodigo, hasGenerated]);
+
+  const handleDownloadPDF = () => {
+    try {
+      generateCodigoEssenciaPDF({
+        userName,
+        language: lang,
+        testResults,
+      });
+      toast.success(t.pdfDownloaded);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error(t.pdfError);
+    }
+  };
+
+  const handleSendEmail = async () => {
+    if (!user?.email) return;
+    
+    setIsSendingEmail(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-pdf-email', {
+        body: {
+          to: user.email,
+          name: userName,
+          testName: lang === 'en' ? 'Essence Code' : 'Código da Essência',
+          testType: 'codigo_essencia',
+          pdfBase64: '', // Would generate here
+          language: lang,
+        },
+      });
+
+      if (error) throw error;
+      toast.success(t.emailSent);
+    } catch (error) {
+      console.error("Error sending email:", error);
+      toast.error(t.emailError);
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
+  const handleRegenerate = async () => {
+    await resetCodigo();
+    setHasGenerated(false);
+  };
+
+  const handlePurchase = () => {
+    // Navigate to purchase page for codigo_da_essencia
+    navigate(`${basePath}/cliente/comprar/codigo_da_essencia`);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">{t.loading}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Journey not complete
+  if (!isJourneyComplete) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-10">
+          <div className="container px-4 py-4 flex items-center justify-between">
+            <LogoText className="text-2xl" variant="solid" />
+            <Button variant="ghost" size="sm" onClick={() => navigate(`${basePath}/cliente`)}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {t.back}
+            </Button>
+          </div>
+        </header>
+
+        <main className="container px-4 py-12">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="w-10 h-10 text-amber-500" />
+            </div>
+            <h1 className="text-3xl font-bold mb-4">{t.journeyIncomplete}</h1>
+            <p className="text-muted-foreground mb-6">
+              {t.journeyIncompleteDesc}
+            </p>
+            
+            {/* Progress */}
+            <div className="bg-card border border-border rounded-xl p-6 mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">{t.testsCompleted}</span>
+                <span className="text-sm text-muted-foreground">
+                  {completedCount} {t.completedOf} {totalSteps}
+                </span>
+              </div>
+              <Progress value={(completedCount / totalSteps) * 100} className="h-2" />
+            </div>
+
+            {/* Missing tests */}
+            {missingTests.length > 0 && (
+              <div className="bg-muted/50 rounded-xl p-4 mb-6 text-left">
+                <p className="text-sm font-medium mb-2">{t.missingTests}</p>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  {missingTests.map((test) => (
+                    <li key={test}>• {test}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <Button onClick={() => navigate(`${basePath}/cliente`)}>
+              {t.continueJourney}
+            </Button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Not purchased (premium lock)
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-10">
+          <div className="container px-4 py-4 flex items-center justify-between">
+            <LogoText className="text-2xl" variant="solid" />
+            <Button variant="ghost" size="sm" onClick={() => navigate(`${basePath}/cliente`)}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {t.back}
+            </Button>
+          </div>
+        </header>
+
+        <main className="container px-4 py-12">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Lock className="w-10 h-10 text-primary" />
+            </div>
+            <h1 className="text-3xl font-bold mb-4">{t.locked}</h1>
+            <p className="text-muted-foreground mb-8">
+              {t.lockedDesc}
+            </p>
+            <Button size="lg" onClick={handlePurchase}>
+              <Sparkles className="w-5 h-5 mr-2" />
+              {t.purchase}
+            </Button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Ready to generate/view
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-10">
+        <div className="container px-4 py-4 flex items-center justify-between">
+          <LogoText className="text-2xl" variant="solid" />
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate(`${basePath}/cliente`)}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {t.back}
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleRegenerate} disabled={isGenerating}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              {t.regenerate}
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleDownloadPDF} disabled={!canGenerate}>
+              <Download className="w-4 h-4 mr-2" />
+              {t.downloadPDF}
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleSendEmail} disabled={isSendingEmail || !canGenerate}>
+              <Mail className="w-4 h-4 mr-2" />
+              {isSendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : t.sendEmail}
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <main className="container px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-8 h-8 text-primary" />
+            </div>
+            <h1 className="text-4xl font-bold mb-2">{t.title}</h1>
+            <p className="text-lg text-primary font-medium mb-2">{t.subtitle}</p>
+            <p className="text-muted-foreground">
+              {userName}, {t.description}
+            </p>
+          </div>
+
+          {/* Journey Complete Badge */}
+          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-8 flex items-center justify-center gap-3">
+            <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+            <span className="text-emerald-700 dark:text-emerald-400 font-medium">
+              {lang === 'en' ? 'All 7 tests completed!' : 'Todos os 7 testes completos!'}
+            </span>
+          </div>
+
+          {/* Generate Button */}
+          {canGenerate && (
+            <div className="bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 border border-primary/20 rounded-2xl p-8 text-center mb-8">
+              <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h2 className="text-2xl font-bold mb-4">{t.generateCode}</h2>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                {lang === 'en' 
+                  ? 'Your complete premium report with deep cross-analysis of all 7 tests is ready to be generated.'
+                  : 'Seu relatório premium completo com cruzamento profundo dos 7 testes está pronto para ser gerado.'
+                }
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" onClick={handleDownloadPDF} className="gap-2">
+                  <Download className="w-5 h-5" />
+                  {t.downloadPDF}
+                </Button>
+                <Button size="lg" variant="outline" onClick={handleSendEmail} disabled={isSendingEmail} className="gap-2">
+                  <Mail className="w-5 h-5" />
+                  {t.sendEmail}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Results Preview */}
+          <div className="grid gap-4 md:grid-cols-2">
+            {Object.entries(SECTION_CONFIG).map(([key, config]) => (
+              <div
+                key={key}
+                className={cn(
+                  "bg-gradient-to-br border rounded-xl p-6 transition-all hover:shadow-lg",
+                  config.color
+                )}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">
+                    {config.icon}
+                  </div>
+                  <h3 className="font-semibold">{config.title[lang]}</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {lang === 'en' 
+                    ? 'Included in your premium PDF report'
+                    : 'Incluído no seu relatório PDF premium'
+                  }
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Disclaimer */}
+          <div className="bg-accent/10 border border-border rounded-xl p-4 text-center mt-8">
+            <p className="text-xs md:text-sm text-muted-foreground">
+              {t.disclaimer}
+            </p>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default CodigoEssencia;
