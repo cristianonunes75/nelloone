@@ -522,11 +522,11 @@ function extractResults(testResults: TestResults, language: 'pt' | 'pt-pt' | 'en
     const temp = testResults.temperamentos;
     if (temp.primary) {
       const tempKey = temp.primary.temperament || temp.primary;
-      temperament = TEMPERAMENT_NAMES[tempKey as keyof typeof TEMPERAMENT_NAMES]?.[lang === 'pt-pt' ? 'pt' : lang] || tempKey;
+      temperament = TEMPERAMENT_NAMES[tempKey as keyof typeof TEMPERAMENT_NAMES]?.[lang] || tempKey;
     }
     if (temp.secondary) {
       const tempKey = temp.secondary.temperament || temp.secondary;
-      temperamentSecondary = TEMPERAMENT_NAMES[tempKey as keyof typeof TEMPERAMENT_NAMES]?.[lang === 'pt-pt' ? 'pt' : lang] || tempKey;
+      temperamentSecondary = TEMPERAMENT_NAMES[tempKey as keyof typeof TEMPERAMENT_NAMES]?.[lang] || tempKey;
     }
   }
 
