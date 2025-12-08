@@ -389,7 +389,7 @@ const UserArea = () => {
                         <Map className="w-16 h-16 mx-auto text-ink" />
                         <p className="text-muted-foreground">{t.map.description}</p>
                         <div className="flex flex-wrap justify-center gap-3">
-                          <Button onClick={() => handleNavigation("/cliente/mapa-essencia")}>
+                          <Button onClick={() => handleNavigation("/codigo-essencia")}>
                             {t.map.view_map}
                           </Button>
                           <Button variant="outline">
@@ -415,7 +415,7 @@ const UserArea = () => {
                           <Badge variant="secondary">{completedTests.length}/7 {language === "en" ? "tests completed" : "testes concluídos"}</Badge>
                         </div>
                         {allTestsCompleted && (
-                          <Button onClick={() => handleNavigation("/cliente/mapa-essencia")}>
+                          <Button onClick={() => handleNavigation("/codigo-essencia")}>
                             {t.map.generate}
                           </Button>
                         )}

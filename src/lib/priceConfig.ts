@@ -105,6 +105,13 @@ export const testPrices: Record<string, TestPrice> = {
     usd: { price: 29, priceId: "price_1SZNXnDjhZZxZELMuGMkDImQ" },
     eur: { price: 27.90, priceId: "price_1SZz0nDjhZZxZELMVagCtoXs" },
   },
+  // Código da Essência - Premium final report (requires all 7 tests completed)
+  codigo_da_essencia: {
+    testType: "codigo_da_essencia",
+    brl: { price: 397, priceId: null }, // Create Stripe price when ready
+    usd: { price: 97, priceId: null },
+    eur: { price: 97, priceId: null },
+  },
 };
 
 // Bundle prices - FULL JOURNEY

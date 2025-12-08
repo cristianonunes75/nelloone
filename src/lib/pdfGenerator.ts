@@ -312,7 +312,7 @@ export const generateMapaPDF = (
   doc.text(text.brand, pageWidth / 2, pageHeight - 40, { align: "center" });
 
   // Save
-  const filePrefix = lang === 'en' ? 'Essence-Map' : 'Mapa-Essencia';
+  const filePrefix = lang === 'en' ? 'Essence-Code' : 'Codigo-Essencia';
   const fileName = `${filePrefix}-${userName.replace(/\s+/g, "-")}.pdf`;
   doc.save(fileName);
 };

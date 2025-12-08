@@ -44,15 +44,15 @@
     "completed_on": "Completed on"
   },
   "map": {
-    "title": "Nello One Map",
-    "subtitle": "Essential Map",
-    "description": "Your integrated self-knowledge map combining all test results.",
-    "not_generated": "Your map hasn't been generated yet.",
-    "complete_tests": "Complete all 7 tests to unlock your personalized map.",
-    "generate": "Generate new map",
-    "export_pdf": "Download professional PDF",
+    "title": "Essence Code",
+    "subtitle": "Premium Report",
+    "description": "Your premium self-knowledge report combining all 7 tests into deep cross-analysis.",
+    "not_generated": "Your Essence Code hasn't been generated yet.",
+    "complete_tests": "Complete all 7 tests to unlock your Essence Code.",
+    "generate": "Generate Essence Code",
+    "export_pdf": "Download Premium PDF",
     "share": "Share",
-    "view_map": "View Map"
+    "view_map": "View Code"
   },
   "history": {
     "title": "Results History",

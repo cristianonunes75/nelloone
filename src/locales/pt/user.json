@@ -44,15 +44,15 @@
     "completed_on": "Concluído em"
   },
   "map": {
-    "title": "Mapa Nello One",
-    "subtitle": "Mapa Essencial",
-    "description": "Seu mapa integrado de autoconhecimento combinando todos os resultados dos testes.",
-    "not_generated": "Seu mapa ainda não foi gerado.",
-    "complete_tests": "Complete os 7 testes para desbloquear seu mapa personalizado.",
-    "generate": "Gerar novo mapa",
-    "export_pdf": "Exportar PDF profissional",
+    "title": "Código da Essência",
+    "subtitle": "Relatório Premium",
+    "description": "Seu relatório premium de autoconhecimento combinando todos os 7 testes em análises cruzadas profundas.",
+    "not_generated": "Seu Código da Essência ainda não foi gerado.",
+    "complete_tests": "Complete os 7 testes para desbloquear seu Código da Essência.",
+    "generate": "Gerar Código da Essência",
+    "export_pdf": "Baixar PDF Premium",
     "share": "Compartilhar",
-    "view_map": "Ver Mapa"
+    "view_map": "Ver Código"
   },
   "history": {
     "title": "Histórico de Resultados",
