@@ -7,17 +7,15 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { Loader2 } from "lucide-react";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 
-// Lazy load modules
-const Dashboard2 = lazy(() => import("@/components/admin/Dashboard2").then(m => ({ default: m.Dashboard2 })));
-const UsersManagement2 = lazy(() => import("@/components/admin/UsersManagement2").then(m => ({ default: m.UsersManagement2 })));
-const TestsJourneysManagement2 = lazy(() => import("@/components/admin/TestsJourneysManagement2").then(m => ({ default: m.TestsJourneysManagement2 })));
-const PlansAndCoupons2 = lazy(() => import("@/components/admin/PlansAndCoupons2").then(m => ({ default: m.PlansAndCoupons2 })));
-const MiguelAIManagement2 = lazy(() => import("@/components/admin/MiguelAIManagement2").then(m => ({ default: m.MiguelAIManagement2 })));
-const LandingContentManagement2 = lazy(() => import("@/components/admin/LandingContentManagement2").then(m => ({ default: m.LandingContentManagement2 })));
-const ReportsManagement2 = lazy(() => import("@/components/admin/ReportsManagement2").then(m => ({ default: m.ReportsManagement2 })));
-const SystemSettings2 = lazy(() => import("@/components/admin/SystemSettings2").then(m => ({ default: m.SystemSettings2 })));
-const AdminTools = lazy(() => import("@/components/admin/AdminTools").then(m => ({ default: m.AdminTools })));
-const SimulationMode = lazy(() => import("@/components/admin/SimulationMode").then(m => ({ default: m.SimulationMode })));
+// Lazy load new admin modules
+const AdminDashboard = lazy(() => import("@/components/admin/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
+const AdminUsersJourneys = lazy(() => import("@/components/admin/AdminUsersJourneys").then(m => ({ default: m.AdminUsersJourneys })));
+const AdminOrdersPayments = lazy(() => import("@/components/admin/AdminOrdersPayments").then(m => ({ default: m.AdminOrdersPayments })));
+const AdminProductsTests = lazy(() => import("@/components/admin/AdminProductsTests").then(m => ({ default: m.AdminProductsTests })));
+const AdminCoupons = lazy(() => import("@/components/admin/AdminCoupons").then(m => ({ default: m.AdminCoupons })));
+const AdminCodigoEssencia = lazy(() => import("@/components/admin/AdminCodigoEssencia").then(m => ({ default: m.AdminCodigoEssencia })));
+const AdminLogs = lazy(() => import("@/components/admin/AdminLogs").then(m => ({ default: m.AdminLogs })));
+const AdminSettings = lazy(() => import("@/components/admin/AdminSettings").then(m => ({ default: m.AdminSettings })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -59,16 +57,14 @@ const Admin = () => {
           <main className="flex-1 p-6 lg:p-8 overflow-auto">
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
-                <Route path="/" element={<Dashboard2 />} />
-                <Route path="/conteudo" element={<LandingContentManagement2 />} />
-                <Route path="/usuarios" element={<UsersManagement2 />} />
-                <Route path="/testes" element={<TestsJourneysManagement2 />} />
-                <Route path="/planos" element={<PlansAndCoupons2 />} />
-                <Route path="/miguel" element={<MiguelAIManagement2 />} />
-                <Route path="/relatorios" element={<ReportsManagement2 />} />
-                <Route path="/configuracoes" element={<SystemSettings2 />} />
-                <Route path="/tools" element={<AdminTools />} />
-                <Route path="/simulador" element={<SimulationMode />} />
+                <Route path="/" element={<AdminDashboard />} />
+                <Route path="/usuarios" element={<AdminUsersJourneys />} />
+                <Route path="/pedidos" element={<AdminOrdersPayments />} />
+                <Route path="/produtos" element={<AdminProductsTests />} />
+                <Route path="/cupons" element={<AdminCoupons />} />
+                <Route path="/codigo-essencia" element={<AdminCodigoEssencia />} />
+                <Route path="/logs" element={<AdminLogs />} />
+                <Route path="/configuracoes" element={<AdminSettings />} />
               </Routes>
             </Suspense>
           </main>
