@@ -113,6 +113,7 @@ const USD_PRICES: Record<string, string> = {
   linguagens_amor: "price_1SZNXYDjhZZxZELMtlzZO8Id",
   inteligencias_multiplas: "price_1SZNXnDjhZZxZELMuGMkDImQ",
   bundle: "price_1SZNYXDjhZZxZELMoGVJUZRP",
+  codigo_da_essencia: "price_1Sc2RfDjhZZxZELMbZP1CvLO", // $97 USD
 };
 
 // BRL Price IDs for PT version (Brazilian market)
@@ -125,7 +126,8 @@ const BRL_PRICES: Record<string, string> = {
   temperamentos: "price_1SZUnqDjhZZxZELMtU9tUMFm",
   linguagens_amor: "price_1SZUoWDjhZZxZELMxEJJKhDn",
   inteligencias_multiplas: "price_1SZUpxDjhZZxZELMAkQlFX11",
-  bundle: "price_1SZNYXDjhZZxZELMoGVJUZRP", // Using USD bundle as fallback
+  bundle: "price_1SZNYXDjhZZxZELMoGVJUZRP",
+  codigo_da_essencia: "price_1Sc2RRDjhZZxZELMPxAnu0I5", // R$397 BRL
 };
 
 // EUR Price IDs for PT-PT version (Portugal/European market)
@@ -139,6 +141,7 @@ const EUR_PRICES: Record<string, string> = {
   linguagens_amor: "price_1SZyykDjhZZxZELM9mlhNwLh",
   inteligencias_multiplas: "price_1SZz0nDjhZZxZELMVagCtoXs",
   bundle: "price_1SZz6vDjhZZxZELMQsZuLKah",
+  codigo_da_essencia: "price_1Sc2TRDjhZZxZELMr66uJZZm", // €97 EUR
 };
 
 // Get expected currency based on language
