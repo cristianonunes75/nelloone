@@ -117,9 +117,9 @@ const Cliente = () => {
     navigate(`${basePath}/cliente/test-execution/${step.testId}/${userTest.id}`);
   };
 
-  const handleGenerateMap = () => {
+  const handleGenerateCode = () => {
     const basePath = getBasePath();
-    navigate(`${basePath}/cliente/mapa-essencia`);
+    navigate(`${basePath}/cliente/codigo-essencia`);
   };
 
   if (isLoading) {
@@ -181,7 +181,7 @@ const Cliente = () => {
               <span className="text-xs md:text-sm font-medium">Jornada de Autoconhecimento</span>
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-3">
-              Seu Mapa da Essência
+              Seu Código da Essência
             </h1>
             <p className="text-sm md:text-lg text-muted-foreground max-w-xl mx-auto px-2">
               Olá, {userName}! Miguel vai te acompanhar em cada etapa. Basta seguir o caminho no seu ritmo.
@@ -218,19 +218,19 @@ const Cliente = () => {
             ))}
           </div>
 
-          {/* Final Map Generation */}
+          {/* Final Code Generation */}
           {isJourneyComplete && (
             <div className="bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 border border-primary/30 rounded-xl md:rounded-2xl p-6 md:p-8 text-center">
               <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
                 <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-primary" />
               </div>
-              <h2 className="text-xl md:text-2xl font-bold mb-2">Mapa Final</h2>
+              <h2 className="text-xl md:text-2xl font-bold mb-2">Código da Essência</h2>
               <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6">
-                Parabéns, {userName}! Sua essência está pronta para ser revelada.
+                Parabéns, {userName}! Seu código interior está pronto para ser revelado.
               </p>
-              <Button size="lg" onClick={handleGenerateMap} className="gap-2 w-full sm:w-auto">
-                <Map className="w-4 h-4 md:w-5 md:h-5" />
-                Gerar Meu Mapa da Essência
+              <Button size="lg" onClick={handleGenerateCode} className="gap-2 w-full sm:w-auto">
+                <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
+                Gerar Meu Código da Essência
               </Button>
             </div>
           )}
