@@ -20,6 +20,13 @@ import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
 import { getInteligenciasResults, INTELLIGENCES, InteligenciasResult } from "@/lib/inteligenciasMultiplas";
 import { generateInteligenciasPremiumPDF } from "@/lib/pdfInteligenciasMultiplas";
+import { generateArquetiposPremiumPDF } from "@/lib/pdfArquetiposPremium";
+import { downloadDISCPremiumPDF } from "@/lib/pdfDisc";
+import { generateEneagramaPDF } from "@/lib/pdfEneagrama";
+import { generateTemperamentosPDF } from "@/lib/pdfTemperamentos";
+import { downloadNello16PremiumPDF } from "@/lib/pdfNello16Personality";
+import { generateEstilosConexaoPremiumPDF } from "@/lib/pdfEstilosConexaoAfetiva";
+import { calculateEstilosConexaoAfetiva } from "@/lib/estilosConexaoAfetiva";
 import { useAuth } from "@/hooks/useAuth";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useTests } from "@/hooks/useTests";
@@ -159,10 +166,85 @@ export default function TestResults() {
     inteligenciasResults = getInteligenciasResults(answers as any);
   }
 
+  // Calculate Estilos de Conexão Afetiva results
+  let estilosConexaoResults = null;
+  if (isLinguagensAmorTest && answers && answers.length > 0) {
+    estilosConexaoResults = calculateEstilosConexaoAfetiva(answers as any, lang as 'pt' | 'en' | 'pt-pt');
+  }
+
   const handleDownloadInteligenciasPDF = () => {
     if (inteligenciasResults) {
       const userName = user?.email?.split('@')[0] || 'Usuario';
       generateInteligenciasPremiumPDF(inteligenciasResults, userName, { language: lang as 'pt' | 'en' });
+    }
+  };
+
+  // Premium PDF handlers for each test type
+  const handleDownloadArquetiposPDF = () => {
+    if (dominantArchetypes && archetypeScoresArray) {
+      const userName = user?.email?.split('@')[0] || 'Usuario';
+      generateArquetiposPremiumPDF({
+        dominant: dominantArchetypes.primary.archetype,
+        secondary: dominantArchetypes.secondary?.archetype || '',
+        tertiary: dominantArchetypes.tertiary?.archetype || '',
+        allScores: archetypeScores,
+        ranking: archetypeScoresArray.map(s => ({ key: s.archetype, score: s.score, percentage: Math.round((s.score / Math.max(...archetypeScoresArray.map(x => x.score))) * 100) }))
+      }, { userName, language: lang as 'pt' | 'pt-pt' | 'en' });
+    }
+  };
+
+  const handleDownloadDISCPDF = () => {
+    if (discResults) {
+      const userName = user?.email?.split('@')[0] || 'Usuario';
+      downloadDISCPremiumPDF({
+        userName,
+        scores: discResults.scores as { D: number; I: number; S: number; C: number },
+        dominantProfile: discResults.dominantProfile,
+        language: lang as 'pt' | 'pt-pt' | 'en'
+      });
+    }
+  };
+
+  const handleDownloadEneagramaPDF = () => {
+    if (enneagramResultData?.primaryType) {
+      const userName = user?.email?.split('@')[0] || 'Usuario';
+      generateEneagramaPDF({
+        dominantType: parseInt(enneagramResultData.primaryType),
+        wing: parseInt(enneagramResultData.primaryType) === 9 ? 1 : parseInt(enneagramResultData.primaryType) + 1,
+        scores: enneagramResultData.scores || {}
+      }, { userName, language: lang as 'pt' | 'pt-pt' | 'en' });
+    }
+  };
+
+  const handleDownloadTemperamentosPDF = () => {
+    if (temperamentosResultData) {
+      const userName = user?.email?.split('@')[0] || 'Usuario';
+      generateTemperamentosPDF({
+        primary: temperamentosResultData.primary,
+        secondary: temperamentosResultData.secondary,
+        scores: temperamentosResultData.scores || { sanguineo: 0, colerico: 0, melancolico: 0, fleumatico: 0 },
+        interpretation: temperamentosResultData.interpretation || ''
+      }, { userName, language: lang as 'pt' | 'pt-pt' | 'en' });
+    }
+  };
+
+  const handleDownloadNello16PDF = () => {
+    if (mbtiResultData?.type) {
+      const userName = user?.email?.split('@')[0] || 'Usuario';
+      downloadNello16PremiumPDF({
+        userName,
+        personalityType: mbtiResultData.type,
+        dimensionScores: mbtiResultData.scores || { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 },
+        language: lang as 'pt' | 'pt-pt' | 'en'
+      });
+    }
+  };
+
+  const handleDownloadEstilosConexaoPDF = () => {
+    if (estilosConexaoResults || linguagensAmorResultData) {
+      const userName = user?.email?.split('@')[0] || 'Usuario';
+      const result = estilosConexaoResults || linguagensAmorResultData;
+      generateEstilosConexaoPremiumPDF(result, userName, { language: lang as 'pt' | 'pt-pt' | 'en' });
     }
   };
   
@@ -754,7 +836,37 @@ export default function TestResults() {
         {isInteligenciasTest && inteligenciasResults ? (
           <Button onClick={handleDownloadInteligenciasPDF} className="flex-1">
             <FileText className="mr-2 h-4 w-4" />
-            {lang === 'en' ? 'Download Premium Report (13 pages)' : 'Baixar Relatório Premium (13 páginas)'}
+            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
+          </Button>
+        ) : isArchetyposTest && dominantArchetypes ? (
+          <Button onClick={handleDownloadArquetiposPDF} className="flex-1">
+            <FileText className="mr-2 h-4 w-4" />
+            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
+          </Button>
+        ) : isDISCTest && discResults ? (
+          <Button onClick={handleDownloadDISCPDF} className="flex-1">
+            <FileText className="mr-2 h-4 w-4" />
+            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
+          </Button>
+        ) : isEnneagramTest && enneagramResultData?.primaryType ? (
+          <Button onClick={handleDownloadEneagramaPDF} className="flex-1">
+            <FileText className="mr-2 h-4 w-4" />
+            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
+          </Button>
+        ) : isTemperamentosTest && temperamentosResultData ? (
+          <Button onClick={handleDownloadTemperamentosPDF} className="flex-1">
+            <FileText className="mr-2 h-4 w-4" />
+            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
+          </Button>
+        ) : isMBTITest && mbtiResultData?.type ? (
+          <Button onClick={handleDownloadNello16PDF} className="flex-1">
+            <FileText className="mr-2 h-4 w-4" />
+            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
+          </Button>
+        ) : isLinguagensAmorTest && (estilosConexaoResults || linguagensAmorResultData) ? (
+          <Button onClick={handleDownloadEstilosConexaoPDF} className="flex-1">
+            <FileText className="mr-2 h-4 w-4" />
+            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
           </Button>
         ) : (
           <Button onClick={handleDownloadPDF} className="flex-1">
