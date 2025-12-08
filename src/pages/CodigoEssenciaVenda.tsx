@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useCodigoEssenciaAccess } from "@/hooks/useCodigoEssenciaAccess";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,11 +18,9 @@ import {
   X, 
   Star,
   ArrowRight,
-  Lock
+  Lock,
+  Loader2
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { formatPrice } from "@/lib/priceConfig";
-import type { Language } from "@/contexts/LanguageContext";
 
 const content = {
   "pt": {
@@ -279,74 +278,17 @@ const CodigoEssenciaVenda = () => {
   const { language } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [hasAccess, setHasAccess] = useState(false);
-  const [allTestsCompleted, setAllTestsCompleted] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { hasUnlocked, allTestsCompleted, isLoading } = useCodigoEssenciaAccess();
 
   const langKey = language === "pt-pt" ? "pt-pt" : language === "en" ? "en" : "pt";
   const t = content[langKey];
 
-  useEffect(() => {
-    const checkAccess = async () => {
-      if (!user) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        // Check test purchases for codigo_da_essencia
-        const { data: purchases } = await supabase
-          .from("test_purchases")
-          .select("*")
-          .eq("user_id", user.id)
-          .eq("payment_status", "completed");
-
-        const hasPurchased = purchases?.some(p => 
-          p.metadata && typeof p.metadata === 'object' && 
-          (p.metadata as any).product_type === 'codigo_da_essencia'
-        );
-        setHasAccess(!!hasPurchased);
-
-        // Check if all 7 tests are completed
-        const { data: userTests } = await supabase
-          .from("user_tests")
-          .select("test_id, status")
-          .eq("user_id", user.id)
-          .eq("status", "completed");
-
-        const { data: tests } = await supabase
-          .from("tests")
-          .select("id, type")
-          .eq("active", true);
-
-        const requiredTypes = [
-          "arquetipos_proposito",
-          "inteligencias_multiplas",
-          "linguagens_amor",
-          "mbti",
-          "disc",
-          "eneagrama",
-          "temperamentos"
-        ];
-
-        const completedTestIds = userTests?.map(ut => ut.test_id) || [];
-        const completedTypes = tests
-          ?.filter(t => completedTestIds.includes(t.id))
-          .map(t => t.type) || [];
-
-        const allCompleted = requiredTypes.every(type => completedTypes.includes(type as any));
-        setAllTestsCompleted(allCompleted);
-      } catch (error) {
-        console.error("Error checking access:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAccess();
-  }, [user]);
-
   const handlePurchase = () => {
+    if (!user) {
+      const authPath = language === "en" ? "/en/auth" : "/auth";
+      navigate(authPath);
+      return;
+    }
     const checkoutPath = language === "en" ? "/en/essence-code/checkout" : 
                         language === "pt-pt" ? "/pt-pt/codigo-da-essencia/checkout" : 
                         "/codigo-da-essencia/checkout";
@@ -354,16 +296,21 @@ const CodigoEssenciaVenda = () => {
   };
 
   const handleGenerate = () => {
-    const generatePath = language === "en" ? "/en/essence-code" : 
-                        language === "pt-pt" ? "/pt-pt/codigo-essencia" : 
-                        "/codigo-essencia";
+    const generatePath = language === "en" ? "/en/cliente/codigo-essencia" : 
+                        language === "pt-pt" ? "/pt-pt/cliente/codigo-essencia" : 
+                        "/cliente/codigo-essencia";
     navigate(generatePath);
+  };
+
+  const handleLogin = () => {
+    const authPath = language === "en" ? "/en/auth" : "/auth";
+    navigate(authPath);
   };
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -413,7 +360,7 @@ const CodigoEssenciaVenda = () => {
                 </div>
               )}
 
-              {hasAccess ? (
+              {hasUnlocked ? (
                 <Button 
                   size="lg" 
                   onClick={handleGenerate}
@@ -590,7 +537,7 @@ const CodigoEssenciaVenda = () => {
                   <p className="text-muted-foreground">{t.hero.priceInstallments}</p>
                 )}
 
-                {hasAccess ? (
+                {hasUnlocked ? (
                   <Button 
                     size="lg" 
                     onClick={handleGenerate}

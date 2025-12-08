@@ -37,7 +37,83 @@ serve(async (req) => {
       
       logStep("Processing completed checkout", { sessionId: session.id });
 
-      // Support both single test (legacy) and multiple tests (new)
+      // Check if this is a Código da Essência purchase
+      const isCodigoEssencia = session.metadata?.product_type === "codigo_da_essencia";
+      const userId = session.metadata?.user_id;
+
+      if (isCodigoEssencia) {
+        logStep("Processing Código da Essência purchase", { userId });
+        
+        if (!userId || userId === "guest") {
+          logStep("ERROR: Código da Essência requires authenticated user");
+          return new Response(JSON.stringify({ error: "User authentication required" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        // Update profile to unlock Código da Essência
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ codigo_essencia_unlocked: true })
+          .eq("id", userId);
+
+        if (updateError) {
+          logStep("ERROR: Failed to unlock Código da Essência", { error: updateError });
+          throw updateError;
+        }
+
+        logStep("Código da Essência unlocked successfully", { userId });
+
+        // Send confirmation email
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", userId)
+            .single();
+
+          const { data: userAuth } = await supabase.auth.admin.getUserById(userId);
+          const userEmail = userAuth?.user?.email;
+
+          if (userEmail) {
+            const language = session.metadata?.language || "pt";
+            const currency = session.metadata?.currency === "USD" ? "$" : 
+                            session.metadata?.currency === "EUR" ? "€" : "R$";
+            const amountPaid = (session.amount_total || 0) / 100;
+
+            await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${supabaseServiceKey}`,
+              },
+              body: JSON.stringify({
+                type: "purchase_confirmation",
+                to: userEmail,
+                data: {
+                  name: profile?.full_name || userEmail.split("@")[0],
+                  testNames: [language === "en" ? "Essence Code" : "Código da Essência"],
+                  amount: amountPaid,
+                  currency,
+                  language,
+                },
+              }),
+            });
+
+            logStep("Confirmation email sent for Código da Essência", { userEmail });
+          }
+        } catch (emailError) {
+          logStep("WARN: Failed to send email", { error: emailError });
+        }
+
+        return new Response(JSON.stringify({ received: true, product: "codigo_da_essencia" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // Standard test purchase flow
       let testIds: string[];
       if (session.metadata?.test_ids) {
         try {
@@ -46,14 +122,11 @@ serve(async (req) => {
           testIds = [session.metadata.test_ids];
         }
       } else if (session.metadata?.test_id) {
-        // Legacy single test support
         testIds = [session.metadata.test_id];
       } else {
         logStep("ERROR: Missing test metadata", { metadata: session.metadata });
         return new Response("Missing test metadata", { status: 400 });
       }
-
-      const userId = session.metadata?.user_id;
 
       if (!userId || userId === "guest") {
         logStep("WARN: Guest purchase - cannot record without user_id");
@@ -176,7 +249,6 @@ serve(async (req) => {
         }
       } catch (emailError) {
         logStep("WARN: Failed to send email", { error: emailError });
-        // Don't fail the webhook for email errors
       }
     }
 

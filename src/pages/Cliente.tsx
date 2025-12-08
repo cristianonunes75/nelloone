@@ -1,11 +1,12 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useTests } from "@/hooks/useTests";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
+import { useCodigoEssenciaAccess } from "@/hooks/useCodigoEssenciaAccess";
 import { Button } from "@/components/ui/button";
 import { JourneyStepCard } from "@/components/cliente/JourneyStepCard";
 import { LogoText } from "@/components/LogoText";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
-import { LogOut, User, Sparkles, Map } from "lucide-react";
+import { LogOut, User, Sparkles, Map, Lock, ShoppingCart } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +29,12 @@ const Cliente = () => {
     testResults,
     isLoading 
   } = useJourneyProgress();
+  const { 
+    canSeeMenuItem: canSeeCodigoMenu,
+    canGenerateCode,
+    canPurchase: canPurchaseCodigo,
+    hasUnlocked: hasCodigoUnlocked
+  } = useCodigoEssenciaAccess();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
@@ -119,7 +126,29 @@ const Cliente = () => {
 
   const handleGenerateCode = () => {
     const basePath = getBasePath();
-    navigate(`${basePath}/cliente/codigo-essencia`);
+    // If user has access, go to generate page; otherwise go to sales page
+    if (hasCodigoUnlocked) {
+      navigate(`${basePath}/cliente/codigo-essencia`);
+    } else {
+      // Go to sales page
+      if (language === 'en') {
+        navigate('/en/essence-code-premium');
+      } else if (language === 'pt-pt') {
+        navigate('/pt-pt/codigo-da-essencia');
+      } else {
+        navigate('/codigo-da-essencia');
+      }
+    }
+  };
+
+  const handlePurchaseCodigo = () => {
+    if (language === 'en') {
+      navigate('/en/essence-code-premium');
+    } else if (language === 'pt-pt') {
+      navigate('/pt-pt/codigo-da-essencia');
+    } else {
+      navigate('/codigo-da-essencia');
+    }
   };
 
   if (isLoading) {
@@ -218,20 +247,40 @@ const Cliente = () => {
             ))}
           </div>
 
-          {/* Final Code Generation */}
-          {isJourneyComplete && (
-            <div className="bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 border border-primary/30 rounded-xl md:rounded-2xl p-6 md:p-8 text-center">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+          {/* Final Code Generation - Shows only when journey is complete */}
+          {canSeeCodigoMenu && (
+            <div className={`bg-gradient-to-br ${hasCodigoUnlocked ? 'from-primary/20 via-primary/10 to-accent/20 border-primary/30' : 'from-amber-500/20 via-amber-400/10 to-orange-400/20 border-amber-500/30'} border rounded-xl md:rounded-2xl p-6 md:p-8 text-center`}>
+              <div className={`w-12 h-12 md:w-16 md:h-16 ${hasCodigoUnlocked ? 'bg-primary/20' : 'bg-amber-500/20'} rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4`}>
+                {hasCodigoUnlocked ? (
+                  <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                ) : (
+                  <Lock className="w-6 h-6 md:w-8 md:h-8 text-amber-600" />
+                )}
               </div>
-              <h2 className="text-xl md:text-2xl font-bold mb-2">Código da Essência</h2>
+              <h2 className="text-xl md:text-2xl font-bold mb-2">
+                {language === 'en' ? 'Essence Code' : 'Código da Essência'}
+              </h2>
               <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6">
-                Parabéns, {userName}! Seu código interior está pronto para ser revelado.
+                {hasCodigoUnlocked 
+                  ? (language === 'en' 
+                    ? `Congratulations, ${userName}! Your inner code is ready to be revealed.`
+                    : `Parabéns, ${userName}! Seu código interior está pronto para ser revelado.`)
+                  : (language === 'en'
+                    ? `${userName}, you've completed all 7 tests! Unlock your Essence Code.`
+                    : `${userName}, você completou todos os 7 testes! Desbloqueie seu Código da Essência.`)
+                }
               </p>
-              <Button size="lg" onClick={handleGenerateCode} className="gap-2 w-full sm:w-auto">
-                <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
-                Gerar Meu Código da Essência
-              </Button>
+              {hasCodigoUnlocked ? (
+                <Button size="lg" onClick={handleGenerateCode} className="gap-2 w-full sm:w-auto">
+                  <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
+                  {language === 'en' ? 'Generate My Essence Code' : 'Gerar Meu Código da Essência'}
+                </Button>
+              ) : (
+                <Button size="lg" onClick={handlePurchaseCodigo} className="gap-2 w-full sm:w-auto bg-amber-600 hover:bg-amber-700">
+                  <ShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
+                  {language === 'en' ? 'Unlock Essence Code' : 'Desbloquear Código da Essência'}
+                </Button>
+              )}
             </div>
           )}
 

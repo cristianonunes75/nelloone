@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { useCodigoEssencia } from "@/hooks/useCodigoEssencia";
-import { useTestAccess } from "@/hooks/useTestAccess";
+import { useCodigoEssenciaAccess } from "@/hooks/useCodigoEssenciaAccess";
 import { Button } from "@/components/ui/button";
 import { LogoText } from "@/components/LogoText";
 import { 
@@ -19,10 +19,10 @@ import {
   Lock,
   CheckCircle2,
   AlertCircle,
-  Mail
+  Mail,
+  ShoppingCart
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { generateCodigoEssenciaPDF, canGenerateCodigoEssencia, getMissingTests } from "@/lib/pdfCodigoEssencia";
 import { toast } from "sonner";
@@ -163,8 +163,8 @@ const TRANSLATIONS = {
 const CodigoEssencia = () => {
   const { profile, user } = useAuth();
   const { isJourneyComplete, testResults, completedCount, totalSteps, isLoading: journeyLoading } = useJourneyProgress();
-  const { hasSavedCodigo, savedCodigo, resetCodigo, saveCodigo, isLoading: codigoLoading } = useCodigoEssencia();
-  const { hasPurchased } = useTestAccess();
+  const { hasSavedCodigo, savedCodigo, resetCodigo, isLoading: codigoLoading } = useCodigoEssencia();
+  const { hasUnlocked, canGenerateCode, canPurchase, isLoading: accessLoading } = useCodigoEssenciaAccess();
   const navigate = useNavigate();
   const { language } = useLanguage();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -177,11 +177,10 @@ const CodigoEssencia = () => {
   const t = TRANSLATIONS[lang];
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   const userName = profile?.full_name || (lang === 'en' ? "Traveler" : "Viajante");
-  const isLoading = journeyLoading || codigoLoading;
+  const isLoading = journeyLoading || codigoLoading || accessLoading;
 
-  // Check if user has access to Código da Essência (premium product)
-  // For now, allow access if journey is complete - purchase flow can be added later
-  const hasAccess = true; // TODO: Check for codigo_da_essencia purchase
+  // Use the proper access check from hook
+  const hasAccess = hasUnlocked;
 
   // Check if all tests are completed
   const canGenerate = useMemo(() => {
@@ -246,8 +245,14 @@ const CodigoEssencia = () => {
   };
 
   const handlePurchase = () => {
-    // Navigate to purchase page for codigo_da_essencia
-    navigate(`${basePath}/cliente/comprar/codigo_da_essencia`);
+    // Navigate to sales page for codigo_da_essencia
+    if (language === 'en') {
+      navigate('/en/essence-code-premium');
+    } else if (language === 'pt-pt') {
+      navigate('/pt-pt/codigo-da-essencia');
+    } else {
+      navigate('/codigo-da-essencia');
+    }
   };
 
   if (isLoading) {
@@ -333,15 +338,15 @@ const CodigoEssencia = () => {
 
         <main className="container px-4 py-12">
           <div className="max-w-2xl mx-auto text-center">
-            <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Lock className="w-10 h-10 text-primary" />
+            <div className="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Lock className="w-10 h-10 text-amber-600" />
             </div>
             <h1 className="text-3xl font-bold mb-4">{t.locked}</h1>
             <p className="text-muted-foreground mb-8">
               {t.lockedDesc}
             </p>
-            <Button size="lg" onClick={handlePurchase}>
-              <Sparkles className="w-5 h-5 mr-2" />
+            <Button size="lg" onClick={handlePurchase} className="bg-amber-600 hover:bg-amber-700">
+              <ShoppingCart className="w-5 h-5 mr-2" />
               {t.purchase}
             </Button>
           </div>
