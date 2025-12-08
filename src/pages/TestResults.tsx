@@ -3,13 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Download, CheckCircle, Lock, RotateCcw, FileText } from "lucide-react";
+import { Download, CheckCircle, Lock, RotateCcw, FileText, Mail, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ARCHETYPES } from "@/lib/archetypes";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 import PhotoSessionBooking from "@/components/cliente/PhotoSessionBooking";
 import ArchetypeResults from "@/components/cliente/ArchetypeResults";
 import { calculateArchetypeScores, getDominantArchetypes } from "@/lib/archetypes";
@@ -33,6 +34,7 @@ import { useTests } from "@/hooks/useTests";
 import { GrowthInsightsCard } from "@/components/growth/GrowthInsightsCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getGrowthInsights } from "@/lib/growthInsights";
+import { usePDFEmail } from "@/hooks/usePDFEmail";
 
 export default function TestResults() {
   const { userTestId } = useParams();
@@ -40,6 +42,7 @@ export default function TestResults() {
   const resultsRef = useRef<HTMLDivElement>(null);
   const { user, userRole } = useAuth();
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
+  const { sendPDFByEmail, isSending: isSendingEmail } = usePDFEmail();
   const { resetTest } = useTests();
   const { language } = useLanguage();
   const isAdmin = userRole === "admin";
@@ -246,6 +249,43 @@ export default function TestResults() {
       const result = estilosConexaoResults || linguagensAmorResultData;
       generateEstilosConexaoPremiumPDF(result, userName, { language: lang as 'pt' | 'pt-pt' | 'en' });
     }
+  };
+
+  // Send PDF by email handler
+  const handleSendPDFByEmail = async () => {
+    if (!user?.email || !userTest?.tests?.type) return;
+    
+    const userName = user?.email?.split('@')[0] || 'Usuario';
+    const testType = userTest.tests.type;
+    const testName = userTest.tests.name || '';
+    
+    // Prepare result data based on test type
+    let resultData: any = {};
+    
+    if (testType === 'disc' && discResults) {
+      resultData = { scores: discResults.scores, dominantProfile: discResults.dominantProfile };
+    } else if (testType === 'mbti' && mbtiResultData) {
+      resultData = { type: mbtiResultData.type, scores: mbtiResultData.scores };
+    } else if (testType === 'eneagrama' && enneagramResultData) {
+      resultData = { primaryType: enneagramResultData.primaryType, scores: enneagramResultData.scores };
+    } else if (testType === 'temperamentos' && temperamentosResultData) {
+      resultData = { primary: temperamentosResultData.primary, secondary: temperamentosResultData.secondary };
+    } else if (testType === 'linguagens_amor') {
+      resultData = estilosConexaoResults || linguagensAmorResultData;
+    } else if (testType === 'inteligencias_multiplas' && inteligenciasResults) {
+      resultData = inteligenciasResults;
+    } else if (testType === 'arquetipos_proposito' && dominantArchetypes) {
+      resultData = { primary: dominantArchetypes.primary, secondary: dominantArchetypes.secondary };
+    }
+    
+    await sendPDFByEmail({
+      testType,
+      testName,
+      userName,
+      userEmail: user.email,
+      language: lang as 'pt' | 'pt-pt' | 'en',
+      resultData
+    });
   };
   
   // Cast result_data for MBTI and Enneagram
@@ -832,7 +872,7 @@ export default function TestResults() {
         />
       )}
 
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-4">
         {isInteligenciasTest && inteligenciasResults ? (
           <Button onClick={handleDownloadInteligenciasPDF} className="flex-1">
             <FileText className="mr-2 h-4 w-4" />
@@ -874,6 +914,21 @@ export default function TestResults() {
             {lang === 'en' ? 'Download PDF' : 'Baixar PDF'}
           </Button>
         )}
+        
+        {/* Send by Email Button */}
+        <Button 
+          onClick={handleSendPDFByEmail} 
+          variant="outline" 
+          className="flex-1"
+          disabled={isSendingEmail || !user?.email}
+        >
+          {isSendingEmail ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Mail className="mr-2 h-4 w-4" />
+          )}
+          {lang === 'en' ? 'Send to Email' : lang === 'pt-pt' ? 'Enviar por Email' : 'Enviar por Email'}
+        </Button>
       </div>
 
       <Card>
