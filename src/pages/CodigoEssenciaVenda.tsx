@@ -317,7 +317,13 @@ const CodigoEssenciaVenda = () => {
     navigate(basePath);
   };
 
-  if (isLoading) {
+  // Set page title
+  useEffect(() => {
+    document.title = langKey === "en" ? "Essence Code - Premium Report | NELLO ONE" : "Código da Essência - Relatório Premium | NELLO ONE";
+  }, [langKey]);
+
+  // Show loading only if user is authenticated and we're fetching data
+  if (user && isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -325,13 +331,8 @@ const CodigoEssenciaVenda = () => {
     );
   }
 
-  // Set page title
-  useEffect(() => {
-    document.title = langKey === "en" ? "Essence Code - Premium Report | NELLO ONE" : "Código da Essência - Relatório Premium | NELLO ONE";
-  }, [langKey]);
-
-  // Block access if journey is not completed - show simple message
-  if (!journeyCompleted) {
+  // Block access if not logged in OR journey is not completed - show simple message
+  if (!user || !journeyCompleted) {
     const incompleteContent = {
       pt: {
         title: "Complete sua Jornada primeiro",
