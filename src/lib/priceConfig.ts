@@ -108,9 +108,9 @@ export const testPrices: Record<string, TestPrice> = {
   // Código da Essência - Premium final report (requires all 7 tests completed)
   codigo_da_essencia: {
     testType: "codigo_da_essencia",
-    brl: { price: 397, priceId: null }, // Create Stripe price when ready
-    usd: { price: 97, priceId: null },
-    eur: { price: 97, priceId: null },
+    brl: { price: 397, priceId: "price_1Sc2RRDjhZZxZELMPxAnu0I5" },
+    usd: { price: 97, priceId: "price_1Sc2RfDjhZZxZELMbZP1CvLO" },
+    eur: { price: 97, priceId: "price_1Sc2TRDjhZZxZELMr66uJZZm" },
   },
 };
 
