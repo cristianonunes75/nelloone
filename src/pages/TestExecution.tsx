@@ -18,12 +18,15 @@ import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
+import { updateJourneyProgress, getJourneySlugFromTestType } from "@/utils/journey";
 
 export default function TestExecution() {
   const { testId, userTestId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { language } = useLanguage();
+  const { user } = useAuth();
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
@@ -245,7 +248,16 @@ export default function TestExecution() {
         }));
       }
 
+      // Complete test and update journey progress
       completeTest(resultData);
+      
+      // Update journey progress immediately after completing test
+      if (user?.id && testType) {
+        const journeySlug = getJourneySlugFromTestType(testType);
+        if (journeySlug) {
+          updateJourneyProgress(user.id, journeySlug, 'completed').catch(console.error);
+        }
+      }
     }
   };
 
