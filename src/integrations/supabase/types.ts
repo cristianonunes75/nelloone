@@ -147,6 +147,33 @@ export type Database = {
           },
         ]
       }
+      app_settings: {
+        Row: {
+          description: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -512,6 +539,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          is_blocked: boolean | null
           journey_completed_at: string | null
           journey_completed_tests: number
           journey_started_at: string | null
@@ -528,6 +556,7 @@ export type Database = {
           created_at?: string
           full_name: string
           id: string
+          is_blocked?: boolean | null
           journey_completed_at?: string | null
           journey_completed_tests?: number
           journey_started_at?: string | null
@@ -544,6 +573,7 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          is_blocked?: boolean | null
           journey_completed_at?: string | null
           journey_completed_tests?: number
           journey_started_at?: string | null

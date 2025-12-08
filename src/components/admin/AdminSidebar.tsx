@@ -3,12 +3,13 @@ import {
   Users, 
   CreditCard, 
   Settings, 
-  BarChart3,
+  Package,
   Bot,
-  FileEdit,
-  Route,
-  Wrench,
-  FlaskConical,
+  FileText,
+  Shield,
+  Ticket,
+  Sparkles,
+  Activity,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -26,7 +27,7 @@ import { cn } from "@/lib/utils";
 
 const menuSections = [
   {
-    label: "INÍCIO",
+    label: "VISÃO GERAL",
     items: [
       { title: "Dashboard", url: "/admin", icon: Home, exact: true },
     ]
@@ -34,24 +35,17 @@ const menuSections = [
   {
     label: "GESTÃO",
     items: [
-      { title: "Landing & Conteúdo", url: "/admin/conteudo", icon: FileEdit },
-      { title: "Usuários", url: "/admin/usuarios", icon: Users },
-      { title: "Testes & Jornadas", url: "/admin/testes", icon: Route },
-      { title: "Planos & Cupons", url: "/admin/planos", icon: CreditCard },
-      { title: "Miguel – IA", url: "/admin/miguel", icon: Bot },
-      { title: "Relatórios", url: "/admin/relatorios", icon: BarChart3 },
-    ]
-  },
-  {
-    label: "FERRAMENTAS",
-    items: [
-      { title: "Modo Simulação", url: "/admin/simulador", icon: FlaskConical },
-      { title: "Admin Tools", url: "/admin/tools", icon: Wrench },
+      { title: "Usuários & Jornadas", url: "/admin/usuarios", icon: Users },
+      { title: "Pedidos & Pagamentos", url: "/admin/pedidos", icon: CreditCard },
+      { title: "Produtos & Testes", url: "/admin/produtos", icon: Package },
+      { title: "Cupons", url: "/admin/cupons", icon: Ticket },
+      { title: "Código da Essência", url: "/admin/codigo-essencia", icon: Sparkles },
     ]
   },
   {
     label: "SISTEMA",
     items: [
+      { title: "Logs & Auditoria", url: "/admin/logs", icon: Activity },
       { title: "Configurações", url: "/admin/configuracoes", icon: Settings },
     ]
   }
