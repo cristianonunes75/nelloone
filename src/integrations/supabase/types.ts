@@ -512,6 +512,12 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          journey_completed_at: string | null
+          journey_completed_tests: number
+          journey_started_at: string | null
+          journey_status: string
+          journey_tests_status: Json
+          journey_total_tests: number
           phone: string | null
           profession: string | null
           updated_at: string
@@ -522,6 +528,12 @@ export type Database = {
           created_at?: string
           full_name: string
           id: string
+          journey_completed_at?: string | null
+          journey_completed_tests?: number
+          journey_started_at?: string | null
+          journey_status?: string
+          journey_tests_status?: Json
+          journey_total_tests?: number
           phone?: string | null
           profession?: string | null
           updated_at?: string
@@ -532,6 +544,12 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          journey_completed_at?: string | null
+          journey_completed_tests?: number
+          journey_started_at?: string | null
+          journey_status?: string
+          journey_tests_status?: Json
+          journey_total_tests?: number
           phone?: string | null
           profession?: string | null
           updated_at?: string
