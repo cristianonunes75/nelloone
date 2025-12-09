@@ -114,6 +114,33 @@ export const testPrices: Record<string, TestPrice> = {
   },
 };
 
+// Fundadores - Special launch tier with complete access
+export const fundadoresPrices = {
+  name: "Fundadores Nello One",
+  productType: "fundadores",
+  brl: {
+    price: 197,
+    originalPrice: 597,
+    priceId: "price_1ScWglDjhZZxZELM3tQocxgu",
+    currency: "BRL" as Currency,
+    symbol: "R$",
+  },
+  usd: {
+    price: 97,
+    originalPrice: 147,
+    priceId: "price_1ScWglDjhZZxZELM3tQocxgu", // Same price for now
+    currency: "USD" as Currency,
+    symbol: "$",
+  },
+  eur: {
+    price: 97,
+    originalPrice: 147,
+    priceId: "price_1ScWglDjhZZxZELM3tQocxgu", // Same price for now
+    currency: "EUR" as Currency,
+    symbol: "€",
+  },
+};
+
 // Bundle prices - FULL JOURNEY
 export const bundlePrices = {
   brl: {

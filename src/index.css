@@ -49,6 +49,14 @@
     --muted: 210 20% 97%;
     --muted-foreground: 216 15% 50%;
 
+    /* Fundadores - Deep Purple (Mistério) + Soft Gold (Honra) */
+    --founder-purple: 252 47% 40%; /* Deep Purple #5B3A94 */
+    --founder-purple-light: 252 40% 50%;
+    --founder-purple-deep: 252 50% 25%;
+    --founder-gold: 42 70% 55%; /* Soft Gold #D4A84B */
+    --founder-gold-light: 42 80% 70%;
+    --founder-gold-deep: 42 60% 40%;
+
     /* Legacy gold support - now using Ink Blue as accent */
     --gold: 216 28% 30%; /* Updated to ink-blue variant */
     --gold-light: 210 36% 92%; /* Maps to bruma */
