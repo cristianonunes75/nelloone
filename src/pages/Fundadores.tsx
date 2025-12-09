@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Check, Star, Heart, Users, Sparkles, Gift, Smartphone, Crown, ArrowRight, Loader2, Wrench, Brain, Compass, BookOpen, Zap } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Check, Star, Heart, Users, Sparkles, Gift, Smartphone, Crown, ArrowRight, Loader2, Wrench, Brain, Compass, BookOpen, Zap, Tag, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -13,10 +14,100 @@ const Fundadores = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [showCouponField, setShowCouponField] = useState(false);
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponDiscount, setCouponDiscount] = useState<number | null>(null);
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  const validateCoupon = async () => {
+    if (!couponCode.trim()) return;
+    
+    setIsValidatingCoupon(true);
+    try {
+      const { data: coupon, error } = await supabase
+        .from("coupons")
+        .select("*")
+        .eq("code", couponCode.trim().toUpperCase())
+        .eq("is_active", true)
+        .single();
+
+      if (error || !coupon) {
+        toast({
+          title: "Cupom inválido",
+          description: "Este código de cupom não existe ou está inativo.",
+          variant: "destructive",
+        });
+        setCouponApplied(false);
+        setCouponDiscount(null);
+        return;
+      }
+
+      // Check if coupon is for Fundadores or all products
+      if (coupon.allowed_product_type && coupon.allowed_product_type !== "fundadores") {
+        toast({
+          title: "Cupom não aplicável",
+          description: "Este cupom não é válido para o plano Fundadores.",
+          variant: "destructive",
+        });
+        setCouponApplied(false);
+        setCouponDiscount(null);
+        return;
+      }
+
+      // Check expiration
+      if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
+        toast({
+          title: "Cupom expirado",
+          description: "Este cupom já não está mais válido.",
+          variant: "destructive",
+        });
+        setCouponApplied(false);
+        setCouponDiscount(null);
+        return;
+      }
+
+      // Check max uses
+      if (coupon.max_uses && coupon.times_used >= coupon.max_uses) {
+        toast({
+          title: "Cupom esgotado",
+          description: "Este cupom já atingiu o limite máximo de utilizações.",
+          variant: "destructive",
+        });
+        setCouponApplied(false);
+        setCouponDiscount(null);
+        return;
+      }
+
+      setCouponApplied(true);
+      setCouponDiscount(coupon.discount_value);
+      toast({
+        title: "Cupom aplicado!",
+        description: coupon.discount_value === 100 
+          ? "Desconto de 100% aplicado. Você terá acesso gratuito!" 
+          : `Desconto de ${coupon.discount_value}% aplicado.`,
+      });
+    } catch (error) {
+      console.error("Coupon validation error:", error);
+      toast({
+        title: "Erro ao validar cupom",
+        description: "Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setCouponCode("");
+    setCouponApplied(false);
+    setCouponDiscount(null);
+  };
 
   const handleCTA = async () => {
     if (!user) {
@@ -36,6 +127,7 @@ const Fundadores = () => {
           isFundadores: true,
           language: "pt",
           currency: "brl",
+          couponCode: couponApplied ? couponCode.trim().toUpperCase() : undefined,
         },
       });
 
@@ -108,6 +200,61 @@ const Fundadores = () => {
                 deste projeto que une ciência, inteligência artificial e propósito.
               </p>
               
+              {/* Coupon Field */}
+              <div className="mb-6">
+                {!showCouponField ? (
+                  <button
+                    onClick={() => setShowCouponField(true)}
+                    className="text-sm text-muted-foreground hover:text-[hsl(252,47%,40%)] flex items-center gap-2 transition-colors"
+                  >
+                    <Tag className="w-4 h-4" />
+                    Possui um cupom de desconto?
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Digite o código do cupom"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        disabled={couponApplied || isValidatingCoupon}
+                        className="max-w-[240px] uppercase"
+                      />
+                      {!couponApplied ? (
+                        <Button
+                          variant="outline"
+                          onClick={validateCoupon}
+                          disabled={isValidatingCoupon || !couponCode.trim()}
+                        >
+                          {isValidatingCoupon ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            "Aplicar"
+                          )}
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={removeCoupon}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                    {couponApplied && couponDiscount !== null && (
+                      <div className="flex items-center gap-2 text-sm text-green-600 font-medium">
+                        <Check className="w-4 h-4" />
+                        {couponDiscount === 100 
+                          ? "Cupom 100% aplicado - Acesso gratuito!" 
+                          : `Cupom de ${couponDiscount}% aplicado`}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <CTAButton className="text-lg px-8 py-6" />
               
               <p className="text-sm text-muted-foreground mt-6 flex items-center gap-2">

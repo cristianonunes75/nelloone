@@ -353,11 +353,14 @@ serve(async (req) => {
     // Check for Fundadores purchase
     const isFundadores = body.isFundadores === true;
     
+    // Check for coupon code
+    const couponCode = body.couponCode || null;
+    
     if (testIds.length === 0 && !isBundle && !isFundadores) {
       throw new Error("At least one test ID is required, or isBundle/isFundadores must be true");
     }
     
-    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, language, currency });
+    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, language, currency, couponCode });
 
     // Get user (optional - supports guest checkout)
     let user = null;
@@ -541,8 +544,62 @@ serve(async (req) => {
       customer_creation: customerId ? undefined : "always",
     };
 
-    // Add discount if applicable
-    if (discountPercentage > 0) {
+    // Check for user-provided coupon code (from database)
+    if (couponCode) {
+      // Create service role client for coupons table access
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      );
+      
+      const { data: dbCoupon, error: couponError } = await supabaseAdmin
+        .from("coupons")
+        .select("*")
+        .eq("code", couponCode)
+        .eq("is_active", true)
+        .single();
+      
+      if (!couponError && dbCoupon) {
+        // Validate coupon for product type
+        const productType = isFundadores ? "fundadores" : isBundle ? "jornada" : "test_avulso";
+        const isValidForProduct = !dbCoupon.allowed_product_type || dbCoupon.allowed_product_type === productType;
+        
+        // Validate expiration and usage
+        const isNotExpired = !dbCoupon.expires_at || new Date(dbCoupon.expires_at) > new Date();
+        const hasUsesLeft = !dbCoupon.max_uses || dbCoupon.times_used < dbCoupon.max_uses;
+        
+        if (isValidForProduct && isNotExpired && hasUsesLeft) {
+          // Use existing Stripe coupon if available, otherwise create one
+          if (dbCoupon.stripe_coupon_id) {
+            sessionParams.discounts = [{ coupon: dbCoupon.stripe_coupon_id }];
+            logStep("Using existing Stripe coupon", { stripeCouponId: dbCoupon.stripe_coupon_id });
+          } else {
+            // Create Stripe coupon dynamically
+            const stripeCoupon = await stripe.coupons.create({
+              percent_off: dbCoupon.discount_value,
+              duration: "once",
+              name: `${dbCoupon.code} - ${dbCoupon.discount_value}%`,
+            });
+            
+            sessionParams.discounts = [{ coupon: stripeCoupon.id }];
+            logStep("Created dynamic Stripe coupon", { couponId: stripeCoupon.id, discount: dbCoupon.discount_value });
+          }
+          
+          // Increment usage counter
+          await supabaseAdmin
+            .from("coupons")
+            .update({ times_used: (dbCoupon.times_used || 0) + 1 })
+            .eq("id", dbCoupon.id);
+            
+          logStep("Coupon usage incremented", { couponId: dbCoupon.id });
+        } else {
+          logStep("Coupon validation failed", { isValidForProduct, isNotExpired, hasUsesLeft });
+        }
+      } else {
+        logStep("Coupon not found or inactive", { couponCode, error: couponError?.message });
+      }
+    } else if (discountPercentage > 0) {
+      // Add quantity-based discount if applicable (only for individual tests without coupon)
       const couponNames: Record<string, string> = {
         pt: `Desconto ${discountPercentage}% - ${testIds.length} testes`,
         en: `${discountPercentage}% Off - ${testIds.length} tests`,
