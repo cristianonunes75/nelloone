@@ -696,35 +696,47 @@ export type Database = {
       }
       test_purchases: {
         Row: {
+          currency: string | null
           id: string
           metadata: Json | null
           payment_method: string | null
           payment_status: string
           price_paid: number
+          purchase_category: string | null
+          purchase_origin: string | null
           purchased_at: string
           test_id: string
+          test_slug: string | null
           transaction_id: string | null
           user_id: string
         }
         Insert: {
+          currency?: string | null
           id?: string
           metadata?: Json | null
           payment_method?: string | null
           payment_status?: string
           price_paid: number
+          purchase_category?: string | null
+          purchase_origin?: string | null
           purchased_at?: string
           test_id: string
+          test_slug?: string | null
           transaction_id?: string | null
           user_id: string
         }
         Update: {
+          currency?: string | null
           id?: string
           metadata?: Json | null
           payment_method?: string | null
           payment_status?: string
           price_paid?: number
+          purchase_category?: string | null
+          purchase_origin?: string | null
           purchased_at?: string
           test_id?: string
+          test_slug?: string | null
           transaction_id?: string | null
           user_id?: string
         }
