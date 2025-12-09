@@ -1,4 +1,5 @@
 import { useLanguage } from "@/contexts/LanguageContext";
+import cristianoPhoto from "@/assets/cristiano-nunes.jpg";
 
 const content = {
   pt: {
@@ -42,18 +43,34 @@ export function AboutCreator() {
   return (
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4 max-w-4xl">
-        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8 text-center">
-          {t.title}
-        </h2>
-        
-        <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
-          {t.paragraphs.map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
+        <div className="flex flex-col md:flex-row gap-10 items-center md:items-start">
+          {/* Photo */}
+          <div className="flex-shrink-0">
+            <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-primary/10 shadow-xl">
+              <img 
+                src={cristianoPhoto} 
+                alt="Cristiano Nunes" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
           
-          <p className="italic text-foreground/70 pt-4 text-center">
-            {t.closing}
-          </p>
+          {/* Content */}
+          <div className="flex-1 text-center md:text-left">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+              {t.title}
+            </h2>
+            
+            <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
+              {t.paragraphs.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+              
+              <p className="italic text-foreground/70 pt-4">
+                {t.closing}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
