@@ -16,6 +16,7 @@ import { FooterSection } from "@/components/landing/v2/FooterSection";
 import { MiguelAgent } from "@/components/MiguelAgent";
 import { MiguelSection } from "@/components/landing/v2/MiguelSection";
 import { MobileStickyCtA } from "@/components/landing/v2/MobileStickyCtA";
+import { AboutCreator } from "@/components/landing/AboutCreator";
 
 const Landing = () => {
   return (
@@ -53,6 +54,9 @@ const Landing = () => {
       
       {/* Miguel Section - AI Guide Introduction */}
       <MiguelSection />
+      
+      {/* About Creator Section */}
+      <AboutCreator />
       
       {/* SEÇÃO 9 - Para Quem Não É (Gatilho de Exclusão) */}
       <NotForYouSection />
