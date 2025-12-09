@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { AboutCreator } from "@/components/landing/AboutCreator";
 
 const Fundadores = () => {
   const { toast } = useToast();
@@ -197,7 +198,7 @@ const Fundadores = () => {
             {[
               { icon: Gift, text: "Recebe tudo que será lançado publicamente" },
               { icon: BookOpen, text: "Recebe o Código da Essência completo" },
-              { icon: Users, text: "Acesso ao grupo fechado com o criador" },
+              { icon: Users, text: "Acesso ao grupo fechado com Cristiano Nunes" },
               { icon: Wrench, text: "Participa do processo de aprimoramento" },
               { icon: Zap, text: "Atualizações da versão 1.0 e 2.0" },
               { icon: Crown, text: "Menor preço da história do Nello One" },
@@ -320,7 +321,7 @@ const Fundadores = () => {
               <h3 className="text-xl font-semibold mb-3">Comunidade Fechada</h3>
               <p className="text-muted-foreground text-sm">
                 Grupo exclusivo no WhatsApp para os Fundadores.
-                Caminho junto, suporte direto e partilha com o criador.
+                Caminho junto, suporte direto e partilha com Cristiano Nunes.
               </p>
             </div>
 
@@ -506,6 +507,9 @@ const Fundadores = () => {
           </div>
         </div>
       </section>
+
+      {/* About Creator Section */}
+      <AboutCreator />
 
       {/* CTA Final */}
       <section className="py-20 md:py-32 px-4 bg-[hsl(252,47%,40%)]">
