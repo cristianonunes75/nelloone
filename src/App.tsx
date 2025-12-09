@@ -27,6 +27,7 @@ import CodigoEssencia from "./pages/CodigoEssencia";
 import CodigoEssenciaVenda from "./pages/CodigoEssenciaVenda";
 import CodigoEssenciaCheckout from "./pages/CodigoEssenciaCheckout";
 import ComprarTeste from "./pages/ComprarTeste";
+import Fundadores from "./pages/Fundadores";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const AppRoutes = () => (
     {/* Public routes */}
     <Route path="/" element={<Landing />} />
     <Route path="/auth" element={<Auth />} />
+    <Route path="/fundadores" element={<Fundadores />} />
     
     {/* Legal pages - PT */}
     <Route path="/termos" element={<TermsOfService />} />
