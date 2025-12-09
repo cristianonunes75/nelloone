@@ -1,12 +1,41 @@
 import { Button } from "@/components/ui/button";
-import { Check, Star, Heart, Users, Sparkles, Gift, Smartphone, Crown, ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Check, Star, Heart, Users, Sparkles, Gift, Smartphone, Crown, ArrowRight, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Fundadores = () => {
-  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleCTA = () => {
-    navigate("/auth");
+  const handleCTA = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: {
+          testIds: [],
+          isFundadores: true,
+          language: "pt",
+          currency: "brl",
+        },
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      } else {
+        throw new Error("URL de checkout não recebida");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast({
+        title: "Erro ao iniciar checkout",
+        description: "Tente novamente em alguns instantes.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -33,11 +62,21 @@ const Fundadores = () => {
           
           <Button 
             onClick={handleCTA}
+            disabled={isLoading}
             size="lg" 
             className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all"
           >
-            Quero entrar para os Fundadores
-            <ArrowRight className="ml-2 w-5 h-5" />
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                Processando...
+              </>
+            ) : (
+              <>
+                Quero entrar para os Fundadores
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </>
+            )}
           </Button>
           
           <p className="text-sm text-muted-foreground mt-6">
@@ -302,11 +341,21 @@ const Fundadores = () => {
             
             <Button 
               onClick={handleCTA}
+              disabled={isLoading}
               size="lg" 
               className="w-full text-lg py-6 rounded-full"
             >
-              Quero ser Fundador agora
-              <ArrowRight className="ml-2 w-5 h-5" />
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                  Processando...
+                </>
+              ) : (
+                <>
+                  Quero ser Fundador agora
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </>
+              )}
             </Button>
             
             <p className="text-sm text-muted-foreground mt-6 italic">
@@ -384,12 +433,22 @@ const Fundadores = () => {
           
           <Button 
             onClick={handleCTA}
+            disabled={isLoading}
             size="lg" 
             variant="secondary"
             className="text-lg px-8 py-6 rounded-full"
           >
-            Quero entrar para os Fundadores
-            <ArrowRight className="ml-2 w-5 h-5" />
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                Processando...
+              </>
+            ) : (
+              <>
+                Quero entrar para os Fundadores
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </>
+            )}
           </Button>
         </div>
       </section>
