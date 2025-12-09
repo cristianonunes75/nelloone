@@ -35,13 +35,130 @@ serve(async (req) => {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       
-      logStep("Processing completed checkout", { sessionId: session.id });
+      logStep("Processing completed checkout", { sessionId: session.id, metadata: session.metadata });
 
-      // Check if this is a Código da Essência purchase
-      const isCodigoEssencia = session.metadata?.product_type === "codigo_da_essencia";
+      const productType = session.metadata?.product_type;
       const userId = session.metadata?.user_id;
 
-      if (isCodigoEssencia) {
+      // ====== FUNDADORES PURCHASE ======
+      if (productType === "fundadores") {
+        logStep("Processing Fundadores purchase", { userId });
+        
+        if (!userId || userId === "guest") {
+          logStep("ERROR: Fundadores requires authenticated user");
+          return new Response(JSON.stringify({ error: "User authentication required" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        // Fundadores gets: Full journey access + Código da Essência
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ 
+            codigo_essencia_unlocked: true,
+            journey_status: "in_progress",
+            journey_started_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+
+        if (updateError) {
+          logStep("ERROR: Failed to unlock Fundadores access", { error: updateError });
+          throw updateError;
+        }
+
+        // Fetch all 7 tests
+        const { data: allTests } = await supabase
+          .from("tests")
+          .select("id, name, type")
+          .eq("active", true);
+
+        if (allTests && allTests.length > 0) {
+          const amountPaid = (session.amount_total || 0) / 100;
+          const pricePerTest = amountPaid / allTests.length;
+
+          // Record purchases for all tests
+          const purchaseRecords = allTests.map(test => ({
+            user_id: userId,
+            test_id: test.id,
+            price_paid: pricePerTest,
+            payment_status: "completed" as const,
+            payment_method: "stripe",
+            transaction_id: session.payment_intent as string,
+            purchase_category: "fundadores",
+            test_slug: test.type,
+            metadata: {
+              session_id: session.id,
+              product_type: "fundadores",
+              total_tests: allTests.length,
+            },
+          }));
+
+          const { error: purchaseError } = await supabase
+            .from("test_purchases")
+            .upsert(purchaseRecords, {
+              onConflict: "user_id,test_id",
+              ignoreDuplicates: false,
+            });
+
+          if (purchaseError) {
+            logStep("ERROR: Failed to record Fundadores purchases", { error: purchaseError });
+          } else {
+            logStep("Fundadores purchases recorded", { count: allTests.length });
+          }
+        }
+
+        logStep("Fundadores access unlocked successfully", { userId });
+
+        // Send confirmation email
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", userId)
+            .single();
+
+          const { data: userAuth } = await supabase.auth.admin.getUserById(userId);
+          const userEmail = userAuth?.user?.email;
+
+          if (userEmail) {
+            const language = session.metadata?.language || "pt";
+            const amountPaid = (session.amount_total || 0) / 100;
+
+            await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${supabaseServiceKey}`,
+              },
+              body: JSON.stringify({
+                type: "purchase_confirmation",
+                to: userEmail,
+                data: {
+                  name: profile?.full_name || userEmail.split("@")[0],
+                  testNames: ["Fundadores Nello One - Acesso Completo"],
+                  amount: amountPaid,
+                  currency: "R$",
+                  language,
+                  isFundadores: true,
+                },
+              }),
+            });
+
+            logStep("Fundadores confirmation email sent", { userEmail });
+          }
+        } catch (emailError) {
+          logStep("WARN: Failed to send Fundadores email", { error: emailError });
+        }
+
+        return new Response(JSON.stringify({ received: true, product: "fundadores" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // ====== CÓDIGO DA ESSÊNCIA PURCHASE ======
+      if (productType === "codigo_da_essencia") {
         logStep("Processing Código da Essência purchase", { userId });
         
         if (!userId || userId === "guest") {
@@ -52,7 +169,6 @@ serve(async (req) => {
           });
         }
 
-        // Update profile to unlock Código da Essência
         const { error: updateError } = await supabase
           .from("profiles")
           .update({ codigo_essencia_unlocked: true })
@@ -65,7 +181,6 @@ serve(async (req) => {
 
         logStep("Código da Essência unlocked successfully", { userId });
 
-        // Send confirmation email
         try {
           const { data: profile } = await supabase
             .from("profiles")
@@ -113,7 +228,77 @@ serve(async (req) => {
         });
       }
 
-      // Standard test purchase flow
+      // ====== JORNADA COMPLETA PURCHASE ======
+      if (productType === "jornada_completa" || productType === "journey") {
+        logStep("Processing Jornada Completa purchase", { userId });
+        
+        if (!userId || userId === "guest") {
+          logStep("WARN: Guest purchase for journey");
+          return new Response(JSON.stringify({ received: true, warning: "Guest purchase" }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        // Update journey status
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ 
+            journey_status: "in_progress",
+            journey_started_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+
+        if (updateError) {
+          logStep("ERROR: Failed to update journey status", { error: updateError });
+        }
+
+        // Fetch all 7 tests and record purchases
+        const { data: allTests } = await supabase
+          .from("tests")
+          .select("id, name, type")
+          .eq("active", true);
+
+        if (allTests && allTests.length > 0) {
+          const amountPaid = (session.amount_total || 0) / 100;
+          const pricePerTest = amountPaid / allTests.length;
+
+          const purchaseRecords = allTests.map(test => ({
+            user_id: userId,
+            test_id: test.id,
+            price_paid: pricePerTest,
+            payment_status: "completed" as const,
+            payment_method: "stripe",
+            transaction_id: session.payment_intent as string,
+            purchase_category: "jornada_completa",
+            test_slug: test.type,
+            metadata: {
+              session_id: session.id,
+              product_type: "jornada_completa",
+            },
+          }));
+
+          const { error: purchaseError } = await supabase
+            .from("test_purchases")
+            .upsert(purchaseRecords, {
+              onConflict: "user_id,test_id",
+              ignoreDuplicates: false,
+            });
+
+          if (purchaseError) {
+            logStep("ERROR: Failed to record journey purchases", { error: purchaseError });
+          } else {
+            logStep("Journey purchases recorded", { count: allTests.length });
+          }
+        }
+
+        return new Response(JSON.stringify({ received: true, product: "jornada_completa" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // ====== STANDARD TEST PURCHASE ======
       let testIds: string[];
       if (session.metadata?.test_ids) {
         try {
@@ -138,10 +323,9 @@ serve(async (req) => {
 
       logStep("Processing purchase", { userId, testIds, count: testIds.length });
 
-      // Fetch all tests
       const { data: tests, error: testsError } = await supabase
         .from("tests")
-        .select("id, name, price_brl")
+        .select("id, name, type, price_brl")
         .in("id", testIds);
 
       if (testsError || !tests || tests.length === 0) {
@@ -152,7 +336,6 @@ serve(async (req) => {
       const amountPaid = (session.amount_total || 0) / 100;
       logStep("Payment details", { amountPaid, testsCount: tests.length });
 
-      // Check for existing purchases (idempotency)
       const { data: existingPurchases } = await supabase
         .from("test_purchases")
         .select("test_id")
@@ -171,7 +354,6 @@ serve(async (req) => {
         });
       }
 
-      // Record purchases for each test
       const pricePerTest = tests.length > 0 ? amountPaid / tests.length : 0;
       
       const purchaseRecords = newTestIds.map(testId => {
@@ -183,6 +365,8 @@ serve(async (req) => {
           payment_status: "completed" as const,
           payment_method: "stripe",
           transaction_id: session.payment_intent as string,
+          purchase_category: "test_avulso",
+          test_slug: test?.type || null,
           metadata: {
             session_id: session.id,
             total_tests: tests.length,
@@ -209,7 +393,6 @@ serve(async (req) => {
         testIds: newTestIds 
       });
 
-      // Send confirmation email
       try {
         const { data: profile } = await supabase
           .from("profiles")
@@ -225,7 +408,6 @@ serve(async (req) => {
           const currency = session.metadata?.currency === "USD" ? "$" : 
                           session.metadata?.currency === "EUR" ? "€" : "R$";
 
-          // Send purchase confirmation
           await fetch(`${supabaseUrl}/functions/v1/send-email`, {
             method: "POST",
             headers: {
