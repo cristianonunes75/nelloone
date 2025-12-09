@@ -261,6 +261,103 @@ export type Database = {
         }
         Relationships: []
       }
+      coupons: {
+        Row: {
+          allowed_product_type: string | null
+          code: string
+          created_at: string | null
+          created_by: string | null
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          max_uses: number | null
+          stripe_coupon_id: string | null
+          times_used: number | null
+        }
+        Insert: {
+          allowed_product_type?: string | null
+          code: string
+          created_at?: string | null
+          created_by?: string | null
+          discount_type?: string
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          stripe_coupon_id?: string | null
+          times_used?: number | null
+        }
+        Update: {
+          allowed_product_type?: string | null
+          code?: string
+          created_at?: string | null
+          created_by?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          stripe_coupon_id?: string | null
+          times_used?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupons_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      founder_feedback: {
+        Row: {
+          created_at: string | null
+          descricao: string
+          device_info: string | null
+          id: string
+          status: string
+          tipo: string
+          titulo: string
+          url_context: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          descricao: string
+          device_info?: string | null
+          id?: string
+          status?: string
+          tipo: string
+          titulo: string
+          url_context?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          descricao?: string
+          device_info?: string | null
+          id?: string
+          status?: string
+          tipo?: string
+          titulo?: string
+          url_context?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "founder_feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gallery_photos: {
         Row: {
           created_at: string
@@ -540,6 +637,7 @@ export type Database = {
           full_name: string
           id: string
           is_blocked: boolean | null
+          is_founder: boolean | null
           journey_completed_at: string | null
           journey_completed_tests: number
           journey_started_at: string | null
@@ -557,6 +655,7 @@ export type Database = {
           full_name: string
           id: string
           is_blocked?: boolean | null
+          is_founder?: boolean | null
           journey_completed_at?: string | null
           journey_completed_tests?: number
           journey_started_at?: string | null
@@ -574,6 +673,7 @@ export type Database = {
           full_name?: string
           id?: string
           is_blocked?: boolean | null
+          is_founder?: boolean | null
           journey_completed_at?: string | null
           journey_completed_tests?: number
           journey_started_at?: string | null

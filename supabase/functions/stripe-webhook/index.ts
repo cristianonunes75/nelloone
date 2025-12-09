@@ -52,13 +52,14 @@ serve(async (req) => {
           });
         }
 
-        // Fundadores gets: Full journey access + Código da Essência
+        // Fundadores gets: Full journey access + Código da Essência + Founder flag
         const { error: updateError } = await supabase
           .from("profiles")
           .update({ 
             codigo_essencia_unlocked: true,
             journey_status: "in_progress",
             journey_started_at: new Date().toISOString(),
+            is_founder: true,
           })
           .eq("id", userId);
 

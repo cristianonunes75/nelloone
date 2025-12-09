@@ -10,6 +10,7 @@ import {
   Ticket,
   Sparkles,
   Activity,
+  Star,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -35,6 +36,7 @@ const menuSections = [
   {
     label: "GESTÃO",
     items: [
+      { title: "Fundadores", url: "/admin/fundadores", icon: Star },
       { title: "Usuários & Jornadas", url: "/admin/usuarios", icon: Users },
       { title: "Pedidos & Pagamentos", url: "/admin/pedidos", icon: CreditCard },
       { title: "Produtos & Testes", url: "/admin/produtos", icon: Package },

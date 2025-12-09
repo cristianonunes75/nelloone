@@ -28,6 +28,7 @@ import CodigoEssenciaVenda from "./pages/CodigoEssenciaVenda";
 import CodigoEssenciaCheckout from "./pages/CodigoEssenciaCheckout";
 import ComprarTeste from "./pages/ComprarTeste";
 import Fundadores from "./pages/Fundadores";
+import FundadorFeedback from "./pages/FundadorFeedback";
 
 const queryClient = new QueryClient();
 
@@ -268,6 +269,32 @@ const AppRoutes = () => (
     />
     <Route path="/pt-pt/auth" element={<Auth />} />
     <Route path="/pt-pt" element={<Landing />} />
+    
+    {/* Founder Feedback Routes */}
+    <Route
+      path="/cliente/fundador-feedback"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <FundadorFeedback />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/cliente/fundador-feedback"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <FundadorFeedback />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/pt-pt/cliente/fundador-feedback"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <FundadorFeedback />
+        </ProtectedRoute>
+      }
+    />
     
     {/* Protected client routes */}
     <Route
