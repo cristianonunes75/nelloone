@@ -114,6 +114,7 @@ const USD_PRICES: Record<string, string> = {
   inteligencias_multiplas: "price_1SZNXnDjhZZxZELMuGMkDImQ",
   bundle: "price_1SZNYXDjhZZxZELMoGVJUZRP",
   codigo_da_essencia: "price_1Sc2RfDjhZZxZELMbZP1CvLO", // $97 USD
+  fundadores: "price_1ScWglDjhZZxZELM3tQocxgu", // R$197 (BRL only)
 };
 
 // BRL Price IDs for PT version (Brazilian market)
@@ -128,6 +129,7 @@ const BRL_PRICES: Record<string, string> = {
   inteligencias_multiplas: "price_1SZUpxDjhZZxZELMAkQlFX11",
   bundle: "price_1SZNYXDjhZZxZELMoGVJUZRP",
   codigo_da_essencia: "price_1Sc2RRDjhZZxZELMPxAnu0I5", // R$397 BRL
+  fundadores: "price_1ScWglDjhZZxZELM3tQocxgu", // R$197 (BRL only)
 };
 
 // EUR Price IDs for PT-PT version (Portugal/European market)
@@ -142,6 +144,7 @@ const EUR_PRICES: Record<string, string> = {
   inteligencias_multiplas: "price_1SZz0nDjhZZxZELMVagCtoXs",
   bundle: "price_1SZz6vDjhZZxZELMQsZuLKah",
   codigo_da_essencia: "price_1Sc2TRDjhZZxZELMr66uJZZm", // €97 EUR
+  fundadores: "price_1ScWglDjhZZxZELM3tQocxgu", // R$197 (BRL only - not available in EUR)
 };
 
 // Get expected currency based on language
@@ -341,17 +344,20 @@ serve(async (req) => {
     } else if (body.testId) {
       testIds = [body.testId];
     } else {
-      throw new Error("testId or testIds array is required");
+      testIds = [];
     }
     
     // Check for bundle purchase
     const isBundle = body.isBundle === true;
     
-    if (testIds.length === 0 && !isBundle) {
-      throw new Error("At least one test ID is required");
+    // Check for Fundadores purchase
+    const isFundadores = body.isFundadores === true;
+    
+    if (testIds.length === 0 && !isBundle && !isFundadores) {
+      throw new Error("At least one test ID is required, or isBundle/isFundadores must be true");
     }
     
-    logStep("Request data", { testIds, count: testIds.length, isBundle, language, currency });
+    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, language, currency });
 
     // Get user (optional - supports guest checkout)
     let user = null;
@@ -386,7 +392,16 @@ serve(async (req) => {
     let lineItems: any[] = [];
     const priceMap = getPriceMap(currency);
     
-    if (isBundle) {
+    if (isFundadores) {
+      // Fundadores purchase - R$197 BRL only
+      const fundadoresPriceId = "price_1ScWglDjhZZxZELM3tQocxgu";
+      
+      lineItems = [{
+        price: fundadoresPriceId,
+        quantity: 1,
+      }];
+      logStep("Fundadores line item created", { priceId: fundadoresPriceId });
+    } else if (isBundle) {
       // Bundle purchase
       const bundlePriceId = priceMap.bundle;
       
