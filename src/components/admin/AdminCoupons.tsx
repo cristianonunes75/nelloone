@@ -31,6 +31,7 @@ interface StripeCoupon {
 
 const PRODUCT_OPTIONS = [
   { value: "all", label: "Todos os produtos" },
+  { value: "fundadores", label: "Apenas Fundadores" },
   { value: "jornada_completa", label: "Jornada Completa" },
   { value: "codigo_essencia", label: "Código da Essência" },
   { value: "test_avulso", label: "Apenas Testes Avulsos" },

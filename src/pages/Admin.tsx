@@ -16,6 +16,7 @@ const AdminCoupons = lazy(() => import("@/components/admin/AdminCoupons").then(m
 const AdminCodigoEssencia = lazy(() => import("@/components/admin/AdminCodigoEssencia").then(m => ({ default: m.AdminCodigoEssencia })));
 const AdminLogs = lazy(() => import("@/components/admin/AdminLogs").then(m => ({ default: m.AdminLogs })));
 const AdminSettings = lazy(() => import("@/components/admin/AdminSettings").then(m => ({ default: m.AdminSettings })));
+const FundadoresAdmin = lazy(() => import("@/components/admin/FundadoresAdmin").then(m => ({ default: m.FundadoresAdmin })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -58,6 +59,7 @@ const Admin = () => {
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
                 <Route path="/" element={<AdminDashboard />} />
+                <Route path="/fundadores" element={<FundadoresAdmin />} />
                 <Route path="/usuarios" element={<AdminUsersJourneys />} />
                 <Route path="/pedidos" element={<AdminOrdersPayments />} />
                 <Route path="/produtos" element={<AdminProductsTests />} />
