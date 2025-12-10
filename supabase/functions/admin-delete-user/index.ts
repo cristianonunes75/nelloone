@@ -97,14 +97,115 @@ serve(async (req) => {
       .eq("id", target_user_id)
       .single();
 
-    // Soft delete: Update profiles table
+    console.log(`Starting deletion of user ${target_user_id} (${targetProfile?.full_name})`);
+
+    // Delete related data in proper order (respecting foreign keys)
+    
+    // 1. Delete test_answers (depends on user_tests)
+    const { data: userTests } = await supabaseAdmin
+      .from("user_tests")
+      .select("id")
+      .eq("user_id", target_user_id);
+    
+    if (userTests && userTests.length > 0) {
+      const userTestIds = userTests.map(t => t.id);
+      const { error: answersError } = await supabaseAdmin
+        .from("test_answers")
+        .delete()
+        .in("user_test_id", userTestIds);
+      
+      if (answersError) console.error("Error deleting test_answers:", answersError);
+      else console.log(`Deleted test answers for ${userTestIds.length} user tests`);
+    }
+
+    // 2. Delete user_tests
+    const { error: testsError } = await supabaseAdmin
+      .from("user_tests")
+      .delete()
+      .eq("user_id", target_user_id);
+    
+    if (testsError) console.error("Error deleting user_tests:", testsError);
+    else console.log("Deleted user_tests");
+
+    // 3. Delete test_purchases
+    const { error: purchasesError } = await supabaseAdmin
+      .from("test_purchases")
+      .delete()
+      .eq("user_id", target_user_id);
+    
+    if (purchasesError) console.error("Error deleting test_purchases:", purchasesError);
+    else console.log("Deleted test_purchases");
+
+    // 4. Delete ai_messages (depends on ai_conversations)
+    const { data: conversations } = await supabaseAdmin
+      .from("ai_conversations")
+      .select("id")
+      .eq("user_id", target_user_id);
+    
+    if (conversations && conversations.length > 0) {
+      const conversationIds = conversations.map(c => c.id);
+      const { error: messagesError } = await supabaseAdmin
+        .from("ai_messages")
+        .delete()
+        .in("conversation_id", conversationIds);
+      
+      if (messagesError) console.error("Error deleting ai_messages:", messagesError);
+      else console.log(`Deleted ai_messages for ${conversationIds.length} conversations`);
+    }
+
+    // 5. Delete ai_conversations
+    const { error: conversationsError } = await supabaseAdmin
+      .from("ai_conversations")
+      .delete()
+      .eq("user_id", target_user_id);
+    
+    if (conversationsError) console.error("Error deleting ai_conversations:", conversationsError);
+    else console.log("Deleted ai_conversations");
+
+    // 6. Delete mapa_essencia
+    const { error: mapaError } = await supabaseAdmin
+      .from("mapa_essencia")
+      .delete()
+      .eq("user_id", target_user_id);
+    
+    if (mapaError) console.error("Error deleting mapa_essencia:", mapaError);
+    else console.log("Deleted mapa_essencia");
+
+    // 7. Delete founder_feedback
+    const { error: feedbackError } = await supabaseAdmin
+      .from("founder_feedback")
+      .delete()
+      .eq("user_id", target_user_id);
+    
+    if (feedbackError) console.error("Error deleting founder_feedback:", feedbackError);
+    else console.log("Deleted founder_feedback");
+
+    // 8. Delete photo_sessions
+    const { error: sessionsError } = await supabaseAdmin
+      .from("photo_sessions")
+      .delete()
+      .eq("user_id", target_user_id);
+    
+    if (sessionsError) console.error("Error deleting photo_sessions:", sessionsError);
+    else console.log("Deleted photo_sessions");
+
+    // 9. Delete user_roles
+    const { error: rolesError } = await supabaseAdmin
+      .from("user_roles")
+      .delete()
+      .eq("user_id", target_user_id);
+    
+    if (rolesError) console.error("Error deleting user_roles:", rolesError);
+    else console.log("Deleted user_roles");
+
+    // 10. Soft delete: Update profiles table
     const { error: updateError } = await supabaseAdmin
       .from("profiles")
       .update({
         is_deleted: true,
         deleted_at: new Date().toISOString(),
         deleted_by: adminUser.id,
-        is_blocked: true, // Also block the user
+        is_blocked: true,
       })
       .eq("id", target_user_id);
 
@@ -116,7 +217,7 @@ serve(async (req) => {
       );
     }
 
-    // Delete user from auth (hard delete from authentication)
+    // 11. Delete user from auth (hard delete from authentication)
     const { error: deleteAuthError } = await supabaseAdmin.auth.admin.deleteUser(target_user_id);
     
     if (deleteAuthError) {
@@ -135,6 +236,7 @@ serve(async (req) => {
         target_user_name: targetProfile?.full_name || "Unknown",
         deleted_by: adminUser.id,
         deleted_at: new Date().toISOString(),
+        deleted_data: ["test_answers", "user_tests", "test_purchases", "ai_messages", "ai_conversations", "mapa_essencia", "founder_feedback", "photo_sessions", "user_roles"]
       },
     });
 
