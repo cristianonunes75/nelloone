@@ -2,11 +2,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTests } from "@/hooks/useTests";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { useCodigoEssenciaAccess } from "@/hooks/useCodigoEssenciaAccess";
+import { useImpersonate } from "@/contexts/ImpersonateContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { JourneyStepCard } from "@/components/cliente/JourneyStepCard";
 import { LogoText } from "@/components/LogoText";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
+import { ImpersonateBanner } from "@/components/ImpersonateBanner";
 import { LogOut, User, Sparkles, Map, Lock, ShoppingCart, Star, MessageSquare } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
@@ -38,6 +40,7 @@ const Cliente = () => {
     canPurchase: canPurchaseCodigo,
     hasUnlocked: hasCodigoUnlocked
   } = useCodigoEssenciaAccess();
+  const { isImpersonating, impersonatedUserName } = useImpersonate();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
@@ -166,10 +169,15 @@ const Cliente = () => {
   }
 
   const progressPercentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
-  const userName = profile?.full_name?.split(" ")[0] || user?.user_metadata?.full_name?.split(" ")[0] || "Viajante";
+  // Use impersonated user name if in impersonate mode
+  const displayName = isImpersonating 
+    ? impersonatedUserName?.split(" ")[0] || "Usuário"
+    : profile?.full_name?.split(" ")[0] || user?.user_metadata?.full_name?.split(" ")[0] || "Viajante";
 
   return (
-    <div className="min-h-screen bg-background pb-24 md:pb-0">
+    <div className={`min-h-screen pb-24 md:pb-0 ${isImpersonating ? 'bg-amber-50/30' : 'bg-background'}`}>
+      {/* Impersonate Banner */}
+      <ImpersonateBanner />
       {/* Header - iOS style with blur */}
       <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-xl z-10">
         <div className="container px-4 py-3 md:py-4 flex items-center justify-between">
@@ -216,7 +224,7 @@ const Cliente = () => {
               Seu Código da Essência
             </h1>
             <p className="text-sm md:text-lg text-muted-foreground max-w-xl mx-auto px-2">
-              Olá, {userName}! Miguel vai te acompanhar em cada etapa. Basta seguir o caminho no seu ritmo.
+              Olá, {displayName}! Miguel vai te acompanhar em cada etapa. Basta seguir o caminho no seu ritmo.
             </p>
           </div>
 
@@ -324,11 +332,11 @@ const Cliente = () => {
               <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6">
                 {hasCodigoUnlocked 
                   ? (language === 'en' 
-                    ? `Congratulations, ${userName}! Your inner code is ready to be revealed.`
-                    : `Parabéns, ${userName}! Seu código interior está pronto para ser revelado.`)
+                    ? `Congratulations, ${displayName}! Your inner code is ready to be revealed.`
+                    : `Parabéns, ${displayName}! Seu código interior está pronto para ser revelado.`)
                   : (language === 'en'
-                    ? `${userName}, you've completed all 7 tests! Unlock your Essence Code.`
-                    : `${userName}, você completou todos os 7 testes! Desbloqueie seu Código da Essência.`)
+                    ? `${displayName}, you've completed all 7 tests! Unlock your Essence Code.`
+                    : `${displayName}, você completou todos os 7 testes! Desbloqueie seu Código da Essência.`)
                 }
               </p>
               {hasCodigoUnlocked ? (

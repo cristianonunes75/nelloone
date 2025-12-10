@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { SimulationProvider } from "@/contexts/SimulationContext";
+import { ImpersonateProvider } from "@/contexts/ImpersonateContext";
 import { LanguageRoute } from "@/components/LanguageRoute";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { GeoRedirect } from "@/components/GeoRedirect";
@@ -422,14 +423,16 @@ const App = () => (
         <LanguageProvider>
           <SimulationProvider>
             <AuthProvider>
-              {/* GEO-routing: Automatically redirects based on IP location */}
-              <GeoRedirect />
-              {/* Currency Protection: Prevents cross-trade between BRL and USD */}
-              <CurrencyProtection>
-                <LanguageRoute>
-                  <AppRoutes />
-                </LanguageRoute>
-              </CurrencyProtection>
+              <ImpersonateProvider>
+                {/* GEO-routing: Automatically redirects based on IP location */}
+                <GeoRedirect />
+                {/* Currency Protection: Prevents cross-trade between BRL and USD */}
+                <CurrencyProtection>
+                  <LanguageRoute>
+                    <AppRoutes />
+                  </LanguageRoute>
+                </CurrencyProtection>
+              </ImpersonateProvider>
             </AuthProvider>
           </SimulationProvider>
         </LanguageProvider>

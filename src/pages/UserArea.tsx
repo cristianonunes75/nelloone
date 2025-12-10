@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useImpersonate } from "@/contexts/ImpersonateContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LogoText } from "@/components/LogoText";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { ImpersonateBanner } from "@/components/ImpersonateBanner";
 import { 
   User, 
   FileText, 
@@ -55,6 +57,7 @@ interface UserTest {
 const UserArea = () => {
   const { user, profile, signOut, userRoles } = useAuth();
   const { language } = useLanguage();
+  const { isImpersonating } = useImpersonate();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -181,7 +184,9 @@ const UserArea = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen ${isImpersonating ? 'bg-amber-50/30' : 'bg-background'}`}>
+      {/* Impersonate Banner */}
+      <ImpersonateBanner />
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="container px-4 py-3 flex items-center justify-between">
