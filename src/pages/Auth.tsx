@@ -79,10 +79,10 @@ const Auth = () => {
     hasAccount: language === 'en' ? 'Already have an account? Sign in' : (language === 'pt-pt' ? 'Já tem conta? Faça login' : 'Já tem conta? Faça login'),
     backToSite: language === 'en' ? '← Back to site' : '← Voltar para o site',
     termsText: language === 'en' 
-      ? 'By proceeding, you agree to the use of your data exclusively for image analysis and delivery of the photography session proposal.' 
+      ? 'By proceeding, you agree to the use of your data for personality analysis and storage of your test results.' 
       : (language === 'pt-pt' 
-        ? 'Ao prosseguir, concorda com o uso dos seus dados exclusivamente para fins de análise de imagem e entrega da proposta de ensaio fotográfico.'
-        : 'Ao prosseguir, você concorda com o uso de seus dados exclusivamente para fins de análise de imagem e entrega da proposta de ensaio fotográfico.'),
+        ? 'Ao prosseguir, concorda com o uso dos seus dados para análise de personalidade e armazenamento dos seus resultados.'
+        : 'Ao prosseguir, você concorda com o uso de seus dados para análise de personalidade e armazenamento dos seus resultados.'),
     termsOfUse: language === 'en' ? 'Terms of Use' : 'Termos de Uso',
     privacyPolicy: language === 'en' ? 'Privacy Policy' : 'Política de Privacidade',
     purchaseRedirectLogin: language === 'en' 
