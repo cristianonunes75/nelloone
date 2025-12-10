@@ -634,9 +634,12 @@ export type Database = {
           avatar_url: string | null
           codigo_essencia_unlocked: boolean | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           full_name: string
           id: string
           is_blocked: boolean | null
+          is_deleted: boolean | null
           is_founder: boolean | null
           journey_completed_at: string | null
           journey_completed_tests: number
@@ -652,9 +655,12 @@ export type Database = {
           avatar_url?: string | null
           codigo_essencia_unlocked?: boolean | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           full_name: string
           id: string
           is_blocked?: boolean | null
+          is_deleted?: boolean | null
           is_founder?: boolean | null
           journey_completed_at?: string | null
           journey_completed_tests?: number
@@ -670,9 +676,12 @@ export type Database = {
           avatar_url?: string | null
           codigo_essencia_unlocked?: boolean | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           full_name?: string
           id?: string
           is_blocked?: boolean | null
+          is_deleted?: boolean | null
           is_founder?: boolean | null
           journey_completed_at?: string | null
           journey_completed_tests?: number

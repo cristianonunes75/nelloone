@@ -19,14 +19,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { 
   Search, 
   Eye, 
   UserCog, 
-  ShieldAlert, 
-  ShieldCheck,
-  Key,
+  Trash2,
   FileText,
   MessageSquare,
   CreditCard,
@@ -35,6 +38,8 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { DeleteUserDialog } from "./DeleteUserDialog";
+import { useAuth } from "@/hooks/useAuth";
 
 interface UserWithDetails {
   id: string;
@@ -46,14 +51,18 @@ interface UserWithDetails {
   test_progress: number;
   purchases_count: number;
   has_mapa: boolean;
+  is_deleted?: boolean;
 }
 
 export const UsersManagementV2 = () => {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<UserWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserWithDetails | null>(null);
   const [impersonating, setImpersonating] = useState<string | null>(null);
+  const [userToDelete, setUserToDelete] = useState<UserWithDetails | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -63,13 +72,12 @@ export const UsersManagementV2 = () => {
     try {
       setLoading(true);
       
-      // Fetch profiles
+      // Fetch profiles (exclude deleted users by default)
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("*")
+        .or("is_deleted.is.null,is_deleted.eq.false")
         .order("created_at", { ascending: false });
-
-      if (profilesError) throw profilesError;
 
       // Fetch roles
       const { data: rolesData, error: rolesError } = await supabase
@@ -175,6 +183,49 @@ export const UsersManagementV2 = () => {
     } finally {
       setImpersonating(null);
     }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-delete-user", {
+        body: { target_user_id: userToDelete.id },
+      });
+
+      if (error) throw error;
+      
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      toast.success(`Usuário ${userToDelete.full_name} deletado com sucesso`);
+      
+      // Remove user from the list
+      setUsers(prev => prev.filter(u => u.id !== userToDelete.id));
+      setUserToDelete(null);
+    } catch (error: any) {
+      console.error("Error deleting user:", error);
+      toast.error(error.message || "Erro ao deletar usuário");
+    }
+  };
+
+  const openDeleteDialog = (user: UserWithDetails) => {
+    // Prevent self-deletion
+    if (user.id === currentUser?.id) {
+      toast.error("Você não pode deletar a própria conta de administrador");
+      return;
+    }
+    
+    // Prevent deleting other admins
+    if (user.roles.includes("admin")) {
+      toast.error("Não é permitido deletar outro administrador");
+      return;
+    }
+    
+    setUserToDelete(user);
+    setShowDeleteDialog(true);
   };
 
   const toggleUserBlock = async (userId: string, currentlyBlocked: boolean) => {
@@ -358,6 +409,28 @@ export const UsersManagementV2 = () => {
                         )}
                         Simular
                       </Button>
+                      
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => openDeleteDialog(user)}
+                            disabled={user.roles.includes('admin') || user.id === currentUser?.id}
+                            className="text-muted-foreground hover:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {user.roles.includes('admin') 
+                            ? "Não é possível deletar admin" 
+                            : user.id === currentUser?.id 
+                              ? "Não é possível deletar você mesmo"
+                              : "Deletar usuário"
+                          }
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -366,6 +439,13 @@ export const UsersManagementV2 = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <DeleteUserDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        userName={userToDelete?.full_name || ""}
+        onConfirm={handleDeleteUser}
+      />
     </div>
   );
 };
