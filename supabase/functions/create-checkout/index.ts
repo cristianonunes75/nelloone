@@ -569,21 +569,41 @@ serve(async (req) => {
         const hasUsesLeft = !dbCoupon.max_uses || dbCoupon.times_used < dbCoupon.max_uses;
         
         if (isValidForProduct && isNotExpired && hasUsesLeft) {
-          // Use existing Stripe coupon if available, otherwise create one
-          if (dbCoupon.stripe_coupon_id) {
-            sessionParams.discounts = [{ coupon: dbCoupon.stripe_coupon_id }];
-            logStep("Using existing Stripe coupon", { stripeCouponId: dbCoupon.stripe_coupon_id });
-          } else {
-            // Create Stripe coupon dynamically
+          // Create Stripe coupon and promotion code to show on checkout
+          let stripeCouponId = dbCoupon.stripe_coupon_id;
+          
+          // If no Stripe coupon exists, create one
+          if (!stripeCouponId) {
             const stripeCoupon = await stripe.coupons.create({
               percent_off: dbCoupon.discount_value,
               duration: "once",
               name: `${dbCoupon.code} - ${dbCoupon.discount_value}%`,
             });
+            stripeCouponId = stripeCoupon.id;
             
-            sessionParams.discounts = [{ coupon: stripeCoupon.id }];
-            logStep("Created dynamic Stripe coupon", { couponId: stripeCoupon.id, discount: dbCoupon.discount_value });
+            // Save the stripe_coupon_id back to database
+            await supabaseAdmin
+              .from("coupons")
+              .update({ stripe_coupon_id: stripeCouponId })
+              .eq("id", dbCoupon.id);
+              
+            logStep("Created Stripe coupon", { couponId: stripeCouponId });
           }
+          
+          // Create a Promotion Code so it appears visible on Stripe Checkout
+          const promotionCode = await stripe.promotionCodes.create({
+            coupon: stripeCouponId,
+            code: dbCoupon.code,
+            max_redemptions: 1, // Single use per session
+          });
+          
+          // Use promotion_code instead of coupon to show it on checkout
+          sessionParams.discounts = [{ promotion_code: promotionCode.id }];
+          logStep("Created promotion code for visibility", { 
+            promoCodeId: promotionCode.id, 
+            code: dbCoupon.code,
+            stripeCouponId 
+          });
           
           // Increment usage counter
           await supabaseAdmin
@@ -612,8 +632,14 @@ serve(async (req) => {
         name: couponNames[language] || couponNames.en,
       });
       
-      sessionParams.discounts = [{ coupon: coupon.id }];
-      logStep("Coupon created", { couponId: coupon.id, discount: discountPercentage });
+      // Create promotion code to show the discount visibly
+      const promoCode = await stripe.promotionCodes.create({
+        coupon: coupon.id,
+        code: `COMBO${testIds.length}`,
+      });
+      
+      sessionParams.discounts = [{ promotion_code: promoCode.id }];
+      logStep("Quantity discount promotion code created", { promoCodeId: promoCode.id, discount: discountPercentage });
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
