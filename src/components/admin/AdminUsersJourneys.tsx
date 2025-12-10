@@ -17,8 +17,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { 
-  Search, Eye, UserCog, Loader2, Map, Download, Ban, CheckCircle, X, RefreshCw
+  Search, Eye, UserCog, Loader2, Map, Download, Ban, CheckCircle, X, RefreshCw, Trash2
 } from "lucide-react";
+import { DeleteUserDialog } from "./DeleteUserDialog";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { JOURNEY_TEST_SLUGS, JourneyTestSlug, updateJourneyProgress } from "@/utils/journey";
@@ -48,6 +55,7 @@ const TEST_DISPLAY_NAMES: Record<JourneyTestSlug, string> = {
 };
 
 export const AdminUsersJourneys = () => {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<UserWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,6 +65,8 @@ export const AdminUsersJourneys = () => {
   const [filter, setFilter] = useState("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<{type: string; user: UserWithDetails} | null>(null);
+  const [userToDelete, setUserToDelete] = useState<UserWithDetails | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -239,6 +249,51 @@ export const AdminUsersJourneys = () => {
       toast.error("Erro ao forçar conclusão do teste");
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const openDeleteDialog = (user: UserWithDetails) => {
+    // Prevent self-deletion
+    if (user.id === currentUser?.id) {
+      toast.error("Você não pode deletar a própria conta de administrador");
+      return;
+    }
+    
+    // Prevent deleting other admins
+    if (user.roles.includes("admin")) {
+      toast.error("Não é permitido deletar outro administrador");
+      return;
+    }
+    
+    setUserToDelete(user);
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { data, error } = await supabase.functions.invoke("admin-delete-user", {
+        body: { target_user_id: userToDelete.id },
+      });
+
+      if (error) throw error;
+
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      toast.success(`Usuário ${userToDelete.full_name} deletado com sucesso`);
+      
+      // Remove user from the list
+      setUsers(prev => prev.filter(u => u.id !== userToDelete.id));
+      setUserToDelete(null);
+    } catch (error: any) {
+      console.error("Error deleting user:", error);
+      toast.error(error.message || "Erro ao deletar usuário");
     }
   };
 
@@ -438,6 +493,27 @@ export const AdminUsersJourneys = () => {
                             <UserCog className="w-4 h-4" />
                           )}
                         </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openDeleteDialog(user)}
+                              disabled={user.roles.includes('admin') || user.id === currentUser?.id}
+                              className="text-muted-foreground hover:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {user.roles.includes('admin') 
+                              ? "Não é possível deletar admin" 
+                              : user.id === currentUser?.id 
+                                ? "Não é possível deletar você mesmo"
+                                : "Deletar usuário"
+                            }
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -644,6 +720,13 @@ export const AdminUsersJourneys = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <DeleteUserDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        userName={userToDelete?.full_name || ""}
+        onConfirm={handleDeleteUser}
+      />
     </div>
   );
 };
