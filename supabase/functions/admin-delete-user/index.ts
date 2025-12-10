@@ -189,7 +189,16 @@ serve(async (req) => {
     if (sessionsError) console.error("Error deleting photo_sessions:", sessionsError);
     else console.log("Deleted photo_sessions");
 
-    // 9. Delete user_roles
+    // 9. Delete impersonation_sessions (as target_user_id OR admin_id)
+    const { error: impersonateError } = await supabaseAdmin
+      .from("impersonation_sessions")
+      .delete()
+      .or(`target_user_id.eq.${target_user_id},admin_id.eq.${target_user_id}`);
+    
+    if (impersonateError) console.error("Error deleting impersonation_sessions:", impersonateError);
+    else console.log("Deleted impersonation_sessions");
+
+    // 10. Delete user_roles
     const { error: rolesError } = await supabaseAdmin
       .from("user_roles")
       .delete()
@@ -198,7 +207,7 @@ serve(async (req) => {
     if (rolesError) console.error("Error deleting user_roles:", rolesError);
     else console.log("Deleted user_roles");
 
-    // 10. Soft delete: Update profiles table
+    // 11. Soft delete: Update profiles table
     const { error: updateError } = await supabaseAdmin
       .from("profiles")
       .update({
@@ -217,12 +226,15 @@ serve(async (req) => {
       );
     }
 
-    // 11. Delete user from auth (hard delete from authentication)
+    // 12. Delete user from auth (hard delete from authentication)
     const { error: deleteAuthError } = await supabaseAdmin.auth.admin.deleteUser(target_user_id);
     
     if (deleteAuthError) {
       console.error("Auth delete error:", deleteAuthError);
-      // Don't fail the whole operation, profile is already marked as deleted
+      return new Response(
+        JSON.stringify({ error: `Falha ao deletar usuário da autenticação: ${deleteAuthError.message}` }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Log the action to audit_logs
