@@ -18,10 +18,10 @@ serve(async (req) => {
       throw new Error("STRIPE_SECRET_KEY is not set");
     }
 
-    // Verify admin role
-    const supabaseClient = createClient(
+    // Use service role key to check admin roles (bypasses RLS)
+    const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
     const authHeader = req.headers.get("Authorization");
@@ -30,22 +30,29 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+    const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(token);
     
     if (userError || !userData.user) {
+      console.log("[CREATE-COUPON] Auth error:", userError?.message);
       throw new Error("User not authenticated");
     }
 
-    // Check if user is admin
-    const { data: roles } = await supabaseClient
+    console.log("[CREATE-COUPON] User authenticated:", userData.user.id);
+
+    // Check if user is admin using service role (bypasses RLS)
+    const { data: roles, error: rolesError } = await supabaseAdmin
       .from("user_roles")
       .select("role")
       .eq("user_id", userData.user.id)
       .eq("role", "admin");
 
-    if (!roles || roles.length === 0) {
+    console.log("[CREATE-COUPON] Roles query result:", { roles, error: rolesError?.message });
+
+    if (rolesError || !roles || roles.length === 0) {
       throw new Error("Unauthorized: Admin access required");
     }
+
+    console.log("[CREATE-COUPON] Admin verified for user:", userData.user.id);
 
     const body = await req.json();
     const { name, percent_off, amount_off, currency, duration, duration_in_months, max_redemptions, redeem_by_months } = body;
