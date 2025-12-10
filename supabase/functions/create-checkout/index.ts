@@ -642,6 +642,13 @@ serve(async (req) => {
       logStep("Quantity discount promotion code created", { promoCodeId: promoCode.id, discount: discountPercentage });
     }
 
+    // Allow users to enter promo codes on the Stripe Checkout page
+    // Only enable if no discount is already applied
+    if (!sessionParams.discounts || sessionParams.discounts.length === 0) {
+      sessionParams.allow_promotion_codes = true;
+      logStep("Enabled promotion code field on checkout");
+    }
+
     const session = await stripe.checkout.sessions.create(sessionParams);
     
     logStep("Checkout session created", { sessionId: session.id, url: session.url, currency, language });
