@@ -55,12 +55,13 @@ serve(async (req) => {
     console.log("[CREATE-COUPON] Admin verified for user:", userData.user.id);
 
     const body = await req.json();
-    const { name, percent_off, amount_off, currency, duration, duration_in_months, max_redemptions, redeem_by_months } = body;
+    const { name, percent_off, amount_off, currency, duration, duration_in_months, max_redemptions, redeem_by_months, allowed_product_type } = body;
 
     console.log("[CREATE-COUPON] Creating coupon:", { name, percent_off, amount_off, currency, duration, max_redemptions, redeem_by_months });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
+    // Build coupon params
     const couponParams: Stripe.CouponCreateParams = {
       name,
       duration: duration || "once",
@@ -77,26 +78,70 @@ serve(async (req) => {
       couponParams.duration_in_months = duration_in_months;
     }
 
-    // Add max redemptions limit
-    if (max_redemptions) {
-      couponParams.max_redemptions = max_redemptions;
-    }
-
     // Add expiration date (redeem_by_months converts to Unix timestamp)
+    let expiresAt: string | null = null;
     if (redeem_by_months) {
       const redeemByDate = new Date();
       redeemByDate.setMonth(redeemByDate.getMonth() + redeem_by_months);
       couponParams.redeem_by = Math.floor(redeemByDate.getTime() / 1000);
+      expiresAt = redeemByDate.toISOString();
     }
 
     // Use the name as the coupon ID for easy reference
     couponParams.id = name;
 
+    // Create the coupon in Stripe
     const coupon = await stripe.coupons.create(couponParams);
+    console.log("[CREATE-COUPON] Stripe coupon created:", coupon.id);
 
-    console.log("[CREATE-COUPON] Coupon created:", coupon.id);
+    // Create a Promotion Code so users can type the code in Stripe Checkout
+    const promotionCodeParams: Stripe.PromotionCodeCreateParams = {
+      coupon: coupon.id,
+      code: name, // Use the same name as the promotion code
+      active: true,
+    };
 
-    return new Response(JSON.stringify({ coupon }), {
+    // Add max redemptions to promotion code if specified
+    if (max_redemptions) {
+      promotionCodeParams.max_redemptions = max_redemptions;
+    }
+
+    const promotionCode = await stripe.promotionCodes.create(promotionCodeParams);
+    console.log("[CREATE-COUPON] Stripe promotion code created:", promotionCode.id, "code:", promotionCode.code);
+
+    // Save to local database for sync
+    const { data: dbCoupon, error: dbError } = await supabaseAdmin
+      .from("coupons")
+      .insert({
+        code: name,
+        discount_type: percent_off ? "percentual" : "fixo",
+        discount_value: percent_off || (amount_off ? amount_off / 100 : 0),
+        max_uses: max_redemptions || null,
+        times_used: 0,
+        is_active: true,
+        expires_at: expiresAt,
+        stripe_coupon_id: coupon.id,
+        allowed_product_type: allowed_product_type || null,
+        created_by: userData.user.id,
+      })
+      .select()
+      .single();
+
+    if (dbError) {
+      console.log("[CREATE-COUPON] Database save warning:", dbError.message);
+      // Don't fail the request, coupon is already created in Stripe
+    } else {
+      console.log("[CREATE-COUPON] Coupon saved to database:", dbCoupon?.id);
+    }
+
+    return new Response(JSON.stringify({ 
+      coupon, 
+      promotionCode: {
+        id: promotionCode.id,
+        code: promotionCode.code,
+      },
+      dbCoupon 
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
