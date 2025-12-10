@@ -348,13 +348,47 @@ serve(async (req) => {
     }
     
     // Check for bundle purchase
-    const isBundle = body.isBundle === true;
+    let isBundle = body.isBundle === true;
     
     // Check for Fundadores purchase
-    const isFundadores = body.isFundadores === true;
+    let isFundadores = body.isFundadores === true;
     
     // Check for coupon code
     const couponCode = body.couponCode || null;
+    
+    // ====== CHECK IF COUPON IS A FUNDADORES COUPON (100% discount + fundadores type) ======
+    // If so, convert this to a Fundadores purchase automatically
+    let fundadoresCoupon = null;
+    if (couponCode) {
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      );
+      
+      const { data: dbCoupon } = await supabaseAdmin
+        .from("coupons")
+        .select("*")
+        .eq("code", couponCode)
+        .eq("is_active", true)
+        .single();
+      
+      if (dbCoupon) {
+        // Check if it's a fundadores coupon (allowed_product_type = 'fundadores' OR 100% discount)
+        const isFundadoresCoupon = dbCoupon.allowed_product_type === "fundadores" || 
+          (dbCoupon.discount_type === "percentual" && dbCoupon.discount_value === 100 && 
+           (dbCoupon.code.toUpperCase().includes("FUNDADOR") || dbCoupon.allowed_product_type === "all_products"));
+        
+        if (isFundadoresCoupon) {
+          logStep("Fundadores coupon detected - converting to Fundadores purchase", { 
+            couponCode, 
+            discount: dbCoupon.discount_value,
+            type: dbCoupon.allowed_product_type 
+          });
+          isFundadores = true;
+          fundadoresCoupon = dbCoupon;
+        }
+      }
+    }
     
     if (testIds.length === 0 && !isBundle && !isFundadores) {
       throw new Error("At least one test ID is required, or isBundle/isFundadores must be true");
@@ -396,7 +430,7 @@ serve(async (req) => {
     const priceMap = getPriceMap(currency);
     
     if (isFundadores) {
-      // Fundadores purchase - R$197 BRL only
+      // Fundadores purchase - R$197 BRL only (or free with 100% coupon)
       const fundadoresPriceId = "price_1ScWglDjhZZxZELM3tQocxgu";
       
       lineItems = [{
@@ -540,29 +574,44 @@ serve(async (req) => {
         language: language,
         currency: currency,
         is_bundle: isBundle ? "true" : "false",
+        is_fundadores: isFundadores ? "true" : "false",
+        product_type: isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
       },
       customer_creation: customerId ? undefined : "always",
     };
 
     // Check for user-provided coupon code (from database)
+    // If fundadoresCoupon was already loaded, use it instead of fetching again
     if (couponCode) {
-      // Create service role client for coupons table access
       const supabaseAdmin = createClient(
         Deno.env.get("SUPABASE_URL") ?? "",
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
       );
       
-      const { data: dbCoupon, error: couponError } = await supabaseAdmin
-        .from("coupons")
-        .select("*")
-        .eq("code", couponCode)
-        .eq("is_active", true)
-        .single();
+      // Use already fetched coupon if available, otherwise fetch
+      let dbCoupon = fundadoresCoupon;
+      if (!dbCoupon) {
+        const { data: fetchedCoupon, error: couponError } = await supabaseAdmin
+          .from("coupons")
+          .select("*")
+          .eq("code", couponCode)
+          .eq("is_active", true)
+          .single();
+        
+        if (couponError) {
+          logStep("Coupon not found or inactive", { couponCode, error: couponError?.message });
+        } else {
+          dbCoupon = fetchedCoupon;
+        }
+      }
       
-      if (!couponError && dbCoupon) {
-        // Validate coupon for product type
+      if (dbCoupon) {
+        // For fundadores coupon, always valid for fundadores product type
         const productType = isFundadores ? "fundadores" : isBundle ? "jornada" : "test_avulso";
-        const isValidForProduct = !dbCoupon.allowed_product_type || dbCoupon.allowed_product_type === productType;
+        const isValidForProduct = !dbCoupon.allowed_product_type || 
+          dbCoupon.allowed_product_type === productType ||
+          dbCoupon.allowed_product_type === "all_products" ||
+          (isFundadores && dbCoupon.allowed_product_type === "fundadores");
         
         // Validate expiration and usage
         const isNotExpired = !dbCoupon.expires_at || new Date(dbCoupon.expires_at) > new Date();
@@ -613,10 +662,8 @@ serve(async (req) => {
             
           logStep("Coupon usage incremented", { couponId: dbCoupon.id });
         } else {
-          logStep("Coupon validation failed", { isValidForProduct, isNotExpired, hasUsesLeft });
+          logStep("Coupon validation failed", { isValidForProduct, isNotExpired, hasUsesLeft, productType });
         }
-      } else {
-        logStep("Coupon not found or inactive", { couponCode, error: couponError?.message });
       }
     } else if (discountPercentage > 0) {
       // Add quantity-based discount if applicable (only for individual tests without coupon)

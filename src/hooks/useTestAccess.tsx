@@ -5,6 +5,26 @@ import { useAuth } from "./useAuth";
 export const useTestAccess = () => {
   const { user, userRole } = useAuth();
 
+  // Fetch user profile to check founder status
+  const { data: profile } = useQuery({
+    queryKey: ["user-profile-access", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("is_founder, codigo_essencia_unlocked")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const isFounder = profile?.is_founder || false;
+
   // Fetch test purchases for current user
   const { data: purchases } = useQuery({
     queryKey: ["test-purchases", user?.id],
@@ -28,14 +48,20 @@ export const useTestAccess = () => {
     // Admins have access to all tests
     if (userRole === "admin") return true;
     
+    // Founders have access to all tests
+    if (isFounder) return true;
+    
     if (isFree) return true;
     return purchases?.some((p) => p.test_id === testId) || false;
   };
 
-  // Check if user has purchased a test (ignoring admin role for freemium flow)
+  // Check if user has purchased a test (or is founder)
   const hasPurchased = (testId: string) => {
+    // Founders have access to all tests (full version)
+    if (isFounder) return true;
+    
     return purchases?.some((p) => p.test_id === testId) || false;
   };
 
-  return { hasAccess, hasPurchased, purchases };
+  return { hasAccess, hasPurchased, purchases, isFounder };
 };
