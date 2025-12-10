@@ -1,17 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, Star, Heart, Users, Sparkles, Gift, Smartphone, Crown, ArrowRight, Loader2, Wrench, Brain, Compass, BookOpen, Zap, Tag, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { AboutCreator } from "@/components/landing/AboutCreator";
 
 const Fundadores = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [couponCode, setCouponCode] = useState("");
@@ -19,10 +20,55 @@ const Fundadores = () => {
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponDiscount, setCouponDiscount] = useState<number | null>(null);
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+  const autoCheckoutTriggered = useRef(false);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  // Auto-trigger checkout when coming from auth with autoCheckout=true
+  useEffect(() => {
+    const autoCheckout = searchParams.get("autoCheckout");
+    
+    if (autoCheckout === "true" && user && !isAuthLoading && !autoCheckoutTriggered.current) {
+      autoCheckoutTriggered.current = true;
+      // Clear the param from URL
+      setSearchParams({});
+      // Trigger checkout
+      triggerCheckout();
+    }
+  }, [user, isAuthLoading, searchParams]);
+
+  const triggerCheckout = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: {
+          testIds: [],
+          isFundadores: true,
+          language: "pt",
+          currency: "brl",
+          couponCode: couponApplied ? couponCode.trim().toUpperCase() : undefined,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("URL de checkout não recebida");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast({
+        title: "Erro ao iniciar checkout",
+        description: "Tente novamente em alguns instantes.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const validateCoupon = async () => {
     if (!couponCode.trim()) return;
@@ -119,34 +165,7 @@ const Fundadores = () => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: {
-          testIds: [],
-          isFundadores: true,
-          language: "pt",
-          currency: "brl",
-          couponCode: couponApplied ? couponCode.trim().toUpperCase() : undefined,
-        },
-      });
-
-      if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, "_blank");
-      } else {
-        throw new Error("URL de checkout não recebida");
-      }
-    } catch (error) {
-      console.error("Checkout error:", error);
-      toast({
-        title: "Erro ao iniciar checkout",
-        description: "Tente novamente em alguns instantes.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    await triggerCheckout();
   };
 
   const CTAButton = ({ className = "", size = "lg" }: { className?: string; size?: "default" | "lg" }) => (
