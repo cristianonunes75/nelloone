@@ -38,8 +38,10 @@ const Auth = () => {
   const { language, t } = useLanguage();
   const [searchParams] = useSearchParams();
   
-  // Check if user came from a purchase attempt
-  const redirectToPurchase = searchParams.get("redirect") === "purchase";
+  // Check redirect parameter
+  const redirectParam = searchParams.get("redirect");
+  const redirectToPurchase = redirectParam === "purchase";
+  const redirectToFundadores = redirectParam === "/fundadores" || redirectParam === "fundadores";
 
   // Helper to get localized path
   const getLocalizedPath = (path: string) => {
@@ -99,7 +101,11 @@ const Auth = () => {
 
   // Redirect if already logged in
   if (user) {
-    navigate(getLocalizedPath("/cliente"));
+    if (redirectToFundadores) {
+      navigate("/fundadores?autoCheckout=true");
+    } else {
+      navigate(getLocalizedPath("/cliente"));
+    }
     return null;
   }
 
@@ -147,6 +153,12 @@ const Auth = () => {
         
         // Wait for roles to be fetched before redirecting
         setTimeout(async () => {
+          // If coming from Fundadores, redirect there with autoCheckout
+          if (redirectToFundadores) {
+            navigate("/fundadores?autoCheckout=true");
+            return;
+          }
+          
           const { data: rolesData } = await supabase
             .from("user_roles")
             .select("role")
@@ -201,6 +213,12 @@ const Auth = () => {
         } else {
           // Wait for roles to be fetched before redirecting
           setTimeout(async () => {
+            // If coming from Fundadores, redirect there with autoCheckout
+            if (redirectToFundadores) {
+              navigate("/fundadores?autoCheckout=true");
+              return;
+            }
+            
             const { data: rolesData } = await supabase
               .from("user_roles")
               .select("role")
