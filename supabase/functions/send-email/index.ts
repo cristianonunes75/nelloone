@@ -13,7 +13,8 @@ type EmailType =
   | "welcome"
   | "access_instructions"
   | "test_completed"
-  | "map_available";
+  | "map_available"
+  | "commission_paid";
 
 interface EmailRequest {
   type: EmailType;
@@ -25,6 +26,8 @@ interface EmailRequest {
     amount?: number;
     currency?: string;
     language?: string;
+    commissionAmount?: number;
+    referralCount?: number;
   };
 }
 
@@ -243,6 +246,47 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
           </div>
         `,
       },
+      commission_paid: {
+        subject: "💰 Sua comissão foi paga - NELLO ONE",
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">Programa de Afiliados</p>
+            </div>
+            
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Olá, ${name}! 💰</h2>
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Sua comissão de afiliado foi processada e paga!
+              </p>
+              
+              <div style="background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 8px; padding: 20px; margin: 24px 0; text-align: center;">
+                <p style="color: #166534; font-size: 14px; margin: 0 0 8px;">Valor pago:</p>
+                <p style="color: #166534; font-size: 28px; font-weight: 600; margin: 0;">
+                  R$ ${(data.commissionAmount || 0).toFixed(2)}
+                </p>
+                <p style="color: #166534; font-size: 14px; margin: 8px 0 0;">
+                  ${data.referralCount || 1} referência(s) processada(s)
+                </p>
+              </div>
+              
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Continue compartilhando seu link de afiliado para ganhar mais comissões!
+              </p>
+              
+              <a href="https://nello.one/cliente" 
+                 style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
+                Ver Meu Painel
+              </a>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. Todos os direitos reservados.
+            </p>
+          </div>
+        `,
+      },
     },
     en: {
       purchase_confirmation: {
@@ -445,6 +489,47 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
               <a href="https://nello.one/en/cliente" 
                  style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
                 View My Map
+              </a>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. All rights reserved.
+            </p>
+          </div>
+        `,
+      },
+      commission_paid: {
+        subject: "💰 Your commission has been paid - NELLO ONE",
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">Affiliate Program</p>
+            </div>
+            
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Hello, ${name}! 💰</h2>
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Your affiliate commission has been processed and paid!
+              </p>
+              
+              <div style="background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 8px; padding: 20px; margin: 24px 0; text-align: center;">
+                <p style="color: #166534; font-size: 14px; margin: 0 0 8px;">Amount paid:</p>
+                <p style="color: #166534; font-size: 28px; font-weight: 600; margin: 0;">
+                  $ ${(data.commissionAmount || 0).toFixed(2)}
+                </p>
+                <p style="color: #166534; font-size: 14px; margin: 8px 0 0;">
+                  ${data.referralCount || 1} referral(s) processed
+                </p>
+              </div>
+              
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Keep sharing your affiliate link to earn more commissions!
+              </p>
+              
+              <a href="https://nello.one/en/cliente" 
+                 style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
+                View My Dashboard
               </a>
             </div>
             
