@@ -325,11 +325,12 @@ export const AffiliatePanel = () => {
 
         {/* Tips */}
         <div className="bg-accent/30 rounded-lg p-3 text-xs text-muted-foreground">
-          <p className="font-medium mb-1">💡 Dicas de divulgação:</p>
+          <p className="font-medium mb-1">💡 Como funciona:</p>
           <ul className="list-disc list-inside space-y-1">
-            <li>Compartilhe seu link nas redes sociais</li>
+            <li>Seu link leva para a página principal do NELLO ONE</li>
+            <li>Você ganha {affiliate.commission_percent}% sobre qualquer compra feita por quem acessar via seu link</li>
+            <li>Compartilhe nas redes sociais, grupos e comunidades</li>
             <li>Envie para amigos que buscam autoconhecimento</li>
-            <li>Use seu código em grupos e comunidades</li>
           </ul>
         </div>
       </CardContent>
