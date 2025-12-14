@@ -14,6 +14,104 @@ export type Database = {
   }
   public: {
     Tables: {
+      affiliate_referrals: {
+        Row: {
+          affiliate_id: string
+          commission_amount: number
+          created_at: string
+          currency: string
+          id: string
+          paid_at: string | null
+          purchase_id: string | null
+          referred_user_id: string
+          sale_amount: number
+          status: string
+        }
+        Insert: {
+          affiliate_id: string
+          commission_amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          paid_at?: string | null
+          purchase_id?: string | null
+          referred_user_id: string
+          sale_amount?: number
+          status?: string
+        }
+        Update: {
+          affiliate_id?: string
+          commission_amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          paid_at?: string | null
+          purchase_id?: string | null
+          referred_user_id?: string
+          sale_amount?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_referrals_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_referrals_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "test_purchases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliates: {
+        Row: {
+          affiliate_code: string
+          commission_percent: number
+          created_at: string
+          id: string
+          is_active: boolean
+          total_earnings: number
+          total_sales: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          affiliate_code: string
+          commission_percent?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          total_earnings?: number
+          total_sales?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          affiliate_code?: string
+          commission_percent?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          total_earnings?: number
+          total_sales?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliates_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_conversations: {
         Row: {
           created_at: string
@@ -805,6 +903,7 @@ export type Database = {
       }
       test_purchases: {
         Row: {
+          affiliate_code: string | null
           currency: string | null
           id: string
           metadata: Json | null
@@ -820,6 +919,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          affiliate_code?: string | null
           currency?: string | null
           id?: string
           metadata?: Json | null
@@ -835,6 +935,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          affiliate_code?: string | null
           currency?: string | null
           id?: string
           metadata?: Json | null

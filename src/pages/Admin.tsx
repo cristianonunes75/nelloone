@@ -17,6 +17,7 @@ const AdminCodigoEssencia = lazy(() => import("@/components/admin/AdminCodigoEss
 const AdminLogs = lazy(() => import("@/components/admin/AdminLogs").then(m => ({ default: m.AdminLogs })));
 const AdminSettings = lazy(() => import("@/components/admin/AdminSettings").then(m => ({ default: m.AdminSettings })));
 const FundadoresAdmin = lazy(() => import("@/components/admin/FundadoresAdmin").then(m => ({ default: m.FundadoresAdmin })));
+const AffiliatesManagement = lazy(() => import("@/components/admin/AffiliatesManagement").then(m => ({ default: m.AffiliatesManagement })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -60,6 +61,7 @@ const Admin = () => {
               <Routes>
                 <Route path="/" element={<AdminDashboard />} />
                 <Route path="/fundadores" element={<FundadoresAdmin />} />
+                <Route path="/afiliados" element={<AffiliatesManagement />} />
                 <Route path="/usuarios" element={<AdminUsersJourneys />} />
                 <Route path="/pedidos" element={<AdminOrdersPayments />} />
                 <Route path="/produtos" element={<AdminProductsTests />} />
