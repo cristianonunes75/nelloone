@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { 
   Users, Percent, DollarSign, TrendingUp, Search, 
   Copy, ExternalLink, Plus, Edit, Loader2, Star,
-  CreditCard, CheckCircle, Clock, Calendar
+  CreditCard, CheckCircle, Clock, Calendar, Download
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -366,6 +366,45 @@ export const AffiliatesManagement = () => {
     setSelectedReferrals(pendingIds);
   };
 
+  const exportToCSV = () => {
+    const dataToExport = filteredReferrals.map(r => ({
+      data: format(new Date(r.created_at), "dd/MM/yyyy", { locale: ptBR }),
+      afiliado: r.affiliate?.profile?.full_name || "—",
+      codigo: r.affiliate?.affiliate_code || "—",
+      valor_venda: r.sale_amount?.toFixed(2) || "0.00",
+      comissao: r.commission_amount?.toFixed(2) || "0.00",
+      moeda: r.currency || "BRL",
+      status: r.status === "paid" ? "Pago" : "Pendente",
+      data_pagamento: r.paid_at ? format(new Date(r.paid_at), "dd/MM/yyyy", { locale: ptBR }) : "—"
+    }));
+
+    const headers = ["Data", "Afiliado", "Código", "Valor Venda", "Comissão", "Moeda", "Status", "Data Pagamento"];
+    const csvContent = [
+      headers.join(";"),
+      ...dataToExport.map(row => [
+        row.data,
+        row.afiliado,
+        row.codigo,
+        row.valor_venda,
+        row.comissao,
+        row.moeda,
+        row.status,
+        row.data_pagamento
+      ].join(";"))
+    ].join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `comissoes_afiliados_${format(new Date(), "yyyy-MM-dd")}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success("Relatório exportado com sucesso!");
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -575,7 +614,7 @@ export const AffiliatesManagement = () => {
 
         <TabsContent value="payments" className="space-y-4">
           {/* Payment Filters */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex gap-2">
               <Button 
                 variant={paymentFilter === "pending" ? "default" : "outline"} 
@@ -601,24 +640,28 @@ export const AffiliatesManagement = () => {
                 Todos
               </Button>
             </div>
-            {paymentFilter === "pending" && pendingReferrals.length > 0 && (
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={selectAllPending}>
-                  Selecionar Todos
-                </Button>
-                <Button 
-                  size="sm" 
-                  onClick={markReferralsAsPaid}
-                  disabled={selectedReferrals.length === 0 || saving}
-                >
-                  {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Marcar como Pago ({selectedReferrals.length})
-                </Button>
-              </div>
-            )}
+            <Button variant="outline" size="sm" onClick={exportToCSV} disabled={filteredReferrals.length === 0}>
+              <Download className="h-4 w-4 mr-2" />
+              Exportar CSV
+            </Button>
           </div>
-
+          
+          {paymentFilter === "pending" && pendingReferrals.length > 0 && (
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={selectAllPending}>
+                Selecionar Todos
+              </Button>
+              <Button 
+                size="sm" 
+                onClick={markReferralsAsPaid}
+                disabled={selectedReferrals.length === 0 || saving}
+              >
+                {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Marcar como Pago ({selectedReferrals.length})
+              </Button>
+            </div>
+          )}
           {/* Payments Table */}
           <Card className="border-border/50">
             <Table>
