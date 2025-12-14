@@ -9,7 +9,7 @@ import { ProblemsSection } from "@/components/landing/v2/ProblemsSection";
 import { TransformationSection } from "@/components/landing/v2/TransformationSection";
 import { WhatYouGetSection } from "@/components/landing/v2/WhatYouGetSection";
 import { NotForYouSection } from "@/components/landing/v2/NotForYouSection";
-import { PricingSection } from "@/components/landing/v2/PricingSection";
+import { SimplifiedPricingSection } from "@/components/landing/v2/SimplifiedPricingSection";
 import { FAQSection } from "@/components/landing/v2/FAQSection";
 import { CTASection } from "@/components/landing/v2/CTASection";
 import { FooterSection } from "@/components/landing/v2/FooterSection";
@@ -61,9 +61,9 @@ const Landing = () => {
       {/* SEÇÃO 9 - Para Quem Não É (Gatilho de Exclusão) */}
       <NotForYouSection />
       
-      {/* SEÇÃO 10 - Blocos de Preços */}
+      {/* SEÇÃO 10 - Oferta Única Simplificada (VALIDATION PHASE) */}
       <div id="pricing">
-        <PricingSection />
+        <SimplifiedPricingSection />
       </div>
       
       {/* SEÇÃO 11 - FAQ Fortíssimo */}

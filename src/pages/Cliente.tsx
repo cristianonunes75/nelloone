@@ -9,6 +9,7 @@ import { JourneyStepCard } from "@/components/cliente/JourneyStepCard";
 import { LogoText } from "@/components/LogoText";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { ImpersonateBanner } from "@/components/ImpersonateBanner";
+import { OnboardingModal } from "@/components/cliente/OnboardingModal";
 import { LogOut, User, Sparkles, Map, Lock, ShoppingCart, Star, MessageSquare } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
@@ -175,8 +176,21 @@ const Cliente = () => {
     ? impersonatedUserName?.split(" ")[0] || "Usuário"
     : profile?.full_name?.split(" ")[0] || user?.user_metadata?.full_name?.split(" ")[0] || "Viajante";
 
+  const handleOnboardingComplete = () => {
+    // Start the first test after onboarding
+    const firstStep = journeySteps[0];
+    if (firstStep) {
+      handleStartTest(firstStep);
+    }
+  };
+
   return (
     <div className={`min-h-screen pb-24 md:pb-0 ${isImpersonating ? 'bg-amber-50/30' : 'bg-background'}`}>
+      {/* Onboarding Modal - shows only once */}
+      <OnboardingModal 
+        userName={displayName} 
+        onComplete={handleOnboardingComplete} 
+      />
       {/* Impersonate Banner */}
       <ImpersonateBanner />
       {/* Header - iOS style with blur */}

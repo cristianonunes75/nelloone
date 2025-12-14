@@ -422,8 +422,9 @@ serve(async (req) => {
       }
 
       // ====== JORNADA COMPLETA PURCHASE ======
+      // VALIDATION PHASE: Jornada Completa now includes Código da Essência
       if (productType === "jornada_completa" || productType === "journey") {
-        logStep("Processing Jornada Completa purchase", { userId });
+        logStep("Processing Jornada Completa purchase (includes Código da Essência)", { userId });
         
         if (!userId || userId === "guest") {
           logStep("WARN: Guest purchase for journey");
@@ -433,17 +434,20 @@ serve(async (req) => {
           });
         }
 
-        // Update journey status
+        // Update journey status AND unlock Código da Essência (VALIDATION PHASE: included in bundle)
         const { error: updateError } = await supabase
           .from("profiles")
           .update({ 
             journey_status: "in_progress",
             journey_started_at: new Date().toISOString(),
+            codigo_essencia_unlocked: true, // VALIDATION PHASE: Código da Essência included
           })
           .eq("id", userId);
 
         if (updateError) {
           logStep("ERROR: Failed to update journey status", { error: updateError });
+        } else {
+          logStep("Código da Essência unlocked as part of Jornada Completa", { userId });
         }
 
         // Fetch all 7 tests and record purchases
@@ -468,6 +472,7 @@ serve(async (req) => {
             metadata: {
               session_id: session.id,
               product_type: "jornada_completa",
+              includes_codigo_essencia: true, // VALIDATION PHASE
             },
           }));
 
@@ -481,11 +486,52 @@ serve(async (req) => {
           if (purchaseError) {
             logStep("ERROR: Failed to record journey purchases", { error: purchaseError });
           } else {
-            logStep("Journey purchases recorded", { count: allTests.length });
+            logStep("Journey purchases recorded with Código da Essência included", { count: allTests.length });
           }
         }
 
-        return new Response(JSON.stringify({ received: true, product: "jornada_completa" }), {
+        // Send confirmation email mentioning Código da Essência is included
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", userId)
+            .single();
+
+          const { data: userAuth } = await supabase.auth.admin.getUserById(userId);
+          const userEmail = userAuth?.user?.email;
+
+          if (userEmail) {
+            const language = session.metadata?.language || "pt";
+            const amountPaid = (session.amount_total || 0) / 100;
+
+            await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${supabaseServiceKey}`,
+              },
+              body: JSON.stringify({
+                type: "purchase_confirmation",
+                to: userEmail,
+                data: {
+                  name: profile?.full_name || userEmail.split("@")[0],
+                  testNames: ["NELLO ONE – Jornada Completa (inclui Código da Essência)"],
+                  amount: amountPaid,
+                  currency: "R$",
+                  language,
+                  includesCodigoEssencia: true,
+                },
+              }),
+            });
+
+            logStep("Jornada Completa confirmation email sent", { userEmail });
+          }
+        } catch (emailError) {
+          logStep("WARN: Failed to send email", { error: emailError });
+        }
+
+        return new Response(JSON.stringify({ received: true, product: "jornada_completa", includes_codigo_essencia: true }), {
           status: 200,
           headers: { "Content-Type": "application/json" },
         });

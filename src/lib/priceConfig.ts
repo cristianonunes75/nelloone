@@ -141,14 +141,16 @@ export const fundadoresPrices = {
   },
 };
 
-// Bundle prices - FULL JOURNEY
+// Bundle prices - FULL JOURNEY (VALIDATION PHASE: R$297 includes everything)
+// Includes: 7 tests + Premium PDFs + Código da Essência
 export const bundlePrices = {
   brl: {
-    original: 862,
-    price: 597,
-    priceId: null, // Create if needed
+    original: 597,
+    price: 297,
+    priceId: "price_1SZNYXDjhZZxZELMoGVJUZRP", // TODO: Create new R$297 price in Stripe
     currency: "BRL" as Currency,
     symbol: "R$",
+    includesCodigoEssencia: true, // New flag for validation phase
   },
   usd: {
     original: 147,
@@ -156,6 +158,7 @@ export const bundlePrices = {
     priceId: "price_1SZNYXDjhZZxZELMoGVJUZRP",
     currency: "USD" as Currency,
     symbol: "$",
+    includesCodigoEssencia: true,
   },
   eur: {
     original: 184,
@@ -163,6 +166,7 @@ export const bundlePrices = {
     priceId: "price_1SZz6vDjhZZxZELMQsZuLKah",
     currency: "EUR" as Currency,
     symbol: "€",
+    includesCodigoEssencia: true,
   },
 };
 
