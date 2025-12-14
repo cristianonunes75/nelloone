@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Check, DollarSign, Users, TrendingUp, Wallet, ExternalLink } from "lucide-react";
+import { Copy, Check, DollarSign, Users, TrendingUp, Wallet, History, Calendar, Package } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface AffiliateData {
   id: string;
@@ -26,13 +28,25 @@ interface AffiliateData {
   };
 }
 
+interface ReferralData {
+  id: string;
+  created_at: string;
+  commission_amount: number;
+  sale_amount: number;
+  currency: string;
+  status: string;
+  purchase_id: string | null;
+}
+
 export const AffiliatePanel = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [affiliate, setAffiliate] = useState<AffiliateData | null>(null);
+  const [referrals, setReferrals] = useState<ReferralData[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   
   // Payment form state
   const [paymentMethod, setPaymentMethod] = useState<string>("");
@@ -69,6 +83,9 @@ export const AffiliatePanel = () => {
         setBankAccount(info.bank_account || "");
         setBankAgency(info.bank_agency || "");
         setPaypalEmail(info.paypal_email || "");
+        
+        // Fetch referrals for this affiliate
+        await fetchReferrals(data.id);
       } else {
         // Create affiliate record if user is a founder with completed journey
         await createAffiliateRecord();
@@ -77,6 +94,21 @@ export const AffiliatePanel = () => {
       console.error("Error fetching affiliate data:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchReferrals = async (affiliateId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("affiliate_referrals")
+        .select("*")
+        .eq("affiliate_id", affiliateId)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setReferrals(data || []);
+    } catch (error) {
+      console.error("Error fetching referrals:", error);
     }
   };
 
@@ -156,6 +188,25 @@ export const AffiliatePanel = () => {
     });
   };
 
+  const getCurrencySymbol = (currency: string) => {
+    switch (currency) {
+      case "USD": return "$";
+      case "EUR": return "€";
+      default: return "R$";
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "paid":
+        return <span className="text-xs bg-green-500/20 text-green-600 px-2 py-0.5 rounded-full">Pago</span>;
+      case "pending":
+        return <span className="text-xs bg-yellow-500/20 text-yellow-600 px-2 py-0.5 rounded-full">Pendente</span>;
+      default:
+        return <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">{status}</span>;
+    }
+  };
+
   const affiliateLink = affiliate?.affiliate_code 
     ? `${window.location.origin}/?ref=${affiliate.affiliate_code}`
     : "";
@@ -206,6 +257,70 @@ export const AffiliatePanel = () => {
             <p className="text-xs text-muted-foreground">Ganhos</p>
           </div>
         </div>
+
+        {/* Sales History Toggle */}
+        {referrals.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={() => setShowHistory(!showHistory)}
+          >
+            <History className="w-4 h-4 mr-2" />
+            {showHistory ? "Ocultar histórico" : `Ver histórico (${referrals.length} vendas)`}
+          </Button>
+        )}
+
+        {/* Sales History */}
+        {showHistory && referrals.length > 0 && (
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            <Label className="text-sm font-medium flex items-center gap-2">
+              <History className="w-4 h-4" />
+              Histórico de Vendas
+            </Label>
+            <div className="space-y-2">
+              {referrals.map((referral) => (
+                <div 
+                  key={referral.id} 
+                  className="bg-background/50 rounded-lg p-3 space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Calendar className="w-3 h-3" />
+                      {format(new Date(referral.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                    </div>
+                    {getStatusBadge(referral.status)}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs">
+                      <Package className="w-3 h-3 text-muted-foreground" />
+                      <span className="text-muted-foreground">Venda:</span>
+                      <span className="font-medium">
+                        {getCurrencySymbol(referral.currency)} {referral.sale_amount.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="text-sm font-bold text-primary">
+                      +{getCurrencySymbol(referral.currency)} {referral.commission_amount.toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty state for history */}
+        {showHistory && referrals.length === 0 && (
+          <div className="bg-background/50 rounded-lg p-4 text-center">
+            <History className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">
+              Nenhuma venda registrada ainda
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Compartilhe seu link para começar a ganhar comissões!
+            </p>
+          </div>
+        )}
 
         {/* Affiliate Link */}
         <div className="space-y-2">
