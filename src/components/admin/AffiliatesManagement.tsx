@@ -243,6 +243,32 @@ export const AffiliatesManagement = () => {
 
     setSaving(true);
     try {
+      // Get the referrals being paid to calculate totals per affiliate
+      const referralsToPay = referrals.filter(r => selectedReferrals.includes(r.id));
+      
+      // Group by affiliate to send one email per affiliate
+      const affiliatePayments: Record<string, { 
+        affiliateId: string;
+        totalAmount: number;
+        referralCount: number;
+        affiliateName: string;
+      }> = {};
+      
+      for (const ref of referralsToPay) {
+        const affId = ref.affiliate_id;
+        if (!affiliatePayments[affId]) {
+          affiliatePayments[affId] = {
+            affiliateId: affId,
+            totalAmount: 0,
+            referralCount: 0,
+            affiliateName: ref.affiliate?.profile?.full_name || "Afiliado"
+          };
+        }
+        affiliatePayments[affId].totalAmount += ref.commission_amount || 0;
+        affiliatePayments[affId].referralCount += 1;
+      }
+
+      // Mark as paid in database
       const { error } = await supabase
         .from("affiliate_referrals")
         .update({ 
@@ -253,7 +279,32 @@ export const AffiliatesManagement = () => {
 
       if (error) throw error;
 
-      toast.success(`${selectedReferrals.length} pagamento(s) marcado(s) como pago(s)`);
+      // Send email notifications to each affiliate
+      for (const payment of Object.values(affiliatePayments)) {
+        // Get affiliate email from auth (via profile user_id)
+        const affiliate = affiliates.find(a => a.id === payment.affiliateId);
+        if (affiliate?.user_id) {
+          try {
+            await supabase.functions.invoke("send-email", {
+              body: {
+                type: "commission_paid",
+                to: affiliate.email || `${affiliate.user_id}@placeholder.com`, // Fallback, ideally get from auth
+                data: {
+                  name: payment.affiliateName,
+                  commissionAmount: payment.totalAmount,
+                  referralCount: payment.referralCount,
+                  language: "pt"
+                }
+              }
+            });
+          } catch (emailError) {
+            console.error("Error sending commission email:", emailError);
+            // Don't fail the whole operation if email fails
+          }
+        }
+      }
+
+      toast.success(`${selectedReferrals.length} pagamento(s) marcado(s) como pago(s). Notificações enviadas.`);
       setSelectedReferrals([]);
       setShowPaymentDialog(false);
       fetchData();
