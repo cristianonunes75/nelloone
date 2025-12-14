@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,10 +27,11 @@ import { toast } from "sonner";
 import { 
   Users, Percent, DollarSign, TrendingUp, Search, 
   Copy, ExternalLink, Plus, Edit, Loader2, Star,
-  CreditCard, CheckCircle, Clock, Calendar, Download
+  CreditCard, CheckCircle, Clock, Calendar, Download, BarChart3
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 interface Affiliate {
   id: string;
@@ -444,6 +445,32 @@ export const AffiliatesManagement = () => {
     toast.success("Relatório exportado com sucesso!");
   };
 
+  // Calculate monthly commissions for chart (last 6 months)
+  const monthlyCommissions = useMemo(() => {
+    const months = [];
+    const now = new Date();
+    
+    for (let i = 5; i >= 0; i--) {
+      const monthDate = subMonths(now, i);
+      const monthStart = startOfMonth(monthDate);
+      const monthEnd = endOfMonth(monthDate);
+      
+      const monthTotal = referrals
+        .filter(r => {
+          const refDate = new Date(r.created_at);
+          return refDate >= monthStart && refDate <= monthEnd;
+        })
+        .reduce((sum, r) => sum + (r.commission_amount || 0), 0);
+      
+      months.push({
+        month: format(monthDate, "MMM", { locale: ptBR }),
+        amount: monthTotal
+      });
+    }
+    
+    return months;
+  }, [referrals]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -550,6 +577,45 @@ export const AffiliatesManagement = () => {
           </div>
         </Card>
       </div>
+
+      {/* Commission Evolution Chart */}
+      <Card className="p-6 border-border/50">
+        <div className="flex items-center gap-2 mb-4">
+          <BarChart3 className="h-5 w-5 text-primary" />
+          <h3 className="font-semibold">Evolução de Comissões (últimos 6 meses)</h3>
+        </div>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={monthlyCommissions}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="month" 
+                className="text-xs fill-muted-foreground"
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+              />
+              <YAxis 
+                className="text-xs fill-muted-foreground"
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                tickFormatter={(value) => `R$${value}`}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px'
+                }}
+                formatter={(value: number) => [`R$ ${value.toFixed(2)}`, 'Comissões']}
+                labelStyle={{ color: 'hsl(var(--foreground))' }}
+              />
+              <Bar 
+                dataKey="amount" 
+                fill="hsl(var(--primary))" 
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
 
       <Tabs defaultValue="affiliates" className="space-y-4">
         <TabsList>
