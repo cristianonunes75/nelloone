@@ -31,6 +31,7 @@ import CodigoEssenciaCheckout from "./pages/CodigoEssenciaCheckout";
 import ComprarTeste from "./pages/ComprarTeste";
 import Fundadores from "./pages/Fundadores";
 import FundadorFeedback from "./pages/FundadorFeedback";
+import DiagnosticoPDF from "./pages/DiagnosticoPDF";
 
 const queryClient = new QueryClient();
 
@@ -408,6 +409,14 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute allowedRoles={["admin"]}>
           <Admin />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/admin/diagnostico"
+      element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+          <DiagnosticoPDF />
         </ProtectedRoute>
       }
     />
