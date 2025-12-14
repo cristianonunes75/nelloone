@@ -90,10 +90,49 @@ export const AffiliatesManagement = () => {
   const [saving, setSaving] = useState(false);
   const [selectedReferrals, setSelectedReferrals] = useState<string[]>([]);
   const [paymentFilter, setPaymentFilter] = useState<"pending" | "paid" | "all">("pending");
+  const [systemEnabled, setSystemEnabled] = useState(true);
+  const [togglingSystem, setTogglingSystem] = useState(false);
 
   useEffect(() => {
     fetchData();
+    fetchSystemStatus();
   }, []);
+
+  const fetchSystemStatus = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "affiliate_system_enabled")
+        .single();
+      
+      if (error) throw error;
+      setSystemEnabled((data?.value as any)?.enabled ?? true);
+    } catch (error) {
+      console.error("Error fetching system status:", error);
+    }
+  };
+
+  const toggleSystemEnabled = async () => {
+    setTogglingSystem(true);
+    try {
+      const newValue = !systemEnabled;
+      const { error } = await supabase
+        .from("app_settings")
+        .update({ value: { enabled: newValue }, updated_at: new Date().toISOString() })
+        .eq("key", "affiliate_system_enabled");
+      
+      if (error) throw error;
+      
+      setSystemEnabled(newValue);
+      toast.success(newValue ? "Sistema de afiliados ativado" : "Sistema de afiliados desativado");
+    } catch (error: any) {
+      console.error("Error toggling system:", error);
+      toast.error("Erro ao alterar configuração");
+    } finally {
+      setTogglingSystem(false);
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -415,6 +454,33 @@ export const AffiliatesManagement = () => {
 
   return (
     <div className="space-y-6">
+      {/* System Toggle */}
+      <Card className="p-4 border-border/50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${systemEnabled ? 'bg-green-500/10' : 'bg-muted'}`}>
+              <Users className={`h-5 w-5 ${systemEnabled ? 'text-green-600' : 'text-muted-foreground'}`} />
+            </div>
+            <div>
+              <p className="font-medium">Sistema de Afiliados</p>
+              <p className="text-sm text-muted-foreground">
+                {systemEnabled ? 'O sistema está ativo e aceitando referências' : 'O sistema está desativado'}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className={`text-sm font-medium ${systemEnabled ? 'text-green-600' : 'text-muted-foreground'}`}>
+              {systemEnabled ? 'Ativo' : 'Inativo'}
+            </span>
+            <Switch 
+              checked={systemEnabled} 
+              onCheckedChange={toggleSystemEnabled}
+              disabled={togglingSystem}
+            />
+          </div>
+        </div>
+      </Card>
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -430,7 +496,7 @@ export const AffiliatesManagement = () => {
               Pagamentos ({pendingReferrals.length})
             </Button>
           )}
-          <Button onClick={() => setShowAddDialog(true)} disabled={founders.length === 0}>
+          <Button onClick={() => setShowAddDialog(true)} disabled={founders.length === 0 || !systemEnabled}>
             <Plus className="h-4 w-4 mr-2" />
             Novo Afiliado
           </Button>
