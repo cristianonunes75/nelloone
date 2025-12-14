@@ -127,7 +127,7 @@ const BRL_PRICES: Record<string, string> = {
   temperamentos: "price_1SZUnqDjhZZxZELMtU9tUMFm",
   linguagens_amor: "price_1SZUoWDjhZZxZELMxEJJKhDn",
   inteligencias_multiplas: "price_1SZUpxDjhZZxZELMAkQlFX11",
-  bundle: "price_1SZNYXDjhZZxZELMoGVJUZRP",
+  bundle: "price_1SeL7gDjhZZxZELMKuDFTI5t", // R$297 - NELLO ONE Jornada Completa (VALIDATION PHASE)
   codigo_da_essencia: "price_1Sc2RRDjhZZxZELMPxAnu0I5", // R$397 BRL
   fundadores: "price_1ScWglDjhZZxZELM3tQocxgu", // R$197 (BRL only)
 };
