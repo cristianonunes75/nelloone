@@ -14,7 +14,8 @@ type EmailType =
   | "access_instructions"
   | "test_completed"
   | "map_available"
-  | "commission_paid";
+  | "commission_paid"
+  | "new_commission";
 
 interface EmailRequest {
   type: EmailType;
@@ -28,6 +29,8 @@ interface EmailRequest {
     language?: string;
     commissionAmount?: number;
     referralCount?: number;
+    saleAmount?: number;
+    productName?: string;
   };
 }
 
@@ -287,6 +290,50 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
           </div>
         `,
       },
+      new_commission: {
+        subject: "🎉 Nova venda! Você ganhou uma comissão - NELLO ONE",
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">Programa de Afiliados</p>
+            </div>
+            
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Parabéns, ${name}! 🎉</h2>
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Alguém usou seu link de afiliado e fez uma compra!
+              </p>
+              
+              <div style="background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                <p style="color: #92400E; font-size: 14px; margin: 0 0 8px;">Detalhes da venda:</p>
+                <p style="color: #92400E; font-size: 16px; margin: 4px 0;">
+                  <strong>Produto:</strong> ${data.productName || "NELLO ONE"}
+                </p>
+                <p style="color: #92400E; font-size: 16px; margin: 4px 0;">
+                  <strong>Valor da venda:</strong> R$ ${(data.saleAmount || 0).toFixed(2)}
+                </p>
+                <p style="color: #166534; font-size: 20px; font-weight: 600; margin: 12px 0 0;">
+                  Sua comissão: R$ ${(data.commissionAmount || 0).toFixed(2)}
+                </p>
+              </div>
+              
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Sua comissão está pendente e será paga em breve. Continue compartilhando para ganhar mais!
+              </p>
+              
+              <a href="https://nello.one/cliente" 
+                 style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
+                Ver Meu Painel
+              </a>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. Todos os direitos reservados.
+            </p>
+          </div>
+        `,
+      },
     },
     en: {
       purchase_confirmation: {
@@ -525,6 +572,50 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
               
               <p style="color: #444; font-size: 16px; line-height: 1.6;">
                 Keep sharing your affiliate link to earn more commissions!
+              </p>
+              
+              <a href="https://nello.one/en/cliente" 
+                 style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
+                View My Dashboard
+              </a>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. All rights reserved.
+            </p>
+          </div>
+        `,
+      },
+      new_commission: {
+        subject: "🎉 New sale! You earned a commission - NELLO ONE",
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">Affiliate Program</p>
+            </div>
+            
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Congratulations, ${name}! 🎉</h2>
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Someone used your affiliate link and made a purchase!
+              </p>
+              
+              <div style="background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                <p style="color: #92400E; font-size: 14px; margin: 0 0 8px;">Sale details:</p>
+                <p style="color: #92400E; font-size: 16px; margin: 4px 0;">
+                  <strong>Product:</strong> ${data.productName || "NELLO ONE"}
+                </p>
+                <p style="color: #92400E; font-size: 16px; margin: 4px 0;">
+                  <strong>Sale amount:</strong> $ ${(data.saleAmount || 0).toFixed(2)}
+                </p>
+                <p style="color: #166534; font-size: 20px; font-weight: 600; margin: 12px 0 0;">
+                  Your commission: $ ${(data.commissionAmount || 0).toFixed(2)}
+                </p>
+              </div>
+              
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Your commission is pending and will be paid soon. Keep sharing to earn more!
               </p>
               
               <a href="https://nello.one/en/cliente" 

@@ -14,6 +14,91 @@ const logStep = (step: string, details?: any) => {
   console.log(`[STRIPE-WEBHOOK] ${step}`, details ? JSON.stringify(details) : '');
 };
 
+// Check if affiliate system is enabled
+async function isAffiliateSystemEnabled(): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from("app_settings")
+      .select("value")
+      .eq("key", "affiliate_system_enabled")
+      .single();
+    
+    if (error) {
+      logStep("Could not fetch affiliate system status, defaulting to enabled", { error: error.message });
+      return true;
+    }
+    
+    const enabled = (data?.value as any)?.enabled ?? true;
+    logStep("Affiliate system status", { enabled });
+    return enabled;
+  } catch (error) {
+    logStep("Error checking affiliate system status", { error });
+    return true;
+  }
+}
+
+// Send notification email to affiliate about new commission
+async function notifyAffiliateNewCommission(
+  affiliateUserId: string,
+  affiliateName: string,
+  saleAmount: number,
+  commissionAmount: number,
+  currency: string,
+  productType: string
+) {
+  try {
+    // Get affiliate email from auth
+    const { data: authData } = await supabase.auth.admin.getUserById(affiliateUserId);
+    const affiliateEmail = authData?.user?.email;
+    
+    if (!affiliateEmail) {
+      logStep("Could not find affiliate email for notification", { affiliateUserId });
+      return;
+    }
+    
+    // Map product type to display name
+    const productNames: Record<string, string> = {
+      fundadores: "NELLO ONE Fundadores",
+      jornada_completa: "NELLO ONE Completo",
+      test_avulso: "Teste Avulso NELLO ONE",
+      codigo_essencia: "Código da Essência",
+    };
+    
+    const productName = productNames[productType] || productType;
+    
+    // Determine language based on currency
+    const language = currency === "USD" ? "en" : "pt";
+    
+    // Send email notification
+    const emailResponse = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseServiceKey}`,
+      },
+      body: JSON.stringify({
+        type: "new_commission",
+        to: affiliateEmail,
+        data: {
+          name: affiliateName,
+          saleAmount,
+          commissionAmount,
+          productName,
+          language,
+        },
+      }),
+    });
+    
+    if (emailResponse.ok) {
+      logStep("New commission notification sent to affiliate", { affiliateEmail, commissionAmount });
+    } else {
+      logStep("Failed to send new commission notification", { status: emailResponse.status });
+    }
+  } catch (error) {
+    logStep("Error sending affiliate notification", { error: error instanceof Error ? error.message : String(error) });
+  }
+}
+
 // Process affiliate referral and create commission record
 async function processAffiliateReferral(
   session: Stripe.Checkout.Session, 
@@ -21,12 +106,22 @@ async function processAffiliateReferral(
   purchasingUserId: string
 ) {
   try {
+    // Check if affiliate system is enabled
+    const systemEnabled = await isAffiliateSystemEnabled();
+    if (!systemEnabled) {
+      logStep("Affiliate system is disabled, skipping referral processing", { affiliateCode });
+      return;
+    }
+    
     logStep("Processing affiliate referral", { affiliateCode, purchasingUserId });
     
     // Find the affiliate by code
     const { data: affiliate, error: affiliateError } = await supabase
       .from("affiliates")
-      .select("*")
+      .select(`
+        *,
+        profile:profiles(full_name)
+      `)
       .eq("affiliate_code", affiliateCode.toUpperCase())
       .eq("is_active", true)
       .single();
@@ -45,6 +140,7 @@ async function processAffiliateReferral(
     const saleAmount = (session.amount_total || 0) / 100;
     const commissionAmount = saleAmount * (affiliate.commission_percent / 100);
     const currency = session.metadata?.currency?.toUpperCase() || "BRL";
+    const productType = session.metadata?.product_type || "test_avulso";
     
     logStep("Calculating commission", { 
       saleAmount, 
@@ -88,6 +184,17 @@ async function processAffiliateReferral(
         totalSales: affiliate.total_sales + 1 
       });
     }
+    
+    // Send notification to affiliate about new commission
+    const affiliateName = (affiliate.profile as any)?.full_name || "Afiliado";
+    await notifyAffiliateNewCommission(
+      affiliate.user_id,
+      affiliateName,
+      saleAmount,
+      commissionAmount,
+      currency,
+      productType
+    );
   } catch (error) {
     logStep("ERROR in processAffiliateReferral", { error: error instanceof Error ? error.message : String(error) });
   }
