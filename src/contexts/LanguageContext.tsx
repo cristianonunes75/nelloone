@@ -15,8 +15,8 @@ export type Language = 'en' | 'pt' | 'pt-pt';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface Translations {
-  landing: typeof enLanding & Record<string, any>;
-  miguel: typeof enMiguel & Record<string, any>;
+  landing: Record<string, any>;
+  miguel: Record<string, any>;
 }
 
 const translations: Record<Language, Translations & { user: typeof enUser }> = {
