@@ -4,13 +4,11 @@ import {
   CreditCard, 
   Settings, 
   Package,
-  Bot,
-  FileText,
-  Shield,
   Ticket,
   Sparkles,
   Activity,
   Star,
+  UserCheck,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -37,6 +35,7 @@ const menuSections = [
     label: "GESTÃO",
     items: [
       { title: "Fundadores", url: "/admin/fundadores", icon: Star },
+      { title: "Afiliados", url: "/admin/afiliados", icon: UserCheck },
       { title: "Usuários & Jornadas", url: "/admin/usuarios", icon: Users },
       { title: "Pedidos & Pagamentos", url: "/admin/pedidos", icon: CreditCard },
       { title: "Produtos & Testes", url: "/admin/produtos", icon: Package },
