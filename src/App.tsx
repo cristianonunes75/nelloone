@@ -11,6 +11,7 @@ import { LanguageRoute } from "@/components/LanguageRoute";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { GeoRedirect } from "@/components/GeoRedirect";
 import { CurrencyProtection } from "@/components/CurrencyProtection";
+import { AffiliateTracker } from "@/hooks/useAffiliateTracking";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Cliente from "./pages/Cliente";
@@ -426,6 +427,8 @@ const App = () => (
               <ImpersonateProvider>
                 {/* GEO-routing: Automatically redirects based on IP location */}
                 <GeoRedirect />
+                {/* Affiliate tracking: Captures referral codes from URL */}
+                <AffiliateTracker />
                 {/* Currency Protection: Prevents cross-trade between BRL and USD */}
                 <CurrencyProtection>
                   <LanguageRoute>

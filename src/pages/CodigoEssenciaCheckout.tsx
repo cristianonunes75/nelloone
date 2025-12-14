@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import { getPriceForLanguage, formatPrice } from "@/lib/priceConfig";
+import { getAffiliateCode } from "@/hooks/useAffiliateTracking";
 
 const content = {
   "pt": {
@@ -106,11 +107,14 @@ const CodigoEssenciaCheckout = () => {
     setIsLoading(true);
 
     try {
+      const affiliateCode = getAffiliateCode();
+      
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: {
           priceId,
           successUrl: `${window.location.origin}${language === "en" ? "/en/essence-code" : "/codigo-essencia"}?success=true`,
           cancelUrl: window.location.href,
+          affiliateCode: affiliateCode,
           metadata: {
             product_type: "codigo_da_essencia",
             user_id: user.id

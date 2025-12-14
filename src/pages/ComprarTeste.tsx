@@ -10,6 +10,7 @@ import * as Icons from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage, Language } from "@/contexts/LanguageContext";
 import { getPriceForLanguage, formatPrice, getCurrencyForLanguage } from "@/lib/priceConfig";
+import { getAffiliateCode } from "@/hooks/useAffiliateTracking";
 
 const ComprarTeste = () => {
   const { testId } = useParams<{ testId: string }>();
@@ -43,11 +44,14 @@ const ComprarTeste = () => {
     try {
       // ANTI-CROSSTRADE: Pass language to enforce correct currency
       const currency = getCurrencyForLanguage(language).toLowerCase();
+      const affiliateCode = getAffiliateCode();
+      
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: { 
           testId: test.id,
           language: language, // Enforces currency based on route
           currency: currency,
+          affiliateCode: affiliateCode,
         },
       });
 

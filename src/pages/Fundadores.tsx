@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { AboutCreator } from "@/components/landing/AboutCreator";
+import { getAffiliateCode } from "@/hooks/useAffiliateTracking";
 
 const Fundadores = () => {
   const { toast } = useToast();
@@ -42,6 +43,8 @@ const Fundadores = () => {
   const triggerCheckout = async () => {
     setIsLoading(true);
     try {
+      const affiliateCode = getAffiliateCode();
+      
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: {
           testIds: [],
@@ -49,6 +52,7 @@ const Fundadores = () => {
           language: "pt",
           currency: "brl",
           couponCode: couponApplied ? couponCode.trim().toUpperCase() : undefined,
+          affiliateCode: affiliateCode,
         },
       });
 

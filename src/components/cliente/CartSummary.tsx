@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getAffiliateCode } from "@/hooks/useAffiliateTracking";
 
 interface CartSummaryProps {
   tests: Array<{
@@ -33,11 +34,14 @@ export const CartSummary = ({ tests }: CartSummaryProps) => {
     setIsProcessing(true);
     try {
       // ANTI-CROSSTRADE: Pass both language and explicit currency
+      const affiliateCode = getAffiliateCode();
+      
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { 
           testIds: selectedTests,
           language: language,
           currency: currency, // Explicit currency for validation
+          affiliateCode: affiliateCode,
         }
       });
 

@@ -560,6 +560,9 @@ serve(async (req) => {
         cancelUrl = `${origin}/cliente?payment=cancelled`;
     }
 
+    // Get affiliate code if provided
+    const affiliateCode = body.affiliateCode || null;
+    
     // Create checkout session
     const sessionParams: any = {
       customer: customerId,
@@ -576,6 +579,7 @@ serve(async (req) => {
         is_bundle: isBundle ? "true" : "false",
         is_fundadores: isFundadores ? "true" : "false",
         product_type: isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
+        affiliate_code: affiliateCode || "",
       },
       customer_creation: customerId ? undefined : "always",
     };

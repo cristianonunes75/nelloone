@@ -14,6 +14,85 @@ const logStep = (step: string, details?: any) => {
   console.log(`[STRIPE-WEBHOOK] ${step}`, details ? JSON.stringify(details) : '');
 };
 
+// Process affiliate referral and create commission record
+async function processAffiliateReferral(
+  session: Stripe.Checkout.Session, 
+  affiliateCode: string, 
+  purchasingUserId: string
+) {
+  try {
+    logStep("Processing affiliate referral", { affiliateCode, purchasingUserId });
+    
+    // Find the affiliate by code
+    const { data: affiliate, error: affiliateError } = await supabase
+      .from("affiliates")
+      .select("*")
+      .eq("affiliate_code", affiliateCode.toUpperCase())
+      .eq("is_active", true)
+      .single();
+    
+    if (affiliateError || !affiliate) {
+      logStep("Affiliate not found or inactive", { affiliateCode, error: affiliateError?.message });
+      return;
+    }
+    
+    // Prevent self-referral
+    if (affiliate.user_id === purchasingUserId) {
+      logStep("Self-referral blocked", { affiliateCode, userId: purchasingUserId });
+      return;
+    }
+    
+    const saleAmount = (session.amount_total || 0) / 100;
+    const commissionAmount = saleAmount * (affiliate.commission_percent / 100);
+    const currency = session.metadata?.currency?.toUpperCase() || "BRL";
+    
+    logStep("Calculating commission", { 
+      saleAmount, 
+      commissionPercent: affiliate.commission_percent, 
+      commissionAmount,
+      currency 
+    });
+    
+    // Create referral record
+    const { error: referralError } = await supabase
+      .from("affiliate_referrals")
+      .insert({
+        affiliate_id: affiliate.id,
+        referred_user_id: purchasingUserId,
+        sale_amount: saleAmount,
+        commission_amount: commissionAmount,
+        currency: currency,
+        status: "pending",
+      });
+    
+    if (referralError) {
+      logStep("ERROR: Failed to create referral record", { error: referralError });
+      return;
+    }
+    
+    // Update affiliate totals
+    const { error: updateError } = await supabase
+      .from("affiliates")
+      .update({
+        total_sales: affiliate.total_sales + 1,
+        total_earnings: affiliate.total_earnings + commissionAmount,
+      })
+      .eq("id", affiliate.id);
+    
+    if (updateError) {
+      logStep("ERROR: Failed to update affiliate totals", { error: updateError });
+    } else {
+      logStep("Affiliate referral processed successfully", { 
+        affiliateId: affiliate.id,
+        commissionAmount,
+        totalSales: affiliate.total_sales + 1 
+      });
+    }
+  } catch (error) {
+    logStep("ERROR in processAffiliateReferral", { error: error instanceof Error ? error.message : String(error) });
+  }
+}
+
 serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
 
@@ -39,6 +118,12 @@ serve(async (req) => {
 
       const productType = session.metadata?.product_type;
       const userId = session.metadata?.user_id;
+      const affiliateCode = session.metadata?.affiliate_code;
+      
+      // Process affiliate referral if applicable
+      if (affiliateCode && affiliateCode.trim() !== "" && userId && userId !== "guest") {
+        await processAffiliateReferral(session, affiliateCode, userId);
+      }
 
       // ====== FUNDADORES PURCHASE ======
       if (productType === "fundadores") {
