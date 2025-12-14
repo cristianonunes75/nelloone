@@ -147,10 +147,10 @@ export const bundlePrices = {
   brl: {
     original: 597,
     price: 297,
-    priceId: "price_1SZNYXDjhZZxZELMoGVJUZRP", // TODO: Create new R$297 price in Stripe
+    priceId: "price_1SeL7gDjhZZxZELMKuDFTI5t", // NELLO ONE Jornada Completa - R$297
     currency: "BRL" as Currency,
     symbol: "R$",
-    includesCodigoEssencia: true, // New flag for validation phase
+    includesCodigoEssencia: true,
   },
   usd: {
     original: 147,
