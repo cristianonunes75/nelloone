@@ -20,6 +20,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { testSlugs } from "@/lib/testContent";
 import { JornadaNelloCard } from "@/components/cliente/JornadaNelloCard";
 import { TEST_TYPE_TO_SLUG } from "@/utils/journey";
+import { AffiliatePanel } from "@/components/cliente/AffiliatePanel";
 
 const Cliente = () => {
   const { user, profile, signOut } = useAuth();
@@ -269,6 +270,11 @@ const Cliente = () => {
             onViewCodigo={handleGenerateCode}
             onPurchaseCodigo={handlePurchaseCodigo}
           />
+
+          {/* Affiliate Panel - Only visible to founders after completing journey */}
+          {profile?.is_founder && isJourneyComplete && (
+            <AffiliatePanel />
+          )}
 
           {/* Founder Card - Only visible to founders */}
           {profile?.is_founder && (
