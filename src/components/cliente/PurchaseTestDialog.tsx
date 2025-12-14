@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useLanguage, Language } from "@/contexts/LanguageContext";
 import { formatPrice, getCurrencyForLanguage } from "@/lib/priceConfig";
+import { getAffiliateCode } from "@/hooks/useAffiliateTracking";
 
 interface PurchaseTestDialogProps {
   open: boolean;
@@ -48,6 +49,8 @@ export const PurchaseTestDialog = ({
 
       // ANTI-CROSSTRADE: Create checkout session with language/currency
       const currency = getCurrencyForLanguage(language).toLowerCase();
+      const affiliateCode = getAffiliateCode();
+      
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: {
           testId,
@@ -55,6 +58,7 @@ export const PurchaseTestDialog = ({
           userEmail: user.email,
           language: language, // Enforces correct currency
           currency: currency,
+          affiliateCode: affiliateCode,
         },
       });
 
