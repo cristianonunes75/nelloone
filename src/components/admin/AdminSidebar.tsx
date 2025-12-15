@@ -9,6 +9,7 @@ import {
   Activity,
   Star,
   UserCheck,
+  Route,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -29,6 +30,7 @@ const menuSections = [
     label: "VISÃO GERAL",
     items: [
       { title: "Dashboard", url: "/admin", icon: Home, exact: true },
+      { title: "Jornadas & Lembretes", url: "/admin/jornadas", icon: Route },
     ]
   },
   {
