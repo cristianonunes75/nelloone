@@ -9,6 +9,7 @@ import { RoleSwitcher } from "@/components/RoleSwitcher";
 
 // Lazy load new admin modules
 const AdminDashboard = lazy(() => import("@/components/admin/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
+const AdminJourneyDashboard = lazy(() => import("@/components/admin/AdminJourneyDashboard").then(m => ({ default: m.AdminJourneyDashboard })));
 const AdminUsersJourneys = lazy(() => import("@/components/admin/AdminUsersJourneys").then(m => ({ default: m.AdminUsersJourneys })));
 const AdminOrdersPayments = lazy(() => import("@/components/admin/AdminOrdersPayments").then(m => ({ default: m.AdminOrdersPayments })));
 const AdminProductsTests = lazy(() => import("@/components/admin/AdminProductsTests").then(m => ({ default: m.AdminProductsTests })));
@@ -60,6 +61,7 @@ const Admin = () => {
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
                 <Route path="/" element={<AdminDashboard />} />
+                <Route path="/jornadas" element={<AdminJourneyDashboard />} />
                 <Route path="/fundadores" element={<FundadoresAdmin />} />
                 <Route path="/afiliados" element={<AffiliatesManagement />} />
                 <Route path="/usuarios" element={<AdminUsersJourneys />} />
