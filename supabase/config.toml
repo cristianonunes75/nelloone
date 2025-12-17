@@ -44,3 +44,6 @@ verify_jwt = true
 
 [functions.send-whatsapp]
 verify_jwt = true
+
+[functions.auto-journey-reminders]
+verify_jwt = false
