@@ -11,7 +11,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import PhotoSessionBooking from "@/components/cliente/PhotoSessionBooking";
+
 import ArchetypeResults from "@/components/cliente/ArchetypeResults";
 import { calculateArchetypeScores, getDominantArchetypes } from "@/lib/archetypes";
 import { getDISCResults, DISC_PROFILES } from "@/lib/disc";
@@ -941,17 +941,6 @@ export default function TestResults() {
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Agendar Sessão de Fotos</CardTitle>
-          <CardDescription>
-            Complete sua jornada com uma sessão fotográfica profissional
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <PhotoSessionBooking />
-        </CardContent>
-      </Card>
 
       <PurchaseTestDialog
         open={purchaseDialogOpen}
