@@ -254,6 +254,28 @@ serve(async (req) => {
       }
     }
 
+    // Log fallback alert in audit_logs for admin visibility
+    await supabase
+      .from("audit_logs")
+      .insert({
+        action: "FALLBACK_CHECKOUT_VERIFICATION",
+        table_name: "test_purchases",
+        record_id: userId,
+        user_id: userId,
+        new_data: {
+          session_id: session.id,
+          product_type: productType,
+          amount: (session.amount_total || 0) / 100,
+          currency: session.currency,
+          payment_intent: session.payment_intent,
+          customer_email: session.customer_email,
+          verified_via: "verify-checkout",
+          webhook_bypassed: true,
+        },
+      });
+
+    logStep("Fallback alert logged to audit_logs");
+
     return new Response(JSON.stringify({ 
       success: true, 
       message: "Purchase verified and access granted",

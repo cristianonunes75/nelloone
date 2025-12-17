@@ -8,7 +8,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Loader2, Activity, RefreshCw, Shield, User, CreditCard, FileText, Zap, CheckCircle2, XCircle, Copy, ExternalLink } from "lucide-react";
+import { Loader2, Activity, RefreshCw, Shield, User, CreditCard, FileText, Zap, CheckCircle2, XCircle, Copy, ExternalLink, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -32,12 +32,14 @@ const ACTION_LABELS: Record<string, { label: string; icon: any; color: string }>
   force_test_complete: { label: "Forçar conclusão teste", icon: Activity, color: "text-violet-600" },
   refund_payment: { label: "Reembolso", icon: CreditCard, color: "text-red-600" },
   regenerate_codigo_essencia: { label: "Regenerar Código", icon: FileText, color: "text-primary" },
+  FALLBACK_CHECKOUT_VERIFICATION: { label: "Checkout via Fallback", icon: AlertTriangle, color: "text-amber-600" },
 };
 
 export const AdminLogs = () => {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionFilter, setActionFilter] = useState("all");
+  const [fallbackAlerts, setFallbackAlerts] = useState<AuditLog[]>([]);
   
   // Webhook health check state
   const [webhookStatus, setWebhookStatus] = useState<"idle" | "checking" | "ok" | "error">("idle");
@@ -70,6 +72,15 @@ export const AdminLogs = () => {
       }));
 
       setLogs(enrichedLogs);
+      
+      // Filter fallback alerts (last 7 days)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const recentFallbacks = enrichedLogs.filter(
+        log => log.action === "FALLBACK_CHECKOUT_VERIFICATION" && 
+               new Date(log.created_at) > sevenDaysAgo
+      );
+      setFallbackAlerts(recentFallbacks);
     } catch (error) {
       console.error("Error fetching logs:", error);
       toast.error("Erro ao carregar logs");
@@ -141,6 +152,54 @@ export const AdminLogs = () => {
           Atualizar
         </Button>
       </div>
+
+      {/* Fallback Alerts */}
+      {fallbackAlerts.length > 0 && (
+        <Card className="border-amber-500/50 bg-amber-500/5">
+          <CardHeader className="pb-3 px-4 md:px-6">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-500" />
+              <div>
+                <CardTitle className="text-base text-amber-600">
+                  Compras processadas via Fallback ({fallbackAlerts.length})
+                </CardTitle>
+                <CardDescription className="text-xs mt-1">
+                  Estas compras não foram processadas pelo webhook do Stripe. Verifique a configuração.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0 px-4 md:px-6">
+            <div className="space-y-2">
+              {fallbackAlerts.slice(0, 5).map((alert) => (
+                <div 
+                  key={alert.id} 
+                  className="bg-background border border-amber-500/20 rounded-lg p-3 text-sm"
+                >
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="font-medium">
+                      {alert.new_data?.product_type || "Compra"} - {alert.new_data?.currency?.toUpperCase()} {alert.new_data?.amount}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {format(new Date(alert.created_at), "dd/MM HH:mm", { locale: ptBR })}
+                    </span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    <span>Email: {alert.new_data?.customer_email || "N/A"}</span>
+                    <span className="mx-2">•</span>
+                    <span>Session: {alert.new_data?.session_id?.substring(0, 20)}...</span>
+                  </div>
+                </div>
+              ))}
+              {fallbackAlerts.length > 5 && (
+                <p className="text-xs text-muted-foreground text-center py-2">
+                  +{fallbackAlerts.length - 5} alertas adicionais nos últimos 7 dias
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Webhook Health Check */}
       <Card className="border-border/50">
