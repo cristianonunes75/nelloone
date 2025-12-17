@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Loader2, Activity, RefreshCw, Shield, User, CreditCard, FileText } from "lucide-react";
+import { Loader2, Activity, RefreshCw, Shield, User, CreditCard, FileText, Zap, CheckCircle2, XCircle, Copy, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -38,6 +38,12 @@ export const AdminLogs = () => {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionFilter, setActionFilter] = useState("all");
+  
+  // Webhook health check state
+  const [webhookStatus, setWebhookStatus] = useState<"idle" | "checking" | "ok" | "error">("idle");
+  const [webhookDetails, setWebhookDetails] = useState<{ hasWebhookSecret?: boolean } | null>(null);
+  
+  const WEBHOOK_URL = "https://hoxcnuzfqwcissykayqa.supabase.co/functions/v1/stripe-webhook";
 
   useEffect(() => {
     fetchLogs();
@@ -70,6 +76,34 @@ export const AdminLogs = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const checkWebhook = async () => {
+    setWebhookStatus("checking");
+    setWebhookDetails(null);
+    
+    try {
+      const response = await fetch(WEBHOOK_URL, { method: "GET" });
+      const data = await response.json();
+      
+      if (response.ok && data.ok) {
+        setWebhookStatus("ok");
+        setWebhookDetails(data);
+        toast.success("Webhook está operacional!");
+      } else {
+        setWebhookStatus("error");
+        toast.error("Webhook retornou erro");
+      }
+    } catch (error) {
+      console.error("Webhook check failed:", error);
+      setWebhookStatus("error");
+      toast.error("Não foi possível conectar ao webhook");
+    }
+  };
+
+  const copyWebhookUrl = () => {
+    navigator.clipboard.writeText(WEBHOOK_URL);
+    toast.success("URL copiada!");
   };
 
   const getActionInfo = (action: string) => {
@@ -108,7 +142,91 @@ export const AdminLogs = () => {
         </Button>
       </div>
 
-      {/* Filter */}
+      {/* Webhook Health Check */}
+      <Card className="border-border/50">
+        <CardHeader className="pb-3 px-4 md:px-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Zap className="w-4 h-4 text-yellow-500" />
+                Stripe Webhook
+              </CardTitle>
+              <CardDescription className="text-xs mt-1">
+                Verifique se o webhook está recebendo eventos do Stripe
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              {webhookStatus === "ok" && (
+                <Badge variant="outline" className="text-emerald-600 border-emerald-600/30 bg-emerald-600/10">
+                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                  Operacional
+                </Badge>
+              )}
+              {webhookStatus === "error" && (
+                <Badge variant="outline" className="text-red-600 border-red-600/30 bg-red-600/10">
+                  <XCircle className="w-3 h-3 mr-1" />
+                  Erro
+                </Badge>
+              )}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={checkWebhook}
+                disabled={webhookStatus === "checking"}
+                className="gap-2"
+              >
+                {webhookStatus === "checking" ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Zap className="w-4 h-4" />
+                )}
+                Testar Webhook
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0 px-4 md:px-6">
+          <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <code className="text-xs text-muted-foreground break-all flex-1">
+                {WEBHOOK_URL}
+              </code>
+              <div className="flex gap-1">
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={copyWebhookUrl}>
+                  <Copy className="w-3.5 h-3.5" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                  <a href={WEBHOOK_URL} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </Button>
+              </div>
+            </div>
+            {webhookDetails && (
+              <div className="text-xs text-muted-foreground">
+                <span className="font-medium">STRIPE_WEBHOOK_SECRET:</span>{" "}
+                {webhookDetails.hasWebhookSecret ? (
+                  <span className="text-emerald-600">Configurado ✓</span>
+                ) : (
+                  <span className="text-amber-600">Não configurado ⚠️</span>
+                )}
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Configure esta URL no{" "}
+              <a 
+                href="https://dashboard.stripe.com/webhooks" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary underline underline-offset-2"
+              >
+                Stripe Dashboard → Webhooks
+              </a>
+              {" "}com o evento <code className="bg-background px-1 rounded">checkout.session.completed</code>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
       <Card className="border-border/50">
         <CardHeader className="pb-3 px-4 md:px-6">
           <Select value={actionFilter} onValueChange={setActionFilter}>
