@@ -201,11 +201,44 @@ async function processAffiliateReferral(
 }
 
 serve(async (req) => {
-  const signature = req.headers.get("stripe-signature");
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": req.headers.get("origin") ?? "*",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, stripe-signature",
+    "Access-Control-Allow-Methods": "POST, OPTIONS, GET",
+  };
 
+  // Health-check / manual verification endpoint (open in browser)
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  logStep("Request received", {
+    method: req.method,
+    url: req.url,
+    hasStripeSignature: Boolean(req.headers.get("stripe-signature")),
+    userAgent: req.headers.get("user-agent"),
+  });
+
+  if (req.method === "GET") {
+    const hasSecret = Boolean(Deno.env.get("STRIPE_WEBHOOK_SECRET"));
+    return new Response(
+      JSON.stringify({ ok: true, webhook: "stripe-webhook", hasWebhookSecret: hasSecret }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+    );
+  }
+
+  // Stripe will call via POST
+  const signature = req.headers.get("stripe-signature");
   if (!signature) {
-    logStep("ERROR: No Stripe signature found");
-    return new Response("No signature", { status: 400 });
+    logStep("ERROR: No Stripe signature found", {
+      method: req.method,
+      url: req.url,
+      headers: {
+        "content-type": req.headers.get("content-type"),
+        "user-agent": req.headers.get("user-agent"),
+      },
+    });
+    return new Response("No signature", { status: 400, headers: corsHeaders });
   }
 
   try {
