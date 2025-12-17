@@ -215,15 +215,6 @@ export default function ArchetypeResults({
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-muted/50 to-muted/20 p-6 rounded-lg">
-            <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-              <span className="text-2xl">📸</span>
-              Direção Fotográfica Sugerida
-            </h3>
-            <p className="text-muted-foreground leading-relaxed">
-              {primaryData.photographyDirection}
-            </p>
-          </div>
         </CardContent>
       </Card>
 
