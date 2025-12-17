@@ -32,6 +32,7 @@ import ComprarTeste from "./pages/ComprarTeste";
 import Fundadores from "./pages/Fundadores";
 import FundadorFeedback from "./pages/FundadorFeedback";
 import DiagnosticoPDF from "./pages/DiagnosticoPDF";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,11 @@ const AppRoutes = () => (
     <Route path="/" element={<Landing />} />
     <Route path="/auth" element={<Auth />} />
     <Route path="/fundadores" element={<Fundadores />} />
+    
+    {/* Checkout success - verifies payment server-side */}
+    <Route path="/checkout/success" element={<CheckoutSuccess />} />
+    <Route path="/en/checkout/success" element={<CheckoutSuccess />} />
+    <Route path="/pt-pt/checkout/success" element={<CheckoutSuccess />} />
     
     {/* Legal pages - PT */}
     <Route path="/termos" element={<TermsOfService />} />
