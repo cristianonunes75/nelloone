@@ -409,13 +409,14 @@ export default function TestExecution() {
             </div>
           </CardHeader>
           <CardContent className="space-y-10 pb-12 px-8">
-            <div className="space-y-8 text-center max-w-2xl mx-auto">
+            {/* Texto Introdutório */}
+            <div className="space-y-6 text-center max-w-2xl mx-auto">
               <p className="text-lg leading-relaxed text-muted-foreground">
-                Sua energia está se movendo principalmente em torno dos arquétipos abaixo,
-                revelando como você se manifesta <strong>hoje</strong> no mundo.
+                Sua energia está se organizando em torno de padrões claros de comportamento e motivação.
+                Eles revelam como você age no mundo, toma decisões e responde aos desafios da vida.
               </p>
-              <p className="text-base leading-relaxed text-muted-foreground/80">
-                Isso mostra os seus comportamentos mais frequentes e como você inspira, protege e cria.
+              <p className="text-base leading-relaxed text-muted-foreground/80 italic">
+                Este é um primeiro recorte da sua essência em movimento.
               </p>
             </div>
 
@@ -423,7 +424,7 @@ export default function TestExecution() {
             <Card className="border-2 border-accent">
               <CardHeader className="bg-gradient-to-r from-accent/10 to-accent/5">
                 <CardTitle className="text-xl font-light flex items-center gap-2">
-                  <span className="text-3xl">{ARCHETYPES[partialArchetypes.primary.archetype]?.emoji}</span>
+                  <span className="text-2xl">✨</span>
                   Seus 3 Arquétipos Predominantes
                 </CardTitle>
               </CardHeader>
@@ -443,7 +444,10 @@ export default function TestExecution() {
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground pl-12">
-                    {ARCHETYPES[partialArchetypes.primary.archetype]?.description}
+                    Você atua com as qualidades centrais deste arquétipo. Sua presença naturalmente expressa essa energia nas situações do dia a dia.
+                  </p>
+                  <p className="text-xs text-muted-foreground/70 pl-12 italic">
+                    Quando equilibrado, você manifesta o melhor dessa força ao seu redor.
                   </p>
                 </div>
 
@@ -462,6 +466,9 @@ export default function TestExecution() {
                         {partialArchetypes.secondary.score} pontos
                       </Badge>
                     </div>
+                    <p className="text-xs text-muted-foreground/70 pl-11">
+                      Existe em você uma força complementar que aparece quando é preciso enfrentar desafios específicos.
+                    </p>
                   </div>
                 )}
 
@@ -480,58 +487,72 @@ export default function TestExecution() {
                         {partialArchetypes.tertiary.score} pontos
                       </Badge>
                     </div>
+                    <p className="text-xs text-muted-foreground/70 pl-11">
+                      Este arquétipo se manifesta de forma mais sutil, influenciando reações específicas e contextos pontuais da sua vida.
+                    </p>
                   </div>
                 )}
               </CardContent>
             </Card>
 
-            <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-xl p-8 space-y-6 border border-accent/30">
+            {/* Bloco de Transição */}
+            <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-xl p-8 space-y-4 border border-accent/30">
               <p className="text-center text-lg font-light">
-                ✨ Deseja descobrir o seu <strong>Arquétipo de Essência</strong> e o equilíbrio completo dos 12 arquétipos?
+                ✨ Este é apenas o começo da sua leitura
               </p>
               <p className="text-center text-base text-muted-foreground">
-                Desbloqueie o relatório completo com <strong>gráficos, percentuais e leitura simbólica</strong> dos seus arquétipos em três dimensões da vida: pessoal, profissional e espiritual.
+                Os arquétipos não atuam isoladamente. Eles se expressam de formas diferentes na vida pessoal, no trabalho e no seu senso de propósito.
+              </p>
+              <p className="text-center text-sm text-muted-foreground/80">
+                Nas próximas etapas da jornada, você vai perceber como esses padrões mudam de acordo com o contexto — e onde estão seus principais pontos de equilíbrio e tensão.
               </p>
             </div>
 
-            <div className="space-y-6 pt-6">
+            {/* Bloco de Antecipação */}
+            <div className="space-y-6 pt-4">
               <div className="bg-gradient-to-br from-accent/5 to-transparent rounded-xl p-8 border border-accent/20">
-                <p className="text-center text-lg font-light mb-4">🌟 Seu resultado está só começando.</p>
-                <p className="text-center text-base text-muted-foreground mb-6">
-                  As próximas 24 perguntas revelam como seus arquétipos se expressam em 3 dimensões:
+                <p className="text-center text-lg font-light mb-6">✨ O que está sendo construído para você</p>
+                <p className="text-center text-sm text-muted-foreground mb-6">
+                  Ao final da jornada completa, você terá acesso a:
                 </p>
-                <ul className="space-y-2 text-sm text-muted-foreground max-w-md mx-auto">
-                  <li className="flex items-center gap-2">
+                <ul className="space-y-3 text-sm text-muted-foreground max-w-md mx-auto">
+                  <li className="flex items-center gap-3">
                     <div className="h-1.5 w-1.5 rounded-full bg-accent" />
-                    Vida pessoal
+                    Seu Arquétipo de Essência
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-3">
                     <div className="h-1.5 w-1.5 rounded-full bg-accent" />
-                    Trabalho e missão
+                    O equilíbrio entre os 12 arquétipos
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-3">
                     <div className="h-1.5 w-1.5 rounded-full bg-accent" />
-                    Espiritualidade e propósito
+                    Um mapa claro dos seus padrões de decisão
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="h-1.5 w-1.5 rounded-full bg-accent" />
+                    Leitura aplicada à vida pessoal, profissional e espiritual
                   </li>
                 </ul>
+                <p className="text-center text-xs text-muted-foreground/70 mt-6 italic">
+                  Esse material reunirá tudo o que hoje aparece de forma fragmentada.
+                </p>
               </div>
 
+              {/* CTAs */}
               <div className="flex flex-col gap-4 max-w-md mx-auto">
                 <Button
-                  onClick={() => {
-                    navigate(`${basePath}/purchase/${testId}`);
-                  }}
+                  onClick={() => navigate(`${basePath}/cliente`)}
                   size="lg"
                   className="w-full h-14 text-lg font-light bg-foreground text-background hover:bg-foreground/90"
                 >
-                  🔓 Liberar Relatório Completo
+                  Continuar Jornada
                 </Button>
                 <Button
                   variant="ghost"
-                  onClick={() => navigate(`${basePath}/cliente/test-results/${userTestId}`)}
-                  className="w-full font-light"
+                  onClick={() => navigate(`${basePath}/cliente`)}
+                  className="w-full font-light text-muted-foreground"
                 >
-                  Ver Depois
+                  Ver depois
                 </Button>
               </div>
             </div>
