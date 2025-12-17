@@ -541,22 +541,22 @@ serve(async (req) => {
     
     logStep("Discount calculated", { quantity: testIds.length, discount: discountPercentage });
 
-    // Set success/cancel URLs based on language
+    // Set success/cancel URLs based on language - use verify-checkout page for reliability
     const origin = req.headers.get("origin") || "";
     let successUrl: string;
     let cancelUrl: string;
     
     switch (language) {
       case "en":
-        successUrl = `${origin}/en/cliente?payment=success`;
+        successUrl = `${origin}/en/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
         cancelUrl = `${origin}/en/cliente?payment=cancelled`;
         break;
       case "pt-pt":
-        successUrl = `${origin}/pt-pt/cliente?payment=success`;
+        successUrl = `${origin}/pt-pt/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
         cancelUrl = `${origin}/pt-pt/cliente?payment=cancelled`;
         break;
       default:
-        successUrl = `${origin}/cliente?payment=success`;
+        successUrl = `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
         cancelUrl = `${origin}/cliente?payment=cancelled`;
     }
 

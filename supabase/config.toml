@@ -47,3 +47,6 @@ verify_jwt = true
 
 [functions.auto-journey-reminders]
 verify_jwt = false
+
+[functions.verify-checkout]
+verify_jwt = false
