@@ -106,30 +106,42 @@ export default function TestResults() {
   });
 
   const handleDownloadPDF = async () => {
-    if (!resultsRef.current) return;
+    if (!resultsRef.current) {
+      toast.error(lang === 'en' ? 'Results not available' : 'Resultados não disponíveis');
+      return;
+    }
 
-    const canvas = await html2canvas(resultsRef.current, {
-      scale: 2,
-      useCORS: true,
-    });
+    try {
+      toast.info(lang === 'en' ? 'Generating PDF...' : 'Gerando PDF...');
+      
+      const canvas = await html2canvas(resultsRef.current, {
+        scale: 2,
+        useCORS: true,
+      });
 
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-    });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-    const imgX = (pdfWidth - imgWidth * ratio) / 2;
-    const imgY = 10;
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 10;
 
-    pdf.addImage(imgData, "PNG", imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-    pdf.save(`resultado-${userTest?.tests?.name}.pdf`);
+      pdf.addImage(imgData, "PNG", imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      pdf.save(`resultado-${userTest?.tests?.name}.pdf`);
+      
+      toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error(lang === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+    }
   };
 
   const handleResetTest = () => {
@@ -188,7 +200,15 @@ export default function TestResults() {
   const handleDownloadInteligenciasPDF = () => {
     if (inteligenciasResults) {
       const userName = user?.email?.split('@')[0] || 'Usuario';
-      generateInteligenciasPremiumPDF(inteligenciasResults, userName, { language: lang as 'pt' | 'en' });
+      try {
+        generateInteligenciasPremiumPDF(inteligenciasResults, userName, { language: lang as 'pt' | 'en' });
+        toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        toast.error(lang === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+      }
+    } else {
+      toast.error(lang === 'en' ? 'Results not available' : 'Resultados não disponíveis');
     }
   };
 
@@ -196,60 +216,100 @@ export default function TestResults() {
   const handleDownloadArquetiposPDF = () => {
     if (dominantArchetypes && archetypeScoresArray) {
       const userName = user?.email?.split('@')[0] || 'Usuario';
-      generateArquetiposPremiumPDF({
-        dominant: dominantArchetypes.primary.archetype,
-        secondary: dominantArchetypes.secondary?.archetype || '',
-        tertiary: dominantArchetypes.tertiary?.archetype || '',
-        allScores: archetypeScores,
-        ranking: archetypeScoresArray.map(s => ({ key: s.archetype, score: s.score, percentage: Math.round((s.score / Math.max(...archetypeScoresArray.map(x => x.score))) * 100) }))
-      }, { userName, language: lang as 'pt' | 'pt-pt' | 'en' });
+      try {
+        generateArquetiposPremiumPDF({
+          dominant: dominantArchetypes.primary.archetype,
+          secondary: dominantArchetypes.secondary?.archetype || '',
+          tertiary: dominantArchetypes.tertiary?.archetype || '',
+          allScores: archetypeScores,
+          ranking: archetypeScoresArray.map(s => ({ key: s.archetype, score: s.score, percentage: Math.round((s.score / Math.max(...archetypeScoresArray.map(x => x.score))) * 100) }))
+        }, { userName, language: lang as 'pt' | 'pt-pt' | 'en' });
+        toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        toast.error(lang === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+      }
+    } else {
+      toast.error(lang === 'en' ? 'Results not available' : 'Resultados não disponíveis');
     }
   };
 
   const handleDownloadDISCPDF = () => {
     if (discResults) {
       const userName = user?.email?.split('@')[0] || 'Usuario';
-      downloadDISCPremiumPDF({
-        userName,
-        scores: discResults.scores as { D: number; I: number; S: number; C: number },
-        dominantProfile: discResults.dominantProfile,
-        language: lang as 'pt' | 'pt-pt' | 'en'
-      });
+      try {
+        downloadDISCPremiumPDF({
+          userName,
+          scores: discResults.scores as { D: number; I: number; S: number; C: number },
+          dominantProfile: discResults.dominantProfile,
+          language: lang as 'pt' | 'pt-pt' | 'en'
+        });
+        toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        toast.error(lang === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+      }
+    } else {
+      toast.error(lang === 'en' ? 'Results not available' : 'Resultados não disponíveis');
     }
   };
 
   const handleDownloadEneagramaPDF = () => {
     if (enneagramResultData?.primaryType) {
       const userName = user?.email?.split('@')[0] || 'Usuario';
-      generateEneagramaPDF({
-        dominantType: parseInt(enneagramResultData.primaryType),
-        wing: parseInt(enneagramResultData.primaryType) === 9 ? 1 : parseInt(enneagramResultData.primaryType) + 1,
-        scores: enneagramResultData.scores || {}
-      }, { userName, language: lang as 'pt' | 'pt-pt' | 'en' });
+      try {
+        generateEneagramaPDF({
+          dominantType: parseInt(enneagramResultData.primaryType),
+          wing: parseInt(enneagramResultData.primaryType) === 9 ? 1 : parseInt(enneagramResultData.primaryType) + 1,
+          scores: enneagramResultData.scores || {}
+        }, { userName, language: lang as 'pt' | 'pt-pt' | 'en' });
+        toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        toast.error(lang === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+      }
+    } else {
+      toast.error(lang === 'en' ? 'Results not available' : 'Resultados não disponíveis');
     }
   };
 
   const handleDownloadTemperamentosPDF = () => {
     if (temperamentosResultData) {
       const userName = user?.email?.split('@')[0] || 'Usuario';
-      generateTemperamentosPDF({
-        primary: temperamentosResultData.primary,
-        secondary: temperamentosResultData.secondary,
-        scores: temperamentosResultData.scores || { sanguineo: 0, colerico: 0, melancolico: 0, fleumatico: 0 },
-        interpretation: temperamentosResultData.interpretation || ''
-      }, { userName, language: lang as 'pt' | 'pt-pt' | 'en' });
+      try {
+        generateTemperamentosPDF({
+          primary: temperamentosResultData.primary,
+          secondary: temperamentosResultData.secondary,
+          scores: temperamentosResultData.scores || { sanguineo: 0, colerico: 0, melancolico: 0, fleumatico: 0 },
+          interpretation: temperamentosResultData.interpretation || ''
+        }, { userName, language: lang as 'pt' | 'pt-pt' | 'en' });
+        toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        toast.error(lang === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+      }
+    } else {
+      toast.error(lang === 'en' ? 'Results not available' : 'Resultados não disponíveis');
     }
   };
 
   const handleDownloadNello16PDF = () => {
     if (mbtiResultData?.type) {
       const userName = user?.email?.split('@')[0] || 'Usuario';
-      downloadNello16PremiumPDF({
-        userName,
-        personalityType: mbtiResultData.type,
-        dimensionScores: mbtiResultData.scores || { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 },
-        language: lang as 'pt' | 'pt-pt' | 'en'
-      });
+      try {
+        downloadNello16PremiumPDF({
+          userName,
+          personalityType: mbtiResultData.type,
+          dimensionScores: mbtiResultData.scores || { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 },
+          language: lang as 'pt' | 'pt-pt' | 'en'
+        });
+        toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        toast.error(lang === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+      }
+    } else {
+      toast.error(lang === 'en' ? 'Results not available' : 'Resultados não disponíveis');
     }
   };
 
@@ -257,7 +317,15 @@ export default function TestResults() {
     if (estilosConexaoResults || linguagensAmorResultData) {
       const userName = user?.email?.split('@')[0] || 'Usuario';
       const result = estilosConexaoResults || linguagensAmorResultData;
-      generateEstilosConexaoPremiumPDF(result, userName, { language: lang as 'pt' | 'pt-pt' | 'en' });
+      try {
+        generateEstilosConexaoPremiumPDF(result, userName, { language: lang as 'pt' | 'pt-pt' | 'en' });
+        toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        toast.error(lang === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+      }
+    } else {
+      toast.error(lang === 'en' ? 'Results not available' : 'Resultados não disponíveis');
     }
   };
 
