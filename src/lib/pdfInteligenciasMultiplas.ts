@@ -496,11 +496,11 @@ const INTELLIGENCE_CONTENT: Record<string, {
   }
 };
 
-export const generateInteligenciasPremiumPDF = (
+export const createInteligenciasPremiumPDF = (
   result: InteligenciasResult,
   userName: string,
   options?: PDFOptions
-): void => {
+): jsPDF => {
   const lang = options?.language || 'pt';
   const doc = new jsPDF({
     orientation: "portrait",
@@ -1003,11 +1003,20 @@ export const generateInteligenciasPremiumPDF = (
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
   doc.text(t.miguelSignature, pageWidth / 2, yPos, { align: "center" });
 
-  // Save PDF
+  return doc;
+};
+
+// Wrapper function for download
+export const generateInteligenciasPremiumPDF = (
+  result: InteligenciasResult,
+  userName: string,
+  options?: PDFOptions
+): void => {
+  const doc = createInteligenciasPremiumPDF(result, userName, options);
+  const lang = options?.language || 'pt';
   const fileName = lang === 'en' 
     ? `NELLO_ONE_Multiple_Intelligences_${userName.replace(/\s+/g, '_')}.pdf`
     : `NELLO_ONE_Inteligencias_Multiplas_${userName.replace(/\s+/g, '_')}.pdf`;
-  
   doc.save(fileName);
 };
 
