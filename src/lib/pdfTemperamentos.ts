@@ -743,7 +743,7 @@ const getTemperamentContent = (temperament: string, lang: string) => {
   return content[temperament]?.[langKey] || content[temperament]?.['pt'] || content['melancolico']['pt'];
 };
 
-export const generateTemperamentosPDF = (result: TemperamentosResult, options?: PDFOptions) => {
+export const createTemperamentosPDF = (result: TemperamentosResult, options?: PDFOptions): jsPDF => {
   const lang = options?.language || 'pt';
   const userName = options?.userName || 'Usuário';
   const t = getTranslations(lang);
@@ -1121,7 +1121,14 @@ export const generateTemperamentosPDF = (result: TemperamentosResult, options?: 
   
   addPageNumber();
 
-  // Save
+  return doc;
+};
+
+// Wrapper function for download
+export const generateTemperamentosPDF = (result: TemperamentosResult, options?: PDFOptions): void => {
+  const doc = createTemperamentosPDF(result, options);
+  const lang = options?.language || 'pt';
+  const userName = options?.userName || 'Usuário';
   const langSuffix = lang === 'en' ? 'temperaments' : 'temperamentos';
   doc.save(`nello-one-${langSuffix}-${userName.toLowerCase().replace(/\s+/g, '-')}.pdf`);
 };

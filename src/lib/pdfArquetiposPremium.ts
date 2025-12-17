@@ -703,11 +703,11 @@ const getTranslations = (lang: 'pt' | 'pt-pt' | 'en') => ({
   }
 })[lang] || getTranslations('pt');
 
-// ==================== MAIN PDF GENERATOR ====================
-export const generateArquetiposPremiumPDF = (
+// ==================== MAIN PDF GENERATOR (returns doc for email) ====================
+export const createArquetiposPremiumPDF = (
   result: ArchetypeResult,
   options: PDFOptions
-): void => {
+): jsPDF | null => {
   const lang = options.language || 'pt';
   const t = getTranslations(lang);
   
@@ -767,7 +767,7 @@ export const generateArquetiposPremiumPDF = (
   
   if (!dominant) {
     console.error("Dominant archetype not found:", result.dominant);
-    return;
+    return null;
   }
 
   // ==================== PAGE 1: COVER ====================
@@ -1224,7 +1224,17 @@ export const generateArquetiposPremiumPDF = (
   doc.setTextColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
   doc.text("NELLO ONE", pageWidth / 2, pageHeight - 30, { align: "center" });
 
-  // Save
-  const fileName = `Arquetipos-Premium-${options.userName.replace(/\s+/g, "-")}.pdf`;
-  doc.save(fileName);
+  return doc;
+};
+
+// ==================== DOWNLOAD FUNCTION (saves PDF) ====================
+export const generateArquetiposPremiumPDF = (
+  result: ArchetypeResult,
+  options: PDFOptions
+): void => {
+  const doc = createArquetiposPremiumPDF(result, options);
+  if (doc) {
+    const fileName = `Arquetipos-Premium-${options.userName.replace(/\s+/g, "-")}.pdf`;
+    doc.save(fileName);
+  }
 };

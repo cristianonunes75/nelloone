@@ -4,13 +4,13 @@ import { toast } from "sonner";
 import jsPDF from "jspdf";
 
 // Import PDF generators
-import { generateInteligenciasPremiumPDF } from "@/lib/pdfInteligenciasMultiplas";
-import { generateArquetiposPremiumPDF } from "@/lib/pdfArquetiposPremium";
-import { downloadDISCPremiumPDF, generateDISCPremiumPDF } from "@/lib/pdfDisc";
-import { generateEneagramaPDF } from "@/lib/pdfEneagrama";
-import { generateTemperamentosPDF } from "@/lib/pdfTemperamentos";
-import { generateNello16PremiumPDF, downloadNello16PremiumPDF } from "@/lib/pdfNello16Personality";
-import { generateEstilosConexaoPremiumPDF } from "@/lib/pdfEstilosConexaoAfetiva";
+import { generateInteligenciasPremiumPDF, createInteligenciasPremiumPDF } from "@/lib/pdfInteligenciasMultiplas";
+import { createArquetiposPremiumPDF } from "@/lib/pdfArquetiposPremium";
+import { generateDISCPremiumPDF } from "@/lib/pdfDisc";
+import { generateEneagramaPDF, createEneagramaPDF } from "@/lib/pdfEneagrama";
+import { generateTemperamentosPDF, createTemperamentosPDF } from "@/lib/pdfTemperamentos";
+import { generateNello16PremiumPDF } from "@/lib/pdfNello16Personality";
+import { generateEstilosConexaoPremiumPDF, createEstilosConexaoPDF } from "@/lib/pdfEstilosConexaoAfetiva";
 
 interface PDFEmailOptions {
   testType: string;
@@ -32,63 +32,71 @@ export const usePDFEmail = () => {
       
       // Generate PDF based on test type and get base64
       let pdfBase64 = "";
+      let doc: jsPDF | null = null;
       
       switch (testType) {
         case "disc":
-          const discDoc = generateDISCPremiumPDF({
+          doc = generateDISCPremiumPDF({
             userName,
             scores: resultData.scores,
             dominantProfile: resultData.dominantProfile,
             language
           });
-          pdfBase64 = discDoc.output('datauristring').split(',')[1];
           break;
           
         case "mbti":
-          const nello16Doc = generateNello16PremiumPDF({
+          doc = generateNello16PremiumPDF({
             userName,
             personalityType: resultData.type,
             dimensionScores: resultData.scores || { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 },
             language
           });
-          pdfBase64 = nello16Doc.output('datauristring').split(',')[1];
           break;
           
         case "eneagrama":
-          // For tests that save directly, we need a different approach
-          // Create a simple PDF with the results
-          const eneagramaDoc = new jsPDF();
-          eneagramaDoc.text(`Eneagrama - Tipo ${resultData.primaryType}`, 20, 20);
-          pdfBase64 = eneagramaDoc.output('datauristring').split(',')[1];
+          doc = createEneagramaPDF({
+            dominantType: parseInt(resultData.primaryType),
+            wing: parseInt(resultData.primaryType) === 9 ? 1 : parseInt(resultData.primaryType) + 1,
+            scores: resultData.scores || {}
+          }, { userName, language });
           break;
           
         case "temperamentos":
-          const tempDoc = new jsPDF();
-          tempDoc.text(`Temperamentos - ${resultData.primary?.name}`, 20, 20);
-          pdfBase64 = tempDoc.output('datauristring').split(',')[1];
+          doc = createTemperamentosPDF({
+            primary: resultData.primary,
+            secondary: resultData.secondary,
+            scores: resultData.scores || { sanguineo: 0, colerico: 0, melancolico: 0, fleumatico: 0 },
+            interpretation: resultData.interpretation || ''
+          }, { userName, language });
           break;
           
         case "linguagens_amor":
-          const estilosDoc = new jsPDF();
-          estilosDoc.text(`Estilos de Conexão Afetiva - ${resultData.primary?.name?.[language] || resultData.primary?.name}`, 20, 20);
-          pdfBase64 = estilosDoc.output('datauristring').split(',')[1];
+          doc = createEstilosConexaoPDF(resultData, userName, { language });
           break;
           
         case "inteligencias_multiplas":
-          const intDoc = new jsPDF();
-          intDoc.text(`Inteligências Múltiplas`, 20, 20);
-          pdfBase64 = intDoc.output('datauristring').split(',')[1];
+          doc = createInteligenciasPremiumPDF(resultData, userName, { language: language as 'pt' | 'en' });
           break;
           
         case "arquetipos_proposito":
-          const arqDoc = new jsPDF();
-          arqDoc.text(`Arquétipos com Propósito`, 20, 20);
-          pdfBase64 = arqDoc.output('datauristring').split(',')[1];
+          doc = createArquetiposPremiumPDF({
+            dominant: resultData.primary?.archetype || resultData.dominant || '',
+            secondary: resultData.secondary?.archetype || resultData.secondary || '',
+            tertiary: resultData.tertiary?.archetype || resultData.tertiary || '',
+            allScores: resultData.allScores || {},
+            ranking: resultData.ranking || []
+          }, { userName, language });
           break;
           
         default:
           throw new Error(`Unsupported test type: ${testType}`);
       }
+      
+      if (!doc) {
+        throw new Error('Failed to generate PDF');
+      }
+      
+      pdfBase64 = doc.output('datauristring').split(',')[1];
       
       // Send email with PDF attachment
       const { data, error } = await supabase.functions.invoke('send-pdf-email', {

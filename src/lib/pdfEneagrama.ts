@@ -1543,7 +1543,7 @@ const getTypeContent = (type: number, lang: string) => {
   return content[type]?.[langKey] || content[type]?.['pt'] || content[1]['pt'];
 };
 
-export const generateEneagramaPDF = (result: EneagramaResult, options?: PDFOptions) => {
+export const createEneagramaPDF = (result: EneagramaResult, options?: PDFOptions): jsPDF => {
   const lang = options?.language || 'pt';
   const userName = options?.userName || 'Usuário';
   const t = getTranslations(lang);
@@ -1900,7 +1900,14 @@ export const generateEneagramaPDF = (result: EneagramaResult, options?: PDFOptio
 
   addPageNumber();
 
-  // Save
+  return doc;
+};
+
+// Wrapper function for download
+export const generateEneagramaPDF = (result: EneagramaResult, options?: PDFOptions): void => {
+  const doc = createEneagramaPDF(result, options);
+  const lang = options?.language || 'pt';
+  const userName = options?.userName || 'Usuário';
   const langSuffix = lang === 'en' ? 'enneagram' : 'eneagrama';
   doc.save(`nello-one-${langSuffix}-${userName.toLowerCase().replace(/\s+/g, '-')}.pdf`);
 };
