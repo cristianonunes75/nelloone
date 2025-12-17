@@ -10,7 +10,8 @@ import { useState, useEffect } from "react";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { calculateArchetypeScores, getDominantArchetypes, ARCHETYPES } from "@/lib/archetypes";
+import { calculateArchetypeScores, getDominantArchetypes } from "@/lib/archetypes";
+import { getArchetypeText, getArchetypeEmoji, getArchetypeTitle } from "@/lib/archetypeCopyLibrary";
 import { getDISCResults } from "@/lib/disc";
 import { getMBTIResults } from "@/lib/mbti";
 import { getEnneagramResults } from "@/lib/eneagrama";
@@ -433,9 +434,9 @@ export default function TestExecution() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <span className="text-3xl">{ARCHETYPES[partialArchetypes.primary.archetype]?.emoji}</span>
+                      <span className="text-3xl">{getArchetypeEmoji(partialArchetypes.primary.archetype)}</span>
                       <div>
-                        <h3 className="font-semibold text-lg">{ARCHETYPES[partialArchetypes.primary.archetype]?.name}</h3>
+                        <h3 className="font-semibold text-lg">{getArchetypeTitle(partialArchetypes.primary.archetype)}</h3>
                         <p className="text-sm text-muted-foreground">Arquétipo Principal</p>
                       </div>
                     </div>
@@ -443,11 +444,8 @@ export default function TestExecution() {
                       {partialArchetypes.primary.score} pontos
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground pl-12">
-                    Você atua com as qualidades centrais deste arquétipo. Sua presença naturalmente expressa essa energia nas situações do dia a dia.
-                  </p>
-                  <p className="text-xs text-muted-foreground/70 pl-12 italic">
-                    Quando equilibrado, você manifesta o melhor dessa força ao seu redor.
+                  <p className="text-sm text-muted-foreground pl-12 leading-relaxed">
+                    {getArchetypeText(partialArchetypes.primary.archetype, 'primary')}
                   </p>
                 </div>
 
@@ -456,9 +454,9 @@ export default function TestExecution() {
                   <div className="space-y-2 border-t pt-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl">{ARCHETYPES[partialArchetypes.secondary.archetype]?.emoji}</span>
+                        <span className="text-2xl">{getArchetypeEmoji(partialArchetypes.secondary.archetype)}</span>
                         <div>
-                          <h3 className="font-medium">{ARCHETYPES[partialArchetypes.secondary.archetype]?.name}</h3>
+                          <h3 className="font-medium">{getArchetypeTitle(partialArchetypes.secondary.archetype)}</h3>
                           <p className="text-xs text-muted-foreground">Arquétipo Secundário</p>
                         </div>
                       </div>
@@ -466,8 +464,8 @@ export default function TestExecution() {
                         {partialArchetypes.secondary.score} pontos
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground/70 pl-11">
-                      Existe em você uma força complementar que aparece quando é preciso enfrentar desafios específicos.
+                    <p className="text-xs text-muted-foreground/70 pl-11 leading-relaxed">
+                      {getArchetypeText(partialArchetypes.secondary.archetype, 'secondary')}
                     </p>
                   </div>
                 )}
@@ -477,9 +475,9 @@ export default function TestExecution() {
                   <div className="space-y-2 border-t pt-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <span className="text-xl">{ARCHETYPES[partialArchetypes.tertiary.archetype]?.emoji}</span>
+                        <span className="text-xl">{getArchetypeEmoji(partialArchetypes.tertiary.archetype)}</span>
                         <div>
-                          <h3 className="font-medium">{ARCHETYPES[partialArchetypes.tertiary.archetype]?.name}</h3>
+                          <h3 className="font-medium">{getArchetypeTitle(partialArchetypes.tertiary.archetype)}</h3>
                           <p className="text-xs text-muted-foreground">Arquétipo Terciário</p>
                         </div>
                       </div>
@@ -487,8 +485,8 @@ export default function TestExecution() {
                         {partialArchetypes.tertiary.score} pontos
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground/70 pl-11">
-                      Este arquétipo se manifesta de forma mais sutil, influenciando reações específicas e contextos pontuais da sua vida.
+                    <p className="text-xs text-muted-foreground/70 pl-11 leading-relaxed">
+                      {getArchetypeText(partialArchetypes.tertiary.archetype, 'tertiary')}
                     </p>
                   </div>
                 )}
