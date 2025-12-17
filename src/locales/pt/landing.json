@@ -57,7 +57,7 @@
       {
         "number": "1",
         "title": "Comece",
-        "description": "Você começa pelo primeiro teste"
+        "description": "Você inicia pelo primeiro teste"
       },
       {
         "number": "2",
@@ -90,7 +90,7 @@
   "miguel": {
     "title": "Você não caminha sozinho.",
     "subtitle": "",
-    "description": "Durante toda a jornada, Miguel te acompanha. Ele interpreta seus resultados, conecta informações e te ajuda a entender o que aparece em cada etapa.",
+    "description": "Durante toda a jornada, Miguel te acompanha. Ele interpreta seus resultados, conecta informações e ajuda você a entender o que aparece em cada etapa.",
     "quote": "Minha função é ajudar você a enxergar com mais clareza.",
     "note": "Miguel não julga, não rotula e não decide por você.",
     "cta": ""
@@ -234,7 +234,7 @@
       },
       {
         "question": "Em que o Nello One é diferente de outros testes?",
-        "answer": "Ele combina 7 metodologias diferentes e integra todos os resultados em um mapa único. O resultado é uma visão completa que mostra quem você é — não só um rótulo isolado."
+        "answer": "Ele combina 7 metodologias diferentes e integra todos os resultados em um mapa único. O resultado é uma visão completa que mostra quem você é, não só um rótulo isolado."
       },
       {
         "question": "Quanto tempo leva para completar?",
