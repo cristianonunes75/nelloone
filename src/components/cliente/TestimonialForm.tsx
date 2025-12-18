@@ -72,6 +72,25 @@ export function TestimonialForm({ testId, testSlug, testName }: TestimonialFormP
 
       if (error) throw error;
 
+      // Send email notification to admin
+      try {
+        await supabase.functions.invoke('send-email', {
+          body: {
+            type: 'new_testimonial',
+            to: 'admin@nello.one',
+            data: {
+              displayName: displayName.trim(),
+              testimonialContent: content.trim(),
+              testName: testName || 'NELLO ONE',
+              userEmail: user.email
+            }
+          }
+        });
+      } catch (emailError) {
+        console.error('Failed to send admin notification:', emailError);
+        // Don't fail the submission if email fails
+      }
+
       setIsSubmitted(true);
       toast({
         title: "Obrigado pelo seu depoimento!",
