@@ -3,13 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Download, CheckCircle, Lock, RotateCcw, FileText, Mail, Loader2 } from "lucide-react";
+import { Download, CheckCircle, Lock, RotateCcw, FileText, Mail, Loader2, ArrowRight, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ARCHETYPES } from "@/lib/archetypes";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { toast } from "sonner";
 
 import ArchetypeResults from "@/components/cliente/ArchetypeResults";
@@ -37,6 +37,17 @@ import { getGrowthInsights } from "@/lib/growthInsights";
 import { usePDFEmail } from "@/hooks/usePDFEmail";
 import { updateJourneyProgress, getJourneySlugFromTestType } from "@/utils/journey";
 
+// Journey order for navigation
+const JOURNEY_ORDER = [
+  "arquetipos_proposito",
+  "inteligencias_multiplas",
+  "linguagens_amor",
+  "mbti",
+  "disc",
+  "eneagrama",
+  "temperamentos"
+] as const;
+
 export default function TestResults() {
   const { userTestId } = useParams();
   const navigate = useNavigate();
@@ -44,7 +55,7 @@ export default function TestResults() {
   const { user, userRole } = useAuth();
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   const { sendPDFByEmail, isSending: isSendingEmail } = usePDFEmail();
-  const { resetTest } = useTests();
+  const { resetTest, tests, userTests } = useTests();
   const { language } = useLanguage();
   const isAdmin = userRole === "admin";
   const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
@@ -391,6 +402,53 @@ export default function TestResults() {
     discResults = getDISCResults(answers as any);
   }
 
+  // Find next test in journey for continuous navigation
+  const nextTestInfo = useMemo(() => {
+    if (!userTest?.tests?.type || !tests || !userTests) return null;
+    
+    const currentType = userTest.tests.type;
+    const currentIndex = JOURNEY_ORDER.indexOf(currentType as typeof JOURNEY_ORDER[number]);
+    
+    if (currentIndex === -1 || currentIndex === JOURNEY_ORDER.length - 1) {
+      // Last test or not in journey - show Código da Essência CTA
+      return { isLastTest: true };
+    }
+    
+    const nextType = JOURNEY_ORDER[currentIndex + 1];
+    const nextTest = tests?.find(t => t.type === nextType);
+    
+    if (!nextTest) return null;
+    
+    // Check if next test is already completed
+    const nextUserTest = userTests?.find(ut => ut.test_id === nextTest.id);
+    const isCompleted = nextUserTest?.status === 'completed';
+    
+    return {
+      isLastTest: false,
+      test: nextTest,
+      isCompleted,
+      userTestId: nextUserTest?.id,
+      position: currentIndex + 2, // 1-indexed position
+      totalTests: JOURNEY_ORDER.length
+    };
+  }, [userTest?.tests?.type, tests, userTests]);
+
+  const handleContinueJourney = async () => {
+    if (!nextTestInfo || nextTestInfo.isLastTest) {
+      // Navigate to Código da Essência
+      navigate(`${basePath}/codigo-essencia`);
+      return;
+    }
+    
+    if (nextTestInfo.isCompleted && nextTestInfo.userTestId) {
+      // View results of completed test
+      navigate(`${basePath}/test-results/${nextTestInfo.userTestId}`);
+    } else if (nextTestInfo.test) {
+      // Start or continue the next test
+      navigate(`${basePath}/cliente`);
+      toast.info(lang === 'en' ? `Next: ${nextTestInfo.test.name}` : `Próximo: ${nextTestInfo.test.name}`);
+    }
+  };
   return (
     <div className="container mx-auto p-6 max-w-4xl space-y-6">
       <div className="flex items-center justify-between">
@@ -1009,6 +1067,68 @@ export default function TestResults() {
         </Button>
       </div>
 
+      {/* Continue Journey Button - Prominent CTA */}
+      <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/20">
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-full bg-primary/10">
+                {nextTestInfo?.isLastTest ? (
+                  <Sparkles className="h-6 w-6 text-primary" />
+                ) : (
+                  <ArrowRight className="h-6 w-6 text-primary" />
+                )}
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">
+                  {nextTestInfo?.isLastTest 
+                    ? (lang === 'en' ? 'Journey Complete!' : lang === 'pt-pt' ? 'Jornada Completa!' : 'Jornada Completa!')
+                    : (lang === 'en' ? 'Continue Your Journey' : lang === 'pt-pt' ? 'Continue a sua Jornada' : 'Continue sua Jornada')}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {nextTestInfo?.isLastTest 
+                    ? (lang === 'en' 
+                        ? 'You have completed all tests. Access your Código da Essência!' 
+                        : lang === 'pt-pt' 
+                        ? 'Completou todos os testes. Aceda ao seu Código da Essência!' 
+                        : 'Você completou todos os testes. Acesse seu Código da Essência!')
+                    : nextTestInfo?.test
+                    ? (lang === 'en' 
+                        ? `Next test (${nextTestInfo.position}/${nextTestInfo.totalTests}): ${nextTestInfo.test.name}`
+                        : lang === 'pt-pt'
+                        ? `Próximo teste (${nextTestInfo.position}/${nextTestInfo.totalTests}): ${nextTestInfo.test.name}`
+                        : `Próximo teste (${nextTestInfo.position}/${nextTestInfo.totalTests}): ${nextTestInfo.test.name}`)
+                    : (lang === 'en' ? 'Keep exploring your self-knowledge' : 'Continue explorando seu autoconhecimento')}
+                </p>
+              </div>
+            </div>
+            <Button 
+              onClick={handleContinueJourney}
+              size="lg"
+              className="w-full sm:w-auto min-w-[200px] group"
+            >
+              {nextTestInfo?.isLastTest 
+                ? (lang === 'en' ? 'View Código da Essência' : lang === 'pt-pt' ? 'Ver Código da Essência' : 'Ver Código da Essência')
+                : (lang === 'en' ? 'Continue to Next Test' : lang === 'pt-pt' ? 'Continuar para o Próximo' : 'Continuar para o Próximo')}
+              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </div>
+          
+          {/* Journey Progress Indicator */}
+          {!nextTestInfo?.isLastTest && nextTestInfo?.position && (
+            <div className="mt-4 pt-4 border-t border-primary/10">
+              <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
+                <span>{lang === 'en' ? 'Journey Progress' : 'Progresso da Jornada'}</span>
+                <span>{Math.round(((nextTestInfo.position - 1) / nextTestInfo.totalTests) * 100)}%</span>
+              </div>
+              <Progress 
+                value={((nextTestInfo.position - 1) / nextTestInfo.totalTests) * 100} 
+                className="h-2"
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <PurchaseTestDialog
         open={purchaseDialogOpen}
