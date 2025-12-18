@@ -725,11 +725,11 @@ export const createEstilosConexaoPDF = (
 
   // Name with symbol
   doc.setFillColor(primaryColor.r, primaryColor.g, primaryColor.b);
-  doc.roundedRect(margin, yPos, contentWidth, 22, 3, 3, "F");
+  doc.roundedRect(margin, yPos, contentWidth, 18, 3, 3, "F");
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(16);
+  doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
-  doc.text(`${result.primary.symbol} ${result.primary.name[lang]} (${result.primary.score} ${t.points})`, margin + 5, yPos + 14);
+  doc.text(`${result.primary.name[lang]} (${result.primary.score} ${t.points})`, margin + 5, yPos + 12);
   yPos += 32;
 
   // What it means
@@ -807,12 +807,12 @@ export const createEstilosConexaoPDF = (
 
     // Style header
     doc.setFillColor(styleColor.r, styleColor.g, styleColor.b);
-    doc.roundedRect(margin, yPos, contentWidth, 14, 2, 2, "F");
+    doc.roundedRect(margin, yPos, contentWidth, 12, 2, 2, "F");
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(11);
+    doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    doc.text(`${style.symbol} ${style.name[lang]} (${score} ${t.points})`, margin + 5, yPos + 9);
-    yPos += 20;
+    doc.text(`${style.name[lang]} (${score} ${t.points})`, margin + 5, yPos + 8);
+    yPos += 16;
 
     // Description
     doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
@@ -855,8 +855,7 @@ export const createEstilosConexaoPDF = (
       doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
       doc.setFontSize(8);
       doc.setFont("helvetica", "bold");
-      doc.text(style.symbol, margin, yPos + 12);
-      doc.text(style.name[lang].substring(0, 8), margin + 8, yPos + 12);
+      doc.text(style.name[lang].substring(0, 10), margin, yPos + 12);
 
       // Score
       doc.setTextColor(255, 255, 255);

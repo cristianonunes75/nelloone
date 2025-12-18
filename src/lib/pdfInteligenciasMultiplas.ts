@@ -634,14 +634,14 @@ export const createInteligenciasPremiumPDF = (
   const color = INTELLIGENCE_COLORS[dominantKey] || COLORS.primary;
 
   if (dominantProfile) {
-    // Name with emoji
+    // Name without emoji
     doc.setFillColor(color.r, color.g, color.b);
-    doc.roundedRect(margin, yPos, contentWidth, 20, 3, 3, "F");
+    doc.roundedRect(margin, yPos, contentWidth, 18, 3, 3, "F");
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(16);
+    doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.text(`${dominantProfile.emoji} ${dominantProfile.name[lang === 'pt-pt' ? 'pt' : lang]} (${dominantRank?.percentage || 0}%)`, margin + 5, yPos + 13);
-    yPos += 30;
+    doc.text(`${dominantProfile.name[lang === 'pt-pt' ? 'pt' : lang]} (${dominantRank?.percentage || 0}%)`, margin + 5, yPos + 12);
+    yPos += 26;
 
     // Description
     doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
@@ -709,12 +709,12 @@ export const createInteligenciasPremiumPDF = (
     if (profile && yPos < pageHeight - 80) {
       // Header
       doc.setFillColor(intColor.r, intColor.g, intColor.b);
-      doc.roundedRect(margin, yPos, contentWidth, 16, 3, 3, "F");
+      doc.roundedRect(margin, yPos, contentWidth, 14, 3, 3, "F");
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
-      doc.text(`${index + 2}º ${profile.emoji} ${profile.name[lang === 'pt-pt' ? 'pt' : lang]} (${rank?.percentage || 0}%)`, margin + 5, yPos + 11);
-      yPos += 22;
+      doc.text(`${index + 2}. ${profile.name[lang === 'pt-pt' ? 'pt' : lang]} (${rank?.percentage || 0}%)`, margin + 5, yPos + 10);
+      yPos += 18;
 
       // Description
       doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
@@ -763,9 +763,9 @@ export const createInteligenciasPremiumPDF = (
 
     // Intelligence name
     doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-    doc.setFontSize(8);
+    doc.setFontSize(7);
     doc.setFont("helvetica", "bold");
-    doc.text(profile.emoji + " " + profile.name[lang === 'pt-pt' ? 'pt' : lang].substring(0, 10), margin, yPos + 11);
+    doc.text(profile.name[lang === 'pt-pt' ? 'pt' : lang].substring(0, 12), margin, yPos + 11);
 
     // Percentage
     doc.setTextColor(255, 255, 255);
