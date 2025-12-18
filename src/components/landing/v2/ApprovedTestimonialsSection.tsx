@@ -55,13 +55,14 @@ export function ApprovedTestimonialsSection() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("testimonials")
-        .select("id, display_name, content, test_slug, created_at")
+        .select("id, display_name, content, test_slug, created_at, is_featured")
         .eq("status", "approved")
+        .order("is_featured", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(6);
 
       if (error) throw error;
-      return data as Testimonial[];
+      return data as (Testimonial & { is_featured: boolean })[];
     },
     staleTime: 1000 * 60 * 5 // Cache for 5 minutes
   });
@@ -105,7 +106,9 @@ export function ApprovedTestimonialsSection() {
           {testimonials.map((testimonial) => (
             <Card 
               key={testimonial.id}
-              className="border-border/50 hover:shadow-lg transition-shadow duration-300"
+              className={`border-border/50 hover:shadow-lg transition-shadow duration-300 ${
+                testimonial.is_featured ? 'ring-2 ring-primary/30 bg-primary/5' : ''
+              }`}
             >
               <CardContent className="p-6 space-y-4">
                 <div className="flex items-start gap-3">

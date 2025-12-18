@@ -16,7 +16,8 @@ type EmailType =
   | "map_available"
   | "commission_paid"
   | "new_commission"
-  | "new_testimonial";
+  | "new_testimonial"
+  | "testimonial_response";
 
 interface EmailRequest {
   type: EmailType;
@@ -35,6 +36,8 @@ interface EmailRequest {
     displayName?: string;
     testimonialContent?: string;
     userEmail?: string;
+    subject?: string;
+    message?: string;
   };
 }
 
@@ -385,6 +388,35 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
           </div>
         `,
       },
+      testimonial_response: {
+        subject: data.subject || "Obrigado pelo seu depoimento - NELLO ONE",
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">O caminho começa dentro.</p>
+            </div>
+            
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Olá, ${name}! 💜</h2>
+              <div style="color: #444; font-size: 16px; line-height: 1.8; white-space: pre-wrap;">
+${data.message || "Obrigado pelo seu feedback!"}
+              </div>
+              
+              <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee;">
+                <a href="https://nello.one/cliente" 
+                   style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500;">
+                  Continuar Minha Jornada
+                </a>
+              </div>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. Todos os direitos reservados.
+            </p>
+          </div>
+        `,
+      },
     },
     en: {
       purchase_confirmation: {
@@ -720,6 +752,35 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
                  style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
                 Review in Admin
               </a>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. All rights reserved.
+            </p>
+          </div>
+        `,
+      },
+      testimonial_response: {
+        subject: data.subject || "Thank you for your testimonial - NELLO ONE",
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">The path begins within.</p>
+            </div>
+            
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Hello, ${name}! 💜</h2>
+              <div style="color: #444; font-size: 16px; line-height: 1.8; white-space: pre-wrap;">
+${data.message || "Thank you for your feedback!"}
+              </div>
+              
+              <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee;">
+                <a href="https://nello.one/en/cliente" 
+                   style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500;">
+                  Continue My Journey
+                </a>
+              </div>
             </div>
             
             <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
