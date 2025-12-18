@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +28,10 @@ import {
   TestTypeBadge 
 } from "@/components/tests/TestVisualElements";
 import TestAnswerOptions from "@/components/tests/TestAnswerOptions";
+import { TestCelebration } from "@/components/tests/TestCelebration";
+import { QuestionTransition, AnimatedProgress, PageTransition } from "@/components/tests/TestTransitions";
+import { motion, AnimatePresence } from "framer-motion";
+
 export default function TestExecution() {
   const { testId, userTestId } = useParams();
   const navigate = useNavigate();
@@ -38,6 +42,8 @@ export default function TestExecution() {
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [navigationDirection, setNavigationDirection] = useState<"left" | "right">("left");
   const [partialArchetypes, setPartialArchetypes] = useState<{
     primary: { archetype: string; score: number };
     secondary?: { archetype: string; score: number };
@@ -100,6 +106,7 @@ export default function TestExecution() {
         answer: { value: isLikertScale ? parseInt(selectedAnswer) : selectedAnswer },
       });
     }
+    setNavigationDirection("left");
     nextQuestion();
   };
 
@@ -110,6 +117,7 @@ export default function TestExecution() {
         answer: { value: isLikertScale ? parseInt(selectedAnswer) : selectedAnswer },
       });
     }
+    setNavigationDirection("right");
     previousQuestion();
   };
 
@@ -255,16 +263,22 @@ export default function TestExecution() {
         }));
       }
 
-      // Complete test and update journey progress
-      completeTest(resultData);
+      // Show celebration before completing
+      setShowCelebration(true);
       
-      // Update journey progress immediately after completing test
-      if (user?.id && testType) {
-        const journeySlug = getJourneySlugFromTestType(testType);
-        if (journeySlug) {
-          updateJourneyProgress(user.id, journeySlug, 'completed').catch(console.error);
+      // Complete test after celebration animation
+      setTimeout(() => {
+        // Complete test and update journey progress
+        completeTest(resultData);
+        
+        // Update journey progress immediately after completing test
+        if (user?.id && testType) {
+          const journeySlug = getJourneySlugFromTestType(testType);
+          if (journeySlug) {
+            updateJourneyProgress(user.id, journeySlug, 'completed').catch(console.error);
+          }
         }
-      }
+      }, 3500);
     }
   };
 
@@ -715,56 +729,94 @@ export default function TestExecution() {
             />
           </div>
 
-          {/* Question */}
-          <CardTitle className="text-3xl font-light tracking-tight leading-tight mb-3">
-            {currentQuestion.question_text}
-          </CardTitle>
-          <CardDescription className="text-base font-light">
-            Responda com sua primeira intuição
-          </CardDescription>
+          {/* Question with transition animation */}
+          <QuestionTransition 
+            questionKey={currentQuestion.id} 
+            direction={navigationDirection}
+          >
+            <div>
+              <CardTitle className="text-3xl font-light tracking-tight leading-tight mb-3">
+                {currentQuestion.question_text}
+              </CardTitle>
+              <CardDescription className="text-base font-light">
+                Responda com sua primeira intuição
+              </CardDescription>
+            </div>
+          </QuestionTransition>
         </CardHeader>
         
         <CardContent className="space-y-6">
-          <TestAnswerOptions
-            testType={testDetails?.type || 'disc'}
-            options={displayOptions || []}
-            selectedAnswer={selectedAnswer}
-            onAnswerChange={handleAnswerChange}
-          />
+          <QuestionTransition 
+            questionKey={`options-${currentQuestion.id}`} 
+            direction={navigationDirection}
+            variant="fade"
+          >
+            <TestAnswerOptions
+              testType={testDetails?.type || 'disc'}
+              options={displayOptions || []}
+              selectedAnswer={selectedAnswer}
+              onAnswerChange={handleAnswerChange}
+            />
+          </QuestionTransition>
 
           <div className="flex items-center justify-between pt-8 gap-4">
-            <Button
-              variant="outline"
-              onClick={handlePrevious}
-              disabled={isFirstQuestion}
-              className="min-w-[140px] font-light"
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <ChevronLeft className="mr-2 h-4 w-4" />
-              Anterior
-            </Button>
-
-            {!isLastQuestion ? (
-              <Button 
-                onClick={handleNext} 
-                disabled={!selectedAnswer}
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={isFirstQuestion}
                 className="min-w-[140px] font-light"
               >
-                Próxima
-                <ChevronRight className="ml-2 h-4 w-4" />
+                <ChevronLeft className="mr-2 h-4 w-4" />
+                Anterior
               </Button>
-            ) : (
-              <Button 
-                onClick={handleComplete} 
-                disabled={!selectedAnswer}
-                className="min-w-[160px] font-light"
+            </motion.div>
+
+            {!isLastQuestion ? (
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                Concluir Teste
-                <CheckCircle className="ml-2 h-4 w-4" />
-              </Button>
+                <Button 
+                  onClick={handleNext} 
+                  disabled={!selectedAnswer}
+                  className="min-w-[140px] font-light"
+                >
+                  Próxima
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
+              </motion.div>
+            ) : (
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                animate={selectedAnswer ? { 
+                  boxShadow: ["0 0 0 0 hsl(var(--primary) / 0.4)", "0 0 0 10px hsl(var(--primary) / 0)", "0 0 0 0 hsl(var(--primary) / 0.4)"]
+                } : {}}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Button 
+                  onClick={handleComplete} 
+                  disabled={!selectedAnswer}
+                  className="min-w-[160px] font-light"
+                >
+                  Concluir Teste
+                  <CheckCircle className="ml-2 h-4 w-4" />
+                </Button>
+              </motion.div>
             )}
           </div>
         </CardContent>
       </Card>
+
+      {/* Celebration overlay */}
+      <TestCelebration 
+        isVisible={showCelebration} 
+        testName={testDetails?.name}
+      />
     </div>
   );
 }
