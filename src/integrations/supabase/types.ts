@@ -1004,6 +1004,62 @@ export type Database = {
           },
         ]
       }
+      testimonials: {
+        Row: {
+          admin_notes: string | null
+          consent_given: boolean
+          content: string
+          created_at: string
+          display_name: string
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          test_id: string | null
+          test_slug: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          consent_given?: boolean
+          content: string
+          created_at?: string
+          display_name: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          test_id?: string | null
+          test_slug?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          consent_given?: boolean
+          content?: string
+          created_at?: string
+          display_name?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          test_id?: string | null
+          test_slug?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "testimonials_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tests: {
         Row: {
           active: boolean

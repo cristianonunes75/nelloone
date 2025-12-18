@@ -10,6 +10,7 @@ import {
   Star,
   UserCheck,
   Route,
+  MessageSquareHeart,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -42,6 +43,7 @@ const menuSections = [
       { title: "Pedidos & Pagamentos", url: "/admin/pedidos", icon: CreditCard },
       { title: "Produtos & Testes", url: "/admin/produtos", icon: Package },
       { title: "Cupons", url: "/admin/cupons", icon: Ticket },
+      { title: "Depoimentos", url: "/admin/depoimentos", icon: MessageSquareHeart },
       { title: "Código da Essência", url: "/admin/codigo-essencia", icon: Sparkles },
     ]
   },

@@ -36,6 +36,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { getGrowthInsights } from "@/lib/growthInsights";
 import { usePDFEmail } from "@/hooks/usePDFEmail";
 import { updateJourneyProgress, getJourneySlugFromTestType } from "@/utils/journey";
+import { TestimonialForm } from "@/components/cliente/TestimonialForm";
 
 // Journey order for navigation
 const JOURNEY_ORDER = [
@@ -1129,6 +1130,13 @@ export default function TestResults() {
           )}
         </CardContent>
       </Card>
+
+      {/* Testimonial Collection Form */}
+      <TestimonialForm 
+        testId={userTest.test_id}
+        testSlug={userTest.tests?.type ? getJourneySlugFromTestType(userTest.tests.type) : undefined}
+        testName={userTest.tests?.name}
+      />
 
       <PurchaseTestDialog
         open={purchaseDialogOpen}
