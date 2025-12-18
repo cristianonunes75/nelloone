@@ -21,7 +21,12 @@ import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { updateJourneyProgress, getJourneySlugFromTestType } from "@/utils/journey";
-
+import { 
+  TestBackgroundVisual, 
+  TestProgressRing, 
+  TestQuestionIndicator,
+  TestTypeBadge 
+} from "@/components/tests/TestVisualElements";
 export default function TestExecution() {
   const { testId, userTestId } = useParams();
   const navigate = useNavigate();
@@ -310,33 +315,113 @@ export default function TestExecution() {
 
   // Show welcome screen at the start
   if (showWelcome && currentQuestionIndex === 0) {
-    const testIcon = testDetails?.icon || "Circle";
     const testName = testDetails?.name || "Teste";
     const testDescription = testDetails?.description || "";
     const questionsCount = testDetails?.questions_count || totalQuestions;
     const estimatedMinutes = testDetails?.estimated_minutes || 15;
     const showFreeMessage = isFreeTest && !hasPaidAccess;
+    const testType = testDetails?.type || 'disc';
+
+    // Test-specific visual configurations
+    const testVisualConfig: Record<string, { icon: string; gradient: string; accentColor: string; decorativeIcons: string[] }> = {
+      arquetipos: { 
+        icon: "👑", 
+        gradient: "from-violet-100 via-purple-50 to-indigo-100",
+        accentColor: "text-violet-600",
+        decorativeIcons: ["✨", "🛡️", "❤️", "🎯"]
+      },
+      arquetipos_proposito: { 
+        icon: "👑", 
+        gradient: "from-violet-100 via-purple-50 to-indigo-100",
+        accentColor: "text-violet-600",
+        decorativeIcons: ["✨", "🛡️", "❤️", "🎯"]
+      },
+      disc: { 
+        icon: "🎯", 
+        gradient: "from-blue-100 via-cyan-50 to-sky-100",
+        accentColor: "text-blue-600",
+        decorativeIcons: ["📊", "👥", "🏆", "💼"]
+      },
+      eneagrama: { 
+        icon: "⭐", 
+        gradient: "from-purple-100 via-indigo-50 to-violet-100",
+        accentColor: "text-purple-600",
+        decorativeIcons: ["🔮", "🌟", "💫", "🎭"]
+      },
+      temperamentos: { 
+        icon: "🔥", 
+        gradient: "from-amber-100 via-orange-50 to-yellow-100",
+        accentColor: "text-amber-600",
+        decorativeIcons: ["💨", "🌊", "⛰️", "🔥"]
+      },
+      inteligencias_multiplas: { 
+        icon: "🧠", 
+        gradient: "from-emerald-100 via-green-50 to-teal-100",
+        accentColor: "text-emerald-600",
+        decorativeIcons: ["🎵", "📐", "🌿", "💬"]
+      },
+      linguagens_amor: { 
+        icon: "💕", 
+        gradient: "from-rose-100 via-pink-50 to-red-100",
+        accentColor: "text-rose-500",
+        decorativeIcons: ["💬", "🤝", "🎁", "⏰"]
+      },
+      solis: { 
+        icon: "💕", 
+        gradient: "from-rose-100 via-pink-50 to-red-100",
+        accentColor: "text-rose-500",
+        decorativeIcons: ["💬", "🤝", "🎁", "⏰"]
+      },
+      mbti: { 
+        icon: "🧩", 
+        gradient: "from-slate-100 via-gray-50 to-blue-100",
+        accentColor: "text-slate-600",
+        decorativeIcons: ["🌞", "🌙", "🧭", "💡"]
+      }
+    };
+
+    const config = testVisualConfig[testType] || testVisualConfig.disc;
 
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <div className="max-w-3xl w-full text-center space-y-8">
-          {/* Icon/Logo */}
-          <div className="flex justify-center mb-6">
-            <div className="text-6xl">
-              {testIcon === "Brain" ? "🧠" : 
-               testIcon === "Heart" ? "❤️" : 
-               testIcon === "Palette" ? "🎨" : 
-               testIcon === "Target" ? "🎯" : 
-               testIcon === "Users" ? "👥" : 
-               testIcon === "Compass" ? "🧭" : 
-               testIcon === "Lightbulb" ? "💡" : 
-               testIcon === "Star" ? "⭐" : "✴️"}
+      <div className={`min-h-screen bg-gradient-to-br ${config.gradient} flex items-center justify-center p-6 relative overflow-hidden`}>
+        {/* Decorative floating elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          {config.decorativeIcons.map((icon, i) => (
+            <div
+              key={i}
+              className="absolute text-4xl opacity-10 animate-pulse"
+              style={{
+                top: `${15 + i * 20}%`,
+                left: i % 2 === 0 ? '8%' : 'auto',
+                right: i % 2 === 1 ? '8%' : 'auto',
+                animationDelay: `${i * 500}ms`,
+                animationDuration: '3s'
+              }}
+            >
+              {icon}
             </div>
+          ))}
+        </div>
+
+        <div className="max-w-3xl w-full text-center space-y-8 relative z-10">
+          {/* Main icon with decorative ring */}
+          <div className="flex justify-center mb-6">
+            <div className="relative">
+              <div className="text-7xl animate-bounce" style={{ animationDuration: '2s' }}>
+                {config.icon}
+              </div>
+              <div className="absolute -inset-4 border-2 border-dashed border-current opacity-20 rounded-full animate-spin" style={{ animationDuration: '20s' }} />
+            </div>
+          </div>
+
+          {/* Test Type Badge */}
+          <div className="flex justify-center">
+            <TestTypeBadge testType={testType} />
           </div>
 
           {/* Main Title */}
           <div className="space-y-4">
-            <h1 className="text-5xl md:text-6xl font-light tracking-tight text-foreground">
+            <h1 className={`text-5xl md:text-6xl font-light tracking-tight ${config.accentColor}`}>
               {testName}
             </h1>
           </div>
@@ -353,20 +438,20 @@ export default function TestExecution() {
             )}
           </div>
 
-          {/* Info Tags */}
-          <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground py-6">
-            <div className="flex items-center gap-2">
+          {/* Info Tags with visual styling */}
+          <div className="flex items-center justify-center gap-6 text-sm py-6 flex-wrap">
+            <div className="flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm">
               <span>⏱️</span>
-              <span>{estimatedMinutes} minutos</span>
+              <span className="text-muted-foreground">{estimatedMinutes} minutos</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span>📜</span>
-              <span>{questionsCount} questões</span>
+            <div className="flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm">
+              <span>📝</span>
+              <span className="text-muted-foreground">{questionsCount} questões</span>
             </div>
             {showFreeMessage && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm">
                 <span>🔓</span>
-                <span>Primeiras 5 gratuitas</span>
+                <span className="text-muted-foreground">5 gratuitas</span>
               </div>
             )}
           </div>
@@ -376,15 +461,16 @@ export default function TestExecution() {
             <Button 
               onClick={() => setShowWelcome(false)}
               size="lg" 
-              className="text-lg px-12 py-7 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="text-lg px-12 py-7 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
-              ▶️ Começar Teste
+              Começar Teste
+              <ChevronRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
 
           {/* Footer Note */}
           {showFreeMessage && (
-            <p className="text-xs text-muted-foreground max-w-xl mx-auto leading-relaxed pt-6">
+            <p className="text-xs text-muted-foreground max-w-xl mx-auto leading-relaxed pt-6 bg-white/40 backdrop-blur-sm px-4 py-3 rounded-lg">
               Este teste oferece gratuitamente as 5 primeiras perguntas. Após o resultado parcial, você poderá desbloquear o relatório completo com {questionsCount} perguntas e leitura personalizada.
             </p>
           )}
@@ -575,10 +661,19 @@ export default function TestExecution() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <Card className="border-none shadow-lg">
+    <div className="container mx-auto p-6 max-w-4xl relative">
+      {/* Background visual elements */}
+      <div className="absolute inset-0 -z-10 overflow-hidden rounded-3xl">
+        <TestBackgroundVisual 
+          testType={testDetails?.type || 'disc'} 
+          currentQuestionIndex={currentQuestionIndex} 
+        />
+      </div>
+
+      <Card className="border-none shadow-lg bg-card/95 backdrop-blur-sm">
         <CardHeader className="pb-6">
-          <div className="flex items-center justify-between mb-6">
+          {/* Top navigation bar */}
+          <div className="flex items-center justify-between mb-4">
             <Button
               variant="ghost"
               onClick={() => navigate(`${basePath}/cliente`)}
@@ -588,6 +683,18 @@ export default function TestExecution() {
               <ChevronLeft className="mr-2 h-4 w-4" />
               Voltar
             </Button>
+            
+            {/* Progress ring */}
+            <TestProgressRing 
+              progress={progress} 
+              testType={testDetails?.type || 'disc'}
+              size={56}
+            />
+          </div>
+
+          {/* Test type badge and question indicator */}
+          <div className="flex items-center justify-between mb-6">
+            <TestTypeBadge testType={testDetails?.type || 'disc'} />
             <div className="text-sm text-muted-foreground font-light">
               Questão {currentQuestionIndex + 1} de {questions?.length}
               {!hasPaidAccess && !isFreeTest && (
@@ -597,7 +704,17 @@ export default function TestExecution() {
               )}
             </div>
           </div>
-          <Progress value={progress} className="mb-6 h-2" />
+
+          {/* Visual progress indicator */}
+          <div className="mb-6">
+            <TestQuestionIndicator
+              testType={testDetails?.type || 'disc'}
+              currentIndex={currentQuestionIndex}
+              total={questions?.length || 0}
+            />
+          </div>
+
+          {/* Question */}
           <CardTitle className="text-3xl font-light tracking-tight leading-tight mb-3">
             {currentQuestion.question_text}
           </CardTitle>
@@ -605,19 +722,30 @@ export default function TestExecution() {
             Responda com sua primeira intuição
           </CardDescription>
         </CardHeader>
+        
         <CardContent className="space-y-6">
           <RadioGroup value={selectedAnswer} onValueChange={handleAnswerChange}>
             <div className="space-y-3">
-              {displayOptions?.map((option) => (
+              {displayOptions?.map((option, index) => (
                 <div
                   key={option.value}
-                  className={`group relative flex items-center border-2 rounded-xl p-5 transition-all duration-200 cursor-pointer ${
+                  className={`group relative flex items-center border-2 rounded-xl p-5 transition-all duration-300 cursor-pointer ${
                     selectedAnswer === option.value 
-                      ? 'bg-primary/5 border-primary shadow-md' 
-                      : 'border-border hover:border-primary/40 hover:bg-accent/50'
+                      ? 'bg-primary/5 border-primary shadow-md scale-[1.01]' 
+                      : 'border-border hover:border-primary/40 hover:bg-accent/50 hover:scale-[1.005]'
                   }`}
                   onClick={() => handleAnswerChange(option.value)}
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
+                  {/* Option number indicator */}
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full mr-4 text-sm font-medium transition-colors ${
+                    selectedAnswer === option.value 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {String.fromCharCode(65 + index)}
+                  </div>
+                  
                   <Label
                     htmlFor={option.value}
                     className="flex-1 cursor-pointer font-light text-base leading-relaxed"
