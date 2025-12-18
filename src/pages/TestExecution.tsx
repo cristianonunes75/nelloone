@@ -27,6 +27,7 @@ import {
   TestQuestionIndicator,
   TestTypeBadge 
 } from "@/components/tests/TestVisualElements";
+import TestAnswerOptions from "@/components/tests/TestAnswerOptions";
 export default function TestExecution() {
   const { testId, userTestId } = useParams();
   const navigate = useNavigate();
@@ -724,43 +725,12 @@ export default function TestExecution() {
         </CardHeader>
         
         <CardContent className="space-y-6">
-          <RadioGroup value={selectedAnswer} onValueChange={handleAnswerChange}>
-            <div className="space-y-3">
-              {displayOptions?.map((option, index) => (
-                <div
-                  key={option.value}
-                  className={`group relative flex items-center border-2 rounded-xl p-5 transition-all duration-300 cursor-pointer ${
-                    selectedAnswer === option.value 
-                      ? 'bg-primary/5 border-primary shadow-md scale-[1.01]' 
-                      : 'border-border hover:border-primary/40 hover:bg-accent/50 hover:scale-[1.005]'
-                  }`}
-                  onClick={() => handleAnswerChange(option.value)}
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  {/* Option number indicator */}
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full mr-4 text-sm font-medium transition-colors ${
-                    selectedAnswer === option.value 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {String.fromCharCode(65 + index)}
-                  </div>
-                  
-                  <Label
-                    htmlFor={option.value}
-                    className="flex-1 cursor-pointer font-light text-base leading-relaxed"
-                  >
-                    {option.label}
-                  </Label>
-                  <RadioGroupItem 
-                    value={option.value} 
-                    id={option.value}
-                    className="shrink-0"
-                  />
-                </div>
-              ))}
-            </div>
-          </RadioGroup>
+          <TestAnswerOptions
+            testType={testDetails?.type || 'disc'}
+            options={displayOptions || []}
+            selectedAnswer={selectedAnswer}
+            onAnswerChange={handleAnswerChange}
+          />
 
           <div className="flex items-center justify-between pt-8 gap-4">
             <Button
