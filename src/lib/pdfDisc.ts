@@ -493,9 +493,9 @@ export function generateDISCPremiumPDF(data: DISCPDFData): jsPDF {
   doc.setFillColor(205, 174, 103); // Gold
   doc.roundedRect(pageWidth / 2 - 30, 115, 60, 25, 5, 5, 'F');
   doc.setTextColor(31, 46, 75);
-  doc.setFontSize(24);
+  doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
-  doc.text(`${profile.emoji} ${dominantProfile}`, pageWidth / 2, 132, { align: 'center' });
+  doc.text(dominantProfile, pageWidth / 2, 132, { align: 'center' });
   
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(12);
@@ -541,9 +541,9 @@ export function generateDISCPremiumPDF(data: DISCPDFData): jsPDF {
   // Profile header
   doc.setFillColor(220, 233, 245); // Bruma Blue
   doc.roundedRect(margin, yPos, contentWidth, 20, 3, 3, 'F');
-  doc.setFontSize(16);
+  doc.setFontSize(14);
   doc.setTextColor(31, 46, 75);
-  doc.text(`${profile.emoji} ${profile.name[lang]} (${dominantProfile})`, margin + 10, yPos + 13);
+  doc.text(`${profile.name[lang]} (${dominantProfile})`, margin + 10, yPos + 13);
   
   yPos += 30;
   
@@ -640,10 +640,10 @@ export function generateDISCPremiumPDF(data: DISCPDFData): jsPDF {
     doc.setFillColor(isFirst ? 205 : 240, isFirst ? 174 : 240, isFirst ? 103 : 240);
     doc.roundedRect(margin, yPos, contentWidth, 18, 3, 3, 'F');
     
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     doc.setFont('helvetica', isFirst ? 'bold' : 'normal');
     doc.setTextColor(31, 46, 75);
-    doc.text(`${p.emoji} ${p.name[lang]} (${key})`, margin + 10, yPos + 12);
+    doc.text(`${p.name[lang]} (${key})`, margin + 10, yPos + 12);
     
     doc.text(`${score} pts`, pageWidth - margin - 25, yPos + 12);
     
@@ -669,10 +669,10 @@ export function generateDISCPremiumPDF(data: DISCPDFData): jsPDF {
     const score = scores[key as keyof DISCScores];
     const barWidth = (score / maxScore) * (contentWidth - 60);
     
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(31, 46, 75);
-    doc.text(`${p.emoji} ${key}`, margin, yPos + 8);
+    doc.text(key, margin, yPos + 8);
     
     // Background bar
     doc.setFillColor(230, 230, 230);

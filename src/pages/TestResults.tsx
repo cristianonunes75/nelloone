@@ -691,8 +691,8 @@ export default function TestResults() {
                 <Card className="border-2 border-accent">
                   <CardHeader>
                     <CardTitle className="text-xl flex items-center gap-2">
-                      <span className="text-3xl">{linguagensAmorResultData.primary?.symbol?.split(' ')[0]}</span>
-                      Linguagem Principal
+                      <span className="text-3xl">💕</span>
+                      {lang === 'en' ? 'Primary Style' : 'Estilo Principal'}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -712,8 +712,8 @@ export default function TestResults() {
                 <Card className="border-2 border-muted">
                   <CardHeader>
                     <CardTitle className="text-xl flex items-center gap-2">
-                      <span className="text-3xl">{linguagensAmorResultData.secondary?.symbol?.split(' ')[0]}</span>
-                      Linguagem Secundária
+                      <span className="text-3xl">✨</span>
+                      {lang === 'en' ? 'Secondary Style' : 'Estilo Secundário'}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">

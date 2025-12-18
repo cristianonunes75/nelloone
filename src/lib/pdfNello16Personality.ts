@@ -731,9 +731,9 @@ export function generateNello16PremiumPDF(data: Nello16PDFData): jsPDF {
   doc.setFillColor(205, 174, 103);
   doc.roundedRect(pageWidth / 2 - 40, 105, 80, 35, 5, 5, 'F');
   doc.setTextColor(31, 46, 75);
-  doc.setFontSize(20);
+  doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text(`${typeData.emoji} ${personalityType}`, pageWidth / 2, 118, { align: 'center' });
+  doc.text(personalityType, pageWidth / 2, 118, { align: 'center' });
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.text(typeData.name[lang], pageWidth / 2, 132, { align: 'center' });
@@ -782,9 +782,9 @@ export function generateNello16PremiumPDF(data: Nello16PDFData): jsPDF {
   // Type header
   doc.setFillColor(220, 233, 245);
   doc.roundedRect(margin, yPos, contentWidth, 25, 3, 3, 'F');
-  doc.setFontSize(16);
+  doc.setFontSize(14);
   doc.setTextColor(31, 46, 75);
-  doc.text(`${typeData.emoji} ${personalityType} — ${typeData.name[lang]}`, margin + 10, yPos + 10);
+  doc.text(`${personalityType} — ${typeData.name[lang]}`, margin + 10, yPos + 10);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'italic');
   doc.text(typeData.subtitle[lang], margin + 10, yPos + 20);

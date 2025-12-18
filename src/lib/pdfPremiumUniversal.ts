@@ -826,9 +826,9 @@ export const generatePremiumTestPDF = (
   doc.roundedRect(margin, yPos, contentWidth, 30, 3, 3, "F");
   
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(18);
+  doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
-  doc.text(`${result.primaryResult.emoji} ${result.primaryResult.name}`, margin + 10, yPos + 19);
+  doc.text(result.primaryResult.name, margin + 10, yPos + 19);
   
   if (result.primaryResult.percentage) {
     doc.text(`${result.primaryResult.percentage}%`, pageWidth - margin - 10, yPos + 19, { align: "right" });
@@ -882,9 +882,9 @@ export const generatePremiumTestPDF = (
       doc.roundedRect(margin, yPos, contentWidth, 25, 3, 3, "F");
       
       doc.setTextColor(testColor.r, testColor.g, testColor.b);
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
-      doc.text(`${index + 2}. ${secondary.emoji} ${secondary.name}`, margin + 10, yPos + 16);
+      doc.text(`${index + 2}. ${secondary.name}`, margin + 10, yPos + 16);
       
       if (secondary.percentage) {
         doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);

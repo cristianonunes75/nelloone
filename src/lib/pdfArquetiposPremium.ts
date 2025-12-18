@@ -866,9 +866,9 @@ export const createArquetiposPremiumPDF = (
   doc.roundedRect(margin, yPos, contentWidth, 35, 3, 3, "F");
   
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(20);
+  doc.setFontSize(18);
   doc.setFont("helvetica", "bold");
-  doc.text(`${dominant.emoji} ${dominant.name[lang]}`, margin + 10, yPos + 22);
+  doc.text(dominant.name[lang], margin + 10, yPos + 22);
   
   const dominantRank = result.ranking.find(r => r.key.toLowerCase() === result.dominant.toLowerCase());
   if (dominantRank) {
@@ -954,10 +954,10 @@ export const createArquetiposPremiumPDF = (
     doc.roundedRect(margin, yPos, contentWidth, 25, 3, 3, "F");
     
     doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
-    doc.setFontSize(14);
+    doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
-    const label = index === 0 ? "Secundário" : "Terciário";
-    doc.text(`${item.profile.emoji} ${item.profile.name[lang]} (${label})`, margin + 10, yPos + 16);
+    const label = index === 0 ? "Secundario" : "Terciario";
+    doc.text(`${item.profile.name[lang]} (${label})`, margin + 10, yPos + 16);
     
     if (item.rank) {
       doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
@@ -1013,11 +1013,10 @@ export const createArquetiposPremiumPDF = (
     doc.setFillColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
     doc.roundedRect(margin + 45, yPos, barWidth, barHeight, 2, 2, "F");
     
-    // Emoji and label
+    // Label
     doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-    doc.setFontSize(9);
-    doc.text(`${profile.emoji}`, margin, yPos + 12);
-    doc.text(profile.name[lang].substring(0, 12), margin + 8, yPos + 12);
+    doc.setFontSize(8);
+    doc.text(profile.name[lang].substring(0, 12), margin, yPos + 12);
     
     // Percentage
     if (barWidth > 25) {
