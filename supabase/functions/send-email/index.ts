@@ -15,7 +15,8 @@ type EmailType =
   | "test_completed"
   | "map_available"
   | "commission_paid"
-  | "new_commission";
+  | "new_commission"
+  | "new_testimonial";
 
 interface EmailRequest {
   type: EmailType;
@@ -31,6 +32,9 @@ interface EmailRequest {
     referralCount?: number;
     saleAmount?: number;
     productName?: string;
+    displayName?: string;
+    testimonialContent?: string;
+    userEmail?: string;
   };
 }
 
@@ -334,6 +338,53 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
           </div>
         `,
       },
+      new_testimonial: {
+        subject: "📝 Novo depoimento para revisão - NELLO ONE",
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">Área Administrativa</p>
+            </div>
+            
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Novo Depoimento Recebido 📝</h2>
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Um usuário enviou um novo depoimento para revisão.
+              </p>
+              
+              <div style="background: #F8F9FA; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                <p style="color: #666; font-size: 14px; margin: 0 0 8px;">Detalhes:</p>
+                <p style="color: #1A1A1A; font-size: 16px; margin: 4px 0;">
+                  <strong>Nome:</strong> ${data.displayName || "Usuário"}
+                </p>
+                <p style="color: #1A1A1A; font-size: 16px; margin: 4px 0;">
+                  <strong>Email:</strong> ${data.userEmail || "N/A"}
+                </p>
+                <p style="color: #1A1A1A; font-size: 16px; margin: 4px 0;">
+                  <strong>Teste:</strong> ${data.testName || "N/A"}
+                </p>
+              </div>
+              
+              <div style="background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                <p style="color: #92400E; font-size: 14px; margin: 0 0 8px;">Depoimento:</p>
+                <p style="color: #1A1A1A; font-size: 16px; line-height: 1.6; margin: 0; font-style: italic;">
+                  "${data.testimonialContent || ""}"
+                </p>
+              </div>
+              
+              <a href="https://nello.one/admin" 
+                 style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
+                Revisar no Admin
+              </a>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. Todos os direitos reservados.
+            </p>
+          </div>
+        `,
+      },
     },
     en: {
       purchase_confirmation: {
@@ -621,6 +672,53 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
               <a href="https://nello.one/en/cliente" 
                  style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
                 View My Dashboard
+              </a>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. All rights reserved.
+            </p>
+          </div>
+        `,
+      },
+      new_testimonial: {
+        subject: "📝 New testimonial for review - NELLO ONE",
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">Admin Area</p>
+            </div>
+            
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">New Testimonial Received 📝</h2>
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                A user has submitted a new testimonial for review.
+              </p>
+              
+              <div style="background: #F8F9FA; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                <p style="color: #666; font-size: 14px; margin: 0 0 8px;">Details:</p>
+                <p style="color: #1A1A1A; font-size: 16px; margin: 4px 0;">
+                  <strong>Name:</strong> ${data.displayName || "User"}
+                </p>
+                <p style="color: #1A1A1A; font-size: 16px; margin: 4px 0;">
+                  <strong>Email:</strong> ${data.userEmail || "N/A"}
+                </p>
+                <p style="color: #1A1A1A; font-size: 16px; margin: 4px 0;">
+                  <strong>Test:</strong> ${data.testName || "N/A"}
+                </p>
+              </div>
+              
+              <div style="background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                <p style="color: #92400E; font-size: 14px; margin: 0 0 8px;">Testimonial:</p>
+                <p style="color: #1A1A1A; font-size: 16px; line-height: 1.6; margin: 0; font-style: italic;">
+                  "${data.testimonialContent || ""}"
+                </p>
+              </div>
+              
+              <a href="https://nello.one/admin" 
+                 style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
+                Review in Admin
               </a>
             </div>
             

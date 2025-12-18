@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check, X, ArrowRight, Sparkles, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ApprovedTestimonialsSection } from "./ApprovedTestimonialsSection";
 
 export const ValidationLanding = () => {
   const { t } = useLanguage();
@@ -222,7 +223,10 @@ export const ValidationLanding = () => {
         </div>
       </section>
 
-      {/* SEÇÃO 9 - SIMPLICIDADE E VERDADE */}
+      {/* SEÇÃO 9 - DEPOIMENTOS */}
+      <ApprovedTestimonialsSection />
+
+      {/* SEÇÃO 10 - SIMPLICIDADE E VERDADE */}
       <section className="py-20 px-6 bg-background">
         <div className="max-w-2xl mx-auto space-y-8">
           <div className="flex flex-wrap justify-center gap-4">
