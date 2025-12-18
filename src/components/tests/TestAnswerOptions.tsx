@@ -1,5 +1,6 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { motion } from "framer-motion";
 import { 
   Crown, Shield, Heart, Sparkles, Target, Users, 
   Brain, Music, Compass, MessageCircle, Star, Flame,
@@ -195,28 +196,42 @@ const CardsLayout = ({
         const isSelected = selectedAnswer === option.value;
         
         return (
-          <div
+          <motion.div
             key={option.value}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              delay: index * 0.08,
+              type: "spring",
+              stiffness: 400,
+              damping: 25
+            }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className={`
               relative flex items-center gap-4 p-5 border-2 cursor-pointer
-              transition-all duration-300 ${style.borderRadius}
+              transition-colors duration-300 ${style.borderRadius}
               ${isSelected 
-                ? `${style.selectedBg} ${style.selectedBorder} shadow-lg scale-[1.02]` 
-                : `border-border ${style.hoverBg} hover:shadow-md hover:scale-[1.01]`
+                ? `${style.selectedBg} ${style.selectedBorder} shadow-lg` 
+                : `border-border ${style.hoverBg} hover:shadow-md`
               }
             `}
             onClick={() => onAnswerChange(option.value)}
           >
             {/* Icon */}
-            <div className={`
-              flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300
-              ${isSelected 
-                ? `${style.iconBgSelected} text-white shadow-md` 
-                : `${style.iconBg} ${style.iconText}`
-              }
-            `}>
+            <motion.div 
+              animate={isSelected ? { rotate: [0, -10, 10, 0] } : {}}
+              transition={{ duration: 0.4 }}
+              className={`
+                flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300
+                ${isSelected 
+                  ? `${style.iconBgSelected} text-white shadow-md` 
+                  : `${style.iconBg} ${style.iconText}`
+                }
+              `}
+            >
               <Icon size={22} strokeWidth={1.5} />
-            </div>
+            </motion.div>
             
             {/* Content */}
             <div className="flex-1">
@@ -226,18 +241,26 @@ const CardsLayout = ({
             </div>
 
             {/* Selection indicator */}
-            <div className={`
-              w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all
-              ${isSelected 
-                ? `${style.dotBorder} ${style.dotBg}` 
-                : 'border-muted'
-              }
-            `}>
+            <motion.div 
+              animate={isSelected ? { scale: [1, 1.2, 1] } : { scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className={`
+                w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all
+                ${isSelected 
+                  ? `${style.dotBorder} ${style.dotBg}` 
+                  : 'border-muted'
+                }
+              `}
+            >
               {isSelected && (
-                <div className="w-2 h-2 rounded-full bg-white" />
+                <motion.div 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="w-2 h-2 rounded-full bg-white" 
+                />
               )}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         );
       })}
     </div>
@@ -270,10 +293,20 @@ const GridLayout = ({
         const isSelected = selectedAnswer === option.value;
         
         return (
-          <div
+          <motion.div
             key={option.value}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ 
+              delay: index * 0.06,
+              type: "spring",
+              stiffness: 400,
+              damping: 25
+            }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
             className={`
-              relative p-5 border-2 cursor-pointer transition-all duration-300
+              relative p-5 border-2 cursor-pointer transition-colors duration-300
               ${style.borderRadius}
               ${isSelected 
                 ? `${style.selectedBg} ${style.selectedBorder} shadow-lg` 
@@ -283,24 +316,32 @@ const GridLayout = ({
             onClick={() => onAnswerChange(option.value)}
           >
             {/* Color accent bar */}
-            <div 
-              className={`absolute top-0 left-0 right-0 h-1 rounded-t-xl transition-opacity ${
-                isSelected ? 'opacity-100' : 'opacity-30'
-              }`}
-              style={{ background: gradients[index % gradients.length] }}
+            <motion.div 
+              className={`absolute top-0 left-0 right-0 h-1 rounded-t-xl`}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: isSelected ? 1 : 0.3, opacity: isSelected ? 1 : 0.3 }}
+              transition={{ duration: 0.3 }}
+              style={{ 
+                background: gradients[index % gradients.length],
+                transformOrigin: 'left'
+              }}
             />
             
             {/* Letter badge */}
-            <div className={`
-              inline-flex items-center justify-center w-8 h-8 rounded-lg mb-3 text-sm font-semibold
-              transition-colors
-              ${isSelected 
-                ? `${style.badgeBg} text-white` 
-                : `${style.badgeBgLight} ${style.badgeText}`
-              }
-            `}>
+            <motion.div 
+              animate={isSelected ? { scale: [1, 1.2, 1] } : {}}
+              transition={{ duration: 0.3 }}
+              className={`
+                inline-flex items-center justify-center w-8 h-8 rounded-lg mb-3 text-sm font-semibold
+                transition-colors
+                ${isSelected 
+                  ? `${style.badgeBg} text-white` 
+                  : `${style.badgeBgLight} ${style.badgeText}`
+                }
+              `}
+            >
               {String.fromCharCode(65 + index)}
-            </div>
+            </motion.div>
             
             <Label className="cursor-pointer font-light text-sm leading-relaxed block">
               {option.label}
@@ -312,7 +353,7 @@ const GridLayout = ({
               id={option.value}
               className="absolute top-4 right-4"
             />
-          </div>
+          </motion.div>
         );
       })}
     </div>
