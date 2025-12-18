@@ -1012,6 +1012,9 @@ export type Database = {
           created_at: string
           display_name: string
           id: string
+          is_featured: boolean | null
+          response_sent_at: string | null
+          response_sent_by: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
@@ -1027,6 +1030,9 @@ export type Database = {
           created_at?: string
           display_name: string
           id?: string
+          is_featured?: boolean | null
+          response_sent_at?: string | null
+          response_sent_by?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -1042,6 +1048,9 @@ export type Database = {
           created_at?: string
           display_name?: string
           id?: string
+          is_featured?: boolean | null
+          response_sent_at?: string | null
+          response_sent_by?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string

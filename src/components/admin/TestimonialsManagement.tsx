@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   MessageSquareHeart, 
   Check, 
@@ -14,7 +17,10 @@ import {
   User,
   Calendar,
   FileText,
-  RefreshCw
+  RefreshCw,
+  Star,
+  Mail,
+  Send
 } from 'lucide-react';
 import {
   Dialog,
@@ -22,6 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -42,14 +49,22 @@ interface Testimonial {
   admin_notes: string | null;
   created_at: string;
   reviewed_at: string | null;
+  is_featured: boolean;
+  response_sent_at: string | null;
 }
 
 export function TestimonialsManagement() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedTestimonial, setSelectedTestimonial] = useState<Testimonial | null>(null);
   const [adminNotes, setAdminNotes] = useState('');
+  const [replyDialog, setReplyDialog] = useState<Testimonial | null>(null);
+  const [replySubject, setReplySubject] = useState('');
+  const [replyMessage, setReplyMessage] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [isSendingReply, setIsSendingReply] = useState(false);
 
   const { data: testimonials, isLoading, refetch } = useQuery({
     queryKey: ['admin-testimonials', statusFilter],
@@ -57,6 +72,7 @@ export function TestimonialsManagement() {
       let query = supabase
         .from('testimonials')
         .select('*')
+        .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false });
 
       if (statusFilter !== 'all') {
@@ -99,6 +115,112 @@ export function TestimonialsManagement() {
     }
   });
 
+  const toggleFeaturedMutation = useMutation({
+    mutationFn: async ({ id, is_featured }: { id: string; is_featured: boolean }) => {
+      const { error } = await supabase
+        .from('testimonials')
+        .update({ is_featured })
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
+      queryClient.invalidateQueries({ queryKey: ['approved-testimonials-landing'] });
+      toast({
+        title: variables.is_featured ? "Depoimento destacado" : "Destaque removido",
+        description: variables.is_featured 
+          ? "O depoimento agora aparece em destaque na landing page."
+          : "O depoimento não está mais em destaque."
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o destaque.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleOpenReplyDialog = async (testimonial: Testimonial) => {
+    setReplyDialog(testimonial);
+    setReplySubject(`Agradecemos seu depoimento sobre o NELLO ONE`);
+    setReplyMessage(`Olá ${testimonial.display_name},\n\nMuito obrigado por compartilhar sua experiência conosco! Seu feedback é muito valioso para melhorarmos continuamente o NELLO ONE.\n\nAtenciosamente,\nEquipe NELLO ONE`);
+    
+    // Fetch user email
+    const { data } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', testimonial.user_id)
+      .single();
+    
+    if (data) {
+      const { data: authData } = await supabase.auth.admin.getUserById(testimonial.user_id);
+      if (authData?.user?.email) {
+        setUserEmail(authData.user.email);
+      }
+    }
+  };
+
+  const handleSendReply = async () => {
+    if (!replyDialog || !userEmail || !replyMessage) {
+      toast({
+        title: "Erro",
+        description: "Preencha todos os campos obrigatórios.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSendingReply(true);
+
+    try {
+      const { error: emailError } = await supabase.functions.invoke('send-email', {
+        body: {
+          type: 'testimonial_response',
+          to: userEmail,
+          data: {
+            name: replyDialog.display_name,
+            subject: replySubject,
+            message: replyMessage
+          }
+        }
+      });
+
+      if (emailError) throw emailError;
+
+      // Update testimonial with response tracking
+      await supabase
+        .from('testimonials')
+        .update({
+          response_sent_at: new Date().toISOString(),
+          response_sent_by: user?.id
+        })
+        .eq('id', replyDialog.id);
+
+      toast({
+        title: "Resposta enviada!",
+        description: `Email enviado para ${userEmail}`
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
+      setReplyDialog(null);
+      setReplySubject('');
+      setReplyMessage('');
+      setUserEmail('');
+    } catch (error) {
+      console.error('Error sending reply:', error);
+      toast({
+        title: "Erro ao enviar",
+        description: "Não foi possível enviar a resposta. Verifique o email.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSendingReply(false);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
@@ -126,6 +248,7 @@ export function TestimonialsManagement() {
   };
 
   const pendingCount = testimonials?.filter(t => t.status === 'pending').length || 0;
+  const featuredCount = testimonials?.filter(t => t.is_featured).length || 0;
 
   return (
     <div className="space-y-6">
@@ -140,6 +263,12 @@ export function TestimonialsManagement() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          {featuredCount > 0 && (
+            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+              <Star className="w-3 h-3 mr-1 fill-amber-500" />
+              {featuredCount} em destaque
+            </Badge>
+          )}
           {pendingCount > 0 && (
             <Badge className="bg-yellow-500">
               {pendingCount} pendente{pendingCount > 1 ? 's' : ''}
@@ -181,7 +310,10 @@ export function TestimonialsManagement() {
       ) : (
         <div className="grid gap-4">
           {testimonials?.map((testimonial) => (
-            <Card key={testimonial.id} className="hover:shadow-md transition-shadow">
+            <Card 
+              key={testimonial.id} 
+              className={`hover:shadow-md transition-shadow ${testimonial.is_featured ? 'ring-2 ring-amber-300 bg-amber-50/30' : ''}`}
+            >
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 space-y-3">
@@ -195,6 +327,18 @@ export function TestimonialsManagement() {
                         {getTestName(testimonial.test_slug)}
                       </Badge>
                       {getStatusBadge(testimonial.status)}
+                      {testimonial.is_featured && (
+                        <Badge className="bg-amber-100 text-amber-700 border-amber-300">
+                          <Star className="w-3 h-3 mr-1 fill-amber-500" />
+                          Destaque
+                        </Badge>
+                      )}
+                      {testimonial.response_sent_at && (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          <Mail className="w-3 h-3 mr-1" />
+                          Respondido
+                        </Badge>
+                      )}
                     </div>
                     
                     <p className="text-foreground leading-relaxed bg-muted/30 p-3 rounded-lg">
@@ -227,7 +371,33 @@ export function TestimonialsManagement() {
                     )}
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2">
+                    {/* Featured toggle for approved testimonials */}
+                    {testimonial.status === 'approved' && (
+                      <Button
+                        size="sm"
+                        variant={testimonial.is_featured ? "default" : "outline"}
+                        className={testimonial.is_featured ? "bg-amber-500 hover:bg-amber-600" : "text-amber-600 hover:bg-amber-50"}
+                        onClick={() => toggleFeaturedMutation.mutate({ 
+                          id: testimonial.id, 
+                          is_featured: !testimonial.is_featured 
+                        })}
+                      >
+                        <Star className={`w-4 h-4 ${testimonial.is_featured ? 'fill-white' : ''}`} />
+                      </Button>
+                    )}
+
+                    {/* Reply button */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-blue-600 hover:bg-blue-50"
+                      onClick={() => handleOpenReplyDialog(testimonial)}
+                    >
+                      <Mail className="w-4 h-4" />
+                    </Button>
+
+                    {/* Approve/Reject buttons */}
                     {testimonial.status === 'pending' && (
                       <>
                         <Button
@@ -268,6 +438,7 @@ export function TestimonialsManagement() {
         </div>
       )}
 
+      {/* Reject Dialog */}
       <Dialog open={!!selectedTestimonial} onOpenChange={() => setSelectedTestimonial(null)}>
         <DialogContent>
           <DialogHeader>
@@ -300,6 +471,70 @@ export function TestimonialsManagement() {
               }}
             >
               Confirmar Rejeição
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reply Dialog */}
+      <Dialog open={!!replyDialog} onOpenChange={() => setReplyDialog(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Mail className="w-5 h-5" />
+              Responder Depoimento
+            </DialogTitle>
+            <DialogDescription>
+              Enviar email de agradecimento para {replyDialog?.display_name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="userEmail">Email do Usuário</Label>
+              <Input
+                id="userEmail"
+                type="email"
+                placeholder="email@exemplo.com"
+                value={userEmail}
+                onChange={(e) => setUserEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="replySubject">Assunto</Label>
+              <Input
+                id="replySubject"
+                placeholder="Assunto do email"
+                value={replySubject}
+                onChange={(e) => setReplySubject(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="replyMessage">Mensagem</Label>
+              <Textarea
+                id="replyMessage"
+                placeholder="Sua mensagem..."
+                value={replyMessage}
+                onChange={(e) => setReplyMessage(e.target.value)}
+                rows={6}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReplyDialog(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSendReply} disabled={isSendingReply || !userEmail}>
+              {isSendingReply ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                  Enviando...
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4 mr-2" />
+                  Enviar Resposta
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
