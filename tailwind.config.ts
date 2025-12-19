@@ -20,6 +20,7 @@ export default {
         premium: ['Satoshi', 'Inter', 'system-ui', 'sans-serif'],
         miguel: ['Satoshi', 'Inter', 'system-ui', 'sans-serif'],
         heading: ['Montserrat Alternates', 'Inter', 'system-ui', 'sans-serif'],
+        scripture: ['Crimson Pro', 'Georgia', 'serif'],
       },
       fontSize: {
         'display-xl': ['4rem', { lineHeight: '1.1', letterSpacing: '-0.025em', fontWeight: '600' }],
