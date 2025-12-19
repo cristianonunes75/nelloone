@@ -1,38 +1,37 @@
 {
   "hero": {
-    "title": "NELLO ONE",
-    "subtitle": "Conheça quem você é. Transforme o que realmente importa.",
-    "description": "O Nello One é um sistema completo de autoconhecimento guiado por IA que revela os seus padrões, forças, desafios e caminhos de evolução, com profundidade e simplicidade.",
-    "tagline": "Começa em menos de 2 minutos.",
-    "cta_primary": "Começar Agora (Grátis)",
-    "cta_secondary": "Explorar Testes",
-    "social_proof": "✓ Pessoas reais já estão a transformar as suas escolhas com o Nello One"
+    "title": "Conhecer quem és muda tudo.",
+    "subtitle": "O Nello One é uma jornada guiada de autoconhecimento em 7 etapas, criada para te ajudar a compreender os teus padrões, escolhas e caminhos com mais clareza.",
+    "description": "Um teste de cada vez. Sem pressa. Com profundidade.",
+    "tagline": "Leva poucos minutos para começar.",
+    "cta_primary": "Começar a minha jornada",
+    "cta_secondary": "Ver como funciona",
+    "social_proof": "",
+    "verse": "\"Sondai me, ó Deus, e conhecei o meu coração.\"",
+    "verse_ref": "Salmo 139,23"
   },
   "mirror": {
-    "title": "Se isto te descreve, o NELLO ONE foi feito para o teu momento:",
+    "title": "Talvez estejas aqui porque sentes isto:",
     "items": [
-      "Sinto que estou a viver abaixo do meu potencial",
-      "Tenho força, mas falta-me clareza",
-      "Tomo decisões que não refletem quem realmente sou",
-      "Repito padrões emocionais sem entender porquê",
-      "Sei que tenho talento mas não sei como usá-lo",
-      "A minha comunicação não corresponde ao que sinto",
-      "Perco-me a tentar agradar a toda a gente",
-      "Quero mudar, mas não sei por onde começar"
-    ]
+      "Sentes que repetes padrões e não entendes porquê",
+      "Já fizeste testes de personalidade, mas tudo parece superficial",
+      "Tens potencial, mas falta te clareza",
+      "Queres conhecer te melhor, sem rótulos"
+    ],
+    "closing": "O Nello One não oferece respostas prontas. Oferece um caminho.",
+    "verse": "\"Examinemos os nossos caminhos, pesquisemo los e voltemos para o Senhor.\"",
+    "verse_ref": "Lamentações 3,40"
   },
   "improvements": {
-    "title": "O NELLO ONE revela:",
+    "title": "O que vais descobrir",
     "items": [
-      "Os teus padrões emocionais",
-      "As tuas forças centrais",
-      "O que te sabota",
-      "Como tomar decisões com confiança",
-      "O teu estilo de comunicação",
-      "Como te relacionares melhor",
-      "Como focar a tua energia",
-      "Como crescer sem te perderes"
-    ]
+      "Como reages emocionalmente",
+      "Como tomas decisões",
+      "O que te motiva e o que te bloqueia",
+      "Onde estão os teus talentos naturais",
+      "Que padrões pedem maturidade"
+    ],
+    "closing": "Clareza não muda quem és. Muda o que fazes com quem és."
   },
   "social_proof": {
     "title": "O que dizem sobre o NELLO ONE",
@@ -90,55 +89,64 @@
     "closing": "Com o NELLO ONE, finalmente percebes quem és, porque ages como ages e como mudar o que já não te ajuda."
   },
   "transformation": {
-    "title": "A Tua Jornada de Transformação",
+    "title": "Uma jornada em 7 etapas",
     "steps": [
       {
         "number": "1",
-        "title": "Clareza",
-        "description": "Percebe quem realmente é, com precisão."
+        "title": "Começa",
+        "description": "Inicias pelo primeiro teste"
       },
       {
         "number": "2",
-        "title": "Consciência",
-        "description": "Entende porque age como age."
+        "title": "Avança",
+        "description": "Progredes ao teu ritmo"
       },
       {
         "number": "3",
-        "title": "Transformação",
-        "description": "Aprende a mudar o que já não serve."
+        "title": "Descobre",
+        "description": "Cada etapa revela uma nova camada"
+      },
+      {
+        "number": "4",
+        "title": "Conecta",
+        "description": "No final, tudo se conecta"
       }
-    ]
+    ],
+    "closing": "Não é sobre acertar respostas. É sobre perceber padrões."
   },
   "what_you_get": {
-    "title": "Por dentro do que recebes",
-    "subtitle": "Tudo o que recebes no NELLO ONE:",
+    "title": "O caminho completo",
+    "subtitle": "A Jornada Nello inclui 7 testes organizados de forma progressiva. Cada etapa aprofunda a anterior.",
     "items": [
-      "7 testes profissionais",
-      "Mapa de identidade completo",
-      "Insights personalizados por IA",
-      "Recomendações práticas",
-      "Crescimento contínuo"
-    ]
+      "Os teus resultados integrados",
+      "Relatórios completos em PDF",
+      "Uma visão final que conecta tudo o que foi revelado"
+    ],
+    "closing": "Tudo faz mais sentido quando visto em conjunto."
   },
   "miguel": {
-    "title": "Conhece o Miguel",
+    "title": "Não caminhas sozinho.",
     "subtitle": "O Teu Guia Interior",
-    "description": "Miguel analisa os seus resultados, identifica padrões centrais e explica tendências emocionais e comportamentais. Com orientação tranquila, acompanha-o em toda a jornada.",
-    "cta": "Falar com o Miguel"
+    "description": "Durante toda a jornada, o Miguel acompanha te. Ele ajuda a interpretar os teus resultados, conectar padrões e abrir espaço para mais clareza interior.",
+    "quote": "A minha função é ajudar te a ver com mais clareza.",
+    "note": "O Miguel não julga, não rotula e não decide por ti. Apenas te ajuda a perceber.",
+    "cta": "Falar com o Miguel",
+    "verse": "\"Sobre tudo o que se deve guardar, guarda o teu coração, porque dele procedem as fontes da vida.\"",
+    "verse_ref": "Provérbios 4,23"
   },
   "not_for_you": {
-    "title_not": "O Nello One não é para si se:",
+    "title_not": "Não é para ti se:",
     "items_not": [
-      "Procura soluções mágicas",
-      "Quer resultados sem reflexão",
-      "Não deseja mudar padrões internos"
+      "Procuras soluções mágicas",
+      "Queres respostas sem reflexão",
+      "Não desejas olhar para ti com honestidade"
     ],
-    "title_for": "O Nello One é para si se:",
+    "title_for": "É para ti se:",
     "items_for": [
-      "Procura clareza emocional",
-      "Quer maturidade prática",
-      "Deseja evolução real",
-      "Quer compreender quem é"
+      "Queres conhecer te de verdade",
+      "Estás aberto a refletir sobre os teus padrões",
+      "Buscas clareza emocional e prática",
+      "Queres ir além de respostas rápidas"
     ]
   },
   "why_matters": {
@@ -196,12 +204,34 @@
     "main_blind_spot": "O teu principal ponto cego",
     "recommended_action": "A tua ação recomendada"
   },
+  "final_result": {
+    "title": "Quando chegas ao fim",
+    "description": "Depois de percorrer todas as etapas, recebes o Código da Essência. Uma síntese clara do teu momento, que integra a tua jornada e aponta caminhos de amadurecimento.",
+    "note": "Não é um laudo. Não é um rótulo. É um convite à clareza.",
+    "verse": "\"Examine se cada um a si mesmo.\"",
+    "verse_ref": "1 Coríntios 11,28"
+  },
+  "inspiration": {
+    "title": "A nossa inspiração",
+    "description": "O Nello One nasce inspirado no chamado bíblico de examinar o coração e buscar uma vida com mais verdade e sentido.",
+    "text": "Acreditamos que o autoconhecimento não é um fim em si mesmo, mas um caminho para viver com mais amor, responsabilidade e abertura ao propósito de Deus.",
+    "verse": "\"Buscai primeiro o Reino de Deus.\"",
+    "verse_ref": "Mateus 6,33"
+  },
+  "simplicity": {
+    "items": [
+      "Um caminho, não um diagnóstico",
+      "Clareza, não julgamento",
+      "Processo, não promessa"
+    ],
+    "closing": "O valor está na jornada. Não apenas no resultado."
+  },
   "faq": {
     "title": "Perguntas Frequentes",
     "items": [
       {
         "question": "Como sei se isto funciona para mim?",
-        "answer": "O Nello One foi criado para qualquer pessoa que deseja clareza emocional e autoconhecimento. Se quer entender os seus padrões e melhorar as suas escolhas, vai funcionar para si."
+        "answer": "O Nello One foi criado para qualquer pessoa que deseja clareza emocional e autoconhecimento. Se queres entender os teus padrões e melhorar as tuas escolhas, vai funcionar para ti."
       },
       {
         "question": "Preciso de entender psicologia?",
@@ -209,15 +239,15 @@
       },
       {
         "question": "Em que o Nello One é diferente de outros testes?",
-        "answer": "Combina múltiplas metodologias, IA comportamental e análises cruzadas. O resultado é um mapa profundo que mostra quem é — não apenas um rótulo."
+        "answer": "Combina 7 metodologias diferentes e integra todos os resultados num mapa único. O resultado é uma visão completa que mostra quem és, não só um rótulo isolado."
       },
       {
-        "question": "Que resultados posso esperar?",
-        "answer": "Clareza sobre padrões, força emocional, consciência sobre decisões e direção prática para evoluir."
+        "question": "Quanto tempo leva para completar?",
+        "answer": "Cada teste leva de 5 a 15 minutos. Podes fazer ao teu ritmo, um por dia ou todos de uma vez."
       },
       {
-        "question": "Funciona se eu estiver emocionalmente perdido?",
-        "answer": "Sim. O Nello One foi criado justamente para quem precisa de clareza quando tudo parece confuso."
+        "question": "O que é o Código da Essência?",
+        "answer": "É o relatório final que integra todos os teus resultados. Mostra os teus padrões, forças e caminhos de amadurecimento numa síntese clara."
       }
     ]
   },
@@ -305,9 +335,9 @@
     "microcopy": "Já estás a pagar o preço da confusão. É aqui que a transformas."
   },
   "cta": {
-    "title": "Comece agora — descubra o seu arquétipo em 2 minutos.",
-    "subtitle": "Sem risco, sem compromisso. Só clareza.",
-    "button": "Começar Agora (Grátis)"
+    "title": "Conhecer te é um processo. Começa agora.",
+    "subtitle": "Sem pressa. Um passo de cada vez.",
+    "button": "Começar a minha jornada"
   },
   "footer": {
     "brand": "NELLO ONE",

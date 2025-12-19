@@ -4,6 +4,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Check, X, ArrowRight, Sparkles, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ApprovedTestimonialsSection } from "./ApprovedTestimonialsSection";
+import heroDawn from "@/assets/hero-dawn.jpg";
+import reflectionWindow from "@/assets/reflection-window.jpg";
+import pathTogether from "@/assets/path-together.jpg";
+import horizonSunrise from "@/assets/horizon-sunrise.jpg";
+import miguelPresence from "@/assets/miguel-presence.jpg";
 
 export const ValidationLanding = () => {
   const { t } = useLanguage();
@@ -17,27 +22,39 @@ export const ValidationLanding = () => {
   return (
     <div className="flex flex-col">
       {/* SEÇÃO 1 - HERO */}
-      <section className="min-h-[90vh] flex items-center justify-center px-6 py-20 bg-background">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
+      <section 
+        className="min-h-[90vh] flex items-center justify-center px-6 py-20 relative"
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${heroDawn})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        <div className="max-w-3xl mx-auto text-center space-y-8 relative z-10">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
             {landing.hero.title}
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
             {landing.hero.subtitle}
           </p>
-          <p className="text-base text-muted-foreground/80 italic">
-            {landing.hero.description}
-          </p>
+          <div className="pt-2">
+            <p className="text-base text-white/80 italic">
+              {(landing.hero as any).verse}
+            </p>
+            <p className="text-sm text-white/60 mt-1">
+              {(landing.hero as any).verse_ref}
+            </p>
+          </div>
           <div className="pt-4 space-y-4">
             <Button 
               onClick={handleCTA}
               size="lg" 
-              className="text-lg px-10 py-6 rounded-full"
+              className="text-lg px-10 py-6 rounded-full bg-white text-foreground hover:bg-white/90"
             >
               {landing.hero.cta_primary}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-white/70">
               {landing.hero.tagline}
             </p>
           </div>
@@ -46,7 +63,11 @@ export const ValidationLanding = () => {
 
       {/* SEÇÃO 2 - IDENTIFICAÇÃO */}
       <section className="py-20 px-6 bg-muted/30">
-        <div className="max-w-3xl mx-auto space-y-10">
+        <div className="max-w-4xl mx-auto space-y-10">
+          <div className="relative rounded-2xl overflow-hidden mb-8">
+            <img src={reflectionWindow} alt="Reflexão" className="w-full h-64 object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+          </div>
           <h2 className="text-2xl md:text-3xl font-semibold text-foreground text-center">
             {landing.mirror.title}
           </h2>
@@ -62,8 +83,16 @@ export const ValidationLanding = () => {
             ))}
           </div>
           <p className="text-center text-muted-foreground italic pt-4">
-            {(landing.mirror as any).closing || "O Nello One não oferece respostas prontas. Ele oferece um caminho."}
+            {landing.mirror.closing}
           </p>
+          <div className="text-center pt-4 border-t border-border/30">
+            <p className="text-foreground/80 italic">
+              {(landing.mirror as any).verse}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {(landing.mirror as any).verse_ref}
+            </p>
+          </div>
         </div>
       </section>
 
@@ -90,7 +119,7 @@ export const ValidationLanding = () => {
             ))}
           </div>
           <p className="text-center text-muted-foreground italic">
-            {(landing.transformation as any).closing || "Não é sobre acertar respostas. É sobre perceber padrões."}
+            {(landing.transformation as any).closing}
           </p>
         </div>
       </section>
@@ -112,7 +141,7 @@ export const ValidationLanding = () => {
             ))}
           </div>
           <p className="text-center text-muted-foreground italic pt-4">
-            {(landing.improvements as any).closing || "Clareza não muda quem você é. Ela muda o que você faz com quem você é."}
+            {landing.improvements.closing}
           </p>
         </div>
       </section>
@@ -120,24 +149,38 @@ export const ValidationLanding = () => {
       {/* SEÇÃO 5 - O PAPEL DO MIGUEL */}
       <section className="py-20 px-6 bg-background">
         <div className="max-w-3xl mx-auto space-y-8">
+          <div className="relative rounded-2xl overflow-hidden mb-4">
+            <img src={pathTogether} alt="Caminho" className="w-full h-48 object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+          </div>
           <h2 className="text-2xl md:text-3xl font-semibold text-foreground text-center">
             {landing.miguel.title}
           </h2>
           <div className="bg-muted/50 rounded-2xl p-8 space-y-6">
             <div className="flex items-center gap-4 justify-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <MessageCircle className="h-8 w-8 text-primary" />
-              </div>
+              <img 
+                src={miguelPresence} 
+                alt="Miguel" 
+                className="w-20 h-20 rounded-full object-cover border-2 border-primary/20"
+              />
             </div>
             <p className="text-center text-foreground/90 text-lg">
               {landing.miguel.description}
             </p>
             <blockquote className="text-center text-primary italic text-lg border-l-4 border-primary pl-4 mx-auto max-w-md">
-              "{(landing.miguel as any).quote || "Minha função é ajudar você a enxergar com mais clareza."}"
+              "{(landing.miguel as any).quote}"
             </blockquote>
             <p className="text-center text-muted-foreground text-sm">
-              {(landing.miguel as any).note || "Miguel não julga, não rotula e não decide por você."}
+              {(landing.miguel as any).note}
             </p>
+            <div className="text-center pt-4 border-t border-border/30">
+              <p className="text-foreground/80 italic text-sm">
+                {(landing.miguel as any).verse}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {(landing.miguel as any).verse_ref}
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -146,7 +189,6 @@ export const ValidationLanding = () => {
       <section className="py-20 px-6 bg-muted/30">
         <div className="max-w-4xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
-            {/* É para você */}
             <div className="space-y-6">
               <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
                 <Check className="h-6 w-6 text-green-500" />
@@ -161,7 +203,6 @@ export const ValidationLanding = () => {
                 ))}
               </div>
             </div>
-            {/* Não é para você */}
             <div className="space-y-6">
               <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
                 <X className="h-6 w-6 text-red-400" />
@@ -203,7 +244,7 @@ export const ValidationLanding = () => {
             </ul>
           </div>
           <p className="text-center text-muted-foreground italic">
-            {(landing.what_you_get as any).closing || "Tudo faz mais sentido quando visto em conjunto."}
+            {landing.what_you_get.closing}
           </p>
         </div>
       </section>
@@ -212,14 +253,22 @@ export const ValidationLanding = () => {
       <section className="py-20 px-6 bg-muted/30">
         <div className="max-w-3xl mx-auto space-y-8">
           <h2 className="text-2xl md:text-3xl font-semibold text-foreground text-center">
-            {(landing as any).final_result?.title || "Quando você chega ao fim"}
+            {(landing as any).final_result?.title}
           </h2>
           <p className="text-center text-foreground/90 text-lg">
-            {(landing as any).final_result?.description || "Depois de percorrer todas as etapas, você recebe o Código da Essência. Um relatório final que integra toda a sua jornada e mostra seus principais padrões, forças e direções de amadurecimento."}
+            {(landing as any).final_result?.description}
           </p>
           <p className="text-center text-muted-foreground italic">
-            {(landing as any).final_result?.note || "Não é um laudo. Não é um rótulo. É uma síntese clara do seu momento."}
+            {(landing as any).final_result?.note}
           </p>
+          <div className="text-center pt-4 border-t border-border/30">
+            <p className="text-foreground/80 italic">
+              {(landing as any).final_result?.verse}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {(landing as any).final_result?.verse_ref}
+            </p>
+          </div>
         </div>
       </section>
 
@@ -230,11 +279,7 @@ export const ValidationLanding = () => {
       <section className="py-20 px-6 bg-background">
         <div className="max-w-2xl mx-auto space-y-8">
           <div className="flex flex-wrap justify-center gap-4">
-            {((landing as any).simplicity?.items || [
-              "Um caminho, não um diagnóstico",
-              "Clareza, não julgamento",
-              "Processo, não promessa"
-            ]).map((item: string, index: number) => (
+            {((landing as any).simplicity?.items || []).map((item: string, index: number) => (
               <span 
                 key={index}
                 className="px-6 py-3 bg-muted rounded-full text-foreground/90 text-sm font-medium"
@@ -244,27 +289,56 @@ export const ValidationLanding = () => {
             ))}
           </div>
           <p className="text-center text-muted-foreground italic text-lg pt-4">
-            {(landing as any).simplicity?.closing || "O valor está na jornada. Não apenas no resultado."}
+            {(landing as any).simplicity?.closing}
           </p>
         </div>
       </section>
 
-      {/* SEÇÃO 10 - CTA FINAL */}
-      <section className="py-24 px-6 bg-foreground text-background">
-        <div className="max-w-2xl mx-auto text-center space-y-8">
-          <h2 className="text-2xl md:text-3xl font-semibold">
+      {/* SEÇÃO 11 - NOSSA INSPIRAÇÃO */}
+      <section className="py-20 px-6 bg-muted/30">
+        <div className="max-w-3xl mx-auto space-y-8 text-center">
+          <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
+            {(landing as any).inspiration?.title || "Nossa inspiração"}
+          </h2>
+          <p className="text-foreground/90 text-lg">
+            {(landing as any).inspiration?.description}
+          </p>
+          <p className="text-muted-foreground">
+            {(landing as any).inspiration?.text}
+          </p>
+          <div className="pt-4">
+            <p className="text-foreground/80 italic text-lg">
+              {(landing as any).inspiration?.verse}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {(landing as any).inspiration?.verse_ref}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* SEÇÃO 12 - CTA FINAL */}
+      <section 
+        className="py-24 px-6 relative"
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${horizonSunrise})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        <div className="max-w-2xl mx-auto text-center space-y-8 relative z-10">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white">
             {landing.cta.title}
           </h2>
           <Button 
             onClick={handleCTA}
             size="lg"
-            variant="secondary"
-            className="text-lg px-10 py-6 rounded-full"
+            className="text-lg px-10 py-6 rounded-full bg-white text-foreground hover:bg-white/90"
           >
             {landing.cta.button}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
-          <p className="text-background/70 text-sm">
+          <p className="text-white/70 text-sm">
             {landing.cta.subtitle}
           </p>
         </div>

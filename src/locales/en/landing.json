@@ -1,38 +1,37 @@
 {
   "hero": {
-    "title": "NELLO ONE",
-    "subtitle": "Discover who you are. Transform what matters.",
-    "description": "Nello One is a complete AI-guided self-knowledge system that reveals your patterns, strengths, challenges and paths of growth, with depth and simplicity.",
-    "tagline": "Takes less than 2 minutes to start.",
-    "cta_primary": "Start Now (Free)",
-    "cta_secondary": "Explore Tests",
-    "social_proof": "✓ Real people are already transforming their choices with Nello One"
+    "title": "Knowing who you are changes everything.",
+    "subtitle": "Nello One is a guided self-knowledge journey in 7 steps, created to help you understand your patterns, choices and paths with more clarity.",
+    "description": "One test at a time. No rush. With depth.",
+    "tagline": "Takes just a few minutes to start.",
+    "cta_primary": "Start my journey",
+    "cta_secondary": "See how it works",
+    "social_proof": "",
+    "verse": "\"Search me, O God, and know my heart.\"",
+    "verse_ref": "Psalm 139:23"
   },
   "mirror": {
-    "title": "If this describes you, NELLO ONE was made for your moment:",
+    "title": "Maybe you are here because you feel this:",
     "items": [
-      "I feel like I'm living below my potential",
-      "I have strength, but lack clarity",
-      "I make decisions that don't reflect who I truly am",
-      "I repeat emotional patterns without understanding why",
-      "I know I have talent but don't know how to use it",
-      "My communication doesn't match what I feel",
-      "I lose myself trying to please everyone",
-      "I want to change, but don't know where to start"
-    ]
+      "You feel like you repeat patterns and don't understand why",
+      "You've taken personality tests, but everything seems shallow",
+      "You have potential, but lack clarity",
+      "You want to know yourself better, without labels"
+    ],
+    "closing": "Nello One doesn't offer ready answers. It offers a path.",
+    "verse": "\"Let us examine our ways and test them, and let us return to the Lord.\"",
+    "verse_ref": "Lamentations 3:40"
   },
   "improvements": {
-    "title": "NELLO ONE reveals:",
+    "title": "What you will discover",
     "items": [
-      "Your emotional patterns",
-      "Your core strengths",
-      "What sabotages you",
-      "How to make confident decisions",
-      "Your communication style",
-      "How to relate better",
-      "How to focus your energy",
-      "How to grow without losing yourself"
-    ]
+      "How you react emotionally",
+      "How you make decisions",
+      "What motivates and blocks you",
+      "Where your natural talents are",
+      "Which patterns need maturity"
+    ],
+    "closing": "Clarity doesn't change who you are. It changes what you do with who you are."
   },
   "social_proof": {
     "title": "What people say about NELLO ONE",
@@ -90,55 +89,64 @@
     "closing": "With NELLO ONE, you finally understand who you are, why you act the way you do and how to change what no longer helps you."
   },
   "transformation": {
-    "title": "Your Transformation Journey",
+    "title": "A journey in 7 steps",
     "steps": [
       {
         "number": "1",
-        "title": "Clarity",
-        "description": "You understand who you truly are with precision."
+        "title": "Begin",
+        "description": "You start with the first test"
       },
       {
         "number": "2",
-        "title": "Awareness",
-        "description": "You understand why you act the way you do."
+        "title": "Advance",
+        "description": "Progress at your own pace"
       },
       {
         "number": "3",
-        "title": "Transformation",
-        "description": "You learn how to change what no longer serves you."
+        "title": "Discover",
+        "description": "Each step reveals a new layer"
+      },
+      {
+        "number": "4",
+        "title": "Connect",
+        "description": "At the end, everything connects"
       }
-    ]
+    ],
+    "closing": "It's not about getting answers right. It's about noticing patterns."
   },
   "what_you_get": {
-    "title": "Inside what you receive",
-    "subtitle": "Everything you get inside NELLO ONE:",
+    "title": "The complete path",
+    "subtitle": "The Nello Journey includes 7 tests organized progressively. Each step deepens the previous one.",
     "items": [
-      "7 professional tests",
-      "Full identity map",
-      "Personalized AI insights",
-      "Practical recommendations",
-      "Continuous growth"
-    ]
+      "Your integrated results",
+      "Complete PDF reports",
+      "A final vision that connects everything revealed"
+    ],
+    "closing": "Everything makes more sense when seen together."
   },
   "miguel": {
-    "title": "Meet Miguel",
+    "title": "You don't walk alone.",
     "subtitle": "Your Inner Guide",
-    "description": "Miguel analyzes your results, identifies core patterns and explains your emotional and behavioral tendencies. With gentle guidance, he walks with you through your entire self-knowledge journey.",
-    "cta": "Talk to Miguel"
+    "description": "Throughout the journey, Miguel accompanies you. He helps interpret your results, connect patterns and open space for more inner clarity.",
+    "quote": "My role is to help you see more clearly.",
+    "note": "Miguel doesn't judge, doesn't label and doesn't decide for you. He just helps you notice.",
+    "cta": "Talk to Miguel",
+    "verse": "\"Above all else, guard your heart, for everything you do flows from it.\"",
+    "verse_ref": "Proverbs 4:23"
   },
   "not_for_you": {
-    "title_not": "Nello One is not for you if:",
+    "title_not": "Not for you if:",
     "items_not": [
-      "You want magical solutions",
-      "You want results without reflection",
-      "You don't want to change internal patterns"
+      "You seek magical solutions",
+      "You want answers without reflection",
+      "You don't want to look at yourself honestly"
     ],
-    "title_for": "Nello One is for you if:",
+    "title_for": "For you if:",
     "items_for": [
-      "You want emotional clarity",
-      "You want practical maturity",
-      "You want real evolution",
-      "You want a safe path to understand who you are"
+      "You want to truly know yourself",
+      "You're open to reflecting on your patterns",
+      "You seek emotional and practical clarity",
+      "You want to go beyond quick answers"
     ]
   },
   "why_matters": {
@@ -196,6 +204,20 @@
     "main_blind_spot": "Your main blind spot",
     "recommended_action": "Your recommended action"
   },
+  "final_result": {
+    "title": "When you reach the end",
+    "description": "After completing all stages, you receive the Essence Code. A clear synthesis of your moment, integrating your journey and pointing paths of growth.",
+    "note": "It's not a report. It's not a label. It's an invitation to clarity.",
+    "verse": "\"Examine yourselves.\"",
+    "verse_ref": "1 Corinthians 11:28"
+  },
+  "inspiration": {
+    "title": "Our inspiration",
+    "description": "Nello One is born inspired by the biblical call to examine the heart and seek a life with more truth and meaning.",
+    "text": "We believe that self-knowledge is not an end in itself, but a path to live with more love, responsibility and openness to God's purpose.",
+    "verse": "\"Seek first the Kingdom of God.\"",
+    "verse_ref": "Matthew 6:33"
+  },
   "faq": {
     "title": "Frequently Asked Questions",
     "items": [
@@ -209,15 +231,15 @@
       },
       {
         "question": "How is Nello One different from other tests?",
-        "answer": "It combines multiple methodologies, behavioral AI and cross-analysis. The result is a deep map that shows who you are — not just a label."
+        "answer": "It combines 7 different methodologies and integrates all results into a unique map. The result is a complete vision that shows who you are, not just an isolated label."
       },
       {
-        "question": "What kind of results can I expect?",
-        "answer": "Clarity about patterns, emotional strength, awareness about decisions and practical direction for growth."
+        "question": "How long does it take to complete?",
+        "answer": "Each test takes 5 to 15 minutes. You can do it at your own pace, one per day or all at once."
       },
       {
-        "question": "Will it work if I feel emotionally lost?",
-        "answer": "Yes. Nello One was created precisely for those who need clarity when everything seems confusing."
+        "question": "What is the Essence Code?",
+        "answer": "It's the final report that integrates all your results. It shows your patterns, strengths and paths of growth in a clear synthesis."
       }
     ]
   },
@@ -278,6 +300,14 @@
       }
     }
   },
+  "simplicity": {
+    "items": [
+      "A path, not a diagnosis",
+      "Clarity, not judgment",
+      "Process, not promise"
+    ],
+    "closing": "The value is in the journey. Not just the result."
+  },
   "pricing": {
     "label": "Investment",
     "title": "Choose your path",
@@ -305,9 +335,9 @@
     "microcopy": "You're already paying the price of confusion. This is where you transform it."
   },
   "cta": {
-    "title": "Start now — discover your archetype in 2 minutes.",
-    "subtitle": "No risk, no commitment. Only clarity.",
-    "button": "Start Now (Free)"
+    "title": "Knowing yourself is a process. Start now.",
+    "subtitle": "No rush. One step at a time.",
+    "button": "Start my journey"
   },
   "footer": {
     "brand": "NELLO ONE",
