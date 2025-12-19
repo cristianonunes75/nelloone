@@ -6,7 +6,9 @@
     "tagline": "Leva poucos minutos para iniciar.",
     "cta_primary": "Começar minha jornada",
     "cta_secondary": "Ver como funciona",
-    "social_proof": ""
+    "social_proof": "",
+    "verse": "\"Sondai me, ó Deus, e conhecei o meu coração.\"",
+    "verse_ref": "Salmo 139,23"
   },
   "mirror": {
     "title": "Talvez você esteja aqui porque sente isso:",
@@ -16,7 +18,9 @@
       "Tem potencial, mas falta clareza",
       "Quer se conhecer melhor, sem rótulos"
     ],
-    "closing": "O Nello One não oferece respostas prontas. Ele oferece um caminho."
+    "closing": "O Nello One não oferece respostas prontas. Ele oferece um caminho.",
+    "verse": "\"Examinemos nossos caminhos, pesquisemo los e voltemos para o Senhor.\"",
+    "verse_ref": "Lamentações 3,40"
   },
   "improvements": {
     "title": "O que você vai descobrir",
@@ -90,10 +94,12 @@
   "miguel": {
     "title": "Você não caminha sozinho.",
     "subtitle": "",
-    "description": "Durante toda a jornada, Miguel te acompanha. Ele interpreta seus resultados, conecta informações e ajuda você a entender o que aparece em cada etapa.",
+    "description": "Durante toda a jornada, Miguel te acompanha. Ele ajuda a interpretar seus resultados, conectar padrões e abrir espaço para mais clareza interior.",
     "quote": "Minha função é ajudar você a enxergar com mais clareza.",
-    "note": "Miguel não julga, não rotula e não decide por você.",
-    "cta": ""
+    "note": "Miguel não julga, não rotula e não decide por você. Ele apenas ajuda você a perceber.",
+    "cta": "",
+    "verse": "\"Com todo cuidado guarda o teu coração, porque dele brotam as fontes da vida.\"",
+    "verse_ref": "Provérbios 4,23"
   },
   "not_for_you": {
     "title_for": "É para você se:",
@@ -184,8 +190,17 @@
   },
   "final_result": {
     "title": "Quando você chega ao fim",
-    "description": "Depois de percorrer todas as etapas, você recebe o Código da Essência. Um relatório final que integra toda a sua jornada e mostra seus principais padrões, forças e direções de amadurecimento.",
-    "note": "Não é um laudo. Não é um rótulo. É uma síntese clara do seu momento."
+    "description": "Depois de percorrer todas as etapas, você recebe o Código da Essência. Uma síntese clara do seu momento, que integra sua jornada e aponta caminhos de amadurecimento.",
+    "note": "Não é um laudo. Não é um rótulo. É um convite à clareza.",
+    "verse": "\"Examine se cada um a si mesmo.\"",
+    "verse_ref": "1 Coríntios 11,28"
+  },
+  "inspiration": {
+    "title": "Nossa inspiração",
+    "description": "O Nello One nasce inspirado no chamado bíblico de examinar o coração e buscar uma vida com mais verdade e sentido.",
+    "text": "Acreditamos que o autoconhecimento não é um fim em si mesmo, mas um caminho para viver com mais amor, responsabilidade e abertura ao propósito de Deus.",
+    "verse": "\"Buscai primeiro o Reino de Deus.\"",
+    "verse_ref": "Mateus 6,33"
   },
   "simplicity": {
     "items": [
