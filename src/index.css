@@ -56,6 +56,11 @@
     --founder-gold: 42 70% 55%; /* Soft Gold #D4A84B */
     --founder-gold-light: 42 80% 70%;
     --founder-gold-deep: 42 60% 40%;
+    
+    /* Scripture - Warm Earth Tones (Espiritualidade) */
+    --scripture: 32 45% 35%; /* Warm brown #8B7355 */
+    --scripture-light: 32 30% 50%;
+    --scripture-glow: 40 50% 92%;
 
     /* Legacy gold support - now using Ink Blue as accent */
     --gold: 216 28% 30%; /* Updated to ink-blue variant */
@@ -174,6 +179,13 @@
     font-family: 'Satoshi', 'Inter', system-ui, sans-serif;
     font-weight: 500;
     font-style: normal;
+  }
+  
+  /* Tipografia para passagens bíblicas */
+  .font-scripture {
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-weight: 500;
+    font-style: italic;
   }
 }
 
