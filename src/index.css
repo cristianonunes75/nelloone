@@ -23,18 +23,23 @@
     --primary-foreground: 40 30% 97%;
     
     /* Nello Gold Palette */
-    --nello-gold: 38 70% 50%; /* #D4A84B */
-    --nello-gold-light: 40 65% 70%; /* Lighter gold */
-    --nello-gold-deep: 36 75% 40%; /* Deeper gold */
-    --nello-gold-glow: 40 50% 92%; /* Subtle glow */
+    --nello-gold: 42 70% 50%; /* HSL 42 70% 50% */
+    --nello-gold-light: 44 65% 70%;
+    --nello-gold-deep: 40 75% 40%;
+    --nello-gold-glow: 42 50% 92%;
+    
+    /* Nello Graphite - CTA Final dark background */
+    --nello-graphite: 25 12% 23%; /* #3D3630 warm graphite */
+    --nello-graphite-light: 25 10% 35%;
+    --nello-graphite-deep: 25 15% 18%;
 
     /* Ink/Text - Warm Brown */
-    --ink-brown: 30 25% 22%; /* Dark warm brown */
-    --ink-deep: 28 20% 18%; /* Deeper variant */
-    --ink-light: 32 15% 45%; /* Lighter variant */
+    --ink-brown: 30 25% 22%;
+    --ink-deep: 28 20% 18%;
+    --ink-light: 32 15% 45%;
 
     /* Miguel - Warm Graphite */
-    --miguel-deep: 30 10% 15%; /* Warm graphite */
+    --miguel-deep: 30 10% 15%;
     --miguel-midnight: 30 8% 10%;
     --miguel-silver: 30 5% 70%;
 
