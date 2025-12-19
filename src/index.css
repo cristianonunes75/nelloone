@@ -138,6 +138,11 @@
     --gold: 210 30% 60%;
     --gold-light: 216 25% 30%;
     --gold-dark: 210 30% 50%;
+    
+    /* Scripture dark mode - Soft warm tones */
+    --scripture: 35 25% 70%; /* Soft cream gold */
+    --scripture-light: 35 20% 55%;
+    --scripture-glow: 35 15% 18%;
 
     --destructive: 0 55% 50%;
     --destructive-foreground: 0 0% 100%;
