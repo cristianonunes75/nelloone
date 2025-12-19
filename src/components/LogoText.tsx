@@ -2,18 +2,19 @@ import { useNavigate } from "react-router-dom";
 
 interface LogoTextProps {
   className?: string;
-  variant?: "default" | "outline" | "solid";
+  variant?: "default" | "light" | "dark" | "solid" | "outline";
   clickable?: boolean;
 }
 
 export const LogoText = ({ className = "", variant = "default", clickable = true }: LogoTextProps) => {
   const navigate = useNavigate();
-  const baseStyles = "font-sans font-semibold tracking-[0.15em] uppercase";
   
   const variantStyles = {
     default: "text-foreground",
+    light: "text-white",
+    dark: "text-ink-brown",
+    solid: "text-ink-deep",
     outline: "text-transparent [-webkit-text-stroke:1.5px_currentColor] stroke-current",
-    solid: "text-ink-blue",
   };
 
   const handleClick = () => {
@@ -25,11 +26,11 @@ export const LogoText = ({ className = "", variant = "default", clickable = true
 
   return (
     <div 
-      className={`${baseStyles} ${variantStyles[variant]} ${clickable ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''} ${className}`}
+      className={`font-heading tracking-[0.08em] uppercase ${variantStyles[variant]} ${clickable ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''} ${className}`}
       onClick={handleClick}
     >
       <span className="font-semibold">NELLO</span>
-      <span className="font-light ml-1 opacity-70">ONE</span>
+      <span className="font-normal ml-1.5 opacity-70">ONE</span>
     </div>
   );
 };

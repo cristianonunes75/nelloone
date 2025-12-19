@@ -15,11 +15,11 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Crimson Pro', 'Georgia', 'serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
-        premium: ['Satoshi', 'Inter', 'system-ui', 'sans-serif'],
-        miguel: ['Satoshi', 'Inter', 'system-ui', 'sans-serif'],
-        heading: ['Montserrat Alternates', 'Inter', 'system-ui', 'sans-serif'],
+        premium: ['Crimson Pro', 'Georgia', 'serif'],
+        miguel: ['Crimson Pro', 'Georgia', 'serif'],
+        heading: ['Crimson Pro', 'Georgia', 'serif'],
         scripture: ['Crimson Pro', 'Georgia', 'serif'],
       },
       fontSize: {
@@ -33,7 +33,7 @@ export default {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
-        "background-cloud": "hsl(var(--background-cloud))",
+        "background-warm": "hsl(var(--background-warm))",
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
@@ -55,24 +55,26 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
-        // NELLO ONE Colors
+        // NELLO Family Colors
+        nello: {
+          gold: "hsl(var(--nello-gold))",
+          "gold-light": "hsl(var(--nello-gold-light))",
+          "gold-deep": "hsl(var(--nello-gold-deep))",
+          "gold-glow": "hsl(var(--nello-gold-glow))",
+        },
         ink: {
-          DEFAULT: "hsl(var(--ink-blue))",
-          blue: "hsl(var(--ink-blue))",
+          DEFAULT: "hsl(var(--ink-brown))",
+          brown: "hsl(var(--ink-brown))",
           deep: "hsl(var(--ink-deep))",
           light: "hsl(var(--ink-light))",
         },
         bruma: {
-          DEFAULT: "hsl(var(--bruma-blue))",
-          blue: "hsl(var(--bruma-blue))",
+          DEFAULT: "hsl(var(--bruma-warm))",
+          warm: "hsl(var(--bruma-warm))",
           light: "hsl(var(--bruma-light))",
           deep: "hsl(var(--bruma-deep))",
         },
-        lavender: {
-          DEFAULT: "hsl(var(--lavender))",
-          deep: "hsl(var(--lavender-deep))",
-        },
-        // Legacy support - maps to new colors
+        // Legacy support - maps to new gold colors
         gold: {
           DEFAULT: "hsl(var(--gold))",
           light: "hsl(var(--gold-light))",
@@ -84,7 +86,7 @@ export default {
           silver: "hsl(var(--miguel-silver))",
         },
         soul: {
-          sand: "hsl(var(--bruma-blue))",
+          sand: "hsl(var(--bruma-warm))",
           amber: "hsl(var(--bruma-deep))",
           light: "hsl(var(--bruma-light))",
         },

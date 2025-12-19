@@ -23,10 +23,10 @@ const ScriptureVerse = ({
   if (variant === "hero") {
     return (
       <div className="pt-2 space-y-2 px-4 sm:px-0">
-        <p className="font-scripture text-lg sm:text-xl md:text-2xl text-white/95 tracking-wide leading-relaxed">
+        <p className="font-scripture text-lg sm:text-xl md:text-2xl text-nello-gold tracking-wide leading-relaxed">
           {verse}
         </p>
-        <p className="text-xs sm:text-sm text-white/70 font-medium tracking-wider uppercase">
+        <p className="text-xs sm:text-sm text-muted-foreground font-medium tracking-wider uppercase">
           {reference}
         </p>
       </div>
@@ -36,11 +36,11 @@ const ScriptureVerse = ({
   if (variant === "card") {
     return (
       <div className="text-center pt-4 sm:pt-6 pb-2 px-2 sm:px-0">
-        <div className="inline-block px-4 sm:px-6 py-3 sm:py-4 bg-amber-50/50 dark:bg-stone-800/40 rounded-xl border border-amber-200/30 dark:border-stone-600/30 max-w-full">
-          <p className="font-scripture text-base sm:text-lg md:text-xl text-amber-900/90 dark:text-stone-200/90 tracking-wide leading-relaxed">
+        <div className="inline-block px-4 sm:px-6 py-3 sm:py-4 bg-nello-gold-glow rounded-xl border border-nello-gold/20 max-w-full">
+          <p className="font-scripture text-base sm:text-lg md:text-xl text-foreground/90 tracking-wide leading-relaxed">
             {verse}
           </p>
-          <p className="text-[10px] sm:text-xs text-amber-700/70 dark:text-stone-400/80 font-semibold tracking-widest uppercase mt-2">
+          <p className="text-[10px] sm:text-xs text-nello-gold font-semibold tracking-widest uppercase mt-2">
             {reference}
           </p>
         </div>
@@ -49,11 +49,11 @@ const ScriptureVerse = ({
   }
 
   return (
-    <div className="text-center pt-4 sm:pt-6 border-t border-amber-200/40 dark:border-stone-700/40 px-2 sm:px-0">
-      <p className="font-scripture text-base sm:text-lg md:text-xl text-amber-800/90 dark:text-stone-300/90 tracking-wide leading-relaxed">
+    <div className="text-center pt-4 sm:pt-6 border-t border-nello-gold/20 px-2 sm:px-0">
+      <p className="font-scripture text-base sm:text-lg md:text-xl text-foreground/85 tracking-wide leading-relaxed">
         {verse}
       </p>
-      <p className="text-[10px] sm:text-xs text-amber-600/70 dark:text-stone-500/80 font-semibold tracking-widest uppercase mt-2">
+      <p className="text-[10px] sm:text-xs text-nello-gold font-semibold tracking-widest uppercase mt-2">
         {reference}
       </p>
     </div>
@@ -70,21 +70,30 @@ export const ValidationLanding = () => {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col bg-background">
       {/* SEÇÃO 1 - HERO */}
       <section 
-        className="min-h-[85vh] sm:min-h-[90vh] flex items-center justify-center px-4 sm:px-6 py-16 sm:py-20 relative"
-        style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${heroDawn})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 30%'
-        }}
+        className="min-h-[85vh] sm:min-h-[90vh] flex items-center justify-center px-4 sm:px-6 py-16 sm:py-20 relative bg-background-warm"
       >
+        {/* Warm golden glow */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-nello-gold/8 rounded-full blur-3xl" />
+        
+        {/* Background image with warm overlay */}
+        <div 
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `url(${heroDawn})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 30%'
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background-warm/95 via-background-warm/85 to-background" />
+        
         <div className="max-w-3xl mx-auto text-center space-y-6 sm:space-y-8 relative z-10">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight px-2">
+          <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground leading-tight px-2">
             {landing.hero.title}
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed px-4">
+          <p className="font-body text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed px-4">
             {landing.hero.subtitle}
           </p>
           
@@ -100,12 +109,12 @@ export const ValidationLanding = () => {
             <Button 
               onClick={handleCTA}
               size="lg" 
-              className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-white text-foreground hover:bg-white/90 shadow-lg"
+              className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg hover:shadow-gold font-sans-ui font-medium"
             >
               {landing.hero.cta_primary}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <p className="text-xs sm:text-sm text-white/70">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               {landing.hero.tagline}
             </p>
           </div>
@@ -153,48 +162,48 @@ export const ValidationLanding = () => {
       {/* SEÇÃO 3 - COMO FUNCIONA */}
       <section className="py-20 px-6 bg-background">
         <div className="max-w-3xl mx-auto space-y-10">
-          <h2 className="text-2xl md:text-3xl font-semibold text-foreground text-center">
+          <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground text-center">
             {landing.transformation.title}
           </h2>
           <div className="grid gap-6">
             {landing.transformation.steps.map((step, index) => (
               <div 
                 key={index}
-                className="flex items-center gap-6 p-5 bg-muted/50 rounded-xl"
+                className="flex items-center gap-6 p-5 bg-secondary/50 rounded-xl border border-border/30"
               >
-                <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
+                <div className="w-10 h-10 rounded-full bg-nello-gold/10 text-nello-gold flex items-center justify-center font-bold shrink-0 font-body">
                   {step.number}
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">{step.title}</p>
-                  <p className="text-muted-foreground text-sm">{step.description}</p>
+                  <p className="font-medium text-foreground font-body">{step.title}</p>
+                  <p className="text-muted-foreground text-sm font-body">{step.description}</p>
                 </div>
               </div>
             ))}
           </div>
-          <p className="text-center text-muted-foreground italic">
+          <p className="text-center text-muted-foreground italic font-body">
             {(landing.transformation as any).closing}
           </p>
         </div>
       </section>
 
       {/* SEÇÃO 4 - O QUE VOCÊ VAI DESCOBRIR */}
-      <section className="py-20 px-6 bg-muted/30">
+      <section className="py-20 px-6 bg-secondary/30">
         <div className="max-w-3xl mx-auto space-y-10">
-          <h2 className="text-2xl md:text-3xl font-semibold text-foreground text-center">
+          <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground text-center">
             {landing.improvements.title}
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
             {landing.improvements.items.map((item, index) => (
-              <Card key={index} className="border-border/50">
+              <Card key={index} className="border-border/30 bg-card/80">
                 <CardContent className="p-5 flex items-start gap-3">
-                  <Sparkles className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <p className="text-foreground/90">{item}</p>
+                  <Sparkles className="h-5 w-5 text-nello-gold shrink-0 mt-0.5" />
+                  <p className="text-foreground/90 font-body">{item}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
-          <p className="text-center text-muted-foreground italic pt-4">
+          <p className="text-center text-muted-foreground italic pt-4 font-body">
             {landing.improvements.closing}
           </p>
         </div>
@@ -203,32 +212,32 @@ export const ValidationLanding = () => {
       {/* SEÇÃO 5 - O PAPEL DO MIGUEL */}
       <section className="py-14 sm:py-20 px-4 sm:px-6 bg-background">
         <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8">
-          <div className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4 shadow-lg">
+          <div className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4 shadow-md">
             <img 
               src={pathTogether} 
               alt="Caminho" 
               className="w-full h-40 sm:h-48 object-cover object-center" 
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
           </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-foreground text-center">
+          <h2 className="font-heading text-xl sm:text-2xl md:text-3xl font-semibold text-foreground text-center">
             {landing.miguel.title}
           </h2>
-          <div className="bg-muted/50 rounded-xl sm:rounded-2xl p-5 sm:p-8 space-y-5 sm:space-y-6">
+          <div className="bg-secondary/40 rounded-xl sm:rounded-2xl p-5 sm:p-8 space-y-5 sm:space-y-6 border border-border/30">
             <div className="flex items-center gap-4 justify-center">
               <img 
                 src={miguelPresence} 
                 alt="Miguel" 
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-primary/20 shadow-md"
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-nello-gold/30 shadow-md"
               />
             </div>
-            <p className="text-center text-foreground/90 text-base sm:text-lg px-2">
+            <p className="text-center text-foreground/90 text-base sm:text-lg px-2 font-body">
               {landing.miguel.description}
             </p>
-            <blockquote className="text-center text-primary italic text-base sm:text-lg border-l-4 border-primary pl-4 mx-auto max-w-md">
+            <blockquote className="text-center text-nello-gold italic text-base sm:text-lg border-l-4 border-nello-gold pl-4 mx-auto max-w-md font-scripture">
               "{(landing.miguel as any).quote}"
             </blockquote>
-            <p className="text-center text-muted-foreground text-xs sm:text-sm px-2">
+            <p className="text-center text-muted-foreground text-xs sm:text-sm px-2 font-body">
               {(landing.miguel as any).note}
             </p>
             
@@ -380,27 +389,20 @@ export const ValidationLanding = () => {
       </section>
 
       {/* SEÇÃO 12 - CTA FINAL */}
-      <section 
-        className="py-16 sm:py-24 px-4 sm:px-6 relative"
-        style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${horizonSunrise})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 40%'
-        }}
-      >
+      <section className="py-16 sm:py-24 px-4 sm:px-6 relative bg-ink-deep">
         <div className="max-w-2xl mx-auto text-center space-y-6 sm:space-y-8 relative z-10">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-white px-4">
+          <h2 className="font-heading text-xl sm:text-2xl md:text-3xl font-semibold text-white px-4">
             {landing.cta.title}
           </h2>
           <Button 
             onClick={handleCTA}
             size="lg"
-            className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-white text-foreground hover:bg-white/90 shadow-lg"
+            className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg hover:shadow-gold font-sans-ui font-medium"
           >
             {landing.cta.button}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
-          <p className="text-white/70 text-xs sm:text-sm px-4">
+          <p className="text-white/70 text-xs sm:text-sm px-4 font-body">
             {landing.cta.subtitle}
           </p>
         </div>

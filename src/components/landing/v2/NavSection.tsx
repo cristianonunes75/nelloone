@@ -86,7 +86,7 @@ export const NavSection = () => {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-400",
         isScrolled 
-          ? "bg-background/90 backdrop-blur-xl border-b border-border/30 shadow-soft"
+          ? "bg-background/95 backdrop-blur-xl border-b border-border/40 shadow-soft"
           : "bg-transparent"
       )}
     >
@@ -94,7 +94,7 @@ export const NavSection = () => {
         <nav className="flex items-center justify-between h-14 md:h-16">
           {/* Logo */}
           <button onClick={() => navigate(getHomePath())} className="focus:outline-none">
-            <LogoText className="text-lg md:text-xl" variant="solid" />
+            <LogoText className="text-lg md:text-xl" variant={isScrolled ? "dark" : "default"} />
           </button>
 
           {/* Desktop nav */}
