@@ -10,11 +10,26 @@ export const LogoText = ({ className = "", variant = "default", clickable = true
   const navigate = useNavigate();
   
   const variantStyles = {
-    default: "text-foreground",
-    light: "text-white",
-    dark: "text-ink-brown",
-    solid: "text-ink-deep",
-    outline: "text-transparent [-webkit-text-stroke:1.5px_currentColor] stroke-current",
+    default: {
+      nello: "text-foreground",
+      one: "text-muted-foreground"
+    },
+    light: {
+      nello: "text-white",
+      one: "text-white/60"
+    },
+    dark: {
+      nello: "text-ink-deep",
+      one: "text-ink-light"
+    },
+    solid: {
+      nello: "text-ink-deep",
+      one: "text-ink-light"
+    },
+    outline: {
+      nello: "text-transparent [-webkit-text-stroke:1.5px_currentColor]",
+      one: "text-transparent [-webkit-text-stroke:1px_currentColor] opacity-60"
+    },
   };
 
   const handleClick = () => {
@@ -24,13 +39,15 @@ export const LogoText = ({ className = "", variant = "default", clickable = true
     }
   };
 
+  const styles = variantStyles[variant];
+
   return (
     <div 
-      className={`font-heading tracking-[0.08em] uppercase ${variantStyles[variant]} ${clickable ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''} ${className}`}
+      className={`font-sans tracking-wide ${clickable ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''} ${className}`}
       onClick={handleClick}
     >
-      <span className="font-semibold">NELLO</span>
-      <span className="font-normal ml-1.5 opacity-70">ONE</span>
+      <span className={`font-bold ${styles.nello}`}>NELLO</span>
+      <span className={`font-normal ml-1 ${styles.one}`}>ONE</span>
     </div>
   );
 };
