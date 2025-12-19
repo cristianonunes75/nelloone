@@ -22,11 +22,11 @@ const ScriptureVerse = ({
 }) => {
   if (variant === "hero") {
     return (
-      <div className="pt-2 space-y-1">
-        <p className="font-scripture text-xl md:text-2xl text-white/95 tracking-wide">
+      <div className="pt-2 space-y-2 px-4 sm:px-0">
+        <p className="font-scripture text-lg sm:text-xl md:text-2xl text-white/95 tracking-wide leading-relaxed">
           {verse}
         </p>
-        <p className="text-sm text-white/70 font-medium tracking-wider uppercase">
+        <p className="text-xs sm:text-sm text-white/70 font-medium tracking-wider uppercase">
           {reference}
         </p>
       </div>
@@ -35,12 +35,12 @@ const ScriptureVerse = ({
 
   if (variant === "card") {
     return (
-      <div className="text-center pt-6 pb-2">
-        <div className="inline-block px-6 py-4 bg-amber-50/50 dark:bg-stone-800/40 rounded-xl border border-amber-200/30 dark:border-stone-600/30">
-          <p className="font-scripture text-lg md:text-xl text-amber-900/90 dark:text-stone-200/90 tracking-wide leading-relaxed">
+      <div className="text-center pt-4 sm:pt-6 pb-2 px-2 sm:px-0">
+        <div className="inline-block px-4 sm:px-6 py-3 sm:py-4 bg-amber-50/50 dark:bg-stone-800/40 rounded-xl border border-amber-200/30 dark:border-stone-600/30 max-w-full">
+          <p className="font-scripture text-base sm:text-lg md:text-xl text-amber-900/90 dark:text-stone-200/90 tracking-wide leading-relaxed">
             {verse}
           </p>
-          <p className="text-xs text-amber-700/70 dark:text-stone-400/80 font-semibold tracking-widest uppercase mt-2">
+          <p className="text-[10px] sm:text-xs text-amber-700/70 dark:text-stone-400/80 font-semibold tracking-widest uppercase mt-2">
             {reference}
           </p>
         </div>
@@ -49,11 +49,11 @@ const ScriptureVerse = ({
   }
 
   return (
-    <div className="text-center pt-6 border-t border-amber-200/40 dark:border-stone-700/40">
-      <p className="font-scripture text-lg md:text-xl text-amber-800/90 dark:text-stone-300/90 tracking-wide leading-relaxed">
+    <div className="text-center pt-4 sm:pt-6 border-t border-amber-200/40 dark:border-stone-700/40 px-2 sm:px-0">
+      <p className="font-scripture text-base sm:text-lg md:text-xl text-amber-800/90 dark:text-stone-300/90 tracking-wide leading-relaxed">
         {verse}
       </p>
-      <p className="text-xs text-amber-600/70 dark:text-stone-500/80 font-semibold tracking-widest uppercase mt-2">
+      <p className="text-[10px] sm:text-xs text-amber-600/70 dark:text-stone-500/80 font-semibold tracking-widest uppercase mt-2">
         {reference}
       </p>
     </div>
@@ -73,18 +73,18 @@ export const ValidationLanding = () => {
     <div className="flex flex-col">
       {/* SEÇÃO 1 - HERO */}
       <section 
-        className="min-h-[90vh] flex items-center justify-center px-6 py-20 relative"
+        className="min-h-[85vh] sm:min-h-[90vh] flex items-center justify-center px-4 sm:px-6 py-16 sm:py-20 relative"
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.55)), url(${heroDawn})`,
+          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${heroDawn})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center'
+          backgroundPosition: 'center 30%'
         }}
       >
-        <div className="max-w-3xl mx-auto text-center space-y-8 relative z-10">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+        <div className="max-w-3xl mx-auto text-center space-y-6 sm:space-y-8 relative z-10">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight px-2">
             {landing.hero.title}
           </h1>
-          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed px-4">
             {landing.hero.subtitle}
           </p>
           
@@ -96,16 +96,16 @@ export const ValidationLanding = () => {
             />
           )}
           
-          <div className="pt-6 space-y-4">
+          <div className="pt-4 sm:pt-6 space-y-3 sm:space-y-4">
             <Button 
               onClick={handleCTA}
               size="lg" 
-              className="text-lg px-10 py-6 rounded-full bg-white text-foreground hover:bg-white/90 shadow-lg"
+              className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-white text-foreground hover:bg-white/90 shadow-lg"
             >
               {landing.hero.cta_primary}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <p className="text-sm text-white/70">
+            <p className="text-xs sm:text-sm text-white/70">
               {landing.hero.tagline}
             </p>
           </div>
@@ -113,27 +113,31 @@ export const ValidationLanding = () => {
       </section>
 
       {/* SEÇÃO 2 - IDENTIFICAÇÃO */}
-      <section className="py-20 px-6 bg-muted/30">
-        <div className="max-w-4xl mx-auto space-y-10">
-          <div className="relative rounded-2xl overflow-hidden mb-8 shadow-lg">
-            <img src={reflectionWindow} alt="Reflexão" className="w-full h-64 object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
+      <section className="py-14 sm:py-20 px-4 sm:px-6 bg-muted/30">
+        <div className="max-w-4xl mx-auto space-y-8 sm:space-y-10">
+          <div className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-6 sm:mb-8 shadow-lg">
+            <img 
+              src={reflectionWindow} 
+              alt="Reflexão" 
+              className="w-full h-48 sm:h-56 md:h-64 object-cover object-center" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
           </div>
-          <h2 className="text-2xl md:text-3xl font-semibold text-foreground text-center">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-foreground text-center px-2">
             {landing.mirror.title}
           </h2>
-          <div className="grid gap-4">
+          <div className="grid gap-3 sm:gap-4">
             {landing.mirror.items.map((item, index) => (
               <div 
                 key={index}
-                className="flex items-start gap-4 p-4 bg-background rounded-lg border border-border/50"
+                className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-background rounded-lg border border-border/50"
               >
                 <div className="w-2 h-2 rounded-full bg-primary mt-2 shrink-0" />
-                <p className="text-foreground/90">{item}</p>
+                <p className="text-sm sm:text-base text-foreground/90">{item}</p>
               </div>
             ))}
           </div>
-          <p className="text-center text-muted-foreground italic pt-4">
+          <p className="text-center text-muted-foreground italic pt-2 sm:pt-4 text-sm sm:text-base px-2">
             {landing.mirror.closing}
           </p>
           
@@ -197,30 +201,34 @@ export const ValidationLanding = () => {
       </section>
 
       {/* SEÇÃO 5 - O PAPEL DO MIGUEL */}
-      <section className="py-20 px-6 bg-background">
-        <div className="max-w-3xl mx-auto space-y-8">
-          <div className="relative rounded-2xl overflow-hidden mb-4 shadow-lg">
-            <img src={pathTogether} alt="Caminho" className="w-full h-48 object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
+      <section className="py-14 sm:py-20 px-4 sm:px-6 bg-background">
+        <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8">
+          <div className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4 shadow-lg">
+            <img 
+              src={pathTogether} 
+              alt="Caminho" 
+              className="w-full h-40 sm:h-48 object-cover object-center" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
           </div>
-          <h2 className="text-2xl md:text-3xl font-semibold text-foreground text-center">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-foreground text-center">
             {landing.miguel.title}
           </h2>
-          <div className="bg-muted/50 rounded-2xl p-8 space-y-6">
+          <div className="bg-muted/50 rounded-xl sm:rounded-2xl p-5 sm:p-8 space-y-5 sm:space-y-6">
             <div className="flex items-center gap-4 justify-center">
               <img 
                 src={miguelPresence} 
                 alt="Miguel" 
-                className="w-20 h-20 rounded-full object-cover border-2 border-primary/20 shadow-md"
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-primary/20 shadow-md"
               />
             </div>
-            <p className="text-center text-foreground/90 text-lg">
+            <p className="text-center text-foreground/90 text-base sm:text-lg px-2">
               {landing.miguel.description}
             </p>
-            <blockquote className="text-center text-primary italic text-lg border-l-4 border-primary pl-4 mx-auto max-w-md">
+            <blockquote className="text-center text-primary italic text-base sm:text-lg border-l-4 border-primary pl-4 mx-auto max-w-md">
               "{(landing.miguel as any).quote}"
             </blockquote>
-            <p className="text-center text-muted-foreground text-sm">
+            <p className="text-center text-muted-foreground text-xs sm:text-sm px-2">
               {(landing.miguel as any).note}
             </p>
             
@@ -344,25 +352,25 @@ export const ValidationLanding = () => {
       </section>
 
       {/* SEÇÃO 11 - NOSSA INSPIRAÇÃO */}
-      <section className="py-20 px-6 bg-gradient-to-b from-amber-50/30 to-muted/30 dark:from-stone-900/30 dark:to-muted/30">
-        <div className="max-w-3xl mx-auto space-y-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
+      <section className="py-14 sm:py-20 px-4 sm:px-6 bg-gradient-to-b from-amber-50/30 to-muted/30 dark:from-stone-900/30 dark:to-muted/30">
+        <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8 text-center">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-foreground px-2">
             {(landing as any).inspiration?.title || "Nossa inspiração"}
           </h2>
-          <p className="text-foreground/90 text-lg">
+          <p className="text-foreground/90 text-base sm:text-lg px-2">
             {(landing as any).inspiration?.description}
           </p>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm sm:text-base px-2">
             {(landing as any).inspiration?.text}
           </p>
           
           {(landing as any).inspiration?.verse && (
-            <div className="pt-6">
-              <div className="inline-block px-8 py-6 bg-amber-50/70 dark:bg-stone-800/50 rounded-2xl border border-amber-200/50 dark:border-stone-600/40 shadow-sm">
-                <p className="font-scripture text-xl md:text-2xl text-amber-900/90 dark:text-stone-200/95 tracking-wide leading-relaxed">
+            <div className="pt-4 sm:pt-6 px-2">
+              <div className="inline-block px-5 sm:px-8 py-5 sm:py-6 bg-amber-50/70 dark:bg-stone-800/50 rounded-xl sm:rounded-2xl border border-amber-200/50 dark:border-stone-600/40 shadow-sm max-w-full">
+                <p className="font-scripture text-lg sm:text-xl md:text-2xl text-amber-900/90 dark:text-stone-200/95 tracking-wide leading-relaxed">
                   {(landing as any).inspiration?.verse}
                 </p>
-                <p className="text-sm text-amber-700/70 dark:text-stone-400/80 font-semibold tracking-widest uppercase mt-3">
+                <p className="text-xs sm:text-sm text-amber-700/70 dark:text-stone-400/80 font-semibold tracking-widest uppercase mt-2 sm:mt-3">
                   {(landing as any).inspiration?.verse_ref}
                 </p>
               </div>
@@ -373,26 +381,26 @@ export const ValidationLanding = () => {
 
       {/* SEÇÃO 12 - CTA FINAL */}
       <section 
-        className="py-24 px-6 relative"
+        className="py-16 sm:py-24 px-4 sm:px-6 relative"
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url(${horizonSunrise})`,
+          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${horizonSunrise})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center'
+          backgroundPosition: 'center 40%'
         }}
       >
-        <div className="max-w-2xl mx-auto text-center space-y-8 relative z-10">
-          <h2 className="text-2xl md:text-3xl font-semibold text-white">
+        <div className="max-w-2xl mx-auto text-center space-y-6 sm:space-y-8 relative z-10">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-white px-4">
             {landing.cta.title}
           </h2>
           <Button 
             onClick={handleCTA}
             size="lg"
-            className="text-lg px-10 py-6 rounded-full bg-white text-foreground hover:bg-white/90 shadow-lg"
+            className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-white text-foreground hover:bg-white/90 shadow-lg"
           >
             {landing.cta.button}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
-          <p className="text-white/70 text-sm">
+          <p className="text-white/70 text-xs sm:text-sm px-4">
             {landing.cta.subtitle}
           </p>
         </div>
