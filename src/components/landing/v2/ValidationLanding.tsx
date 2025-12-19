@@ -36,11 +36,11 @@ const ScriptureVerse = ({
   if (variant === "card") {
     return (
       <div className="text-center pt-6 pb-2">
-        <div className="inline-block px-6 py-4 bg-amber-50/50 dark:bg-amber-900/10 rounded-xl border border-amber-200/30 dark:border-amber-700/20">
-          <p className="font-scripture text-lg md:text-xl text-amber-900/90 dark:text-amber-100/90 tracking-wide leading-relaxed">
+        <div className="inline-block px-6 py-4 bg-amber-50/50 dark:bg-stone-800/40 rounded-xl border border-amber-200/30 dark:border-stone-600/30">
+          <p className="font-scripture text-lg md:text-xl text-amber-900/90 dark:text-stone-200/90 tracking-wide leading-relaxed">
             {verse}
           </p>
-          <p className="text-xs text-amber-700/70 dark:text-amber-300/60 font-semibold tracking-widest uppercase mt-2">
+          <p className="text-xs text-amber-700/70 dark:text-stone-400/80 font-semibold tracking-widest uppercase mt-2">
             {reference}
           </p>
         </div>
@@ -49,11 +49,11 @@ const ScriptureVerse = ({
   }
 
   return (
-    <div className="text-center pt-6 border-t border-amber-200/40 dark:border-amber-800/20">
-      <p className="font-scripture text-lg md:text-xl text-amber-800/90 dark:text-amber-200/80 tracking-wide leading-relaxed">
+    <div className="text-center pt-6 border-t border-amber-200/40 dark:border-stone-700/40">
+      <p className="font-scripture text-lg md:text-xl text-amber-800/90 dark:text-stone-300/90 tracking-wide leading-relaxed">
         {verse}
       </p>
-      <p className="text-xs text-amber-600/70 dark:text-amber-400/60 font-semibold tracking-widest uppercase mt-2">
+      <p className="text-xs text-amber-600/70 dark:text-stone-500/80 font-semibold tracking-widest uppercase mt-2">
         {reference}
       </p>
     </div>
@@ -344,7 +344,7 @@ export const ValidationLanding = () => {
       </section>
 
       {/* SEÇÃO 11 - NOSSA INSPIRAÇÃO */}
-      <section className="py-20 px-6 bg-gradient-to-b from-amber-50/30 to-muted/30 dark:from-amber-900/5 dark:to-muted/30">
+      <section className="py-20 px-6 bg-gradient-to-b from-amber-50/30 to-muted/30 dark:from-stone-900/30 dark:to-muted/30">
         <div className="max-w-3xl mx-auto space-y-8 text-center">
           <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
             {(landing as any).inspiration?.title || "Nossa inspiração"}
@@ -358,11 +358,11 @@ export const ValidationLanding = () => {
           
           {(landing as any).inspiration?.verse && (
             <div className="pt-6">
-              <div className="inline-block px-8 py-6 bg-amber-50/70 dark:bg-amber-900/20 rounded-2xl border border-amber-200/50 dark:border-amber-700/30 shadow-sm">
-                <p className="font-scripture text-xl md:text-2xl text-amber-900/90 dark:text-amber-100/90 tracking-wide leading-relaxed">
+              <div className="inline-block px-8 py-6 bg-amber-50/70 dark:bg-stone-800/50 rounded-2xl border border-amber-200/50 dark:border-stone-600/40 shadow-sm">
+                <p className="font-scripture text-xl md:text-2xl text-amber-900/90 dark:text-stone-200/95 tracking-wide leading-relaxed">
                   {(landing as any).inspiration?.verse}
                 </p>
-                <p className="text-sm text-amber-700/70 dark:text-amber-300/60 font-semibold tracking-widest uppercase mt-3">
+                <p className="text-sm text-amber-700/70 dark:text-stone-400/80 font-semibold tracking-widest uppercase mt-3">
                   {(landing as any).inspiration?.verse_ref}
                 </p>
               </div>
