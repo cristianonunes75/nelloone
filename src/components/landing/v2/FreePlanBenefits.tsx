@@ -11,15 +11,16 @@ export const FreePlanBenefits = ({ variant = "light" }: FreePlanBenefitsProps) =
     "Cancele quando quiser"
   ];
 
-  const textColor = variant === "dark" ? "text-white/70" : "text-foreground/60";
-  const checkColor = variant === "dark" ? "text-nello-gold" : "text-nello-gold";
+  const textColor = variant === "dark" ? "text-white/80" : "text-foreground/90";
+  const checkColor = "text-nello-gold";
+  const bgColor = variant === "dark" ? "bg-white/10 backdrop-blur-sm" : "bg-background/80 backdrop-blur-sm";
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+    <div className={`flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 py-3 rounded-full ${bgColor}`}>
       {benefits.map((benefit, index) => (
         <div key={index} className="flex items-center gap-1.5">
-          <Check className={`w-4 h-4 ${checkColor}`} strokeWidth={2} />
-          <span className={`text-sm ${textColor}`}>{benefit}</span>
+          <Check className={`w-4 h-4 ${checkColor}`} strokeWidth={2.5} />
+          <span className={`text-sm font-medium ${textColor}`}>{benefit}</span>
         </div>
       ))}
     </div>
