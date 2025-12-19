@@ -471,8 +471,8 @@ export const NelloOneLanding = () => {
           </p>
           
           <a 
-            href="https://nellolife.com" 
-            target="_blank" 
+            href="https://auroradigital.lovable.app" 
+            target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-foreground hover:text-nello-gold transition-colors group"
           >
