@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -17,46 +17,44 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-[90vh] md:min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 gradient-nello" />
+    <section className="relative min-h-[90vh] md:min-h-screen flex items-center justify-center overflow-hidden bg-background">
+      {/* Warm gradient background */}
+      <div className="absolute inset-0 gradient-warm" />
       
-      {/* Subtle glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] gradient-glow opacity-30 subtle-pulse" />
+      {/* Subtle golden glow */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[400px] h-[400px] md:w-[700px] md:h-[700px] bg-nello-gold/5 rounded-full blur-3xl subtle-pulse" />
       
-      {/* Portal circles */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] md:w-[700px] md:h-[700px] border border-bruma-deep/15 rounded-full opacity-20" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] md:w-[500px] md:h-[500px] border border-bruma-deep/10 rounded-full opacity-15" />
+      {/* Light decorative circles */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] md:w-[700px] md:h-[700px] border border-nello-gold/10 rounded-full opacity-30" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] md:w-[500px] md:h-[500px] border border-nello-gold/8 rounded-full opacity-20" />
       
       <div ref={ref} className="container relative z-10 px-4 md:px-6 py-20 md:py-32">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Brand name */}
+          {/* Small decorative icon */}
           <div 
             className={cn(
-              "mb-8 md:mb-10 transition-all duration-700",
+              "mb-6 md:mb-8 flex justify-center transition-all duration-700",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            <span className="font-display text-xs md:text-sm tracking-[0.4em] uppercase text-ink-light/80">
-              {t.landing.hero.title}
-            </span>
+            <Sparkles className="w-6 h-6 text-nello-gold" strokeWidth={1.5} />
           </div>
 
-          {/* Main headline - 60-72px desktop, 36-42px mobile */}
+          {/* Main headline - Serif editorial */}
           <h1 
             className={cn(
-              "font-display text-[2.25rem] leading-[1.1] sm:text-5xl md:text-6xl lg:text-[4.5rem] text-foreground mb-6 md:mb-8 transition-all duration-700 delay-100",
+              "font-heading text-[2.5rem] leading-[1.1] sm:text-5xl md:text-6xl lg:text-[4.5rem] text-foreground mb-6 md:mb-8 transition-all duration-700 delay-100",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
             <span className="block">{t.landing.hero.subtitle.split('.')[0]}.</span>
-            <span className="block text-ink-blue">{t.landing.hero.subtitle.split('.')[1]?.trim()}.</span>
+            <span className="block text-nello-gold">{t.landing.hero.subtitle.split('.')[1]?.trim()}.</span>
           </h1>
 
-          {/* Subheadline - 22-26px */}
+          {/* Subheadline */}
           <p 
             className={cn(
-              "font-body text-lg md:text-[1.375rem] lg:text-2xl text-muted-foreground max-w-3xl mx-auto mb-5 md:mb-6 leading-relaxed transition-all duration-700 delay-200",
+              "font-body text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto mb-5 md:mb-6 leading-relaxed transition-all duration-700 delay-200",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
@@ -73,7 +71,7 @@ export const HeroSection = () => {
             {t.landing.hero.tagline}
           </p>
 
-          {/* CTA Button - Large */}
+          {/* CTA Button - Golden warm */}
           <div 
             className={cn(
               "flex flex-col items-center justify-center gap-4 px-4 md:px-0 transition-all duration-700 delay-400",
@@ -82,7 +80,7 @@ export const HeroSection = () => {
           >
             <Button 
               size="lg" 
-              className="group w-full sm:w-auto h-14 md:h-16 px-10 md:px-12 text-base md:text-lg rounded-full bg-ink-blue hover:bg-ink-deep text-primary-foreground shadow-lg hover:shadow-xl hover-lift press-effect"
+              className="group w-full sm:w-auto h-14 md:h-16 px-10 md:px-12 text-base md:text-lg rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg hover:shadow-gold hover-lift press-effect font-sans-ui font-medium"
               onClick={() => navigate(getAuthPath())}
             >
               {t.landing.hero.cta_primary}
@@ -93,7 +91,7 @@ export const HeroSection = () => {
           {/* Social proof */}
           <p 
             className={cn(
-              "mt-10 md:mt-12 text-xs md:text-sm text-muted-foreground/80 transition-all duration-700 delay-500",
+              "mt-10 md:mt-12 text-xs md:text-sm text-muted-foreground/80 font-body transition-all duration-700 delay-500",
               isVisible ? "opacity-100" : "opacity-0"
             )}
           >

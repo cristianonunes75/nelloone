@@ -2,163 +2,170 @@
 @tailwind components;
 @tailwind utilities;
 
-/* NELLO ONE Design System - Apple + Calm + Modern Premium Minimalism */
+/* NELLO ONE Design System - Editorial, Luminoso, Espiritual */
+/* Família Nello: Visual cristão, quente e acolhedor */
 
 @layer base {
   :root {
-    /* Primary - Snow White (Clareza) */
-    --background: 0 0% 100%; /* White Snow #FFFFFF */
-    --background-cloud: 210 20% 97%; /* Bruma Blue Light #F8FAFC */
-    --foreground: 216 28% 20%; /* Ink Blue #1F2E4B */
+    /* Background - Warm Cream (Luz e Acolhimento) */
+    --background: 40 30% 97%; /* Cream warm #FAF8F5 */
+    --background-warm: 38 35% 95%; /* Warmer variant #F7F3ED */
+    --foreground: 30 15% 25%; /* Warm brown-gray #463F36 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 216 28% 20%;
+    --card: 40 25% 98%;
+    --card-foreground: 30 15% 25%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 216 28% 20%;
+    --popover: 40 25% 98%;
+    --popover-foreground: 30 15% 25%;
 
-    /* Primary - Ink Blue (Profundidade) */
-    --primary: 216 28% 20%; /* Ink Blue #1F2E4B */
-    --primary-foreground: 0 0% 100%;
+    /* Primary - Warm Gold (Espiritualidade e Propósito) */
+    --primary: 38 70% 50%; /* Warm Gold #D4A84B */
+    --primary-foreground: 40 30% 97%;
     
-    --ink-blue: 216 28% 20%; /* #1F2E4B */
-    --ink-deep: 216 30% 14%; /* Deeper variant */
-    --ink-light: 216 20% 35%; /* Lighter variant */
+    /* Nello Gold Palette */
+    --nello-gold: 38 70% 50%; /* #D4A84B */
+    --nello-gold-light: 40 65% 70%; /* Lighter gold */
+    --nello-gold-deep: 36 75% 40%; /* Deeper gold */
+    --nello-gold-glow: 40 50% 92%; /* Subtle glow */
 
-    /* Miguel - Graphite (Presença) */
-    --miguel-deep: 0 0% 10%; /* Graphite Soft #1A1A1A */
-    --miguel-midnight: 0 0% 8%;
-    --miguel-silver: 0 0% 75%;
+    /* Ink/Text - Warm Brown */
+    --ink-brown: 30 25% 22%; /* Dark warm brown */
+    --ink-deep: 28 20% 18%; /* Deeper variant */
+    --ink-light: 32 15% 45%; /* Lighter variant */
 
-    /* Secondary - Bruma Blue (Calma) */
-    --secondary: 210 36% 92%; /* Bruma Blue #DCE9F5 */
-    --secondary-foreground: 216 28% 20%;
+    /* Miguel - Warm Graphite */
+    --miguel-deep: 30 10% 15%; /* Warm graphite */
+    --miguel-midnight: 30 8% 10%;
+    --miguel-silver: 30 5% 70%;
+
+    /* Secondary - Warm Beige */
+    --secondary: 38 25% 92%; /* Warm beige #F0EBE3 */
+    --secondary-foreground: 30 15% 25%;
     
-    --bruma-blue: 210 36% 92%; /* #DCE9F5 */
-    --bruma-light: 210 40% 96%; /* #F0F6FB */
-    --bruma-deep: 210 30% 85%; /* #C5D6E8 */
+    --bruma-warm: 38 25% 92%;
+    --bruma-light: 40 30% 96%;
+    --bruma-deep: 36 20% 85%;
 
-    /* Accent - Ice Lavender (Sensibilidade) */
-    --accent: 249 100% 96%; /* Ice Lavender #EDEAFF */
-    --accent-foreground: 216 28% 20%;
-    
-    --lavender: 249 100% 96%; /* #EDEAFF */
-    --lavender-deep: 249 50% 90%;
+    /* Accent - Soft Cream */
+    --accent: 42 40% 94%; /* Soft cream accent */
+    --accent-foreground: 30 15% 25%;
 
     /* Muted */
-    --muted: 210 20% 97%;
-    --muted-foreground: 216 15% 50%;
+    --muted: 38 20% 95%;
+    --muted-foreground: 30 12% 50%;
 
-    /* Fundadores - Deep Purple (Mistério) + Soft Gold (Honra) */
-    --founder-purple: 252 47% 40%; /* Deep Purple #5B3A94 */
+    /* Fundadores - Deep Purple + Gold */
+    --founder-purple: 252 47% 40%;
     --founder-purple-light: 252 40% 50%;
     --founder-purple-deep: 252 50% 25%;
-    --founder-gold: 42 70% 55%; /* Soft Gold #D4A84B */
-    --founder-gold-light: 42 80% 70%;
-    --founder-gold-deep: 42 60% 40%;
+    --founder-gold: 38 70% 50%;
+    --founder-gold-light: 40 65% 70%;
+    --founder-gold-deep: 36 75% 40%;
     
-    /* Scripture - Warm Earth Tones (Espiritualidade) */
-    --scripture: 32 45% 35%; /* Warm brown #8B7355 */
+    /* Scripture - Warm Earth Tones */
+    --scripture: 32 45% 35%;
     --scripture-light: 32 30% 50%;
     --scripture-glow: 40 50% 92%;
 
-    /* Legacy gold support - now using Ink Blue as accent */
-    --gold: 216 28% 30%; /* Updated to ink-blue variant */
-    --gold-light: 210 36% 92%; /* Maps to bruma */
-    --gold-dark: 216 28% 20%;
+    /* Legacy support */
+    --gold: 38 70% 50%;
+    --gold-light: 40 65% 70%;
+    --gold-dark: 36 75% 40%;
 
     /* Feedback */
-    --destructive: 0 60% 55%;
+    --destructive: 0 55% 50%;
     --destructive-foreground: 0 0% 100%;
-    --success: 152 60% 45%; /* #2E9B6B */
-    --warning: 38 92% 60%; /* #F5A623 */
-    --error-soft: 0 70% 68%;
+    --success: 145 55% 42%;
+    --warning: 38 92% 55%;
+    --error-soft: 0 60% 65%;
 
-    --border: 210 25% 92%;
-    --input: 210 25% 92%;
-    --ring: 216 28% 30%;
+    --border: 38 20% 88%;
+    --input: 38 20% 90%;
+    --ring: 38 70% 50%;
 
     --radius: 0.75rem;
     
-    /* Shadows - Apple-like, ultra subtle */
-    --shadow-sm: 0 1px 3px -1px hsl(216 28% 20% / 0.05);
-    --shadow-md: 0 4px 12px -4px hsl(216 28% 20% / 0.08);
-    --shadow-lg: 0 12px 32px -8px hsl(216 28% 20% / 0.1);
-    --shadow-glow: 0 0 48px hsl(210 36% 92% / 0.3);
+    /* Shadows - Warm and subtle */
+    --shadow-sm: 0 1px 3px -1px hsl(30 25% 22% / 0.04);
+    --shadow-md: 0 4px 12px -4px hsl(30 25% 22% / 0.06);
+    --shadow-lg: 0 12px 32px -8px hsl(30 25% 22% / 0.08);
+    --shadow-glow: 0 0 48px hsl(38 70% 50% / 0.15);
+    --shadow-gold: 0 4px 20px hsl(38 70% 50% / 0.25);
 
     /* Sidebar */
-    --sidebar-background: 210 40% 96%;
-    --sidebar-foreground: 216 28% 20%;
-    --sidebar-primary: 216 28% 20%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 36% 92%;
-    --sidebar-accent-foreground: 216 28% 20%;
-    --sidebar-border: 210 25% 92%;
-    --sidebar-ring: 216 28% 30%;
+    --sidebar-background: 40 30% 96%;
+    --sidebar-foreground: 30 15% 25%;
+    --sidebar-primary: 38 70% 50%;
+    --sidebar-primary-foreground: 40 30% 97%;
+    --sidebar-accent: 38 25% 92%;
+    --sidebar-accent-foreground: 30 15% 25%;
+    --sidebar-border: 38 20% 88%;
+    --sidebar-ring: 38 70% 50%;
   }
 
   .dark {
-    --background: 216 30% 8%;
-    --background-cloud: 216 28% 10%;
-    --foreground: 210 40% 96%;
+    --background: 30 15% 10%;
+    --background-warm: 28 12% 12%;
+    --foreground: 38 25% 90%;
 
-    --card: 216 28% 12%;
-    --card-foreground: 210 40% 96%;
+    --card: 30 12% 14%;
+    --card-foreground: 38 25% 90%;
 
-    --popover: 216 28% 12%;
-    --popover-foreground: 210 40% 96%;
+    --popover: 30 12% 14%;
+    --popover-foreground: 38 25% 90%;
 
-    --primary: 210 40% 96%;
-    --primary-foreground: 216 30% 8%;
+    --primary: 40 65% 55%;
+    --primary-foreground: 30 15% 10%;
     
-    --ink-blue: 210 30% 75%;
-    --ink-deep: 216 30% 8%;
-    --ink-light: 210 20% 60%;
+    --nello-gold: 40 65% 55%;
+    --nello-gold-light: 42 60% 65%;
+    --nello-gold-deep: 38 70% 45%;
+    --nello-gold-glow: 38 30% 20%;
 
-    --miguel-deep: 0 0% 85%;
-    --miguel-midnight: 0 0% 8%;
-    --miguel-silver: 0 0% 40%;
+    --ink-brown: 38 20% 80%;
+    --ink-deep: 30 15% 10%;
+    --ink-light: 35 15% 60%;
 
-    --secondary: 216 25% 16%;
-    --secondary-foreground: 210 40% 95%;
+    --miguel-deep: 38 15% 85%;
+    --miguel-midnight: 30 10% 8%;
+    --miguel-silver: 30 8% 45%;
+
+    --secondary: 30 15% 18%;
+    --secondary-foreground: 38 25% 90%;
     
-    --bruma-blue: 216 25% 20%;
-    --bruma-light: 216 25% 14%;
-    --bruma-deep: 216 20% 25%;
+    --bruma-warm: 30 12% 20%;
+    --bruma-light: 30 10% 15%;
+    --bruma-deep: 28 12% 25%;
 
-    --accent: 249 30% 20%;
-    --accent-foreground: 249 100% 96%;
-    
-    --lavender: 249 30% 20%;
-    --lavender-deep: 249 25% 25%;
+    --accent: 32 20% 20%;
+    --accent-foreground: 40 40% 90%;
 
-    --muted: 216 25% 18%;
-    --muted-foreground: 216 15% 60%;
+    --muted: 30 12% 18%;
+    --muted-foreground: 35 12% 55%;
 
-    --gold: 210 30% 60%;
-    --gold-light: 216 25% 30%;
-    --gold-dark: 210 30% 50%;
-    
-    /* Scripture dark mode - Soft warm tones */
-    --scripture: 35 25% 70%; /* Soft cream gold */
-    --scripture-light: 35 20% 55%;
+    --scripture: 38 30% 70%;
+    --scripture-light: 38 25% 55%;
     --scripture-glow: 35 15% 18%;
 
-    --destructive: 0 55% 50%;
+    --gold: 40 60% 55%;
+    --gold-light: 38 20% 30%;
+    --gold-dark: 40 55% 50%;
+
+    --destructive: 0 50% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 216 25% 20%;
-    --input: 216 25% 20%;
-    --ring: 210 30% 60%;
+    --border: 30 12% 22%;
+    --input: 30 12% 22%;
+    --ring: 40 60% 55%;
     
-    --sidebar-background: 216 30% 8%;
-    --sidebar-foreground: 210 40% 96%;
-    --sidebar-primary: 210 30% 60%;
-    --sidebar-primary-foreground: 216 30% 8%;
-    --sidebar-accent: 216 25% 16%;
-    --sidebar-accent-foreground: 210 40% 96%;
-    --sidebar-border: 216 25% 20%;
-    --sidebar-ring: 210 30% 60%;
+    --sidebar-background: 30 15% 10%;
+    --sidebar-foreground: 38 25% 90%;
+    --sidebar-primary: 40 60% 55%;
+    --sidebar-primary-foreground: 30 15% 10%;
+    --sidebar-accent: 30 12% 18%;
+    --sidebar-accent-foreground: 38 25% 90%;
+    --sidebar-border: 30 12% 22%;
+    --sidebar-ring: 40 60% 55%;
   }
 }
 
@@ -173,15 +180,22 @@
     font-weight: 400;
   }
 
+  /* Headings - Serif editorial como Nello Life */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Crimson Pro', Georgia, serif;
     font-weight: 600;
     @apply tracking-tight;
   }
   
+  /* Font para texto longo e UI */
+  .font-sans-ui {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+  }
+  
   /* Serifada elegante para frases do Miguel */
   .font-miguel {
-    font-family: 'Satoshi', 'Inter', system-ui, sans-serif;
+    font-family: 'Crimson Pro', Georgia, serif;
     font-weight: 500;
     font-style: normal;
   }
@@ -192,13 +206,19 @@
     font-weight: 500;
     font-style: italic;
   }
+  
+  /* Heading serif editorial */
+  .font-heading {
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-weight: 600;
+  }
 }
 
 @layer utilities {
   .text-balance { text-wrap: balance; }
-  .font-display { font-family: 'Inter', system-ui, sans-serif; font-weight: 600; }
+  .font-display { font-family: 'Crimson Pro', Georgia, serif; font-weight: 600; }
   .font-body { font-family: 'Inter', system-ui, sans-serif; font-weight: 400; }
-  .font-premium { font-family: 'Satoshi', 'Inter', system-ui, sans-serif; font-weight: 500; }
+  .font-premium { font-family: 'Crimson Pro', Georgia, serif; font-weight: 500; }
   html { scroll-behavior: smooth; }
 
   /* Animations */
@@ -224,7 +244,7 @@
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
   @keyframes gentlePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
   
-  /* Hover effects - Sutis e premium */
+  /* Hover effects - Warm and elegant */
   .hover-lift { transition: transform 0.25s ease-out, box-shadow 0.25s ease-out; }
   .hover-lift:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
   .hover-glow { transition: box-shadow 0.3s ease-out; }
@@ -233,15 +253,16 @@
   .press-effect:active { transform: scale(0.98); }
   .subtle-pulse { animation: gentlePulse 4s ease-in-out infinite; }
 
-  /* Glassmorphism */
+  /* Glassmorphism - Warm */
   .glass { @apply bg-card/80 backdrop-blur-xl; }
   
-  /* Gradients - NELLO ONE style */
-  .gradient-radial { background: radial-gradient(circle at 50% 0%, hsl(var(--bruma-blue) / 0.3) 0%, transparent 50%); }
-  .gradient-glow { background: radial-gradient(ellipse at center, hsl(var(--bruma-blue) / 0.2) 0%, transparent 70%); }
-  .gradient-soul { background: linear-gradient(180deg, hsl(var(--bruma-light)) 0%, hsl(var(--background)) 100%); }
-  .gradient-miguel { background: linear-gradient(135deg, hsl(var(--ink-blue)) 0%, hsl(var(--ink-deep)) 100%); }
-  .gradient-nello { background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--bruma-light)) 50%, hsl(var(--background)) 100%); }
+  /* Gradients - NELLO Family warm style */
+  .gradient-radial { background: radial-gradient(circle at 50% 0%, hsl(var(--nello-gold-glow) / 0.4) 0%, transparent 50%); }
+  .gradient-glow { background: radial-gradient(ellipse at center, hsl(var(--nello-gold) / 0.12) 0%, transparent 70%); }
+  .gradient-soul { background: linear-gradient(180deg, hsl(var(--background-warm)) 0%, hsl(var(--background)) 100%); }
+  .gradient-warm { background: linear-gradient(180deg, hsl(40 35% 96%) 0%, hsl(var(--background)) 100%); }
+  .gradient-nello { background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background-warm)) 50%, hsl(var(--background)) 100%); }
+  .gradient-gold { background: linear-gradient(135deg, hsl(var(--nello-gold)) 0%, hsl(var(--nello-gold-deep)) 100%); }
   
   /* Scrollbar hide utility */
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
