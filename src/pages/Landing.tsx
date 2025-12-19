@@ -1,21 +1,21 @@
 import { SEOHead } from "@/components/SEOHead";
-import { ValidationNav } from "@/components/landing/v2/ValidationNav";
-import { ValidationLanding } from "@/components/landing/v2/ValidationLanding";
-import { ValidationFooter } from "@/components/landing/v2/ValidationFooter";
+import { NavSection } from "@/components/landing/v2/NavSection";
+import { NelloOneLanding } from "@/components/landing/v2/NelloOneLanding";
+import { FooterSection } from "@/components/landing/v2/FooterSection";
 import { MiguelAgent } from "@/components/MiguelAgent";
 
 const Landing = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead page="landing" />
-      <ValidationNav />
+      <NavSection />
       
       {/* Spacer for fixed nav */}
       <div className="h-16" />
       
-      <ValidationLanding />
+      <NelloOneLanding />
       
-      <ValidationFooter />
+      <FooterSection />
       <MiguelAgent location="landing" />
     </div>
   );

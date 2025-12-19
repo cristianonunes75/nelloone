@@ -61,6 +61,9 @@ export default {
           "gold-light": "hsl(var(--nello-gold-light))",
           "gold-deep": "hsl(var(--nello-gold-deep))",
           "gold-glow": "hsl(var(--nello-gold-glow))",
+          graphite: "hsl(var(--nello-graphite))",
+          "graphite-light": "hsl(var(--nello-graphite-light))",
+          "graphite-deep": "hsl(var(--nello-graphite-deep))",
         },
         ink: {
           DEFAULT: "hsl(var(--ink-brown))",
