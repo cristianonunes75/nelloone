@@ -7,6 +7,8 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { SimulationProvider } from "@/contexts/SimulationContext";
 import { ImpersonateProvider } from "@/contexts/ImpersonateContext";
+import { NelloAppProvider } from "@/contexts/NelloAppContext";
+import { NelloAppRouter } from "@/components/NelloAppRouter";
 import { LanguageRoute } from "@/components/LanguageRoute";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { GeoRedirect } from "@/components/GeoRedirect";
@@ -436,24 +438,29 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <LanguageProvider>
-          <SimulationProvider>
-            <AuthProvider>
-              <ImpersonateProvider>
-                {/* GEO-routing: Automatically redirects based on IP location */}
-                <GeoRedirect />
-                {/* Affiliate tracking: Captures referral codes from URL */}
-                <AffiliateTracker />
-                {/* Currency Protection: Prevents cross-trade between BRL and USD */}
-                <CurrencyProtection>
-                  <LanguageRoute>
-                    <AppRoutes />
-                  </LanguageRoute>
-                </CurrencyProtection>
-              </ImpersonateProvider>
-            </AuthProvider>
-          </SimulationProvider>
-        </LanguageProvider>
+        <NelloAppProvider>
+          <LanguageProvider>
+            <SimulationProvider>
+              <AuthProvider>
+                <ImpersonateProvider>
+                  {/* GEO-routing: Automatically redirects based on IP location */}
+                  <GeoRedirect />
+                  {/* Affiliate tracking: Captures referral codes from URL */}
+                  <AffiliateTracker />
+                  {/* Currency Protection: Prevents cross-trade between BRL and USD */}
+                  <CurrencyProtection>
+                    <LanguageRoute>
+                      {/* Nello App Router: Routes to Flow, Life, or One based on subdomain */}
+                      <NelloAppRouter>
+                        <AppRoutes />
+                      </NelloAppRouter>
+                    </LanguageRoute>
+                  </CurrencyProtection>
+                </ImpersonateProvider>
+              </AuthProvider>
+            </SimulationProvider>
+          </LanguageProvider>
+        </NelloAppProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

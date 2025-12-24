@@ -18,6 +18,13 @@ interface SEOConfig {
 
 interface SEOHeadProps {
   page?: "landing" | "pricing" | "auth";
+  // Custom overrides for external apps (Flow, Life, etc.)
+  title?: string;
+  description?: string;
+  keywords?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  siteUrl?: string;
 }
 
 const seoConfig: Record<string, SEOConfig> = {
@@ -65,10 +72,27 @@ const seoConfig: Record<string, SEOConfig> = {
   },
 };
 
-export const SEOHead = ({ page = "landing" }: SEOHeadProps) => {
+export const SEOHead = ({ 
+  page = "landing",
+  title: customTitle,
+  description: customDescription,
+  keywords,
+  ogTitle: customOgTitle,
+  ogDescription: customOgDescription,
+  siteUrl: customSiteUrl,
+}: SEOHeadProps) => {
   const { language } = useLanguage();
-  const config = seoConfig[page]?.[language] || seoConfig.landing.pt;
-  const siteUrl = "https://nelloone.com";
+  const pageConfig = seoConfig[page]?.[language] || seoConfig.landing.pt;
+  
+  // Use custom props if provided, otherwise fall back to page config
+  const config = {
+    title: customTitle || pageConfig.title,
+    description: customDescription || pageConfig.description,
+    ogTitle: customOgTitle || customTitle || pageConfig.ogTitle,
+    ogDescription: customOgDescription || customDescription || pageConfig.ogDescription,
+  };
+  
+  const siteUrl = customSiteUrl || "https://nelloone.com";
   const currentUrl = `${siteUrl}${language === "en" ? "/en" : ""}`;
 
   useEffect(() => {
