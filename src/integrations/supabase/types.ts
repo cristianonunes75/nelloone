@@ -418,6 +418,277 @@ export type Database = {
           },
         ]
       }
+      flow_chats: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      flow_checkins: {
+        Row: {
+          adjustments: string | null
+          created_at: string | null
+          id: string
+          user_id: string
+          week_ref: string
+          what_not: string | null
+          what_worked: string | null
+        }
+        Insert: {
+          adjustments?: string | null
+          created_at?: string | null
+          id?: string
+          user_id: string
+          week_ref: string
+          what_not?: string | null
+          what_worked?: string | null
+        }
+        Update: {
+          adjustments?: string | null
+          created_at?: string | null
+          id?: string
+          user_id?: string
+          week_ref?: string
+          what_not?: string | null
+          what_worked?: string | null
+        }
+        Relationships: []
+      }
+      flow_focus: {
+        Row: {
+          created_at: string | null
+          goal_description: string | null
+          id: string
+          idea_id: string | null
+          is_active: boolean | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          goal_description?: string | null
+          id?: string
+          idea_id?: string | null
+          is_active?: boolean | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          goal_description?: string | null
+          id?: string
+          idea_id?: string | null
+          is_active?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flow_focus_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "flow_ideas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flow_ideas: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          status: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      flow_offers: {
+        Row: {
+          audience: string | null
+          created_at: string | null
+          format: string | null
+          id: string
+          idea_id: string | null
+          price_suggested: number | null
+          problem: string | null
+          promise: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          audience?: string | null
+          created_at?: string | null
+          format?: string | null
+          id?: string
+          idea_id?: string | null
+          price_suggested?: number | null
+          problem?: string | null
+          promise?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          audience?: string | null
+          created_at?: string | null
+          format?: string | null
+          id?: string
+          idea_id?: string | null
+          price_suggested?: number | null
+          problem?: string | null
+          promise?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flow_offers_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "flow_ideas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flow_profiles: {
+        Row: {
+          created_at: string | null
+          feels_dispersed: boolean | null
+          has_tdah: string | null
+          id: string
+          monthly_goal: number | null
+          onboarding_completed: boolean | null
+          onboarding_step: number | null
+          updated_at: string | null
+          user_id: string
+          weekly_time_available: string | null
+          what_brought_you: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          feels_dispersed?: boolean | null
+          has_tdah?: string | null
+          id?: string
+          monthly_goal?: number | null
+          onboarding_completed?: boolean | null
+          onboarding_step?: number | null
+          updated_at?: string | null
+          user_id: string
+          weekly_time_available?: string | null
+          what_brought_you?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          feels_dispersed?: boolean | null
+          has_tdah?: string | null
+          id?: string
+          monthly_goal?: number | null
+          onboarding_completed?: boolean | null
+          onboarding_step?: number | null
+          updated_at?: string | null
+          user_id?: string
+          weekly_time_available?: string | null
+          what_brought_you?: string | null
+        }
+        Relationships: []
+      }
+      flow_subscriptions: {
+        Row: {
+          created_at: string | null
+          current_period_end: string | null
+          id: string
+          status: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_period_end?: string | null
+          id?: string
+          status?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_period_end?: string | null
+          id?: string
+          status?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      flow_tasks: {
+        Row: {
+          created_at: string | null
+          description: string
+          done: boolean | null
+          id: string
+          user_id: string
+          week_ref: string
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          done?: boolean | null
+          id?: string
+          user_id: string
+          week_ref: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          done?: boolean | null
+          id?: string
+          user_id?: string
+          week_ref?: string
+        }
+        Relationships: []
+      }
       founder_feedback: {
         Row: {
           created_at: string | null
