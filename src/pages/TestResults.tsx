@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Download, CheckCircle, Lock, RotateCcw, FileText, Mail, Loader2, ArrowRight, Sparkles } from "lucide-react";
+import { Download, CheckCircle, Lock, RotateCcw, FileText, Mail, Loader2, ArrowRight, Sparkles, Star, AlertTriangle, Lightbulb } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ARCHETYPES } from "@/lib/archetypes";
@@ -695,9 +695,125 @@ export default function TestResults() {
                 </CardContent>
               </Card>
 
+              {/* Pontos Fortes */}
+              {NELLO_16_PROFILES[mbtiResultData.type]?.strengths?.[lang] && (
+                <Card className="border-2 border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/20">
+                  <CardHeader>
+                    <CardTitle className="text-xl flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+                      <Star className="h-5 w-5" />
+                      {lang === 'en' ? 'Your Strengths' : lang === 'pt-pt' ? 'Os Seus Pontos Fortes' : 'Seus Pontos Fortes'}
+                    </CardTitle>
+                    <CardDescription>
+                      {lang === 'en' ? 'Natural gifts that make you unique' : lang === 'pt-pt' ? 'Dons naturais que o tornam único' : 'Dons naturais que te tornam único'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3">
+                      {NELLO_16_PROFILES[mbtiResultData.type].strengths[lang].map((strength, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
+                          <span className="text-foreground">{strength}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Desafios */}
+              {NELLO_16_PROFILES[mbtiResultData.type]?.challenges?.[lang] && (
+                <Card className="border-2 border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20">
+                  <CardHeader>
+                    <CardTitle className="text-xl flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                      <AlertTriangle className="h-5 w-5" />
+                      {lang === 'en' ? 'Growth Challenges' : lang === 'pt-pt' ? 'Desafios de Crescimento' : 'Desafios de Crescimento'}
+                    </CardTitle>
+                    <CardDescription>
+                      {lang === 'en' ? 'Areas that invite your attention and development' : lang === 'pt-pt' ? 'Áreas que convidam à sua atenção e desenvolvimento' : 'Áreas que convidam sua atenção e desenvolvimento'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3">
+                      {NELLO_16_PROFILES[mbtiResultData.type].challenges[lang].map((challenge, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <span className="h-5 w-5 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 text-xs font-medium mt-0.5 flex-shrink-0">
+                            {index + 1}
+                          </span>
+                          <span className="text-foreground">{challenge}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Dicas de Crescimento Pessoal */}
+              {NELLO_16_PROFILES[mbtiResultData.type]?.growthTips?.[lang] && (
+                <Card className="border-2 border-primary/30 bg-primary/5">
+                  <CardHeader>
+                    <CardTitle className="text-xl flex items-center gap-2 text-primary">
+                      <Lightbulb className="h-5 w-5" />
+                      {lang === 'en' ? 'Personal Growth Tips' : lang === 'pt-pt' ? 'Dicas de Crescimento Pessoal' : 'Dicas de Crescimento Pessoal'}
+                    </CardTitle>
+                    <CardDescription>
+                      {lang === 'en' ? 'Practical suggestions for your evolution' : lang === 'pt-pt' ? 'Sugestões práticas para a sua evolução' : 'Sugestões práticas para sua evolução'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-4">
+                      {NELLO_16_PROFILES[mbtiResultData.type].growthTips[lang].map((tip, index) => (
+                        <li key={index} className="flex items-start gap-3 p-3 rounded-lg bg-background/80 border border-border/50">
+                          <span className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-semibold flex-shrink-0">
+                            {index + 1}
+                          </span>
+                          <span className="text-foreground leading-relaxed">{tip}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Quadrante */}
+              <Card className="border border-border/50">
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    {lang === 'en' ? 'Your Quadrant' : lang === 'pt-pt' ? 'O Seu Quadrante' : 'Seu Quadrante'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-full bg-accent/20 flex items-center justify-center">
+                      <span className="text-2xl">
+                        {NELLO_16_PROFILES[mbtiResultData.type]?.quadrant === 'analytic' ? '🔬' :
+                         NELLO_16_PROFILES[mbtiResultData.type]?.quadrant === 'humanist' ? '💝' :
+                         NELLO_16_PROFILES[mbtiResultData.type]?.quadrant === 'pragmatic' ? '⚙️' : '🔮'}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-lg capitalize">
+                        {NELLO_16_PROFILES[mbtiResultData.type]?.quadrant === 'analytic' ? (lang === 'en' ? 'Analytic' : 'Analítico') :
+                         NELLO_16_PROFILES[mbtiResultData.type]?.quadrant === 'humanist' ? (lang === 'en' ? 'Humanist' : 'Humanista') :
+                         NELLO_16_PROFILES[mbtiResultData.type]?.quadrant === 'pragmatic' ? (lang === 'en' ? 'Pragmatic' : 'Pragmático') :
+                         (lang === 'en' ? 'Visionary' : 'Visionário')}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {NELLO_16_PROFILES[mbtiResultData.type]?.quadrant === 'analytic' ? 
+                          (lang === 'en' ? 'Focused on logic and strategy' : 'Focado em lógica e estratégia') :
+                         NELLO_16_PROFILES[mbtiResultData.type]?.quadrant === 'humanist' ? 
+                          (lang === 'en' ? 'Focused on people and values' : 'Focado em pessoas e valores') :
+                         NELLO_16_PROFILES[mbtiResultData.type]?.quadrant === 'pragmatic' ? 
+                          (lang === 'en' ? 'Focused on action and results' : 'Focado em ação e resultados') :
+                          (lang === 'en' ? 'Focused on possibilities and innovation' : 'Focado em possibilidades e inovação')}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               <div className="text-center py-8">
                 <p className="text-lg font-light italic text-muted-foreground">
-                  NELLO ONE — uma jornada de autoconhecimento e verdade interior.
+                  NELLO ONE — {lang === 'en' ? 'a journey of self-knowledge and inner truth.' : 'uma jornada de autoconhecimento e verdade interior.'}
                 </p>
               </div>
             </CardContent>
