@@ -1,19 +1,25 @@
-import { Check, Lock, Play, Clock, HelpCircle, CreditCard, ArrowRight } from "lucide-react";
+import { Check, Lock, Play, Clock, HelpCircle, CreditCard, ArrowRight, Eye, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { JourneyStep } from "@/hooks/useJourneyProgress";
 import * as Icons from "lucide-react";
 import { useTestAccess } from "@/hooks/useTestAccess";
+import { useAuth } from "@/hooks/useAuth";
 
 interface JourneyStepCardProps {
   step: JourneyStep;
   onStart: () => void;
   onContinue: () => void;
   onPurchase: () => void;
+  onViewResult?: () => void;
+  onReset?: () => void;
+  resultSummary?: string;
 }
 
-export function JourneyStepCard({ step, onStart, onContinue, onPurchase }: JourneyStepCardProps) {
+export function JourneyStepCard({ step, onStart, onContinue, onPurchase, onViewResult, onReset, resultSummary }: JourneyStepCardProps) {
   const { hasAccess } = useTestAccess();
+  const { userRole } = useAuth();
+  const isAdmin = userRole === "admin";
   const IconComponent = (Icons as any)[step.icon] || Icons.Circle;
 
   const stepDescriptions: Record<string, string> = {
@@ -40,9 +46,16 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase }: Journ
   const getActionButton = () => {
     if (isCompleted) {
       return (
-        <div className="flex items-center justify-center sm:justify-start gap-2 text-primary text-xs sm:text-sm font-medium py-2 sm:py-0">
-          <Check className="w-4 h-4" />
-          Concluído
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Button size="sm" variant="outline" onClick={onViewResult} className="flex-1 sm:flex-none gap-1.5">
+            <Eye className="w-4 h-4" />
+            Ver Resultado
+          </Button>
+          {isAdmin && onReset && (
+            <Button size="sm" variant="ghost" onClick={onReset} className="px-2" title="Refazer teste">
+              <RotateCcw className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       );
     }
@@ -228,6 +241,16 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase }: Journ
                 ~{step.estimatedMinutes} min
               </span>
             </div>
+            
+            {/* Result Summary for completed tests */}
+            {isCompleted && resultSummary && (
+              <div className="mt-2 pt-2 border-t border-border/50">
+                <div className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                  <span className="text-xs font-medium text-primary">{resultSummary}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Action - Full width on mobile */}

@@ -22,10 +22,13 @@ import { testSlugs } from "@/lib/testContent";
 import { JornadaNelloCard } from "@/components/cliente/JornadaNelloCard";
 import { TEST_TYPE_TO_SLUG } from "@/utils/journey";
 import { AffiliatePanel } from "@/components/cliente/AffiliatePanel";
+import { NELLO_16_PROFILES } from "@/lib/nello16Personality";
+import { DISC_PROFILES } from "@/lib/disc";
+import { ENNEAGRAM_PROFILES } from "@/lib/eneagrama";
 
 const Cliente = () => {
-  const { user, profile, signOut } = useAuth();
-  const { startTestAsync } = useTests();
+  const { user, profile, signOut, userRole } = useAuth();
+  const { startTestAsync, userTests, resetTest } = useTests();
   const {
     journeySteps, 
     completedTests, 
@@ -130,6 +133,72 @@ const Cliente = () => {
     const userTest = await startTestAsync(step.testId);
     const basePath = getBasePath();
     navigate(`${basePath}/cliente/test-execution/${step.testId}/${userTest.id}`);
+  };
+
+  const handleViewResult = (step: typeof journeySteps[0]) => {
+    const userTest = userTests?.find(ut => ut.test_id === step.testId);
+    if (userTest) {
+      const basePath = getBasePath();
+      navigate(`${basePath}/cliente/test-results/${userTest.id}`);
+    }
+  };
+
+  const handleResetTest = (step: typeof journeySteps[0]) => {
+    resetTest(step.testId);
+  };
+
+  // Get result summary for a test
+  const getResultSummary = (step: typeof journeySteps[0]): string | undefined => {
+    if (step.status !== "completed") return undefined;
+    
+    const userTest = userTests?.find(ut => ut.test_id === step.testId);
+    if (!userTest?.result_data) return undefined;
+    
+    const resultData = userTest.result_data as any;
+    
+    // Generate summary based on test type
+    switch (step.testType) {
+      case "nello16":
+        if (resultData.type) {
+          const profile = NELLO_16_PROFILES[resultData.type];
+          return `${resultData.type} - ${profile?.name?.pt || ""}`;
+        }
+        break;
+      case "disc":
+        if (resultData.dominantProfile) {
+          const profile = DISC_PROFILES[resultData.dominantProfile as keyof typeof DISC_PROFILES];
+          return `${resultData.dominantProfile} - ${profile?.name || ""}`;
+        }
+        break;
+      case "eneagrama":
+        if (resultData.primaryType) {
+          const profile = ENNEAGRAM_PROFILES[resultData.primaryType];
+          return `Tipo ${resultData.primaryType} - ${profile?.name || ""}`;
+        }
+        break;
+      case "temperamentos":
+        if (resultData.primary) {
+          return `${resultData.primary}${resultData.secondary ? ` / ${resultData.secondary}` : ""}`;
+        }
+        break;
+      case "arquetipos_proposito":
+        if (resultData.primary?.archetype) {
+          return `${resultData.primary.archetype}${resultData.secondary?.archetype ? ` + ${resultData.secondary.archetype}` : ""}`;
+        }
+        break;
+      case "inteligencias_multiplas":
+        if (resultData.dominant?.name) {
+          return resultData.dominant.name;
+        }
+        break;
+      case "estilos_conexao":
+        if (resultData.primary?.name) {
+          return resultData.primary.name;
+        }
+        break;
+    }
+    
+    return "Resultado disponível";
   };
 
   const handleGenerateCode = () => {
@@ -332,6 +401,9 @@ const Cliente = () => {
                 onStart={() => handleStartTest(step)}
                 onContinue={() => handleContinueTest(step)}
                 onPurchase={() => navigate(`${getBasePath()}/cliente/comprar/${step.testId}`)}
+                onViewResult={() => handleViewResult(step)}
+                onReset={() => handleResetTest(step)}
+                resultSummary={getResultSummary(step)}
               />
             ))}
           </div>
