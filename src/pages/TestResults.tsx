@@ -1080,7 +1080,7 @@ function TestResultsInner() {
           </Card>
         )}
 
-        {isTemperamentosTest && temperamentosResultData && (
+        {isTemperamentosTest && temperamentosResultData?.primary?.temperament && temperamentosResultData?.secondary?.temperament && temperamentosResultData?.scores && (
           <TemperamentosResultsSection 
             temperamentosResults={temperamentosResultData} 
             lang={lang as 'pt' | 'pt-pt' | 'en'} 

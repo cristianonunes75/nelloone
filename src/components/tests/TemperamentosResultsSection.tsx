@@ -285,6 +285,12 @@ export function TemperamentosResultsSection({ temperamentosResults, lang }: Temp
   const labels = getLabels(lang);
   const effectiveLang = lang === 'pt-pt' ? 'pt' : lang; // pt-pt uses pt content
   
+  // Safety checks for required data
+  if (!temperamentosResults?.primary?.temperament || !temperamentosResults?.secondary?.temperament || !temperamentosResults?.scores) {
+    console.error('TemperamentosResultsSection: Missing required data', temperamentosResults);
+    return null;
+  }
+  
   const primaryKey = temperamentosResults.primary.temperament as keyof typeof TEMPERAMENT_DATA;
   const secondaryKey = temperamentosResults.secondary.temperament as keyof typeof TEMPERAMENT_DATA;
   
@@ -292,16 +298,18 @@ export function TemperamentosResultsSection({ temperamentosResults, lang }: Temp
   const secondaryData = TEMPERAMENT_DATA[secondaryKey]?.[effectiveLang] || TEMPERAMENT_DATA[secondaryKey]?.pt;
   
   if (!primaryData || !secondaryData) {
+    console.error('TemperamentosResultsSection: Invalid temperament keys', { primaryKey, secondaryKey });
     return null;
   }
 
-  const totalScore = Object.values(temperamentosResults.scores).reduce((a, b) => a + b, 0);
+  const scores = temperamentosResults.scores || { sanguineo: 0, colerico: 0, melancolico: 0, fleumatico: 0 };
+  const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
 
   const temperamentOrder = [
-    { key: 'colerico', label: 'Colérico', score: temperamentosResults.scores.colerico },
-    { key: 'sanguineo', label: 'Sanguíneo', score: temperamentosResults.scores.sanguineo },
-    { key: 'melancolico', label: 'Melancólico', score: temperamentosResults.scores.melancolico },
-    { key: 'fleumatico', label: 'Fleumático', score: temperamentosResults.scores.fleumatico }
+    { key: 'colerico', label: 'Colérico', score: scores.colerico || 0 },
+    { key: 'sanguineo', label: 'Sanguíneo', score: scores.sanguineo || 0 },
+    { key: 'melancolico', label: 'Melancólico', score: scores.melancolico || 0 },
+    { key: 'fleumatico', label: 'Fleumático', score: scores.fleumatico || 0 }
   ].sort((a, b) => b.score - a.score);
 
   return (
