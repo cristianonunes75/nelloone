@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Target, Save, Loader2 } from 'lucide-react';
+import { Target, Save, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,9 +8,37 @@ import { SEOHead } from '@/components/SEOHead';
 import { FlowLayout } from '../components/FlowLayout';
 import { useFlowData } from '../hooks/useFlowData';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+
+type FieldType = 'audience' | 'problem' | 'promise' | 'format' | 'price';
+
+const FIELD_PROMPTS: Record<FieldType, { label: string; prompt: string }> = {
+  audience: {
+    label: 'Público-alvo',
+    prompt: 'Me ajude a definir meu público-alvo. Quero uma descrição clara e específica de quem é meu cliente ideal para a minha oferta.',
+  },
+  problem: {
+    label: 'Problema',
+    prompt: 'Me ajude a articular o problema que minha oferta resolve. Qual a dor principal do meu cliente ideal?',
+  },
+  promise: {
+    label: 'Promessa',
+    prompt: 'Me ajude a criar uma promessa de transformação clara. O que meu cliente vai conseguir após comprar minha oferta?',
+  },
+  format: {
+    label: 'Formato',
+    prompt: 'Me ajude a escolher o formato ideal para minha oferta (consultoria, curso, mentoria, etc). Qual formato combina mais comigo e com minha proposta?',
+  },
+  price: {
+    label: 'Preço',
+    prompt: 'Me ajude a definir um preço justo e estratégico para minha oferta. Considere o valor entregue e o mercado.',
+  },
+};
 
 export default function FlowOffer() {
   const { offer, chosenIdea, saveOffer, loading } = useFlowData();
+  const { user } = useAuth();
   
   const [audience, setAudience] = useState(offer?.audience || '');
   const [problem, setProblem] = useState(offer?.problem || '');
@@ -19,6 +47,10 @@ export default function FlowOffer() {
   const [price, setPrice] = useState(offer?.price_suggested?.toString() || '');
   const [status, setStatus] = useState(offer?.status || 'draft');
   const [isSaving, setIsSaving] = useState(false);
+  
+  // AI assistance state
+  const [aiLoading, setAiLoading] = useState<FieldType | null>(null);
+  const [aiSuggestion, setAiSuggestion] = useState<{ field: FieldType; content: string } | null>(null);
 
   const handleSave = async (newStatus?: 'draft' | 'active') => {
     setIsSaving(true);
@@ -39,6 +71,128 @@ export default function FlowOffer() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const requestAIHelp = async (field: FieldType) => {
+    if (!user?.id) {
+      toast.error('Faça login para usar o Mentor IA');
+      return;
+    }
+
+    setAiLoading(field);
+    setAiSuggestion(null);
+
+    try {
+      // Build context from current offer data
+      const context = [
+        chosenIdea?.title ? `Minha ideia: ${chosenIdea.title}` : '',
+        chosenIdea?.description ? `Descrição: ${chosenIdea.description}` : '',
+        audience ? `Público-alvo atual: ${audience}` : '',
+        problem ? `Problema que resolvo: ${problem}` : '',
+        promise ? `Promessa: ${promise}` : '',
+        format ? `Formato: ${format}` : '',
+        price ? `Preço sugerido: R$ ${price}` : '',
+      ].filter(Boolean).join('\n');
+
+      const fullPrompt = `${FIELD_PROMPTS[field].prompt}\n\nContexto da minha oferta:\n${context || 'Ainda estou começando a estruturar.'}\n\nMe dê uma sugestão direta e prática que eu possa usar.`;
+
+      const { data, error } = await supabase.functions.invoke('flow-mentor', {
+        body: {
+          message: fullPrompt,
+          userId: user.id,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.response) {
+        setAiSuggestion({ field, content: data.response });
+      }
+    } catch (error) {
+      console.error('Error getting AI help:', error);
+      toast.error('Erro ao obter ajuda do Mentor IA');
+    } finally {
+      setAiLoading(null);
+    }
+  };
+
+  const applySuggestion = (field: FieldType, suggestion: string) => {
+    // Extract just the core suggestion (remove explanatory text)
+    const cleanSuggestion = suggestion.trim();
+    
+    switch (field) {
+      case 'audience':
+        setAudience(cleanSuggestion);
+        break;
+      case 'problem':
+        setProblem(cleanSuggestion);
+        break;
+      case 'promise':
+        setPromise(cleanSuggestion);
+        break;
+      case 'format':
+        setFormat(cleanSuggestion);
+        break;
+      case 'price':
+        // Try to extract a number from the suggestion
+        const priceMatch = cleanSuggestion.match(/R?\$?\s*(\d+[.,]?\d*)/);
+        if (priceMatch) {
+          setPrice(priceMatch[1].replace(',', '.'));
+        }
+        break;
+    }
+    setAiSuggestion(null);
+    toast.success('Sugestão aplicada!');
+  };
+
+  const AIHelpButton = ({ field }: { field: FieldType }) => (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => requestAIHelp(field)}
+      disabled={aiLoading !== null}
+      className="text-violet-400 hover:text-violet-300 hover:bg-violet-500/10 gap-1.5 h-7 px-2"
+    >
+      {aiLoading === field ? (
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+      ) : (
+        <Sparkles className="w-3.5 h-3.5" />
+      )}
+      <span className="text-xs">Pedir ajuda à IA</span>
+    </Button>
+  );
+
+  const AISuggestionBox = ({ field }: { field: FieldType }) => {
+    if (!aiSuggestion || aiSuggestion.field !== field) return null;
+
+    return (
+      <div className="mt-2 p-4 rounded-xl bg-violet-500/10 border border-violet-500/30 space-y-3">
+        <div className="flex items-start gap-2">
+          <Sparkles className="w-4 h-4 text-violet-400 mt-0.5 shrink-0" />
+          <div className="text-sm text-slate-300 whitespace-pre-wrap">
+            {aiSuggestion.content}
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            onClick={() => applySuggestion(field, aiSuggestion.content)}
+            className="bg-violet-500 hover:bg-violet-600 text-white h-8"
+          >
+            Usar esta sugestão
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setAiSuggestion(null)}
+            className="text-slate-400 hover:text-slate-300 h-8"
+          >
+            Ignorar
+          </Button>
+        </div>
+      </div>
+    );
   };
 
   if (loading) {
@@ -90,47 +244,66 @@ export default function FlowOffer() {
           {/* Form */}
           <div className="space-y-6 p-6 rounded-2xl bg-slate-800/50 border border-slate-700/50">
             <div className="space-y-2">
-              <Label className="text-slate-300">Público-alvo</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-slate-300">Público-alvo</Label>
+                <AIHelpButton field="audience" />
+              </div>
               <Textarea
                 placeholder="Para quem é essa oferta? Descreva seu cliente ideal..."
                 value={audience}
                 onChange={(e) => setAudience(e.target.value)}
                 className="bg-slate-900/50 border-slate-700 text-white min-h-[80px]"
               />
+              <AISuggestionBox field="audience" />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-slate-300">Problema que resolve</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-slate-300">Problema que resolve</Label>
+                <AIHelpButton field="problem" />
+              </div>
               <Textarea
                 placeholder="Qual dor ou problema você resolve?"
                 value={problem}
                 onChange={(e) => setProblem(e.target.value)}
                 className="bg-slate-900/50 border-slate-700 text-white min-h-[80px]"
               />
+              <AISuggestionBox field="problem" />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-slate-300">Promessa / Transformação</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-slate-300">Promessa / Transformação</Label>
+                <AIHelpButton field="promise" />
+              </div>
               <Textarea
                 placeholder="O que a pessoa vai conseguir após comprar?"
                 value={promise}
                 onChange={(e) => setPromise(e.target.value)}
                 className="bg-slate-900/50 border-slate-700 text-white min-h-[80px]"
               />
+              <AISuggestionBox field="promise" />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-slate-300">Formato do produto/serviço</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-slate-300">Formato do produto/serviço</Label>
+                <AIHelpButton field="format" />
+              </div>
               <Input
                 placeholder="Ex: Consultoria 1:1, Curso online, Mentoria em grupo..."
                 value={format}
                 onChange={(e) => setFormat(e.target.value)}
                 className="bg-slate-900/50 border-slate-700 text-white"
               />
+              <AISuggestionBox field="format" />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-slate-300">Preço sugerido (R$)</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-slate-300">Preço sugerido (R$)</Label>
+                <AIHelpButton field="price" />
+              </div>
               <Input
                 type="number"
                 placeholder="497"
@@ -138,6 +311,7 @@ export default function FlowOffer() {
                 onChange={(e) => setPrice(e.target.value)}
                 className="bg-slate-900/50 border-slate-700 text-white"
               />
+              <AISuggestionBox field="price" />
             </div>
 
             {/* Actions */}
@@ -172,6 +346,7 @@ export default function FlowOffer() {
               <li>• Foque em um problema concreto e urgente</li>
               <li>• Sua promessa deve ser alcançável e mensurável</li>
               <li>• Comece com um formato simples que você domina</li>
+              <li>• Use o botão <Sparkles className="w-3 h-3 inline text-violet-400" /> para pedir ajuda da IA em cada campo</li>
             </ul>
           </div>
         </div>
