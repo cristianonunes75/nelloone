@@ -387,13 +387,16 @@ export default function ArchetypeResults({
             </div>
           </div>
 
-          {/* Mantra Pessoal */}
+          {/* Jaculatória Pessoal */}
           <div className="pt-4">
             <div className="bg-gradient-to-br from-[hsl(var(--accent))]/15 to-[hsl(var(--accent))]/5 p-6 rounded-lg border border-[hsl(var(--accent))]/30">
               <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                <span className="text-2xl">🔮</span>
-                Seu Mantra Pessoal
+                <span className="text-2xl">🕯️</span>
+                Sua Jaculatória Pessoal
               </h3>
+              <p className="text-xs text-muted-foreground mb-3 text-center">
+                Uma oração breve para repetir ao longo do dia e manter o coração voltado para Deus.
+              </p>
               <p className="text-xl italic text-foreground leading-relaxed text-center">
                 "{primaryData.personalMantra}"
               </p>
