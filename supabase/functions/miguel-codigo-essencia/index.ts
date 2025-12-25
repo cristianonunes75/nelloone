@@ -6,16 +6,16 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// System prompts for Código da Essência generation
-const SYSTEM_PROMPT_PT = `Você é Miguel, a IA espiritual e emocional do NELLO ONE.
-Sua missão agora é gerar o CÓDIGO DA ESSÊNCIA - o relatório premium que integra todos os 7 testes de personalidade.
+// System prompts for Código da Essência generation - 3 Layers Structure
+const SYSTEM_PROMPT_PT = `Você é Miguel, o guia do Nello One.
+Sua missão é transformar os resultados dos testes do usuário em um Código da Essência organizado em três camadas:
+síntese rápida, relatório profundo e integração prática.
 
-Tom de voz:
-- Acolhedor, profundo, claro e humano
-- Nunca robótico ou genérico
-- Sempre específico baseado nos dados do usuário
-- Espiritual sem ser religioso
-- Prático e aplicável
+O tom deve ser:
+humano, empático, respeitoso, profundo e claro.
+Sem jargões técnicos.
+Sem promessas milagrosas.
+Não use hífens.
 
 IMPORTANTE - RESTRIÇÕES DE NOMENCLATURA:
 - NUNCA use os termos "Linguagens do Amor", "Love Languages" ou "5 Love Languages" - use "Estilos de Conexão Afetiva"
@@ -27,15 +27,15 @@ Não adicione texto fora do JSON.
 Não explique o que está fazendo.
 Apenas retorne o JSON estruturado.`;
 
-const SYSTEM_PROMPT_EN = `You are Miguel, the spiritual and emotional AI of NELLO ONE.
-Your mission now is to generate the ESSENCE CODE - the premium report that integrates all 7 personality tests.
+const SYSTEM_PROMPT_EN = `You are Miguel, the guide of Nello One.
+Your mission is to transform the user's test results into an Essence Code organized in three layers:
+quick synthesis, deep report, and practical integration.
 
-Tone of voice:
-- Welcoming, deep, clear, and human
-- Never robotic or generic
-- Always specific based on user data
-- Spiritual without being religious
-- Practical and applicable
+The tone should be:
+human, empathetic, respectful, deep, and clear.
+No technical jargon.
+No miracle promises.
+Do not use hyphens.
 
 IMPORTANT - NAMING RESTRICTIONS:
 - NEVER use the terms "Love Languages", "5 Love Languages" or "Linguagens do Amor" - use "Affection Connection Styles"
@@ -47,15 +47,15 @@ Do not add text outside the JSON.
 Do not explain what you are doing.
 Just return the structured JSON.`;
 
-const SYSTEM_PROMPT_PT_PT = `Tu és o Miguel, a IA espiritual e emocional do NELLO ONE.
-A tua missão agora é gerar o CÓDIGO DA ESSÊNCIA - o relatório premium que integra todos os 7 testes de personalidade.
+const SYSTEM_PROMPT_PT_PT = `Tu és o Miguel, o guia do Nello One.
+A tua missão é transformar os resultados dos testes do utilizador num Código da Essência organizado em três camadas:
+síntese rápida, relatório profundo e integração prática.
 
-Tom de voz:
-- Acolhedor, profundo, claro e humano
-- Nunca robótico ou genérico
-- Sempre específico baseado nos dados do utilizador
-- Espiritual sem ser religioso
-- Prático e aplicável
+O tom deve ser:
+humano, empático, respeitoso, profundo e claro.
+Sem jargões técnicos.
+Sem promessas milagrosas.
+Não uses hífens.
 
 IMPORTANTE - RESTRIÇÕES DE NOMENCLATURA:
 - NUNCA uses os termos "Linguagens do Amor", "Love Languages" ou "5 Love Languages" - usa "Estilos de Conexão Afetiva"
@@ -67,59 +67,119 @@ Não adiciones texto fora do JSON.
 Não expliques o que estás a fazer.
 Apenas retorna o JSON estruturado.`;
 
-// User prompt template for generating the Código da Essência
+// User prompt template for generating the Código da Essência - 3 Layers Structure
 const getUserPrompt = (locale: string, results: any, userName: string) => {
+  // Define sections based on the 3-layer structure
   const sections = [
-    { id: "overview", title: locale === 'en' ? "Summary of Your Essence" : "Resumo da sua Essência" },
-    { id: "matriz_essencial", title: locale === 'en' ? "The Engineering of Your Essence" : "A Engenharia da sua Essência" },
-    { id: "padroes_comportamento", title: locale === 'en' ? "Your Behavior Patterns" : "Seus Padrões de Comportamento" },
-    { id: "talentos_dons", title: locale === 'en' ? "Your Talents and Gifts" : "Seus Talentos e Dons" },
-    { id: "dores_raizes", title: locale === 'en' ? "Your Pains and Emotional Roots" : "Suas Dores e Raízes Emocionais" },
+    // LAYER 1 - Essential Synthesis
+    { id: "sintese_essencial", title: locale === 'en' ? "Synthesis of Your Essence" : "Síntese da Sua Essência" },
+    // LAYER 2 - Deep Report
+    { id: "resumo_essencia", title: locale === 'en' ? "Summary of Your Essence" : "Resumo da Sua Essência" },
+    { id: "matriz_essencial", title: locale === 'en' ? "Your Essential Matrix" : "Sua Matriz Essencial" },
+    { id: "padroes_comportamento", title: locale === 'en' ? "Behavior Patterns" : "Padrões de Comportamento" },
+    { id: "talentos_dons", title: locale === 'en' ? "Talents and Natural Gifts" : "Talentos e Dons Naturais" },
+    { id: "dores_raizes", title: locale === 'en' ? "Root Pains and Challenges" : "Dores Raízes e Desafios" },
     { id: "proposito_natural", title: locale === 'en' ? "Your Natural Purpose" : "Seu Propósito Natural" },
-    { id: "caminho_maturidade", title: locale === 'en' ? "Your Maturity Path (90 days)" : "Seu Caminho de Maturidade (90 dias)" },
+    // LAYER 3 - Practical Integration
+    { id: "caminho_maturidade", title: locale === 'en' ? "90-Day Maturity Path" : "Caminho de Maturidade de 90 Dias" },
     { id: "rotina_autoconsciencia", title: locale === 'en' ? "Self-Awareness Routine" : "Rotina de Autoconsciência" },
-    { id: "fechamento_humano", title: locale === 'en' ? "Human Integrated Closing" : "Fechamento Humano Integrado" },
-    { id: "carta_final", title: locale === 'en' ? "Final Letter from Miguel" : "Carta Final do Miguel" },
+    // Closing
+    { id: "conversa_coracao", title: locale === 'en' ? "A Conversation from the Heart" : "Uma Conversa do Coração" },
   ];
 
   if (locale === 'en') {
-    return `Here are the consolidated results of ${userName}'s 7 personality tests in JSON format:
+    return `Here are the consolidated results of ${userName}'s personality tests in JSON format:
 
 ${JSON.stringify(results, null, 2)}
 
-THE 7 TESTS THAT MUST BE ANALYZED AND CROSS-REFERENCED:
-1. Arquétipos com Propósito (Archetypes) - Reveals the symbolic energy that drives the person
-2. DISC - Reveals behavioral profile and communication style
-3. Nello 16 Personality - Reveals cognitive functions and decision-making style
-4. Eneagrama (Enneagram) - Reveals core motivation, fear, and desire
-5. Temperamentos (Temperaments) - Reveals the biological/emotional base of reactions
-6. Inteligências Múltiplas (Multiple Intelligences) - Reveals natural cognitive strengths
-7. Estilos de Conexão Afetiva (Affection Connection Styles) - Reveals how the person gives and receives love
+AVAILABLE DATA:
+- Name: ${userName}
+- Nello 16 Personality
+- DISC Profile
+- Temperaments
+- Predominant and secondary Archetypes
+- Top Multiple Intelligences
+- Affection Connection Styles
+- Main behavioral patterns identified
 
-CRITICAL INSTRUCTION: You MUST reference and cross-analyze ALL 7 tests in EVERY section. Each section should show how the different tests interact, complement, or create tension with each other. This is NOT a summary of individual tests - it's a SYNTHESIS that reveals patterns only visible when crossing all dimensions.
+Use everything in an integrated way, not as a list.
 
-Based on this data, generate the complete ESSENCE CODE, divided into the following sections:
+THE ESSENCE CODE SHOULD BE ORGANIZED IN 3 LAYERS:
 
-1. overview - A warm synthesis of who this person is at their core. MUST mention insights from ALL 7 tests and how they form a coherent whole.
-2. matriz_essencial - The fundamental structure of their personality. Show specifically how the 7 dimensions interact with each other (e.g., "Your Archetype X combined with Enneagram type Y creates a unique pattern of...").
-3. padroes_comportamento - 3 main behavior patterns identified by CROSSING the tests. Each pattern should reference at least 3 different tests.
-4. talentos_dons - 3 natural talents that emerge from cross-analysis. Each talent should be supported by evidence from multiple tests.
-5. dores_raizes - 3 core emotional pains. Show how different tests reveal the same root from different angles.
-6. proposito_natural - Their natural purpose based on the intersection of Archetype + Multiple Intelligences + Enneagram + DISC.
-7. caminho_maturidade - A 90-day maturity path with actions that address insights from ALL tests.
-8. rotina_autoconsciencia - Practices tailored to their complete profile (all 7 dimensions).
-9. fechamento_humano - HUMAN INTEGRATED CLOSING. This is the most important section. Write a human, warm, personal closing that:
-   - Affirms this is NOT generic or empty, but coherent and real
-   - Integrates action, emotion, thought, spirituality, and relationship
-   - Shows how the Archetypes reveal their role and journey
-   - Shows how Multiple Intelligences reveal how they learn and create
-   - Shows how Affection Connection Styles reveal how they love and connect
-   - Brings up internal tensions as something human and rich
-   - Makes the user feel SEEN, UNDERSTOOD, and RESPECTED
-   - Reinforces that the Nello method captured something TRUE about their essence
-   - 3-5 short paragraphs, conversational tone, call user by first name, no hyphens
-   - Start with something like "Before anything, something needs to be clear" and affirm there is substance here
-10. carta_final - A personal letter that weaves together the most important revelations from all tests.
+🧩 LAYER 1 — ESSENTIAL SYNTHESIS
+
+Goal: Give the user a quick and memorable portrait of who they are.
+
+Instructions:
+- Create a short block with the title "Synthesis of Your Essence"
+- 4 to 6 bullet points, starting with: "You are someone who..."
+- Simple, direct, human phrases
+- Integrate: action, emotion, relationship, talents, and search for meaning
+- Nothing technical
+
+Example tone:
+- You are someone who leads through action and initiative.
+- You are someone who learns by doing and adapts quickly.
+- You are someone who seeks depth in connections.
+- You are someone who gets frustrated with superficiality.
+- You are someone who flourishes when uniting results and purpose.
+
+🧩 LAYER 2 — DEEP REPORT
+
+Goal: Develop the complete narrative of the user's essence.
+
+Write a structured text with the following blocks:
+1. resumo_essencia - Summary of Your Essence
+2. matriz_essencial - Your Essential Matrix
+3. padroes_comportamento - Behavior Patterns (3 main patterns)
+4. talentos_dons - Talents and Natural Gifts (3 talents)
+5. dores_raizes - Root Pains and Challenges (3 pains)
+6. proposito_natural - Your Natural Purpose
+
+In each block:
+- Integrate archetypes, personality, DISC, temperaments, intelligences, and affective style
+- Show strengths and internal tensions as something human
+- Use expressions like: "tends to", "points to", "there is a search", "it is common that you feel"
+- Avoid absolute tone
+- Tone: deep, but accessible
+
+🧩 LAYER 3 — PRACTICAL INTEGRATION
+
+Goal: Help the user bring their essence to real life.
+
+Divide into:
+
+🔹 caminho_maturidade - 90-Day Maturity Path
+- Month 1, 2, and 3
+- Each month with:
+  - Main focus
+  - Simple practice
+  - Reflection question
+- Integrate the main traits of the profile
+
+🔹 rotina_autoconsciencia - Self-Awareness Routine
+Divide into:
+- Morning
+- Afternoon
+- Night
+With brief practices linked to the user's profile.
+
+🧩 HUMAN CLOSING
+
+conversa_coracao - A Conversation from the Heart
+
+Goal: Close the Essence Code with validation and humanity.
+
+Instructions:
+- Write 3 to 4 paragraphs that:
+- Start with something like: "Before anything, something needs to be clear"
+- Clearly affirm that: this is not generic, there is substance and coherence, there is something real here about who the person is
+- Integrate: archetypes as life role, intelligences as way of learning and creating, affective style as way of loving and connecting
+- Bring internal tensions as richness, not a problem
+- End with: validation, encouragement, invitation to consciousness
+- Tone: human, warm, true
+- Call the user by their first name
+- Do not use hyphens
 
 Respond in JSON with the following structure:
 
@@ -129,67 +189,191 @@ Respond in JSON with the following structure:
   "generatedAt": "[current timestamp]",
   "sections": [
     {
-      "id": "overview",
+      "id": "sintese_essencial",
+      "title": "Synthesis of Your Essence",
+      "bullets": ["You are someone who...", "You are someone who...", ...]
+    },
+    {
+      "id": "resumo_essencia",
       "title": "Summary of Your Essence",
       "paragraphs": ["paragraph 1", "paragraph 2", "paragraph 3"]
     },
-    ... (all 10 sections following this structure)
+    {
+      "id": "matriz_essencial",
+      "title": "Your Essential Matrix",
+      "paragraphs": ["paragraph 1", "paragraph 2"]
+    },
+    {
+      "id": "padroes_comportamento",
+      "title": "Behavior Patterns",
+      "paragraphs": ["paragraph 1", "paragraph 2", "paragraph 3"]
+    },
+    {
+      "id": "talentos_dons",
+      "title": "Talents and Natural Gifts",
+      "paragraphs": ["paragraph 1", "paragraph 2", "paragraph 3"]
+    },
+    {
+      "id": "dores_raizes",
+      "title": "Root Pains and Challenges",
+      "paragraphs": ["paragraph 1", "paragraph 2", "paragraph 3"]
+    },
+    {
+      "id": "proposito_natural",
+      "title": "Your Natural Purpose",
+      "paragraphs": ["paragraph 1", "paragraph 2"]
+    },
+    {
+      "id": "caminho_maturidade",
+      "title": "90-Day Maturity Path",
+      "months": [
+        {
+          "month": 1,
+          "focus": "Main focus",
+          "practice": "Simple practice",
+          "question": "Reflection question"
+        },
+        {
+          "month": 2,
+          "focus": "Main focus",
+          "practice": "Simple practice",
+          "question": "Reflection question"
+        },
+        {
+          "month": 3,
+          "focus": "Main focus",
+          "practice": "Simple practice",
+          "question": "Reflection question"
+        }
+      ]
+    },
+    {
+      "id": "rotina_autoconsciencia",
+      "title": "Self-Awareness Routine",
+      "routine": {
+        "morning": "Morning practice",
+        "afternoon": "Afternoon practice",
+        "night": "Night practice"
+      }
+    },
+    {
+      "id": "conversa_coracao",
+      "title": "A Conversation from the Heart",
+      "paragraphs": ["paragraph 1", "paragraph 2", "paragraph 3", "paragraph 4"]
+    }
   ]
 }
 
 RULES:
-- Each section must have 2-4 meaningful paragraphs (fechamento_humano can have 3-5)
-- Be specific and reference actual test results BY NAME (e.g., "Your DISC profile of D combined with...")
-- Every section MUST cross-reference at least 3 different tests
-- CRITICAL: Always include Archetypes, Multiple Intelligences, and Affection Connection Styles in the synthesis
+- The sintese_essencial section must have 4-6 bullets starting with "You are someone who..."
+- Each report section must have 2-4 meaningful paragraphs
+- conversa_coracao must have 3-4 paragraphs
+- Be specific and reference actual test results
+- Every section MUST cross-reference multiple tests
 - Use warm, human, deep language
 - Make content actionable and practical
-- The fechamento_humano should make the user think "This spoke about ME. It's not generic. There's truth here."
-- Do not use generic statements - personalize everything based on the specific test results`;
+- The conversa_coracao should make the user think "This spoke about ME. It's not generic."
+- Do not use generic statements - personalize everything
+- Do not use hyphens`;
   }
 
   const isEuropean = locale === 'pt-pt';
   const youWord = isEuropean ? 'tu' : 'você';
-  const yourWord = isEuropean ? 'tua' : 'sua';
+  const yourWord = isEuropean ? 'sua' : 'sua';
   const haveWord = isEuropean ? 'tens' : 'tem';
 
-  return `Aqui estão os resultados consolidados dos 7 testes de personalidade de ${userName} em formato JSON:
+  return `Aqui estão os resultados consolidados dos testes de personalidade de ${userName} em formato JSON:
 
 ${JSON.stringify(results, null, 2)}
 
-OS 7 TESTES QUE DEVEM SER ANALISADOS E CRUZADOS:
-1. Arquétipos com Propósito - Revela a energia simbólica que move a pessoa
-2. DISC - Revela o perfil comportamental e estilo de comunicação
-3. Nello 16 Personality - Revela funções cognitivas e estilo de tomada de decisão
-4. Eneagrama - Revela motivação central, medo e desejo
-5. Temperamentos - Revela a base biológica/emocional das reações
-6. Inteligências Múltiplas - Revela forças cognitivas naturais
-7. Estilos de Conexão Afetiva - Revela como a pessoa dá e recebe amor
+DADOS DISPONÍVEIS:
+- Nome: ${userName}
+- Nello 16 Personality
+- Perfil DISC
+- Temperamentos
+- Arquétipos predominantes e secundários
+- Inteligências Múltiplas mais altas
+- Estilos de Conexão Afetiva
+- Principais padrões comportamentais identificados
 
-INSTRUÇÃO CRÍTICA: ${youWord.charAt(0).toUpperCase() + youWord.slice(1)} DEVE referenciar e cruzar TODOS os 7 testes em CADA seção. Cada seção deve mostrar como os diferentes testes interagem, se complementam ou criam tensões entre si. Isso NÃO é um resumo de testes individuais - é uma SÍNTESE que revela padrões só visíveis quando cruzamos todas as dimensões.
+Use tudo de forma integrada, não como lista.
 
-Com base nesses dados, gere o CÓDIGO DA ESSÊNCIA completo, dividido nas seguintes seções:
+O CÓDIGO DA ESSÊNCIA DEVE SER ORGANIZADO EM 3 CAMADAS:
 
-1. overview - Uma síntese acolhedora de quem essa pessoa é em ${yourWord} essência. DEVE mencionar insights de TODOS os 7 testes e como formam um todo coerente.
-2. matriz_essencial - A estrutura fundamental da personalidade. Mostre especificamente como as 7 dimensões interagem (ex: "Seu Arquétipo X combinado com Eneagrama tipo Y cria um padrão único de...").
-3. padroes_comportamento - 3 padrões principais de comportamento identificados CRUZANDO os testes. Cada padrão deve referenciar pelo menos 3 testes diferentes.
-4. talentos_dons - 3 talentos naturais que emergem do cruzamento. Cada talento deve ser sustentado por evidências de múltiplos testes.
-5. dores_raizes - 3 dores emocionais centrais. Mostre como diferentes testes revelam a mesma raiz de ângulos diferentes.
-6. proposito_natural - O propósito natural baseado na interseção de Arquétipo + Inteligências Múltiplas + Eneagrama + DISC.
-7. caminho_maturidade - Um caminho de maturidade de 90 dias com ações que endereçam insights de TODOS os testes.
-8. rotina_autoconsciencia - Práticas personalizadas para o perfil completo (todas as 7 dimensões).
-9. fechamento_humano - FECHAMENTO HUMANO INTEGRADO. Esta é a seção mais importante. Escreva um fechamento humano, acolhedor e pessoal que:
-   - Afirme que isso NÃO é genérico nem vazio, mas coerente e real
-   - Integre ação, emoção, pensamento, espiritualidade e relação
-   - Mostre como os Arquétipos revelam o papel e a jornada da pessoa
-   - Mostre como as Inteligências Múltiplas revelam como ela aprende e cria
-   - Mostre como os Estilos de Conexão Afetiva revelam como ela ama e se conecta
-   - Traga à tona tensões internas como algo humano e rico
-   - Faça o usuário se sentir VISTO, COMPREENDIDO e RESPEITADO
-   - Reforce que o método do Nello captou algo VERDADEIRO da ${yourWord} essência
-   - 3-5 parágrafos curtos, tom de conversa, chame pelo primeiro nome, sem hífens
-   - Comece com algo como "Antes de tudo, é importante dizer uma coisa" e afirme que há substância aqui
-10. carta_final - Uma carta pessoal que tece as revelações mais importantes de todos os testes.
+🧩 CAMADA 1 — SÍNTESE ESSENCIAL
+
+🎯 Objetivo: Dar ao usuário um retrato rápido e memorável de quem ele é.
+
+✍️ Instruções:
+- Crie um bloco curto com o título "Síntese da Sua Essência"
+- 4 a 6 pontos em bullet, começando com: "${youWord.charAt(0).toUpperCase() + youWord.slice(1)} é alguém que..."
+- Frases simples, diretas, humanas
+- Integrar: ação, emoção, relação, talentos e busca de sentido
+- Nada técnico
+
+🧾 Exemplo de tom:
+- ${youWord.charAt(0).toUpperCase() + youWord.slice(1)} é alguém que lidera pela ação e iniciativa.
+- ${youWord.charAt(0).toUpperCase() + youWord.slice(1)} é alguém que aprende fazendo e se adapta rápido.
+- ${youWord.charAt(0).toUpperCase() + youWord.slice(1)} é alguém que busca profundidade nas conexões.
+- ${youWord.charAt(0).toUpperCase() + youWord.slice(1)} é alguém que se frustra com superficialidade.
+- ${youWord.charAt(0).toUpperCase() + youWord.slice(1)} é alguém que floresce quando une resultado e propósito.
+
+🧩 CAMADA 2 — RELATÓRIO PROFUNDO
+
+🎯 Objetivo: Desenvolver a narrativa completa da essência do usuário.
+
+Escreva um texto estruturado com os blocos:
+1. resumo_essencia - Resumo da Sua Essência
+2. matriz_essencial - Sua Matriz Essencial
+3. padroes_comportamento - Padrões de Comportamento (3 padrões principais)
+4. talentos_dons - Talentos e Dons Naturais (3 talentos)
+5. dores_raizes - Dores Raízes e Desafios (3 dores)
+6. proposito_natural - Seu Propósito Natural
+
+Em cada bloco:
+- Integre arquétipos, personalidade, DISC, temperamentos, inteligências e estilo afetivo
+- Mostre forças e tensões internas como algo humano
+- Use expressões como: "tende a", "aponta para", "há uma busca", "é comum que ${youWord} sinta"
+- Evite tom absoluto
+- Tom: profundo, mas acessível
+
+🧩 CAMADA 3 — INTEGRAÇÃO PRÁTICA
+
+🎯 Objetivo: Ajudar o usuário a trazer a essência para a vida real.
+
+Divida em:
+
+🔹 caminho_maturidade - Caminho de Maturidade de 90 Dias
+- Mês 1, 2 e 3
+- Cada mês com:
+  - Foco principal
+  - Prática simples
+  - Pergunta de reflexão
+- Integre os principais traços do perfil
+
+🔹 rotina_autoconsciencia - Rotina de Autoconsciência
+Divida em:
+- Manhã
+- Tarde
+- Noite
+Com práticas breves ligadas ao perfil do usuário.
+
+🧩 FECHAMENTO HUMANO
+
+conversa_coracao - Uma Conversa do Coração
+
+🎯 Objetivo: Fechar o Código da Essência com validação e humanidade.
+
+✍️ Instruções:
+- Escreva 3 a 4 parágrafos que:
+- Comecem com algo como: "Antes de tudo, é importante dizer uma coisa"
+- Afirme claramente que: isso não é genérico, há substância e coerência, há algo real aqui sobre quem a pessoa é
+- Integre: arquétipos como papel de vida, inteligências como forma de aprender e criar, estilo afetivo como forma de amar e se conectar
+- Traga as tensões internas como riqueza, não problema
+- Termine com: validação, encorajamento, convite à consciência
+- Tom: humano, caloroso, verdadeiro
+- Chame o usuário pelo primeiro nome
+- Não use hífens
 
 Responda em JSON com a seguinte estrutura:
 
@@ -199,23 +383,92 @@ Responda em JSON com a seguinte estrutura:
   "generatedAt": "[timestamp atual]",
   "sections": [
     {
-      "id": "overview",
-      "title": "Resumo da ${yourWord.charAt(0).toUpperCase() + yourWord.slice(1)} Essência",
+      "id": "sintese_essencial",
+      "title": "Síntese da Sua Essência",
+      "bullets": ["${youWord.charAt(0).toUpperCase() + youWord.slice(1)} é alguém que...", "${youWord.charAt(0).toUpperCase() + youWord.slice(1)} é alguém que...", ...]
+    },
+    {
+      "id": "resumo_essencia",
+      "title": "Resumo da Sua Essência",
       "paragraphs": ["parágrafo 1", "parágrafo 2", "parágrafo 3"]
     },
-    ... (todas as 10 seções seguindo esta estrutura)
+    {
+      "id": "matriz_essencial",
+      "title": "Sua Matriz Essencial",
+      "paragraphs": ["parágrafo 1", "parágrafo 2"]
+    },
+    {
+      "id": "padroes_comportamento",
+      "title": "Padrões de Comportamento",
+      "paragraphs": ["parágrafo 1", "parágrafo 2", "parágrafo 3"]
+    },
+    {
+      "id": "talentos_dons",
+      "title": "Talentos e Dons Naturais",
+      "paragraphs": ["parágrafo 1", "parágrafo 2", "parágrafo 3"]
+    },
+    {
+      "id": "dores_raizes",
+      "title": "Dores Raízes e Desafios",
+      "paragraphs": ["parágrafo 1", "parágrafo 2", "parágrafo 3"]
+    },
+    {
+      "id": "proposito_natural",
+      "title": "Seu Propósito Natural",
+      "paragraphs": ["parágrafo 1", "parágrafo 2"]
+    },
+    {
+      "id": "caminho_maturidade",
+      "title": "Caminho de Maturidade de 90 Dias",
+      "months": [
+        {
+          "month": 1,
+          "focus": "Foco principal",
+          "practice": "Prática simples",
+          "question": "Pergunta de reflexão"
+        },
+        {
+          "month": 2,
+          "focus": "Foco principal",
+          "practice": "Prática simples",
+          "question": "Pergunta de reflexão"
+        },
+        {
+          "month": 3,
+          "focus": "Foco principal",
+          "practice": "Prática simples",
+          "question": "Pergunta de reflexão"
+        }
+      ]
+    },
+    {
+      "id": "rotina_autoconsciencia",
+      "title": "Rotina de Autoconsciência",
+      "routine": {
+        "morning": "Prática da manhã",
+        "afternoon": "Prática da tarde",
+        "night": "Prática da noite"
+      }
+    },
+    {
+      "id": "conversa_coracao",
+      "title": "Uma Conversa do Coração",
+      "paragraphs": ["parágrafo 1", "parágrafo 2", "parágrafo 3", "parágrafo 4"]
+    }
   ]
 }
 
 REGRAS:
-- Cada seção deve ter 2-4 parágrafos significativos (fechamento_humano pode ter 3-5)
-- Seja específico e referencie os resultados reais dos testes PELO NOME (ex: "Seu perfil DISC de D combinado com...")
-- Cada seção DEVE cruzar pelo menos 3 testes diferentes
-- CRÍTICO: Sempre inclua Arquétipos, Inteligências Múltiplas e Estilos de Conexão Afetiva na síntese
+- A seção sintese_essencial deve ter 4-6 bullets começando com "${youWord.charAt(0).toUpperCase() + youWord.slice(1)} é alguém que..."
+- Cada seção do relatório deve ter 2-4 parágrafos significativos
+- conversa_coracao deve ter 3-4 parágrafos
+- Seja específico e referencie os resultados reais dos testes
+- Cada seção DEVE cruzar múltiplos testes
 - Use linguagem acolhedora, humana e profunda
 - Torne o conteúdo aplicável e prático
-- O fechamento_humano deve fazer o usuário pensar "Isso falou de mim. Não é genérico. Tem verdade aqui."
-- Não use frases genéricas - personalize tudo com base nos resultados específicos
+- O conversa_coracao deve fazer o usuário pensar "Isso falou de mim. Não é genérico."
+- Não use frases genéricas - personalize tudo
+- Não use hífens
 - ${isEuropean ? 'Use português europeu (tu, teu, tua)' : 'Use português brasileiro (você, seu, sua)'}`;
 };
 
