@@ -17,6 +17,11 @@ Tom de voz:
 - Espiritual sem ser religioso
 - Prático e aplicável
 
+IMPORTANTE - RESTRIÇÕES DE NOMENCLATURA:
+- NUNCA use os termos "Linguagens do Amor", "Love Languages" ou "5 Love Languages" - use "Estilos de Conexão Afetiva"
+- NUNCA use o termo "MBTI" ou "Myers-Briggs" - use "Nello 16 Personality" ou "Perfil de Personalidade Nello 16"
+- Esses termos são marcas registradas e não devem ser usados
+
 Você deve responder SEMPRE em JSON, no formato exato solicitado.
 Não adicione texto fora do JSON.
 Não explique o que está fazendo.
@@ -32,6 +37,11 @@ Tone of voice:
 - Spiritual without being religious
 - Practical and applicable
 
+IMPORTANT - NAMING RESTRICTIONS:
+- NEVER use the terms "Love Languages", "5 Love Languages" or "Linguagens do Amor" - use "Affection Connection Styles"
+- NEVER use the terms "MBTI" or "Myers-Briggs" - use "Nello 16 Personality" or "Nello 16 Personality Profile"
+- These are trademarked terms and must not be used
+
 You must ALWAYS respond in JSON, in the exact format requested.
 Do not add text outside the JSON.
 Do not explain what you are doing.
@@ -46,6 +56,11 @@ Tom de voz:
 - Sempre específico baseado nos dados do utilizador
 - Espiritual sem ser religioso
 - Prático e aplicável
+
+IMPORTANTE - RESTRIÇÕES DE NOMENCLATURA:
+- NUNCA uses os termos "Linguagens do Amor", "Love Languages" ou "5 Love Languages" - usa "Estilos de Conexão Afetiva"
+- NUNCA uses o termo "MBTI" ou "Myers-Briggs" - usa "Nello 16 Personality" ou "Perfil de Personalidade Nello 16"
+- Esses termos são marcas registadas e não devem ser usados
 
 Deves responder SEMPRE em JSON, no formato exato solicitado.
 Não adiciones texto fora do JSON.
@@ -234,19 +249,36 @@ serve(async (req) => {
       );
     }
 
-    // Build consolidated results object
+    // Build consolidated results object with copyright-safe names
+    const testNameMapping: Record<string, string> = {
+      'linguagens_amor': 'Estilos de Conexão Afetiva',
+      'mbti': 'Nello 16 Personality',
+      'disc': 'DISC',
+      'eneagrama': 'Eneagrama',
+      'temperamentos': 'Temperamentos',
+      'inteligencias_multiplas': 'Inteligências Múltiplas',
+      'arquetipos_proposito': 'Arquétipos com Propósito',
+      'arquetipos': 'Arquétipos',
+    };
+
+    const testKeyMapping: Record<string, string> = {
+      'linguagens_amor': 'estilos_conexao_afetiva',
+      'mbti': 'nello16_personality',
+    };
+
     const results: Record<string, any> = {};
     
     userTests?.forEach(ut => {
       const testType = (ut.tests as any)?.type;
-      const testName = (ut.tests as any)?.name;
       
       if (testType && ut.result_data) {
-        // Extract key information from each test result
+        // Use mapped key and name to avoid copyright terms
+        const mappedKey = testKeyMapping[testType] || testType;
+        const mappedName = testNameMapping[testType] || (ut.tests as any)?.name;
         const resultData = ut.result_data as any;
         
-        results[testType] = {
-          testName,
+        results[mappedKey] = {
+          testName: mappedName,
           ...extractKeyResults(testType, resultData)
         };
       }
