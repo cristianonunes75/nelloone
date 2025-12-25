@@ -41,6 +41,7 @@ import { ResultsFloatingMenu } from "@/components/cliente/ResultsFloatingMenu";
 import { TestResultsSkeleton } from "@/components/tests/TestResultsSkeleton";
 import { DISCResultsSection } from "@/components/tests/DISCResultsSection";
 import { TemperamentosResultsSection } from "@/components/tests/TemperamentosResultsSection";
+import { EneagramaResultsSection } from "@/components/tests/EneagramaResultsSection";
 import { recalculateTestResult } from "@/lib/recalculateTestResult";
 
 // Journey order for navigation
@@ -744,104 +745,12 @@ function TestResultsInner() {
           </CardContent>
         </Card>
 
-        {/* Enneagram Results */}
+        {/* Enneagram Results - Using Rich Component */}
         {isEnneagramTest && enneagramResultData?.primaryType && (
-          <Card className="border-none shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
-              <div className="text-center space-y-4">
-                <div className="text-6xl">🌿</div>
-                <CardTitle className="text-3xl font-light">Tipo {enneagramResultData.primaryType}</CardTitle>
-                <CardDescription className="text-lg">
-                  {ENNEAGRAM_PROFILES[enneagramResultData.primaryType]?.name || "Seu Tipo do Eneagrama"}
-                </CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-8 space-y-8">
-              <div className="space-y-4 text-center max-w-3xl mx-auto">
-                <p className="text-lg leading-relaxed">
-                  {ENNEAGRAM_PROFILES[enneagramResultData.primaryType]?.description}
-                </p>
-              </div>
-
-              {(() => {
-                const profile = ENNEAGRAM_PROFILES[String(enneagramResultData.primaryType)];
-                const scores = (enneagramResultData?.scores ?? {}) as Record<string, number>;
-                const percentages = (enneagramResultData?.percentages ?? {}) as Record<string, number>;
-                const sortedEntries = Object.entries(scores).sort(([, a], [, b]) => Number(b) - Number(a));
-
-                return (
-                  <>
-                    <Card className="border-2 border-accent/30">
-                      <CardHeader>
-                        <CardTitle className="text-xl">Características Principais</CardTitle>
-                        <CardDescription>Qualidades que definem o seu tipo</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex flex-wrap gap-3 justify-center">
-                          {(profile?.traits ?? []).map((trait: string) => (
-                            <Badge key={trait} variant="secondary" className="px-4 py-2 text-sm">
-                              {trait}
-                            </Badge>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {sortedEntries.length > 0 && (
-                      <Card className="border-2 border-accent/30">
-                        <CardHeader>
-                          <CardTitle className="text-xl">Pontuação por Tipo</CardTitle>
-                          <CardDescription>Como você se distribui entre os 9 tipos do Eneagrama</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          {sortedEntries.map(([type, score]) => {
-                            const percentage = Number(percentages[type] ?? 0);
-                            const isPrimary = String(type) === String(enneagramResultData.primaryType);
-                            const profileData = ENNEAGRAM_PROFILES[String(type)];
-                            const scoreValue = Number(score);
-                            return (
-                              <div
-                                key={type}
-                                className={`space-y-2 p-4 rounded-lg ${
-                                  isPrimary ? "bg-accent/20 border-2 border-accent" : "bg-muted/50"
-                                }`}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    <span className="text-2xl">🌿</span>
-                                    <div>
-                                      <h4 className={`font-medium ${isPrimary ? "text-accent" : ""}`}>
-                                        Tipo {type} - {profileData?.name}
-                                      </h4>
-                                      <p className="text-xs text-muted-foreground">{profileData?.shortDescription}</p>
-                                    </div>
-                                  </div>
-                                  <div className="text-right">
-                                    <span className={`text-lg font-bold ${isPrimary ? "text-accent" : ""}`}>
-                                      {scoreValue}/25
-                                    </span>
-                                    <p className="text-xs text-muted-foreground">{percentage}%</p>
-                                  </div>
-                                </div>
-                                <Progress value={percentage} className={isPrimary ? "h-3" : "h-2"} />
-                              </div>
-                            );
-                          })}
-                        </CardContent>
-                      </Card>
-                    )}
-                  </>
-                );
-              })()}
-
-
-              <div className="text-center py-8">
-                <p className="text-lg font-light italic text-muted-foreground">
-                  NELLO ONE — uma jornada de autoconhecimento e verdade interior.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <EneagramaResultsSection 
+            enneagramResults={enneagramResultData} 
+            lang={lang as 'pt' | 'pt-pt' | 'en'} 
+          />
         )}
 
         {/* Nello 16 Personality Map Results */}
