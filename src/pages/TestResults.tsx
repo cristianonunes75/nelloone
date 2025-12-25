@@ -194,8 +194,10 @@ function TestResultsInner() {
   }
 
 
-  const { data: answers } = useQuery({
+  // Wait for userTest to load before fetching answers
+  const { data: answers, isLoading: answersLoading } = useQuery({
     queryKey: ["test-result-answers", userTestId],
+    enabled: !!userTestId && !!userTest, // Only fetch after userTest is loaded
     queryFn: async () => {
       const { data, error } = await supabase
         .from("test_answers")
@@ -206,6 +208,9 @@ function TestResultsInner() {
       return data;
     },
   });
+
+  // Combined loading state - wait for both queries
+  const isFullyLoaded = !isLoading && !answersLoading && userTest;
 
   const { data: hasPurchased } = useQuery({
     queryKey: ["test-purchase", user?.id, userTest?.test_id],
@@ -278,11 +283,14 @@ function TestResultsInner() {
     queryClient.invalidateQueries({ queryKey: ["test-result-answers", userTestId] });
   }
 
-  if (isLoading) {
+  // Show loading until both userTest and answers are loaded
+  if (!isFullyLoaded) {
     return (
       <div className="container mx-auto p-6 flex flex-col items-center justify-center min-h-screen gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="text-muted-foreground">Carregando resultados...</p>
+        <p className="text-muted-foreground">
+          {isLoading ? "Carregando teste..." : "Carregando respostas..."}
+        </p>
       </div>
     );
   }
