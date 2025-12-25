@@ -763,60 +763,77 @@ function TestResultsInner() {
                 </p>
               </div>
 
-              <Card className="border-2 border-accent/30">
-                <CardHeader>
-                  <CardTitle className="text-xl">Características Principais</CardTitle>
-                  <CardDescription>Qualidades que definem o seu tipo</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-3 justify-center">
-                    {ENNEAGRAM_PROFILES[enneagramResultData.primaryType]?.traits.map((trait: string) => (
-                      <Badge key={trait} variant="secondary" className="px-4 py-2 text-sm">
-                        {trait}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              {(() => {
+                const profile = ENNEAGRAM_PROFILES[String(enneagramResultData.primaryType)];
+                const scores = (enneagramResultData?.scores ?? {}) as Record<string, number>;
+                const percentages = (enneagramResultData?.percentages ?? {}) as Record<string, number>;
+                const sortedEntries = Object.entries(scores).sort(([, a], [, b]) => Number(b) - Number(a));
 
-              <Card className="border-2 border-accent/30">
-                <CardHeader>
-                  <CardTitle className="text-xl">Pontuação por Tipo</CardTitle>
-                  <CardDescription>Como você se distribui entre os 9 tipos do Eneagrama</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {Object.entries(enneagramResultData.scores)
-                    .sort(([,a], [,b]) => (Number(b) - Number(a)))
-                    .map(([type, score]) => {
-                      const percentage = enneagramResultData.percentages[type];
-                      const isPrimary = type === enneagramResultData.primaryType;
-                      const profileData = ENNEAGRAM_PROFILES[type];
-                      const scoreValue = Number(score);
-                      return (
-                        <div key={type} className={`space-y-2 p-4 rounded-lg ${isPrimary ? 'bg-accent/20 border-2 border-accent' : 'bg-muted/50'}`}>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <span className="text-2xl">🌿</span>
-                              <div>
-                                <h4 className={`font-medium ${isPrimary ? 'text-accent' : ''}`}>
-                                  Tipo {type} - {profileData?.name}
-                                </h4>
-                                <p className="text-xs text-muted-foreground">{profileData?.shortDescription}</p>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <span className={`text-lg font-bold ${isPrimary ? 'text-accent' : ''}`}>
-                                {scoreValue}/25
-                              </span>
-                              <p className="text-xs text-muted-foreground">{percentage}%</p>
-                            </div>
-                          </div>
-                          <Progress value={percentage} className={isPrimary ? "h-3" : "h-2"} />
+                return (
+                  <>
+                    <Card className="border-2 border-accent/30">
+                      <CardHeader>
+                        <CardTitle className="text-xl">Características Principais</CardTitle>
+                        <CardDescription>Qualidades que definem o seu tipo</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-wrap gap-3 justify-center">
+                          {(profile?.traits ?? []).map((trait: string) => (
+                            <Badge key={trait} variant="secondary" className="px-4 py-2 text-sm">
+                              {trait}
+                            </Badge>
+                          ))}
                         </div>
-                      );
-                    })}
-                </CardContent>
-              </Card>
+                      </CardContent>
+                    </Card>
+
+                    {sortedEntries.length > 0 && (
+                      <Card className="border-2 border-accent/30">
+                        <CardHeader>
+                          <CardTitle className="text-xl">Pontuação por Tipo</CardTitle>
+                          <CardDescription>Como você se distribui entre os 9 tipos do Eneagrama</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {sortedEntries.map(([type, score]) => {
+                            const percentage = Number(percentages[type] ?? 0);
+                            const isPrimary = String(type) === String(enneagramResultData.primaryType);
+                            const profileData = ENNEAGRAM_PROFILES[String(type)];
+                            const scoreValue = Number(score);
+                            return (
+                              <div
+                                key={type}
+                                className={`space-y-2 p-4 rounded-lg ${
+                                  isPrimary ? "bg-accent/20 border-2 border-accent" : "bg-muted/50"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-2xl">🌿</span>
+                                    <div>
+                                      <h4 className={`font-medium ${isPrimary ? "text-accent" : ""}`}>
+                                        Tipo {type} - {profileData?.name}
+                                      </h4>
+                                      <p className="text-xs text-muted-foreground">{profileData?.shortDescription}</p>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <span className={`text-lg font-bold ${isPrimary ? "text-accent" : ""}`}>
+                                      {scoreValue}/25
+                                    </span>
+                                    <p className="text-xs text-muted-foreground">{percentage}%</p>
+                                  </div>
+                                </div>
+                                <Progress value={percentage} className={isPrimary ? "h-3" : "h-2"} />
+                              </div>
+                            );
+                          })}
+                        </CardContent>
+                      </Card>
+                    )}
+                  </>
+                );
+              })()}
+
 
               <div className="text-center py-8">
                 <p className="text-lg font-light italic text-muted-foreground">
