@@ -128,13 +128,8 @@ export const AdminOrdersPayments = () => {
         p_new_data: { payment_status: 'refunded' }
       });
 
-      const metadata = selectedPurchase.metadata as any;
-      if (metadata?.product_type === 'codigo_da_essencia') {
-        await supabase
-          .from("profiles")
-          .update({ codigo_essencia_unlocked: false })
-          .eq("id", selectedPurchase.user_id);
-      }
+      // Note: codigo_essencia is now automatic when journey is complete
+      // No need to update any profile flag
 
       toast.success("Reembolso realizado com sucesso");
       setShowRefundDialog(false);

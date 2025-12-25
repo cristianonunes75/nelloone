@@ -1007,7 +1007,6 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
-          codigo_essencia_unlocked: boolean | null
           created_at: string
           deleted_at: string | null
           deleted_by: string | null
@@ -1028,7 +1027,6 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
-          codigo_essencia_unlocked?: boolean | null
           created_at?: string
           deleted_at?: string | null
           deleted_by?: string | null
@@ -1049,7 +1047,6 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
-          codigo_essencia_unlocked?: boolean | null
           created_at?: string
           deleted_at?: string | null
           deleted_by?: string | null

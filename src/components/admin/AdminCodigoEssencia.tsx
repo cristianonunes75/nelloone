@@ -70,13 +70,13 @@ export const AdminCodigoEssencia = () => {
       const purchaseMap = new Map(codigoPurchases.map(p => [p.user_id, p.purchased_at]));
 
       const enrichedUsers: CodigoEssenciaUser[] = (profiles || [])
-        .filter(p => p.codigo_essencia_unlocked || p.journey_status === 'completed')
+        .filter(p => p.journey_status === 'completed')
         .map(profile => {
           const mapa = mapaMap.get(profile.id);
           return {
             id: profile.id,
             full_name: profile.full_name,
-            codigo_essencia_unlocked: profile.codigo_essencia_unlocked || false,
+            codigo_essencia_unlocked: true, // Always true when journey is completed
             journey_status: profile.journey_status || 'not_started',
             created_at: profile.created_at,
             purchase_date: purchaseMap.get(profile.id),
