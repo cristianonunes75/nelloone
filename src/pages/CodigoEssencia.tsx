@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { useCodigoEssencia } from "@/hooks/useCodigoEssencia";
@@ -163,6 +163,7 @@ const CodigoEssencia = () => {
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
   const [generatedSections, setGeneratedSections] = useState<any[]>([]);
+  const autoGenAttemptedRef = useRef(false);
 
   const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   const t = TRANSLATIONS[lang];
@@ -189,13 +190,16 @@ const CodigoEssencia = () => {
   }, [savedCodigo, hasGenerated]);
 
   // Auto-generate on page entry when journey is complete and there is no saved report
+  // Guarded to avoid infinite retry loops if the backend returns an error.
   useEffect(() => {
     if (!user?.id) return;
     if (!isJourneyComplete) return;
     if (hasGenerated) return;
     if (hasSavedCodigo) return;
     if (isGenerating) return;
+    if (autoGenAttemptedRef.current) return;
 
+    autoGenAttemptedRef.current = true;
     toast.info(lang === 'en' ? 'Generating your Essence Code...' : 'Gerando seu Código da Essência...');
     void handleGenerateCodigo();
     // eslint-disable-next-line react-hooks/exhaustive-deps

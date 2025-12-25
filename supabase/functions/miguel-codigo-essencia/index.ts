@@ -178,7 +178,7 @@ serve(async (req) => {
     // 1. Validate user has completed the journey
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("journey_status, full_name, codigo_essencia_unlocked")
+      .select("journey_status, full_name")
       .eq("id", user_id)
       .single();
 
