@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import ArchetypeResults from "@/components/cliente/ArchetypeResults";
 import { calculateArchetypeScores, getDominantArchetypes } from "@/lib/archetypes";
 import { getDISCResults, DISC_PROFILES } from "@/lib/disc";
-import { NELLO_16_PROFILES } from "@/lib/nello16Personality";
+import { NELLO_16_PROFILES, getNello16DisplayCode } from "@/lib/nello16Personality";
 import { ENNEAGRAM_PROFILES } from "@/lib/eneagrama";
 import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
@@ -759,7 +759,7 @@ function TestResultsInner() {
             <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
               <div className="text-center space-y-4">
                 <div className="text-6xl">🧠</div>
-                <CardTitle className="text-3xl font-light">{mbtiResultData.type}</CardTitle>
+                <CardTitle className="text-3xl font-light">{getNello16DisplayCode(mbtiResultData.type)}</CardTitle>
                 <CardDescription className="text-lg">
                   {NELLO_16_PROFILES[mbtiResultData.type]?.name?.[lang] || "Seu Tipo Psicológico"}
                 </CardDescription>

@@ -1,6 +1,32 @@
 // Nello 16 Personality Map Type Profiles
 // Proprietary Nello One system inspired by Carl Jung's psychological type theory
 
+// Mapping from internal MBTI-style codes to Nello proprietary display codes
+// This allows us to use original naming while maintaining backward compatibility
+export const NELLO_16_CODE_MAP: Record<string, string> = {
+  INTJ: "N1-EA", // Nello 1 - Estrategista Analítico
+  INTP: "N2-AA", // Nello 2 - Analista Abstrato
+  ENTJ: "N3-AO", // Nello 3 - Arquitetador Organizacional
+  ENTP: "N4-VI", // Nello 4 - Visionário Inovador
+  INFJ: "N5-CP", // Nello 5 - Conselheiro Profundo
+  INFP: "N6-PI", // Nello 6 - Poeta Idealista
+  ENFJ: "N7-MI", // Nello 7 - Mentor Inspirador
+  ENFP: "N8-IC", // Nello 8 - Inspirador Criativo
+  ISTJ: "N9-GP", // Nello 9 - Guardião Prático
+  ISFJ: "N10-PC", // Nello 10 - Protetor Confiável
+  ESTJ: "N11-GE", // Nello 11 - Gestor Eficiente
+  ESFJ: "N12-AF", // Nello 12 - Anfitrião Fraterno
+  ISTP: "N13-AV", // Nello 13 - Artesão Versátil
+  ISFP: "N14-AE", // Nello 14 - Artista Espontâneo
+  ESTP: "N15-AT", // Nello 15 - Ativador Tático
+  ESFP: "N16-AP", // Nello 16 - Animador Presente
+};
+
+// Get the display code for a Nello 16 type
+export const getNello16DisplayCode = (internalCode: string): string => {
+  return NELLO_16_CODE_MAP[internalCode] || internalCode;
+};
+
 export interface Nello16Profile {
   code: string;
   name: {
