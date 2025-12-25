@@ -1,4 +1,4 @@
-// Dados dos Arquétipos com Propósito
+// Dados dos Arquétipos com Propósito - Textos profundos e específicos
 
 export interface ArchetypeData {
   name: string;
@@ -11,475 +11,861 @@ export interface ArchetypeData {
   powerPhrase: string;
   alignedBehavior: string;
   excessBehavior: string;
-  // Campos para combinação de arquétipos
-  complementsEnergy: string; // Como complementa a energia do primário
-  reinforcesExpression: string; // Como reforça a expressão no mundo
-  // Campos para aplicações práticas específicas
-  practicalRelationships: string[]; // Dicas práticas para relacionamentos
-  practicalWork: string[]; // Dicas práticas para trabalho
-  practicalSpiritual: string[]; // Dicas práticas para espiritualidade
+  complementsEnergy: string;
+  reinforcesExpression: string;
+  practicalRelationships: string[];
+  practicalWork: string[];
+  practicalSpiritual: string[];
   morningPractice: string;
   dailyExpression: string;
   eveningReflection: string;
   personalMantra: string;
+  // Novos campos para profundidade
+  deepPatterns: string[]; // Padrões reais de comportamento
+  commonChallenges: string[]; // Desafios e armadilhas típicas
+  cultivationPractices: string[]; // Como cultivar em equilíbrio
 }
 
 export const ARCHETYPES: Record<string, ArchetypeData> = {
   Governante: {
     name: "O Governante",
-    description: "Você é um líder nato com forte senso de responsabilidade e controle. Sua essência busca ordem, estabilidade e prosperidade através de decisões estratégicas.",
+    description: "Você não nasceu para ser mais um. Existe em você uma força que busca ordem, estabilidade e controle porque, lá no fundo, você sente que é sua responsabilidade fazer as coisas funcionarem. Quando algo está fora do lugar, você sente. Quando a equipe está perdida, você assume. Não porque queira aplausos, mas porque simplesmente não consegue ficar parado enquanto o barco afunda. O problema é que isso tem um preço: você carrega peso demais. E às vezes esquece que liderar também significa confiar.",
     characteristics: [
-      "Organizado e metódico",
-      "Assume responsabilidade naturalmente",
-      "Valoriza estabilidade e controle",
-      "Toma decisões baseadas em lógica"
+      "Você tende a assumir a frente em qualquer situação, mesmo quando ninguém pediu. É quase instintivo.",
+      "Fica incomodado com bagunça, atrasos e falta de direção. Caos te desestabiliza.",
+      "Toma decisões rápidas e depois se cobra se não foram perfeitas.",
+      "Sente que precisa ter resposta para tudo, mesmo quando não tem."
     ],
-    visualStyle: "Sofisticado e estruturado, com linhas limpas e composição equilibrada",
+    visualStyle: "Sofisticado e estruturado, com linhas limpas e composição equilibrada que transmite autoridade natural",
     colorPalette: ["#1a1a1a", "#ffffff", "#c9a961", "#2c3e50"],
     photographyDirection: "Ambiente corporativo elegante, postura confiante, iluminação dramática que transmite autoridade",
     emoji: "👑",
-    powerPhrase: "Quando lidero com visão estratégica, construo estabilidade e prosperidade ao meu redor.",
-    alignedBehavior: "Você lidera com sabedoria e responsabilidade, construindo estruturas que beneficiam a todos. Sua visão estratégica inspira confiança.",
-    excessBehavior: "Pode tender ao controle excessivo ou rigidez, precisando lembrar que delegar e confiar também são formas de liderança.",
-    complementsEnergy: "trazendo estrutura, organização e visão estratégica",
-    reinforcesExpression: "adicionando capacidade de liderança e tomada de decisão",
+    powerPhrase: "Tenho força para liderar e sabedoria para delegar. Não preciso carregar tudo sozinho.",
+    alignedBehavior: "Quando você está em equilíbrio, lidera com visão e generosidade. Constrói estruturas que beneficiam a todos, inspira confiança e sabe quando dar espaço para outros brilharem.",
+    excessBehavior: "Quando em excesso, você se torna controlador, rígido e impaciente com quem não segue seu ritmo. Começa a microgerenciar e a sentir que ninguém faz nada direito. O peso aumenta, a solidão também.",
+    complementsEnergy: "trazendo estrutura, organização e visão estratégica para suas decisões",
+    reinforcesExpression: "adicionando capacidade de liderança e tomada de decisão assertiva",
     practicalRelationships: [
-      "Reserve um horário fixo semanal para conversas profundas com seu parceiro/amigos",
-      "Delegue pequenas decisões aos outros para praticar confiança",
-      "Crie rituais familiares que tragam estabilidade (jantar em família, passeios regulares)"
+      "Perceba quando você está controlando demais uma situação familiar. Solte. Pergunte ao invés de dirigir.",
+      "Esta semana, deixe alguém tomar uma decisão que normalmente seria sua. Observe como você se sente.",
+      "Quando seu parceiro ou amigo errar, resista ao impulso de corrigir. Apenas escute."
     ],
     practicalWork: [
-      "Organize reuniões de alinhamento toda segunda-feira com sua equipe",
-      "Crie sistemas e processos documentados que outros possam seguir",
-      "Mentore alguém mais júnior, compartilhando sua visão estratégica"
+      "Delegue uma tarefa importante sem dar instruções detalhadas. Confie no processo.",
+      "Em uma reunião, faça mais perguntas do que afirmações. Lidere ouvindo.",
+      "Reconheça publicamente uma conquista de alguém da sua equipe que normalmente passaria despercebida."
     ],
     practicalSpiritual: [
-      "Pratique meditação de 10 minutos focada em soltar o controle",
-      "Escreva em um diário sobre momentos onde confiou e deu certo",
-      "Reserve um dia por mês sem planejamento rígido para fluir"
+      "Pratique 10 minutos de meditação focada em soltar o controle. Respire e confie.",
+      "Um dia por mês, não planeje nada. Deixe o dia acontecer.",
+      "Escreva sobre um momento em que você confiou em alguém e deu certo. O que isso te ensinou?"
     ],
-    morningPractice: "Defina suas 3 prioridades do dia e visualize o impacto positivo da sua liderança",
-    dailyExpression: "Tome uma decisão importante com sabedoria e delegue algo que normalmente faria sozinho",
-    eveningReflection: "Reconheça onde liderou bem e onde pode confiar mais nos outros amanhã",
-    personalMantra: "Eu lidero com sabedoria, criando prosperidade para todos ao meu redor"
+    morningPractice: "Antes de planejar o dia, pergunte: 'O que realmente depende de mim hoje e o que posso confiar aos outros?'",
+    dailyExpression: "Tome uma decisão importante com calma e delegue algo que normalmente faria sozinho",
+    eveningReflection: "Onde liderei bem hoje? Onde posso confiar mais amanhã?",
+    personalMantra: "Eu lidero com sabedoria e crio espaço para outros também liderarem",
+    deepPatterns: [
+      "Você provavelmente foi a pessoa responsável desde cedo. Na família, no trabalho, entre amigos.",
+      "Quando algo dá errado, sua primeira reação é pensar no que você poderia ter feito diferente.",
+      "Elogios te deixam desconfortável porque você sempre acha que poderia ter feito melhor.",
+      "Você tem dificuldade de pedir ajuda. Parece fraqueza."
+    ],
+    commonChallenges: [
+      "Carregar responsabilidades que não são suas porque 'ninguém mais vai fazer direito'.",
+      "Sentir-se sozinho no topo, mesmo cercado de pessoas.",
+      "Rigidez que afasta as pessoas que você mais quer por perto.",
+      "Dificuldade em relaxar sem sentir culpa."
+    ],
+    cultivationPractices: [
+      "Pratique pedir ajuda uma vez por semana, mesmo em algo pequeno.",
+      "Quando sentir vontade de assumir algo, pergunte primeiro: 'Isso é realmente meu?'",
+      "Celebre vitórias antes de já pensar no próximo desafio.",
+      "Permita-se descansar sem precisar ter 'merecido'."
+    ]
   },
   Amante: {
     name: "O Amante",
-    description: "Você vive com intensidade e paixão, valorizando profundamente as conexões emocionais e experiências sensoriais da vida.",
+    description: "Você sente a vida com intensidade. Onde outros passam rápido, você para. Onde outros veem o comum, você encontra beleza. Suas emoções são profundas, suas conexões são intensas, e você não sabe viver pela metade. O problema é que essa sensibilidade que te torna tão especial também te fere com facilidade. Você ama demais, se entrega demais, e às vezes esquece que precisa guardar algo para si.",
     characteristics: [
-      "Intenso e apaixonado",
-      "Valoriza conexões profundas",
-      "Busca beleza e prazer",
-      "Guiado pelas emoções"
+      "Você se apaixona por pessoas, lugares, músicas, momentos. Tudo te toca profundamente.",
+      "Quando ama, ama de verdade. Quando sofre, sofre intensamente. Não existe meio-termo.",
+      "Precisa de conexão genuína para se sentir vivo. Superficialidade te entedia e te esvazia.",
+      "Valoriza beleza em todas as formas: um pôr do sol, uma conversa profunda, um abraço demorado."
     ],
-    visualStyle: "Sensual e íntimo, com foco em texturas e emoções",
+    visualStyle: "Sensual e íntimo, com foco em texturas, emoções e atmosfera envolvente",
     colorPalette: ["#8B0000", "#FFC0CB", "#800020", "#FFD700"],
     photographyDirection: "Ambientes aconchegantes, luz natural suave, close-ups emocionais, toques românticos",
     emoji: "❤️",
-    powerPhrase: "Quando me entrego com paixão e presença, crio conexões profundas e transformadoras.",
-    alignedBehavior: "Você cria conexões autênticas e aprecia a beleza em todas as suas formas. Sua intensidade emocional inspira outros a viverem com mais paixão.",
-    excessBehavior: "Pode tender à dependência emocional ou ao ciúme, precisando equilibrar a intensidade com autonomia saudável.",
-    complementsEnergy: "trazendo paixão, profundidade emocional e sensibilidade",
-    reinforcesExpression: "adicionando calor humano e capacidade de criar conexões genuínas",
+    powerPhrase: "Minha capacidade de amar profundamente é meu dom. Também mereço receber o que dou.",
+    alignedBehavior: "Quando equilibrado, você cria conexões transformadoras e inspira outros a viverem com mais paixão e presença. Sua sensibilidade é um portal para experiências profundas.",
+    excessBehavior: "Quando em excesso, você pode se perder no outro, criar dependência emocional ou sofrer desproporcionalmente por rejeições. Ciúme e possessividade aparecem quando você esquece seu próprio valor.",
+    complementsEnergy: "trazendo paixão, profundidade emocional e sensibilidade genuína",
+    reinforcesExpression: "adicionando calor humano e capacidade de criar conexões que transformam",
     practicalRelationships: [
-      "Surpreenda alguém querido com um gesto de carinho inesperado esta semana",
-      "Planeje uma experiência sensorial especial (jantar à luz de velas, passeio ao pôr do sol)",
-      "Expresse verbalmente seu amor e admiração por quem você ama hoje"
+      "Antes de se entregar completamente, pergunte: essa pessoa está investindo tanto quanto eu?",
+      "Reserve um tempo só seu esta semana. Não é abandono, é nutrição.",
+      "Expresse seu amor, mas também expresse suas necessidades. Seu parceiro não lê mentes."
     ],
     practicalWork: [
-      "Decore seu espaço de trabalho com elementos que tragam beleza e inspiração",
-      "Conecte-se genuinamente com um colega - pergunte como ele realmente está",
-      "Traga paixão para um projeto: encontre o que te emociona nele"
+      "Traga beleza para seu ambiente de trabalho. Seu espaço influencia como você se sente.",
+      "Conecte-se genuinamente com um colega. Pergunte como ele realmente está e escute de verdade.",
+      "Encontre o que te apaixona no seu trabalho atual. Se não existe, isso é um sinal."
     ],
     practicalSpiritual: [
-      "Pratique gratidão sensorial: aprecie uma refeição com todos os sentidos",
-      "Crie um ritual de autocuidado semanal (banho relaxante, skincare, música)",
-      "Dance sozinho(a) em casa por 5 minutos, sentindo seu corpo e emoções"
+      "Pratique autocuidado como ato de amor próprio, não como recompensa.",
+      "Dance sozinho em casa. Sinta seu corpo. Reconecte-se consigo.",
+      "Escreva uma carta de amor para você mesmo. Sim, pode parecer estranho. Faça mesmo assim."
     ],
-    morningPractice: "Conecte-se com gratidão pelo que é belo em sua vida e sinta amor por si mesmo",
-    dailyExpression: "Demonstre afeto a alguém importante e crie um momento de conexão verdadeira",
-    eveningReflection: "Aprecie as conexões que nutriu e a beleza que encontrou durante o dia",
-    personalMantra: "Eu amo profundamente e celebro a beleza em todas as suas formas"
+    morningPractice: "Olhe no espelho e diga algo genuinamente amoroso para si mesmo antes de amar qualquer outra pessoa hoje",
+    dailyExpression: "Demonstre afeto a alguém importante E reserve um momento de prazer só para você",
+    eveningReflection: "O que me nutriu hoje? O que me drenou? Estou recebendo tanto quanto dou?",
+    personalMantra: "Eu amo profundamente e também me permito ser profundamente amado",
+    deepPatterns: [
+      "Você provavelmente já se perdeu em relacionamentos, priorizando o outro até esquecer de si.",
+      "Quando alguém se afasta, você tende a achar que fez algo errado.",
+      "Tem dificuldade de ficar sozinho porque o silêncio amplifica emoções.",
+      "Você idealiza pessoas e depois sofre quando elas se revelam humanas."
+    ],
+    commonChallenges: [
+      "Confundir intensidade com profundidade. Nem toda paixão é amor verdadeiro.",
+      "Fazer do outro sua fonte de felicidade e depois sofrer quando ele falha.",
+      "Medo de abandono que te faz aceitar menos do que merece.",
+      "Dificuldade de estabelecer limites porque você não quer magoar ninguém."
+    ],
+    cultivationPractices: [
+      "Antes de se entregar, pergunte: estou escolhendo ou estou precisando?",
+      "Cultive fontes de prazer que não dependam de outra pessoa.",
+      "Quando sentir ciúme, pare e pergunte: o que estou com medo de perder em mim?",
+      "Pratique dizer não com amor. Limites são atos de cuidado, não de rejeição."
+    ]
   },
   Criador: {
     name: "O Criador",
-    description: "Você é movido pela necessidade de expressar sua visão única e deixar sua marca criativa no mundo.",
+    description: "Você precisa criar. Não é capricho, é necessidade. Quando não está expressando algo, sente que está morrendo por dentro. Seu olhar encontra possibilidades onde outros veem limitações. Você não se contenta com o comum, busca o original, o autêntico, o que nunca foi feito. O problema é que essa busca pela expressão perfeita às vezes te paralisa. Você tem medo de criar algo medíocre, então às vezes prefere não criar nada.",
     characteristics: [
-      "Original e inovador",
-      "Expressa criatividade livremente",
-      "Busca autenticidade",
-      "Valoriza a individualidade"
+      "Você enxerga o mundo diferente. Onde outros veem problemas, você vê matéria-prima.",
+      "Tem ideias constantes. Sua mente não para. Isso é dom e às vezes é exaustão.",
+      "Não suporta cópias. Precisa colocar sua marca única em tudo que faz.",
+      "Perfeccionismo te atrapalha mais do que ajuda. Você descarta projetos inteiros porque não ficaram 'perfeitos'."
     ],
-    visualStyle: "Artístico e experimental, quebrando convenções",
+    visualStyle: "Artístico e experimental, quebrando convenções com originalidade autêntica",
     colorPalette: ["#9B59B6", "#FF6B6B", "#4ECDC4", "#F39C12"],
     photographyDirection: "Ambientes criativos não convencionais, ângulos únicos, uso criativo de cores e luz",
     emoji: "🎨",
-    powerPhrase: "Quando expresso minha visão autêntica, inspiro outros a abraçarem sua própria originalidade.",
-    alignedBehavior: "Você manifesta criatividade genuína e deixa sua marca única no mundo. Sua originalidade inspira inovação e expressão autêntica.",
-    excessBehavior: "Pode tender ao perfeccionismo paralisante ou à frustração criativa, precisando aceitar que criação é processo, não só resultado.",
-    complementsEnergy: "trazendo criatividade, originalidade e novas perspectivas",
-    reinforcesExpression: "adicionando inovação e capacidade de materializar ideias únicas",
+    powerPhrase: "Criar imperfeito é melhor do que não criar. Minha expressão não precisa ser perfeita para ter valor.",
+    alignedBehavior: "Quando equilibrado, você manifesta sua visão única sem se prender à perfeição. Inspira outros a se expressarem e deixa sua marca genuína no mundo.",
+    excessBehavior: "Quando em excesso, você se paralisa buscando a expressão perfeita, ou se frustra quando a realidade não corresponde à visão. Pode se isolar em seu mundo criativo.",
+    complementsEnergy: "trazendo criatividade, originalidade e perspectivas que ninguém mais teria",
+    reinforcesExpression: "adicionando inovação e capacidade de materializar ideias únicas e transformadoras",
     practicalRelationships: [
-      "Planeje um encontro criativo: cozinhem juntos uma receita nova ou pintem algo",
-      "Presenteie alguém com algo feito por você, mesmo simples",
-      "Compartilhe uma ideia ou projeto criativo com alguém de confiança esta semana"
+      "Compartilhe um projeto ainda incompleto com alguém de confiança. Vulnerabilidade criativa aproxima.",
+      "Crie algo junto com alguém que você ama. Cozinhem, pintem, escrevam. O processo importa mais que o resultado.",
+      "Quando criticarem sua criação, separe: isso é sobre a obra ou sobre mim?"
     ],
     practicalWork: [
-      "Proponha uma solução diferente para um problema recorrente no trabalho",
-      "Reserve 30 minutos por dia para brainstorm livre, sem julgamento",
-      "Documente suas ideias em um caderno criativo - desenhe, escreva, cole imagens"
+      "Estabeleça prazos para suas ideias. Sem prazo, a busca pela perfeição nunca termina.",
+      "Mostre seu trabalho antes de estar 'pronto'. Feedback melhora mais do que perfeccionismo.",
+      "Reserve 30 minutos por dia para criar sem objetivo. Sem julgamento. Só expressão."
     ],
     practicalSpiritual: [
-      "Faça algo artístico sem objetivo: desenhe, escreva poesia, fotografe",
-      "Visite uma exposição, show ou evento cultural este mês",
-      "Decore um cantinho da sua casa que expresse quem você é"
+      "Crie algo feio de propósito. Liberte-se da tirania do perfeito.",
+      "Visite uma exposição, show ou feira criativa. Alimente sua alma de referências.",
+      "Termine algo hoje. Qualquer coisa. O ato de concluir é espiritual."
     ],
-    morningPractice: "Permita-se imaginar sem julgamento - anote uma ideia criativa antes de começar o dia",
-    dailyExpression: "Crie algo, mesmo pequeno, e compartilhe sua visão única com o mundo",
-    eveningReflection: "Celebre o que criou hoje e as ideias que surgiram, sem cobrar perfeição",
-    personalMantra: "Eu expresso minha essência única e inspiro originalidade ao meu redor"
+    morningPractice: "Antes de qualquer autocrítica, pergunte: o que quero expressar hoje, mesmo imperfeito?",
+    dailyExpression: "Crie algo e mostre para alguém. A criação só vive quando é compartilhada",
+    eveningReflection: "O que criei hoje? Onde o perfeccionismo me travou? O que posso terminar amanhã?",
+    personalMantra: "Minha expressão tem valor mesmo imperfeita. Criar é minha forma de existir",
+    deepPatterns: [
+      "Você provavelmente tem projetos inacabados porque nenhum ficou 'bom o suficiente'.",
+      "Compara seu trabalho com o de outros e sempre sai perdendo.",
+      "Fica frustrado quando a realidade não corresponde à visão que tinha na cabeça.",
+      "Às vezes prefere não mostrar do que mostrar e ser criticado."
+    ],
+    commonChallenges: [
+      "Perfeccionismo que paralisa. Você não termina porque nunca está perfeito.",
+      "Comparação com outros criadores que te faz questionar seu valor.",
+      "Isolamento criativo: mergulhar tanto no seu mundo que esquece de viver.",
+      "Sensação de que ninguém realmente entende o que você está tentando expressar."
+    ],
+    cultivationPractices: [
+      "Defina 'pronto' antes de começar. Quando chegar lá, pare.",
+      "Mostre trabalhos em progresso. O feedback é parte do processo.",
+      "Celebre o que criou antes de já pensar no que falta.",
+      "Crie algo todo dia, mesmo pequeno. Consistência supera inspiração."
+    ]
   },
   Inocente: {
     name: "O Inocente",
-    description: "Você mantém uma visão otimista da vida, buscando simplicidade, alegria e confiança no bem.",
+    description: "Você vê o mundo com olhos que outros perderam. Onde há cinismo, você encontra esperança. Onde há complexidade, você busca simplicidade. Sua fé nas pessoas e na vida não é ingenuidade, é escolha consciente. Você sabe que o mundo pode ser duro, mas prefere focar no que há de bom. O problema é que essa pureza às vezes te deixa vulnerável. Você confia demais, espera demais, e quando a realidade decepciona, a queda é grande.",
     characteristics: [
-      "Otimista e confiante",
-      "Aprecia a simplicidade",
-      "Mantém fé no bem",
-      "Busca felicidade genuína"
+      "Você tende a ver o melhor nas pessoas, mesmo quando já te decepcionaram.",
+      "Prefere simplicidade a complicação. Para você, muitas coisas poderiam ser mais fáceis se as pessoas não complicassem.",
+      "Fica genuinamente feliz com coisas pequenas: um dia de sol, um café gostoso, uma risada.",
+      "Tem dificuldade de entender maldade gratuita. Sempre tenta encontrar uma justificativa."
     ],
-    visualStyle: "Luminoso e leve, com atmosfera alegre e despreocupada",
+    visualStyle: "Luminoso e leve, com atmosfera alegre, natural e despreocupada",
     colorPalette: ["#87CEEB", "#FFE4E1", "#FFFACD", "#E0FFFF"],
     photographyDirection: "Ambientes naturais, luz do dia clara, expressões autênticas de alegria, cenários simples",
     emoji: "🌟",
-    powerPhrase: "Quando mantenho minha fé no bem, trago leveza e esperança para todos ao meu redor.",
-    alignedBehavior: "Você irradia otimismo genuíno e inspira outros com sua capacidade de ver o melhor nas pessoas e situações.",
-    excessBehavior: "Pode tender à ingenuidade ou negação de problemas reais, precisando equilibrar esperança com discernimento.",
-    complementsEnergy: "trazendo otimismo, leveza e fé nas pessoas",
-    reinforcesExpression: "adicionando esperança e capacidade de ver o lado positivo",
+    powerPhrase: "Minha fé no bem é força, não fraqueza. Posso ver a luz sem negar a sombra.",
+    alignedBehavior: "Quando equilibrado, você irradia esperança genuína sem ser ingênuo. Inspira outros a verem possibilidades e traz leveza para situações pesadas.",
+    excessBehavior: "Quando em excesso, você nega problemas reais, confia em quem não deveria e depois se surpreende quando é traído. Pode parecer imaturo ou desconectado da realidade.",
+    complementsEnergy: "trazendo otimismo, leveza e fé genuína nas pessoas e no futuro",
+    reinforcesExpression: "adicionando esperança e capacidade de ver possibilidades onde outros só veem problemas",
     practicalRelationships: [
-      "Elogie sinceramente três pessoas diferentes hoje",
-      "Organize um piquenique ou passeio simples ao ar livre com quem você ama",
-      "Perdoe uma pequena mágoa e escolha ver o melhor no outro"
+      "Confie, mas observe. Nem todos merecem sua abertura imediata.",
+      "Quando alguém te decepcionar, permita-se sentir raiva. Não precisa justificar tudo.",
+      "Escolha com quem compartilhar sua pureza. Alguns vão valorizar, outros vão se aproveitar."
     ],
     practicalWork: [
-      "Comece reuniões reconhecendo algo positivo que aconteceu",
-      "Simplifique um processo complicado - menos é mais",
-      "Seja o portador de boas notícias: compartilhe conquistas da equipe"
+      "Sua positividade é valiosa, mas aprenda a identificar riscos reais antes de minimizá-los.",
+      "Quando algo der errado, resista ao impulso de dizer 'vai dar tudo certo' antes de entender o problema.",
+      "Use sua capacidade de ver o positivo para motivar a equipe, mas também seja realista sobre prazos."
     ],
     practicalSpiritual: [
-      "Passe 20 minutos na natureza sem celular, apenas observando",
-      "Escreva uma carta de gratidão para alguém que marcou sua vida",
-      "Pratique desapego: doe algo que não usa mais com alegria"
+      "Passe tempo na natureza. Ela te reconecta com a simplicidade que você valoriza.",
+      "Quando sentir que perdeu a fé, lembre-se: escolher acreditar é coragem, não ignorância.",
+      "Pratique discernimento como forma de proteção, não de cinismo."
     ],
-    morningPractice: "Liste 3 coisas pelas quais é grato e visualize um dia cheio de bênçãos",
-    dailyExpression: "Compartilhe sua alegria com alguém e escolha ver o melhor em cada situação",
-    eveningReflection: "Reconheça os momentos de graça do dia e agradeça pelas pequenas alegrias",
-    personalMantra: "Eu confio na bondade da vida e irradio esperança onde quer que esteja"
+    morningPractice: "O que há de bom esperando por mim hoje? E do que preciso me proteger?",
+    dailyExpression: "Compartilhe sua alegria com alguém E observe se está ignorando algo importante",
+    eveningReflection: "Onde minha fé se confirmou hoje? Onde eu poderia ter sido mais atento?",
+    personalMantra: "Escolho ver o bem sem negar o real. Minha esperança é informada, não cega",
+    deepPatterns: [
+      "Você provavelmente já foi chamado de ingênuo ou 'sonhador demais'.",
+      "Tem dificuldade de guardar mágoas. Perdoa rápido demais às vezes.",
+      "Quando alguém te decepciona, você primeiro duvida de si do que da pessoa.",
+      "Ambientes negativos te drenam completamente."
+    ],
+    commonChallenges: [
+      "Confiar em quem não merece e depois se surpreender com a traição.",
+      "Negar problemas reais porque é mais fácil do que enfrentá-los.",
+      "Ser visto como imaturo ou desconectado por pessoas mais 'realistas'.",
+      "Sofrer muito quando a realidade contradiz suas expectativas."
+    ],
+    cultivationPractices: [
+      "Pratique dizer 'preciso pensar' antes de confiar cegamente.",
+      "Quando algo parecer bom demais, pergunte: o que eu não estou vendo?",
+      "Permita-se sentir decepção. Nem tudo tem explicação positiva.",
+      "Escolha conscientemente em quem depositar sua fé. Nem todos merecem."
+    ]
   },
   Sábio: {
     name: "O Sábio",
-    description: "Você busca constantemente conhecimento e compreensão profunda do mundo, valorizando verdade e sabedoria.",
+    description: "Você busca entender. Não se contenta com respostas superficiais, precisa ir fundo, encontrar a verdade, compreender o porquê das coisas. Seu prazer está no conhecimento, na reflexão, no momento em que as peças se encaixam. O problema é que às vezes você fica tanto tempo pensando que esquece de viver. Analisa tanto que paralisa. Sabe tanto que se desconecta de quem não acompanha seu ritmo mental.",
     characteristics: [
-      "Reflexivo e analítico",
-      "Busca conhecimento",
-      "Valoriza a verdade",
-      "Mentor natural"
+      "Você questiona tudo. Aceitar algo só porque 'é assim' não funciona para você.",
+      "Prefere observar antes de agir. Precisa entender o contexto antes de se posicionar.",
+      "Livros, conversas profundas e ideias complexas te energizam mais do que festas.",
+      "Às vezes sua mente não para. Você pensa demais, analisa demais, preocupa-se demais."
     ],
-    visualStyle: "Contemplativo e intelectual, com atmosfera de introspecção",
+    visualStyle: "Contemplativo e intelectual, com atmosfera de introspecção e profundidade",
     colorPalette: ["#2C3E50", "#95A5A6", "#34495E", "#7F8C8D"],
     photographyDirection: "Bibliotecas, espaços de estudo, luz suave que convida à reflexão, expressões pensativas",
     emoji: "📚",
-    powerPhrase: "Quando busco compreender antes de julgar, encontro verdades que transformam vidas.",
-    alignedBehavior: "Você compartilha sabedoria com humildade e ajuda outros a encontrarem suas próprias respostas através da reflexão.",
-    excessBehavior: "Pode tender ao isolamento intelectual ou arrogância do conhecimento, precisando equilibrar saber com agir.",
-    complementsEnergy: "trazendo sabedoria, análise profunda e discernimento",
-    reinforcesExpression: "adicionando clareza mental e capacidade de encontrar verdades",
+    powerPhrase: "Saber muito não significa saber tudo. Posso aprender com quem sabe diferente.",
+    alignedBehavior: "Quando equilibrado, você compartilha conhecimento com humildade e ajuda outros a encontrarem suas próprias respostas. Sua sabedoria ilumina sem ofuscar.",
+    excessBehavior: "Quando em excesso, você se isola em seu mundo intelectual, julga quem sabe menos ou paralisa na análise eterna. Pode parecer arrogante ou desconectado.",
+    complementsEnergy: "trazendo sabedoria, análise profunda e discernimento para suas escolhas",
+    reinforcesExpression: "adicionando clareza mental e capacidade de encontrar verdades que outros não veem",
     practicalRelationships: [
-      "Faça perguntas genuínas ao invés de dar conselhos imediatos",
-      "Compartilhe um livro ou podcast que te transformou com alguém querido",
-      "Reserve tempo de qualidade para conversas profundas, sem pressa"
+      "Quando alguém te contar um problema, pergunte: ela quer conselho ou quer ser ouvida?",
+      "Valorize também a sabedoria emocional dos outros. Nem todo conhecimento vem de livros.",
+      "Pare de corrigir informações pequenas. Nem toda conversa é debate."
     ],
     practicalWork: [
-      "Antes de uma decisão importante, pesquise 3 perspectivas diferentes",
-      "Ensine algo que você sabe bem para um colega ou equipe",
-      "Documente aprendizados de projetos para referência futura"
+      "Estabeleça um prazo para decisões. Análise infinita é procrastinação disfarçada.",
+      "Ensine algo que você sabe. Conhecimento guardado é conhecimento perdido.",
+      "Ouça ideias de pessoas menos 'qualificadas'. Elas podem ver o que você não vê."
     ],
     practicalSpiritual: [
-      "Leia 20 minutos por dia sobre um tema que expanda sua mente",
-      "Pratique journaling reflexivo: escreva sobre uma pergunta profunda",
-      "Faça silêncio contemplativo por 15 minutos, apenas observando pensamentos"
+      "Pratique silêncio mental. Nem todo momento precisa de análise.",
+      "Experimente algo novo sem pesquisar antes. Deixe a experiência te ensinar.",
+      "Escreva sobre o que você não sabe. Humildade intelectual é sabedoria madura."
     ],
-    morningPractice: "Reflita sobre uma pergunta significativa e estabeleça intenção de aprendizado",
-    dailyExpression: "Compartilhe um insight valioso com alguém e escute para aprender algo novo",
-    eveningReflection: "Reconheça o que aprendeu hoje e como sua compreensão do mundo cresceu",
-    personalMantra: "Eu busco a verdade com humildade e compartilho sabedoria com amor"
+    morningPractice: "O que quero aprender hoje? E o que quero VIVER, não só entender?",
+    dailyExpression: "Compartilhe um insight valioso E faça algo sem pensar demais",
+    eveningReflection: "O que aprendi hoje? Onde pensei demais ao invés de agir?",
+    personalMantra: "Busco a verdade com humildade e lembro que viver também é uma forma de saber",
+    deepPatterns: [
+      "Você provavelmente foi a criança que fazia perguntas que adultos não sabiam responder.",
+      "Tem dificuldade de respeitar autoridades que não demonstram conhecimento.",
+      "Às vezes se sente sozinho porque poucos acompanham suas reflexões.",
+      "Analisa relacionamentos ao invés de simplesmente vivê-los."
+    ],
+    commonChallenges: [
+      "Paralisia por análise: pensar tanto que não consegue agir.",
+      "Arrogância intelectual que afasta pessoas.",
+      "Desconexão emocional: entender não é o mesmo que sentir.",
+      "Dificuldade de aceitar que algumas coisas não têm explicação."
+    ],
+    cultivationPractices: [
+      "Pratique decidir com 80% de informação. Perfeição não existe.",
+      "Quando for ensinar, pergunte primeiro. Ensino começa com escuta.",
+      "Reserve tempo para atividades 'inúteis'. Nem tudo precisa ter propósito.",
+      "Valorize o saber do corpo, não só da mente."
+    ]
   },
   Explorador: {
     name: "O Explorador",
-    description: "Você é movido pela necessidade de descobrir, experienciar e se aventurar além dos limites conhecidos.",
+    description: "Você não nasceu para ficar parado. Existe em você uma inquietação saudável que te empurra para além do conhecido, do seguro, do previsível. Liberdade não é luxo para você, é oxigênio. O problema é que essa sede de novidade às vezes te impede de criar raízes. Você começa muitas coisas e termina poucas. Foge quando as coisas ficam rotineiras porque confunde estabilidade com prisão.",
     characteristics: [
-      "Aventureiro e curioso",
-      "Busca liberdade",
-      "Valoriza experiências novas",
-      "Independente"
+      "Rotina te sufoca. Você precisa de novidade, variedade, movimento.",
+      "Compromissos de longo prazo te assustam. Não porque não quer, mas porque teme perder liberdade.",
+      "Você se sente mais vivo viajando, conhecendo pessoas novas, experimentando o desconhecido.",
+      "Quando algo se torna familiar demais, você já está pensando no próximo destino."
     ],
-    visualStyle: "Dinâmico e expansivo, capturando movimento e descoberta",
+    visualStyle: "Dinâmico e expansivo, capturando movimento, descoberta e horizontes abertos",
     colorPalette: ["#2ECC71", "#3498DB", "#F39C12", "#E67E22"],
-    photographyDirection: "Ambientes externos, paisagens abertas, captura de movimento, expressões de admiração",
+    photographyDirection: "Ambientes externos, paisagens abertas, captura de movimento, expressões de admiração e descoberta",
     emoji: "🧭",
-    powerPhrase: "Quando me aventuro além do conhecido, descubro não só o mundo, mas também quem eu sou.",
-    alignedBehavior: "Você inspira outros a expandirem seus horizontes e a abraçarem novas experiências com curiosidade genuína.",
-    excessBehavior: "Pode tender à inquietação crônica ou fuga de compromissos, precisando encontrar raízes em meio à liberdade.",
-    complementsEnergy: "trazendo espírito aventureiro, curiosidade e abertura ao novo",
-    reinforcesExpression: "adicionando coragem para explorar e descobrir novos caminhos",
+    powerPhrase: "Posso explorar o mundo e ainda assim criar um lugar para chamar de lar.",
+    alignedBehavior: "Quando equilibrado, você inspira outros a expandirem horizontes e vive experiências que enriquecem genuinamente. Sua liberdade não exclui conexão.",
+    excessBehavior: "Quando em excesso, você foge de compromissos, abandona projetos no meio e confunde qualquer estabilidade com prisão. Fica inquieto mesmo quando deveria estar presente.",
+    complementsEnergy: "trazendo espírito aventureiro, curiosidade insaciável e abertura ao novo",
+    reinforcesExpression: "adicionando coragem para explorar caminhos que ninguém tentou antes",
     practicalRelationships: [
-      "Proponha uma aventura nova: trilha, viagem de um dia, restaurante diferente",
-      "Aprenda algo junto com alguém querido (idioma, esporte, hobby)",
-      "Permita-se conhecer pessoas fora do seu círculo habitual"
+      "Compromisso não é prisão. Você pode escolher alguém e ainda ser livre.",
+      "Quando sentir vontade de fugir, pergunte: estou buscando algo ou fugindo de algo?",
+      "Leve as pessoas que ama nas suas aventuras. Explorar sozinho fica vazio."
     ],
     practicalWork: [
-      "Explore uma área diferente da sua expertise - faça um curso ou workshop",
-      "Proponha um projeto piloto inovador que ninguém tentou antes",
-      "Trabalhe de um lugar diferente uma vez por semana para mudar perspectiva"
+      "Termine um projeto antes de começar o próximo. A conclusão também é descoberta.",
+      "Encontre formas de explorar dentro da sua área. Nem toda aventura exige mudar de carreira.",
+      "Quando a rotina apertar, mude pequenas coisas antes de abandonar tudo."
     ],
     practicalSpiritual: [
-      "Visite um lugar novo na sua cidade este fim de semana",
-      "Experimente uma prática espiritual diferente da sua (meditação, yoga, retiro)",
-      "Caminhe sem destino definido por 30 minutos, seguindo sua intuição"
+      "Explore mundos internos também. Meditação, autoconhecimento, silêncio.",
+      "Pergunte-se: do que estou fugindo quando busco o próximo destino?",
+      "Aprenda a encontrar novidade no familiar. O extraordinário existe no cotidiano."
     ],
-    morningPractice: "Pergunte-se: 'O que posso descobrir de novo hoje?' e abra-se para possibilidades",
-    dailyExpression: "Explore algo novo, mesmo pequeno, e expanda seus horizontes",
-    eveningReflection: "Reconheça as descobertas do dia e o que elas revelaram sobre você",
-    personalMantra: "Eu exploro o mundo com curiosidade e descubro minha verdade em cada jornada"
+    morningPractice: "O que posso descobrir hoje, mesmo ficando onde estou?",
+    dailyExpression: "Explore algo novo E permaneça presente em algo que já começou",
+    eveningReflection: "O que descobri hoje? De onde fugi? Onde poderia ter ficado mais?",
+    personalMantra: "Exploro o mundo com curiosidade e também encontro aventura na permanência",
+    deepPatterns: [
+      "Você provavelmente tem histórico de abandonar coisas quando ficam 'chatas'.",
+      "Relacionamentos longos te assustam porque você teme perder sua identidade.",
+      "Sente culpa por não conseguir se satisfazer com o que tem.",
+      "Compara sua vida com a de quem parece viver mais aventuras."
+    ],
+    commonChallenges: [
+      "Confundir estabilidade com prisão e fugir de coisas boas.",
+      "Não terminar o que começa porque já está pensando no próximo.",
+      "Dificuldade de estar presente porque está sempre planejando o futuro.",
+      "Usar viagens e mudanças para fugir de problemas internos."
+    ],
+    cultivationPractices: [
+      "Antes de abandonar algo, pergunte: explorei tudo que há aqui?",
+      "Pratique encontrar novidade no familiar. Olhe de novo para o que já conhece.",
+      "Comprometa-se com algo por um período definido. Liberdade também é escolher ficar.",
+      "Explore seu mundo interno com a mesma curiosidade que explora o externo."
+    ]
   },
   Rebelde: {
     name: "O Rebelde",
-    description: "Você desafia convenções e busca transformação, questionando o status quo e criando seu próprio caminho.",
+    description: "Você não aceita as coisas só porque sempre foram assim. Existe em você uma força que questiona, desafia, transforma. Você vê o que está errado quando outros preferem não ver. Dá voz ao que precisa ser dito quando outros se calam. O problema é que nem toda batalha é sua. Às vezes você luta contra tudo por reflexo, não por convicção. E a rebeldia sem direção vira destruição.",
     characteristics: [
-      "Desafiador e autêntico",
-      "Questiona regras",
-      "Busca mudança",
-      "Valoriza liberdade"
+      "Autoridade sem mérito te irrita profundamente. Você não obedece só porque mandam.",
+      "Quando vê injustiça, sente necessidade física de fazer algo.",
+      "Já foi chamado de 'difícil', 'do contra' ou 'radical'. E provavelmente sentiu orgulho.",
+      "Tem dificuldade de seguir regras que não fazem sentido, mesmo quando seria mais fácil."
     ],
-    visualStyle: "Ousado e não convencional, quebrando expectativas visuais",
+    visualStyle: "Ousado e não convencional, quebrando expectativas visuais com impacto",
     colorPalette: ["#000000", "#E74C3C", "#8E44AD", "#C0392B"],
     photographyDirection: "Ambientes urbanos alternativos, contraste dramático, poses ousadas, estética underground",
     emoji: "⚡",
-    powerPhrase: "Quando questiono o que parece imutável, abro caminhos para transformações necessárias.",
-    alignedBehavior: "Você catalisa mudanças positivas e dá voz ao que precisa ser dito, inspirando autenticidade nos outros.",
-    excessBehavior: "Pode tender à rebeldia sem causa ou destruição gratuita, precisando direcionar sua energia para construção.",
-    complementsEnergy: "trazendo coragem para questionar e impulso de transformação",
-    reinforcesExpression: "adicionando autenticidade radical e capacidade de quebrar padrões",
+    powerPhrase: "Minha rebeldia tem propósito. Destruo o que não serve para construir o que importa.",
+    alignedBehavior: "Quando equilibrado, você catalisa mudanças necessárias e dá voz ao que precisa ser dito. Sua coragem de questionar inspira outros a serem autênticos.",
+    excessBehavior: "Quando em excesso, você briga por brigar, destrói sem construir e se isola de todos que não concordam. Sua energia vira sabotagem, não transformação.",
+    complementsEnergy: "trazendo coragem para questionar o estabelecido e impulso de transformação real",
+    reinforcesExpression: "adicionando autenticidade radical e capacidade de quebrar padrões que limitam",
     practicalRelationships: [
-      "Tenha uma conversa honesta sobre algo que você evitava falar",
-      "Apoie alguém a ser mais autêntico - encoraje sua verdade",
-      "Questione uma tradição familiar que não faz mais sentido - com respeito"
+      "Nem toda discordância precisa virar confronto. Escolha suas batalhas.",
+      "Questione sistemas, não pessoas. Elas também são prisioneiras das estruturas.",
+      "Permita que outros mudem no próprio ritmo. Revolução forçada gera resistência."
     ],
     practicalWork: [
-      "Proponha eliminar uma reunião ou processo que não agrega valor",
-      "Defenda uma ideia impopular em que você acredita",
-      "Desafie um 'sempre foi assim' com uma alternativa melhor"
+      "Antes de destruir algo, tenha clareza do que vai construir no lugar.",
+      "Encontre aliados. Mudança coletiva é mais poderosa que rebeldia solitária.",
+      "Questione com soluções, não só com críticas. Transformação precisa de alternativas."
     ],
     practicalSpiritual: [
-      "Identifique uma crença limitante e escreva uma nova versão",
-      "Faça algo que te assusta um pouco - saia da zona de conforto",
-      "Questione uma regra interna que você segue sem saber por quê"
+      "Pergunte-se: estou lutando por algo ou lutando contra tudo por hábito?",
+      "Rebele-se contra seus próprios padrões também. A maior revolução é interna.",
+      "Encontre paz com o que não pode mudar. Nem tudo é batalha."
     ],
-    morningPractice: "Conecte-se com sua verdade e a coragem de expressá-la hoje",
-    dailyExpression: "Desafie algo que não serve mais e construa algo melhor no lugar",
-    eveningReflection: "Reconheça as mudanças positivas que catalisou e seu impacto",
-    personalMantra: "Eu desafio o que não serve e crio caminhos de transformação"
+    morningPractice: "Qual mudança realmente importa hoje? E o que posso aceitar como é?",
+    dailyExpression: "Desafie algo que não serve E construa algo no lugar",
+    eveningReflection: "Onde minha rebeldia foi construtiva? Onde foi só destrutiva?",
+    personalMantra: "Questiono o que não serve e canalizo minha força para construir o novo",
+    deepPatterns: [
+      "Você provavelmente teve conflitos com autoridades desde cedo.",
+      "Sente-se incompreendido com frequência. Poucos entendem sua intensidade.",
+      "Quando algo vai bem demais, você desconfia. Estabilidade parece armadilha.",
+      "Tem dificuldade de pertencer a grupos porque inevitavelmente discorda de algo."
+    ],
+    commonChallenges: [
+      "Brigar contra tudo sem saber exatamente pelo que está lutando.",
+      "Destruir relacionamentos, trabalhos e oportunidades por não saber ceder.",
+      "Isolamento porque poucos 'entendem' você.",
+      "Usar a rebeldia para evitar vulnerabilidade."
+    ],
+    cultivationPractices: [
+      "Antes de reagir, pergunte: isso é importante ou é reflexo?",
+      "Pratique aceitar algo que não concorda sem precisar mudar.",
+      "Construa tanto quanto questiona. Destruição sem criação é vazia.",
+      "Encontre comunidade com outros inconformados. Você não precisa lutar sozinho."
+    ]
   },
   Mago: {
     name: "O Mago",
-    description: "Você tem o dom de transformar sonhos em realidade, vendo possibilidades onde outros veem limitações.",
+    description: "Você vê o que outros não veem. Onde há limitação, você enxerga possibilidade. Onde há problema, você encontra a alquimia que transforma. Sua intuição é aguçada, sua visão vai além do óbvio. Você sabe que a realidade é mais maleável do que parece. O problema é que essa conexão com o extraordinário às vezes te desconecta do ordinário. Você vive tanto no mundo das possibilidades que esquece de ancorar no mundo concreto.",
     characteristics: [
-      "Visionário e transformador",
-      "Acredita em possibilidades",
-      "Catalisador de mudanças",
-      "Intuitivo"
+      "Você percebe coisas que outros não percebem. Padrões, conexões, sincronicidades.",
+      "Acredita genuinamente que pode transformar situações que parecem impossíveis.",
+      "Sua intuição raramente erra, mas nem sempre você sabe explicar de onde vem.",
+      "Às vezes se frustra porque sua visão está tão à frente que outros não acompanham."
     ],
-    visualStyle: "Místico e transformador, com elementos de fantasia e magia",
+    visualStyle: "Místico e transformador, com elementos de fantasia e profundidade simbólica",
     colorPalette: ["#9B59B6", "#1ABC9C", "#F1C40F", "#2C3E50"],
     photographyDirection: "Efeitos de luz criativos, composições surreais, atmosfera mística, transformações visuais",
     emoji: "✨",
-    powerPhrase: "Quando confio na minha intuição transformadora, o impossível se torna caminho.",
-    alignedBehavior: "Você catalisa transformações profundas e ajuda outros a enxergarem possibilidades onde só viam limitações.",
-    excessBehavior: "Pode tender à manipulação ou desconexão com a realidade, precisando ancorar sua magia no mundo concreto.",
-    complementsEnergy: "trazendo visão transformadora e capacidade de manifestar o extraordinário",
+    powerPhrase: "Minha magia se manifesta quando conecto visão com ação. Sonhar é o início, fazer é o poder.",
+    alignedBehavior: "Quando equilibrado, você catalisa transformações reais e ajuda outros a enxergarem possibilidades que não viam. Sua visão se materializa em resultados concretos.",
+    excessBehavior: "Quando em excesso, você vive no mundo das ideias sem nunca materializar, manipula situações ou se desconecta da realidade em nome da 'magia'. Promete transformações que não entrega.",
+    complementsEnergy: "trazendo visão transformadora e capacidade de manifestar o que parece impossível",
     reinforcesExpression: "adicionando intuição aguçada e poder de catalisar mudanças profundas",
     practicalRelationships: [
-      "Ajude alguém a visualizar uma possibilidade que ela não consegue ver",
-      "Crie um ritual significativo para celebrar uma conquista em família",
-      "Transforme um conflito em oportunidade de crescimento mútuo"
+      "Use sua percepção para ajudar outros, não para manipular.",
+      "Nem todos querem ser transformados. Respeite o tempo de cada um.",
+      "Comunique suas visões de forma que outros entendam. Magia obscura afasta."
     ],
     practicalWork: [
-      "Visualize o resultado final de um projeto antes de começar - e compartilhe a visão",
-      "Encontre a conexão oculta entre dois projetos aparentemente desconectados",
-      "Transforme um obstáculo atual em oportunidade - mude a perspectiva"
+      "Transforme visões em planos de ação concretos. Magia precisa de metodologia.",
+      "Valide suas intuições com dados. Sua percepção + evidências = poder.",
+      "Entregue resultados mensuráveis. Promessas mágicas sem entrega destroem credibilidade."
     ],
     practicalSpiritual: [
-      "Pratique visualização criativa por 10 minutos diários",
-      "Mantenha um diário de sincronicidades e coincidências significativas",
-      "Crie um ritual pessoal de manifestação (quadro de visão, afirmações)"
+      "Pratique grounding. Sua magia precisa de raízes na terra.",
+      "Questione: isso é intuição ou é o que eu quero acreditar?",
+      "Use seu dom para servir, não para impressionar."
     ],
-    morningPractice: "Conecte-se com sua intuição e visualize as transformações que deseja criar hoje",
-    dailyExpression: "Confie em uma intuição e tome uma ação que manifeste sua visão",
-    eveningReflection: "Reconheça as transformações que catalisou e as sincronicidades do dia",
-    personalMantra: "Eu transformo possibilidades em realidade e ajudo outros a verem sua magia"
+    morningPractice: "Que transformação quero catalisar hoje? E qual o primeiro passo concreto?",
+    dailyExpression: "Confie em uma intuição E tome uma ação prática baseada nela",
+    eveningReflection: "O que transformei hoje? Onde fiquei só no mundo das ideias?",
+    personalMantra: "Minha visão se torna realidade quando uno intuição com ação consistente",
+    deepPatterns: [
+      "Você provavelmente já previu coisas que depois aconteceram.",
+      "Às vezes se sente mais conectado com o invisível do que com o tangível.",
+      "Frustra-se porque sua visão está clara, mas a manifestação demora.",
+      "Já foi acusado de viver nas nuvens ou de ser desconectado da realidade."
+    ],
+    commonChallenges: [
+      "Prometer transformações mágicas e não entregar resultados concretos.",
+      "Usar intuição como desculpa para não fazer o trabalho duro.",
+      "Manipular situações e pessoas em nome de um 'bem maior'.",
+      "Desconectar-se da realidade em nome do extraordinário."
+    ],
+    cultivationPractices: [
+      "Para cada visão, crie um plano de ação com passos concretos.",
+      "Pratique ancoramento: exercício físico, natureza, tarefas manuais.",
+      "Valide intuições antes de agir. Nem toda intuição é verdade.",
+      "Entregue pequenas transformações consistentemente antes de prometer as grandes."
+    ]
   },
   Herói: {
     name: "O Herói",
-    description: "Você enfrenta desafios com coragem, determinado a superar obstáculos e alcançar grandes feitos.",
+    description: "Você não foge quando a vida aperta. Pelo contrário, é comum sentir que precisa ser forte, resolver e sustentar, mesmo quando isso te cansa. Existe em você uma força que se ativa diante do desafio. Você protege, enfrenta, supera. O problema é que você não sabe parar. Carrega peso demais, pede ajuda de menos, e quando finalmente para, às vezes já está no limite.",
     characteristics: [
-      "Corajoso e determinado",
-      "Supera obstáculos",
-      "Busca excelência",
-      "Protege os outros"
+      "Você tende a se cobrar muito e dificilmente fica satisfeito com algo feito pela metade.",
+      "Quando alguém precisa de ajuda, você é o primeiro a se oferecer, mesmo sobrecarregado.",
+      "Tem dificuldade de mostrar fraqueza. Vulnerabilidade parece falha.",
+      "Busca excelência em tudo. Mediocridade te incomoda profundamente."
     ],
-    visualStyle: "Épico e poderoso, transmitindo força e determinação",
+    visualStyle: "Épico e poderoso, transmitindo força, determinação e capacidade de superação",
     colorPalette: ["#C0392B", "#2C3E50", "#F39C12", "#ECF0F1"],
     photographyDirection: "Poses de ação, iluminação dramática, ambientes que sugerem conquista, expressões de determinação",
     emoji: "🦸",
-    powerPhrase: "Quando enfrento meus desafios com coragem, inspiro outros a encontrarem sua própria força.",
-    alignedBehavior: "Você supera obstáculos com determinação e protege aqueles que precisam, sendo exemplo de coragem.",
-    excessBehavior: "Pode tender à arrogância ou ao esgotamento por assumir demais, precisando reconhecer seus próprios limites.",
-    complementsEnergy: "trazendo coragem, determinação e força de vontade",
-    reinforcesExpression: "adicionando capacidade de superar obstáculos e proteger outros",
+    powerPhrase: "Tenho força para enfrentar desafios e sabedoria para não carregar o que não é meu.",
+    alignedBehavior: "Quando equilibrado, você supera obstáculos com coragem e inspira outros a encontrarem sua própria força. Sabe quando lutar e quando pedir ajuda.",
+    excessBehavior: "Quando em excesso, você se esgota salvando todos, não pede ajuda nunca e se frustra quando não é reconhecido. Pode se tornar arrogante ou se ressentir de quem não luta como você.",
+    complementsEnergy: "trazendo coragem, determinação e força de vontade inabalável",
+    reinforcesExpression: "adicionando capacidade de superar obstáculos e proteger quem precisa",
     practicalRelationships: [
-      "Defenda alguém que está sendo injustiçado ou ignorado",
-      "Enfrente uma conversa difícil que você está adiando",
-      "Seja vulnerável com alguém de confiança - heróis também precisam de suporte"
+      "Peça ajuda esta semana. Sim, você. Não é fraqueza, é humanidade.",
+      "Deixe alguém cuidar de você por um momento. Heróis também precisam de suporte.",
+      "Quando for ajudar, pergunte se a pessoa quer ajuda. Nem sempre quer ser salva."
     ],
     practicalWork: [
-      "Assuma um projeto desafiador que outros evitam",
-      "Estabeleça uma meta ambiciosa e crie um plano de ação concreto",
-      "Reconheça publicamente a contribuição de outros da equipe"
+      "Reconheça publicamente contribuições de outros. Você não vence sozinho.",
+      "Estabeleça limites. Assumir tudo não te faz herói, te faz exausto.",
+      "Antes de assumir mais um desafio, pergunte: ainda tenho energia para isso?"
     ],
     practicalSpiritual: [
-      "Pratique um exercício físico desafiador que te faça superar limites",
-      "Identifique um medo e dê um pequeno passo para enfrentá-lo",
-      "Permita-se descansar sem culpa - recuperação faz parte da jornada"
+      "Descanse sem culpa. Recuperação faz parte da jornada do herói.",
+      "Permita-se ser imperfeito. Você não precisa salvar todo mundo.",
+      "Identifique de onde vem essa necessidade de provar. O que você está tentando demonstrar?"
     ],
-    morningPractice: "Conecte-se com sua força interior e visualize-se superando o maior desafio do dia",
-    dailyExpression: "Enfrente um medo ou obstáculo com coragem e proteja alguém que precisa",
-    eveningReflection: "Reconheça as batalhas vencidas e a força que demonstrou hoje",
-    personalMantra: "Eu enfrento desafios com coragem e inspiro força ao meu redor"
+    morningPractice: "Qual batalha é realmente minha hoje? E o que posso deixar de carregar?",
+    dailyExpression: "Enfrente um desafio importante E peça ajuda em outro",
+    eveningReflection: "Onde fui corajoso hoje? Onde carreguei peso demais? O que posso soltar?",
+    personalMantra: "Sou forte para enfrentar o que é meu e sábio para soltar o que não é",
+    deepPatterns: [
+      "Você provavelmente foi responsável por algo ou alguém desde muito cedo.",
+      "Quando algo dá errado, sua primeira reação é pensar no que você poderia ter feito.",
+      "Tem dificuldade de relaxar porque sempre sente que deveria estar fazendo algo.",
+      "Ressente-se quando seu esforço não é reconhecido, mas não fala sobre isso."
+    ],
+    commonChallenges: [
+      "Assumir responsabilidades que não são suas porque 'precisa ser feito'.",
+      "Não pedir ajuda até estar no limite do esgotamento.",
+      "Frustrar-se quando outros não lutam com a mesma intensidade.",
+      "Confundir valor pessoal com capacidade de performance."
+    ],
+    cultivationPractices: [
+      "Antes de assumir algo, pergunte: isso é realmente meu para carregar?",
+      "Pratique pedir ajuda em coisas pequenas. É treino.",
+      "Celebre vitórias antes de já pensar na próxima batalha.",
+      "Descanse como se fosse parte do treinamento, não como prêmio."
+    ]
   },
   Prestativo: {
     name: "O Prestativo",
-    description: "Você encontra propósito em ajudar os outros, oferecendo suporte e cuidado com generosidade.",
+    description: "Você se realiza cuidando. Quando alguém precisa, você está lá. Sua generosidade é genuína, seu cuidado é profundo. O problema é que às vezes você dá tanto que se esvazia. Cuida de todos menos de si. E quando ninguém cuida de você de volta, sente mágoa, mas não fala porque não quer parecer egoísta.",
     characteristics: [
-      "Generoso e empático",
-      "Coloca outros em primeiro lugar",
-      "Busca ser útil",
-      "Conecta e apoia"
+      "Você percebe as necessidades dos outros antes mesmo deles falarem.",
+      "Tem dificuldade de dizer não, especialmente quando alguém precisa de você.",
+      "Se sente culpado quando faz algo só para si.",
+      "Às vezes ressente secretamente quem não retribui seu cuidado."
     ],
-    visualStyle: "Caloroso e acolhedor, focando em conexão humana",
+    visualStyle: "Caloroso e acolhedor, focando em conexão humana e cuidado genuíno",
     colorPalette: ["#E8B4B8", "#95E1D3", "#F38181", "#AA96DA"],
     photographyDirection: "Ambientes acolhedores, interações humanas, luz suave e calorosa, expressões de cuidado",
     emoji: "🤗",
-    powerPhrase: "Quando cuido dos outros com generosidade, crio círculos de amor que se expandem infinitamente.",
-    alignedBehavior: "Você nutre relações com cuidado genuíno e cria ambientes onde todos se sentem acolhidos e apoiados.",
-    excessBehavior: "Pode tender ao autossacrifício ou codependência, precisando lembrar que cuidar de si é essencial para cuidar dos outros.",
-    complementsEnergy: "trazendo empatia, cuidado genuíno e disponibilidade para ajudar",
-    reinforcesExpression: "adicionando calor humano e capacidade de nutrir relacionamentos",
+    powerPhrase: "Cuidar de mim não é egoísmo. É o que me permite continuar cuidando.",
+    alignedBehavior: "Quando equilibrado, você nutre relações com cuidado genuíno sem se esvaziar. Sabe receber tanto quanto dar e estabelece limites saudáveis.",
+    excessBehavior: "Quando em excesso, você se sacrifica até adoecer, cria dependência nos outros e ressente secretamente quem não retribui. Seu cuidado vira controle disfarçado.",
+    complementsEnergy: "trazendo empatia profunda, cuidado genuíno e disponibilidade para apoiar",
+    reinforcesExpression: "adicionando calor humano e capacidade de nutrir relacionamentos verdadeiros",
     practicalRelationships: [
-      "Pergunte a alguém: 'Como posso te ajudar hoje?' e realmente faça",
-      "Aceite ajuda quando oferecerem - pratique receber também",
-      "Prepare algo especial para alguém sem esperar nada em troca"
+      "Antes de ajudar, pergunte se a pessoa quer ajuda ou só quer ser ouvida.",
+      "Aceite ajuda quando oferecerem. Dizer sim também é um ato de conexão.",
+      "Expresse suas necessidades. Quem te ama quer saber do que você precisa."
     ],
     practicalWork: [
-      "Ofereça-se para ajudar um colega sobrecarregado",
-      "Crie um ambiente acolhedor na sua equipe (café, bolo, celebrações)",
-      "Reconheça e agradeça contribuições de outros publicamente"
+      "Estabeleça limites claros de até onde vai seu cuidado profissional.",
+      "Cuide de si durante o expediente também. Pausa para você não é egoísmo.",
+      "Reconheça quando está fazendo o trabalho emocional de outros."
     ],
     practicalSpiritual: [
-      "Reserve 30 minutos só para você, sem culpa - faça algo que te nutre",
-      "Pratique dizer 'não' gentilmente quando estiver sobrecarregado",
-      "Medite enviando amor e compaixão para si mesmo primeiro"
+      "Reserve tempo só para você, sem culpa. É recarregar, não abandonar.",
+      "Pratique dizer não gentilmente. É cuidar de si para poder cuidar melhor.",
+      "Pergunte-se: estou cuidando por amor ou para ser amado?"
     ],
-    morningPractice: "Conecte-se com compaixão por si mesmo antes de planejar como ajudar outros",
-    dailyExpression: "Ofereça seu cuidado genuíno a alguém E reserve um momento só para você",
-    eveningReflection: "Reconheça o bem que fez e como também cuidou de si hoje",
-    personalMantra: "Eu cuido com amor e também me permito receber cuidado"
+    morningPractice: "Como posso cuidar de mim hoje para ter energia de cuidar dos outros?",
+    dailyExpression: "Ofereça seu cuidado a alguém E reserve um momento só para você",
+    eveningReflection: "Cuidei de quem precisava hoje? E de mim, cuidei também?",
+    personalMantra: "Meu cuidado flui quando primeiro cuido de mim",
+    deepPatterns: [
+      "Você provavelmente aprendeu cedo que seu valor está em ser útil.",
+      "Sente culpa quando faz algo só para si, sem beneficiar ninguém.",
+      "Atrai pessoas que precisam de muito e dão pouco em troca.",
+      "Quando perguntam o que você quer, você não sabe responder."
+    ],
+    commonChallenges: [
+      "Dar até se esvaziar e depois ressentir quem não retribui.",
+      "Dificuldade de receber. Você dá, mas não sabe aceitar.",
+      "Criar dependência nas pessoas ao invés de empoderá-las.",
+      "Confundir amor com utilidade. Se não está ajudando, não se sente amado."
+    ],
+    cultivationPractices: [
+      "Pratique receber. Quando oferecerem algo, aceite com gratidão.",
+      "Pergunte-se: estou ajudando ou estou precisando ser necessário?",
+      "Estabeleça um limite esta semana e mantenha-o.",
+      "Faça algo só para você, sem utilidade prática."
+    ]
   },
   "Bobo da Corte": {
     name: "O Bobo da Corte",
-    description: "Você traz leveza e alegria para a vida, valorizando o humor e a capacidade de não se levar tão a sério.",
+    description: "Você traz leveza para a vida. Onde outros veem peso, você encontra humor. Onde há tensão, você traz alívio. Sua capacidade de rir de si mesmo e não se levar a sério é um dom. O problema é que às vezes você usa o humor para evitar profundidade. Ri para não chorar. Brinca para não enfrentar.",
     characteristics: [
-      "Divertido e espontâneo",
-      "Valoriza o momento presente",
-      "Traz alegria aos outros",
-      "Leve e descontraído"
+      "Você consegue fazer qualquer um rir, mesmo em situações tensas.",
+      "Não se leva a sério e às vezes não entende por que outros levam tudo tão a sério.",
+      "Usa humor quando está desconfortável. É sua forma de proteção.",
+      "Pessoas te procuram quando precisam de leveza, mas nem sempre quando precisam de profundidade."
     ],
-    visualStyle: "Alegre e dinâmico, capturando espontaneidade e diversão",
+    visualStyle: "Alegre e dinâmico, capturando espontaneidade, diversão e energia contagiante",
     colorPalette: ["#FF6B6B", "#4ECDC4", "#FFD93D", "#6BCB77"],
     photographyDirection: "Momentos espontâneos, expressões genuínas de alegria, ambientes descontraídos, cores vibrantes",
     emoji: "🎭",
-    powerPhrase: "Quando trago leveza para os momentos difíceis, transformo o peso em possibilidade.",
-    alignedBehavior: "Você alegra ambientes e ajuda outros a não levarem a vida tão a sério, trazendo perspectiva saudável.",
-    excessBehavior: "Pode tender a evitar assuntos sérios ou usar humor como escudo, precisando equilibrar leveza com profundidade.",
-    complementsEnergy: "trazendo humor, leveza e capacidade de aliviar tensões",
-    reinforcesExpression: "adicionando espontaneidade e alegria contagiante",
+    powerPhrase: "Minha alegria é genuína E posso ser profundo quando preciso.",
+    alignedBehavior: "Quando equilibrado, você traz perspectiva saudável e alegria genuína sem fugir do que é sério. Seu humor cura e conecta.",
+    excessBehavior: "Quando em excesso, você usa o humor como escudo para evitar vulnerabilidade. Brinca com coisas que deveriam ser tratadas com seriedade e depois se sente sozinho.",
+    complementsEnergy: "trazendo humor inteligente, leveza necessária e capacidade de aliviar tensões",
+    reinforcesExpression: "adicionando espontaneidade genuína e alegria que contagia e transforma ambientes",
     practicalRelationships: [
-      "Planeje uma atividade divertida só pela diversão: jogo de tabuleiro, karaokê, dança",
-      "Ria de si mesmo quando errar - e convide outros a rirem também",
-      "Surpreenda alguém com um convite espontâneo para fazer algo leve"
+      "Quando alguém te contar algo sério, resista ao impulso de fazer piada. Só escute.",
+      "Permita-se chorar na frente de alguém de confiança. Vulnerabilidade conecta mais que piada.",
+      "Quando usar humor, pergunte: estou conectando ou estou fugindo?"
     ],
     practicalWork: [
-      "Comece uma reunião com um quebra-gelo divertido",
-      "Celebre pequenas vitórias da equipe de formas criativas",
-      "Use humor apropriado para aliviar tensões em momentos difíceis"
+      "Seu humor é valioso, mas saiba quando é hora de ser sério.",
+      "Use leveza para conectar equipes, não para evitar conversas difíceis.",
+      "Quando criticarem algo sério, não responda com piada. Responda com escuta."
     ],
     practicalSpiritual: [
-      "Dance livremente por 5 minutos ouvindo sua música favorita",
-      "Assista a uma comédia ou leia algo que te faça rir",
-      "Permita-se ser 'bobo' sem julgamento - brinque como criança"
+      "Reserve momentos de silêncio. Nem tudo precisa de comentário engraçado.",
+      "Pergunte-se: do que estou rindo para não chorar?",
+      "Pratique presença sem performance. Você é valioso mesmo sem entreter."
     ],
-    morningPractice: "Encontre algo para sorrir e conecte-se com a alegria de estar vivo",
-    dailyExpression: "Faça alguém rir hoje e não leve um problema tão a sério",
-    eveningReflection: "Reconheça os sorrisos que provocou e a alegria que espalhou",
-    personalMantra: "Eu trago alegria ao mundo e celebro a leveza de cada momento"
+    morningPractice: "Onde posso trazer leveza genuína hoje? E onde preciso ser presente sem piadas?",
+    dailyExpression: "Faça alguém rir E tenha uma conversa séria sem usar humor como escape",
+    eveningReflection: "Onde meu humor conectou hoje? Onde usei ele para fugir?",
+    personalMantra: "Minha alegria é dom e também sei ser profundo quando a vida pede",
+    deepPatterns: [
+      "Você provavelmente aprendeu que ser engraçado garantia aceitação.",
+      "Quando a conversa fica séria demais, você sente desconforto e quer aliviar.",
+      "Às vezes sente que ninguém te conhece de verdade porque só veem o palhaço.",
+      "Usa humor para testar se as pessoas vão gostar de você antes de mostrar quem é."
+    ],
+    commonChallenges: [
+      "Usar piada para fugir de conversas difíceis ou emoções desconfortáveis.",
+      "Não ser levado a sério mesmo quando quer ser.",
+      "Sentir-se vazio quando não está entretendo.",
+      "Dificuldade de criar intimidade verdadeira porque sempre está 'atuando'."
+    ],
+    cultivationPractices: [
+      "Permita silêncios desconfortáveis sem preenchê-los com humor.",
+      "Compartilhe algo vulnerável com alguém de confiança, sem fazer piada.",
+      "Observe quando você usa humor como escudo. O que está evitando?",
+      "Pratique ser você mesmo sem precisar ser engraçado."
+    ]
   },
   "Homem Comum": {
     name: "O Homem Comum",
-    description: "Você valoriza autenticidade e pertencimento, buscando conexão genuína com os outros através da simplicidade.",
+    description: "Você valoriza o autêntico, o simples, o verdadeiro. Não precisa de holofotes ou status para se sentir bem. Seu maior desejo é pertencer, conectar, ser parte de algo maior sem precisar se destacar. O problema é que às vezes você se diminui para caber. Evita brilhar para não parecer arrogante. E no processo, deixa de ocupar o espaço que merece.",
     characteristics: [
-      "Autêntico e acessível",
-      "Valoriza igualdade",
-      "Busca pertencimento",
-      "Pés no chão"
+      "Você se sente mais confortável em grupo do que em destaque.",
+      "Pretensão te incomoda. Pessoas que se acham melhores que outras te irritam.",
+      "Valoriza o comum, o cotidiano, o simples. Luxo excessivo não te atrai.",
+      "Tem dificuldade de aceitar elogios. Tende a diminuir suas conquistas."
     ],
-    visualStyle: "Natural e genuíno, sem artifícios ou pretensões",
+    visualStyle: "Natural e genuíno, sem artifícios ou pretensões, transmitindo autenticidade acessível",
     colorPalette: ["#A8DADC", "#457B9D", "#F1FAEE", "#E63946"],
     photographyDirection: "Ambientes cotidianos, luz natural, poses relaxadas, expressões autênticas e acessíveis",
     emoji: "👤",
-    powerPhrase: "Quando me conecto com autenticidade, crio pertencimento verdadeiro onde quer que esteja.",
-    alignedBehavior: "Você cria conexões genuínas e faz todos se sentirem incluídos e valorizados, sem pretensões.",
-    excessBehavior: "Pode tender a se diminuir ou evitar destaque, precisando reconhecer que seu valor não depende de ser igual aos outros.",
-    complementsEnergy: "trazendo autenticidade, simplicidade e senso de pertencimento",
-    reinforcesExpression: "adicionando acessibilidade e capacidade de incluir todos",
+    powerPhrase: "Pertenço a este mundo exatamente como sou. Meu valor não depende de ser especial.",
+    alignedBehavior: "Quando equilibrado, você cria conexões genuínas e faz todos se sentirem incluídos. Sua autenticidade é magnética e seu senso de comunidade constrói pontes.",
+    excessBehavior: "Quando em excesso, você se diminui para caber, evita qualquer destaque e pode se tornar invisível. Sabota oportunidades de crescimento por medo de parecer pretensioso.",
+    complementsEnergy: "trazendo autenticidade, simplicidade e senso de pertencimento que une",
+    reinforcesExpression: "adicionando acessibilidade genuína e capacidade de incluir todos",
     practicalRelationships: [
-      "Organize um encontro simples: café em casa, churrasco, piquenique",
-      "Inclua alguém que parece estar de fora do grupo",
-      "Compartilhe uma vulnerabilidade com alguém de confiança"
+      "Aceite um elogio com gratidão, sem diminuí-lo. 'Obrigado' basta.",
+      "Inclua alguém que parece de fora. Você sabe como é importante pertencer.",
+      "Compartilhe uma conquista sua sem se desculpar por ela."
     ],
     practicalWork: [
-      "Converse com colegas de diferentes níveis hierárquicos igualmente",
-      "Simplifique uma comunicação corporativa para linguagem acessível",
-      "Reconheça contribuições de todos, especialmente os 'invisíveis'"
+      "Candidate-se àquela vaga ou projeto que parece 'demais' para você. Você merece.",
+      "Reconheça seu diferencial. Humildade não é invisibilidade.",
+      "Quando for incluído em algo, não pergunte 'por que eu?'. Pergunte 'como posso contribuir?'"
     ],
     practicalSpiritual: [
-      "Agradeça pelas coisas simples: água quente, comida, teto",
-      "Passe tempo em comunidade: vizinhos, igreja, clube, grupo",
-      "Aceite um elogio com gratidão em vez de diminuí-lo"
+      "Você pertence a este mundo exatamente como é. Não precisa ser extraordinário.",
+      "Pratique receber reconhecimento sem diminuí-lo.",
+      "Pergunte-se: onde estou me escondendo para não parecer pretensioso?"
     ],
-    morningPractice: "Conecte-se com gratidão pela vida simples e pelas pessoas ao seu redor",
-    dailyExpression: "Seja autêntico em todas as interações e faça alguém se sentir incluído",
-    eveningReflection: "Reconheça as conexões genuínas que fez e seu valor único no mundo",
-    personalMantra: "Eu pertenço a este mundo e crio conexões autênticas onde quer que esteja"
+    morningPractice: "Eu pertenço. Eu tenho valor. Hoje vou ocupar meu espaço sem me desculpar.",
+    dailyExpression: "Conecte-se genuinamente com alguém E reconheça seu próprio valor em algo",
+    eveningReflection: "Onde me conectei hoje? Onde me diminuí desnecessariamente?",
+    personalMantra: "Pertenço a este mundo e meu valor não depende de ser mais ou menos que ninguém",
+    deepPatterns: [
+      "Você provavelmente aprendeu que se destacar era perigoso ou arrogante.",
+      "Compara-se com outros e sempre acha que eles são mais qualificados.",
+      "Quando algo bom acontece para você, espera que algo ruim venha para equilibrar.",
+      "Sente-se impostor quando é reconhecido."
+    ],
+    commonChallenges: [
+      "Diminuir-se para caber e depois ressentir-se de ser invisível.",
+      "Evitar oportunidades de crescimento por medo de parecer pretensioso.",
+      "Dificuldade de reconhecer que você também tem algo único a oferecer.",
+      "Ficar em relacionamentos ou trabalhos medianos por não acreditar que merece mais."
+    ],
+    cultivationPractices: [
+      "Liste 5 coisas em que você é bom. Leia todo dia até acreditar.",
+      "Quando minimizar uma conquista, pare e reformule com reconhecimento.",
+      "Permita-se desejar mais sem culpa. Ambição não é arrogância.",
+      "Ocupe um espaço de destaque esta semana, mesmo pequeno."
+    ]
+  },
+  Cuidador: {
+    name: "O Cuidador",
+    description: "Você se realiza protegendo e nutrindo. Quando alguém precisa, você está lá, não por obrigação, mas porque cuidar é sua linguagem de amor. Você cria ambientes seguros, oferece suporte incondicional e faz os outros se sentirem acolhidos. O problema é que às vezes você cuida tanto dos outros que esquece de si. E quando ninguém cuida de você de volta, a mágoa cresce em silêncio.",
+    characteristics: [
+      "Você antecipa as necessidades dos outros antes mesmo deles pedirem.",
+      "Sente-se útil e realizado quando está ajudando alguém.",
+      "Tem dificuldade de pedir ajuda porque está acostumado a ser quem oferece.",
+      "Às vezes se ressente quando seu cuidado não é reconhecido ou retribuído."
+    ],
+    visualStyle: "Acolhedor e protetor, transmitindo segurança, calor humano e cuidado genuíno",
+    colorPalette: ["#E8B4B8", "#95E1D3", "#F5E6E8", "#7FCDCD"],
+    photographyDirection: "Ambientes familiares, luz suave e quente, gestos de carinho, atmosfera de segurança",
+    emoji: "🌱",
+    powerPhrase: "Cuido dos outros com amor e também permito que cuidem de mim.",
+    alignedBehavior: "Quando equilibrado, você protege e nutre sem se esgotar, estabelece limites saudáveis e sabe pedir ajuda quando precisa. Seu cuidado empodera ao invés de criar dependência.",
+    excessBehavior: "Quando em excesso, você se sacrifica até adoecer, cria dependência emocional e ressente secretamente quem não retribui. Pode se tornar controlador em nome do 'cuidado'.",
+    complementsEnergy: "trazendo proteção, nutrição emocional e capacidade de criar ambientes seguros",
+    reinforcesExpression: "adicionando compaixão ativa e habilidade de acolher quem precisa",
+    practicalRelationships: [
+      "Quando for ajudar, pergunte primeiro: essa pessoa quer ajuda ou quer ser ouvida?",
+      "Aceite quando oferecerem cuidado. Receber também é um ato de amor.",
+      "Expresse quando estiver cansado. Quem te ama quer saber."
+    ],
+    practicalWork: [
+      "Delegue tarefas de cuidado. Você não precisa ser o único que cuida.",
+      "Reserve pausas para si mesmo durante o dia. Não é egoísmo.",
+      "Reconheça quando está fazendo mais do que sua função exige."
+    ],
+    practicalSpiritual: [
+      "Pratique autocuidado como ritual, não como recompensa.",
+      "Pergunte-se: estou cuidando por amor ou para me sentir necessário?",
+      "Reserve um dia por mês só para você, sem culpa."
+    ],
+    morningPractice: "Como posso cuidar de mim hoje para ter energia de cuidar dos outros?",
+    dailyExpression: "Ofereça seu cuidado genuíno E aceite cuidado de alguém",
+    eveningReflection: "Quem cuidei hoje? E quem cuidou de mim? Estou em equilíbrio?",
+    personalMantra: "Meu cuidado flui naturalmente quando também me permito ser cuidado",
+    deepPatterns: [
+      "Você provavelmente assumiu papel de cuidador desde cedo, na família ou entre amigos.",
+      "Quando não está cuidando de alguém, sente-se perdido ou sem propósito.",
+      "Atrai pessoas que precisam de muito suporte.",
+      "Sente culpa quando faz algo só para si."
+    ],
+    commonChallenges: [
+      "Esgotar-se cuidando dos outros e não sobrar energia para si.",
+      "Criar dependência nas pessoas ao invés de empoderá-las.",
+      "Dificuldade de receber cuidado. Você só sabe dar.",
+      "Ressentir-se em silêncio quando seu esforço não é reconhecido."
+    ],
+    cultivationPractices: [
+      "Pratique dizer 'não' com amor. Limites protegem você e o outro.",
+      "Aceite ajuda quando oferecerem, sem justificar ou devolver imediatamente.",
+      "Identifique de onde vem essa necessidade de cuidar. O que você está buscando?",
+      "Cuide de si com a mesma dedicação que cuida dos outros."
+    ]
+  },
+  Realista: {
+    name: "O Realista",
+    description: "Você vê as coisas como são, não como gostaria que fossem. Enquanto outros sonham acordados, você analisa, planeja e executa com os pés no chão. Sua praticidade é valiosa: você entrega resultados quando outros ainda estão debatendo possibilidades. O problema é que às vezes você limita o que é possível antes mesmo de tentar. E pode parecer pessimista para quem não entende que você está apenas sendo prático.",
+    characteristics: [
+      "Você prefere fatos a promessas. Resultados concretos te interessam mais que grandes visões.",
+      "Tem dificuldade com pessoas que 'vivem nas nuvens' ou fazem planos irrealistas.",
+      "Sua primeira reação a ideias novas é pensar nos obstáculos. Não é negatividade, é análise.",
+      "Valoriza estabilidade e segurança. Riscos desnecessários não fazem sentido para você."
+    ],
+    visualStyle: "Sólido e confiável, transmitindo estabilidade, competência e senso de realidade",
+    colorPalette: ["#5D6D7E", "#85929E", "#ABB2B9", "#566573"],
+    photographyDirection: "Ambientes funcionais, iluminação natural e neutra, expressões sérias e confiáveis",
+    emoji: "⚙️",
+    powerPhrase: "Minha praticidade é força. E também posso sonhar antes de calcular.",
+    alignedBehavior: "Quando equilibrado, você transforma visões em realidade através de planejamento sólido. Sua praticidade ancora os sonhos dos outros e entrega resultados consistentes.",
+    excessBehavior: "Quando em excesso, você descarta possibilidades antes de explorá-las, frustra quem quer inovar e pode parecer negativo ou limitador. Mata sonhos em nome da 'realidade'.",
+    complementsEnergy: "trazendo praticidade, senso de realidade e capacidade de execução",
+    reinforcesExpression: "adicionando análise criteriosa e habilidade de transformar ideias em planos viáveis",
+    practicalRelationships: [
+      "Antes de apontar problemas em uma ideia, ouça completamente. Às vezes seu parceiro só quer sonhar em voz alta.",
+      "Permita-se fazer algo sem propósito prático de vez em quando.",
+      "Quando alguém compartilhar um sonho, pergunte como pode ajudar antes de listar obstáculos."
+    ],
+    practicalWork: [
+      "Use sua análise para viabilizar ideias, não para descartá-las.",
+      "Seja o ponte entre visão e execução, não o bloqueador.",
+      "Reconheça que inovação às vezes requer tolerar incerteza."
+    ],
+    practicalSpiritual: [
+      "Pratique sonhar sem calcular viabilidade. Só permita-se imaginar.",
+      "Pergunte-se: o que seria possível se eu suspendesse minha análise por um momento?",
+      "Reserve tempo para atividades 'inúteis'. Nem tudo precisa de resultado."
+    ],
+    morningPractice: "O que é realista hoje? E que possibilidade nova posso considerar antes de descartar?",
+    dailyExpression: "Use sua praticidade para viabilizar algo E ouça uma ideia sem analisar imediatamente",
+    eveningReflection: "Onde minha praticidade ajudou? Onde limitei possibilidades cedo demais?",
+    personalMantra: "Meus pés estão no chão e minha mente também pode explorar o céu",
+    deepPatterns: [
+      "Você provavelmente aprendeu que sonhar demais leva a decepções.",
+      "Frustra-se com pessoas que não planejam ou que fazem promessas irrealistas.",
+      "Às vezes é visto como pessimista quando está apenas sendo prático.",
+      "Tem dificuldade de se animar com possibilidades antes de verificar viabilidade."
+    ],
+    commonChallenges: [
+      "Limitar o que é possível antes de explorar opções.",
+      "Parecer negativo para quem tem mais otimismo natural.",
+      "Perder oportunidades por esperar certeza que nunca vem.",
+      "Dificuldade de apreciar o processo quando o resultado ainda não é visível."
+    ],
+    cultivationPractices: [
+      "Quando ouvir uma ideia nova, espere 24 horas antes de apontar problemas.",
+      "Pratique dizer 'como podemos fazer isso funcionar?' antes de 'isso não vai dar certo'.",
+      "Permita-se um projeto sem garantia de resultado.",
+      "Celebre progressos, não só conclusões."
+    ]
+  },
+  Comediante: {
+    name: "O Comediante",
+    description: "Você transforma o pesado em leve. Onde há tensão, você encontra uma piada. Onde há drama, você traz perspectiva. Sua capacidade de fazer os outros rirem é genuína e poderosa. O problema é que às vezes você usa o humor para evitar sentir. Ri para não enfrentar. E quando finalmente para de fazer piada, não sabe quem você é.",
+    characteristics: [
+      "Você consegue aliviar qualquer ambiente com uma observação bem colocada.",
+      "Percebe o absurdo em situações que outros levam a sério.",
+      "Usa autocrítica como ferramenta de conexão, mas às vezes vai longe demais.",
+      "Quando algo te machuca, sua primeira reação é fazer graça."
+    ],
+    visualStyle: "Expressivo e energético, capturando timing, expressão e conexão instantânea",
+    colorPalette: ["#FF6B6B", "#4ECDC4", "#FFD93D", "#6BCB77"],
+    photographyDirection: "Captura de expressões genuínas, momentos de riso, energia contagiante",
+    emoji: "😄",
+    powerPhrase: "Meu humor é dom. E por baixo dele existe uma pessoa completa, com todas as emoções.",
+    alignedBehavior: "Quando equilibrado, você usa humor para conectar, curar e trazer perspectiva sem fugir da profundidade. Sabe quando rir e quando estar presente de outras formas.",
+    excessBehavior: "Quando em excesso, você transforma tudo em piada, não é levado a sério quando deveria e usa humor para fugir de emoções desconfortáveis. Sente-se vazio quando para de atuar.",
+    complementsEnergy: "trazendo leveza essencial, perspectiva cômica e capacidade de transformar clima",
+    reinforcesExpression: "adicionando timing perfeito e habilidade de criar conexão instantânea através do riso",
+    practicalRelationships: [
+      "Quando alguém te contar algo doloroso, resista à piada. Presença silenciosa também conecta.",
+      "Mostre quem você é por baixo do personagem engraçado. Vulnerabilidade gera intimidade real.",
+      "Pergunte-se: estou fazendo rir para conectar ou para fugir?"
+    ],
+    practicalWork: [
+      "Seu humor é valioso em equipes, mas saiba quando ser sério.",
+      "Use leveza para motivar, não para evitar conversas difíceis.",
+      "Quando fizerem uma crítica séria, ouça sem fazer graça."
+    ],
+    practicalSpiritual: [
+      "Permita-se momentos de silêncio. Você não precisa entreter sempre.",
+      "Explore o que você sente quando não está fazendo ninguém rir.",
+      "Pergunte-se: do que tenho medo que aparece quando não estou sendo engraçado?"
+    ],
+    morningPractice: "Onde posso trazer leveza genuína hoje? E onde preciso estar presente de outras formas?",
+    dailyExpression: "Faça alguém rir de verdade E tenha uma conversa séria sem usar humor como escape",
+    eveningReflection: "Onde meu humor conectou? Onde usei ele para fugir de algo?",
+    personalMantra: "Meu humor é uma das minhas cores, não a minha única cor",
+    deepPatterns: [
+      "Você provavelmente descobriu cedo que fazer rir garantia aceitação e atenção.",
+      "Quando a conversa fica séria, você sente desconforto físico.",
+      "Às vezes sente que ninguém conhece quem você realmente é.",
+      "Usa autocrítica excessiva antes que outros possam te criticar."
+    ],
+    commonChallenges: [
+      "Transformar tudo em piada, mesmo quando a situação pede seriedade.",
+      "Não saber quem você é quando para de performar.",
+      "Dificuldade de criar intimidade verdadeira porque sempre está atuando.",
+      "Medo de que, se parasse de ser engraçado, ninguém mais te quisesse por perto."
+    ],
+    cultivationPractices: [
+      "Fique em silêncio por 5 minutos em uma conversa sem preencher com humor.",
+      "Compartilhe algo vulnerável sem fazer piada para aliviar.",
+      "Pergunte a alguém próximo: como você me vê quando não estou tentando ser engraçado?",
+      "Identifique momentos em que usa humor como escudo. O que está protegendo?"
+    ]
   }
 };
 
@@ -501,14 +887,17 @@ const ANSWER_TO_ARCHETYPE: Record<string, string[]> = {
   "Explorador": ["1E","2E","3B","4D","5B","7A","8E","9A","10C","11A","12D","13B","14E","15E","16B","17D","18B","19E","20D","21A","22D","23C","24E","25E","26B","27C","28E","29D","30E","31C","32E","33E","34E","35E","36E"],
   "Rebelde": ["1E","2E","3B","4D","5B","7A","8C","9A","10C","11A","12D","13B","14E","15E","16B","17D","18B","19E","20D","21A","22D","23C","24E","25E","26B","27C","28E","29D","30E","31C","32E","33E","34E","35E","36E"],
   "Sábio": ["2C","3A","4E","5A","6B","7C","8E","9D","10D","11C","12E","13E","14B","15B","16D","17B","18D","19D","20E","21D","22C","23A","24D","25C","26D","27E","28D","29B","30B","31D","32C","33B","34B","35B","36B"],
-  "Comediante": ["2A","5C","6C","9C","10C","11E","19C"]
+  "Comediante": ["2A","5C","6C","9C","10C","11E","19C"],
+  "Bobo da Corte": ["2A","5C","6C","9C","10C","11E","19C"],
+  "Prestativo": ["1D","2D","3E","4A","5D","6A","7B","8A","9C","10B","11B","12C","13A","14D","15A","16A","17A","18A","19A","20C","21B","22A","23E","24C","25D","26C","27E","28B","29C","30C","31A","32A","33D","35A","36C"],
+  "Homem Comum": ["1C","2A","3C","4E","5A","6C","7E","8D","9D","10E","11E","12A","13D","14A","15D","16D","17A","18D","20A","21E","23B","24D","26D","27C","29A","30A","31C","32B","33A","34A","35C","36A"]
 };
 
 export function calculateArchetypeScores(answers: any[]): ArchetypeScore[] {
   const scores: Record<string, number> = {};
 
   // Initialize all archetypes with 0
-  Object.keys(ANSWER_TO_ARCHETYPE).forEach(archetype => {
+  Object.keys(ARCHETYPES).forEach(archetype => {
     scores[archetype] = 0;
   });
 
@@ -518,7 +907,7 @@ export function calculateArchetypeScores(answers: any[]): ArchetypeScore[] {
     if (answerValue) {
       // Check which archetypes this answer contributes to
       Object.entries(ANSWER_TO_ARCHETYPE).forEach(([archetype, answerKeys]) => {
-        if (answerKeys.includes(answerValue)) {
+        if (answerKeys.includes(answerValue) && ARCHETYPES[archetype]) {
           scores[archetype] = (scores[archetype] || 0) + 1;
         }
       });

@@ -398,18 +398,45 @@ export default function ArchetypeResults({
             </div>
           </div>
 
-          {/* Mensagem Final */}
+          {/* Como Cultivar seu Arquétipo */}
+          {primaryData.cultivationPractices && (
+            <div className="space-y-3 border-t pt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--accent))]/10">
+                  <span className="text-2xl">🌿</span>
+                </div>
+                <h3 className="font-semibold text-xl">Como Cultivar seu Arquétipo</h3>
+              </div>
+              <div className="space-y-3">
+                {primaryData.cultivationPractices.map((practice, index) => (
+                  <div key={index} className="p-4 rounded-lg bg-muted/30 border-l-4 border-emerald-500">
+                    <p className="text-muted-foreground">{practice}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Uma Leitura Direta da Sua Essência */}
           <div className="pt-8 border-t">
-            <div className="bg-gradient-to-br from-[hsl(var(--accent))]/10 to-[hsl(var(--accent))]/5 p-8 rounded-lg text-center space-y-4">
-              <p className="text-lg text-foreground leading-relaxed">
-                Você é um reflexo vivo da harmonia entre forças divinas e humanas.
-              </p>
-              <p className="text-base text-muted-foreground leading-relaxed">
-                Sua essência é única — e o <strong>Essentia</strong> existe para ajudar você 
-                a expressá-la com propósito e beleza.
-              </p>
+            <div className="bg-gradient-to-br from-[hsl(var(--accent))]/10 to-[hsl(var(--accent))]/5 p-8 rounded-lg space-y-6">
+              <h3 className="font-semibold text-xl flex items-center gap-2">
+                <span className="text-2xl">🧭</span>
+                Uma Leitura Direta da Sua Essência
+              </h3>
+              <div className="space-y-4 text-muted-foreground leading-relaxed">
+                <p>
+                  O que aparece aqui não é aleatório. Esse arquétipo descreve formas muito específicas de como você encara a vida, toma decisões e se posiciona no mundo.
+                </p>
+                <p>
+                  Não é um texto que serviria para qualquer pessoa. Existem padrões reais por trás dessa leitura: como você se comporta sob pressão, o que te motiva, o que te frustra, o que você busca provar.
+                </p>
+                <p className="font-medium text-foreground">
+                  Se você se reconheceu em alguma dessas descrições, não é coincidência. É reconhecimento.
+                </p>
+              </div>
               {navigator.share && (
-                <div className="pt-4">
+                <div className="pt-4 text-center">
                   <Button onClick={handleShare} variant="outline" size="lg" className="gap-2">
                     <Share2 className="h-4 w-4" />
                     Compartilhar Resultado
