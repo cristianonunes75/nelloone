@@ -6,13 +6,14 @@ import { useImpersonate } from "@/contexts/ImpersonateContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { JourneyStepCard } from "@/components/cliente/JourneyStepCard";
+import { JourneyResultsSummary } from "@/components/cliente/JourneyResultsSummary";
 import { LogoText } from "@/components/LogoText";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { ImpersonateBanner } from "@/components/ImpersonateBanner";
 import { OnboardingModal } from "@/components/cliente/OnboardingModal";
 import { LogOut, User, Sparkles, Map, Lock, ShoppingCart, Star, MessageSquare } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { MiguelAgent } from "@/components/MiguelAgent";
@@ -147,6 +148,28 @@ const Cliente = () => {
     resetTest(step.testId);
   };
 
+  const handleShareResult = (testName: string, summary: string) => {
+    const shareText = `🌟 Descobri meu resultado no teste "${testName}": ${summary}\n\nDescubra sua essência também em nello.one`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: `Meu resultado: ${testName}`,
+        text: shareText,
+        url: "https://nello.one",
+      }).catch(() => {
+        // User cancelled sharing
+      });
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(shareText).then(() => {
+        toast({
+          title: "Copiado!",
+          description: "Texto copiado para a área de transferência.",
+        });
+      });
+    }
+  };
+
   // Get result summary for a test
   const getResultSummary = (step: typeof journeySteps[0]): string | undefined => {
     if (step.status !== "completed") return undefined;
@@ -200,6 +223,30 @@ const Cliente = () => {
     
     return "Resultado disponível";
   };
+
+  // Get completion date for a test
+  const getCompletedAt = (step: typeof journeySteps[0]): string | undefined => {
+    if (step.status !== "completed") return undefined;
+    const userTest = userTests?.find(ut => ut.test_id === step.testId);
+    return userTest?.completed_at ?? undefined;
+  };
+
+  // Get completed results for summary card
+  const completedResultsForSummary = useMemo(() => {
+    return journeySteps
+      .filter(step => step.status === "completed")
+      .map(step => {
+        const userTest = userTests?.find(ut => ut.test_id === step.testId);
+        return {
+          testType: step.testType,
+          testName: step.name,
+          summary: getResultSummary(step) || "Resultado disponível",
+          completedAt: userTest?.completed_at ?? undefined,
+          userTestId: userTest?.id,
+        };
+      })
+      .filter(r => r.summary);
+  }, [journeySteps, userTests]);
 
   const handleGenerateCode = () => {
     const basePath = getBasePath();
@@ -392,6 +439,18 @@ const Cliente = () => {
             </Card>
           )}
 
+          {/* Consolidated Results Summary - Shows completed tests */}
+          {completedResultsForSummary.length > 0 && (
+            <JourneyResultsSummary
+              results={completedResultsForSummary}
+              onViewResult={(userTestId) => {
+                const basePath = getBasePath();
+                navigate(`${basePath}/cliente/test-results/${userTestId}`);
+              }}
+              onShareResult={(result) => handleShareResult(result.testName, result.summary)}
+            />
+          )}
+
           {/* Journey Steps */}
           <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
             {journeySteps.map((step) => (
@@ -403,7 +462,12 @@ const Cliente = () => {
                 onPurchase={() => navigate(`${getBasePath()}/cliente/comprar/${step.testId}`)}
                 onViewResult={() => handleViewResult(step)}
                 onReset={() => handleResetTest(step)}
+                onShare={() => {
+                  const summary = getResultSummary(step);
+                  if (summary) handleShareResult(step.name, summary);
+                }}
                 resultSummary={getResultSummary(step)}
+                completedAt={getCompletedAt(step)}
               />
             ))}
           </div>

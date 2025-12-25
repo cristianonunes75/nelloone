@@ -1,10 +1,12 @@
-import { Check, Lock, Play, Clock, HelpCircle, CreditCard, ArrowRight, Eye, RotateCcw } from "lucide-react";
+import { Check, Lock, Play, Clock, HelpCircle, CreditCard, ArrowRight, Eye, RotateCcw, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { JourneyStep } from "@/hooks/useJourneyProgress";
 import * as Icons from "lucide-react";
 import { useTestAccess } from "@/hooks/useTestAccess";
 import { useAuth } from "@/hooks/useAuth";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface JourneyStepCardProps {
   step: JourneyStep;
@@ -13,10 +15,12 @@ interface JourneyStepCardProps {
   onPurchase: () => void;
   onViewResult?: () => void;
   onReset?: () => void;
+  onShare?: () => void;
   resultSummary?: string;
+  completedAt?: string;
 }
 
-export function JourneyStepCard({ step, onStart, onContinue, onPurchase, onViewResult, onReset, resultSummary }: JourneyStepCardProps) {
+export function JourneyStepCard({ step, onStart, onContinue, onPurchase, onViewResult, onReset, onShare, resultSummary, completedAt }: JourneyStepCardProps) {
   const { hasAccess } = useTestAccess();
   const { userRole } = useAuth();
   const isAdmin = userRole === "admin";
@@ -51,6 +55,11 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase, onViewR
             <Eye className="w-4 h-4" />
             Ver Resultado
           </Button>
+          {onShare && (
+            <Button size="sm" variant="ghost" onClick={onShare} className="px-2" title="Compartilhar resultado">
+              <Share2 className="w-4 h-4" />
+            </Button>
+          )}
           {isAdmin && onReset && (
             <Button size="sm" variant="ghost" onClick={onReset} className="px-2" title="Refazer teste">
               <RotateCcw className="w-4 h-4" />
@@ -249,6 +258,11 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase, onViewR
                   <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                   <span className="text-xs font-medium text-primary">{resultSummary}</span>
                 </div>
+                {completedAt && (
+                  <p className="text-[10px] text-muted-foreground mt-1 ml-5.5">
+                    Concluído {formatDistanceToNow(new Date(completedAt), { addSuffix: true, locale: ptBR })}
+                  </p>
+                )}
               </div>
             )}
           </div>
