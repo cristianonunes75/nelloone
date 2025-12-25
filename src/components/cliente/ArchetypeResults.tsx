@@ -165,8 +165,7 @@ export default function ArchetypeResults({
                   <span>✓</span> Quando Alinhado
                 </h4>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Você manifesta {primaryData.characteristics[0]?.toLowerCase()} e {primaryData.characteristics[1]?.toLowerCase()}, 
-                  tornando-se uma fonte de inspiração e transformação para quem está ao seu redor.
+                  {primaryData.alignedBehavior}
                 </p>
               </div>
               <div className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20">
@@ -174,8 +173,7 @@ export default function ArchetypeResults({
                   <span>⚠</span> Quando em Excesso
                 </h4>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Pode tender ao desequilíbrio manifestando rigidez ou exagero em {primaryData.characteristics[2]?.toLowerCase()}, 
-                  necessitando reconexão com sua essência verdadeira.
+                  {primaryData.excessBehavior}
                 </p>
               </div>
             </div>
@@ -189,9 +187,18 @@ export default function ArchetypeResults({
             <div className="space-y-3">
               <div className="p-4 rounded-lg bg-muted/30">
                 <h4 className="font-medium mb-2">Paleta de Cores Sugerida</h4>
-                <p className="text-sm text-muted-foreground">
-                  {primaryData.colorPalette.join(", ")}
-                </p>
+                <div className="flex flex-wrap gap-3 mt-3">
+                  {primaryData.colorPalette.map((color, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div 
+                        className="w-8 h-8 rounded-full border border-border shadow-sm"
+                        style={{ backgroundColor: color }}
+                        title={color}
+                      />
+                      <span className="text-xs text-muted-foreground font-mono">{color}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
               <div className="p-4 rounded-lg bg-muted/30">
                 <h4 className="font-medium mb-2">Estilo de Expressão</h4>
@@ -209,8 +216,7 @@ export default function ArchetypeResults({
                 Frase de Poder
               </h3>
               <p className="text-lg italic text-foreground leading-relaxed">
-                "Quando ajo com {primaryData.characteristics[0]?.toLowerCase()}, 
-                o mundo responde com {primaryData.characteristics[1]?.toLowerCase()}."
+                "{primaryData.powerPhrase}"
               </p>
             </div>
           </div>
