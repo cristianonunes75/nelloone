@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { generateCodigoEssenciaPDF, canGenerateCodigoEssencia, getMissingTests } from "@/lib/pdfCodigoEssencia";
+import { generateCodigoEssenciaPDF, generateCodigoEssenciaPDFBase64, getMissingTests } from "@/lib/pdfCodigoEssencia";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -169,13 +169,11 @@ const CodigoEssencia = () => {
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   const userName = profile?.full_name || (lang === 'en' ? "Traveler" : "Viajante");
 
-  // Report generation is allowed as soon as the journey is complete (UI should not depend on client-side testResults)
+  // Report generation is allowed as soon as the journey is complete
   const canGenerateReport = isJourneyComplete;
 
-  // PDF generation still depends on having the full client-side test results available
-  const canDownloadPdf = useMemo(() => {
-    return canGenerateCodigoEssencia(testResults);
-  }, [testResults]);
+  // PDF/email actions should be available when the journey is complete
+  const canDownloadPdf = isJourneyComplete;
 
   const missingTests = useMemo(() => {
     return getMissingTests(testResults, lang);
@@ -186,8 +184,22 @@ const CodigoEssencia = () => {
     if (savedCodigo && savedCodigo.sections && savedCodigo.sections.length > 0 && !hasGenerated) {
       setHasGenerated(true);
       setGeneratedSections(savedCodigo.sections);
+      toast.success(lang === 'en' ? 'Loaded your saved report.' : 'Relatório carregado do seu histórico.');
     }
   }, [savedCodigo, hasGenerated]);
+
+  // Auto-generate on page entry when journey is complete and there is no saved report
+  useEffect(() => {
+    if (!user?.id) return;
+    if (!isJourneyComplete) return;
+    if (hasGenerated) return;
+    if (hasSavedCodigo) return;
+    if (isGenerating) return;
+
+    toast.info(lang === 'en' ? 'Generating your Essence Code...' : 'Gerando seu Código da Essência...');
+    void handleGenerateCodigo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, isJourneyComplete, hasGenerated, hasSavedCodigo, isGenerating, lang]);
 
   // Generate Codigo da Essencia via Miguel AI endpoint
   const handleGenerateCodigo = async () => {
@@ -240,16 +252,22 @@ const CodigoEssencia = () => {
 
   const handleSendEmail = async () => {
     if (!user?.email) return;
-    
+
     setIsSendingEmail(true);
     try {
+      const pdfBase64 = generateCodigoEssenciaPDFBase64({
+        userName,
+        language: lang,
+        testResults,
+      });
+
       const { error } = await supabase.functions.invoke('send-pdf-email', {
         body: {
           to: user.email,
           name: userName,
           testName: lang === 'en' ? 'Essence Code' : 'Código da Essência',
           testType: 'codigo_essencia',
-          pdfBase64: '', // Would generate here
+          pdfBase64,
           language: lang,
         },
       });
@@ -265,8 +283,11 @@ const CodigoEssencia = () => {
   };
 
   const handleRegenerate = async () => {
+    toast.info(lang === 'en' ? 'Regenerating report...' : 'Regenerando relatório...');
     await resetCodigo();
+    setGeneratedSections([]);
     setHasGenerated(false);
+    await handleGenerateCodigo();
   };
 
 

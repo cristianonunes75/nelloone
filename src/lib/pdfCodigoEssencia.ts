@@ -349,7 +349,7 @@ const getPrimaryValue = (value: unknown): string => {
   return '';
 };
 
-export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void => {
+const buildCodigoEssenciaDoc = (options: CodigoEssenciaOptions): jsPDF => {
   const { userName, language, testResults } = options;
   const lang = language === 'pt-pt' ? 'pt-pt' : language === 'en' ? 'en' : 'pt';
   const t = TRANSLATIONS[lang];
@@ -372,21 +372,21 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
   // Extract results
   const archetype = testResults.arquetipos_proposito?.primary || '';
   const archetypeName = ARCHETYPE_NAMES[archetype]?.[lang] || archetype;
-  
+
   const intelligence = testResults.inteligencias_multiplas?.primary || '';
   const intelligenceName = INTELLIGENCE_NAMES[intelligence]?.[lang] || intelligence;
-  
+
   const connectionStyle = testResults.linguagens_amor?.primary || '';
   const connectionName = CONNECTION_NAMES[connectionStyle]?.[lang] || connectionStyle;
-  
+
   const nello16Type = testResults.mbti?.type || '';
-  
+
   const discProfile = testResults.disc?.dominantProfile || '';
-  
+
   const enneagramType = Number(testResults.eneagrama?.primaryType) || 0;
   const virtue = ENNEAGRAM_VIRTUES[enneagramType]?.[lang] || '';
   const passion = ENNEAGRAM_PASSIONS[enneagramType]?.[lang] || '';
-  
+
   const temperament = getPrimaryValue(testResults.temperamentos?.primary);
   const temperamentName = TEMPERAMENT_NAMES[temperament]?.[lang] || temperament;
 
@@ -443,34 +443,39 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
   // Helper function to add a new page with header
   const addSectionPage = (title: string): number => {
     doc.addPage();
-    
+
     // Header bar
     doc.setFillColor(primaryColor.r, primaryColor.g, primaryColor.b);
     doc.rect(0, 0, pageWidth, 35, "F");
-    
+
     // Title
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
     doc.text(title, margin, 23);
-    
+
     // Footer
     doc.setFontSize(8);
     doc.setTextColor(180, 180, 180);
     doc.text(`${t.brand} • ${t.title}`, margin, pageHeight - 10);
-    
+
     return 50; // Starting Y position
   };
 
   // Helper to add text with auto page break
-  const addText = (text: string, startY: number, fontSize: number = 11, bold: boolean = false): number => {
+  const addText = (
+    text: string,
+    startY: number,
+    fontSize: number = 11,
+    bold: boolean = false
+  ): number => {
     doc.setFontSize(fontSize);
     doc.setFont("helvetica", bold ? "bold" : "normal");
     doc.setTextColor(50, 50, 50);
-    
+
     const lines = doc.splitTextToSize(text, contentWidth);
     let y = startY;
-    
+
     lines.forEach((line: string) => {
       if (y > pageHeight - 25) {
         doc.addPage();
@@ -485,7 +490,7 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
       doc.text(line, margin, y);
       y += fontSize * 0.5;
     });
-    
+
     return y + 5;
   };
 
@@ -508,17 +513,17 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
 
   resultItems.forEach((item, index) => {
     // Card background
-    const cardY = y + (index * 22);
+    const cardY = y + index * 22;
     doc.setFillColor(248, 248, 248);
     doc.setDrawColor(230, 230, 230);
     doc.roundedRect(margin, cardY, contentWidth, 18, 3, 3, "FD");
-    
+
     // Label
     doc.setTextColor(120, 120, 120);
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
     doc.text(item.label.toUpperCase(), margin + 8, cardY + 8);
-    
+
     // Value
     doc.setTextColor(primaryColor.r, primaryColor.g, primaryColor.b);
     doc.setFontSize(12);
@@ -530,11 +535,32 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
   y = addSectionPage(t.structureTitle);
 
   const structureItems = [
-    { label: t.emotionalMatrix, value: lang === 'en' ? `Your center is ${archetypeName} with ${nello16Type} cognitive structure` : `Seu centro é ${archetypeName} com estrutura cognitiva ${nello16Type}` },
-    { label: t.emotionalWound, value: lang === 'en' ? `Connected to ${passion} - the passion of Type ${enneagramType}` : `Conectada à ${passion} - a paixão do Tipo ${enneagramType}` },
+    {
+      label: t.emotionalMatrix,
+      value:
+        lang === 'en'
+          ? `Your center is ${archetypeName} with ${nello16Type} cognitive structure`
+          : `Seu centro é ${archetypeName} com estrutura cognitiva ${nello16Type}`,
+    },
+    {
+      label: t.emotionalWound,
+      value:
+        lang === 'en'
+          ? `Connected to ${passion} - the passion of Type ${enneagramType}`
+          : `Conectada à ${passion} - a paixão do Tipo ${enneagramType}`,
+    },
     { label: t.essentialVirtue, value: virtue || '-' },
-    { label: t.survivalPattern, value: lang === 'en' ? `${discProfile} profile activates as protection` : `Perfil ${discProfile} ativa como proteção` },
-    { label: t.maturityMovement, value: lang === 'en' ? `Integration through ${virtue}` : `Integração através de ${virtue}` },
+    {
+      label: t.survivalPattern,
+      value:
+        lang === 'en'
+          ? `${discProfile} profile activates as protection`
+          : `Perfil ${discProfile} ativa como proteção`,
+    },
+    {
+      label: t.maturityMovement,
+      value: lang === 'en' ? `Integration through ${virtue}` : `Integração através de ${virtue}`,
+    },
   ];
 
   structureItems.forEach((item) => {
@@ -543,7 +569,7 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
     doc.setFont("helvetica", "bold");
     doc.text(item.label, margin, y);
     y += 6;
-    
+
     doc.setTextColor(70, 70, 70);
     doc.setFont("helvetica", "normal");
     const valueLines = doc.splitTextToSize(item.value, contentWidth);
@@ -560,27 +586,53 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
   const patterns = [
     {
       name: lang === 'en' ? 'Pattern 1: Action Mode' : 'Padrão 1: Modo de Ação',
-      balance: lang === 'en' ? `As a ${discProfile} with ${nello16Type}, you naturally lead and organize situations with clarity.` : `Como ${discProfile} com ${nello16Type}, você naturalmente lidera e organiza situações com clareza.`,
-      stress: lang === 'en' ? 'Under pressure, you may become controlling or impatient.' : 'Sob pressão, pode se tornar controlador(a) ou impaciente.',
-      defense: lang === 'en' ? `The passion of ${passion} emerges to protect your ego.` : `A paixão de ${passion} emerge para proteger seu ego.`,
-      sabotage: lang === 'en' ? 'You may sacrifice relationships for results.' : 'Pode sacrificar relacionamentos por resultados.',
-      guidance: lang === 'en' ? 'Pause before reacting. The truth doesn\'t require force.' : 'Pause antes de reagir. A verdade não precisa de força.',
+      balance:
+        lang === 'en'
+          ? `As a ${discProfile} with ${nello16Type}, you naturally lead and organize situations with clarity.`
+          : `Como ${discProfile} com ${nello16Type}, você naturalmente lidera e organiza situações com clareza.`,
+      stress:
+        lang === 'en'
+          ? 'Under pressure, you may become controlling or impatient.'
+          : 'Sob pressão, pode se tornar controlador(a) ou impaciente.',
+      defense:
+        lang === 'en'
+          ? `The passion of ${passion} emerges to protect your ego.`
+          : `A paixão de ${passion} emerge para proteger seu ego.`,
+      sabotage:
+        lang === 'en' ? 'You may sacrifice relationships for results.' : 'Pode sacrificar relacionamentos por resultados.',
+      guidance:
+        lang === 'en'
+          ? "Pause before reacting. The truth doesn't require force."
+          : 'Pause antes de reagir. A verdade não precisa de força.',
     },
     {
       name: lang === 'en' ? 'Pattern 2: Connection Mode' : 'Padrão 2: Modo de Conexão',
-      balance: lang === 'en' ? `Your ${connectionName} style creates deep authentic bonds.` : `Seu estilo de ${connectionName} cria vínculos profundos e autênticos.`,
-      stress: lang === 'en' ? 'You may over-give or expect recognition.' : 'Pode se doar demais ou esperar reconhecimento.',
-      defense: lang === 'en' ? 'Emotional attachment becomes your shield.' : 'O apego emocional se torna seu escudo.',
+      balance:
+        lang === 'en'
+          ? `Your ${connectionName} style creates deep authentic bonds.`
+          : `Seu estilo de ${connectionName} cria vínculos profundos e autênticos.`,
+      stress:
+        lang === 'en' ? 'You may over-give or expect recognition.' : 'Pode se doar demais ou esperar reconhecimento.',
+      defense:
+        lang === 'en' ? 'Emotional attachment becomes your shield.' : 'O apego emocional se torna seu escudo.',
       sabotage: lang === 'en' ? 'You confuse love with approval.' : 'Confunde amor com aprovação.',
-      guidance: lang === 'en' ? 'True love is free. It doesn\'t demand return.' : 'O amor verdadeiro é livre. Não exige retorno.',
+      guidance:
+        lang === 'en' ? "True love is free. It doesn't demand return." : 'O amor verdadeiro é livre. Não exige retorno.',
     },
     {
       name: lang === 'en' ? 'Pattern 3: Thinking Mode' : 'Padrão 3: Modo de Pensamento',
-      balance: lang === 'en' ? `Your ${intelligenceName} intelligence offers unique insights.` : `Sua inteligência ${intelligenceName} oferece insights únicos.`,
+      balance:
+        lang === 'en'
+          ? `Your ${intelligenceName} intelligence offers unique insights.`
+          : `Sua inteligência ${intelligenceName} oferece insights únicos.`,
       stress: lang === 'en' ? 'Over-analysis can lead to paralysis.' : 'Análise excessiva pode levar à paralisia.',
-      defense: lang === 'en' ? 'Intellectualization protects from feeling.' : 'A intelectualização protege de sentir.',
+      defense:
+        lang === 'en' ? 'Intellectualization protects from feeling.' : 'A intelectualização protege de sentir.',
       sabotage: lang === 'en' ? 'You mistake knowing for living.' : 'Confunde saber com viver.',
-      guidance: lang === 'en' ? 'Wisdom is applied understanding. Act on what you know.' : 'Sabedoria é compreensão aplicada. Aja sobre o que sabe.',
+      guidance:
+        lang === 'en'
+          ? 'Wisdom is applied understanding. Act on what you know.'
+          : 'Sabedoria é compreensão aplicada. Aja sobre o que sabe.',
     },
   ];
 
@@ -609,7 +661,7 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
       doc.setFont("helvetica", "bold");
       doc.text(item.label.toUpperCase(), margin, y);
       y += 5;
-      
+
       doc.setTextColor(70, 70, 70);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(11);
@@ -632,24 +684,60 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
   const talents = [
     {
       name: lang === 'en' ? `The Gift of ${archetypeName}` : `O Dom do ${archetypeName}`,
-      description: lang === 'en' ? `Your ${archetypeName} archetype gives you natural presence and inspiration.` : `Seu arquétipo ${archetypeName} lhe dá presença natural e inspiração.`,
-      daily: lang === 'en' ? 'People naturally seek your perspective and energy.' : 'Pessoas naturalmente buscam sua perspectiva e energia.',
-      amplify: lang === 'en' ? 'When you embrace your authentic expression without fear.' : 'Quando você abraça sua expressão autêntica sem medo.',
-      mission: lang === 'en' ? 'Your mission is served when you lead by being, not doing.' : 'Sua missão é servida quando você lidera pelo ser, não pelo fazer.',
+      description:
+        lang === 'en'
+          ? `Your ${archetypeName} archetype gives you natural presence and inspiration.`
+          : `Seu arquétipo ${archetypeName} lhe dá presença natural e inspiração.`,
+      daily:
+        lang === 'en'
+          ? 'People naturally seek your perspective and energy.'
+          : 'Pessoas naturalmente buscam sua perspectiva e energia.',
+      amplify:
+        lang === 'en'
+          ? 'When you embrace your authentic expression without fear.'
+          : 'Quando você abraça sua expressão autêntica sem medo.',
+      mission:
+        lang === 'en'
+          ? 'Your mission is served when you lead by being, not doing.'
+          : 'Sua missão é servida quando você lidera pelo ser, não pelo fazer.',
     },
     {
       name: lang === 'en' ? `The Gift of ${intelligenceName}` : `O Dom da ${intelligenceName}`,
-      description: lang === 'en' ? `Your ${intelligenceName} intelligence processes reality uniquely.` : `Sua inteligência ${intelligenceName} processa a realidade de forma única.`,
-      daily: lang === 'en' ? 'You solve problems others can\'t even perceive.' : 'Você resolve problemas que outros nem percebem.',
-      amplify: lang === 'en' ? 'Through deliberate practice and teaching others.' : 'Através de prática deliberada e ensinando outros.',
-      mission: lang === 'en' ? 'Share your understanding to elevate collective wisdom.' : 'Compartilhe sua compreensão para elevar a sabedoria coletiva.',
+      description:
+        lang === 'en'
+          ? `Your ${intelligenceName} intelligence processes reality uniquely.`
+          : `Sua inteligência ${intelligenceName} processa a realidade de forma única.`,
+      daily:
+        lang === 'en'
+          ? "You solve problems others can't even perceive."
+          : 'Você resolve problemas que outros nem percebem.',
+      amplify:
+        lang === 'en'
+          ? 'Through deliberate practice and teaching others.'
+          : 'Através de prática deliberada e ensinando outros.',
+      mission:
+        lang === 'en'
+          ? 'Share your understanding to elevate collective wisdom.'
+          : 'Compartilhe sua compreensão para elevar a sabedoria coletiva.',
     },
     {
       name: lang === 'en' ? `The Gift of ${virtue}` : `O Dom da ${virtue}`,
-      description: lang === 'en' ? `The virtue of ${virtue} is your path to wholeness.` : `A virtude da ${virtue} é seu caminho para a inteireza.`,
-      daily: lang === 'en' ? 'When present, you become a healing presence for others.' : 'Quando presente, você se torna uma presença curadora para outros.',
-      amplify: lang === 'en' ? 'Through conscious practice and self-compassion.' : 'Através de prática consciente e autocompaixão.',
-      mission: lang === 'en' ? 'Model the virtue you seek - become the teaching.' : 'Modele a virtude que busca - torne-se o ensinamento.',
+      description:
+        lang === 'en'
+          ? `The virtue of ${virtue} is your path to wholeness.`
+          : `A virtude da ${virtue} é seu caminho para a inteireza.`,
+      daily:
+        lang === 'en'
+          ? 'When present, you become a healing presence for others.'
+          : 'Quando presente, você se torna uma presença curadora para outros.',
+      amplify:
+        lang === 'en'
+          ? 'Through conscious practice and self-compassion.'
+          : 'Através de prática consciente e autocompaixão.',
+      mission:
+        lang === 'en'
+          ? 'Model the virtue you seek - become the teaching.'
+          : 'Modele a virtude que busca - torne-se o ensinamento.',
     },
   ];
 
@@ -677,7 +765,7 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
       doc.setFont("helvetica", "bold");
       doc.text(item.label, margin, y);
       y += 5;
-      
+
       doc.setTextColor(70, 70, 70);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
@@ -693,24 +781,50 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
   const pains = [
     {
       name: lang === 'en' ? `The Wound of ${passion}` : `A Ferida da ${passion}`,
-      origin: lang === 'en' ? `Root emotion that activates your Type ${enneagramType} defense.` : `Emoção raiz que ativa sua defesa do Tipo ${enneagramType}.`,
-      manifestation: lang === 'en' ? 'Triggers automatic reactions that don\'t serve your growth.' : 'Dispara reações automáticas que não servem seu crescimento.',
+      origin:
+        lang === 'en'
+          ? `Root emotion that activates your Type ${enneagramType} defense.`
+          : `Emoção raiz que ativa sua defesa do Tipo ${enneagramType}.`,
+      manifestation:
+        lang === 'en'
+          ? "Triggers automatic reactions that don't serve your growth."
+          : 'Dispara reações automáticas que não servem seu crescimento.',
       limitation: lang === 'en' ? 'Keeps you stuck in old patterns.' : 'Mantém você preso(a) em padrões antigos.',
-      healing: lang === 'en' ? `Practice ${virtue} as medicine. Small doses, daily.` : `Pratique ${virtue} como remédio. Pequenas doses, diariamente.`,
+      healing:
+        lang === 'en'
+          ? `Practice ${virtue} as medicine. Small doses, daily.`
+          : `Pratique ${virtue} como remédio. Pequenas doses, diariamente.`,
     },
     {
       name: lang === 'en' ? 'The Wound of Connection' : 'A Ferida da Conexão',
-      origin: lang === 'en' ? `Your ${connectionName} style reveals your deepest need.` : `Seu estilo ${connectionName} revela sua necessidade mais profunda.`,
+      origin:
+        lang === 'en'
+          ? `Your ${connectionName} style reveals your deepest need.`
+          : `Seu estilo ${connectionName} revela sua necessidade mais profunda.`,
       manifestation: lang === 'en' ? 'You may give what you want to receive.' : 'Você pode dar o que quer receber.',
-      limitation: lang === 'en' ? 'Creates unfulfilling relationship dynamics.' : 'Cria dinâmicas relacionais insatisfatórias.',
-      healing: lang === 'en' ? 'Learn to receive in ways that feel foreign.' : 'Aprenda a receber de formas que parecem estranhas.',
+      limitation:
+        lang === 'en' ? 'Creates unfulfilling relationship dynamics.' : 'Cria dinâmicas relacionais insatisfatórias.',
+      healing:
+        lang === 'en'
+          ? 'Learn to receive in ways that feel foreign.'
+          : 'Aprenda a receber de formas que parecem estranhas.',
     },
     {
       name: lang === 'en' ? 'The Wound of Identity' : 'A Ferida da Identidade',
-      origin: lang === 'en' ? `Your ${temperamentName} temperament shapes how you see yourself.` : `Seu temperamento ${temperamentName} molda como você se vê.`,
-      manifestation: lang === 'en' ? 'You may confuse personality with essence.' : 'Você pode confundir personalidade com essência.',
-      limitation: lang === 'en' ? 'Over-identification with traits blocks growth.' : 'Identificação excessiva com traços bloqueia crescimento.',
-      healing: lang === 'en' ? 'You are not your personality. You are awareness itself.' : 'Você não é sua personalidade. Você é a consciência em si.',
+      origin:
+        lang === 'en'
+          ? `Your ${temperamentName} temperament shapes how you see yourself.`
+          : `Seu temperamento ${temperamentName} molda como você se vê.`,
+      manifestation:
+        lang === 'en' ? 'You may confuse personality with essence.' : 'Você pode confundir personalidade com essência.',
+      limitation:
+        lang === 'en'
+          ? 'Over-identification with traits blocks growth.'
+          : 'Identificação excessiva com traços bloqueia crescimento.',
+      healing:
+        lang === 'en'
+          ? 'You are not your personality. You are awareness itself.'
+          : 'Você não é sua personalidade. Você é a consciência em si.',
     },
   ];
 
@@ -738,7 +852,7 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
       doc.setFont("helvetica", "bold");
       doc.text(item.label, margin, y);
       y += 5;
-      
+
       doc.setTextColor(70, 70, 70);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
@@ -759,11 +873,12 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
   doc.setTextColor(primaryColor.r, primaryColor.g, primaryColor.b);
   doc.setFontSize(12);
   doc.setFont("helvetica", "italic");
-  
-  const purposeText = lang === 'en' 
-    ? `"Your purpose is to transform the world through your ${intelligenceName} intelligence, serving people with the energy of the ${archetypeName} archetype and the virtue of ${virtue}."`
-    : `"Seu propósito é transformar o mundo através de sua inteligência ${intelligenceName}, servindo pessoas com a energia do arquétipo ${archetypeName} e a virtude de ${virtue}."`;
-  
+
+  const purposeText =
+    lang === 'en'
+      ? `"Your purpose is to transform the world through your ${intelligenceName} intelligence, serving people with the energy of the ${archetypeName} archetype and the virtue of ${virtue}."`
+      : `"Seu propósito é transformar o mundo através de sua inteligência ${intelligenceName}, servindo pessoas com a energia do arquétipo ${archetypeName} e a virtude de ${virtue}."`;
+
   const purposeLines = doc.splitTextToSize(purposeText, contentWidth - 20);
   doc.text(purposeLines, pageWidth / 2, y + 20, { align: "center" });
 
@@ -772,11 +887,12 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
   doc.setTextColor(70, 70, 70);
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
-  
-  const purposeExplanation = lang === 'en'
-    ? `This isn't a career suggestion. It's a deeper truth about how your unique combination of gifts serves the world. Your ${archetypeName} presence, combined with ${nello16Type} thinking and ${discProfile} action style, creates a specific way of contributing that no one else can replicate.`
-    : `Esta não é uma sugestão de carreira. É uma verdade mais profunda sobre como sua combinação única de dons serve o mundo. Sua presença ${archetypeName}, combinada com o pensamento ${nello16Type} e o estilo de ação ${discProfile}, cria uma forma específica de contribuir que ninguém mais pode replicar.`;
-  
+
+  const purposeExplanation =
+    lang === 'en'
+      ? `This isn't a career suggestion. It's a deeper truth about how your unique combination of gifts serves the world. Your ${archetypeName} presence, combined with ${nello16Type} thinking and ${discProfile} action style, creates a specific way of contributing that no one else can replicate.`
+      : `Esta não é uma sugestão de carreira. É uma verdade mais profunda sobre como sua combinação única de dons serve o mundo. Sua presença ${archetypeName}, combinada com o pensamento ${nello16Type} e o estilo de ação ${discProfile}, cria uma forma específica de contribuir que ninguém mais pode replicar.`;
+
   y = addText(purposeExplanation, y, 11);
 
   // ============== PAGE 9: MATURITY PATH ==============
@@ -786,25 +902,25 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
     {
       title: t.emotional90Days,
       items: [
-        lang === 'en' ? 'Days 1-30: Observe your triggers without reacting' : 'Dias 1-30: Observe seus gatilhos sem reagir',
-        lang === 'en' ? 'Days 31-60: Practice naming emotions as they arise' : 'Dias 31-60: Pratique nomear emoções conforme surgem',
-        lang === 'en' ? 'Days 61-90: Respond from essence, not pattern' : 'Dias 61-90: Responda da essência, não do padrão',
+        ...(lang === 'en'
+          ? ['Days 1-30: Observe your triggers without reacting', 'Days 31-60: Practice naming emotions as they arise', 'Days 61-90: Respond from essence, not pattern']
+          : ['Dias 1-30: Observe seus gatilhos sem reagir', 'Dias 31-60: Pratique nomear emoções conforme surgem', 'Dias 61-90: Responda da essência, não do padrão']),
       ],
     },
     {
       title: t.spiritual90Days,
       items: [
-        lang === 'en' ? 'Days 1-30: 5 minutes of silence daily' : 'Dias 1-30: 5 minutos de silêncio diário',
-        lang === 'en' ? 'Days 31-60: Gratitude practice before sleep' : 'Dias 31-60: Prática de gratidão antes de dormir',
-        lang === 'en' ? 'Days 61-90: Weekly self-inquiry meditation' : 'Dias 61-90: Meditação semanal de autoindagação',
+        ...(lang === 'en'
+          ? ['Days 1-30: 5 minutes of silence daily', 'Days 31-60: Gratitude practice before sleep', 'Days 61-90: Weekly self-inquiry meditation']
+          : ['Dias 1-30: 5 minutos de silêncio diário', 'Dias 31-60: Prática de gratidão antes de dormir', 'Dias 61-90: Meditação semanal de autoindagação']),
       ],
     },
     {
       title: t.cognitive90Days,
       items: [
-        lang === 'en' ? 'Days 1-30: Read one book on your shadow side' : 'Dias 1-30: Leia um livro sobre seu lado sombra',
-        lang === 'en' ? 'Days 31-60: Journal about pattern insights' : 'Dias 31-60: Escreva sobre insights de padrões',
-        lang === 'en' ? 'Days 61-90: Teach what you\'ve learned to someone' : 'Dias 61-90: Ensine o que aprendeu para alguém',
+        ...(lang === 'en'
+          ? ['Days 1-30: Read one book on your shadow side', 'Days 31-60: Journal about pattern insights', "Days 61-90: Teach what you've learned to someone"]
+          : ['Dias 1-30: Leia um livro sobre seu lado sombra', 'Dias 31-60: Escreva sobre insights de padrões', 'Dias 61-90: Ensine o que aprendeu para alguém']),
       ],
     },
   ];
@@ -832,41 +948,34 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
   const routines = [
     {
       title: t.dailyChecklist,
-      items: lang === 'en' ? [
-        '□ Morning: 3 deep breaths + intention for the day',
-        '□ Midday: Check emotional state (1-10)',
-        '□ Evening: One thing I\'m grateful for today',
-        '□ Night: Did I act from essence or pattern?',
-      ] : [
-        '□ Manhã: 3 respirações profundas + intenção do dia',
-        '□ Meio-dia: Verificar estado emocional (1-10)',
-        '□ Tarde: Uma coisa pela qual sou grato(a) hoje',
-        '□ Noite: Agi da essência ou do padrão?',
-      ],
+      items:
+        lang === 'en'
+          ? [
+              '□ Morning: 3 deep breaths + intention for the day',
+              '□ Midday: Check emotional state (1-10)',
+              "□ Evening: One thing I'm grateful for today",
+              '□ Night: Did I act from essence or pattern?',
+            ]
+          : [
+              '□ Manhã: 3 respirações profundas + intenção do dia',
+              '□ Meio-dia: Verificar estado emocional (1-10)',
+              '□ Tarde: Uma coisa pela qual sou grato(a) hoje',
+              '□ Noite: Agi da essência ou do padrão?',
+            ],
     },
     {
       title: t.weeklyChecklist,
-      items: lang === 'en' ? [
-        '□ Review: What triggered me this week?',
-        '□ Celebrate: One growth moment',
-        '□ Plan: One conscious action for next week',
-      ] : [
-        '□ Revisão: O que me despertou gatilhos essa semana?',
-        '□ Celebrar: Um momento de crescimento',
-        '□ Planejar: Uma ação consciente para próxima semana',
-      ],
+      items:
+        lang === 'en'
+          ? ['□ Review: What triggered me this week?', '□ Celebrate: One growth moment', '□ Plan: One conscious action for next week']
+          : ['□ Revisão: O que me despertou gatilhos essa semana?', '□ Celebrar: Um momento de crescimento', '□ Planejar: Uma ação consciente para próxima semana'],
     },
     {
       title: t.monthlyChecklist,
-      items: lang === 'en' ? [
-        '□ Deep review: Am I living from my purpose?',
-        '□ Assess: Which pattern showed up most?',
-        '□ Adjust: What needs attention next month?',
-      ] : [
-        '□ Revisão profunda: Estou vivendo meu propósito?',
-        '□ Avaliar: Qual padrão apareceu mais?',
-        '□ Ajustar: O que precisa atenção no próximo mês?',
-      ],
+      items:
+        lang === 'en'
+          ? ['□ Deep review: Am I living from my purpose?', '□ Assess: Which pattern showed up most?', '□ Adjust: What needs attention next month?']
+          : ['□ Revisão profunda: Estou vivendo meu propósito?', '□ Avaliar: Qual padrão apareceu mais?', '□ Ajustar: O que precisa atenção no próximo mês?'],
     },
   ];
 
@@ -900,7 +1009,7 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
   doc.setTextColor(220, 220, 220);
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
-  
+
   const letterLines = doc.splitTextToSize(t.finalLetter, contentWidth - 20);
   let letterY = 60;
   letterLines.forEach((line: string) => {
@@ -914,7 +1023,15 @@ export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void 
   doc.setFont("helvetica", "bold");
   doc.text(t.brand, pageWidth / 2, pageHeight - 30, { align: "center" });
 
-  // Save
+  return doc;
+};
+
+export const generateCodigoEssenciaPDF = (options: CodigoEssenciaOptions): void => {
+  const { userName, language } = options;
+  const lang = language === 'pt-pt' ? 'pt-pt' : language === 'en' ? 'en' : 'pt';
+
+  const doc = buildCodigoEssenciaDoc(options);
+
   const filePrefix = lang === 'en' ? 'Essence-Code' : 'Codigo-Essencia';
   const fileName = `${filePrefix}-${userName.replace(/\s+/g, "-")}.pdf`;
   doc.save(fileName);
@@ -961,47 +1078,6 @@ export const getMissingTests = (testResults: TestResults, language: 'pt' | 'pt-p
 
 // Generate PDF as base64 for email
 export const generateCodigoEssenciaPDFBase64 = (options: CodigoEssenciaOptions): string => {
-  const { userName, language, testResults } = options;
-  const lang = language === 'pt-pt' ? 'pt-pt' : language === 'en' ? 'en' : 'pt';
-  const t = TRANSLATIONS[lang];
-
-  const doc = new jsPDF({
-    orientation: "portrait",
-    unit: "mm",
-    format: "a4",
-  });
-
-  // Simplified version for email - just cover and summary
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const primaryColor = { r: 31, g: 46, b: 75 };
-  const goldColor = { r: 205, g: 174, b: 103 };
-
-  // Cover
-  doc.setFillColor(15, 15, 20);
-  doc.rect(0, 0, pageWidth, pageHeight, "F");
-
-  doc.setFillColor(goldColor.r, goldColor.g, goldColor.b);
-  doc.rect(0, pageHeight / 3 - 1, pageWidth, 2, "F");
-
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(42);
-  doc.setFont("helvetica", "bold");
-  doc.text(t.title, pageWidth / 2, pageHeight / 2 - 30, { align: "center" });
-
-  doc.setFontSize(16);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(goldColor.r, goldColor.g, goldColor.b);
-  doc.text(t.subtitle, pageWidth / 2, pageHeight / 2 - 15, { align: "center" });
-
-  doc.setFontSize(20);
-  doc.setTextColor(200, 200, 200);
-  doc.text(userName, pageWidth / 2, pageHeight / 2 + 15, { align: "center" });
-
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(goldColor.r, goldColor.g, goldColor.b);
-  doc.text(t.brand, pageWidth / 2, pageHeight - 40, { align: "center" });
-
+  const doc = buildCodigoEssenciaDoc(options);
   return doc.output('datauristring').split(',')[1];
 };
