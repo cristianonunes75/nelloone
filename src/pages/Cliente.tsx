@@ -26,6 +26,7 @@ import { AffiliatePanel } from "@/components/cliente/AffiliatePanel";
 import { NELLO_16_PROFILES } from "@/lib/nello16Personality";
 import { DISC_PROFILES } from "@/lib/disc";
 import { ENNEAGRAM_PROFILES } from "@/lib/eneagrama";
+import { supabase } from "@/integrations/supabase/client";
 
 const Cliente = () => {
   const { user, profile, signOut, userRole } = useAuth();
@@ -136,7 +137,7 @@ const Cliente = () => {
     navigate(`${basePath}/cliente/test-execution/${step.testId}/${userTest.id}`);
   };
 
-  const handleViewResult = (step: typeof journeySteps[0]) => {
+  const handleViewResult = async (step: typeof journeySteps[0]) => {
     const basePath = getBasePath();
 
     const candidates = (userTests || [])
@@ -149,6 +150,31 @@ const Cliente = () => {
 
     const best = candidates[0];
     if (best) {
+      // Prefetch data before navigating to avoid race condition
+      await Promise.all([
+        queryClient.prefetchQuery({
+          queryKey: ["user-test-result", best.id],
+          queryFn: async () => {
+            const { data } = await supabase
+              .from("user_tests")
+              .select("*, tests(*)")
+              .eq("id", best.id)
+              .maybeSingle();
+            return data;
+          },
+        }),
+        queryClient.prefetchQuery({
+          queryKey: ["test-result-answers", best.id],
+          queryFn: async () => {
+            const { data } = await supabase
+              .from("test_answers")
+              .select("*, test_questions(*)")
+              .eq("user_test_id", best.id);
+            return data;
+          },
+        }),
+      ]);
+      
       navigate(`${basePath}/cliente/test-results/${best.id}`);
       return;
     }
