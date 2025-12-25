@@ -389,6 +389,14 @@ const AppRoutes = () => (
       }
     />
     <Route
+      path="/codigo-essencia"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <CodigoEssencia />
+        </ProtectedRoute>
+      }
+    />
+    <Route
       path="/essence-code"
       element={
         <ProtectedRoute allowedRoles={["cliente", "admin"]}>
