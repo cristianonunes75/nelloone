@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { useCodigoEssencia } from "@/hooks/useCodigoEssencia";
-import { useCodigoEssenciaAccess } from "@/hooks/useCodigoEssenciaAccess";
+// Access is now automatic - no separate purchase needed
 import { Button } from "@/components/ui/button";
 import { LogoText } from "@/components/LogoText";
 import { 
@@ -16,11 +16,9 @@ import {
   Target, 
   BookOpen, 
   RefreshCw,
-  Lock,
   CheckCircle2,
   AlertCircle,
-  Mail,
-  ShoppingCart
+  Mail
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -164,7 +162,8 @@ const CodigoEssencia = () => {
   const { profile, user } = useAuth();
   const { isJourneyComplete, testResults, completedCount, totalSteps, isLoading: journeyLoading } = useJourneyProgress();
   const { hasSavedCodigo, savedCodigo, saveCodigo, resetCodigo, isLoading: codigoLoading } = useCodigoEssencia();
-  const { hasUnlocked, canGenerateCode, canPurchase, isLoading: accessLoading } = useCodigoEssenciaAccess();
+  // Access is now automatic when journey is complete - no separate purchase
+  const isLoading = journeyLoading || codigoLoading;
   const navigate = useNavigate();
   const { language } = useLanguage();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -178,10 +177,6 @@ const CodigoEssencia = () => {
   const t = TRANSLATIONS[lang];
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   const userName = profile?.full_name || (lang === 'en' ? "Traveler" : "Viajante");
-  const isLoading = journeyLoading || codigoLoading || accessLoading;
-
-  // Use the proper access check from hook
-  const hasAccess = hasUnlocked;
 
   // Check if all tests are completed
   const canGenerate = useMemo(() => {
@@ -280,16 +275,6 @@ const CodigoEssencia = () => {
     setHasGenerated(false);
   };
 
-  const handlePurchase = () => {
-    // Navigate to sales page for codigo_da_essencia
-    if (language === 'en') {
-      navigate('/en/essence-code-premium');
-    } else if (language === 'pt-pt') {
-      navigate('/pt-pt/codigo-da-essencia');
-    } else {
-      navigate('/codigo-da-essencia');
-    }
-  };
 
   if (isLoading) {
     return (
@@ -351,39 +336,6 @@ const CodigoEssencia = () => {
 
             <Button onClick={() => navigate(`${basePath}/cliente`)}>
               {t.continueJourney}
-            </Button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // Not purchased (premium lock)
-  if (!hasAccess) {
-    return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-10">
-          <div className="container px-4 py-4 flex items-center justify-between">
-            <LogoText className="text-2xl" variant="solid" />
-            <Button variant="ghost" size="sm" onClick={() => navigate(`${basePath}/cliente`)}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {t.back}
-            </Button>
-          </div>
-        </header>
-
-        <main className="container px-4 py-12">
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Lock className="w-10 h-10 text-amber-600" />
-            </div>
-            <h1 className="text-3xl font-bold mb-4">{t.locked}</h1>
-            <p className="text-muted-foreground mb-8">
-              {t.lockedDesc}
-            </p>
-            <Button size="lg" onClick={handlePurchase} className="bg-amber-600 hover:bg-amber-700">
-              <ShoppingCart className="w-5 h-5 mr-2" />
-              {t.purchase}
             </Button>
           </div>
         </main>
