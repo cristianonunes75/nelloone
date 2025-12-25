@@ -425,6 +425,16 @@ serve(async (req) => {
 });
 
 /**
+ * Mapping from internal MBTI-style codes to Nello proprietary display codes
+ */
+const NELLO_16_CODE_MAP: Record<string, string> = {
+  INTJ: "N1-EA", INTP: "N2-AA", ENTJ: "N3-AO", ENTP: "N4-VI",
+  INFJ: "N5-CP", INFP: "N6-PI", ENFJ: "N7-MI", ENFP: "N8-IC",
+  ISTJ: "N9-GP", ISFJ: "N10-PC", ESTJ: "N11-GE", ESFJ: "N12-AF",
+  ISTP: "N13-AV", ISFP: "N14-AE", ESTP: "N15-AT", ESFP: "N16-AP",
+};
+
+/**
  * Extracts key results from each test type for the consolidated summary
  */
 function extractKeyResults(testType: string, resultData: any): any {
@@ -450,8 +460,12 @@ function extractKeyResults(testType: string, resultData: any): any {
 
     case 'mbti':
     case 'nello16':
+      // Convert MBTI code to Nello code for display
+      const internalType = resultData.type || resultData.tipo || resultData.personalityType;
+      const nelloCode = NELLO_16_CODE_MAP[internalType] || internalType;
       return {
-        personalityType: resultData.type || resultData.tipo || resultData.personalityType,
+        personalityType: nelloCode,
+        internalType: internalType, // Keep internal reference if needed
         dimensions: resultData.dimensions || resultData.dimensoes,
         description: resultData.description || resultData.descricao,
         strengths: resultData.strengths || resultData.forcas,
@@ -470,10 +484,13 @@ function extractKeyResults(testType: string, resultData: any): any {
       };
 
     case 'temperamentos':
+      // Handle both object and string formats
+      const primaryTemp = resultData.primary?.name || resultData.primary?.temperament || resultData.dominant || resultData.dominante;
+      const secondaryTemp = resultData.secondary?.name || resultData.secondary?.temperament || resultData.secondary || resultData.secundario;
       return {
-        dominantTemperament: resultData.dominant || resultData.dominante,
-        secondaryTemperament: resultData.secondary || resultData.secundario,
-        description: resultData.description || resultData.descricao,
+        dominantTemperament: primaryTemp,
+        secondaryTemperament: secondaryTemp,
+        description: resultData.description || resultData.interpretation || resultData.descricao,
         strengths: resultData.strengths || resultData.forcas,
         challenges: resultData.challenges || resultData.desafios,
       };

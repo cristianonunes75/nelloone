@@ -23,7 +23,7 @@ import { testSlugs } from "@/lib/testContent";
 import { JornadaNelloCard } from "@/components/cliente/JornadaNelloCard";
 import { TEST_TYPE_TO_SLUG } from "@/utils/journey";
 import { AffiliatePanel } from "@/components/cliente/AffiliatePanel";
-import { NELLO_16_PROFILES } from "@/lib/nello16Personality";
+import { NELLO_16_PROFILES, getNello16DisplayCode } from "@/lib/nello16Personality";
 import { DISC_PROFILES } from "@/lib/disc";
 import { ENNEAGRAM_PROFILES } from "@/lib/eneagrama";
 import { supabase } from "@/integrations/supabase/client";
@@ -226,7 +226,8 @@ const Cliente = () => {
       case "nello16":
         if (resultData.type) {
           const profile = NELLO_16_PROFILES[resultData.type];
-          return `${resultData.type} - ${profile?.name?.pt || ""}`;
+          const displayCode = getNello16DisplayCode(resultData.type);
+          return `${displayCode} - ${profile?.name?.pt || ""}`;
         }
         break;
       case "disc":
@@ -243,7 +244,12 @@ const Cliente = () => {
         break;
       case "temperamentos":
         if (resultData.primary) {
-          return `${resultData.primary}${resultData.secondary ? ` / ${resultData.secondary}` : ""}`;
+          // Handle both object and string formats for primary/secondary
+          const primaryName = typeof resultData.primary === 'object' ? resultData.primary.name : resultData.primary;
+          const secondaryName = resultData.secondary 
+            ? (typeof resultData.secondary === 'object' ? resultData.secondary.name : resultData.secondary)
+            : null;
+          return `${primaryName}${secondaryName ? ` / ${secondaryName}` : ""}`;
         }
         break;
       case "arquetipos_proposito":
