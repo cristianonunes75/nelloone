@@ -292,29 +292,8 @@ const Cliente = () => {
 
   const handleGenerateCode = () => {
     const basePath = getBasePath();
-    // If user has access, go to generate page; otherwise go to sales page
-    if (hasCodigoUnlocked) {
-      navigate(`${basePath}/cliente/codigo-essencia`);
-    } else {
-      // Go to sales page
-      if (language === 'en') {
-        navigate('/en/essence-code-premium');
-      } else if (language === 'pt-pt') {
-        navigate('/pt-pt/codigo-da-essencia');
-      } else {
-        navigate('/codigo-da-essencia');
-      }
-    }
-  };
-
-  const handlePurchaseCodigo = () => {
-    if (language === 'en') {
-      navigate('/en/essence-code-premium');
-    } else if (language === 'pt-pt') {
-      navigate('/pt-pt/codigo-da-essencia');
-    } else {
-      navigate('/codigo-da-essencia');
-    }
+    // Access is now automatic when journey is complete
+    navigate(`${basePath}/cliente/codigo-essencia`);
   };
 
   if (isLoading) {
@@ -441,7 +420,7 @@ const Cliente = () => {
               if (currentStepData) handleStartTest(currentStepData);
             }}
             onViewCodigo={handleGenerateCode}
-            onPurchaseCodigo={handlePurchaseCodigo}
+            onPurchaseCodigo={handleGenerateCode}
           />
 
           {/* Affiliate Panel - Only visible to founders after completing journey */}
@@ -538,15 +517,10 @@ const Cliente = () => {
                     : `${displayName}, você completou todos os 7 testes! Desbloqueie seu Código da Essência.`)
                 }
               </p>
-              {hasCodigoUnlocked ? (
+              {hasCodigoUnlocked && (
                 <Button size="lg" onClick={handleGenerateCode} className="gap-2 w-full sm:w-auto">
                   <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
                   {language === 'en' ? 'Generate My Essence Code' : 'Gerar Meu Código da Essência'}
-                </Button>
-              ) : (
-                <Button size="lg" onClick={handlePurchaseCodigo} className="gap-2 w-full sm:w-auto bg-amber-600 hover:bg-amber-700">
-                  <ShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
-                  {language === 'en' ? 'Unlock Essence Code' : 'Desbloquear Código da Essência'}
                 </Button>
               )}
             </div>

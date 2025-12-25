@@ -173,25 +173,11 @@ export function JornadaNelloCard({
   };
 
   const handleNavigateToCodigo = () => {
-    if (hasCodigoEssencia) {
-      if (onViewCodigo) {
-        onViewCodigo();
-      } else {
-        navigate(`${basePath}/cliente/codigo-essencia`);
-      }
+    // Access is now automatic when journey is complete - always go to generate page
+    if (onViewCodigo) {
+      onViewCodigo();
     } else {
-      if (onPurchaseCodigo) {
-        onPurchaseCodigo();
-      } else {
-        // Navigate to sales page
-        if (language === 'en') {
-          navigate('/en/essence-code-premium');
-        } else if (language === 'pt-pt') {
-          navigate('/pt-pt/codigo-da-essencia');
-        } else {
-          navigate('/codigo-da-essencia');
-        }
-      }
+      navigate(`${basePath}/cliente/codigo-essencia`);
     }
   };
 
