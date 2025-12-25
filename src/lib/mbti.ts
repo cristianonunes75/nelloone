@@ -66,13 +66,17 @@ export const MBTI_PROFILES: Record<string, { name: string; description: string }
   },
 };
 
+interface MBTIOption {
+  dimension: string;
+  direction: string;
+  text: string;
+  value: string;
+}
+
 interface MBTIAnswer {
-  answer: { value: number };
-  test_questions: {
-    options: {
-      dimension: string;
-      favors: string;
-    };
+  answer: { value: string | number };
+  test_questions?: {
+    options: MBTIOption[] | { dimension?: string; favors?: string };
   };
 }
 
@@ -95,12 +99,21 @@ export function getMBTIResults(answers: MBTIAnswer[]): {
 
   // Calculate scores based on answers
   answers.forEach((answer) => {
-    if (answer.test_questions && answer.test_questions.options) {
-      const { favors } = answer.test_questions.options;
-      const value = answer.answer.value;
-      
-      // Add the score to the appropriate dimension
-      scores[favors] += value;
+    if (!answer.test_questions?.options) return;
+    
+    const options = answer.test_questions.options;
+    const answerValue = String(answer.answer.value);
+    
+    // Handle new format: options is an array with dimension/direction/text/value
+    if (Array.isArray(options)) {
+      const selectedOption = options.find((opt: MBTIOption) => opt.value === answerValue);
+      if (selectedOption && selectedOption.direction) {
+        scores[selectedOption.direction] = (scores[selectedOption.direction] || 0) + 1;
+      }
+    }
+    // Handle legacy format: options has favors property
+    else if (options.favors && typeof answer.answer.value === 'number') {
+      scores[options.favors] += answer.answer.value;
     }
   });
 
