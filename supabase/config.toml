@@ -50,3 +50,15 @@ verify_jwt = false
 
 [functions.verify-checkout]
 verify_jwt = false
+
+[functions.flow-mentor]
+verify_jwt = true
+
+[functions.flow-checkout]
+verify_jwt = true
+
+[functions.flow-check-subscription]
+verify_jwt = true
+
+[functions.flow-customer-portal]
+verify_jwt = true
