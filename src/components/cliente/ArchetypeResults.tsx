@@ -13,6 +13,7 @@ interface ArchetypeResultsProps {
   secondaryScore?: number;
   tertiaryScore?: number;
   allScores?: Record<string, number>;
+  userName?: string;
 }
 
 export default function ArchetypeResults({
@@ -23,6 +24,7 @@ export default function ArchetypeResults({
   secondaryScore,
   tertiaryScore,
   allScores = {},
+  userName = "Você",
 }: ArchetypeResultsProps) {
   const primaryData = ARCHETYPES[primaryArchetype];
   const secondaryData = secondaryArchetype ? ARCHETYPES[secondaryArchetype] : null;
@@ -58,7 +60,7 @@ export default function ArchetypeResults({
           </h2>
           <div className="max-w-2xl mx-auto mt-12 pt-12 border-t border-border/30">
             <p className="text-lg italic text-muted-foreground leading-relaxed mb-6">
-              "Você floresce quando vive como <strong>{primaryData.name}</strong> — 
+              "{userName}, você floresce quando vive como <strong>{primaryData.name}</strong> — 
               guiado por propósito, beleza e fé."
             </p>
             <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground mt-8">
@@ -429,7 +431,7 @@ export default function ArchetypeResults({
                   O que aparece aqui não é aleatório. Esse arquétipo descreve formas muito específicas de como você encara a vida, toma decisões e se posiciona no mundo.
                 </p>
                 <p>
-                  Não é um texto que serviria para qualquer pessoa. Existem padrões reais por trás dessa leitura: como você se comporta sob pressão, o que te motiva, o que te frustra, o que você busca provar.
+                  {userName}, não é um texto que serviria para qualquer pessoa. Existem padrões reais por trás dessa leitura: como você se comporta sob pressão, o que te motiva, o que te frustra, o que você busca provar.
                 </p>
                 <p className="font-medium text-foreground">
                   Se você se reconheceu em alguma dessas descrições, não é coincidência. É reconhecimento.
