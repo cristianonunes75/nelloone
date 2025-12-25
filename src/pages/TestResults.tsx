@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { ARCHETYPES } from "@/lib/archetypes";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, Component, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import ArchetypeResults from "@/components/cliente/ArchetypeResults";
@@ -50,7 +50,84 @@ const JOURNEY_ORDER = [
   "temperamentos"
 ] as const;
 
+type TestResultsErrorBoundaryProps = {
+  children: ReactNode;
+  onBackToCliente: () => void;
+  onRetry: () => void;
+};
+
+type TestResultsErrorBoundaryState = {
+  hasError: boolean;
+  error?: unknown;
+};
+
+class TestResultsErrorBoundary extends Component<
+  TestResultsErrorBoundaryProps,
+  TestResultsErrorBoundaryState
+> {
+  state: TestResultsErrorBoundaryState = { hasError: false };
+
+  static getDerivedStateFromError(error: unknown) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: unknown) {
+    // eslint-disable-next-line no-console
+    console.error("TestResults crashed:", error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="container mx-auto p-6 flex flex-col items-center justify-center min-h-[60vh]">
+          <Card className="max-w-md w-full">
+            <CardContent className="pt-6 text-center space-y-4">
+              <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto" />
+              <h2 className="text-xl font-semibold">Não foi possível abrir o resultado</h2>
+              <p className="text-muted-foreground text-sm">
+                Ocorreu um erro ao renderizar esta página. Você ainda pode voltar para a Área do Cliente e tentar novamente.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
+                <Button variant="outline" onClick={this.props.onRetry} className="gap-2">
+                  <RefreshCw className="h-4 w-4" />
+                  Tentar novamente
+                </Button>
+                <Button onClick={this.props.onBackToCliente} className="gap-2">
+                  <Home className="h-4 w-4" />
+                  Voltar ao Cliente
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 export default function TestResults() {
+  const { language } = useLanguage();
+  const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
+  const { userTestId } = useParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  return (
+    <TestResultsErrorBoundary
+      onBackToCliente={() => navigate(`${basePath}/cliente`)}
+      onRetry={() => {
+        queryClient.invalidateQueries({ queryKey: ["user-test-result", userTestId] });
+        queryClient.invalidateQueries({ queryKey: ["test-result-answers", userTestId] });
+      }}
+    >
+      <TestResultsInner />
+    </TestResultsErrorBoundary>
+  );
+}
+
+function TestResultsInner() {
   const { userTestId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -64,28 +141,58 @@ export default function TestResults() {
   const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
 
-  const { data: userTest, isLoading } = useQuery({
+  const { data: userTest, isLoading, isError: isUserTestError, error: userTestError } = useQuery({
     queryKey: ["user-test-result", userTestId],
+    enabled: !!userTestId,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("user_tests")
         .select("*, tests(*)")
         .eq("id", userTestId!)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      
+
       // Update journey progress when test is completed
-      if (data && data.status === 'completed' && user?.id && data.tests?.type) {
+      if (data && data.status === "completed" && user?.id && data.tests?.type) {
         const journeySlug = getJourneySlugFromTestType(data.tests.type);
         if (journeySlug) {
-          updateJourneyProgress(user.id, journeySlug, 'completed').catch(console.error);
+          updateJourneyProgress(user.id, journeySlug, "completed").catch(console.error);
         }
       }
-      
+
       return data;
     },
   });
+
+  if (isUserTestError) {
+    return (
+      <div className="container mx-auto p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Card className="max-w-md w-full">
+          <CardContent className="pt-6 text-center space-y-4">
+            <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto" />
+            <h2 className="text-xl font-semibold">Não foi possível carregar o resultado</h2>
+            <p className="text-muted-foreground text-sm">
+              {(userTestError as any)?.message
+                ? String((userTestError as any).message)
+                : "Tente novamente em alguns segundos."}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
+              <Button variant="outline" onClick={handleRetry} className="gap-2">
+                <RefreshCw className="h-4 w-4" />
+                Tentar novamente
+              </Button>
+              <Button onClick={() => navigate(`${basePath}/cliente`)} className="gap-2">
+                <Home className="h-4 w-4" />
+                Voltar ao Cliente
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
 
   const { data: answers } = useQuery({
     queryKey: ["test-result-answers", userTestId],
@@ -166,10 +273,10 @@ export default function TestResults() {
   };
 
   // Retry loading data
-  const handleRetry = () => {
+  function handleRetry() {
     queryClient.invalidateQueries({ queryKey: ["user-test-result", userTestId] });
     queryClient.invalidateQueries({ queryKey: ["test-result-answers", userTestId] });
-  };
+  }
 
   if (isLoading) {
     return (
