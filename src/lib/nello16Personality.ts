@@ -24,6 +24,11 @@ export interface Nello16Profile {
     en: string[];
     'pt-pt': string[];
   };
+  growthTips: {
+    pt: string[];
+    en: string[];
+    'pt-pt': string[];
+  };
 }
 
 export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
@@ -45,6 +50,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Dificuldade em expressar emoções", "Tendência ao perfeccionismo", "Pode parecer distante ou frio"],
       en: ["Difficulty expressing emotions", "Tendency towards perfectionism", "May appear distant or cold"],
       'pt-pt': ["Dificuldade em expressar emoções", "Tendência ao perfeccionismo", "Pode parecer distante ou frio"]
+    },
+    growthTips: {
+      pt: ["Pratique expressar seus sentimentos, mesmo que brevemente", "Permita-se celebrar conquistas antes de buscar a próxima meta", "Cultive paciência com processos que não seguem sua lógica"],
+      en: ["Practice expressing your feelings, even briefly", "Allow yourself to celebrate achievements before seeking the next goal", "Cultivate patience with processes that don't follow your logic"],
+      'pt-pt': ["Pratique expressar os seus sentimentos, mesmo que brevemente", "Permita-se celebrar conquistas antes de procurar o próximo objetivo", "Cultive paciência com processos que não seguem a sua lógica"]
     }
   },
   INTP: {
@@ -65,6 +75,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Dificuldade em finalizar projetos", "Pode ser percebido como distraído", "Resistência a rotinas"],
       en: ["Difficulty finishing projects", "May be perceived as distracted", "Resistance to routines"],
       'pt-pt': ["Dificuldade em finalizar projetos", "Pode ser percebido como distraído", "Resistência a rotinas"]
+    },
+    growthTips: {
+      pt: ["Estabeleça pequenas metas diárias para concluir projetos", "Pratique escuta ativa nas conversas", "Crie uma rotina mínima que dê estrutura ao seu dia"],
+      en: ["Set small daily goals to complete projects", "Practice active listening in conversations", "Create a minimal routine that gives structure to your day"],
+      'pt-pt': ["Estabeleça pequenas metas diárias para concluir projetos", "Pratique escuta ativa nas conversas", "Crie uma rotina mínima que dê estrutura ao seu dia"]
     }
   },
   ENTJ: {
@@ -85,6 +100,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Pode ser visto como dominador", "Impaciência com processos lentos", "Dificuldade em delegar"],
       en: ["May be seen as domineering", "Impatience with slow processes", "Difficulty delegating"],
       'pt-pt': ["Pode ser visto como dominador", "Impaciência com processos lentos", "Dificuldade em delegar"]
+    },
+    growthTips: {
+      pt: ["Pratique a arte de ouvir antes de decidir", "Confie mais na capacidade dos outros e delegue", "Reserve momentos de vulnerabilidade com pessoas próximas"],
+      en: ["Practice the art of listening before deciding", "Trust more in others' capabilities and delegate", "Reserve moments of vulnerability with close people"],
+      'pt-pt': ["Pratique a arte de ouvir antes de decidir", "Confie mais na capacidade dos outros e delegue", "Reserve momentos de vulnerabilidade com pessoas próximas"]
     }
   },
   ENTP: {
@@ -105,6 +125,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Dificuldade em manter foco", "Pode ser argumentativo demais", "Tendência a procrastinar rotinas"],
       en: ["Difficulty maintaining focus", "May be too argumentative", "Tendency to procrastinate routines"],
       'pt-pt': ["Dificuldade em manter foco", "Pode ser argumentativo demais", "Tendência a procrastinar rotinas"]
+    },
+    growthTips: {
+      pt: ["Canalize sua energia em construir, não apenas debater", "Pratique a conclusão de projetos antes de iniciar novos", "Cultive a arte de concordar em discordar"],
+      en: ["Channel your energy into building, not just debating", "Practice completing projects before starting new ones", "Cultivate the art of agreeing to disagree"],
+      'pt-pt': ["Canalize a sua energia em construir, não apenas debater", "Pratique a conclusão de projetos antes de iniciar novos", "Cultive a arte de concordar em discordar"]
     }
   },
   INFJ: {
@@ -125,6 +150,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Tendência ao perfeccionismo", "Pode se esgotar cuidando dos outros", "Dificuldade em lidar com conflitos"],
       en: ["Tendency towards perfectionism", "May burn out caring for others", "Difficulty dealing with conflicts"],
       'pt-pt': ["Tendência ao perfeccionismo", "Pode esgotar-se a cuidar dos outros", "Dificuldade em lidar com conflitos"]
+    },
+    growthTips: {
+      pt: ["Reserve tempo sagrado para autocuidado", "Aceite que nem todos precisam ser salvos por você", "Pratique expressar suas necessidades sem culpa"],
+      en: ["Reserve sacred time for self-care", "Accept that not everyone needs to be saved by you", "Practice expressing your needs without guilt"],
+      'pt-pt': ["Reserve tempo sagrado para autocuidado", "Aceite que nem todos precisam de ser salvos por si", "Pratique expressar as suas necessidades sem culpa"]
     }
   },
   INFP: {
@@ -145,6 +175,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Sensibilidade a críticas", "Dificuldade com decisões práticas", "Pode idealizar demais"],
       en: ["Sensitivity to criticism", "Difficulty with practical decisions", "May over-idealize"],
       'pt-pt': ["Sensibilidade a críticas", "Dificuldade com decisões práticas", "Pode idealizar demais"]
+    },
+    growthTips: {
+      pt: ["Estabeleça metas concretas para seus sonhos", "Pratique receber feedback como oportunidade de crescimento", "Equilibre idealismo com ação prática"],
+      en: ["Set concrete goals for your dreams", "Practice receiving feedback as a growth opportunity", "Balance idealism with practical action"],
+      'pt-pt': ["Estabeleça metas concretas para os seus sonhos", "Pratique receber feedback como oportunidade de crescimento", "Equilibre idealismo com ação prática"]
     }
   },
   ENFJ: {
@@ -165,6 +200,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Dificuldade em dizer não", "Pode negligenciar próprias necessidades", "Sensibilidade a rejeição"],
       en: ["Difficulty saying no", "May neglect own needs", "Sensitivity to rejection"],
       'pt-pt': ["Dificuldade em dizer não", "Pode negligenciar as próprias necessidades", "Sensibilidade à rejeição"]
+    },
+    growthTips: {
+      pt: ["Pratique dizer 'não' como um ato de amor próprio", "Reserve energia para você antes de dar aos outros", "Reconheça que rejeição não define seu valor"],
+      en: ["Practice saying 'no' as an act of self-love", "Reserve energy for yourself before giving to others", "Recognize that rejection doesn't define your worth"],
+      'pt-pt': ["Pratique dizer 'não' como um ato de amor próprio", "Reserve energia para si antes de dar aos outros", "Reconheça que rejeição não define o seu valor"]
     }
   },
   ENFP: {
@@ -185,6 +225,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Dificuldade em manter foco", "Pode evitar conflitos necessários", "Tendência a assumir demais"],
       en: ["Difficulty maintaining focus", "May avoid necessary conflicts", "Tendency to take on too much"],
       'pt-pt': ["Dificuldade em manter foco", "Pode evitar conflitos necessários", "Tendência a assumir demais"]
+    },
+    growthTips: {
+      pt: ["Escolha uma prioridade por vez e comprometa-se", "Enfrente conversas difíceis com compaixão", "Estabeleça limites claros de energia"],
+      en: ["Choose one priority at a time and commit", "Face difficult conversations with compassion", "Set clear energy boundaries"],
+      'pt-pt': ["Escolha uma prioridade de cada vez e comprometa-se", "Enfrente conversas difíceis com compaixão", "Estabeleça limites claros de energia"]
     }
   },
   ISTJ: {
@@ -205,6 +250,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Resistência a mudanças", "Pode ser inflexível demais", "Dificuldade em expressar emoções"],
       en: ["Resistance to change", "May be too inflexible", "Difficulty expressing emotions"],
       'pt-pt': ["Resistência a mudanças", "Pode ser inflexível demais", "Dificuldade em expressar emoções"]
+    },
+    growthTips: {
+      pt: ["Permita-se experimentar uma novidade por semana", "Pratique a flexibilidade em pequenas decisões", "Expresse uma emoção genuína por dia"],
+      en: ["Allow yourself to try something new each week", "Practice flexibility in small decisions", "Express one genuine emotion per day"],
+      'pt-pt': ["Permita-se experimentar uma novidade por semana", "Pratique a flexibilidade em pequenas decisões", "Expresse uma emoção genuína por dia"]
     }
   },
   ISFJ: {
@@ -225,6 +275,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Dificuldade em pedir ajuda", "Pode reprimir próprias necessidades", "Resistência a mudanças"],
       en: ["Difficulty asking for help", "May suppress own needs", "Resistance to change"],
       'pt-pt': ["Dificuldade em pedir ajuda", "Pode reprimir as próprias necessidades", "Resistência a mudanças"]
+    },
+    growthTips: {
+      pt: ["Pratique pedir ajuda como um presente aos outros", "Reconheça e expresse suas próprias necessidades", "Abrace pequenas mudanças como oportunidades"],
+      en: ["Practice asking for help as a gift to others", "Recognize and express your own needs", "Embrace small changes as opportunities"],
+      'pt-pt': ["Pratique pedir ajuda como um presente aos outros", "Reconheça e expresse as suas próprias necessidades", "Abrace pequenas mudanças como oportunidades"]
     }
   },
   ESTJ: {
@@ -245,6 +300,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Pode parecer inflexível", "Dificuldade com mudanças inesperadas", "Impaciência com processos lentos"],
       en: ["May appear inflexible", "Difficulty with unexpected changes", "Impatience with slow processes"],
       'pt-pt': ["Pode parecer inflexível", "Dificuldade com mudanças inesperadas", "Impaciência com processos lentos"]
+    },
+    growthTips: {
+      pt: ["Pratique pausar antes de reagir", "Reconheça o valor de perspectivas diferentes", "Cultive momentos de presença sem agenda"],
+      en: ["Practice pausing before reacting", "Recognize the value of different perspectives", "Cultivate moments of presence without agenda"],
+      'pt-pt': ["Pratique pausar antes de reagir", "Reconheça o valor de perspetivas diferentes", "Cultive momentos de presença sem agenda"]
     }
   },
   ESFJ: {
@@ -265,6 +325,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Dificuldade em lidar com críticas", "Pode negligenciar próprias necessidades", "Busca excessiva por aprovação"],
       en: ["Difficulty dealing with criticism", "May neglect own needs", "Excessive search for approval"],
       'pt-pt': ["Dificuldade em lidar com críticas", "Pode negligenciar as próprias necessidades", "Busca excessiva por aprovação"]
+    },
+    growthTips: {
+      pt: ["Pratique receber críticas sem internalizar", "Cuide de si antes de cuidar dos outros", "Busque validação interna, não apenas externa"],
+      en: ["Practice receiving criticism without internalizing", "Take care of yourself before caring for others", "Seek internal validation, not just external"],
+      'pt-pt': ["Pratique receber críticas sem internalizar", "Cuide de si antes de cuidar dos outros", "Procure validação interna, não apenas externa"]
     }
   },
   ISTP: {
@@ -285,6 +350,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Dificuldade em expressar emoções", "Pode parecer desinteressado", "Resistência a compromissos longos"],
       en: ["Difficulty expressing emotions", "May appear disinterested", "Resistance to long commitments"],
       'pt-pt': ["Dificuldade em expressar emoções", "Pode parecer desinteressado", "Resistência a compromissos longos"]
+    },
+    growthTips: {
+      pt: ["Pratique verbalizar seus sentimentos", "Mostre interesse através de perguntas genuínas", "Permita-se vulnerabilidade em relacionamentos próximos"],
+      en: ["Practice verbalizing your feelings", "Show interest through genuine questions", "Allow yourself vulnerability in close relationships"],
+      'pt-pt': ["Pratique verbalizar os seus sentimentos", "Mostre interesse através de perguntas genuínas", "Permita-se vulnerabilidade em relacionamentos próximos"]
     }
   },
   ISFP: {
@@ -305,6 +375,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Dificuldade em planejar longo prazo", "Pode evitar conflitos", "Sensibilidade a críticas"],
       en: ["Difficulty planning long term", "May avoid conflicts", "Sensitivity to criticism"],
       'pt-pt': ["Dificuldade em planear a longo prazo", "Pode evitar conflitos", "Sensibilidade a críticas"]
+    },
+    growthTips: {
+      pt: ["Crie uma visão de 3 meses para sua vida", "Enfrente pequenos conflitos antes que cresçam", "Transforme críticas em combustível criativo"],
+      en: ["Create a 3-month vision for your life", "Face small conflicts before they grow", "Transform criticism into creative fuel"],
+      'pt-pt': ["Crie uma visão de 3 meses para a sua vida", "Enfrente pequenos conflitos antes que cresçam", "Transforme críticas em combustível criativo"]
     }
   },
   ESTP: {
@@ -325,6 +400,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Dificuldade com planejamento", "Pode ser impulsivo", "Resistência a rotinas"],
       en: ["Difficulty with planning", "May be impulsive", "Resistance to routines"],
       'pt-pt': ["Dificuldade com planeamento", "Pode ser impulsivo", "Resistência a rotinas"]
+    },
+    growthTips: {
+      pt: ["Pause 5 segundos antes de decisões importantes", "Equilibre adrenalina com momentos de reflexão", "Desenvolva uma rotina mínima que respeite sua natureza"],
+      en: ["Pause 5 seconds before important decisions", "Balance adrenaline with moments of reflection", "Develop a minimal routine that respects your nature"],
+      'pt-pt': ["Pause 5 segundos antes de decisões importantes", "Equilibre adrenalina com momentos de reflexão", "Desenvolva uma rotina mínima que respeite a sua natureza"]
     }
   },
   ESFP: {
@@ -345,6 +425,11 @@ export const NELLO_16_PROFILES: Record<string, Nello16Profile> = {
       pt: ["Dificuldade com planejamento", "Pode evitar conversas difíceis", "Busca constante por estímulos"],
       en: ["Difficulty with planning", "May avoid difficult conversations", "Constant search for stimuli"],
       'pt-pt': ["Dificuldade com planeamento", "Pode evitar conversas difíceis", "Busca constante por estímulos"]
+    },
+    growthTips: {
+      pt: ["Defina um propósito claro para sua energia", "Pratique conversas honestas com gentileza", "Cultive momentos de quietude interior"],
+      en: ["Define a clear purpose for your energy", "Practice honest conversations with gentleness", "Cultivate moments of inner stillness"],
+      'pt-pt': ["Defina um propósito claro para a sua energia", "Pratique conversas honestas com gentileza", "Cultive momentos de quietude interior"]
     }
   },
 };
