@@ -637,7 +637,13 @@ function TestResultsInner() {
               <div>
                 <CardTitle className="text-2xl">{userTest.tests?.name}</CardTitle>
                 <CardDescription className="text-primary-foreground/80">
-                  Teste concluído em {new Date(userTest.completed_at!).toLocaleDateString("pt-BR")}
+                  {(() => {
+                    const raw = userTest.completed_at;
+                    if (!raw) return "Teste concluído";
+                    const d = new Date(raw);
+                    if (Number.isNaN(d.getTime())) return "Teste concluído";
+                    return `Teste concluído em ${d.toLocaleDateString("pt-BR")}`;
+                  })()}
                 </CardDescription>
               </div>
             </div>
