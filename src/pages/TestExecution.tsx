@@ -185,7 +185,7 @@ export default function TestExecution() {
     // Calculate full results for paid users
     const { data: allAnswers } = await supabase
       .from("test_answers")
-      .select("*")
+      .select("*, test_questions(options)")
       .eq("user_test_id", userTestId!);
 
     if (allAnswers && allAnswers.length > 0) {

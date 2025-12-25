@@ -618,14 +618,14 @@ export default function TestResults() {
                           <span className="font-medium">Extroversão (E)</span>
                           <span className="text-lg font-bold">{mbtiResultData.scores?.E || 0}</span>
                         </div>
-                        <Progress value={(mbtiResultData.scores?.E / (mbtiResultData.scores?.E + mbtiResultData.scores?.I)) * 100} className="h-2" />
+                        <Progress value={((mbtiResultData.scores?.E || 0) + (mbtiResultData.scores?.I || 0)) > 0 ? ((mbtiResultData.scores?.E || 0) / ((mbtiResultData.scores?.E || 0) + (mbtiResultData.scores?.I || 0))) * 100 : (mbtiResultData.type[0] === 'E' ? 100 : 0)} className="h-2" />
                       </div>
                       <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[0] === 'I' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium">Introversão (I)</span>
                           <span className="text-lg font-bold">{mbtiResultData.scores?.I || 0}</span>
                         </div>
-                        <Progress value={(mbtiResultData.scores?.I / (mbtiResultData.scores?.E + mbtiResultData.scores?.I)) * 100} className="h-2" />
+                        <Progress value={((mbtiResultData.scores?.E || 0) + (mbtiResultData.scores?.I || 0)) > 0 ? ((mbtiResultData.scores?.I || 0) / ((mbtiResultData.scores?.E || 0) + (mbtiResultData.scores?.I || 0))) * 100 : (mbtiResultData.type[0] === 'I' ? 100 : 0)} className="h-2" />
                       </div>
                     </div>
                   </div>
@@ -639,14 +639,14 @@ export default function TestResults() {
                           <span className="font-medium">Sensação (S)</span>
                           <span className="text-lg font-bold">{mbtiResultData.scores?.S || 0}</span>
                         </div>
-                        <Progress value={(mbtiResultData.scores?.S / (mbtiResultData.scores?.S + mbtiResultData.scores?.N)) * 100} className="h-2" />
+                        <Progress value={((mbtiResultData.scores?.S || 0) + (mbtiResultData.scores?.N || 0)) > 0 ? ((mbtiResultData.scores?.S || 0) / ((mbtiResultData.scores?.S || 0) + (mbtiResultData.scores?.N || 0))) * 100 : (mbtiResultData.type[1] === 'S' ? 100 : 0)} className="h-2" />
                       </div>
                       <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[1] === 'N' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium">Intuição (N)</span>
                           <span className="text-lg font-bold">{mbtiResultData.scores?.N || 0}</span>
                         </div>
-                        <Progress value={(mbtiResultData.scores?.N / (mbtiResultData.scores?.S + mbtiResultData.scores?.N)) * 100} className="h-2" />
+                        <Progress value={((mbtiResultData.scores?.S || 0) + (mbtiResultData.scores?.N || 0)) > 0 ? ((mbtiResultData.scores?.N || 0) / ((mbtiResultData.scores?.S || 0) + (mbtiResultData.scores?.N || 0))) * 100 : (mbtiResultData.type[1] === 'N' ? 100 : 0)} className="h-2" />
                       </div>
                     </div>
                   </div>
@@ -660,14 +660,14 @@ export default function TestResults() {
                           <span className="font-medium">Pensamento (T)</span>
                           <span className="text-lg font-bold">{mbtiResultData.scores?.T || 0}</span>
                         </div>
-                        <Progress value={(mbtiResultData.scores?.T / (mbtiResultData.scores?.T + mbtiResultData.scores?.F)) * 100} className="h-2" />
+                        <Progress value={((mbtiResultData.scores?.T || 0) + (mbtiResultData.scores?.F || 0)) > 0 ? ((mbtiResultData.scores?.T || 0) / ((mbtiResultData.scores?.T || 0) + (mbtiResultData.scores?.F || 0))) * 100 : (mbtiResultData.type[2] === 'T' ? 100 : 0)} className="h-2" />
                       </div>
                       <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[2] === 'F' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium">Sentimento (F)</span>
                           <span className="text-lg font-bold">{mbtiResultData.scores?.F || 0}</span>
                         </div>
-                        <Progress value={(mbtiResultData.scores?.F / (mbtiResultData.scores?.T + mbtiResultData.scores?.F)) * 100} className="h-2" />
+                        <Progress value={((mbtiResultData.scores?.T || 0) + (mbtiResultData.scores?.F || 0)) > 0 ? ((mbtiResultData.scores?.F || 0) / ((mbtiResultData.scores?.T || 0) + (mbtiResultData.scores?.F || 0))) * 100 : (mbtiResultData.type[2] === 'F' ? 100 : 0)} className="h-2" />
                       </div>
                     </div>
                   </div>
@@ -681,14 +681,14 @@ export default function TestResults() {
                           <span className="font-medium">Julgamento (J)</span>
                           <span className="text-lg font-bold">{mbtiResultData.scores?.J || 0}</span>
                         </div>
-                        <Progress value={(mbtiResultData.scores?.J / (mbtiResultData.scores?.J + mbtiResultData.scores?.P)) * 100} className="h-2" />
+                        <Progress value={((mbtiResultData.scores?.J || 0) + (mbtiResultData.scores?.P || 0)) > 0 ? ((mbtiResultData.scores?.J || 0) / ((mbtiResultData.scores?.J || 0) + (mbtiResultData.scores?.P || 0))) * 100 : (mbtiResultData.type[3] === 'J' ? 100 : 0)} className="h-2" />
                       </div>
                       <div className={`p-4 rounded-lg border-2 ${mbtiResultData.type[3] === 'P' ? 'bg-accent/20 border-accent' : 'bg-muted/30 border-border'}`}>
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium">Percepção (P)</span>
                           <span className="text-lg font-bold">{mbtiResultData.scores?.P || 0}</span>
                         </div>
-                        <Progress value={(mbtiResultData.scores?.P / (mbtiResultData.scores?.J + mbtiResultData.scores?.P)) * 100} className="h-2" />
+                        <Progress value={((mbtiResultData.scores?.J || 0) + (mbtiResultData.scores?.P || 0)) > 0 ? ((mbtiResultData.scores?.P || 0) / ((mbtiResultData.scores?.J || 0) + (mbtiResultData.scores?.P || 0))) * 100 : (mbtiResultData.type[3] === 'P' ? 100 : 0)} className="h-2" />
                       </div>
                     </div>
                   </div>
