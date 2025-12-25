@@ -78,6 +78,7 @@ const getUserPrompt = (locale: string, results: any, userName: string) => {
     { id: "proposito_natural", title: locale === 'en' ? "Your Natural Purpose" : "Seu Propósito Natural" },
     { id: "caminho_maturidade", title: locale === 'en' ? "Your Maturity Path (90 days)" : "Seu Caminho de Maturidade (90 dias)" },
     { id: "rotina_autoconsciencia", title: locale === 'en' ? "Self-Awareness Routine" : "Rotina de Autoconsciência" },
+    { id: "fechamento_humano", title: locale === 'en' ? "Human Integrated Closing" : "Fechamento Humano Integrado" },
     { id: "carta_final", title: locale === 'en' ? "Final Letter from Miguel" : "Carta Final do Miguel" },
   ];
 
@@ -104,10 +105,21 @@ Based on this data, generate the complete ESSENCE CODE, divided into the followi
 3. padroes_comportamento - 3 main behavior patterns identified by CROSSING the tests. Each pattern should reference at least 3 different tests.
 4. talentos_dons - 3 natural talents that emerge from cross-analysis. Each talent should be supported by evidence from multiple tests.
 5. dores_raizes - 3 core emotional pains. Show how different tests reveal the same root from different angles.
-6. proposito_natural - Their natural purpose based on the intersection of Archetype + Intelligences + Enneagram + DISC.
+6. proposito_natural - Their natural purpose based on the intersection of Archetype + Multiple Intelligences + Enneagram + DISC.
 7. caminho_maturidade - A 90-day maturity path with actions that address insights from ALL tests.
 8. rotina_autoconsciencia - Practices tailored to their complete profile (all 7 dimensions).
-9. carta_final - A personal letter that weaves together the most important revelations from all tests.
+9. fechamento_humano - HUMAN INTEGRATED CLOSING. This is the most important section. Write a human, warm, personal closing that:
+   - Affirms this is NOT generic or empty, but coherent and real
+   - Integrates action, emotion, thought, spirituality, and relationship
+   - Shows how the Archetypes reveal their role and journey
+   - Shows how Multiple Intelligences reveal how they learn and create
+   - Shows how Affection Connection Styles reveal how they love and connect
+   - Brings up internal tensions as something human and rich
+   - Makes the user feel SEEN, UNDERSTOOD, and RESPECTED
+   - Reinforces that the Nello method captured something TRUE about their essence
+   - 3-5 short paragraphs, conversational tone, call user by first name, no hyphens
+   - Start with something like "Before anything, something needs to be clear" and affirm there is substance here
+10. carta_final - A personal letter that weaves together the most important revelations from all tests.
 
 Respond in JSON with the following structure:
 
@@ -121,17 +133,18 @@ Respond in JSON with the following structure:
       "title": "Summary of Your Essence",
       "paragraphs": ["paragraph 1", "paragraph 2", "paragraph 3"]
     },
-    ... (all 9 sections following this structure)
+    ... (all 10 sections following this structure)
   ]
 }
 
 RULES:
-- Each section must have 2-4 meaningful paragraphs
+- Each section must have 2-4 meaningful paragraphs (fechamento_humano can have 3-5)
 - Be specific and reference actual test results BY NAME (e.g., "Your DISC profile of D combined with...")
 - Every section MUST cross-reference at least 3 different tests
+- CRITICAL: Always include Archetypes, Multiple Intelligences, and Affection Connection Styles in the synthesis
 - Use warm, human, deep language
 - Make content actionable and practical
-- The final letter should be personal and touching
+- The fechamento_humano should make the user think "This spoke about ME. It's not generic. There's truth here."
 - Do not use generic statements - personalize everything based on the specific test results`;
   }
 
@@ -162,10 +175,21 @@ Com base nesses dados, gere o CÓDIGO DA ESSÊNCIA completo, dividido nas seguin
 3. padroes_comportamento - 3 padrões principais de comportamento identificados CRUZANDO os testes. Cada padrão deve referenciar pelo menos 3 testes diferentes.
 4. talentos_dons - 3 talentos naturais que emergem do cruzamento. Cada talento deve ser sustentado por evidências de múltiplos testes.
 5. dores_raizes - 3 dores emocionais centrais. Mostre como diferentes testes revelam a mesma raiz de ângulos diferentes.
-6. proposito_natural - O propósito natural baseado na interseção de Arquétipo + Inteligências + Eneagrama + DISC.
+6. proposito_natural - O propósito natural baseado na interseção de Arquétipo + Inteligências Múltiplas + Eneagrama + DISC.
 7. caminho_maturidade - Um caminho de maturidade de 90 dias com ações que endereçam insights de TODOS os testes.
 8. rotina_autoconsciencia - Práticas personalizadas para o perfil completo (todas as 7 dimensões).
-9. carta_final - Uma carta pessoal que tece as revelações mais importantes de todos os testes.
+9. fechamento_humano - FECHAMENTO HUMANO INTEGRADO. Esta é a seção mais importante. Escreva um fechamento humano, acolhedor e pessoal que:
+   - Afirme que isso NÃO é genérico nem vazio, mas coerente e real
+   - Integre ação, emoção, pensamento, espiritualidade e relação
+   - Mostre como os Arquétipos revelam o papel e a jornada da pessoa
+   - Mostre como as Inteligências Múltiplas revelam como ela aprende e cria
+   - Mostre como os Estilos de Conexão Afetiva revelam como ela ama e se conecta
+   - Traga à tona tensões internas como algo humano e rico
+   - Faça o usuário se sentir VISTO, COMPREENDIDO e RESPEITADO
+   - Reforce que o método do Nello captou algo VERDADEIRO da ${yourWord} essência
+   - 3-5 parágrafos curtos, tom de conversa, chame pelo primeiro nome, sem hífens
+   - Comece com algo como "Antes de tudo, é importante dizer uma coisa" e afirme que há substância aqui
+10. carta_final - Uma carta pessoal que tece as revelações mais importantes de todos os testes.
 
 Responda em JSON com a seguinte estrutura:
 
@@ -179,17 +203,18 @@ Responda em JSON com a seguinte estrutura:
       "title": "Resumo da ${yourWord.charAt(0).toUpperCase() + yourWord.slice(1)} Essência",
       "paragraphs": ["parágrafo 1", "parágrafo 2", "parágrafo 3"]
     },
-    ... (todas as 9 seções seguindo esta estrutura)
+    ... (todas as 10 seções seguindo esta estrutura)
   ]
 }
 
 REGRAS:
-- Cada seção deve ter 2-4 parágrafos significativos
+- Cada seção deve ter 2-4 parágrafos significativos (fechamento_humano pode ter 3-5)
 - Seja específico e referencie os resultados reais dos testes PELO NOME (ex: "Seu perfil DISC de D combinado com...")
 - Cada seção DEVE cruzar pelo menos 3 testes diferentes
+- CRÍTICO: Sempre inclua Arquétipos, Inteligências Múltiplas e Estilos de Conexão Afetiva na síntese
 - Use linguagem acolhedora, humana e profunda
 - Torne o conteúdo aplicável e prático
-- A carta final deve ser pessoal e tocante
+- O fechamento_humano deve fazer o usuário pensar "Isso falou de mim. Não é genérico. Tem verdade aqui."
 - Não use frases genéricas - personalize tudo com base nos resultados específicos
 - ${isEuropean ? 'Use português europeu (tu, teu, tua)' : 'Use português brasileiro (você, seu, sua)'}`;
 };
@@ -441,12 +466,16 @@ function extractKeyResults(testType: string, resultData: any): any {
   switch (testType) {
     case 'arquetipos_proposito':
     case 'arquetipos':
+      // Handle multiple data structures for archetypes
+      const primaryArchetype = resultData.primary?.archetype || resultData.archetype || resultData.arquetipo || resultData.dominante || resultData.dominant;
+      const secondaryArchetype = resultData.secondary?.archetype || resultData.secondary || resultData.secundario;
       return {
-        dominantArchetype: resultData.archetype || resultData.arquetipo || resultData.dominante,
-        secondaryArchetype: resultData.secondary || resultData.secundario,
-        description: resultData.description || resultData.descricao,
-        strengths: resultData.strengths || resultData.forcas,
-        challenges: resultData.challenges || resultData.desafios,
+        dominantArchetype: primaryArchetype,
+        secondaryArchetype: secondaryArchetype,
+        archetypeOfEssence: resultData.essenceArchetype || resultData.arquetipoEssencia,
+        description: resultData.primary?.description || resultData.description || resultData.descricao,
+        strengths: resultData.primary?.strengths || resultData.strengths || resultData.forcas,
+        challenges: resultData.primary?.challenges || resultData.challenges || resultData.desafios,
       };
 
     case 'disc':
@@ -496,20 +525,30 @@ function extractKeyResults(testType: string, resultData: any): any {
       };
 
     case 'inteligencias_multiplas':
+      // Handle multiple data structures for multiple intelligences
+      const topIntelligences = resultData.dominant?.name 
+        ? [resultData.dominant.name, resultData.secondary?.name, resultData.tertiary?.name].filter(Boolean)
+        : resultData.top || resultData.principais || [];
       return {
-        topIntelligences: resultData.top || resultData.principais,
+        topIntelligences: topIntelligences,
+        dominantIntelligence: resultData.dominant?.name || resultData.dominant || topIntelligences[0],
+        secondaryIntelligence: resultData.secondary?.name || resultData.secondary || topIntelligences[1],
         scores: resultData.scores || resultData.pontuacoes,
-        description: resultData.description || resultData.descricao,
+        description: resultData.dominant?.description || resultData.description || resultData.descricao,
         learningStyle: resultData.learningStyle || resultData.estiloAprendizagem,
       };
 
     case 'linguagens_amor':
     case 'estilos_conexao':
+      // Handle multiple data structures for affection connection styles
+      const primaryStyle = resultData.primary?.name || resultData.primary?.style || resultData.dominant || resultData.dominante;
+      const secondaryStyle = resultData.secondary?.name || resultData.secondary?.style || resultData.secondary || resultData.secundario;
       return {
-        dominantStyle: resultData.dominant || resultData.dominante,
-        secondaryStyle: resultData.secondary || resultData.secundario,
+        dominantStyle: primaryStyle,
+        secondaryStyle: secondaryStyle,
         scores: resultData.scores || resultData.pontuacoes,
-        description: resultData.description || resultData.descricao,
+        description: resultData.primary?.description || resultData.description || resultData.descricao,
+        interpretation: resultData.interpretation || resultData.interpretacao,
       };
 
     default:

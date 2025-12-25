@@ -72,6 +72,11 @@ const SECTION_CONFIG: Record<string, { title: Record<string, string>; icon: Reac
     icon: <BookOpen className="w-5 h-5" />,
     color: "from-teal-500/20 to-cyan-500/20 border-teal-500/30"
   },
+  HUMAN_CLOSING: { 
+    title: { pt: "Fechamento Humano", 'pt-pt': "Fechamento Humano", en: "Human Closing" },
+    icon: <Heart className="w-5 h-5" />,
+    color: "from-rose-500/20 to-pink-500/20 border-rose-500/30"
+  },
 };
 
 const TRANSLATIONS = {
