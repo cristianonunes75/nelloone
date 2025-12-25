@@ -43,6 +43,7 @@ import { DISCResultsSection } from "@/components/tests/DISCResultsSection";
 import { TemperamentosResultsSection } from "@/components/tests/TemperamentosResultsSection";
 import { EneagramaResultsSection } from "@/components/tests/EneagramaResultsSection";
 import { InteligenciasResultsSection } from "@/components/tests/InteligenciasResultsSection";
+import { EstilosConexaoResultsSection } from "@/components/tests/EstilosConexaoResultsSection";
 import { recalculateTestResult } from "@/lib/recalculateTestResult";
 
 // Journey order for navigation
@@ -1007,95 +1008,13 @@ function TestResultsInner() {
           <DISCResultsSection discResults={discResults} lang={lang as 'pt' | 'pt-pt' | 'en'} />
         )}
 
-        {isLinguagensAmorTest && (estilosConexaoResults || linguagensAmorResultData) && (() => {
-          // Prefer recalculated results (estilosConexaoResults) over cached data (linguagensAmorResultData)
-          // This ensures the new style names are always displayed
-          const displayData = estilosConexaoResults || linguagensAmorResultData;
-          const primaryName = displayData.primary?.name?.pt || displayData.primary?.name || '';
-          const primarySymbol = displayData.primary?.symbol || '';
-          const primaryScore = displayData.primary?.score || 0;
-          const primaryEssence = displayData.primary?.essence?.pt || displayData.primary?.essence || '';
-          const secondaryName = displayData.secondary?.name?.pt || displayData.secondary?.name || '';
-          const secondarySymbol = displayData.secondary?.symbol || '';
-          const secondaryScore = displayData.secondary?.score || 0;
-          const secondaryEssence = displayData.secondary?.essence?.pt || displayData.secondary?.essence || '';
-          const interpretation = displayData.interpretation?.pt || displayData.interpretation || '';
-          
-          return (
-          <Card className="border-none shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
-              <div className="text-center space-y-4">
-                <div className="text-6xl">💕</div>
-                <CardTitle className="text-3xl font-light">Estilos de Conexão Afetiva</CardTitle>
-                <CardDescription className="text-lg">Como você se conecta emocionalmente</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-8 space-y-8">
-              <div className="grid md:grid-cols-2 gap-6">
-                <Card className="border-2 border-accent">
-                  <CardHeader>
-                    <CardTitle className="text-xl flex items-center gap-2">
-                      <span className="text-3xl">💕</span>
-                      {lang === 'en' ? 'Primary Style' : 'Estilo Principal'}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h3 className="text-lg font-semibold">{primaryName}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{primarySymbol}</p>
-                    </div>
-                    <Badge variant="default" className="text-lg px-4 py-2">
-                      {primaryScore} pontos
-                    </Badge>
-                    <p className="text-base leading-relaxed italic">
-                      {primaryEssence}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 border-muted">
-                  <CardHeader>
-                    <CardTitle className="text-xl flex items-center gap-2">
-                      <span className="text-3xl">✨</span>
-                      {lang === 'en' ? 'Secondary Style' : 'Estilo Secundário'}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h3 className="text-lg font-semibold">{secondaryName}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{secondarySymbol}</p>
-                    </div>
-                    <Badge variant="outline" className="text-lg px-4 py-2">
-                      {secondaryScore} pontos
-                    </Badge>
-                    <p className="text-base leading-relaxed italic">
-                      {secondaryEssence}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card className="bg-gradient-to-br from-accent/10 to-background border-accent/30">
-                <CardContent className="pt-6 space-y-4">
-                  <div className="flex items-center gap-2 text-lg font-semibold">
-                    <span className="text-2xl">✨</span>
-                    Interpretação Personalizada
-                  </div>
-                  <p className="text-base leading-relaxed pl-8 whitespace-pre-line">
-                    {interpretation}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <div className="text-center py-8">
-                <p className="text-lg font-light italic text-muted-foreground">
-                  NELLO ONE — uma jornada de autoconhecimento e verdade interior.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          );
-        })()}
+        {isLinguagensAmorTest && (estilosConexaoResults || linguagensAmorResultData) && (
+          <EstilosConexaoResultsSection 
+            estilosResults={estilosConexaoResults || linguagensAmorResultData}
+            userName={user?.email?.split('@')[0] || 'Você'}
+            lang={lang as 'pt' | 'pt-pt' | 'en'}
+          />
+        )}
 
         {isTemperamentosTest && temperamentosResultData?.primary?.temperament && temperamentosResultData?.secondary?.temperament && temperamentosResultData?.scores && (
           <TemperamentosResultsSection 
