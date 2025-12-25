@@ -36,47 +36,98 @@ interface Section {
   color: string;
 }
 
-const SECTION_CONFIG: Record<string, { title: Record<string, string>; icon: React.ReactNode; color: string }> = {
-  PANEL: { 
-    title: { pt: "Painel dos 7 Resultados", 'pt-pt': "Painel dos 7 Resultados", en: "7 Results Panel" },
-    icon: <User className="w-5 h-5" />,
-    color: "from-violet-500/20 to-purple-500/20 border-violet-500/30"
-  },
-  STRUCTURE: { 
-    title: { pt: "Engenharia da Essência", 'pt-pt': "Engenharia da Essência", en: "Essence Engineering" },
-    icon: <Brain className="w-5 h-5" />,
-    color: "from-blue-500/20 to-cyan-500/20 border-blue-500/30"
-  },
-  PATTERNS: { 
-    title: { pt: "3 Padrões de Comportamento", 'pt-pt': "3 Padrões de Comportamento", en: "3 Behavior Patterns" },
-    icon: <Target className="w-5 h-5" />,
-    color: "from-amber-500/20 to-orange-500/20 border-amber-500/30"
-  },
-  TALENTS: { 
-    title: { pt: "3 Talentos e Dons", 'pt-pt': "3 Talentos e Dons", en: "3 Talents and Gifts" },
+// Section config for 3-layer structure
+const SECTION_CONFIG: Record<string, { title: Record<string, string>; icon: React.ReactNode; color: string; layer: number }> = {
+  // LAYER 1 - Essential Synthesis
+  sintese_essencial: { 
+    title: { pt: "Síntese da Sua Essência", 'pt-pt': "Síntese da Tua Essência", en: "Synthesis of Your Essence" },
     icon: <Sparkles className="w-5 h-5" />,
-    color: "from-emerald-500/20 to-green-500/20 border-emerald-500/30"
+    color: "from-violet-500/20 to-purple-500/20 border-violet-500/30",
+    layer: 1
   },
-  PAINS: { 
-    title: { pt: "3 Dores e Raízes", 'pt-pt': "3 Dores e Raízes", en: "3 Pains and Roots" },
-    icon: <Heart className="w-5 h-5" />,
-    color: "from-pink-500/20 to-rose-500/20 border-pink-500/30"
+  // LAYER 2 - Deep Report
+  resumo_essencia: { 
+    title: { pt: "Resumo da Sua Essência", 'pt-pt': "Resumo da Tua Essência", en: "Summary of Your Essence" },
+    icon: <User className="w-5 h-5" />,
+    color: "from-blue-500/20 to-cyan-500/20 border-blue-500/30",
+    layer: 2
   },
-  PURPOSE: { 
-    title: { pt: "Propósito Natural", 'pt-pt': "Propósito Natural", en: "Natural Purpose" },
+  matriz_essencial: { 
+    title: { pt: "Sua Matriz Essencial", 'pt-pt': "A Tua Matriz Essencial", en: "Your Essential Matrix" },
+    icon: <Brain className="w-5 h-5" />,
+    color: "from-indigo-500/20 to-blue-500/20 border-indigo-500/30",
+    layer: 2
+  },
+  padroes_comportamento: { 
+    title: { pt: "Padrões de Comportamento", 'pt-pt': "Padrões de Comportamento", en: "Behavior Patterns" },
     icon: <Target className="w-5 h-5" />,
-    color: "from-indigo-500/20 to-blue-500/20 border-indigo-500/30"
+    color: "from-amber-500/20 to-orange-500/20 border-amber-500/30",
+    layer: 2
   },
-  MATURITY: { 
-    title: { pt: "Caminho de Maturidade", 'pt-pt': "Caminho de Maturidade", en: "Maturity Path" },
-    icon: <BookOpen className="w-5 h-5" />,
-    color: "from-teal-500/20 to-cyan-500/20 border-teal-500/30"
+  talentos_dons: { 
+    title: { pt: "Talentos e Dons Naturais", 'pt-pt': "Talentos e Dons Naturais", en: "Talents and Natural Gifts" },
+    icon: <Sparkles className="w-5 h-5" />,
+    color: "from-emerald-500/20 to-green-500/20 border-emerald-500/30",
+    layer: 2
   },
-  HUMAN_CLOSING: { 
-    title: { pt: "Fechamento Humano", 'pt-pt': "Fechamento Humano", en: "Human Closing" },
+  dores_raizes: { 
+    title: { pt: "Dores Raízes e Desafios", 'pt-pt': "Dores Raízes e Desafios", en: "Root Pains and Challenges" },
     icon: <Heart className="w-5 h-5" />,
-    color: "from-rose-500/20 to-pink-500/20 border-rose-500/30"
+    color: "from-pink-500/20 to-rose-500/20 border-pink-500/30",
+    layer: 2
   },
+  proposito_natural: { 
+    title: { pt: "Seu Propósito Natural", 'pt-pt': "O Teu Propósito Natural", en: "Your Natural Purpose" },
+    icon: <Target className="w-5 h-5" />,
+    color: "from-purple-500/20 to-indigo-500/20 border-purple-500/30",
+    layer: 2
+  },
+  // LAYER 3 - Practical Integration
+  caminho_maturidade: { 
+    title: { pt: "Caminho de Maturidade de 90 Dias", 'pt-pt': "Caminho de Maturidade de 90 Dias", en: "90-Day Maturity Path" },
+    icon: <BookOpen className="w-5 h-5" />,
+    color: "from-teal-500/20 to-cyan-500/20 border-teal-500/30",
+    layer: 3
+  },
+  rotina_autoconsciencia: { 
+    title: { pt: "Rotina de Autoconsciência", 'pt-pt': "Rotina de Autoconsciência", en: "Self-Awareness Routine" },
+    icon: <RefreshCw className="w-5 h-5" />,
+    color: "from-cyan-500/20 to-blue-500/20 border-cyan-500/30",
+    layer: 3
+  },
+  // Closing
+  conversa_coracao: { 
+    title: { pt: "Uma Conversa do Coração", 'pt-pt': "Uma Conversa do Coração", en: "A Conversation from the Heart" },
+    icon: <Heart className="w-5 h-5" />,
+    color: "from-rose-500/20 to-pink-500/20 border-rose-500/30",
+    layer: 4
+  },
+  // Legacy support for old format
+  overview: { 
+    title: { pt: "Resumo da Sua Essência", 'pt-pt': "Resumo da Tua Essência", en: "Summary of Your Essence" },
+    icon: <User className="w-5 h-5" />,
+    color: "from-violet-500/20 to-purple-500/20 border-violet-500/30",
+    layer: 1
+  },
+  fechamento_humano: { 
+    title: { pt: "Uma Conversa do Coração", 'pt-pt': "Uma Conversa do Coração", en: "A Conversation from the Heart" },
+    icon: <Heart className="w-5 h-5" />,
+    color: "from-rose-500/20 to-pink-500/20 border-rose-500/30",
+    layer: 4
+  },
+  carta_final: { 
+    title: { pt: "Carta Final do Miguel", 'pt-pt': "Carta Final do Miguel", en: "Final Letter from Miguel" },
+    icon: <Heart className="w-5 h-5" />,
+    color: "from-rose-500/20 to-pink-500/20 border-rose-500/30",
+    layer: 4
+  },
+};
+
+const LAYER_LABELS: Record<number, Record<string, string>> = {
+  1: { pt: "Camada 1 — Síntese Essencial", 'pt-pt': "Camada 1 — Síntese Essencial", en: "Layer 1 — Essential Synthesis" },
+  2: { pt: "Camada 2 — Relatório Profundo", 'pt-pt': "Camada 2 — Relatório Profundo", en: "Layer 2 — Deep Report" },
+  3: { pt: "Camada 3 — Integração Prática", 'pt-pt': "Camada 3 — Integração Prática", en: "Layer 3 — Practical Integration" },
+  4: { pt: "Fechamento Humano", 'pt-pt': "Fechamento Humano", en: "Human Closing" },
 };
 
 const TRANSLATIONS = {
@@ -475,46 +526,133 @@ const CodigoEssencia = () => {
                 </Button>
               </div>
 
-              {/* Generated Sections with colors from SECTION_CONFIG */}
-              {generatedSections.map((section: any, index: number) => {
-                const sectionKey = section.id || Object.keys(SECTION_CONFIG)[index];
-                const config = SECTION_CONFIG[sectionKey as keyof typeof SECTION_CONFIG] || {
-                  icon: <Sparkles className="w-5 h-5" />,
-                  color: "from-gray-500/20 to-gray-400/20 border-gray-500/30"
-                };
-                
-                return (
-                  <div 
-                    key={section.id || index}
-                    className={cn(
-                      "bg-gradient-to-br border rounded-xl p-6 transition-all",
-                      config.color
-                    )}
-                  >
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">
-                        {config.icon}
-                      </div>
-                      <h3 className="text-xl font-bold">{section.title}</h3>
-                    </div>
-                    <div className="space-y-4 text-foreground/80 leading-relaxed bg-background/40 rounded-lg p-4">
-                      {(() => {
-                        const paragraphs: string[] = Array.isArray(section.paragraphs)
-                          ? section.paragraphs
-                          : typeof section.content === "string"
-                            ? section.content.split(/\n\s*\n/).map((p: string) => p.trim()).filter(Boolean)
-                            : [];
+              {/* Generated Sections with 3-Layer Structure */}
+              {(() => {
+                // Group sections by layer
+                const sectionsByLayer: Record<number, any[]> = {};
+                generatedSections.forEach((section: any) => {
+                  const config = SECTION_CONFIG[section.id as keyof typeof SECTION_CONFIG];
+                  const layer = config?.layer || 2;
+                  if (!sectionsByLayer[layer]) sectionsByLayer[layer] = [];
+                  sectionsByLayer[layer].push(section);
+                });
 
-                        return paragraphs.length > 0
-                          ? paragraphs.map((paragraph: string, pIndex: number) => (
-                              <p key={pIndex}>{paragraph}</p>
-                            ))
-                          : null;
-                      })()}
+                return Object.entries(sectionsByLayer)
+                  .sort(([a], [b]) => Number(a) - Number(b))
+                  .map(([layerNum, layerSections]) => (
+                    <div key={layerNum} className="space-y-4">
+                      {/* Layer Header */}
+                      <div className="flex items-center gap-3 pt-4">
+                        <div className="h-px bg-border flex-1" />
+                        <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                          {LAYER_LABELS[Number(layerNum)]?.[lang] || `Layer ${layerNum}`}
+                        </span>
+                        <div className="h-px bg-border flex-1" />
+                      </div>
+
+                      {/* Layer Sections */}
+                      {layerSections.map((section: any, index: number) => {
+                        const config = SECTION_CONFIG[section.id as keyof typeof SECTION_CONFIG] || {
+                          icon: <Sparkles className="w-5 h-5" />,
+                          color: "from-gray-500/20 to-gray-400/20 border-gray-500/30",
+                          layer: 2
+                        };
+                        
+                        return (
+                          <div 
+                            key={section.id || index}
+                            className={cn(
+                              "bg-gradient-to-br border rounded-xl p-6 transition-all",
+                              config.color
+                            )}
+                          >
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">
+                                {config.icon}
+                              </div>
+                              <h3 className="text-xl font-bold">{section.title}</h3>
+                            </div>
+                            <div className="space-y-4 text-foreground/80 leading-relaxed bg-background/40 rounded-lg p-4">
+                              {/* Render bullets for sintese_essencial */}
+                              {section.bullets && Array.isArray(section.bullets) && (
+                                <ul className="space-y-2">
+                                  {section.bullets.map((bullet: string, bIndex: number) => (
+                                    <li key={bIndex} className="flex items-start gap-2">
+                                      <span className="text-primary mt-1">•</span>
+                                      <span>{bullet}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+
+                              {/* Render months for caminho_maturidade */}
+                              {section.months && Array.isArray(section.months) && (
+                                <div className="grid gap-4 md:grid-cols-3">
+                                  {section.months.map((month: any, mIndex: number) => (
+                                    <div key={mIndex} className="bg-background/60 rounded-lg p-4 space-y-2">
+                                      <div className="font-semibold text-primary">
+                                        {lang === 'en' ? `Month ${month.month}` : `Mês ${month.month}`}
+                                      </div>
+                                      <div>
+                                        <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                                          {lang === 'en' ? 'Focus:' : 'Foco:'}
+                                        </span>
+                                        <p className="font-medium">{month.focus}</p>
+                                      </div>
+                                      <div>
+                                        <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                                          {lang === 'en' ? 'Practice:' : 'Prática:'}
+                                        </span>
+                                        <p>{month.practice}</p>
+                                      </div>
+                                      <div>
+                                        <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                                          {lang === 'en' ? 'Reflection:' : 'Reflexão:'}
+                                        </span>
+                                        <p className="italic">{month.question}</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Render routine for rotina_autoconsciencia */}
+                              {section.routine && typeof section.routine === 'object' && (
+                                <div className="grid gap-4 md:grid-cols-3">
+                                  {['morning', 'afternoon', 'night'].map((time) => (
+                                    <div key={time} className="bg-background/60 rounded-lg p-4">
+                                      <div className="font-semibold text-primary mb-2">
+                                        {time === 'morning' ? (lang === 'en' ? '☀️ Morning' : '☀️ Manhã') :
+                                         time === 'afternoon' ? (lang === 'en' ? '🌤️ Afternoon' : '🌤️ Tarde') :
+                                         (lang === 'en' ? '🌙 Night' : '🌙 Noite')}
+                                      </div>
+                                      <p>{section.routine[time]}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Render paragraphs */}
+                              {(() => {
+                                const paragraphs: string[] = Array.isArray(section.paragraphs)
+                                  ? section.paragraphs
+                                  : typeof section.content === "string"
+                                    ? section.content.split(/\n\s*\n/).map((p: string) => p.trim()).filter(Boolean)
+                                    : [];
+
+                                return paragraphs.length > 0
+                                  ? paragraphs.map((paragraph: string, pIndex: number) => (
+                                      <p key={pIndex}>{paragraph}</p>
+                                    ))
+                                  : null;
+                              })()}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  </div>
-                );
-              })}
+                  ));
+              })()}
 
               {/* Disclaimer */}
               <div className="bg-muted/50 rounded-xl p-4 text-center">
@@ -525,29 +663,49 @@ const CodigoEssencia = () => {
 
           {/* Results Preview - only show when NOT generated */}
           {!hasGenerated && (
-            <div className="grid gap-4 md:grid-cols-2">
-              {Object.entries(SECTION_CONFIG).map(([key, config]) => (
-                <div
-                  key={key}
-                  className={cn(
-                    "bg-gradient-to-br border rounded-xl p-6 transition-all hover:shadow-lg",
-                    config.color
-                  )}
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">
-                      {config.icon}
+            <div className="space-y-6">
+              {Object.entries(LAYER_LABELS).map(([layerNum, labels]) => {
+                const layerSections = Object.entries(SECTION_CONFIG)
+                  .filter(([key, cfg]) => cfg.layer === Number(layerNum) && !['overview', 'fechamento_humano', 'carta_final'].includes(key));
+                
+                if (layerSections.length === 0) return null;
+                
+                return (
+                  <div key={layerNum}>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="h-px bg-border flex-1" />
+                      <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                        {labels[lang]}
+                      </span>
+                      <div className="h-px bg-border flex-1" />
                     </div>
-                    <h3 className="font-semibold">{config.title[lang]}</h3>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {layerSections.map(([key, config]) => (
+                        <div
+                          key={key}
+                          className={cn(
+                            "bg-gradient-to-br border rounded-xl p-6 transition-all hover:shadow-lg",
+                            config.color
+                          )}
+                        >
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">
+                              {config.icon}
+                            </div>
+                            <h3 className="font-semibold">{config.title[lang]}</h3>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {lang === 'en' 
+                              ? 'Included in your Essence Code report'
+                              : 'Incluído no seu relatório Código da Essência'
+                            }
+                          </p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {lang === 'en' 
-                      ? 'Included in your premium PDF report'
-                      : 'Incluído no seu relatório PDF premium'
-                    }
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
