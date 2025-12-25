@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Download, CheckCircle, Lock, RotateCcw, FileText, Mail, Loader2, ArrowRight, Sparkles, Star, AlertTriangle, Lightbulb, RefreshCw, Home } from "lucide-react";
+import { Download, CheckCircle, Lock, RotateCcw, FileText, Mail, Loader2, ArrowRight, Sparkles, Star, AlertTriangle, Lightbulb, RefreshCw, Home, Calculator } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ARCHETYPES } from "@/lib/archetypes";
@@ -38,6 +38,8 @@ import { usePDFEmail } from "@/hooks/usePDFEmail";
 import { updateJourneyProgress, getJourneySlugFromTestType } from "@/utils/journey";
 import { TestimonialForm } from "@/components/cliente/TestimonialForm";
 import { ResultsFloatingMenu } from "@/components/cliente/ResultsFloatingMenu";
+import { TestResultsSkeleton } from "@/components/tests/TestResultsSkeleton";
+import { recalculateTestResult } from "@/lib/recalculateTestResult";
 
 // Journey order for navigation
 const JOURNEY_ORDER = [
@@ -140,6 +142,25 @@ function TestResultsInner() {
   const isAdmin = userRole === "admin";
   const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
+  const [isRecalculating, setIsRecalculating] = useState(false);
+
+  // Check if user is founder
+  const { data: profile } = useQuery({
+    queryKey: ["profile-founder", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("is_founder")
+        .eq("id", user!.id)
+        .single();
+      if (error) return null;
+      return data;
+    },
+  });
+
+  const isFounder = profile?.is_founder || false;
+  const canRecalculate = isAdmin || isFounder;
 
   const { data: userTest, isLoading, isError: isUserTestError, error: userTestError } = useQuery({
     queryKey: ["user-test-result", userTestId],
@@ -283,16 +304,38 @@ function TestResultsInner() {
     queryClient.invalidateQueries({ queryKey: ["test-result-answers", userTestId] });
   }
 
-  // Show loading until both userTest and answers are loaded
-  if (!isFullyLoaded) {
-    return (
-      <div className="container mx-auto p-6 flex flex-col items-center justify-center min-h-screen gap-4">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="text-muted-foreground">
-          {isLoading ? "Carregando teste..." : "Carregando respostas..."}
-        </p>
-      </div>
+  // Recalculate result from answers
+  const handleRecalculate = async () => {
+    if (!userTestId || !userTest?.tests?.type || !answers || answers.length === 0) {
+      toast.error("Não há respostas suficientes para recalcular");
+      return;
+    }
+
+    setIsRecalculating(true);
+    toast.info("Recalculando resultado...");
+
+    const result = await recalculateTestResult(
+      userTestId,
+      userTest.tests.type as any,
+      answers
     );
+
+    setIsRecalculating(false);
+
+    if (result.success) {
+      toast.success("Resultado recalculado com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["user-test-result", userTestId] });
+    } else {
+      toast.error(result.error || "Erro ao recalcular resultado");
+    }
+  };
+
+  // Determine loading stage for skeleton
+  const loadingStage = isLoading ? "test" : answersLoading ? "answers" : "calculating";
+
+  // Show skeleton loading until both userTest and answers are loaded
+  if (!isFullyLoaded) {
+    return <TestResultsSkeleton stage={loadingStage} />;
   }
 
   if (!userTest) {
@@ -339,7 +382,21 @@ function TestResultsInner() {
                 <RefreshCw className="h-4 w-4" />
                 Recarregar
               </Button>
-              <Button onClick={() => navigate(`${basePath}/cliente`)} className="gap-2">
+              {canRecalculate && answers && answers.length > 0 && (
+                <Button 
+                  onClick={handleRecalculate} 
+                  disabled={isRecalculating}
+                  className="gap-2"
+                >
+                  {isRecalculating ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Calculator className="h-4 w-4" />
+                  )}
+                  Recalcular Resultado
+                </Button>
+              )}
+              <Button variant="outline" onClick={() => navigate(`${basePath}/cliente`)} className="gap-2">
                 <Home className="h-4 w-4" />
                 Voltar ao Cliente
               </Button>
@@ -619,6 +676,20 @@ function TestResultsInner() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Seus Resultados</h1>
         <div className="flex gap-2">
+          {canRecalculate && (
+            <Button 
+              onClick={handleRecalculate} 
+              variant="outline"
+              disabled={isRecalculating || !answers?.length}
+            >
+              {isRecalculating ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Calculator className="w-4 h-4 mr-2" />
+              )}
+              Recalcular
+            </Button>
+          )}
           {isAdmin && (
             <Button onClick={handleResetTest} variant="outline">
               <RotateCcw className="w-4 h-4 mr-2" />
