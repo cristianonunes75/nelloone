@@ -63,7 +63,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     morningPractice: "Antes de planejar o dia, pergunte: 'O que realmente depende de mim hoje e o que posso confiar aos outros?'",
     dailyExpression: "Tome uma decisão importante com calma e delegue algo que normalmente faria sozinho",
     eveningReflection: "Onde liderei bem hoje? Onde posso confiar mais amanhã?",
-    personalMantra: "Eu lidero com sabedoria e crio espaço para outros também liderarem",
+    personalMantra: "Senhor, dá-me sabedoria para liderar e humildade para confiar. Em Ti está a minha força.",
     deepPatterns: [
       "Você provavelmente foi a pessoa responsável desde cedo. Na família, no trabalho, entre amigos.",
       "Quando algo dá errado, sua primeira reação é pensar no que você poderia ter feito diferente.",
@@ -119,7 +119,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     morningPractice: "Olhe no espelho e diga algo genuinamente amoroso para si mesmo antes de amar qualquer outra pessoa hoje",
     dailyExpression: "Demonstre afeto a alguém importante E reserve um momento de prazer só para você",
     eveningReflection: "O que me nutriu hoje? O que me drenou? Estou recebendo tanto quanto dou?",
-    personalMantra: "Eu amo profundamente e também me permito ser profundamente amado",
+    personalMantra: "Jesus, ensina-me a amar como Tu amas: com entrega e sem me perder. Em Ti descanso.",
     deepPatterns: [
       "Você provavelmente já se perdeu em relacionamentos, priorizando o outro até esquecer de si.",
       "Quando alguém se afasta, você tende a achar que fez algo errado.",
@@ -175,7 +175,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     morningPractice: "Antes de qualquer autocrítica, pergunte: o que quero expressar hoje, mesmo imperfeito?",
     dailyExpression: "Crie algo e mostre para alguém. A criação só vive quando é compartilhada",
     eveningReflection: "O que criei hoje? Onde o perfeccionismo me travou? O que posso terminar amanhã?",
-    personalMantra: "Minha expressão tem valor mesmo imperfeita. Criar é minha forma de existir",
+    personalMantra: "Senhor, que minha criação Te glorifique. Liberta-me do medo de errar e usa minhas mãos.",
     deepPatterns: [
       "Você provavelmente tem projetos inacabados porque nenhum ficou 'bom o suficiente'.",
       "Compara seu trabalho com o de outros e sempre sai perdendo.",
@@ -231,7 +231,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     morningPractice: "O que há de bom esperando por mim hoje? E do que preciso me proteger?",
     dailyExpression: "Compartilhe sua alegria com alguém E observe se está ignorando algo importante",
     eveningReflection: "Onde minha fé se confirmou hoje? Onde eu poderia ter sido mais atento?",
-    personalMantra: "Escolho ver o bem sem negar o real. Minha esperança é informada, não cega",
+    personalMantra: "Senhor, ajuda-me a ver o bem sem negar a verdade. Em Ti coloco minha esperança.",
     deepPatterns: [
       "Você provavelmente já foi chamado de ingênuo ou 'sonhador demais'.",
       "Tem dificuldade de guardar mágoas. Perdoa rápido demais às vezes.",
@@ -287,7 +287,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     morningPractice: "O que quero aprender hoje? E o que quero VIVER, não só entender?",
     dailyExpression: "Compartilhe um insight valioso E faça algo sem pensar demais",
     eveningReflection: "O que aprendi hoje? Onde pensei demais ao invés de agir?",
-    personalMantra: "Busco a verdade com humildade e lembro que viver também é uma forma de saber",
+    personalMantra: "Senhor, conduze-me à Verdade que liberta. Que eu saiba menos e Te conheça mais.",
     deepPatterns: [
       "Você provavelmente foi a criança que fazia perguntas que adultos não sabiam responder.",
       "Tem dificuldade de respeitar autoridades que não demonstram conhecimento.",
@@ -343,7 +343,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     morningPractice: "O que posso descobrir hoje, mesmo ficando onde estou?",
     dailyExpression: "Explore algo novo E permaneça presente em algo que já começou",
     eveningReflection: "O que descobri hoje? De onde fugi? Onde poderia ter ficado mais?",
-    personalMantra: "Exploro o mundo com curiosidade e também encontro aventura na permanência",
+    personalMantra: "Senhor, ensina-me a encontrar plenitude em Ti, onde quer que eu esteja. Tu és o bastante.",
     deepPatterns: [
       "Você provavelmente tem histórico de abandonar coisas quando ficam 'chatas'.",
       "Relacionamentos longos te assustam porque você teme perder sua identidade.",
@@ -399,7 +399,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     morningPractice: "Qual mudança realmente importa hoje? E o que posso aceitar como é?",
     dailyExpression: "Desafie algo que não serve E construa algo no lugar",
     eveningReflection: "Onde minha rebeldia foi construtiva? Onde foi só destrutiva?",
-    personalMantra: "Questiono o que não serve e canalizo minha força para construir o novo",
+    personalMantra: "Senhor, dá-me discernimento para lutar pelo que é justo. Que minha força venha de Ti.",
     deepPatterns: [
       "Você provavelmente teve conflitos com autoridades desde cedo.",
       "Sente-se incompreendido com frequência. Poucos entendem sua intensidade.",
@@ -455,7 +455,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     morningPractice: "Que transformação quero catalisar hoje? E qual o primeiro passo concreto?",
     dailyExpression: "Confie em uma intuição E tome uma ação prática baseada nela",
     eveningReflection: "O que transformei hoje? Onde fiquei só no mundo das ideias?",
-    personalMantra: "Minha visão se torna realidade quando uno intuição com ação consistente",
+    personalMantra: "Espírito Santo, ilumina minha visão e guia meus passos. Que eu veja como Tu vês.",
     deepPatterns: [
       "Você provavelmente já previu coisas que depois aconteceram.",
       "Às vezes se sente mais conectado com o invisível do que com o tangível.",
@@ -511,7 +511,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     morningPractice: "Qual batalha é realmente minha hoje? E o que posso deixar de carregar?",
     dailyExpression: "Enfrente um desafio importante E peça ajuda em outro",
     eveningReflection: "Onde fui corajoso hoje? Onde carreguei peso demais? O que posso soltar?",
-    personalMantra: "Sou forte para enfrentar o que é meu e sábio para soltar o que não é",
+    personalMantra: "Senhor, Tu és minha fortaleza. Ensina-me a lutar com coragem e a descansar em Ti.",
     deepPatterns: [
       "Você provavelmente foi responsável por algo ou alguém desde muito cedo.",
       "Quando algo dá errado, sua primeira reação é pensar no que você poderia ter feito.",
@@ -567,7 +567,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     morningPractice: "Como posso cuidar de mim hoje para ter energia de cuidar dos outros?",
     dailyExpression: "Ofereça seu cuidado a alguém E reserve um momento só para você",
     eveningReflection: "Cuidei de quem precisava hoje? E de mim, cuidei também?",
-    personalMantra: "Meu cuidado flui quando primeiro cuido de mim",
+    personalMantra: "Senhor, que meu cuidado flua do Teu amor. Ensina-me a receber para poder dar.",
     deepPatterns: [
       "Você provavelmente aprendeu cedo que seu valor está em ser útil.",
       "Sente culpa quando faz algo só para si, sem beneficiar ninguém.",
@@ -623,7 +623,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     morningPractice: "Onde posso trazer leveza genuína hoje? E onde preciso ser presente sem piadas?",
     dailyExpression: "Faça alguém rir E tenha uma conversa séria sem usar humor como escape",
     eveningReflection: "Onde meu humor conectou hoje? Onde usei ele para fugir?",
-    personalMantra: "Minha alegria é dom e também sei ser profundo quando a vida pede",
+    personalMantra: "Senhor, que minha alegria venha de Ti. Ensina-me a rir com leveza e chorar com fé.",
     deepPatterns: [
       "Você provavelmente aprendeu que ser engraçado garantia aceitação.",
       "Quando a conversa fica séria demais, você sente desconforto e quer aliviar.",
@@ -679,7 +679,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     morningPractice: "Eu pertenço. Eu tenho valor. Hoje vou ocupar meu espaço sem me desculpar.",
     dailyExpression: "Conecte-se genuinamente com alguém E reconheça seu próprio valor em algo",
     eveningReflection: "Onde me conectei hoje? Onde me diminuí desnecessariamente?",
-    personalMantra: "Pertenço a este mundo e meu valor não depende de ser mais ou menos que ninguém",
+    personalMantra: "Senhor, Tu me criaste com propósito. Ajuda-me a ocupar o lugar que preparaste para mim.",
     deepPatterns: [
       "Você provavelmente aprendeu que se destacar era perigoso ou arrogante.",
       "Compara-se com outros e sempre acha que eles são mais qualificados.",
