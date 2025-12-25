@@ -242,7 +242,7 @@ export default function ArchetypeResults({
             <p className="text-muted-foreground leading-relaxed text-base">
               {secondaryArchetype && secondaryData && (
                 <>
-                  <strong>{secondaryData.name}</strong> complementa sua energia {secondaryData.complementsEnergy}.{" "}
+                  <strong>{secondaryData.name}</strong> complementa seu modo de ser {secondaryData.complementsEnergy}.{" "}
                 </>
               )}
               {tertiaryArchetype && tertiaryData && (

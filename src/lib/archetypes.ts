@@ -378,8 +378,8 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "⚡",
     powerPhrase: "Minha rebeldia tem propósito. Destruo o que não serve para construir o que importa.",
     alignedBehavior: "Quando equilibrado, você catalisa mudanças necessárias e dá voz ao que precisa ser dito. Sua coragem de questionar inspira outros a serem autênticos.",
-    excessBehavior: "Quando em excesso, você briga por brigar, destrói sem construir e se isola de todos que não concordam. Sua energia vira sabotagem, não transformação.",
-    complementsEnergy: "trazendo coragem para questionar o estabelecido e impulso de transformação real",
+    excessBehavior: "Quando em excesso, você briga por brigar, destrói sem construir e se isola de todos que não concordam. Sua força vira sabotagem, não transformação.",
+    complementsEnergy: "trazendo coragem para questionar o estabelecido e impulso de mudança real",
     reinforcesExpression: "adicionando autenticidade radical e capacidade de quebrar padrões que limitam",
     practicalRelationships: [
       "Nem toda discordância precisa virar confronto. Escolha suas batalhas.",
@@ -420,35 +420,35 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     ]
   },
   Mago: {
-    name: "O Mago",
-    description: "Você vê o que outros não veem. Onde há limitação, você enxerga possibilidade. Onde há problema, você encontra a alquimia que transforma. Sua intuição é aguçada, sua visão vai além do óbvio. Você sabe que a realidade é mais maleável do que parece. O problema é que essa conexão com o extraordinário às vezes te desconecta do ordinário. Você vive tanto no mundo das possibilidades que esquece de ancorar no mundo concreto.",
+    name: "O Visionário",
+    description: "Você vê o que outros não veem. Onde há limitação, você enxerga possibilidade. Onde há problema, você encontra o caminho que transforma. Sua intuição é aguçada, sua visão vai além do óbvio. Você percebe que a realidade pode ser transformada pelo discernimento e pela ação correta. O problema é que essa conexão com o extraordinário às vezes te desconecta do ordinário. Você vive tanto no mundo das possibilidades que esquece de ancorar no mundo concreto.",
     characteristics: [
-      "Você percebe coisas que outros não percebem. Padrões, conexões, sincronicidades.",
+      "Você percebe coisas que outros não percebem. Padrões, conexões, providências.",
       "Acredita genuinamente que pode transformar situações que parecem impossíveis.",
       "Sua intuição raramente erra, mas nem sempre você sabe explicar de onde vem.",
       "Às vezes se frustra porque sua visão está tão à frente que outros não acompanham."
     ],
-    visualStyle: "Místico e transformador, com elementos de fantasia e profundidade simbólica",
+    visualStyle: "Profundo e transformador, com elementos de luz e profundidade simbólica",
     colorPalette: ["#9B59B6", "#1ABC9C", "#F1C40F", "#2C3E50"],
-    photographyDirection: "Efeitos de luz criativos, composições surreais, atmosfera mística, transformações visuais",
+    photographyDirection: "Efeitos de luz criativos, composições surreais, atmosfera contemplativa, transformações visuais",
     emoji: "✨",
-    powerPhrase: "Minha magia se manifesta quando conecto visão com ação. Sonhar é o início, fazer é o poder.",
+    powerPhrase: "Minha visão se concretiza quando conecto discernimento com ação. Sonhar é o início, fazer é o poder.",
     alignedBehavior: "Quando equilibrado, você catalisa transformações reais e ajuda outros a enxergarem possibilidades que não viam. Sua visão se materializa em resultados concretos.",
-    excessBehavior: "Quando em excesso, você vive no mundo das ideias sem nunca materializar, manipula situações ou se desconecta da realidade em nome da 'magia'. Promete transformações que não entrega.",
-    complementsEnergy: "trazendo visão transformadora e capacidade de manifestar o que parece impossível",
+    excessBehavior: "Quando em excesso, você vive no mundo das ideias sem nunca concretizar, manipula situações ou se desconecta da realidade em nome do seu dom. Promete transformações que não entrega.",
+    complementsEnergy: "trazendo visão transformadora e capacidade de concretizar o que parece impossível",
     reinforcesExpression: "adicionando intuição aguçada e poder de catalisar mudanças profundas",
     practicalRelationships: [
       "Use sua percepção para ajudar outros, não para manipular.",
       "Nem todos querem ser transformados. Respeite o tempo de cada um.",
-      "Comunique suas visões de forma que outros entendam. Magia obscura afasta."
+      "Comunique suas visões de forma que outros entendam. Clareza aproxima."
     ],
     practicalWork: [
-      "Transforme visões em planos de ação concretos. Magia precisa de metodologia.",
+      "Transforme visões em planos de ação concretos. Discernimento precisa de metodologia.",
       "Valide suas intuições com dados. Sua percepção + evidências = poder.",
-      "Entregue resultados mensuráveis. Promessas mágicas sem entrega destroem credibilidade."
+      "Entregue resultados mensuráveis. Promessas sem entrega destroem credibilidade."
     ],
     practicalSpiritual: [
-      "Pratique grounding. Sua magia precisa de raízes na terra.",
+      "Pratique ancoramento na oração. Sua visão precisa de raízes na verdade.",
       "Questione: isso é intuição ou é o que eu quero acreditar?",
       "Use seu dom para servir, não para impressionar."
     ],
@@ -459,11 +459,11 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     deepPatterns: [
       "Você provavelmente já previu coisas que depois aconteceram.",
       "Às vezes se sente mais conectado com o invisível do que com o tangível.",
-      "Frustra-se porque sua visão está clara, mas a manifestação demora.",
+      "Frustra-se porque sua visão está clara, mas a concretização demora.",
       "Já foi acusado de viver nas nuvens ou de ser desconectado da realidade."
     ],
     commonChallenges: [
-      "Prometer transformações mágicas e não entregar resultados concretos.",
+      "Prometer grandes transformações e não entregar resultados concretos.",
       "Usar intuição como desculpa para não fazer o trabalho duro.",
       "Manipular situações e pessoas em nome de um 'bem maior'.",
       "Desconectar-se da realidade em nome do extraordinário."
@@ -501,7 +501,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     practicalWork: [
       "Reconheça publicamente contribuições de outros. Você não vence sozinho.",
       "Estabeleça limites. Assumir tudo não te faz herói, te faz exausto.",
-      "Antes de assumir mais um desafio, pergunte: ainda tenho energia para isso?"
+      "Antes de assumir mais um desafio, pergunte: ainda tenho forças para isso?"
     ],
     practicalSpiritual: [
       "Descanse sem culpa. Recuperação faz parte da jornada do herói.",
@@ -564,7 +564,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
       "Pratique dizer não gentilmente. É cuidar de si para poder cuidar melhor.",
       "Pergunte-se: estou cuidando por amor ou para ser amado?"
     ],
-    morningPractice: "Como posso cuidar de mim hoje para ter energia de cuidar dos outros?",
+    morningPractice: "Como posso cuidar de mim hoje para ter forças de cuidar dos outros?",
     dailyExpression: "Ofereça seu cuidado a alguém E reserve um momento só para você",
     eveningReflection: "Cuidei de quem precisava hoje? E de mim, cuidei também?",
     personalMantra: "Senhor, que meu cuidado flua do Teu amor. Ensina-me a receber para poder dar.",
@@ -596,7 +596,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
       "Usa humor quando está desconfortável. É sua forma de proteção.",
       "Pessoas te procuram quando precisam de leveza, mas nem sempre quando precisam de profundidade."
     ],
-    visualStyle: "Alegre e dinâmico, capturando espontaneidade, diversão e energia contagiante",
+    visualStyle: "Alegre e dinâmico, capturando espontaneidade, diversão e alegria contagiante",
     colorPalette: ["#FF6B6B", "#4ECDC4", "#FFD93D", "#6BCB77"],
     photographyDirection: "Momentos espontâneos, expressões genuínas de alegria, ambientes descontraídos, cores vibrantes",
     emoji: "🎭",
@@ -732,7 +732,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
       "Pergunte-se: estou cuidando por amor ou para me sentir necessário?",
       "Reserve um dia por mês só para você, sem culpa."
     ],
-    morningPractice: "Como posso cuidar de mim hoje para ter energia de cuidar dos outros?",
+    morningPractice: "Como posso cuidar de mim hoje para ter forças de cuidar dos outros?",
     dailyExpression: "Ofereça seu cuidado genuíno E aceite cuidado de alguém",
     eveningReflection: "Quem cuidei hoje? E quem cuidou de mim? Estou em equilíbrio?",
     personalMantra: "Meu cuidado flui naturalmente quando também me permito ser cuidado",
@@ -743,7 +743,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
       "Sente culpa quando faz algo só para si."
     ],
     commonChallenges: [
-      "Esgotar-se cuidando dos outros e não sobrar energia para si.",
+      "Esgotar-se cuidando dos outros e não sobrar forças para si.",
       "Criar dependência nas pessoas ao invés de empoderá-las.",
       "Dificuldade de receber cuidado. Você só sabe dar.",
       "Ressentir-se em silêncio quando seu esforço não é reconhecido."
@@ -822,7 +822,7 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     ],
     visualStyle: "Expressivo e energético, capturando timing, expressão e conexão instantânea",
     colorPalette: ["#FF6B6B", "#4ECDC4", "#FFD93D", "#6BCB77"],
-    photographyDirection: "Captura de expressões genuínas, momentos de riso, energia contagiante",
+    photographyDirection: "Captura de expressões genuínas, momentos de riso, alegria contagiante",
     emoji: "😄",
     powerPhrase: "Meu humor é dom. E por baixo dele existe uma pessoa completa, com todas as emoções.",
     alignedBehavior: "Quando equilibrado, você usa humor para conectar, curar e trazer perspectiva sem fugir da profundidade. Sabe quando rir e quando estar presente de outras formas.",
