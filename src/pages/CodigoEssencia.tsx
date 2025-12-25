@@ -169,8 +169,11 @@ const CodigoEssencia = () => {
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   const userName = profile?.full_name || (lang === 'en' ? "Traveler" : "Viajante");
 
-  // Check if all tests are completed
-  const canGenerate = useMemo(() => {
+  // Report generation is allowed as soon as the journey is complete (UI should not depend on client-side testResults)
+  const canGenerateReport = isJourneyComplete;
+
+  // PDF generation still depends on having the full client-side test results available
+  const canDownloadPdf = useMemo(() => {
     return canGenerateCodigoEssencia(testResults);
   }, [testResults]);
 
@@ -349,11 +352,11 @@ const CodigoEssencia = () => {
               <RefreshCw className="w-4 h-4 mr-2" />
               {t.regenerate}
             </Button>
-            <Button variant="outline" size="sm" onClick={handleDownloadPDF} disabled={!canGenerate}>
+            <Button variant="outline" size="sm" onClick={handleDownloadPDF} disabled={!canDownloadPdf}>
               <Download className="w-4 h-4 mr-2" />
               {t.downloadPDF}
             </Button>
-            <Button variant="outline" size="sm" onClick={handleSendEmail} disabled={isSendingEmail || !canGenerate}>
+            <Button variant="outline" size="sm" onClick={handleSendEmail} disabled={isSendingEmail || !canDownloadPdf}>
               <Mail className="w-4 h-4 mr-2" />
               {isSendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : t.sendEmail}
             </Button>
@@ -384,7 +387,7 @@ const CodigoEssencia = () => {
           </div>
 
           {/* Generate Button - when not yet generated */}
-          {!hasGenerated && canGenerate && (
+          {!hasGenerated && canGenerateReport && (
             <div className="bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 border border-primary/20 rounded-2xl p-8 text-center mb-8">
               <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
               <h2 className="text-2xl font-bold mb-4">{t.generateCode}</h2>
@@ -465,12 +468,19 @@ const CodigoEssencia = () => {
                       <h3 className="text-xl font-bold">{section.title}</h3>
                     </div>
                     <div className="space-y-4 text-foreground/80 leading-relaxed bg-background/40 rounded-lg p-4">
-                      {section.paragraphs?.map((paragraph: string, pIndex: number) => (
-                        <p key={pIndex}>{paragraph}</p>
-                      ))}
-                      {section.content && !section.paragraphs && (
-                        <p>{section.content}</p>
-                      )}
+                      {(() => {
+                        const paragraphs: string[] = Array.isArray(section.paragraphs)
+                          ? section.paragraphs
+                          : typeof section.content === "string"
+                            ? section.content.split(/\n\s*\n/).map((p: string) => p.trim()).filter(Boolean)
+                            : [];
+
+                        return paragraphs.length > 0
+                          ? paragraphs.map((paragraph: string, pIndex: number) => (
+                              <p key={pIndex}>{paragraph}</p>
+                            ))
+                          : null;
+                      })()}
                     </div>
                   </div>
                 );
