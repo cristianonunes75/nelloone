@@ -8,9 +8,20 @@ export interface ArchetypeData {
   colorPalette: string[];
   photographyDirection: string;
   emoji: string;
-  powerPhrase: string; // Frase de poder específica
-  alignedBehavior: string; // Comportamento quando alinhado
-  excessBehavior: string; // Comportamento quando em excesso
+  powerPhrase: string;
+  alignedBehavior: string;
+  excessBehavior: string;
+  // Novos campos para textos dinâmicos gramaticalmente corretos
+  offersInFriendships: string;
+  seekInPartner: string;
+  expressesInFamily: string;
+  professionalStrength: string;
+  uniqueDifferential: string;
+  spiritualPath: string;
+  morningPractice: string;
+  dailyExpression: string;
+  eveningReflection: string;
+  personalMantra: string;
 }
 
 export const ARCHETYPES: Record<string, ArchetypeData> = {
@@ -29,7 +40,17 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "👑",
     powerPhrase: "Quando lidero com visão estratégica, construo estabilidade e prosperidade ao meu redor.",
     alignedBehavior: "Você lidera com sabedoria e responsabilidade, construindo estruturas que beneficiam a todos. Sua visão estratégica inspira confiança.",
-    excessBehavior: "Pode tender ao controle excessivo ou rigidez, precisando lembrar que delegar e confiar também são formas de liderança."
+    excessBehavior: "Pode tender ao controle excessivo ou rigidez, precisando lembrar que delegar e confiar também são formas de liderança.",
+    offersInFriendships: "estrutura, segurança e orientação estratégica",
+    seekInPartner: "lealdade, estabilidade e parceria equitativa",
+    expressesInFamily: "proteção, responsabilidade e visão de longo prazo",
+    professionalStrength: "liderança estratégica e capacidade de criar estruturas sólidas",
+    uniqueDifferential: "transformar caos em ordem e inspirar confiança em qualquer equipe",
+    spiritualPath: "equilibrar controle com entrega e sabedoria com humildade",
+    morningPractice: "defina suas prioridades e visualize o impacto positivo da sua liderança",
+    dailyExpression: "tome decisões com sabedoria e inspire outros pelo exemplo",
+    eveningReflection: "reconheça onde liderou bem e onde pode delegar mais",
+    personalMantra: "Eu lidero com sabedoria, criando prosperidade para todos ao meu redor"
   },
   Amante: {
     name: "O Amante",
@@ -46,7 +67,17 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "❤️",
     powerPhrase: "Quando me entrego com paixão e presença, crio conexões profundas e transformadoras.",
     alignedBehavior: "Você cria conexões autênticas e aprecia a beleza em todas as suas formas. Sua intensidade emocional inspira outros a viverem com mais paixão.",
-    excessBehavior: "Pode tender à dependência emocional ou ao ciúme, precisando equilibrar a intensidade com autonomia saudável."
+    excessBehavior: "Pode tender à dependência emocional ou ao ciúme, precisando equilibrar a intensidade com autonomia saudável.",
+    offersInFriendships: "presença calorosa, afeto genuíno e celebração da vida",
+    seekInPartner: "intensidade emocional, conexão profunda e admiração mútua",
+    expressesInFamily: "amor incondicional, carinho e criação de momentos memoráveis",
+    professionalStrength: "criar conexões autênticas e inspirar paixão pelo trabalho",
+    uniqueDifferential: "transformar o ordinário em extraordinário através da beleza e do afeto",
+    spiritualPath: "equilibrar entrega com autonomia e paixão com paz interior",
+    morningPractice: "conecte-se com gratidão pelo que é belo em sua vida",
+    dailyExpression: "demonstre afeto e crie momentos de conexão verdadeira",
+    eveningReflection: "aprecie as conexões que nutriu e a beleza que encontrou",
+    personalMantra: "Eu amo profundamente e celebro a beleza em todas as suas formas"
   },
   Criador: {
     name: "O Criador",
@@ -63,7 +94,17 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "🎨",
     powerPhrase: "Quando expresso minha visão autêntica, inspiro outros a abraçarem sua própria originalidade.",
     alignedBehavior: "Você manifesta criatividade genuína e deixa sua marca única no mundo. Sua originalidade inspira inovação e expressão autêntica.",
-    excessBehavior: "Pode tender ao perfeccionismo paralisante ou à frustração criativa, precisando aceitar que criação é processo, não só resultado."
+    excessBehavior: "Pode tender ao perfeccionismo paralisante ou à frustração criativa, precisando aceitar que criação é processo, não só resultado.",
+    offersInFriendships: "perspectivas únicas, inspiração criativa e autenticidade",
+    seekInPartner: "apreciação pela originalidade e espaço para expressão criativa",
+    expressesInFamily: "incentivo à individualidade e celebração das diferenças",
+    professionalStrength: "inovação, visão original e capacidade de criar algo novo",
+    uniqueDifferential: "ver possibilidades onde outros veem limitações e materializar ideias únicas",
+    spiritualPath: "equilibrar criação com aceitação e originalidade com conexão",
+    morningPractice: "permita-se imaginar sem julgamento e honre sua visão criativa",
+    dailyExpression: "crie algo, mesmo pequeno, e deixe sua marca no mundo",
+    eveningReflection: "celebre o que criou e as ideias que surgiram",
+    personalMantra: "Eu expresso minha essência única e inspiro originalidade ao meu redor"
   },
   Inocente: {
     name: "O Inocente",
@@ -80,7 +121,17 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "🌟",
     powerPhrase: "Quando mantenho minha fé no bem, trago leveza e esperança para todos ao meu redor.",
     alignedBehavior: "Você irradia otimismo genuíno e inspira outros com sua capacidade de ver o melhor nas pessoas e situações.",
-    excessBehavior: "Pode tender à ingenuidade ou negação de problemas reais, precisando equilibrar esperança com discernimento."
+    excessBehavior: "Pode tender à ingenuidade ou negação de problemas reais, precisando equilibrar esperança com discernimento.",
+    offersInFriendships: "leveza, otimismo e capacidade de ver o melhor em cada um",
+    seekInPartner: "pureza de intenções, alegria compartilhada e bondade",
+    expressesInFamily: "alegria contagiante, confiança no futuro e harmonia",
+    professionalStrength: "trazer esperança e simplicidade para ambientes complexos",
+    uniqueDifferential: "renovar a fé das pessoas no bem e criar atmosferas de paz",
+    spiritualPath: "equilibrar inocência com sabedoria e esperança com realismo",
+    morningPractice: "conecte-se com gratidão e visualize um dia abençoado",
+    dailyExpression: "compartilhe sua alegria e veja o melhor nas situações",
+    eveningReflection: "reconheça os momentos de graça e as bênçãos do dia",
+    personalMantra: "Eu confio na bondade da vida e irradio esperança onde quer que esteja"
   },
   Sábio: {
     name: "O Sábio",
@@ -97,7 +148,17 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "📚",
     powerPhrase: "Quando busco compreender antes de julgar, encontro verdades que transformam vidas.",
     alignedBehavior: "Você compartilha sabedoria com humildade e ajuda outros a encontrarem suas próprias respostas através da reflexão.",
-    excessBehavior: "Pode tender ao isolamento intelectual ou arrogância do conhecimento, precisando equilibrar saber com agir."
+    excessBehavior: "Pode tender ao isolamento intelectual ou arrogância do conhecimento, precisando equilibrar saber com agir.",
+    offersInFriendships: "perspectiva sábia, conselhos ponderados e escuta profunda",
+    seekInPartner: "profundidade intelectual, honestidade e respeito pela busca da verdade",
+    expressesInFamily: "orientação sábia, paciência e transmissão de conhecimento",
+    professionalStrength: "análise profunda, visão clara e capacidade de ensinar",
+    uniqueDifferential: "encontrar padrões e verdades onde outros veem apenas confusão",
+    spiritualPath: "equilibrar conhecimento intelectual com sabedoria do coração",
+    morningPractice: "reflita sobre uma pergunta significativa e busque compreensão",
+    dailyExpression: "compartilhe sua sabedoria com humildade e escute para aprender",
+    eveningReflection: "reconheça o que aprendeu e como sua compreensão cresceu",
+    personalMantra: "Eu busco a verdade com humildade e compartilho sabedoria com amor"
   },
   Explorador: {
     name: "O Explorador",
@@ -114,7 +175,17 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "🧭",
     powerPhrase: "Quando me aventuro além do conhecido, descubro não só o mundo, mas também quem eu sou.",
     alignedBehavior: "Você inspira outros a expandirem seus horizontes e a abraçarem novas experiências com curiosidade genuína.",
-    excessBehavior: "Pode tender à inquietação crônica ou fuga de compromissos, precisando encontrar raízes em meio à liberdade."
+    excessBehavior: "Pode tender à inquietação crônica ou fuga de compromissos, precisando encontrar raízes em meio à liberdade.",
+    offersInFriendships: "aventura, perspectivas novas e convites para expandir horizontes",
+    seekInPartner: "liberdade, espírito aventureiro e respeito pela independência",
+    expressesInFamily: "estímulo à descoberta, coragem para crescer e abertura ao novo",
+    professionalStrength: "encontrar novas possibilidades e se adaptar a qualquer ambiente",
+    uniqueDifferential: "descobrir caminhos onde outros veem becos e inspirar coragem para o desconhecido",
+    spiritualPath: "equilibrar exploração externa com jornada interior",
+    morningPractice: "abra-se para as possibilidades do dia com curiosidade",
+    dailyExpression: "explore algo novo, mesmo pequeno, e expanda seus horizontes",
+    eveningReflection: "reconheça as descobertas do dia e o que elas revelaram sobre você",
+    personalMantra: "Eu exploro o mundo com curiosidade e descubro minha verdade em cada jornada"
   },
   Rebelde: {
     name: "O Rebelde",
@@ -131,7 +202,17 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "⚡",
     powerPhrase: "Quando questiono o que parece imutável, abro caminhos para transformações necessárias.",
     alignedBehavior: "Você catalisa mudanças positivas e dá voz ao que precisa ser dito, inspirando autenticidade nos outros.",
-    excessBehavior: "Pode tender à rebeldia sem causa ou destruição gratuita, precisando direcionar sua energia para construção."
+    excessBehavior: "Pode tender à rebeldia sem causa ou destruição gratuita, precisando direcionar sua energia para construção.",
+    offersInFriendships: "coragem para ser autêntico e permissão para questionar o status quo",
+    seekInPartner: "autenticidade, coragem e liberdade de expressão",
+    expressesInFamily: "encorajamento à individualidade e questionamento saudável",
+    professionalStrength: "desafiar o que não funciona e catalisar mudanças necessárias",
+    uniqueDifferential: "ver através das aparências e ter coragem de nomear o que precisa mudar",
+    spiritualPath: "equilibrar rebeldia com propósito e destruição com construção",
+    morningPractice: "conecte-se com sua verdade e a coragem de expressá-la",
+    dailyExpression: "desafie o que não serve mais e construa o novo",
+    eveningReflection: "reconheça as mudanças que catalisou e seu impacto positivo",
+    personalMantra: "Eu desafio o que não serve e crio caminhos de transformação"
   },
   Mago: {
     name: "O Mago",
@@ -148,7 +229,17 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "✨",
     powerPhrase: "Quando confio na minha intuição transformadora, o impossível se torna caminho.",
     alignedBehavior: "Você catalisa transformações profundas e ajuda outros a enxergarem possibilidades onde só viam limitações.",
-    excessBehavior: "Pode tender à manipulação ou desconexão com a realidade, precisando ancorar sua magia no mundo concreto."
+    excessBehavior: "Pode tender à manipulação ou desconexão com a realidade, precisando ancorar sua magia no mundo concreto.",
+    offersInFriendships: "transformação, novas perspectivas e expansão de possibilidades",
+    seekInPartner: "profundidade, abertura para o misterioso e crescimento mútuo",
+    expressesInFamily: "capacidade de transformar desafios em oportunidades de crescimento",
+    professionalStrength: "transformar visões em realidade e catalisar mudanças profundas",
+    uniqueDifferential: "ver o potencial oculto e manifestar o que parecia impossível",
+    spiritualPath: "equilibrar poder transformador com humildade e sabedoria",
+    morningPractice: "conecte-se com sua intuição e visualize as transformações que deseja criar",
+    dailyExpression: "confie em sua visão e tome ações que manifestem seu propósito",
+    eveningReflection: "reconheça as transformações que catalisou e as sincronicidades do dia",
+    personalMantra: "Eu transformo possibilidades em realidade e ajudo outros a verem sua magia"
   },
   Herói: {
     name: "O Herói",
@@ -165,7 +256,17 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "🦸",
     powerPhrase: "Quando enfrento meus desafios com coragem, inspiro outros a encontrarem sua própria força.",
     alignedBehavior: "Você supera obstáculos com determinação e protege aqueles que precisam, sendo exemplo de coragem.",
-    excessBehavior: "Pode tender à arrogância ou ao esgotamento por assumir demais, precisando reconhecer seus próprios limites."
+    excessBehavior: "Pode tender à arrogância ou ao esgotamento por assumir demais, precisando reconhecer seus próprios limites.",
+    offersInFriendships: "proteção, coragem para enfrentar desafios e exemplo de determinação",
+    seekInPartner: "força, integridade e admiração pela coragem",
+    expressesInFamily: "proteção, encorajamento para superar medos e modelo de perseverança",
+    professionalStrength: "enfrentar desafios com determinação e inspirar equipes em momentos difíceis",
+    uniqueDifferential: "transformar obstáculos em conquistas e inspirar coragem nos outros",
+    spiritualPath: "equilibrar força com vulnerabilidade e heroísmo com humildade",
+    morningPractice: "conecte-se com sua força interior e visualize-se superando desafios",
+    dailyExpression: "enfrente seus medos com coragem e proteja quem precisa",
+    eveningReflection: "reconheça as batalhas vencidas e a força que demonstrou",
+    personalMantra: "Eu enfrento desafios com coragem e inspiro força ao meu redor"
   },
   Prestativo: {
     name: "O Prestativo",
@@ -182,7 +283,17 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "🤗",
     powerPhrase: "Quando cuido dos outros com generosidade, crio círculos de amor que se expandem infinitamente.",
     alignedBehavior: "Você nutre relações com cuidado genuíno e cria ambientes onde todos se sentem acolhidos e apoiados.",
-    excessBehavior: "Pode tender ao autossacrifício ou codependência, precisando lembrar que cuidar de si é essencial para cuidar dos outros."
+    excessBehavior: "Pode tender ao autossacrifício ou codependência, precisando lembrar que cuidar de si é essencial para cuidar dos outros.",
+    offersInFriendships: "suporte incondicional, cuidado genuíno e disponibilidade amorosa",
+    seekInPartner: "reciprocidade no cuidado, reconhecimento e gratidão",
+    expressesInFamily: "nutrição emocional, apoio constante e ambiente acolhedor",
+    professionalStrength: "criar ambientes de suporte e fazer todos se sentirem valorizados",
+    uniqueDifferential: "perceber o que os outros precisam antes mesmo deles pedirem",
+    spiritualPath: "equilibrar cuidar dos outros com autocuidado genuíno",
+    morningPractice: "conecte-se com compaixão por si mesmo antes de cuidar dos outros",
+    dailyExpression: "ofereça seu cuidado genuíno e esteja presente para quem precisa",
+    eveningReflection: "reconheça o bem que fez e como também cuidou de si",
+    personalMantra: "Eu cuido com amor e também me permito receber cuidado"
   },
   "Bobo da Corte": {
     name: "O Bobo da Corte",
@@ -199,7 +310,17 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "🎭",
     powerPhrase: "Quando trago leveza para os momentos difíceis, transformo o peso em possibilidade.",
     alignedBehavior: "Você alegra ambientes e ajuda outros a não levarem a vida tão a sério, trazendo perspectiva saudável.",
-    excessBehavior: "Pode tender a evitar assuntos sérios ou usar humor como escudo, precisando equilibrar leveza com profundidade."
+    excessBehavior: "Pode tender a evitar assuntos sérios ou usar humor como escudo, precisando equilibrar leveza com profundidade.",
+    offersInFriendships: "alegria contagiante, leveza e capacidade de transformar peso em riso",
+    seekInPartner: "capacidade de rir junto, leveza e apreciação pelo momento",
+    expressesInFamily: "diversão, espontaneidade e celebração das pequenas coisas",
+    professionalStrength: "aliviar tensões, criar ambientes leves e manter equipes motivadas",
+    uniqueDifferential: "transformar momentos pesados em oportunidades de leveza e conexão",
+    spiritualPath: "equilibrar leveza com profundidade e humor com presença",
+    morningPractice: "encontre algo para sorrir e conecte-se com a alegria de estar vivo",
+    dailyExpression: "traga leveza aos ambientes e ajude outros a rirem de si mesmos",
+    eveningReflection: "reconheça os sorrisos que provocou e a alegria que espalhou",
+    personalMantra: "Eu trago alegria ao mundo e celebro a leveza de cada momento"
   },
   "Homem Comum": {
     name: "O Homem Comum",
@@ -216,7 +337,17 @@ export const ARCHETYPES: Record<string, ArchetypeData> = {
     emoji: "👤",
     powerPhrase: "Quando me conecto com autenticidade, crio pertencimento verdadeiro onde quer que esteja.",
     alignedBehavior: "Você cria conexões genuínas e faz todos se sentirem incluídos e valorizados, sem pretensões.",
-    excessBehavior: "Pode tender a se diminuir ou evitar destaque, precisando reconhecer que seu valor não depende de ser igual aos outros."
+    excessBehavior: "Pode tender a se diminuir ou evitar destaque, precisando reconhecer que seu valor não depende de ser igual aos outros.",
+    offersInFriendships: "presença genuína, aceitação incondicional e senso de pertencimento",
+    seekInPartner: "autenticidade, simplicidade e conexão sem máscaras",
+    expressesInFamily: "igualdade, pertencimento e valorização de cada membro",
+    professionalStrength: "criar ambientes inclusivos onde todos se sentem valorizados",
+    uniqueDifferential: "fazer qualquer pessoa se sentir aceita e parte do grupo",
+    spiritualPath: "equilibrar humildade com reconhecimento do próprio valor único",
+    morningPractice: "conecte-se com gratidão pela vida simples e pelas pessoas ao redor",
+    dailyExpression: "seja autêntico e faça os outros se sentirem incluídos e aceitos",
+    eveningReflection: "reconheça as conexões genuínas que fez e seu valor único",
+    personalMantra: "Eu pertenço a este mundo e crio conexões autênticas onde quer que esteja"
   }
 };
 

@@ -135,7 +135,7 @@ export default function ArchetypeResults({
               Descrição Simbólica
             </h3>
             <p className="text-muted-foreground leading-relaxed text-base">
-              Você vibra na frequência de quem {primaryData.description.toLowerCase()}.
+              {primaryData.description}
             </p>
           </div>
 
@@ -240,14 +240,14 @@ export default function ArchetypeResults({
             <p className="text-muted-foreground leading-relaxed text-base">
               {secondaryArchetype && secondaryData && (
                 <>
-                  O arquétipo <strong>{secondaryData.name}</strong> complementa sua energia trazendo{" "}
-                  {secondaryData.characteristics[0]?.toLowerCase()}.{" "}
+                  O arquétipo <strong>{secondaryData.name}</strong> complementa sua energia, 
+                  adicionando à sua essência a capacidade de {secondaryData.offersInFriendships}.{" "}
                 </>
               )}
               {tertiaryArchetype && tertiaryData && (
                 <>
-                  O arquétipo <strong>{tertiaryData.name}</strong> reforça sua expressão no mundo com{" "}
-                  {tertiaryData.characteristics[0]?.toLowerCase()}.
+                  O arquétipo <strong>{tertiaryData.name}</strong> reforça sua expressão no mundo 
+                  através da habilidade de {tertiaryData.offersInFriendships}.
                 </>
               )}
             </p>
@@ -290,12 +290,9 @@ export default function ArchetypeResults({
 
             <div className="pt-4 border-t">
               <p className="text-lg text-muted-foreground leading-relaxed bg-[hsl(var(--accent))]/5 p-6 rounded-lg">
-                Essa combinação revela um perfil que tende a{" "}
-                <strong>
-                  {primaryData.characteristics[0]?.toLowerCase()} com{" "}
-                  {secondaryData?.characteristics[0]?.toLowerCase()}
-                </strong>
-                , criando uma presença autêntica e equilibrada.
+                Essa combinação revela um perfil que une <strong>{primaryData.professionalStrength}</strong> com a capacidade de{" "}
+                <strong>{secondaryData?.offersInFriendships || "conexão autêntica"}</strong>, 
+                criando uma presença única e equilibrada.
               </p>
             </div>
           </CardContent>
@@ -324,24 +321,24 @@ export default function ArchetypeResults({
             </div>
             <div className="space-y-4 pl-15">
               <p className="text-muted-foreground leading-relaxed">
-                Suas energias moldam suas relações e emoções através de {primaryData.characteristics[0]?.toLowerCase()}.
-                Você tende a buscar conexões que ressoem com sua essência de {primaryData.name.toLowerCase()},
-                valorizando {primaryData.characteristics[1]?.toLowerCase()} em seus vínculos mais profundos.
+                Como {primaryData.name}, suas relações são profundamente marcadas pela sua capacidade de 
+                oferecer {primaryData.offersInFriendships}. Você busca conexões que ressoem com sua essência, 
+                valorizando parceiros que apreciem {primaryData.seekInPartner}.
               </p>
               <div className="p-4 rounded-lg bg-muted/30">
                 <h4 className="font-medium mb-2 text-base">Como você aparece nas relações:</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="text-[hsl(var(--accent))] mt-1">→</span>
-                    <span>Nas amizades, oferece {primaryData.characteristics[0]?.toLowerCase()}</span>
+                    <span>Nas amizades, você oferece {primaryData.offersInFriendships}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-[hsl(var(--accent))] mt-1">→</span>
-                    <span>No amor, busca parceiros que valorizem {primaryData.characteristics[1]?.toLowerCase()}</span>
+                    <span>No amor, você busca parceiros que valorizem {primaryData.seekInPartner}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-[hsl(var(--accent))] mt-1">→</span>
-                    <span>Em família, expressa {primaryData.characteristics[2]?.toLowerCase()}</span>
+                    <span>Na família, você expressa {primaryData.expressesInFamily}</span>
                   </li>
                 </ul>
               </div>
@@ -358,23 +355,21 @@ export default function ArchetypeResults({
             </div>
             <div className="space-y-4 pl-15">
               <p className="text-muted-foreground leading-relaxed">
-                No campo profissional, você expressa seus dons através de {primaryData.characteristics[2]?.toLowerCase()}.
-                Seu propósito está em trazer {primaryData.characteristics[0]?.toLowerCase()} para o mundo,
-                criando impacto através da sua capacidade única de {primaryData.characteristics[1]?.toLowerCase()}.
+                No campo profissional, sua maior força é a {primaryData.professionalStrength}. 
+                Seu propósito está em trazer para o mundo sua capacidade única de {primaryData.uniqueDifferential}.
               </p>
               <div className="grid md:grid-cols-2 gap-3">
                 <div className="p-4 rounded-lg bg-[hsl(var(--accent))]/5 border border-[hsl(var(--accent))]/20">
                   <h4 className="font-medium mb-2 text-base">Áreas de Atuação Ideais:</h4>
                   <p className="text-sm text-muted-foreground">
-                    Ambientes que valorizem {primaryData.characteristics[0]?.toLowerCase()} e permitam 
-                    expressar {primaryData.characteristics[1]?.toLowerCase()}.
+                    Ambientes que valorizem sua {primaryData.professionalStrength} e permitam 
+                    expressar seu diferencial único.
                   </p>
                 </div>
                 <div className="p-4 rounded-lg bg-[hsl(var(--accent))]/5 border border-[hsl(var(--accent))]/20">
                   <h4 className="font-medium mb-2 text-base">Seu Diferencial Único:</h4>
                   <p className="text-sm text-muted-foreground">
-                    Capacidade natural de {primaryData.characteristics[2]?.toLowerCase()} combinada 
-                    com sua essência de {primaryData.name.toLowerCase()}.
+                    Sua capacidade natural de {primaryData.uniqueDifferential}.
                   </p>
                 </div>
               </div>
@@ -391,19 +386,18 @@ export default function ArchetypeResults({
             </div>
             <div className="space-y-4 pl-15">
               <p className="text-muted-foreground leading-relaxed">
-                Sua alma busca aprender e oferecer {primaryData.characteristics[0]?.toLowerCase()}.
-                O caminho espiritual de {primaryData.name} está em viver plenamente sua essência,
-                equilibrando luz e sombra, e trazendo sua energia única para manifestar propósito no mundo.
+                O caminho espiritual de {primaryData.name} envolve {primaryData.spiritualPath}. 
+                Viva plenamente sua essência, equilibrando luz e sombra, e trazendo sua energia única 
+                para manifestar propósito no mundo.
               </p>
               <div className="p-4 rounded-lg bg-gradient-to-r from-[hsl(var(--accent))]/10 to-transparent">
                 <h4 className="font-medium mb-2 text-base">Prática Espiritual Recomendada:</h4>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Conecte-se com sua essência através de práticas que honrem {primaryData.characteristics[0]?.toLowerCase()} 
-                  e cultivem {primaryData.characteristics[1]?.toLowerCase()}.
+                  Conecte-se com sua essência através de práticas que honrem seu caminho de 
+                  {primaryData.spiritualPath}.
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  <strong>Mantra pessoal:</strong> "Eu sou {primaryData.name.toLowerCase()}, e minha luz 
-                  brilha através de {primaryData.characteristics[0]?.toLowerCase()}."
+                  <strong>Mantra pessoal:</strong> "{primaryData.personalMantra}."
                 </p>
               </div>
             </div>
@@ -426,21 +420,21 @@ export default function ArchetypeResults({
                   <div className="text-2xl mb-2">🌅</div>
                   <h4 className="font-medium text-sm mb-2">Pela Manhã</h4>
                   <p className="text-xs text-muted-foreground">
-                    Inicie o dia conectando-se com {primaryData.characteristics[0]?.toLowerCase()}
+                    {primaryData.morningPractice}
                   </p>
                 </div>
                 <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
                   <div className="text-2xl mb-2">☀️</div>
                   <h4 className="font-medium text-sm mb-2">Durante o Dia</h4>
                   <p className="text-xs text-muted-foreground">
-                    Expresse {primaryData.characteristics[1]?.toLowerCase()} em suas ações
+                    {primaryData.dailyExpression}
                   </p>
                 </div>
                 <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
                   <div className="text-2xl mb-2">🌙</div>
                   <h4 className="font-medium text-sm mb-2">À Noite</h4>
                   <p className="text-xs text-muted-foreground">
-                    Reflita sobre como manifestou {primaryData.characteristics[2]?.toLowerCase()}
+                    {primaryData.eveningReflection}
                   </p>
                 </div>
               </div>
