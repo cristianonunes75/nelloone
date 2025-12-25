@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, Target, Zap, Brain, Lightbulb, Rocket } from 'lucide-react';
+import { ArrowRight, Sparkles, Target, Zap, Brain, Lightbulb, Rocket, Check, Users, Eye, Heart } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 
 /**
@@ -69,9 +69,9 @@ export default function FlowLanding() {
               
               {/* Subheadline */}
               <p className="text-xl md:text-2xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
-                Você é multipotencial, cheio de ideias, mas disperso?
+                Você é multipotencial, cheio de ideias, mas se sente disperso?
                 <br />
-                O Método FLOW te ajuda a focar no que importa e executar.
+                O Nello Flow é um mentor digital com IA que te ajuda a focar no que importa e executar, com leveza, verdade e propósito.
               </p>
               
               {/* CTA */}
@@ -100,7 +100,7 @@ export default function FlowLanding() {
           </div>
         </section>
         
-        {/* Problem Section */}
+        {/* Problem Section - "Você se identifica?" */}
         <section className="py-20 border-t border-slate-800/50">
           <div className="container mx-auto px-6">
             <div className="max-w-3xl mx-auto text-center mb-16">
@@ -109,22 +109,22 @@ export default function FlowLanding() {
               </h2>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12">
               {[
                 {
                   icon: Brain,
                   title: "Muitas ideias, pouca execução",
-                  description: "Você tem 10 projetos começados e nenhum terminado"
+                  description: "Você tem vários projetos começados e nenhum terminado."
                 },
                 {
                   icon: Target,
                   title: "Dificuldade de focar",
-                  description: "Cada dia uma nova prioridade, nunca sabe por onde começar"
+                  description: "Cada dia uma nova prioridade, sem saber por onde começar."
                 },
                 {
                   icon: Lightbulb,
                   title: "Potencial desperdiçado",
-                  description: "Sente que poderia fazer muito mais, mas algo te trava"
+                  description: "Sente que poderia fazer muito mais, mas algo sempre te trava."
                 }
               ].map((item, i) => (
                 <div key={i} className="p-6 rounded-2xl bg-slate-800/50 border border-slate-700/50 hover:border-violet-500/30 transition-colors">
@@ -136,10 +136,19 @@ export default function FlowLanding() {
                 </div>
               ))}
             </div>
+            
+            {/* Closing statement */}
+            <div className="max-w-2xl mx-auto text-center">
+              <p className="text-xl text-slate-300">
+                👉 Você não é desorganizado.
+                <br />
+                <span className="text-violet-400 font-medium">Você é grande demais para uma estrutura pequena.</span>
+              </p>
+            </div>
           </div>
         </section>
         
-        {/* Method Section */}
+        {/* Method Section - Método FLOW */}
         <section className="py-20 border-t border-slate-800/50">
           <div className="container mx-auto px-6">
             <div className="max-w-3xl mx-auto text-center mb-16">
@@ -151,38 +160,244 @@ export default function FlowLanding() {
                 De ideias dispersas a resultados concretos
               </h2>
               <p className="text-xl text-slate-400">
-                4 passos simples para transformar sua mente multipotencial em uma máquina de execução
+                4 passos simples para transformar sua mente multipotencial em um fluxo de execução possível e consistente.
               </p>
             </div>
             
-            <div className="grid md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-4 gap-6 max-w-5xl mx-auto mb-12">
               {[
-                { letter: "F", title: "Focus", desc: "Identifique o que realmente importa agora" },
-                { letter: "L", title: "List", desc: "Organize suas ideias em ações concretas" },
-                { letter: "O", title: "Operate", desc: "Execute com foco e sem distrações" },
-                { letter: "W", title: "Win", desc: "Celebre vitórias e mantenha momentum" },
+                { 
+                  letter: "F", 
+                  title: "Foco", 
+                  desc: "Identifique o que realmente importa agora",
+                  detail: "Entre tantas ideias, escolha uma única prioridade. Clareza vem antes da ação."
+                },
+                { 
+                  letter: "L", 
+                  title: "Lapidar", 
+                  desc: "Transforme sua ideia em uma oferta clara",
+                  detail: "Defina para quem é, qual problema resolve e como isso pode gerar renda."
+                },
+                { 
+                  letter: "O", 
+                  title: "Operar", 
+                  desc: "Execute em ciclos curtos e possíveis",
+                  detail: "Ação simples, sem sobrecarga. Passos pequenos, mas constantes."
+                },
+                { 
+                  letter: "W", 
+                  title: "Watch", 
+                  desc: "Revise com verdade e ajuste o caminho",
+                  detail: "Olhe para o que funcionou, corrija a rota e siga em frente com mais consciência."
+                },
               ].map((step, i) => (
-                <div key={i} className="relative p-6 rounded-2xl bg-gradient-to-b from-slate-800/80 to-slate-900/80 border border-slate-700/50">
+                <div key={i} className="relative p-6 rounded-2xl bg-gradient-to-b from-slate-800/80 to-slate-900/80 border border-slate-700/50 hover:border-violet-500/30 transition-colors">
                   <div className="text-6xl font-bold bg-gradient-to-br from-violet-400 to-fuchsia-400 bg-clip-text text-transparent mb-4">
                     {step.letter}
                   </div>
                   <h3 className="text-lg font-semibold text-white mb-2">{step.title}</h3>
-                  <p className="text-slate-400 text-sm">{step.desc}</p>
+                  <p className="text-violet-300 text-sm mb-2">{step.desc}</p>
+                  <p className="text-slate-500 text-sm">{step.detail}</p>
                 </div>
               ))}
+            </div>
+            
+            {/* Closing statement */}
+            <div className="max-w-2xl mx-auto text-center">
+              <p className="text-xl text-slate-300 font-medium">
+                Menos caos. Mais direção. No seu ritmo.
+              </p>
             </div>
           </div>
         </section>
         
-        {/* CTA Section */}
+        {/* Solution Section - "Um mentor ao seu lado" */}
+        <section className="py-20 border-t border-slate-800/50">
+          <div className="container mx-auto px-6">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                  Um mentor ao seu lado para sair do pensar e entrar no fazer
+                </h2>
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div className="space-y-4">
+                  <p className="text-xl text-slate-300 mb-6">Com o Nello Flow, você vai:</p>
+                  {[
+                    "organizar suas ideias",
+                    "escolher um foco realista",
+                    "montar uma oferta simples",
+                    "definir quanto cobrar",
+                    "criar um plano possível para sua rotina",
+                    "executar com acompanhamento",
+                    "revisar e ajustar com verdade"
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-4 h-4 text-violet-400" />
+                      </div>
+                      <span className="text-slate-300">{item}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="p-8 rounded-2xl bg-gradient-to-br from-violet-900/30 to-fuchsia-900/30 border border-violet-500/20">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center mb-6">
+                    <Sparkles className="w-8 h-8 text-white" />
+                  </div>
+                  <p className="text-lg text-slate-300 leading-relaxed">
+                    Tudo guiado por um <span className="text-violet-400 font-medium">mentor com IA</span>, que pensa com você e não te deixa se perder no caminho.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        {/* For Who Section - "Para quem é o Nello Flow?" */}
+        <section className="py-20 border-t border-slate-800/50">
+          <div className="container mx-auto px-6">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                  Para quem é o Nello Flow?
+                </h2>
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-4 mb-12">
+                {[
+                  "é multipotencial, criativo ou visionário",
+                  "se sente disperso e sobrecarregado",
+                  "começa projetos e não termina",
+                  "empreende sozinho",
+                  "quer ganhar dinheiro com algo próprio",
+                  "tem TDAH ou apenas precisa de mais clareza",
+                  "sente que nasceu para mais, mas falta direção"
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 p-4 rounded-xl bg-slate-800/30 border border-slate-700/30">
+                    <Users className="w-5 h-5 text-violet-400 flex-shrink-0" />
+                    <span className="text-slate-300">Para quem {item}</span>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Quote */}
+              <div className="max-w-2xl mx-auto text-center p-8 rounded-2xl bg-gradient-to-br from-violet-900/20 to-fuchsia-900/20 border border-violet-500/10">
+                <p className="text-xl text-slate-300 italic mb-4">
+                  "Sou alguém com muitas potencialidades, que precisa de estrutura para florescer."
+                </p>
+                <p className="text-violet-400 font-medium">
+                  Se isso é você, o Nello Flow é para você.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        {/* Family Section - "Parte da família Nello" */}
+        <section className="py-20 border-t border-slate-800/50">
+          <div className="container mx-auto px-6">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-12">
+                Parte da família Nello
+              </h2>
+              
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                {[
+                  {
+                    name: "Nello One",
+                    tagline: "descubra sua essência",
+                    icon: Heart,
+                    gradient: "from-amber-500 to-orange-500",
+                    link: "https://nello.one"
+                  },
+                  {
+                    name: "Nello Life",
+                    tagline: "organize sua vida e hábitos",
+                    icon: Eye,
+                    gradient: "from-emerald-500 to-teal-500",
+                    link: "https://life.nello.one"
+                  },
+                  {
+                    name: "Nello Flow",
+                    tagline: "transforme isso em ação e renda",
+                    icon: Zap,
+                    gradient: "from-violet-500 to-fuchsia-500",
+                    current: true
+                  }
+                ].map((app, i) => (
+                  <div 
+                    key={i} 
+                    className={`p-6 rounded-2xl border transition-colors ${
+                      app.current 
+                        ? 'bg-gradient-to-br from-violet-900/40 to-fuchsia-900/40 border-violet-500/30' 
+                        : 'bg-slate-800/30 border-slate-700/50 hover:border-slate-600/50'
+                    }`}
+                  >
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${app.gradient} flex items-center justify-center mb-4 mx-auto`}>
+                      <app.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-1">{app.name}</h3>
+                    <p className="text-slate-400 text-sm">{app.tagline}</p>
+                    {app.link && (
+                      <a href={app.link} className="inline-block mt-3 text-sm text-violet-400 hover:text-violet-300 transition-colors">
+                        Conhecer →
+                      </a>
+                    )}
+                    {app.current && (
+                      <span className="inline-block mt-3 text-sm text-fuchsia-400">Você está aqui</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              
+              <p className="text-slate-400 max-w-xl mx-auto">
+                Um ecossistema para quem quer se conhecer, viver bem e prosperar com propósito.
+              </p>
+            </div>
+          </div>
+        </section>
+        
+        {/* Pricing Section - "Comece agora" */}
+        <section className="py-20 border-t border-slate-800/50">
+          <div className="container mx-auto px-6">
+            <div className="max-w-2xl mx-auto text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                Comece agora no Nello Flow
+              </h2>
+              <p className="text-xl text-slate-400 mb-8">
+                Tenha um mentor digital com IA ao seu lado todos os dias por:
+              </p>
+              
+              <div className="p-8 rounded-2xl bg-gradient-to-br from-violet-900/30 to-fuchsia-900/30 border border-violet-500/20 mb-8">
+                <div className="text-5xl font-bold text-white mb-2">
+                  R$ 49<span className="text-xl font-normal text-slate-400">/mês</span>
+                </div>
+                <p className="text-slate-400">Cancele quando quiser.</p>
+              </div>
+              
+              <Link to="/auth?signup=true">
+                <Button size="lg" className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 text-white text-lg px-8 py-6 rounded-xl shadow-lg shadow-violet-500/25">
+                  Começar Agora — É Grátis
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
+              <p className="text-slate-500 text-sm mt-4">Teste sem compromisso</p>
+            </div>
+          </div>
+        </section>
+        
+        {/* Final CTA Section */}
         <section className="py-20 border-t border-slate-800/50">
           <div className="container mx-auto px-6">
             <div className="max-w-3xl mx-auto text-center">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-                Pronto para sair do modo "pensar" <br />e entrar no modo "fazer"?
+                Pronto para sair do modo "pensar"
+                <br />e entrar no modo "fazer"?
               </h2>
               <p className="text-xl text-slate-400 mb-8">
-                Comece grátis e descubra como o Flow pode transformar sua produtividade.
+                Comece grátis e descubra como o Nello Flow pode te ajudar a transformar potencial em resultados reais.
               </p>
               <Link to="/auth?signup=true">
                 <Button size="lg" className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 text-white text-lg px-8 py-6 rounded-xl shadow-lg shadow-violet-500/25">
@@ -208,7 +423,7 @@ export default function FlowLanding() {
               </div>
               
               <div className="flex items-center gap-6 text-sm text-slate-500">
-                <a href="https://one.nello.one" className="hover:text-slate-300 transition-colors">Nello One</a>
+                <a href="https://nello.one" className="hover:text-slate-300 transition-colors">Nello One</a>
                 <a href="https://life.nello.one" className="hover:text-slate-300 transition-colors">Nello Life</a>
                 <Link to="/termos" className="hover:text-slate-300 transition-colors">Termos</Link>
                 <Link to="/privacidade" className="hover:text-slate-300 transition-colors">Privacidade</Link>
