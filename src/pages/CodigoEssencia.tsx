@@ -91,9 +91,6 @@ const TRANSLATIONS = {
     regenerate: "Regenerar",
     downloadPDF: "Baixar PDF",
     sendEmail: "Enviar por Email",
-    locked: "Premium Bloqueado",
-    lockedDesc: "O Código da Essência é um produto premium. Adquira para desbloquear seu relatório completo.",
-    purchase: "Desbloquear Código da Essência",
     missingTests: "Testes faltando:",
     disclaimer: "⚠️ Este código é uma síntese simbólica baseada nos seus 7 testes. Use-o como ferramenta de reflexão e autoconhecimento.",
     emailSent: "PDF enviado para seu email!",
@@ -118,9 +115,6 @@ const TRANSLATIONS = {
     regenerate: "Regenerar",
     downloadPDF: "Transferir PDF",
     sendEmail: "Enviar por Email",
-    locked: "Premium Bloqueado",
-    lockedDesc: "O Código da Essência é um produto premium. Adquire para desbloquear o teu relatório completo.",
-    purchase: "Desbloquear Código da Essência",
     missingTests: "Testes em falta:",
     disclaimer: "⚠️ Este código é uma síntese simbólica baseada nos teus 7 testes. Usa-o como ferramenta de reflexão e autoconhecimento.",
     emailSent: "PDF enviado para o teu email!",
@@ -145,9 +139,6 @@ const TRANSLATIONS = {
     regenerate: "Regenerate",
     downloadPDF: "Download PDF",
     sendEmail: "Send via Email",
-    locked: "Premium Locked",
-    lockedDesc: "The Essence Code is a premium product. Purchase to unlock your complete report.",
-    purchase: "Unlock Essence Code",
     missingTests: "Missing tests:",
     disclaimer: "⚠️ This code is a symbolic synthesis based on your 7 tests. Use it as a tool for reflection and self-knowledge.",
     emailSent: "PDF sent to your email!",
@@ -425,6 +416,20 @@ const CodigoEssencia = () => {
           {/* Generated Report Display */}
           {hasGenerated && generatedSections.length > 0 && (
             <div className="space-y-6 mb-8">
+              {/* Success Message */}
+              <div className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 border border-emerald-500/30 rounded-xl p-6 text-center">
+                <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
+                <h2 className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 mb-2">
+                  {lang === 'en' ? 'Your Essence Code is Ready!' : 'Seu Código da Essência está pronto!'}
+                </h2>
+                <p className="text-muted-foreground">
+                  {lang === 'en' 
+                    ? 'Miguel has analyzed all your test results and generated your personalized report.'
+                    : 'Miguel analisou todos os seus resultados e gerou seu relatório personalizado.'
+                  }
+                </p>
+              </div>
+
               {/* Actions */}
               <div className="flex flex-wrap gap-3 justify-center mb-6">
                 <Button onClick={handleDownloadPDF} className="gap-2">
@@ -437,20 +442,39 @@ const CodigoEssencia = () => {
                 </Button>
               </div>
 
-              {/* Sections */}
-              {generatedSections.map((section: any, index: number) => (
-                <div 
-                  key={section.id || index}
-                  className="bg-card border border-border rounded-xl p-6"
-                >
-                  <h3 className="text-xl font-bold mb-4 text-primary">{section.title}</h3>
-                  <div className="space-y-4 text-muted-foreground leading-relaxed">
-                    {section.paragraphs?.map((paragraph: string, pIndex: number) => (
-                      <p key={pIndex}>{paragraph}</p>
-                    ))}
+              {/* Generated Sections with colors from SECTION_CONFIG */}
+              {generatedSections.map((section: any, index: number) => {
+                const sectionKey = section.id || Object.keys(SECTION_CONFIG)[index];
+                const config = SECTION_CONFIG[sectionKey as keyof typeof SECTION_CONFIG] || {
+                  icon: <Sparkles className="w-5 h-5" />,
+                  color: "from-gray-500/20 to-gray-400/20 border-gray-500/30"
+                };
+                
+                return (
+                  <div 
+                    key={section.id || index}
+                    className={cn(
+                      "bg-gradient-to-br border rounded-xl p-6 transition-all",
+                      config.color
+                    )}
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">
+                        {config.icon}
+                      </div>
+                      <h3 className="text-xl font-bold">{section.title}</h3>
+                    </div>
+                    <div className="space-y-4 text-foreground/80 leading-relaxed bg-background/40 rounded-lg p-4">
+                      {section.paragraphs?.map((paragraph: string, pIndex: number) => (
+                        <p key={pIndex}>{paragraph}</p>
+                      ))}
+                      {section.content && !section.paragraphs && (
+                        <p>{section.content}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               {/* Disclaimer */}
               <div className="bg-muted/50 rounded-xl p-4 text-center">
@@ -459,31 +483,33 @@ const CodigoEssencia = () => {
             </div>
           )}
 
-          {/* Results Preview */}
-          <div className="grid gap-4 md:grid-cols-2">
-            {Object.entries(SECTION_CONFIG).map(([key, config]) => (
-              <div
-                key={key}
-                className={cn(
-                  "bg-gradient-to-br border rounded-xl p-6 transition-all hover:shadow-lg",
-                  config.color
-                )}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">
-                    {config.icon}
+          {/* Results Preview - only show when NOT generated */}
+          {!hasGenerated && (
+            <div className="grid gap-4 md:grid-cols-2">
+              {Object.entries(SECTION_CONFIG).map(([key, config]) => (
+                <div
+                  key={key}
+                  className={cn(
+                    "bg-gradient-to-br border rounded-xl p-6 transition-all hover:shadow-lg",
+                    config.color
+                  )}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">
+                      {config.icon}
+                    </div>
+                    <h3 className="font-semibold">{config.title[lang]}</h3>
                   </div>
-                  <h3 className="font-semibold">{config.title[lang]}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {lang === 'en' 
+                      ? 'Included in your premium PDF report'
+                      : 'Incluído no seu relatório PDF premium'
+                    }
+                  </p>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {lang === 'en' 
-                    ? 'Included in your premium PDF report'
-                    : 'Incluído no seu relatório PDF premium'
-                  }
-                </p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* Disclaimer */}
           <div className="bg-accent/10 border border-border rounded-xl p-4 text-center mt-8">

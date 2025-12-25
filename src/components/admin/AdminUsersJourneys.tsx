@@ -99,7 +99,7 @@ export const AdminUsersJourneys = () => {
           journey_status: profile.journey_status || 'not_started',
           journey_completed_tests: profile.journey_completed_tests || 0,
           journey_tests_status: (profile.journey_tests_status as Record<string, string>) || {},
-          codigo_essencia_unlocked: profile.codigo_essencia_unlocked || false,
+          codigo_essencia_unlocked: profile.journey_status === 'completed', // Auto when complete
           is_blocked: (profile as any).is_blocked || false,
           is_founder: profile.is_founder || false,
           roles: userRoles,
@@ -189,37 +189,7 @@ export const AdminUsersJourneys = () => {
     }
   };
 
-  const handleRemoveCodigoAccess = async (user: UserWithDetails) => {
-    setActionLoading('codigo');
-    try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ codigo_essencia_unlocked: false })
-        .eq("id", user.id);
-
-      if (error) throw error;
-
-      await supabase.rpc('log_audit', {
-        p_action: 'remove_codigo_essencia_access',
-        p_table_name: 'profiles',
-        p_record_id: user.id,
-        p_old_data: { codigo_essencia_unlocked: true },
-        p_new_data: { codigo_essencia_unlocked: false }
-      });
-
-      toast.success("Acesso ao Código da Essência removido");
-      fetchUsers();
-      setConfirmAction(null);
-      if (selectedUser?.id === user.id) {
-        setSelectedUser({ ...selectedUser, codigo_essencia_unlocked: false });
-      }
-    } catch (error) {
-      console.error("Error removing access:", error);
-      toast.error("Erro ao remover acesso");
-    } finally {
-      setActionLoading(null);
-    }
-  };
+  // Note: handleRemoveCodigoAccess removed - codigo_essencia is now automatic when journey is complete
 
   const handleForceTestComplete = async (user: UserWithDetails, testSlug: JourneyTestSlug) => {
     setActionLoading(testSlug);
@@ -728,9 +698,8 @@ export const AdminUsersJourneys = () => {
               onClick={() => {
                 if (confirmAction?.type === 'block') {
                   handleBlockUser(confirmAction.user);
-                } else if (confirmAction?.type === 'removeCodigo') {
-                  handleRemoveCodigoAccess(confirmAction.user);
                 }
+                // Note: removeCodigo action removed - codigo_essencia is now automatic
               }}
               disabled={!!actionLoading}
             >

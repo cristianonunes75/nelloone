@@ -77,7 +77,7 @@ export const FundadoresAdmin = () => {
           journey_status: profile.journey_status || "not_started",
           journey_completed_tests: profile.journey_completed_tests || 0,
           journey_total_tests: profile.journey_total_tests || 7,
-          codigo_essencia_unlocked: profile.codigo_essencia_unlocked || false,
+          codigo_essencia_unlocked: profile.journey_status === 'completed', // Auto when complete
           created_at: profile.created_at,
           purchase_date: purchase?.purchased_at,
           purchase_amount: purchase?.price_paid,

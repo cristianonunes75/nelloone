@@ -98,7 +98,7 @@ export const AdminDashboard = () => {
         supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", thirtyDaysAgo),
         supabase.from("profiles").select("id", { count: "exact", head: true }).eq("journey_status", "in_progress"),
         supabase.from("profiles").select("id", { count: "exact", head: true }).eq("journey_status", "completed"),
-        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("codigo_essencia_unlocked", true),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("journey_status", "completed"),
         supabase.from("test_purchases").select("price_paid, purchase_category, test_slug, metadata").eq("payment_status", "completed").gte("purchased_at", startISO),
       ]);
 

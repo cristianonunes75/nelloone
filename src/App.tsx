@@ -28,8 +28,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
 import { TestDetailPage } from "./components/tests/TestDetailPage";
 import CodigoEssencia from "./pages/CodigoEssencia";
-import CodigoEssenciaVenda from "./pages/CodigoEssenciaVenda";
-import CodigoEssenciaCheckout from "./pages/CodigoEssenciaCheckout";
+// CodigoEssencia sales pages removed - now included in journey
 import ComprarTeste from "./pages/ComprarTeste";
 import Fundadores from "./pages/Fundadores";
 import FundadorFeedback from "./pages/FundadorFeedback";
@@ -68,26 +67,8 @@ const AppRoutes = () => (
     {/* Test detail pages - PT (new semantic routes) */}
     <Route path="/testes/:slug" element={<TestDetailPage />} />
     
-    {/* Código da Essência Sales - PT */}
-    <Route path="/codigo-da-essencia" element={<CodigoEssenciaVenda />} />
-    <Route path="/codigo-da-essencia/checkout" element={<CodigoEssenciaCheckout />} />
-    <Route path="/codigo-da-essencia/view" element={
-      <ProtectedRoute allowedRoles={["cliente", "admin"]}>
-        <CodigoEssencia />
-      </ProtectedRoute>
-    } />
-    
     {/* Test detail pages - EN (new semantic routes) */}
     <Route path="/en/tests/:slug" element={<TestDetailPage />} />
-    
-    {/* Essence Code Sales - EN */}
-    <Route path="/en/essence-code-premium" element={<CodigoEssenciaVenda />} />
-    <Route path="/en/essence-code/checkout" element={<CodigoEssenciaCheckout />} />
-    <Route path="/en/essence-code/view" element={
-      <ProtectedRoute allowedRoles={["cliente", "admin"]}>
-        <CodigoEssencia />
-      </ProtectedRoute>
-    } />
     
     {/* EN Landing and Auth */}
     <Route path="/en" element={<Landing />} />
@@ -206,15 +187,6 @@ const AppRoutes = () => (
     
     {/* Test detail pages - PT-PT (European Portuguese) */}
     <Route path="/pt-pt/testes/:slug" element={<TestDetailPage />} />
-    
-    {/* Código da Essência Sales - PT-PT */}
-    <Route path="/pt-pt/codigo-da-essencia" element={<CodigoEssenciaVenda />} />
-    <Route path="/pt-pt/codigo-da-essencia/checkout" element={<CodigoEssenciaCheckout />} />
-    <Route path="/pt-pt/codigo-da-essencia/view" element={
-      <ProtectedRoute allowedRoles={["cliente", "admin"]}>
-        <CodigoEssencia />
-      </ProtectedRoute>
-    } />
     
     {/* Legal pages - PT-PT */}
     <Route path="/pt-pt/termos" element={<TermsOfService />} />

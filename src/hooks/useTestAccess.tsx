@@ -14,7 +14,7 @@ export const useTestAccess = () => {
       
       const { data, error } = await supabase
         .from("profiles")
-        .select("is_founder, codigo_essencia_unlocked")
+        .select("is_founder")
         .eq("id", user.id)
         .single();
 
