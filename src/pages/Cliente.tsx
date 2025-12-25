@@ -137,11 +137,27 @@ const Cliente = () => {
   };
 
   const handleViewResult = (step: typeof journeySteps[0]) => {
-    const userTest = userTests?.find(ut => ut.test_id === step.testId);
-    if (userTest) {
-      const basePath = getBasePath();
-      navigate(`${basePath}/cliente/test-results/${userTest.id}`);
+    const basePath = getBasePath();
+
+    const candidates = (userTests || [])
+      .filter((ut) => ut.test_id === step.testId && ut.status === "completed")
+      .sort((a, b) => {
+        const ad = a.completed_at ? new Date(a.completed_at).getTime() : 0;
+        const bd = b.completed_at ? new Date(b.completed_at).getTime() : 0;
+        return bd - ad;
+      });
+
+    const best = candidates[0];
+    if (best) {
+      navigate(`${basePath}/cliente/test-results/${best.id}`);
+      return;
     }
+
+    toast({
+      title: "Resultado indisponível",
+      description: "Este teste ainda não foi concluído (ou não salvou o resultado).",
+      variant: "destructive",
+    });
   };
 
   const handleResetTest = (step: typeof journeySteps[0]) => {
@@ -302,10 +318,11 @@ const Cliente = () => {
 
   return (
     <div className={`min-h-screen pb-24 md:pb-0 ${isImpersonating ? 'bg-amber-50/30' : 'bg-background'}`}>
-      {/* Onboarding Modal - shows only once */}
+      {/* Onboarding Modal - shows only when user hasn't completed any test */}
       <OnboardingModal 
         userName={displayName} 
-        onComplete={handleOnboardingComplete} 
+        onComplete={handleOnboardingComplete}
+        enabled={completedCount === 0}
       />
       {/* Impersonate Banner */}
       <ImpersonateBanner />
