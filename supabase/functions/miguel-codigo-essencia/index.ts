@@ -540,12 +540,40 @@ function extractKeyResults(testType: string, resultData: any): any {
 
     case 'linguagens_amor':
     case 'estilos_conexao':
+      // Map old style names to new proprietary names
+      const STYLE_NAME_MAP: Record<string, string> = {
+        'Palavras de Afirmação': 'Expressão Verbal',
+        'Words of Affirmation': 'Verbal Expression',
+        'Tempo de Qualidade': 'Presença Ativa',
+        'Quality Time': 'Active Presence',
+        'Presentes': 'Gestos Simbólicos',
+        'Presentes e Gestos Simbólicos': 'Gestos Simbólicos',
+        'Receiving Gifts': 'Symbolic Gestures',
+        'Atos de Serviço': 'Cuidado Prático',
+        'Acts of Service': 'Practical Care',
+        'Toque Físico': 'Conexão Física',
+        'Physical Touch': 'Physical Connection',
+      };
+      
       // Handle multiple data structures for affection connection styles
-      const primaryStyle = resultData.primary?.name || resultData.primary?.style || resultData.dominant || resultData.dominante;
-      const secondaryStyle = resultData.secondary?.name || resultData.secondary?.style || resultData.secondary || resultData.secundario;
+      let rawPrimaryStyle = resultData.primary?.name || resultData.primary?.style || resultData.dominant || resultData.dominante;
+      let rawSecondaryStyle = resultData.secondary?.name || resultData.secondary?.style || resultData.secondary || resultData.secundario;
+      
+      // Handle object format (with .pt)
+      if (typeof rawPrimaryStyle === 'object' && rawPrimaryStyle?.pt) {
+        rawPrimaryStyle = rawPrimaryStyle.pt;
+      }
+      if (typeof rawSecondaryStyle === 'object' && rawSecondaryStyle?.pt) {
+        rawSecondaryStyle = rawSecondaryStyle.pt;
+      }
+      
+      // Map old names to new names
+      const primaryStyleMapped = STYLE_NAME_MAP[rawPrimaryStyle] || rawPrimaryStyle;
+      const secondaryStyleMapped = STYLE_NAME_MAP[rawSecondaryStyle] || rawSecondaryStyle;
+      
       return {
-        dominantStyle: primaryStyle,
-        secondaryStyle: secondaryStyle,
+        dominantStyle: primaryStyleMapped,
+        secondaryStyle: secondaryStyleMapped,
         scores: resultData.scores || resultData.pontuacoes,
         description: resultData.primary?.description || resultData.description || resultData.descricao,
         interpretation: resultData.interpretation || resultData.interpretacao,

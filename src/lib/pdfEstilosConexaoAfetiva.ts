@@ -166,9 +166,9 @@ const STYLE_CONTENT: Record<string, {
       en: ["Deep attention", "Genuine listening", "Ability to create memorable moments", "Valuing time together", "Intense connection without words"]
     },
     vulnerabilities: {
-      pt: ["Sensibilidade a distrações do outro", "Frustração quando não há tempo de qualidade", "Dificuldade com relacionamentos à distância", "Interpretação de ausência como rejeição"],
-      'pt-pt': ["Sensibilidade a distrações do outro", "Frustração quando não há tempo de qualidade", "Dificuldade com relacionamentos à distância", "Interpretação de ausência como rejeição"],
-      en: ["Sensitivity to others' distractions", "Frustration when there's no quality time", "Difficulty with long-distance relationships", "Interpreting absence as rejection"]
+      pt: ["Sensibilidade a distrações do outro", "Frustração quando não há presença genuína", "Dificuldade com relacionamentos à distância", "Interpretação de ausência como rejeição"],
+      'pt-pt': ["Sensibilidade a distrações do outro", "Frustração quando não há presença genuína", "Dificuldade com relacionamentos à distância", "Interpretação de ausência como rejeição"],
+      en: ["Sensitivity to others' distractions", "Frustration when there's no genuine presence", "Difficulty with long-distance relationships", "Interpreting absence as rejection"]
     },
     emotionalDynamic: {
       whatTouches: {
@@ -251,9 +251,9 @@ const STYLE_CONTENT: Record<string, {
       ]
     },
     miguelAnalysis: {
-      pt: "Sua energia se estabiliza quando há tempo de qualidade real. Você não precisa de muito, precisa de verdade. Quando está plenamente com alguém, você floresce. Quando sente que compete com distrações, sua alma se retrai.",
-      'pt-pt': "A tua energia estabiliza-se quando há tempo de qualidade real. Tu não precisas de muito, precisas de verdade. Quando estás plenamente com alguém, tu floresces. Quando sentes que competes com distrações, a tua alma retrai-se.",
-      en: "Your energy stabilizes when there's real quality time. You don't need much, you need truth. When you're fully with someone, you flourish. When you feel you're competing with distractions, your soul withdraws."
+      pt: "Sua energia se estabiliza quando há presença genuína e plena. Você não precisa de muito, precisa de verdade. Quando está plenamente com alguém, você floresce. Quando sente que compete com distrações, sua alma se retrai.",
+      'pt-pt': "A tua energia estabiliza-se quando há presença genuína e plena. Tu não precisas de muito, precisas de verdade. Quando estás plenamente com alguém, tu floresces. Quando sentes que competes com distrações, a tua alma retrai-se.",
+      en: "Your energy stabilizes when there's genuine and full presence. You don't need much, you need truth. When you're fully with someone, you flourish. When you feel you're competing with distractions, your soul withdraws."
     },
     selfExamQuestion: {
       pt: "Você tem oferecido a si mesmo a mesma presença que busca nos outros?",

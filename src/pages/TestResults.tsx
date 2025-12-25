@@ -1005,7 +1005,21 @@ function TestResultsInner() {
           <DISCResultsSection discResults={discResults} lang={lang as 'pt' | 'pt-pt' | 'en'} />
         )}
 
-        {isLinguagensAmorTest && linguagensAmorResultData && (
+        {isLinguagensAmorTest && (estilosConexaoResults || linguagensAmorResultData) && (() => {
+          // Prefer recalculated results (estilosConexaoResults) over cached data (linguagensAmorResultData)
+          // This ensures the new style names are always displayed
+          const displayData = estilosConexaoResults || linguagensAmorResultData;
+          const primaryName = displayData.primary?.name?.pt || displayData.primary?.name || '';
+          const primarySymbol = displayData.primary?.symbol || '';
+          const primaryScore = displayData.primary?.score || 0;
+          const primaryEssence = displayData.primary?.essence?.pt || displayData.primary?.essence || '';
+          const secondaryName = displayData.secondary?.name?.pt || displayData.secondary?.name || '';
+          const secondarySymbol = displayData.secondary?.symbol || '';
+          const secondaryScore = displayData.secondary?.score || 0;
+          const secondaryEssence = displayData.secondary?.essence?.pt || displayData.secondary?.essence || '';
+          const interpretation = displayData.interpretation?.pt || displayData.interpretation || '';
+          
+          return (
           <Card className="border-none shadow-lg">
             <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
               <div className="text-center space-y-4">
@@ -1025,14 +1039,14 @@ function TestResultsInner() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <h3 className="text-lg font-semibold">{linguagensAmorResultData.primary?.name}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{linguagensAmorResultData.primary?.symbol}</p>
+                      <h3 className="text-lg font-semibold">{primaryName}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{primarySymbol}</p>
                     </div>
                     <Badge variant="default" className="text-lg px-4 py-2">
-                      {linguagensAmorResultData.primary?.score} pontos
+                      {primaryScore} pontos
                     </Badge>
                     <p className="text-base leading-relaxed italic">
-                      {linguagensAmorResultData.primary?.essence}
+                      {primaryEssence}
                     </p>
                   </CardContent>
                 </Card>
@@ -1046,14 +1060,14 @@ function TestResultsInner() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <h3 className="text-lg font-semibold">{linguagensAmorResultData.secondary?.name}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{linguagensAmorResultData.secondary?.symbol}</p>
+                      <h3 className="text-lg font-semibold">{secondaryName}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{secondarySymbol}</p>
                     </div>
                     <Badge variant="outline" className="text-lg px-4 py-2">
-                      {linguagensAmorResultData.secondary?.score} pontos
+                      {secondaryScore} pontos
                     </Badge>
                     <p className="text-base leading-relaxed italic">
-                      {linguagensAmorResultData.secondary?.essence}
+                      {secondaryEssence}
                     </p>
                   </CardContent>
                 </Card>
@@ -1066,7 +1080,7 @@ function TestResultsInner() {
                     Interpretação Personalizada
                   </div>
                   <p className="text-base leading-relaxed pl-8 whitespace-pre-line">
-                    {linguagensAmorResultData.interpretation}
+                    {interpretation}
                   </p>
                 </CardContent>
               </Card>
@@ -1078,7 +1092,8 @@ function TestResultsInner() {
               </div>
             </CardContent>
           </Card>
-        )}
+          );
+        })()}
 
         {isTemperamentosTest && temperamentosResultData?.primary?.temperament && temperamentosResultData?.secondary?.temperament && temperamentosResultData?.scores && (
           <TemperamentosResultsSection 
