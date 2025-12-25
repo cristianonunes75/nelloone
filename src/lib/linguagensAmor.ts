@@ -25,34 +25,34 @@ export interface LinguagensAmorResult {
 
 const styleData = {
   palavras_afirmacao: {
-    name: "Palavras de Afirmação",
+    name: "Expressão Verbal",
     symbol: "🕊️ Voz da Criação",
     essence: "Você cria mundos com suas palavras. Quando fala com amor, tudo floresce.",
     description: "Seu estilo de conexão é expresso através de palavras. Elogios, palavras de encorajamento, reconhecimento verbal e mensagens de carinho são fundamentais para você se sentir amado(a) e para demonstrar afeto aos outros."
   },
   tempo_qualidade: {
-    name: "Tempo de Qualidade",
+    name: "Presença Ativa",
     symbol: "🌅 Presença Plena",
     essence: "O tempo é sua forma de amar. Você transforma simples momentos em eternidade.",
     description: "Para você, conexão é presença. Conversas profundas, atenção total e momentos compartilhados sem distrações são a forma mais verdadeira de conexão. O tempo dedicado é seu maior presente."
   },
   presentes: {
-    name: "Presentes e Gestos Simbólicos",
+    name: "Gestos Simbólicos",
     symbol: "🎁 Rituais de Afeto",
     essence: "Para você, o amor é um gesto visível, uma lembrança do que é invisível.",
-    description: "Os presentes e gestos simbólicos carregam significado profundo para você. Não é o valor material, mas o pensamento, a lembrança e o simbolismo que tocam seu coração."
+    description: "Os gestos simbólicos carregam significado profundo para você. Não é o valor material, mas o pensamento, a lembrança e o simbolismo que tocam seu coração."
   },
   atos_servico: {
-    name: "Atos de Serviço",
+    name: "Cuidado Prático",
     symbol: "💧 Amor em Ação",
     essence: "O amor, pra você, é verbo. Está em cuidar, servir e aliviar o peso do outro.",
     description: "Para você, conexão é ação. Quando alguém faz algo prático para ajudar, resolver problemas ou facilitar sua vida, você sente o amor verdadeiro. E é assim que você demonstra cuidado aos outros."
   },
   toque_fisico: {
-    name: "Toque Físico",
+    name: "Conexão Física",
     symbol: "🔥 Fogo Sagrado",
     essence: "Você se comunica pelo contato. O toque é oração, presença e entrega.",
-    description: "O toque físico é seu estilo de conexão. Abraços, carinhos, proximidade física e gestos afetuosos são essenciais para você se sentir amado(a) e expressar afeto aos outros."
+    description: "O contato físico é seu estilo de conexão. Abraços, carinhos, proximidade física e gestos afetuosos são essenciais para você se sentir amado(a) e expressar afeto aos outros."
   }
 };
 
@@ -85,11 +85,11 @@ export const calculateLinguagensAmor = (answers: any[]): LinguagensAmorResult =>
   const primary = sortedStyles[0];
   const secondary = sortedStyles[1];
 
-  const interpretation = `Seu estilo principal de conexão afetiva é ${primary.name}. ${primary.description}
+  const interpretation = `Seu estilo primário de conexão afetiva é ${primary.name}. ${primary.description}
 
-Seu estilo secundário é ${secondary.name}, mostrando que você também valoriza ${secondary.name.toLowerCase()} em seus relacionamentos.
+Seu estilo secundário é ${secondary.name}, mostrando que você também valoriza esse estilo em seus relacionamentos.
 
-Essa combinação revela uma pessoa que se conecta de forma ${primary.score > secondary.score + 5 ? 'profundamente focada' : 'equilibrada'}, sabendo expressar e receber afeto através de ${primary.name.toLowerCase()}${primary.score <= secondary.score + 3 ? ` e ${secondary.name.toLowerCase()}` : ''}.`;
+Essa combinação revela uma pessoa que se conecta de forma ${primary.score > secondary.score + 5 ? 'profundamente focada' : 'equilibrada'}, sabendo expressar e receber afeto de maneiras diversas e complementares.`;
 
   return {
     primary,

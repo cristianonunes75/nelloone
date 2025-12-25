@@ -264,7 +264,20 @@ const Cliente = () => {
         break;
       case "estilos_conexao":
         if (resultData.primary?.name) {
-          return resultData.primary.name;
+          // Handle both object format (with .pt) and string format
+          const styleName = typeof resultData.primary.name === 'object' 
+            ? resultData.primary.name.pt 
+            : resultData.primary.name;
+          return styleName || "Resultado disponível";
+        }
+        break;
+      default:
+        // Also handle linguagens_amor (database test type for estilos_conexao)
+        if (resultData.primary?.name) {
+          const styleName = typeof resultData.primary.name === 'object' 
+            ? resultData.primary.name.pt 
+            : resultData.primary.name;
+          return styleName;
         }
         break;
     }
