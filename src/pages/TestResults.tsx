@@ -39,6 +39,7 @@ import { updateJourneyProgress, getJourneySlugFromTestType } from "@/utils/journ
 import { TestimonialForm } from "@/components/cliente/TestimonialForm";
 import { ResultsFloatingMenu } from "@/components/cliente/ResultsFloatingMenu";
 import { TestResultsSkeleton } from "@/components/tests/TestResultsSkeleton";
+import { DISCResultsSection } from "@/components/tests/DISCResultsSection";
 import { recalculateTestResult } from "@/lib/recalculateTestResult";
 
 // Journey order for navigation
@@ -1074,23 +1075,7 @@ function TestResultsInner() {
         )}
 
         {isDISCTest && discResults && (
-          <Card className="border-none shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
-              <div className="text-center space-y-4">
-                <div className="text-6xl">{discResults.profileData.emoji}</div>
-                <CardTitle className="text-3xl font-light">{discResults.profileData.name}</CardTitle>
-                <CardDescription className="text-lg">Seu Perfil Comportamental</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-8 space-y-8">
-...
-              <div className="text-center py-8">
-                <p className="text-lg font-light italic text-muted-foreground">
-                  NELLO ONE — uma jornada de autoconhecimento e verdade interior.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <DISCResultsSection discResults={discResults} lang={lang as 'pt' | 'pt-pt' | 'en'} />
         )}
 
         {isLinguagensAmorTest && linguagensAmorResultData && (
