@@ -40,6 +40,7 @@ import { TestimonialForm } from "@/components/cliente/TestimonialForm";
 import { ResultsFloatingMenu } from "@/components/cliente/ResultsFloatingMenu";
 import { TestResultsSkeleton } from "@/components/tests/TestResultsSkeleton";
 import { DISCResultsSection } from "@/components/tests/DISCResultsSection";
+import { TemperamentosResultsSection } from "@/components/tests/TemperamentosResultsSection";
 import { recalculateTestResult } from "@/lib/recalculateTestResult";
 
 // Journey order for navigation
@@ -1154,86 +1155,10 @@ function TestResultsInner() {
         )}
 
         {isTemperamentosTest && temperamentosResultData && (
-          <Card className="border-none shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
-              <div className="text-center space-y-4">
-                <div className="text-6xl">⚖️</div>
-                <CardTitle className="text-3xl font-light">Temperamentos</CardTitle>
-                <CardDescription className="text-lg">Sua natureza essencial</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-8 space-y-8">
-              <div className="grid md:grid-cols-2 gap-6">
-                <Card className="border-2 border-accent">
-                  <CardHeader>
-                    <CardTitle className="text-xl">Temperamento Dominante</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h3 className="text-2xl font-semibold">{temperamentosResultData.primary?.name}</h3>
-                    </div>
-                    <Badge variant="default" className="text-lg px-4 py-2">
-                      {temperamentosResultData.primary?.score} pontos
-                    </Badge>
-                    <p className="text-base leading-relaxed">
-                      {temperamentosResultData.primary?.description}
-                    </p>
-                    <div className="space-y-2 mt-4">
-                      <h4 className="font-semibold text-sm">Características:</h4>
-                      <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                        {temperamentosResultData.primary?.traits?.map((trait: string, idx: number) => (
-                          <li key={idx}>{trait}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 border-muted">
-                  <CardHeader>
-                    <CardTitle className="text-xl">Temperamento Secundário</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h3 className="text-2xl font-semibold">{temperamentosResultData.secondary?.name}</h3>
-                    </div>
-                    <Badge variant="outline" className="text-lg px-4 py-2">
-                      {temperamentosResultData.secondary?.score} pontos
-                    </Badge>
-                    <p className="text-base leading-relaxed">
-                      {temperamentosResultData.secondary?.description}
-                    </p>
-                    <div className="space-y-2 mt-4">
-                      <h4 className="font-semibold text-sm">Características:</h4>
-                      <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                        {temperamentosResultData.secondary?.traits?.map((trait: string, idx: number) => (
-                          <li key={idx}>{trait}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card className="bg-gradient-to-br from-accent/10 to-background border-accent/30">
-                <CardContent className="pt-6 space-y-4">
-                  <div className="flex items-center gap-2 text-lg font-semibold">
-                    <span className="text-2xl">🌱</span>
-                    Interpretação Personalizada
-                  </div>
-                  <p className="text-base leading-relaxed pl-8 whitespace-pre-line">
-                    {temperamentosResultData.interpretation}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <div className="text-center py-8">
-                <p className="text-lg font-light italic text-muted-foreground">
-                  NELLO ONE — uma jornada de autoconhecimento e verdade interior.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <TemperamentosResultsSection 
+            temperamentosResults={temperamentosResultData} 
+            lang={lang as 'pt' | 'pt-pt' | 'en'} 
+          />
         )}
 
         {/* Inteligências Múltiplas Results */}
