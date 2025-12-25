@@ -314,7 +314,11 @@ export default function TestExecution() {
   const isLikertScale = options && (options.scale || options.type === "likert");
   const isMultipleChoice = options && options.type === "multiple_choice";
   
-  const displayOptions = isLikertScale 
+  // Get test type for randomization logic
+  const testType = testDetails?.type || '';
+  
+  // Build display options
+  let displayOptions = isLikertScale 
     ? (options.scale || Array.from({ length: options.max - options.min + 1 }, (_, i) => ({
         value: String(options.min + i),
         label: options.labels?.[String(options.min + i)] || String(options.min + i)
@@ -327,6 +331,20 @@ export default function TestExecution() {
             label: opt.text || opt.label || String(opt.value)
           }))
         : []);
+  
+  // Randomize options for DISC and Temperamentos tests to prevent predictable patterns
+  // Uses question ID as seed for consistent randomization per question
+  const shouldRandomize = ['disc', 'temperamentos'].includes(testType) && !isLikertScale;
+  if (shouldRandomize && Array.isArray(displayOptions) && displayOptions.length > 0) {
+    // Create a seeded shuffle based on question ID for consistency
+    const seed = currentQuestion.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const shuffled = [...displayOptions];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = (seed + i) % (i + 1);
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    displayOptions = shuffled;
+  }
 
   // Show welcome screen at the start
   if (showWelcome && currentQuestionIndex === 0) {
