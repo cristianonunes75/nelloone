@@ -86,17 +86,28 @@ const getUserPrompt = (locale: string, results: any, userName: string) => {
 
 ${JSON.stringify(results, null, 2)}
 
+THE 7 TESTS THAT MUST BE ANALYZED AND CROSS-REFERENCED:
+1. Arquétipos com Propósito (Archetypes) - Reveals the symbolic energy that drives the person
+2. DISC - Reveals behavioral profile and communication style
+3. Nello 16 Personality - Reveals cognitive functions and decision-making style
+4. Eneagrama (Enneagram) - Reveals core motivation, fear, and desire
+5. Temperamentos (Temperaments) - Reveals the biological/emotional base of reactions
+6. Inteligências Múltiplas (Multiple Intelligences) - Reveals natural cognitive strengths
+7. Estilos de Conexão Afetiva (Affection Connection Styles) - Reveals how the person gives and receives love
+
+CRITICAL INSTRUCTION: You MUST reference and cross-analyze ALL 7 tests in EVERY section. Each section should show how the different tests interact, complement, or create tension with each other. This is NOT a summary of individual tests - it's a SYNTHESIS that reveals patterns only visible when crossing all dimensions.
+
 Based on this data, generate the complete ESSENCE CODE, divided into the following sections:
 
-1. overview - A warm synthesis of who this person is at their core, integrating all test insights
-2. matriz_essencial - The fundamental structure of their personality, how the 7 dimensions interact
-3. padroes_comportamento - 3 main behavior patterns identified across the tests (strengths and vulnerabilities)
-4. talentos_dons - 3 natural talents and gifts that emerge from the cross-analysis
-5. dores_raizes - 3 core emotional pains and their roots, with compassion and clarity
-6. proposito_natural - Their natural purpose and life direction based on the patterns
-7. caminho_maturidade - A 90-day maturity path with concrete weekly actions
-8. rotina_autoconsciencia - Daily/weekly self-awareness practices tailored to their profile
-9. carta_final - A personal, touching letter from Miguel to this person
+1. overview - A warm synthesis of who this person is at their core. MUST mention insights from ALL 7 tests and how they form a coherent whole.
+2. matriz_essencial - The fundamental structure of their personality. Show specifically how the 7 dimensions interact with each other (e.g., "Your Archetype X combined with Enneagram type Y creates a unique pattern of...").
+3. padroes_comportamento - 3 main behavior patterns identified by CROSSING the tests. Each pattern should reference at least 3 different tests.
+4. talentos_dons - 3 natural talents that emerge from cross-analysis. Each talent should be supported by evidence from multiple tests.
+5. dores_raizes - 3 core emotional pains. Show how different tests reveal the same root from different angles.
+6. proposito_natural - Their natural purpose based on the intersection of Archetype + Intelligences + Enneagram + DISC.
+7. caminho_maturidade - A 90-day maturity path with actions that address insights from ALL tests.
+8. rotina_autoconsciencia - Practices tailored to their complete profile (all 7 dimensions).
+9. carta_final - A personal letter that weaves together the most important revelations from all tests.
 
 Respond in JSON with the following structure:
 
@@ -116,32 +127,45 @@ Respond in JSON with the following structure:
 
 RULES:
 - Each section must have 2-4 meaningful paragraphs
-- Be specific and reference actual test results
+- Be specific and reference actual test results BY NAME (e.g., "Your DISC profile of D combined with...")
+- Every section MUST cross-reference at least 3 different tests
 - Use warm, human, deep language
 - Make content actionable and practical
 - The final letter should be personal and touching
-- Do not use generic statements - personalize everything`;
+- Do not use generic statements - personalize everything based on the specific test results`;
   }
 
   const isEuropean = locale === 'pt-pt';
   const youWord = isEuropean ? 'tu' : 'você';
   const yourWord = isEuropean ? 'tua' : 'sua';
+  const haveWord = isEuropean ? 'tens' : 'tem';
 
   return `Aqui estão os resultados consolidados dos 7 testes de personalidade de ${userName} em formato JSON:
 
 ${JSON.stringify(results, null, 2)}
 
+OS 7 TESTES QUE DEVEM SER ANALISADOS E CRUZADOS:
+1. Arquétipos com Propósito - Revela a energia simbólica que move a pessoa
+2. DISC - Revela o perfil comportamental e estilo de comunicação
+3. Nello 16 Personality - Revela funções cognitivas e estilo de tomada de decisão
+4. Eneagrama - Revela motivação central, medo e desejo
+5. Temperamentos - Revela a base biológica/emocional das reações
+6. Inteligências Múltiplas - Revela forças cognitivas naturais
+7. Estilos de Conexão Afetiva - Revela como a pessoa dá e recebe amor
+
+INSTRUÇÃO CRÍTICA: ${youWord.charAt(0).toUpperCase() + youWord.slice(1)} DEVE referenciar e cruzar TODOS os 7 testes em CADA seção. Cada seção deve mostrar como os diferentes testes interagem, se complementam ou criam tensões entre si. Isso NÃO é um resumo de testes individuais - é uma SÍNTESE que revela padrões só visíveis quando cruzamos todas as dimensões.
+
 Com base nesses dados, gere o CÓDIGO DA ESSÊNCIA completo, dividido nas seguintes seções:
 
-1. overview - Uma síntese acolhedora de quem essa pessoa é em ${yourWord} essência, integrando todos os testes
-2. matriz_essencial - A estrutura fundamental da personalidade, como as 7 dimensões interagem
-3. padroes_comportamento - 3 padrões principais de comportamento identificados (forças e vulnerabilidades)
-4. talentos_dons - 3 talentos e dons naturais que emergem do cruzamento
-5. dores_raizes - 3 dores emocionais centrais e suas raízes, com compaixão e clareza
-6. proposito_natural - O propósito natural e direção de vida baseado nos padrões
-7. caminho_maturidade - Um caminho de maturidade de 90 dias com ações semanais concretas
-8. rotina_autoconsciencia - Práticas diárias/semanais de autoconsciência para o perfil
-9. carta_final - Uma carta pessoal e tocante do Miguel para essa pessoa
+1. overview - Uma síntese acolhedora de quem essa pessoa é em ${yourWord} essência. DEVE mencionar insights de TODOS os 7 testes e como formam um todo coerente.
+2. matriz_essencial - A estrutura fundamental da personalidade. Mostre especificamente como as 7 dimensões interagem (ex: "Seu Arquétipo X combinado com Eneagrama tipo Y cria um padrão único de...").
+3. padroes_comportamento - 3 padrões principais de comportamento identificados CRUZANDO os testes. Cada padrão deve referenciar pelo menos 3 testes diferentes.
+4. talentos_dons - 3 talentos naturais que emergem do cruzamento. Cada talento deve ser sustentado por evidências de múltiplos testes.
+5. dores_raizes - 3 dores emocionais centrais. Mostre como diferentes testes revelam a mesma raiz de ângulos diferentes.
+6. proposito_natural - O propósito natural baseado na interseção de Arquétipo + Inteligências + Eneagrama + DISC.
+7. caminho_maturidade - Um caminho de maturidade de 90 dias com ações que endereçam insights de TODOS os testes.
+8. rotina_autoconsciencia - Práticas personalizadas para o perfil completo (todas as 7 dimensões).
+9. carta_final - Uma carta pessoal que tece as revelações mais importantes de todos os testes.
 
 Responda em JSON com a seguinte estrutura:
 
@@ -161,11 +185,12 @@ Responda em JSON com a seguinte estrutura:
 
 REGRAS:
 - Cada seção deve ter 2-4 parágrafos significativos
-- Seja específico e referencie os resultados reais dos testes
+- Seja específico e referencie os resultados reais dos testes PELO NOME (ex: "Seu perfil DISC de D combinado com...")
+- Cada seção DEVE cruzar pelo menos 3 testes diferentes
 - Use linguagem acolhedora, humana e profunda
 - Torne o conteúdo aplicável e prático
 - A carta final deve ser pessoal e tocante
-- Não use frases genéricas - personalize tudo
+- Não use frases genéricas - personalize tudo com base nos resultados específicos
 - ${isEuropean ? 'Use português europeu (tu, teu, tua)' : 'Use português brasileiro (você, seu, sua)'}`;
 };
 
