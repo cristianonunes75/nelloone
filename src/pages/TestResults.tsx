@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Download, CheckCircle, Lock, RotateCcw, FileText, Mail, Loader2, ArrowRight, Sparkles, Star, AlertTriangle, Lightbulb } from "lucide-react";
+import { Download, CheckCircle, Lock, RotateCcw, FileText, Mail, Loader2, ArrowRight, Sparkles, Star, AlertTriangle, Lightbulb, RefreshCw, Home } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ARCHETYPES } from "@/lib/archetypes";
@@ -37,6 +37,7 @@ import { getGrowthInsights } from "@/lib/growthInsights";
 import { usePDFEmail } from "@/hooks/usePDFEmail";
 import { updateJourneyProgress, getJourneySlugFromTestType } from "@/utils/journey";
 import { TestimonialForm } from "@/components/cliente/TestimonialForm";
+import { ResultsFloatingMenu } from "@/components/cliente/ResultsFloatingMenu";
 
 // Journey order for navigation
 const JOURNEY_ORDER = [
@@ -52,6 +53,7 @@ const JOURNEY_ORDER = [
 export default function TestResults() {
   const { userTestId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const resultsRef = useRef<HTMLDivElement>(null);
   const { user, userRole } = useAuth();
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
@@ -163,9 +165,16 @@ export default function TestResults() {
     }
   };
 
+  // Retry loading data
+  const handleRetry = () => {
+    queryClient.invalidateQueries({ queryKey: ["user-test-result", userTestId] });
+    queryClient.invalidateQueries({ queryKey: ["test-result-answers", userTestId] });
+  };
+
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6 flex items-center justify-center min-h-screen">
+      <div className="container mx-auto p-6 flex flex-col items-center justify-center min-h-screen gap-4">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
         <p className="text-muted-foreground">Carregando resultados...</p>
       </div>
     );
@@ -173,12 +182,52 @@ export default function TestResults() {
 
   if (!userTest) {
     return (
-      <div className="container mx-auto p-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">Resultados não encontrados.</p>
-            <div className="flex justify-center mt-4">
-              <Button onClick={() => navigate(`${basePath}/cliente`)}>Voltar para Dashboard</Button>
+      <div className="container mx-auto p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Card className="max-w-md w-full">
+          <CardContent className="pt-6 text-center space-y-4">
+            <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto" />
+            <h2 className="text-xl font-semibold">Resultado não encontrado</h2>
+            <p className="text-muted-foreground text-sm">
+              O teste pode não ter sido concluído corretamente ou o resultado ainda está sendo processado.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
+              <Button variant="outline" onClick={handleRetry} className="gap-2">
+                <RefreshCw className="h-4 w-4" />
+                Tentar novamente
+              </Button>
+              <Button onClick={() => navigate(`${basePath}/cliente`)} className="gap-2">
+                <Home className="h-4 w-4" />
+                Voltar ao Cliente
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Check if test is completed but result_data is empty
+  const hasResultData = userTest.result_data && Object.keys(userTest.result_data as object).length > 0;
+  
+  if (userTest.status === 'completed' && !hasResultData) {
+    return (
+      <div className="container mx-auto p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Card className="max-w-md w-full">
+          <CardContent className="pt-6 text-center space-y-4">
+            <Loader2 className="h-12 w-12 text-primary mx-auto animate-spin" />
+            <h2 className="text-xl font-semibold">Processando resultado...</h2>
+            <p className="text-muted-foreground text-sm">
+              O teste foi concluído mas o resultado ainda está sendo calculado. Tente novamente em alguns segundos.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
+              <Button variant="outline" onClick={handleRetry} className="gap-2">
+                <RefreshCw className="h-4 w-4" />
+                Recarregar
+              </Button>
+              <Button onClick={() => navigate(`${basePath}/cliente`)} className="gap-2">
+                <Home className="h-4 w-4" />
+                Voltar ao Cliente
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -1252,6 +1301,22 @@ export default function TestResults() {
         testId={userTest.test_id}
         testSlug={userTest.tests?.type ? getJourneySlugFromTestType(userTest.tests.type) : undefined}
         testName={userTest.tests?.name}
+      />
+
+      {/* Floating Navigation Menu */}
+      <ResultsFloatingMenu
+        basePath={basePath}
+        onShare={() => {
+          const testName = userTest.tests?.name || "teste";
+          const shareText = `🌟 Concluí o teste "${testName}" no NELLO ONE!\n\nDescubra sua essência em nello.one`;
+          if (navigator.share) {
+            navigator.share({ title: `Resultado: ${testName}`, text: shareText, url: "https://nello.one" }).catch(() => {});
+          } else {
+            navigator.clipboard.writeText(shareText).then(() => toast.success("Link copiado!"));
+          }
+        }}
+        onContinue={handleContinueJourney}
+        showContinue={!!nextTestInfo}
       />
 
       <PurchaseTestDialog
