@@ -145,7 +145,7 @@ const ENNEAGRAM_PROFILES_RICH: Record<string, Record<string, any>> = {
     }
   },
   "4": {
-    name: { pt: 'O Individualista', 'pt-pt': 'O Individualista', en: 'The Individualist' },
+    name: { pt: 'O Romântico', 'pt-pt': 'O Romântico', en: 'The Romantic' },
     emoji: '🎭',
     color: '#6366F1',
     essence: { pt: 'Profundidade, originalidade', 'pt-pt': 'Profundidade, originalidade', en: 'Depth, originality' },
