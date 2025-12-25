@@ -240,14 +240,12 @@ export default function ArchetypeResults({
             <p className="text-muted-foreground leading-relaxed text-base">
               {secondaryArchetype && secondaryData && (
                 <>
-                  O arquétipo <strong>{secondaryData.name}</strong> complementa sua energia, 
-                  adicionando à sua essência a capacidade de {secondaryData.offersInFriendships}.{" "}
+                  <strong>{secondaryData.name}</strong> complementa sua energia {secondaryData.complementsEnergy}.{" "}
                 </>
               )}
               {tertiaryArchetype && tertiaryData && (
                 <>
-                  O arquétipo <strong>{tertiaryData.name}</strong> reforça sua expressão no mundo 
-                  através da habilidade de {tertiaryData.offersInFriendships}.
+                  <strong>{tertiaryData.name}</strong> reforça sua expressão no mundo {tertiaryData.reinforcesExpression}.
                 </>
               )}
             </p>
@@ -287,14 +285,6 @@ export default function ArchetypeResults({
                 </p>
               </div>
             )}
-
-            <div className="pt-4 border-t">
-              <p className="text-lg text-muted-foreground leading-relaxed bg-[hsl(var(--accent))]/5 p-6 rounded-lg">
-                Essa combinação revela um perfil que une <strong>{primaryData.professionalStrength}</strong> com a capacidade de{" "}
-                <strong>{secondaryData?.offersInFriendships || "conexão autêntica"}</strong>, 
-                criando uma presença única e equilibrada.
-              </p>
-            </div>
           </CardContent>
         </Card>
       )}
@@ -304,10 +294,10 @@ export default function ArchetypeResults({
         <CardHeader className="bg-gradient-to-r from-[hsl(var(--accent))]/5 to-background">
           <CardTitle className="text-2xl font-light flex items-center gap-2">
             <span className="text-3xl">🧭</span>
-            Aplicações Práticas
+            Aplicações Práticas para o seu Dia a Dia
           </CardTitle>
           <CardDescription className="text-base">
-            Como suas energias moldam diferentes áreas da sua vida
+            Ações concretas para viver sua essência de {primaryData.name}
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-8 space-y-8">
@@ -317,31 +307,14 @@ export default function ArchetypeResults({
               <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--accent))]/10">
                 <span className="text-2xl">💛</span>
               </div>
-              <h3 className="font-semibold text-xl">Vida Pessoal e Relações</h3>
+              <h3 className="font-semibold text-xl">Nos Relacionamentos</h3>
             </div>
-            <div className="space-y-4 pl-15">
-              <p className="text-muted-foreground leading-relaxed">
-                Como {primaryData.name}, suas relações são profundamente marcadas pela sua capacidade de 
-                oferecer {primaryData.offersInFriendships}. Você busca conexões que ressoem com sua essência, 
-                valorizando parceiros que apreciem {primaryData.seekInPartner}.
-              </p>
-              <div className="p-4 rounded-lg bg-muted/30">
-                <h4 className="font-medium mb-2 text-base">Como você aparece nas relações:</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="text-[hsl(var(--accent))] mt-1">→</span>
-                    <span>Nas amizades, você oferece {primaryData.offersInFriendships}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[hsl(var(--accent))] mt-1">→</span>
-                    <span>No amor, você busca parceiros que valorizem {primaryData.seekInPartner}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[hsl(var(--accent))] mt-1">→</span>
-                    <span>Na família, você expressa {primaryData.expressesInFamily}</span>
-                  </li>
-                </ul>
-              </div>
+            <div className="space-y-3">
+              {primaryData.practicalRelationships.map((tip, index) => (
+                <div key={index} className="p-4 rounded-lg bg-muted/30 border-l-4 border-[hsl(var(--accent))]">
+                  <p className="text-muted-foreground">{tip}</p>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -351,28 +324,14 @@ export default function ArchetypeResults({
               <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--accent))]/10">
                 <span className="text-2xl">💼</span>
               </div>
-              <h3 className="font-semibold text-xl">Trabalho e Missão</h3>
+              <h3 className="font-semibold text-xl">No Trabalho</h3>
             </div>
-            <div className="space-y-4 pl-15">
-              <p className="text-muted-foreground leading-relaxed">
-                No campo profissional, sua maior força é a {primaryData.professionalStrength}. 
-                Seu propósito está em trazer para o mundo sua capacidade única de {primaryData.uniqueDifferential}.
-              </p>
-              <div className="grid md:grid-cols-2 gap-3">
-                <div className="p-4 rounded-lg bg-[hsl(var(--accent))]/5 border border-[hsl(var(--accent))]/20">
-                  <h4 className="font-medium mb-2 text-base">Áreas de Atuação Ideais:</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Ambientes que valorizem sua {primaryData.professionalStrength} e permitam 
-                    expressar seu diferencial único.
-                  </p>
+            <div className="space-y-3">
+              {primaryData.practicalWork.map((tip, index) => (
+                <div key={index} className="p-4 rounded-lg bg-muted/30 border-l-4 border-[hsl(var(--accent))]">
+                  <p className="text-muted-foreground">{tip}</p>
                 </div>
-                <div className="p-4 rounded-lg bg-[hsl(var(--accent))]/5 border border-[hsl(var(--accent))]/20">
-                  <h4 className="font-medium mb-2 text-base">Seu Diferencial Único:</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Sua capacidade natural de {primaryData.uniqueDifferential}.
-                  </p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
@@ -382,62 +341,60 @@ export default function ArchetypeResults({
               <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--accent))]/10">
                 <span className="text-2xl">🌿</span>
               </div>
-              <h3 className="font-semibold text-xl">Espiritualidade e Propósito</h3>
+              <h3 className="font-semibold text-xl">Para sua Alma</h3>
             </div>
-            <div className="space-y-4 pl-15">
-              <p className="text-muted-foreground leading-relaxed">
-                O caminho espiritual de {primaryData.name} envolve {primaryData.spiritualPath}. 
-                Viva plenamente sua essência, equilibrando luz e sombra, e trazendo sua energia única 
-                para manifestar propósito no mundo.
-              </p>
-              <div className="p-4 rounded-lg bg-gradient-to-r from-[hsl(var(--accent))]/10 to-transparent">
-                <h4 className="font-medium mb-2 text-base">Prática Espiritual Recomendada:</h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Conecte-se com sua essência através de práticas que honrem seu caminho de 
-                  {primaryData.spiritualPath}.
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  <strong>Mantra pessoal:</strong> "{primaryData.personalMantra}."
-                </p>
-              </div>
+            <div className="space-y-3">
+              {primaryData.practicalSpiritual.map((tip, index) => (
+                <div key={index} className="p-4 rounded-lg bg-muted/30 border-l-4 border-[hsl(var(--accent))]">
+                  <p className="text-muted-foreground">{tip}</p>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Como Cultivar Seu Arquétipo */}
+          {/* Rotina Diária */}
           <div className="space-y-3 border-t pt-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--accent))]/10">
                 <span className="text-2xl">🌱</span>
               </div>
-              <h3 className="font-semibold text-xl">Como Cultivar Seu Arquétipo</h3>
+              <h3 className="font-semibold text-xl">Rotina Diária Sugerida</h3>
             </div>
-            <div className="space-y-3 pl-15">
-              <p className="text-muted-foreground leading-relaxed mb-4">
-                Para viver plenamente como {primaryData.name}, cultive estas práticas diárias:
-              </p>
-              <div className="grid md:grid-cols-3 gap-3">
-                <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                  <div className="text-2xl mb-2">🌅</div>
-                  <h4 className="font-medium text-sm mb-2">Pela Manhã</h4>
-                  <p className="text-xs text-muted-foreground">
-                    {primaryData.morningPractice}
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                  <div className="text-2xl mb-2">☀️</div>
-                  <h4 className="font-medium text-sm mb-2">Durante o Dia</h4>
-                  <p className="text-xs text-muted-foreground">
-                    {primaryData.dailyExpression}
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                  <div className="text-2xl mb-2">🌙</div>
-                  <h4 className="font-medium text-sm mb-2">À Noite</h4>
-                  <p className="text-xs text-muted-foreground">
-                    {primaryData.eveningReflection}
-                  </p>
-                </div>
+            <div className="grid md:grid-cols-3 gap-3">
+              <div className="p-4 rounded-lg bg-gradient-to-b from-amber-500/10 to-transparent border border-amber-500/20">
+                <div className="text-2xl mb-2">🌅</div>
+                <h4 className="font-medium text-sm mb-2 text-amber-700 dark:text-amber-400">Pela Manhã</h4>
+                <p className="text-xs text-muted-foreground">
+                  {primaryData.morningPractice}
+                </p>
               </div>
+              <div className="p-4 rounded-lg bg-gradient-to-b from-sky-500/10 to-transparent border border-sky-500/20">
+                <div className="text-2xl mb-2">☀️</div>
+                <h4 className="font-medium text-sm mb-2 text-sky-700 dark:text-sky-400">Durante o Dia</h4>
+                <p className="text-xs text-muted-foreground">
+                  {primaryData.dailyExpression}
+                </p>
+              </div>
+              <div className="p-4 rounded-lg bg-gradient-to-b from-indigo-500/10 to-transparent border border-indigo-500/20">
+                <div className="text-2xl mb-2">🌙</div>
+                <h4 className="font-medium text-sm mb-2 text-indigo-700 dark:text-indigo-400">À Noite</h4>
+                <p className="text-xs text-muted-foreground">
+                  {primaryData.eveningReflection}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Mantra Pessoal */}
+          <div className="pt-4">
+            <div className="bg-gradient-to-br from-[hsl(var(--accent))]/15 to-[hsl(var(--accent))]/5 p-6 rounded-lg border border-[hsl(var(--accent))]/30">
+              <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                <span className="text-2xl">🔮</span>
+                Seu Mantra Pessoal
+              </h3>
+              <p className="text-xl italic text-foreground leading-relaxed text-center">
+                "{primaryData.personalMantra}"
+              </p>
             </div>
           </div>
 
