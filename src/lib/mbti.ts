@@ -1,5 +1,5 @@
-// MBTI Type Profiles
-export const MBTI_PROFILES: Record<string, { name: string; description: string }> = {
+// Nello 16 Personality Type Profiles
+export const NELLO_16_PROFILES: Record<string, { name: string; description: string }> = {
   INFP: {
     name: "O Idealista",
     description: "Idealista e compassivo, você é guiado por valores e pela busca de significado. Sensível e criativo, encontra sentido em servir e inspirar. Sua força está em transformar sentimento em beleza e fé em ação.",
@@ -125,9 +125,9 @@ export function getMBTIResults(answers: MBTIAnswer[]): {
     scores.J >= scores.P ? "J" : "P",
   ].join("");
 
-  const profileData = MBTI_PROFILES[type] || {
+  const profileData = NELLO_16_PROFILES[type] || {
     name: "Tipo Desconhecido",
-    description: "Não foi possível determinar seu tipo MBTI.",
+    description: "Não foi possível determinar seu perfil Nello 16.",
   };
 
   return {

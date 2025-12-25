@@ -483,12 +483,11 @@ export const TestsManagement = () => {
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <option value="mbti">MBTI</option>
+                  <option value="mbti">Nello 16 Personality</option>
                   <option value="disc">DISC</option>
                   <option value="eneagrama">Eneagrama</option>
-                  
                   <option value="temperamentos">Temperamentos</option>
-                  <option value="linguagens_amor">Linguagens do Amor</option>
+                  <option value="linguagens_amor">Estilos de Conexão Afetiva</option>
                   <option value="inteligencias_multiplas">Inteligências Múltiplas</option>
                   <option value="arquetipos">Arquétipos</option>
                   <option value="arquetipos_proposito">Arquétipos de Propósito</option>
