@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, type ReactNode } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useAuth } from "@/hooks/useAuth";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
@@ -17,8 +17,19 @@ import {
   BarChart3,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import { generateCodigoEssenciaPDF, generateCodigoEssenciaPDFBase64, getMissingTests } from "@/lib/pdfCodigoEssencia";
+import { getMissingTests } from "@/lib/pdfCodigoEssencia";
+import { generateCodigoEssenciaPremiumPDF, generateCodigoEssenciaPremiumPDFBase64 } from "@/lib/pdfCodigoEssenciaPremium";
+import { 
+  validateImpactBlocks, 
+  validatePlan90, 
+  validateRoutine, 
+  calculateScoreHighlights,
+  validatePeacePressure,
+  validateRarity,
+  validateTensions,
+  validateLifeAreas,
+  type LangKey,
+} from "@/lib/codigoEssenciaFallbacks";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,7 +60,7 @@ import {
   ProfileRarityBadge,
 } from "@/components/codigo-essencia";
 
-type LangKey = 'pt' | 'pt-pt' | 'en';
+// LangKey now imported from codigoEssenciaFallbacks
 
 const TRANSLATIONS = {
   pt: {
@@ -314,7 +325,12 @@ const CodigoEssenciaInner = () => {
 
   const handleDownloadPDF = () => {
     try {
-      generateCodigoEssenciaPDF({ userName, language: lang, testResults });
+      generateCodigoEssenciaPremiumPDF({ 
+        userName, 
+        language: lang, 
+        sections: generatedSections,
+        testResults 
+      });
       toast.success(t.pdfDownloaded);
     } catch (error) {
       console.error("Error generating PDF:", error);
@@ -326,7 +342,12 @@ const CodigoEssenciaInner = () => {
     if (!user?.email) return;
     setIsSendingEmail(true);
     try {
-      const pdfBase64 = generateCodigoEssenciaPDFBase64({ userName, language: lang, testResults });
+      const pdfBase64 = generateCodigoEssenciaPremiumPDFBase64({ 
+        userName, 
+        language: lang, 
+        sections: generatedSections,
+        testResults 
+      });
       const { error } = await supabase.functions.invoke('send-pdf-email', {
         body: { to: user.email, name: userName, testName: lang === 'en' ? 'Essence Code' : 'Código da Essência', testType: 'codigo_essencia', pdfBase64, language: lang }
       });
