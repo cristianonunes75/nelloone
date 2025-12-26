@@ -43,6 +43,10 @@ import {
   TalentsGiftsSection,
   VocationSection,
   ArchetypesMissionSection,
+  InternalTensionsSection,
+  LifeAreasSection,
+  PeacePressureSection,
+  ProfileRarityBadge,
 } from "@/components/codigo-essencia";
 
 type LangKey = 'pt' | 'pt-pt' | 'en';
@@ -355,7 +359,10 @@ const CodigoEssenciaInner = () => {
   const vocacaoSection = generatedSections.find(s => s.id === 'sua_vocacao');
   const arquetiposChamadoSection = generatedSections.find(s => s.id === 'arquetipos_chamado');
   const riscosDesvioSection = generatedSections.find(s => s.id === 'riscos_desvio');
-
+  const tensoesSection = generatedSections.find(s => s.id === 'tensoes_internas');
+  const areasVidaSection = generatedSections.find(s => s.id === 'areas_vida');
+  const pazPressaoSection = generatedSections.find(s => s.id === 'paz_pressao');
+  const raridadeSection = generatedSections.find(s => s.id === 'raridade_perfil');
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -457,13 +464,22 @@ const CodigoEssenciaInner = () => {
               />
             )}
             
-            {/* Score Highlights */}
-            {generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights && (
-              <ScoreHighlights 
-                highlights={generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights || []}
-                rarityNote={generatedSections.find(s => s.id === 'retrato_essencial')?.rarity_note}
-                language={lang}
-              />
+            {/* Score Highlights + Rarity */}
+            {(generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights || raridadeSection) && (
+              <div className="space-y-3">
+                <ScoreHighlights 
+                  highlights={generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights || []}
+                  rarityNote={generatedSections.find(s => s.id === 'retrato_essencial')?.rarity_note}
+                  language={lang}
+                />
+                {raridadeSection && (
+                  <ProfileRarityBadge 
+                    percentage={raridadeSection.percentage}
+                    explanation={raridadeSection.explanation}
+                    language={lang}
+                  />
+                )}
+              </div>
             )}
             
             {/* Impact Blocks - 4 columns on desktop */}
@@ -507,6 +523,18 @@ const CodigoEssenciaInner = () => {
 
             <SectionDivider variant="line" />
 
+            {/* === NEW: Peace vs Pressure === */}
+            {pazPressaoSection && (
+              <>
+                <PeacePressureSection 
+                  inPeace={pazPressaoSection.in_peace}
+                  underPressure={pazPressaoSection.under_pressure}
+                  language={lang}
+                />
+                <SectionDivider variant="dots" />
+              </>
+            )}
+
             {/* === SECTION 3: Confrontation (Direct, impactful) === */}
             {confrontationData && confrontationData.title && (
               <ConfrontationSection 
@@ -520,6 +548,17 @@ const CodigoEssenciaInner = () => {
             )}
 
             <SectionDivider variant="gradient" />
+
+            {/* === NEW: Life Areas Reading === */}
+            {areasVidaSection?.items?.length > 0 && (
+              <>
+                <LifeAreasSection 
+                  areas={areasVidaSection.items}
+                  language={lang}
+                />
+                <SectionDivider variant="dots" />
+              </>
+            )}
 
             {/* === SECTION 4: Purpose (Manifesto style) === */}
             {purposeData && purposeData.manifesto && (
@@ -560,6 +599,17 @@ const CodigoEssenciaInner = () => {
                 deviationRisks={riscosDesvioSection?.items}
                 language={lang}
               />
+            )}
+
+            {/* === NEW: Internal Tensions === */}
+            {tensoesSection?.items?.length > 0 && (
+              <>
+                <SectionDivider variant="wave" />
+                <InternalTensionsSection 
+                  tensions={tensoesSection.items}
+                  language={lang}
+                />
+              </>
             )}
 
             <SectionDivider variant="wave" />
