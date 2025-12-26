@@ -39,7 +39,12 @@ import {
   PatternCard,
   TimelinePath,
   DailyRoutineChecklist,
-  ProfileSummaryCard,
+  QuickSummary,
+  EssenceRadarChart,
+  EssenceIndicators,
+  ConfrontationSection,
+  PurposeManifesto,
+  CollapsibleSection,
 } from "@/components/codigo-essencia";
 
 const SECTION_CONFIG: Record<string, { title: Record<string, string>; icon: React.ReactNode; color: string }> = {
@@ -62,6 +67,11 @@ const SECTION_CONFIG: Record<string, { title: Record<string, string>; icon: Reac
     title: { pt: "Suas Sombras e Bloqueios", 'pt-pt': "As Tuas Sombras e Bloqueios", en: "Your Shadows and Blocks" },
     icon: <Shield className="w-5 h-5" />,
     color: "from-amber-500/20 to-orange-500/20 border-amber-500/30"
+  },
+  confronto: {
+    title: { pt: "A Verdade Que Você Precisa Encarar", 'pt-pt': "A Verdade Que Precisas de Encarar", en: "The Truth You Need to Face" },
+    icon: <AlertCircle className="w-5 h-5" />,
+    color: "from-rose-500/20 to-orange-500/20 border-rose-500/30"
   },
   seu_proposito: { 
     title: { pt: "Seu Propósito Natural", 'pt-pt': "O Teu Propósito Natural", en: "Your Natural Purpose" },
@@ -88,7 +98,7 @@ const SECTION_CONFIG: Record<string, { title: Record<string, string>; icon: Reac
 const TRANSLATIONS = {
   pt: {
     title: "Código da Essência",
-    subtitle: "Seu Relatório Personalizado",
+    subtitle: "Seu Diagnóstico Personalizado",
     description: "seu retrato está pronto.",
     loading: "Carregando...",
     generating: "Gerando seu código...",
@@ -109,10 +119,11 @@ const TRANSLATIONS = {
     pdfDownloaded: "PDF baixado!",
     pdfError: "Erro ao gerar PDF.",
     generateCode: "Gerar meu Código",
+    closingQuestion: "O que, a partir de hoje, você escolhe viver de forma diferente?",
   },
   'pt-pt': {
     title: "Código da Essência",
-    subtitle: "O Teu Relatório Personalizado",
+    subtitle: "O Teu Diagnóstico Personalizado",
     description: "o teu retrato está pronto.",
     loading: "A carregar...",
     generating: "A gerar o teu código...",
@@ -133,10 +144,11 @@ const TRANSLATIONS = {
     pdfDownloaded: "PDF transferido!",
     pdfError: "Erro ao gerar PDF.",
     generateCode: "Gerar o meu Código",
+    closingQuestion: "O que, a partir de hoje, escolhes viver de forma diferente?",
   },
   en: {
     title: "Essence Code",
-    subtitle: "Your Personalized Report",
+    subtitle: "Your Personalized Diagnosis",
     description: "your portrait is ready.",
     loading: "Loading...",
     generating: "Generating your code...",
@@ -157,6 +169,7 @@ const TRANSLATIONS = {
     pdfDownloaded: "PDF downloaded!",
     pdfError: "Error generating PDF.",
     generateCode: "Generate my Code",
+    closingQuestion: "What, starting today, do you choose to live differently?",
   },
 };
 
@@ -185,6 +198,57 @@ const CodigoEssencia = () => {
   const missingTests = useMemo(() => {
     return getMissingTests(testResults, lang);
   }, [testResults, lang]);
+
+  // Extract visual data from sections for the new components
+  const visualData = useMemo(() => {
+    const retratoSection = generatedSections.find(s => s.id === 'retrato_essencial');
+    return retratoSection?.visual_data || null;
+  }, [generatedSections]);
+
+  const quickSummaryData = useMemo(() => {
+    const retratoSection = generatedSections.find(s => s.id === 'retrato_essencial');
+    const impactBlocks = retratoSection?.impact_blocks;
+    const bullets = retratoSection?.bullets || [];
+    
+    // Extract strengths (positive bullets) and alerts (shadow bullets)
+    const strengths = bullets.filter((_: string, i: number) => i < 3);
+    const alerts = bullets.filter((_: string, i: number) => i >= 3);
+    
+    return {
+      strengths: strengths.length > 0 ? strengths : [impactBlocks?.gift, impactBlocks?.calling].filter(Boolean),
+      alerts: alerts.length > 0 ? alerts : [impactBlocks?.risk].filter(Boolean),
+      direction: impactBlocks?.calling || ""
+    };
+  }, [generatedSections]);
+
+  const confrontationData = useMemo(() => {
+    const shadows = generatedSections.find(s => s.id === 'suas_sombras');
+    const funciona = generatedSections.find(s => s.id === 'como_voce_funciona');
+    
+    if (!shadows?.items?.[0] && !funciona?.shadow) return null;
+    
+    const mainPattern = shadows?.items?.[0] || {};
+    return {
+      title: mainPattern.pattern || funciona?.shadow || "",
+      crossReference: shadows?.source || "DISC + Temperamento + Eneagrama",
+      strengthens: funciona?.strength || "",
+      sabotages: mainPattern.situation || funciona?.shadow || "",
+      question: mainPattern.exit || lang === 'en' 
+        ? "What will you keep losing if you don't change this?" 
+        : "O que você vai continuar perdendo se não mudar isso?"
+    };
+  }, [generatedSections, lang]);
+
+  const purposeData = useMemo(() => {
+    const proposito = generatedSections.find(s => s.id === 'seu_proposito');
+    if (!proposito) return null;
+    
+    return {
+      manifesto: proposito.motivation || "",
+      expressions: [proposito.daily_example, proposito.invitation].filter(Boolean),
+      risk: proposito.common_error || ""
+    };
+  }, [generatedSections]);
 
   useEffect(() => {
     if (savedCodigo && savedCodigo.sections && savedCodigo.sections.length > 0 && !hasGenerated) {
@@ -269,48 +333,21 @@ const CodigoEssencia = () => {
       color: "from-gray-500/20 to-gray-400/20 border-gray-500/30" 
     };
 
-    // Essential Portrait with visual data
-    if (section.id === 'retrato_essencial') {
+    // Skip retrato_essencial - handled separately with new components
+    if (section.id === 'retrato_essencial') return null;
+
+    // How You Function - Collapsible
+    if (section.id === 'como_voce_funciona') {
       return (
-        <div className={cn("bg-gradient-to-br border rounded-2xl p-6 space-y-6", config.color)}>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">{config.icon}</div>
-            <h3 className="text-2xl font-bold">{section.title || config.title[lang]}</h3>
-          </div>
-
-          {/* Impact Blocks */}
-          {section.impact_blocks && (
-            <ImpactBlocks 
-              essence={section.impact_blocks.essence}
-              risk={section.impact_blocks.risk}
-              calling={section.impact_blocks.calling}
-              gift={section.impact_blocks.gift}
-              language={lang}
-            />
-          )}
-
-          {/* Visual Data Charts */}
-          {section.visual_data && (
-            <div className="grid gap-6 md:grid-cols-2 mt-6">
-              {section.visual_data.disc && <div className="bg-background/60 rounded-xl p-4"><h4 className="font-semibold mb-3">DISC</h4><DISCChart results={section.visual_data.disc} language={lang} /></div>}
-              {section.visual_data.temperament && <div className="bg-background/60 rounded-xl p-4"><h4 className="font-semibold mb-3">{lang === 'en' ? 'Temperament' : 'Temperamento'}</h4><TemperamentChart results={section.visual_data.temperament} language={lang} /></div>}
-              {section.visual_data.intelligences && <div className="bg-background/60 rounded-xl p-4"><h4 className="font-semibold mb-3">{lang === 'en' ? 'Top Intelligences' : 'Inteligências'}</h4><IntelligenceRanking results={section.visual_data.intelligences} language={lang} /></div>}
-              {section.visual_data.connection_style && <div className="bg-background/60 rounded-xl p-4"><h4 className="font-semibold mb-3">{lang === 'en' ? 'Connection Style' : 'Estilo de Conexão'}</h4><ConnectionStyleChart results={section.visual_data.connection_style} language={lang} /></div>}
-            </div>
-          )}
-
-          {/* Bullets */}
-          {section.bullets && (
-            <ul className="space-y-2 mt-4">
-              {section.bullets.map((b: string, i: number) => (
-                <li key={i} className="flex items-start gap-3 bg-background/40 rounded-lg p-3">
-                  <span className="text-primary font-bold">•</span>
-                  <span>{b}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <CollapsibleSection
+          icon={config.icon}
+          title={section.title || config.title[lang]}
+          color={config.color}
+          synthesis={section.mirror || ""}
+          bullets={[section.strength, section.shadow, section.invitation].filter(Boolean)}
+          deepContent={section.paragraphs?.join('\n') || undefined}
+          language={lang}
+        />
       );
     }
 
@@ -332,8 +369,8 @@ const CodigoEssencia = () => {
       );
     }
 
-    // Shadows with items
-    if (section.id === 'suas_sombras' && section.items) {
+    // Shadows - skip if we have confrontation section
+    if (section.id === 'suas_sombras') {
       return (
         <div className={cn("bg-gradient-to-br border rounded-2xl p-6", config.color)}>
           <div className="flex items-center gap-3 mb-4">
@@ -341,13 +378,20 @@ const CodigoEssencia = () => {
             <h3 className="text-xl font-bold">{section.title || config.title[lang]}</h3>
           </div>
           {section.source && <p className="text-xs text-muted-foreground uppercase tracking-wide mb-4">{section.source}</p>}
-          <div className="space-y-3">
-            {section.items.map((item: any, i: number) => (
-              <PatternCard key={i} pattern={item.pattern} situation={item.situation} exit={item.exit} variant="warning" language={lang} />
-            ))}
-          </div>
+          {section.items && (
+            <div className="space-y-3">
+              {section.items.slice(1).map((item: any, i: number) => (
+                <PatternCard key={i} pattern={item.pattern} situation={item.situation} exit={item.exit} variant="warning" language={lang} />
+              ))}
+            </div>
+          )}
         </div>
       );
+    }
+
+    // Purpose - use new PurposeManifesto
+    if (section.id === 'seu_proposito') {
+      return null; // Handled by purposeData
     }
 
     // 90-day plan
@@ -376,7 +420,27 @@ const CodigoEssencia = () => {
       );
     }
 
-    // Default section (mirror/strength/shadow/invitation or paragraphs)
+    // Final conversation - simplified
+    if (section.id === 'conversa_final') {
+      return (
+        <div className={cn("bg-gradient-to-br border rounded-2xl p-6", config.color)}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">{config.icon}</div>
+            <h3 className="text-xl font-bold">{section.title || config.title[lang]}</h3>
+          </div>
+          <div className="space-y-4">
+            {section.paragraphs?.slice(0, 3).map((p: string, i: number) => (
+              <p key={i} className="leading-relaxed text-sm">{p}</p>
+            ))}
+            <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 text-center mt-6">
+              <p className="text-lg font-medium italic">"{t.closingQuestion}"</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Default section
     return (
       <div className={cn("bg-gradient-to-br border rounded-2xl p-6", config.color)}>
         <div className="flex items-center gap-3 mb-4">
@@ -384,15 +448,11 @@ const CodigoEssencia = () => {
           <h3 className="text-xl font-bold">{section.title || config.title?.[lang]}</h3>
         </div>
         {section.source && <p className="text-xs text-muted-foreground uppercase tracking-wide mb-4">{section.source}</p>}
-        
         <div className="space-y-4">
           {section.mirror && <div className="flex items-start gap-2"><span>🪞</span><p>{section.mirror}</p></div>}
           {section.strength && <div className="flex items-start gap-2 bg-emerald-500/10 rounded-lg p-3"><span>🌟</span><p>{section.strength}</p></div>}
           {section.shadow && <div className="flex items-start gap-2 bg-amber-500/10 rounded-lg p-3"><span>⚠️</span><p>{section.shadow}</p></div>}
           {section.invitation && <div className="flex items-start gap-2 bg-primary/10 rounded-lg p-3"><span>🎯</span><p className="font-medium">{section.invitation}</p></div>}
-          {section.motivation && <div><p className="text-sm text-muted-foreground">{lang === 'en' ? 'What moves you:' : 'O que te move:'}</p><p className="font-medium">{section.motivation}</p></div>}
-          {section.daily_example && <div><p className="text-sm text-muted-foreground">{lang === 'en' ? 'In daily life:' : 'No dia a dia:'}</p><p>{section.daily_example}</p></div>}
-          {section.common_error && <div className="bg-amber-500/10 rounded-lg p-3"><p className="text-sm text-muted-foreground">{lang === 'en' ? 'Where you err:' : 'Onde você erra:'}</p><p>{section.common_error}</p></div>}
           {section.paragraphs && section.paragraphs.map((p: string, i: number) => <p key={i} className="leading-relaxed">{p}</p>)}
         </div>
       </div>
@@ -460,18 +520,25 @@ const CodigoEssencia = () => {
 
       <main className="container px-4 py-8">
         <div className="max-w-4xl mx-auto">
+          {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-4"><Sparkles className="w-8 h-8 text-primary" /></div>
+            <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-8 h-8 text-primary" />
+            </div>
             <h1 className="text-4xl font-bold mb-2">{t.title}</h1>
             <p className="text-lg text-primary font-medium mb-2">{t.subtitle}</p>
             <p className="text-muted-foreground">{firstName}, {t.description}</p>
           </div>
 
+          {/* Completed badge */}
           <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-8 flex items-center justify-center gap-3">
             <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-            <span className="text-emerald-700 dark:text-emerald-400 font-medium">{lang === 'en' ? 'All 7 tests completed!' : 'Todos os 7 testes completos!'}</span>
+            <span className="text-emerald-700 dark:text-emerald-400 font-medium">
+              {lang === 'en' ? 'All 7 tests completed!' : 'Todos os 7 testes completos!'}
+            </span>
           </div>
 
+          {/* Generate button */}
           {!hasGenerated && canGenerateReport && (
             <div className="bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 border border-primary/20 rounded-2xl p-8 text-center mb-8">
               <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
@@ -483,10 +550,71 @@ const CodigoEssencia = () => {
             </div>
           )}
 
+          {/* Generated content with NEW structure */}
           {hasGenerated && generatedSections.length > 0 && (
             <div className="space-y-6 mb-8">
-              {generatedSections.map((section, index) => <div key={section.id || index}>{renderSection(section)}</div>)}
-              <div className="bg-muted/50 rounded-xl p-4 text-center"><p className="text-sm text-muted-foreground">{t.disclaimer}</p></div>
+              {/* 1. Quick Summary - 60 seconds */}
+              {quickSummaryData.strengths.length > 0 && (
+                <QuickSummary 
+                  strengths={quickSummaryData.strengths}
+                  alerts={quickSummaryData.alerts}
+                  direction={quickSummaryData.direction}
+                  language={lang}
+                />
+              )}
+
+              {/* 2. Radar Chart - Visual Map */}
+              {visualData && (
+                <EssenceRadarChart 
+                  disc={visualData.disc}
+                  temperament={visualData.temperament?.scores}
+                  intelligences={visualData.intelligences?.scores}
+                  language={lang}
+                />
+              )}
+
+              {/* 3. Essence Indicators */}
+              {visualData && (
+                <EssenceIndicators 
+                  disc={visualData.disc}
+                  temperament={visualData.temperament}
+                  connectionStyle={visualData.connection_style}
+                  language={lang}
+                />
+              )}
+
+              {/* 4. Confrontation Section */}
+              {confrontationData && confrontationData.title && (
+                <ConfrontationSection 
+                  title={confrontationData.title}
+                  crossReference={confrontationData.crossReference}
+                  strengthens={confrontationData.strengthens}
+                  sabotages={confrontationData.sabotages}
+                  question={confrontationData.question}
+                  language={lang}
+                />
+              )}
+
+              {/* 5. Purpose Manifesto */}
+              {purposeData && purposeData.manifesto && (
+                <PurposeManifesto 
+                  manifesto={purposeData.manifesto}
+                  expressions={purposeData.expressions}
+                  risk={purposeData.risk}
+                  language={lang}
+                />
+              )}
+
+              {/* 6. Remaining sections */}
+              {generatedSections.map((section, index) => {
+                const rendered = renderSection(section);
+                return rendered ? <div key={section.id || index}>{rendered}</div> : null;
+              })}
+
+              {/* Disclaimer */}
+              <div className="bg-muted/50 rounded-xl p-4 text-center">
+                <p className="text-sm text-muted-foreground">{t.disclaimer}</p>
+              </div>
             </div>
           )}
         </div>
