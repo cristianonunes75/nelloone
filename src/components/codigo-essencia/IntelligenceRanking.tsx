@@ -35,30 +35,42 @@ const INTELLIGENCE_EMOJI: Record<string, string> = {
 
 export const IntelligenceRanking = ({ results, language = "pt" }: IntelligenceRankingProps) => {
   const lang = language === "en" ? "en" : language === "pt-pt" ? "pt-pt" : "pt";
-  
+
+  const toKey = (value: unknown) => {
+    if (typeof value === "string") return value.toLowerCase();
+    if (typeof value === "number") return String(value).toLowerCase();
+    return String(value ?? "").toLowerCase();
+  };
+
   const intelligenceData = useMemo(() => {
     if (!results?.scores) {
       // Fallback to top array if scores not available
       if (results?.top) {
-        return results.top.slice(0, 5).map((key, index) => ({
-          key: key.toLowerCase(),
-          label: INTELLIGENCE_LABELS[key.toLowerCase()]?.[lang] || key,
-          rank: index + 1,
-          isTop3: index < 3,
-        }));
+        return results.top.slice(0, 5).map((key, index) => {
+          const k = toKey(key);
+          return {
+            key: k,
+            label: INTELLIGENCE_LABELS[k]?.[lang] || String(key),
+            rank: index + 1,
+            isTop3: index < 3,
+          };
+        });
       }
       return [];
     }
-    
+
     return Object.entries(results.scores)
       .sort(([, a], [, b]) => (b || 0) - (a || 0))
       .slice(0, 5)
-      .map(([key], index) => ({
-        key: key.toLowerCase(),
-        label: INTELLIGENCE_LABELS[key.toLowerCase()]?.[lang] || key,
-        rank: index + 1,
-        isTop3: index < 3,
-      }));
+      .map(([key], index) => {
+        const k = toKey(key);
+        return {
+          key: k,
+          label: INTELLIGENCE_LABELS[k]?.[lang] || String(key),
+          rank: index + 1,
+          isTop3: index < 3,
+        };
+      });
   }, [results, lang]);
 
   if (intelligenceData.length === 0) return null;
