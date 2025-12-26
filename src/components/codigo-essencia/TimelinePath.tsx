@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { Target, Dumbbell, HelpCircle, CheckCircle2 } from "lucide-react";
 
 interface MonthData {
   month: number;
@@ -20,87 +19,46 @@ export const TimelinePath = ({ months, language = "pt" }: TimelinePathProps) => 
   const labels = {
     month: { pt: "Mês", "pt-pt": "Mês", en: "Month" },
     focus: { pt: "Foco", "pt-pt": "Foco", en: "Focus" },
-    practice: { pt: "Prática", "pt-pt": "Prática", en: "Practice" },
-    check: { pt: "Verificar", "pt-pt": "Verificar", en: "Check" },
+    practice: { pt: "Faça", "pt-pt": "Faz", en: "Do" },
+    check: { pt: "Pergunte-se", "pt-pt": "Pergunta-te", en: "Ask yourself" },
   };
 
-  const monthColors = [
-    { bg: "bg-blue-500", light: "bg-blue-500/10", border: "border-blue-500/30" },
-    { bg: "bg-purple-500", light: "bg-purple-500/10", border: "border-purple-500/30" },
-    { bg: "bg-emerald-500", light: "bg-emerald-500/10", border: "border-emerald-500/30" },
-  ];
+  const monthColors = ["bg-blue-500", "bg-purple-500", "bg-emerald-500"];
 
   if (!months || months.length === 0) return null;
 
   return (
-    <div className="relative">
-      {/* Timeline line */}
-      <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-emerald-500 hidden md:block" />
-      
-      <div className="space-y-4 md:space-y-6">
-        {months.map((month, index) => {
-          const color = monthColors[index % monthColors.length];
-          
-          return (
-            <div 
-              key={month.month || index}
-              className={cn(
-                "relative rounded-xl border p-4 md:p-5 md:ml-12",
-                color.light,
-                color.border
-              )}
-            >
-              {/* Timeline dot - desktop */}
-              <div className={cn(
-                "absolute -left-[3.25rem] top-5 w-4 h-4 rounded-full hidden md:flex items-center justify-center",
-                color.bg
-              )}>
-                <div className="w-2 h-2 rounded-full bg-white" />
-              </div>
+    <div className="flex flex-col md:flex-row gap-3">
+      {months.map((month, index) => (
+        <div 
+          key={month.month || index}
+          className="flex-1 rounded-xl bg-background/50 border border-border p-4"
+        >
+          {/* Month badge */}
+          <div className={cn("inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-white text-xs font-bold mb-3", monthColors[index % monthColors.length])}>
+            {labels.month[lang]} {month.month}
+          </div>
 
-              {/* Month header */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold", color.bg)}>
-                  {month.month}
-                </div>
-                <h4 className="font-bold text-lg">
-                  {labels.month[lang]} {month.month}
-                </h4>
-              </div>
+          {/* Focus */}
+          <div className="mb-2">
+            <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{labels.focus[lang]}</span>
+            <p className="font-semibold text-sm leading-snug">{month.focus}</p>
+          </div>
 
-              {/* Content grid */}
-              <div className="grid gap-3 md:grid-cols-3">
-                {/* Focus */}
-                <div className="p-3 rounded-lg bg-background/60">
-                  <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground mb-2">
-                    <Target className="w-3.5 h-3.5" />
-                    {labels.focus[lang]}
-                  </div>
-                  <p className="font-medium">{month.focus}</p>
-                </div>
+          {/* Practice */}
+          <div className="mb-2">
+            <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{labels.practice[lang]}</span>
+            <p className="text-xs leading-snug">{month.practice}</p>
+          </div>
 
-                {/* Practice */}
-                <div className="p-3 rounded-lg bg-background/60">
-                  <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground mb-2">
-                    <Dumbbell className="w-3.5 h-3.5" />
-                    {labels.practice[lang]}
-                  </div>
-                  <p>{month.practice}</p>
-                </div>
-
-                {/* Check */}
-                <div className="p-3 rounded-lg bg-background/60">
-                  <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground mb-2">
-                    <HelpCircle className="w-3.5 h-3.5" />
-                    {labels.check[lang]}
-                  </div>
-                  <p className="italic text-sm">{month.check || month.question}</p>
-                </div>
-              </div>
+          {/* Check */}
+          {(month.check || month.question) && (
+            <div className="p-2 rounded-md bg-muted/50 mt-2">
+              <p className="text-xs italic leading-snug">"{month.check || month.question}"</p>
             </div>
-          );
-        })}
-      </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
