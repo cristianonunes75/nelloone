@@ -1,15 +1,15 @@
 {
-  "greeting": "Olá, sou o Nello AI — o teu guia interior no NELLO ONE.",
-  "intro": "O meu propósito é ajudar-te a compreenderes-te com clareza, profundidade e leveza. Juntos, exploramos os teus padrões, forças, pontos cegos e potencial. Estou aqui para te ajudar a crescer de dentro para fora.",
+  "greeting": "\"Olá, sou o Nello — o teu guia no NELLO ONE.\"",
+  "intro": "\"O meu propósito é ajudar-te a compreenderes-te com clareza e verdade. Estou aqui para caminhar ao teu lado.\"",
   "placeholder": "Escreve a tua mensagem...",
-  "typing": "O Nello AI está a pensar...",
-  "error": "Desculpa, tive um momento de pausa. Podes repetir o que disseste?",
+  "typing": "O Nello está a pensar...",
+  "error": "\"Desculpa, tive um momento de pausa. Podes repetir o que disseste?\"",
   "subtitle": "O teu guia no NELLO ONE",
-  "landingGreeting": "Olá{name}! Sou o Nello AI, o teu guia no NELLO ONE.\n\nO NELLO ONE combina ciência da personalidade, design emocional e IA para revelar padrões internos que transformam a forma como te vês, decides e relacionas.\n\nO caminho começa por dentro. Como posso ajudar-te hoje?",
-  "clienteGreetingNew": "Estás no início da tua jornada de autodescoberta. O primeiro passo é o teste de Arquétipos, que irá revelar a energia que te move. Quando estiveres pronto, é só começar!",
-  "clienteGreetingProgress": "Completaste {count} teste{plural}. Continua a tua jornada para descobrires mais sobre quem és.",
-  "clienteGreetingComplete": "Parabéns! Completaste todos os testes. O teu Mapa NELLO ONE está pronto para ser revelado!",
-  "clienteGreetingIntro": "Olá{name}! Que bom ver-te aqui.\n\n{progress}\n\nComo posso ajudar-te?",
+  "landingGreeting": "\"Bom ver-te por aqui{name}! Sou o Nello, o teu guia no NELLO ONE.\n\nO caminho começa por dentro. Como posso ajudar-te hoje?\"",
+  "clienteGreetingNew": "\"Estás no início da tua jornada. O primeiro passo é o teste de Arquétipos, que irá revelar a energia que te move. Quando estiveres pronto, é só começar!\"",
+  "clienteGreetingProgress": "\"Completaste {count} teste{plural}. Continua a tua jornada para descobrires mais sobre quem és.\"",
+  "clienteGreetingComplete": "\"Parabéns! Completaste todos os testes. O teu Código da Essência está pronto para ser revelado!\"",
+  "clienteGreetingIntro": "\"Que bom ver-te aqui{name}!\n\n{progress}\n\nComo posso ajudar-te?\"",
   "quickReplies": {
     "landing": {
       "whatIs": "O que é o NELLO ONE?",
@@ -45,8 +45,8 @@
         "nextTestAction": "Fala-me sobre o próximo teste.",
         "myResults": "Os meus resultados",
         "myResultsAction": "Quero compreender melhor os meus resultados.",
-        "nelloMap": "Mapa NELLO ONE",
-        "nelloMapAction": "O que é o Mapa NELLO ONE?"
+        "nelloMap": "Código da Essência",
+        "nelloMapAction": "O que é o Código da Essência?"
       }
     }
   }
