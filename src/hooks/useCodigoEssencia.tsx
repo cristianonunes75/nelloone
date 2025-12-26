@@ -3,10 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import type { Json } from "@/integrations/supabase/types";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface CodigoSection {
   id: string;
-  title: string;
-  content: string;
+  title?: string;
+  content?: string;
+  [key: string]: any; // Allow additional properties from AI generation
 }
 
 interface SavedCodigo {
