@@ -98,11 +98,11 @@ export default function NelloConcierge() {
 
   return (
     <Card className="fixed bottom-6 right-6 w-96 h-[500px] shadow-xl flex flex-col">
-      <CardHeader className="bg-primary text-primary-foreground rounded-t-lg flex-shrink-0">
+      <CardHeader className="bg-ink-blue text-primary-foreground rounded-t-lg flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5" />
-            <CardTitle className="text-lg">NELLO ONE Concierge</CardTitle>
+            <CardTitle className="text-lg">Nello</CardTitle>
           </div>
           <Button
             variant="ghost"
@@ -118,11 +118,12 @@ export default function NelloConcierge() {
         <ScrollArea className="flex-1 p-4" ref={scrollRef}>
           {displayMessages.length === 0 && (
             <div className="text-center text-muted-foreground py-8">
-              <Sparkles className="h-12 w-12 mx-auto mb-4 text-primary" />
-              <p className="font-medium mb-2">Olá! Sou o NELLO ONE Concierge</p>
+              <Sparkles className="h-12 w-12 mx-auto mb-4 text-ink-blue" />
+              <p className="font-medium mb-2">"Bom te ver por aqui!"</p>
               <p className="text-sm">
-                Estou aqui para ajudar você a entender seus resultados e guiar sua jornada de autoconhecimento!
+                "Estou aqui para caminhar ao seu lado nessa jornada de autoconhecimento."
               </p>
+              <p className="text-xs mt-2 opacity-70">— Nello</p>
             </div>
           )}
           <div className="space-y-4">
