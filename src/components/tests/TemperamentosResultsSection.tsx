@@ -24,7 +24,7 @@ const TEMPERAMENT_DATA = {
       strengths: ['Carisma natural', 'Comunicação fluida', 'Sociabilidade elevada', 'Otimismo contagiante', 'Criatividade relacional', 'Adaptabilidade'],
       fragilities: ['Dificuldade com disciplina', 'Procrastinação emocional', 'Impulso por agradar', 'Vulnerabilidade a críticas', 'Falta de foco prolongado', 'Superficialidade em vínculos'],
       light: 'Você movimenta corações. Sua presença muda ambientes e ilumina pessoas.',
-      miguelMessage: 'Sua alma é festa. Você transforma ambientes pesados em lugares leves. Mas cuidado: nem toda alegria é saúde. Às vezes você sorri para esconder. Aprenda a ser leve E profundo.',
+      nelloMessage: 'Sua alma é festa. Você transforma ambientes pesados em lugares leves. Mas cuidado: nem toda alegria é saúde. Às vezes você sorri para esconder. Aprenda a ser leve E profundo.',
       expansion: ['Criar rotina emocional', 'Praticar constância', 'Reduzir impulsividade', 'Aprofundar vínculos', 'Aceitar momentos de solidão'],
       sevenDayPlan: [
         'Termine uma tarefa antes de começar outra',
@@ -48,7 +48,7 @@ const TEMPERAMENT_DATA = {
       strengths: ['Natural charisma', 'Fluid communication', 'High sociability', 'Contagious optimism', 'Relational creativity', 'Adaptability'],
       fragilities: ['Difficulty with discipline', 'Emotional procrastination', 'Urge to please', 'Vulnerability to criticism', 'Lack of prolonged focus', 'Superficiality in bonds'],
       light: 'You move hearts. Your presence changes environments and illuminates people.',
-      miguelMessage: 'Your soul is a celebration. You transform heavy environments into light places. But be careful: not all joy is health. Sometimes you smile to hide. Learn to be light AND deep.',
+      nelloMessage: 'Your soul is a celebration. You transform heavy environments into light places. But be careful: not all joy is health. Sometimes you smile to hide. Learn to be light AND deep.',
       expansion: ['Create emotional routine', 'Practice constancy', 'Reduce impulsivity', 'Deepen bonds', 'Accept moments of solitude'],
       sevenDayPlan: [
         'Finish one task before starting another',
@@ -74,7 +74,7 @@ const TEMPERAMENT_DATA = {
       strengths: ['Decisão rápida e certeira', 'Liderança natural', 'Clareza de propósito', 'Coragem para enfrentar desafios', 'Produtividade elevada', 'Capacidade de resolver problemas'],
       fragilities: ['Dureza no trato pessoal', 'Impaciência com processos lentos', 'Dificuldade em delegar', 'Tendência a controlar demais', 'Pouca tolerância a erros', 'Desconexão emocional sob pressão'],
       light: 'Você abre caminhos que outros têm medo de atravessar. Sua força move montanhas.',
-      miguelMessage: 'Vejo em você uma força que poucos têm. Sua energia é fogo que ilumina ou queima. Quando você aprende a dosar essa intensidade, você se torna líder de verdade — não por imposição, mas por inspiração.',
+      nelloMessage: 'Vejo em você uma força que poucos têm. Sua energia é fogo que ilumina ou queima. Quando você aprende a dosar essa intensidade, você se torna líder de verdade — não por imposição, mas por inspiração.',
       expansion: ['Suavizar o tom nas conversas', 'Pausar antes de reagir', 'Ampliar a empatia', 'Praticar a escuta ativa', 'Aceitar que nem tudo depende de você'],
       sevenDayPlan: [
         'Ouça alguém sem interromper',
@@ -98,7 +98,7 @@ const TEMPERAMENT_DATA = {
       strengths: ['Quick and accurate decisions', 'Natural leadership', 'Clarity of purpose', 'Courage to face challenges', 'High productivity', 'Problem-solving ability'],
       fragilities: ['Harshness in personal dealings', 'Impatience with slow processes', 'Difficulty delegating', 'Tendency to over-control', 'Low tolerance for mistakes', 'Emotional disconnection under pressure'],
       light: 'You open paths that others are afraid to cross. Your strength moves mountains.',
-      miguelMessage: 'I see in you a strength that few have. Your energy is fire that illuminates or burns. When you learn to dose this intensity, you become a true leader — not by imposition, but by inspiration.',
+      nelloMessage: 'I see in you a strength that few have. Your energy is fire that illuminates or burns. When you learn to dose this intensity, you become a true leader — not by imposition, but by inspiration.',
       expansion: ['Soften the tone in conversations', 'Pause before reacting', 'Expand empathy', 'Practice active listening', 'Accept that not everything depends on you'],
       sevenDayPlan: [
         'Listen to someone without interrupting',
@@ -124,7 +124,7 @@ const TEMPERAMENT_DATA = {
       strengths: ['Empatia profunda', 'Memória emocional rica', 'Cuidado com detalhes', 'Reflexão antes de agir', 'Profundidade estética e espiritual', 'Capacidade analítica'],
       fragilities: ['Autocrítica excessiva', 'Timidez emocional', 'Medo de errar', 'Desânimo diante de caos', 'Perfeccionismo paralisante', 'Tendência à melancolia'],
       light: 'Sua alma enxerga o que outros não veem. Você sente com verdade e profundidade.',
-      miguelMessage: 'Você carrega um universo interno que poucos conhecem. Sua profundidade é dom, não fardo. Aprenda a não se afogar no que sente. A clareza vem quando você para de se julgar.',
+      nelloMessage: 'Você carrega um universo interno que poucos conhecem. Sua profundidade é dom, não fardo. Aprenda a não se afogar no que sente. A clareza vem quando você para de se julgar.',
       expansion: ['Reduzir autocrítica', 'Simplificar expectativas', 'Praticar ações rápidas', 'Fortalecer coragem emocional', 'Aceitar imperfeição'],
       sevenDayPlan: [
         'Nomeie um sentimento sem julgá-lo',
@@ -148,7 +148,7 @@ const TEMPERAMENT_DATA = {
       strengths: ['Deep empathy', 'Rich emotional memory', 'Attention to detail', 'Reflection before action', 'Aesthetic and spiritual depth', 'Analytical capacity'],
       fragilities: ['Excessive self-criticism', 'Emotional shyness', 'Fear of making mistakes', 'Discouragement in chaos', 'Paralyzing perfectionism', 'Tendency toward melancholy'],
       light: 'Your soul sees what others cannot see. You feel with truth and depth.',
-      miguelMessage: 'You carry an inner universe that few know. Your depth is a gift, not a burden. Learn not to drown in what you feel. Clarity comes when you stop judging yourself.',
+      nelloMessage: 'You carry an inner universe that few know. Your depth is a gift, not a burden. Learn not to drown in what you feel. Clarity comes when you stop judging yourself.',
       expansion: ['Reduce self-criticism', 'Simplify expectations', 'Practice quick actions', 'Strengthen emotional courage', 'Accept imperfection'],
       sevenDayPlan: [
         'Name a feeling without judging it',
@@ -174,7 +174,7 @@ const TEMPERAMENT_DATA = {
       strengths: ['Paciência elevada', 'Equilíbrio emocional', 'Capacidade de mediação', 'Lealdade profunda', 'Escuta atenta', 'Consistência'],
       fragilities: ['Medo de conflito', 'Passividade excessiva', 'Dificuldade em decidir', 'Resistência a mudanças', 'Tendência a postergar', 'Dificuldade em expressar necessidades'],
       light: 'Você é âncora em meio à tempestade. Sua calma é refúgio para muitos.',
-      miguelMessage: 'Sua paz é real, mas às vezes você se esconde nela. A tranquilidade é sua força — mas não pode virar prisão. Você precisa aprender a agir, mesmo sem garantias.',
+      nelloMessage: 'Sua paz é real, mas às vezes você se esconde nela. A tranquilidade é sua força — mas não pode virar prisão. Você precisa aprender a agir, mesmo sem garantias.',
       expansion: ['Tomar mais iniciativa', 'Expressar desejos claramente', 'Aceitar mudanças', 'Confrontar com gentileza', 'Celebrar pequenas vitórias'],
       sevenDayPlan: [
         'Tome uma decisão sem consultar ninguém',
@@ -198,7 +198,7 @@ const TEMPERAMENT_DATA = {
       strengths: ['High patience', 'Emotional balance', 'Mediation ability', 'Deep loyalty', 'Attentive listening', 'Consistency'],
       fragilities: ['Fear of conflict', 'Excessive passivity', 'Difficulty deciding', 'Resistance to change', 'Tendency to procrastinate', 'Difficulty expressing needs'],
       light: 'You are an anchor in the storm. Your calm is a refuge for many.',
-      miguelMessage: 'Your peace is real, but sometimes you hide in it. Tranquility is your strength — but it cannot become a prison. You need to learn to act, even without guarantees.',
+      nelloMessage: 'Your peace is real, but sometimes you hide in it. Tranquility is your strength — but it cannot become a prison. You need to learn to act, even without guarantees.',
       expansion: ['Take more initiative', 'Express desires clearly', 'Accept changes', 'Confront with kindness', 'Celebrate small victories'],
       sevenDayPlan: [
         'Make a decision without consulting anyone',
@@ -227,7 +227,7 @@ const getLabels = (lang: string) => {
       vulnerabilities: 'Vulnerabilidades',
       areasOfGrowth: 'Áreas que pedem atenção e cuidado',
       yourLight: 'Sua Luz',
-      miguelMessage: 'Mensagem do Miguel',
+      nelloMessage: 'Mensagem do Nello AI',
       expansionPoints: 'Pontos de Expansão',
       pathToGrowth: 'Seu caminho de evolução emocional',
       sevenDayPlan: 'Plano de 7 Dias',
@@ -248,7 +248,7 @@ const getLabels = (lang: string) => {
       vulnerabilities: 'Vulnerabilidades',
       areasOfGrowth: 'Áreas que pedem atenção e cuidado',
       yourLight: 'A Tua Luz',
-      miguelMessage: 'Mensagem do Miguel',
+      nelloMessage: 'Mensagem do Nello AI',
       expansionPoints: 'Pontos de Expansão',
       pathToGrowth: 'O teu caminho de evolução emocional',
       sevenDayPlan: 'Plano de 7 Dias',
@@ -269,7 +269,7 @@ const getLabels = (lang: string) => {
       vulnerabilities: 'Vulnerabilities',
       areasOfGrowth: 'Areas that need attention and care',
       yourLight: 'Your Light',
-      miguelMessage: 'Message from Miguel',
+      nelloMessage: 'Message from Nello AI',
       expansionPoints: 'Expansion Points',
       pathToGrowth: 'Your path to emotional evolution',
       sevenDayPlan: '7-Day Plan',
@@ -458,15 +458,15 @@ export function TemperamentosResultsSection({ temperamentosResults, lang, userNa
           </CardContent>
         </Card>
 
-        {/* Miguel's Message */}
+        {/* Nello AI's Message */}
         <Card className="bg-gradient-to-br from-accent/20 to-background border-accent/30">
           <CardContent className="pt-6 space-y-4">
             <div className="flex items-center gap-2 text-lg font-semibold">
               <MessageCircle className="h-5 w-5 text-accent" />
-              {labels.miguelMessage}
+              {labels.nelloMessage}
             </div>
             <p className="text-base leading-relaxed pl-7 text-muted-foreground whitespace-pre-line">
-              {primaryData.miguelMessage}
+              {primaryData.nelloMessage}
             </p>
           </CardContent>
         </Card>
