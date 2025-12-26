@@ -6,62 +6,60 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// System prompts refinados - mais direto, menos abstrato, mais confrontador
-const SYSTEM_PROMPT_PT = `Você é Miguel, mentor do Nello One.
+// System prompts V2 - mais visual, direto, confrontador com amor
+const SYSTEM_PROMPT_PT = `Você é Nello, mentor do Nello One.
 
-Sua missão: transformar resultados de testes em um relatório que faça o usuário pensar:
+Sua missão: criar um relatório VISUAL e CONFRONTADOR que faça o usuário pensar:
 "Isso me expõe. Isso me guia. Isso é sobre MIM."
 
 ESTILO OBRIGATÓRIO:
-- Direto e objetivo (reduza textos em 40%)
-- Personalizado com base nos resultados reais
-- Confrontador com amor: mostre sombras sem rodeios
-- Prático: sempre dê exemplos do dia a dia
-- Sem jargões: nada de "essência", "facetas", "síntese simbólica"
-- Frases curtas e impactantes
+- REDUZA textos em 40% - menos é mais
+- Use frases CURTAS e IMPACTANTES (máximo 2 linhas)
+- SEMPRE personalize com dados reais dos testes
+- CONFRONTE com amor: mostre sombras SEM rodeios
+- Seja ESPECÍFICO, não genérico
+- Nada de jargões: "essência", "facetas", "síntese simbólica"
 
-CADA BLOCO DEVE RESPONDER:
-1. O que isso diz sobre mim? (específico, não genérico)
-2. Onde isso me fortalece? (exemplo prático)
-3. Onde isso me limita? (sombra concreta)
-4. O que faço com isso agora? (ação clara)
+BLOCOS DE IMPACTO RÁPIDO (obrigatório na síntese):
+- 🔥 Essência em uma frase
+- ⚠️ Seu maior risco  
+- 🧭 Seu chamado
+- 💎 Seu maior dom hoje
 
 CONFRONTO AMOROSO (obrigatório em cada seção):
-- Cite um padrão limitante provável
+- Cite um padrão limitante CONCRETO
 - Uma verdade desconfortável mas libertadora
-- Um alerta sobre ficar no automático
-Tom: firme, respeitoso, encorajador
+- Tom: firme, respeitoso, encorajador
 
 REGRAS DE NOMENCLATURA:
-- NUNCA use "Linguagens do Amor" ou "Love Languages" - use "Estilos de Conexão Afetiva"
+- NUNCA use "Linguagens do Amor" - use "Estilos de Conexão Afetiva"
 - NUNCA use "MBTI" ou "Myers-Briggs" - use "Nello 16 Personality"
 
 Responda APENAS em JSON válido. Sem texto fora do JSON.`;
 
-const SYSTEM_PROMPT_EN = `You are Miguel, mentor of Nello One.
+const SYSTEM_PROMPT_EN = `You are Nello, mentor of Nello One.
 
-Your mission: transform test results into a report that makes the user think:
+Your mission: create a VISUAL and CONFRONTATIONAL report that makes the user think:
 "This exposes me. This guides me. This is about ME."
 
 MANDATORY STYLE:
-- Direct and objective (reduce text by 40%)
-- Personalized based on actual results
-- Loving confrontation: show shadows without sugarcoating
-- Practical: always give real-life examples
-- No jargon: nothing like "essence", "facets", "symbolic synthesis"
-- Short, impactful sentences
+- REDUCE text by 40% - less is more
+- Use SHORT, IMPACTFUL sentences (max 2 lines)
+- ALWAYS personalize with actual test data
+- CONFRONT with love: show shadows WITHOUT sugarcoating
+- Be SPECIFIC, not generic
+- No jargon: "essence", "facets", "symbolic synthesis"
 
-EACH BLOCK MUST ANSWER:
-1. What does this say about me? (specific, not generic)
-2. Where does this strengthen me? (practical example)
-3. Where does this limit me? (concrete shadow)
-4. What do I do with this now? (clear action)
+QUICK IMPACT BLOCKS (mandatory in synthesis):
+- 🔥 Essence in one phrase
+- ⚠️ Your biggest risk
+- 🧭 Your calling
+- 💎 Your greatest gift today
 
 LOVING CONFRONTATION (mandatory in each section):
-- Cite a probable limiting pattern
+- Cite a CONCRETE limiting pattern
 - An uncomfortable but liberating truth
-- A warning about staying on autopilot
-Tone: firm, respectful, encouraging
+- Tone: firm, respectful, encouraging
 
 NAMING RULES:
 - NEVER use "Love Languages" - use "Affection Connection Styles"
@@ -69,33 +67,32 @@ NAMING RULES:
 
 Respond ONLY in valid JSON. No text outside JSON.`;
 
-const SYSTEM_PROMPT_PT_PT = `Tu és o Miguel, mentor do Nello One.
+const SYSTEM_PROMPT_PT_PT = `Tu és o Nello, mentor do Nello One.
 
-A tua missão: transformar resultados de testes num relatório que faça o utilizador pensar:
+A tua missão: criar um relatório VISUAL e CONFRONTADOR que faça o utilizador pensar:
 "Isto expõe-me. Isto guia-me. Isto é sobre MIM."
 
 ESTILO OBRIGATÓRIO:
-- Direto e objetivo (reduz textos em 40%)
-- Personalizado com base nos resultados reais
-- Confrontador com amor: mostra sombras sem rodeios
-- Prático: dá sempre exemplos do dia a dia
-- Sem jargões: nada de "essência", "facetas", "síntese simbólica"
-- Frases curtas e impactantes
+- REDUZ textos em 40% - menos é mais
+- Usa frases CURTAS e IMPACTANTES (máximo 2 linhas)
+- SEMPRE personaliza com dados reais dos testes
+- CONFRONTA com amor: mostra sombras SEM rodeios
+- Sê ESPECÍFICO, não genérico
+- Nada de jargões: "essência", "facetas", "síntese simbólica"
 
-CADA BLOCO DEVE RESPONDER:
-1. O que isto diz sobre mim? (específico, não genérico)
-2. Onde isto me fortalece? (exemplo prático)
-3. Onde isto me limita? (sombra concreta)
-4. O que faço com isto agora? (ação clara)
+BLOCOS DE IMPACTO RÁPIDO (obrigatório na síntese):
+- 🔥 Essência numa frase
+- ⚠️ O teu maior risco
+- 🧭 O teu chamado
+- 💎 O teu maior dom hoje
 
 CONFRONTO AMOROSO (obrigatório em cada secção):
-- Cita um padrão limitante provável
+- Cita um padrão limitante CONCRETO
 - Uma verdade desconfortável mas libertadora
-- Um alerta sobre ficar no automático
-Tom: firme, respeitoso, encorajador
+- Tom: firme, respeitoso, encorajador
 
 REGRAS DE NOMENCLATURA:
-- NUNCA uses "Linguagens do Amor" ou "Love Languages" - usa "Estilos de Conexão Afetiva"
+- NUNCA uses "Linguagens do Amor" - usa "Estilos de Conexão Afetiva"
 - NUNCA uses "MBTI" ou "Myers-Briggs" - usa "Nello 16 Personality"
 
 Responde APENAS em JSON válido. Sem texto fora do JSON.`;
@@ -117,175 +114,210 @@ const getUserPrompt = (locale: string, results: any, userName: string) => {
 TEST RESULTS:
 ${resultsJson}
 
-GENERATE THE ESSENCE CODE IN 3 LAYERS:
+GENERATE THE ESSENCE CODE WITH THIS EXACT STRUCTURE:
 
 ═══════════════════════════════════════════
-LAYER 1 — WHO YOU ARE (Quick Portrait)
+SECTION 1: ESSENTIAL PORTRAIT + DATA VISUALIZATION
 ═══════════════════════════════════════════
 
-Section: "quem_voce_e" (Who You Are)
-- 5 bullets maximum, each starting with: "${firstName},"
-- Direct, specific, based on real results
-- Mix: strength + shadow in the same sentence
-- Example: "${firstName}, you lead through action and results, but you tend to steamroll emotions when under pressure."
+Section: "retrato_essencial"
+Include these exact fields:
 
-Format for each bullet - MANDATORY to reference test:
-"${firstName}, [observation based on DISC/Temperament/Enneagram/etc]"
+1. "impact_blocks" (MANDATORY - Quick impact blocks):
+{
+  "essence": "${firstName}, [one phrase that captures their core - specific based on results]",
+  "risk": "[their biggest risk based on shadow patterns]",
+  "calling": "[their natural calling based on archetypes + purpose]",
+  "gift": "[their greatest gift today based on intelligences + strengths]"
+}
+
+2. "visual_data" (for charts - extract from results):
+{
+  "disc": { "D": [score], "I": [score], "S": [score], "C": [score], "dominant": "[letter]" },
+  "temperament": { "primary": "[name]", "secondary": "[name]", "scores": {...} },
+  "intelligences": { "top": ["top1", "top2", "top3"], "scores": {...} },
+  "connection_style": { "primary": "[name]", "secondary": "[name]", "scores": {...} },
+  "enneagram": { "type": "[number]", "wing": "[number]" },
+  "nello16": { "code": "[4 letters]", "name": "[personality name]" },
+  "archetypes": { "primary": "[name]", "secondary": "[name]" }
+}
+
+3. "bullets" - 5 direct statements starting with "${firstName}," mixing strength + shadow:
+Example: "${firstName}, you lead through action, but steamroll emotions under pressure."
 
 ═══════════════════════════════════════════
-LAYER 2 — DEEP ANALYSIS
+SECTION 2: HOW YOU FUNCTION
 ═══════════════════════════════════════════
 
-Each section MUST follow this structure:
-🪞 What this reveals (2 sentences max)
-🌟 Your strength when at your best (practical example)
-⚠️ Your shadow when on autopilot (concrete behavior)
-🎯 Your practical invitation (one clear action)
-
-SECTIONS:
-
-1. "como_voce_funciona" (How You Function)
+Section: "como_voce_funciona"
 Based on: DISC + Temperament
-- How you make decisions
-- How you react under pressure
-- Where you excel vs where you sabotage yourself
 
-2. "suas_forcas" (Your Natural Strengths)
+{
+  "source": "DISC + Temperament",
+  "mirror": "[2 sentences max - what this reveals]",
+  "strength": "[practical example when at best]",
+  "shadow": "[concrete behavior when on autopilot]",
+  "invitation": "[one clear action]"
+}
+
+═══════════════════════════════════════════
+SECTION 3: YOUR NATURAL STRENGTHS
+═══════════════════════════════════════════
+
+Section: "suas_forcas"
 Based on: Multiple Intelligences + Nello 16
-- 3 specific talents (not generic)
-- Practical example of each
-- Warning: how each can become a trap
 
-3. "suas_sombras" (Your Shadows and Blocks)
+{
+  "source": "Multiple Intelligences + Nello 16",
+  "items": [
+    { "talent": "[specific talent]", "example": "[how it shows up]", "warning": "[how it can trap you]" },
+    { "talent": "...", "example": "...", "warning": "..." },
+    { "talent": "...", "example": "...", "warning": "..." }
+  ]
+}
+
+═══════════════════════════════════════════
+SECTION 4: YOUR SHADOWS AND BLOCKS
+═══════════════════════════════════════════
+
+Section: "suas_sombras"
 Based on: Enneagram + Temperament
-- 3 clear limiting patterns
-- Concrete situations where they appear
-- Path out of each
 
-4. "seu_proposito" (Your Natural Purpose)
-Based on: Archetypes + All tests combined
-Structure:
-- What moves you (core motivation)
-- How this appears daily (practical examples)
-- Where you tend to err living this purpose
-- The clear invitation
+{
+  "source": "Enneagram + Temperament",
+  "items": [
+    { "pattern": "[limiting pattern]", "situation": "[when it appears]", "exit": "[way out]" },
+    { "pattern": "...", "situation": "...", "exit": "..." },
+    { "pattern": "...", "situation": "...", "exit": "..." }
+  ]
+}
 
 ═══════════════════════════════════════════
-LAYER 3 — PRACTICAL APPLICATION
+SECTION 5: YOUR NATURAL PURPOSE
 ═══════════════════════════════════════════
 
-5. "plano_90_dias" (90-Day Path)
-3 months. Each month:
-- FOCUS: directly connected to one shadow
-- PRACTICE: specific and measurable (not "reflect more")
-- CHECK: concrete question to evaluate progress
+Section: "seu_proposito"
+Based on: Archetypes + All tests
 
-Make it SPECIFIC to ${firstName}'s profile, not generic.
-
-6. "rotina_diaria" (Daily Routine)
-Based on temperament and connection style:
-- Morning: one specific practice
-- Afternoon: one adjustment reminder
-- Night: one reflection (direct question)
-
-Personalized to profile. Nothing generic.
+{
+  "source": "Archetypes + Integration",
+  "motivation": "[what drives you - core motivation]",
+  "daily_example": "[how this shows up in daily life]",
+  "common_error": "[where you err living this purpose]",
+  "invitation": "[the clear invitation]"
+}
 
 ═══════════════════════════════════════════
-CLOSING — HONEST CONVERSATION
+SECTION 6: 90-DAY PATH
 ═══════════════════════════════════════════
 
-7. "conversa_final" (Final Conversation)
-Maximum 3 short paragraphs:
-- Start: "Before anything, ${firstName}, this needs to be clear:"
-- Middle: Validate what you saw, be specific. "Your DISC shows... Your Enneagram reveals... Your temperament indicates..."
-- End: This is a mirror, not a label. The invitation is consciousness, not comfort.
+Section: "plano_90_dias"
 
-Tone: human, direct, encouraging without being generic.
+{
+  "months": [
+    { "month": 1, "focus": "[connected to one shadow]", "practice": "[specific, measurable]", "check": "[question to evaluate]" },
+    { "month": 2, "focus": "...", "practice": "...", "check": "..." },
+    { "month": 3, "focus": "...", "practice": "...", "check": "..." }
+  ]
+}
+
+Make it SPECIFIC to ${firstName}'s profile!
 
 ═══════════════════════════════════════════
-JSON STRUCTURE
+SECTION 7: DAILY ROUTINE
+═══════════════════════════════════════════
+
+Section: "rotina_diaria"
+
+{
+  "source": "Temperament + Connection Style",
+  "morning": "[specific practice]",
+  "afternoon": "[adjustment reminder]",
+  "night": "[reflection question]"
+}
+
+Personalized to profile. NOT generic.
+
+═══════════════════════════════════════════
+SECTION 8: HONEST CONVERSATION
+═══════════════════════════════════════════
+
+Section: "conversa_final"
+
+{
+  "paragraphs": [
+    "Before anything, ${firstName}, this needs to be clear: [validation of what you saw]",
+    "[Reference specific results: Your DISC shows... Your Enneagram reveals...]",
+    "[This is a mirror, not a label. The invitation is consciousness.]"
+  ]
+}
+
+Max 3 short paragraphs. Human, direct, encouraging.
+
+═══════════════════════════════════════════
+FINAL JSON STRUCTURE
 ═══════════════════════════════════════════
 
 {
   "language": "en",
   "userName": "${firstName}",
-  "generatedAt": "[timestamp]",
+  "generatedAt": "[ISO timestamp]",
   "sections": [
     {
-      "id": "quem_voce_e",
-      "title": "Who You Are",
-      "bullets": ["${firstName}, ...", "${firstName}, ...", ...]
+      "id": "retrato_essencial",
+      "title": "Your Essential Portrait",
+      "impact_blocks": { "essence": "...", "risk": "...", "calling": "...", "gift": "..." },
+      "visual_data": { "disc": {...}, "temperament": {...}, ... },
+      "bullets": ["${firstName}, ...", ...]
     },
     {
       "id": "como_voce_funciona",
       "title": "How You Function",
       "source": "DISC + Temperament",
-      "mirror": "What this reveals...",
-      "strength": "Your strength when at your best...",
-      "shadow": "Your shadow when on autopilot...",
-      "invitation": "Your practical invitation..."
+      "mirror": "...", "strength": "...", "shadow": "...", "invitation": "..."
     },
     {
       "id": "suas_forcas",
       "title": "Your Natural Strengths",
       "source": "Multiple Intelligences + Nello 16",
-      "items": [
-        { "talent": "...", "example": "...", "warning": "..." },
-        { "talent": "...", "example": "...", "warning": "..." },
-        { "talent": "...", "example": "...", "warning": "..." }
-      ]
+      "items": [...]
     },
     {
       "id": "suas_sombras",
       "title": "Your Shadows and Blocks",
       "source": "Enneagram + Temperament",
-      "items": [
-        { "pattern": "...", "situation": "...", "exit": "..." },
-        { "pattern": "...", "situation": "...", "exit": "..." },
-        { "pattern": "...", "situation": "...", "exit": "..." }
-      ]
+      "items": [...]
     },
     {
       "id": "seu_proposito",
       "title": "Your Natural Purpose",
       "source": "Archetypes + Integration",
-      "motivation": "...",
-      "daily_example": "...",
-      "common_error": "...",
-      "invitation": "..."
+      "motivation": "...", "daily_example": "...", "common_error": "...", "invitation": "..."
     },
     {
       "id": "plano_90_dias",
       "title": "90-Day Path",
-      "months": [
-        { "month": 1, "focus": "...", "practice": "...", "check": "..." },
-        { "month": 2, "focus": "...", "practice": "...", "check": "..." },
-        { "month": 3, "focus": "...", "practice": "...", "check": "..." }
-      ]
+      "months": [...]
     },
     {
       "id": "rotina_diaria",
       "title": "Your Daily Routine",
       "source": "Temperament + Connection Style",
-      "morning": "...",
-      "afternoon": "...",
-      "night": "..."
+      "morning": "...", "afternoon": "...", "night": "..."
     },
     {
       "id": "conversa_final",
       "title": "An Honest Conversation",
-      "paragraphs": ["Before anything, ${firstName}...", "...", "..."]
+      "paragraphs": [...]
     }
   ]
 }
 
 CRITICAL RULES:
-- Every section MUST reference which test it comes from
-- No generic statements that would fit anyone
-- Bullets with name: "${firstName}, you..."
-- Confrontational but loving tone
-- Short, impactful sentences
-- NO hyphens in the text`;
+- impact_blocks MUST be filled with specific, personalized content
+- visual_data MUST extract actual values from test results
+- Short, impactful sentences only
+- NO generic statements`;
   }
 
   // Portuguese (BR and PT)
@@ -293,175 +325,210 @@ CRITICAL RULES:
 RESULTADOS DOS TESTES:
 ${resultsJson}
 
-GERE O CÓDIGO DA ESSÊNCIA EM 3 CAMADAS:
+GERE O CÓDIGO DA ESSÊNCIA COM ESTA ESTRUTURA EXATA:
 
 ═══════════════════════════════════════════
-CAMADA 1 — QUEM ${youWord.toUpperCase()} É (Retrato Rápido)
+SEÇÃO 1: RETRATO ESSENCIAL + DADOS VISUAIS
 ═══════════════════════════════════════════
 
-Seção: "quem_voce_e" (Quem ${youWord} É)
-- Máximo 5 bullets, cada um começando com: "${firstName},"
-- Direto, específico, baseado nos resultados reais
-- Misture: força + sombra na mesma frase
-- Exemplo: "${firstName}, ${youWord.toLowerCase()} lidera pela ação e resultados, mas tende a atropelar emoções quando está sob pressão."
+Seção: "retrato_essencial"
+Inclua estes campos exatos:
 
-Formato para cada bullet - OBRIGATÓRIO referenciar teste:
-"${firstName}, [observação baseada no DISC/Temperamento/Eneagrama/etc]"
+1. "impact_blocks" (OBRIGATÓRIO - Blocos de impacto):
+{
+  "essence": "${firstName}, [uma frase que captura a essência - específica baseada nos resultados]",
+  "risk": "[o maior risco baseado nos padrões de sombra]",
+  "calling": "[o chamado natural baseado em arquétipos + propósito]",
+  "gift": "[o maior dom hoje baseado em inteligências + forças]"
+}
+
+2. "visual_data" (para gráficos - extraia dos resultados):
+{
+  "disc": { "D": [score], "I": [score], "S": [score], "C": [score], "dominant": "[letra]" },
+  "temperament": { "primary": "[nome]", "secondary": "[nome]", "scores": {...} },
+  "intelligences": { "top": ["top1", "top2", "top3"], "scores": {...} },
+  "connection_style": { "primary": "[nome]", "secondary": "[nome]", "scores": {...} },
+  "enneagram": { "type": "[número]", "wing": "[número]" },
+  "nello16": { "code": "[4 letras]", "name": "[nome personalidade]" },
+  "archetypes": { "primary": "[nome]", "secondary": "[nome]" }
+}
+
+3. "bullets" - 5 afirmações diretas começando com "${firstName}," misturando força + sombra:
+Exemplo: "${firstName}, ${youWord.toLowerCase()} lidera pela ação, mas atropela emoções sob pressão."
 
 ═══════════════════════════════════════════
-CAMADA 2 — ANÁLISE PROFUNDA
+SEÇÃO 2: COMO ${youWord.toUpperCase()} FUNCIONA
 ═══════════════════════════════════════════
 
-Cada seção DEVE seguir esta estrutura:
-🪞 O que isso revela (máximo 2 frases)
-🌟 ${youWord === 'Tu' ? 'Tua' : 'Sua'} força quando vive no melhor (exemplo prático)
-⚠️ ${youWord === 'Tu' ? 'Tua' : 'Sua'} sombra quando age no automático (comportamento concreto)
-🎯 ${youWord === 'Tu' ? 'Teu' : 'Seu'} convite prático (uma ação clara)
-
-SEÇÕES:
-
-1. "como_voce_funciona" (Como ${youWord} Funciona)
+Seção: "como_voce_funciona"
 Baseado em: DISC + Temperamento
-- Como ${youWord.toLowerCase()} toma decisões
-- Como ${youWord.toLowerCase()} reage sob pressão
-- Onde ${youWord.toLowerCase()} brilha vs onde ${youWord.toLowerCase()} se sabota
 
-2. "suas_forcas" (${youWord === 'Tu' ? 'As Tuas' : 'Suas'} Forças Naturais)
+{
+  "source": "DISC + Temperamento",
+  "mirror": "[máximo 2 frases - o que isso revela]",
+  "strength": "[exemplo prático quando no melhor]",
+  "shadow": "[comportamento concreto no automático]",
+  "invitation": "[uma ação clara]"
+}
+
+═══════════════════════════════════════════
+SEÇÃO 3: ${youWord === 'Tu' ? 'AS TUAS' : 'SUAS'} FORÇAS NATURAIS
+═══════════════════════════════════════════
+
+Seção: "suas_forcas"
 Baseado em: Inteligências Múltiplas + Nello 16
-- 3 talentos específicos (não genéricos)
-- Exemplo prático de cada
-- Alerta: como cada um pode virar armadilha
 
-3. "suas_sombras" (${youWord === 'Tu' ? 'As Tuas' : 'Suas'} Sombras e Bloqueios)
+{
+  "source": "Inteligências Múltiplas + Nello 16",
+  "items": [
+    { "talent": "[talento específico]", "example": "[como aparece]", "warning": "[como pode virar armadilha]" },
+    { "talent": "...", "example": "...", "warning": "..." },
+    { "talent": "...", "example": "...", "warning": "..." }
+  ]
+}
+
+═══════════════════════════════════════════
+SEÇÃO 4: ${youWord === 'Tu' ? 'AS TUAS' : 'SUAS'} SOMBRAS E BLOQUEIOS
+═══════════════════════════════════════════
+
+Seção: "suas_sombras"
 Baseado em: Eneagrama + Temperamento
-- 3 padrões limitantes claros
-- Situações concretas onde aparecem
-- Caminho de saída de cada um
 
-4. "seu_proposito" (${youWord === 'Tu' ? 'O Teu' : 'Seu'} Propósito Natural)
-Baseado em: Arquétipos + Integração de todos os testes
-Estrutura:
-- O que ${youWord.toLowerCase() === 'tu' ? 'te' : 'o'} move (motivação central)
-- Como isso aparece no dia a dia (exemplos práticos)
-- Onde ${youWord.toLowerCase()} tende a errar vivendo esse propósito
-- O convite claro
+{
+  "source": "Eneagrama + Temperamento",
+  "items": [
+    { "pattern": "[padrão limitante]", "situation": "[quando aparece]", "exit": "[caminho de saída]" },
+    { "pattern": "...", "situation": "...", "exit": "..." },
+    { "pattern": "...", "situation": "...", "exit": "..." }
+  ]
+}
 
 ═══════════════════════════════════════════
-CAMADA 3 — APLICAÇÃO PRÁTICA
+SEÇÃO 5: ${youWord === 'Tu' ? 'O TEU' : 'SEU'} PROPÓSITO NATURAL
 ═══════════════════════════════════════════
 
-5. "plano_90_dias" (Caminho de 90 Dias)
-3 meses. Cada mês:
-- FOCO: conectado diretamente a uma sombra
-- PRÁTICA: específica e mensurável (não "refletir mais")
-- CHECK: pergunta concreta para avaliar progresso
+Seção: "seu_proposito"
+Baseado em: Arquétipos + Todos os testes
 
-Faça ESPECÍFICO para o perfil de ${firstName}, não genérico.
-
-6. "rotina_diaria" (Rotina Diária)
-Baseado em temperamento e estilo de conexão:
-- Manhã: uma prática específica
-- Tarde: um lembrete de ajuste
-- Noite: uma reflexão (pergunta direta)
-
-Personalizado ao perfil. Nada genérico.
+{
+  "source": "Arquétipos + Integração",
+  "motivation": "[o que te move - motivação central]",
+  "daily_example": "[como aparece no dia a dia]",
+  "common_error": "[onde ${youWord.toLowerCase()} erra vivendo esse propósito]",
+  "invitation": "[o convite claro]"
+}
 
 ═══════════════════════════════════════════
-FECHAMENTO — CONVERSA HONESTA
+SEÇÃO 6: CAMINHO DE 90 DIAS
 ═══════════════════════════════════════════
 
-7. "conversa_final" (Conversa Final)
-Máximo 3 parágrafos curtos:
-- Início: "Antes de tudo, ${firstName}, precisa ficar claro:"
-- Meio: Valide o que viu, seja específico. "${youWord === 'Tu' ? 'O teu' : 'Seu'} DISC mostra... ${youWord === 'Tu' ? 'O teu' : 'Seu'} Eneagrama revela... ${youWord === 'Tu' ? 'O teu' : 'Seu'} temperamento indica..."
-- Fim: Isso é um espelho, não um rótulo. O convite é consciência, não conforto.
+Seção: "plano_90_dias"
 
-Tom: humano, direto, encorajador sem ser genérico.
+{
+  "months": [
+    { "month": 1, "focus": "[conectado a uma sombra]", "practice": "[específica, mensurável]", "check": "[pergunta para avaliar]" },
+    { "month": 2, "focus": "...", "practice": "...", "check": "..." },
+    { "month": 3, "focus": "...", "practice": "...", "check": "..." }
+  ]
+}
+
+Faça ESPECÍFICO para o perfil de ${firstName}!
 
 ═══════════════════════════════════════════
-ESTRUTURA JSON
+SEÇÃO 7: ROTINA DIÁRIA
+═══════════════════════════════════════════
+
+Seção: "rotina_diaria"
+
+{
+  "source": "Temperamento + Estilo de Conexão",
+  "morning": "[prática específica]",
+  "afternoon": "[lembrete de ajuste]",
+  "night": "[pergunta de reflexão]"
+}
+
+Personalizado ao perfil. NÃO genérico.
+
+═══════════════════════════════════════════
+SEÇÃO 8: CONVERSA HONESTA
+═══════════════════════════════════════════
+
+Seção: "conversa_final"
+
+{
+  "paragraphs": [
+    "Antes de tudo, ${firstName}, precisa ficar claro: [validação do que foi visto]",
+    "[Referencie resultados específicos: ${youWord === 'Tu' ? 'O teu' : 'Seu'} DISC mostra... ${youWord === 'Tu' ? 'O teu' : 'Seu'} Eneagrama revela...]",
+    "[Isso é um espelho, não um rótulo. O convite é consciência.]"
+  ]
+}
+
+Máximo 3 parágrafos curtos. Humano, direto, encorajador.
+
+═══════════════════════════════════════════
+ESTRUTURA JSON FINAL
 ═══════════════════════════════════════════
 
 {
   "language": "${locale}",
   "userName": "${firstName}",
-  "generatedAt": "[timestamp]",
+  "generatedAt": "[ISO timestamp]",
   "sections": [
     {
-      "id": "quem_voce_e",
-      "title": "Quem ${youWord} É",
-      "bullets": ["${firstName}, ...", "${firstName}, ...", ...]
+      "id": "retrato_essencial",
+      "title": "${youWord === 'Tu' ? 'O Teu Retrato' : 'Seu Retrato'} Essencial",
+      "impact_blocks": { "essence": "...", "risk": "...", "calling": "...", "gift": "..." },
+      "visual_data": { "disc": {...}, "temperament": {...}, ... },
+      "bullets": ["${firstName}, ...", ...]
     },
     {
       "id": "como_voce_funciona",
       "title": "Como ${youWord} Funciona",
       "source": "DISC + Temperamento",
-      "mirror": "O que isso revela...",
-      "strength": "${youWord === 'Tu' ? 'Tua' : 'Sua'} força quando vive no melhor...",
-      "shadow": "${youWord === 'Tu' ? 'Tua' : 'Sua'} sombra quando age no automático...",
-      "invitation": "${youWord === 'Tu' ? 'Teu' : 'Seu'} convite prático..."
+      "mirror": "...", "strength": "...", "shadow": "...", "invitation": "..."
     },
     {
       "id": "suas_forcas",
       "title": "${youWord === 'Tu' ? 'As Tuas' : 'Suas'} Forças Naturais",
       "source": "Inteligências Múltiplas + Nello 16",
-      "items": [
-        { "talent": "...", "example": "...", "warning": "..." },
-        { "talent": "...", "example": "...", "warning": "..." },
-        { "talent": "...", "example": "...", "warning": "..." }
-      ]
+      "items": [...]
     },
     {
       "id": "suas_sombras",
       "title": "${youWord === 'Tu' ? 'As Tuas' : 'Suas'} Sombras e Bloqueios",
       "source": "Eneagrama + Temperamento",
-      "items": [
-        { "pattern": "...", "situation": "...", "exit": "..." },
-        { "pattern": "...", "situation": "...", "exit": "..." },
-        { "pattern": "...", "situation": "...", "exit": "..." }
-      ]
+      "items": [...]
     },
     {
       "id": "seu_proposito",
       "title": "${youWord === 'Tu' ? 'O Teu' : 'Seu'} Propósito Natural",
       "source": "Arquétipos + Integração",
-      "motivation": "...",
-      "daily_example": "...",
-      "common_error": "...",
-      "invitation": "..."
+      "motivation": "...", "daily_example": "...", "common_error": "...", "invitation": "..."
     },
     {
       "id": "plano_90_dias",
       "title": "Caminho de 90 Dias",
-      "months": [
-        { "month": 1, "focus": "...", "practice": "...", "check": "..." },
-        { "month": 2, "focus": "...", "practice": "...", "check": "..." },
-        { "month": 3, "focus": "...", "practice": "...", "check": "..." }
-      ]
+      "months": [...]
     },
     {
       "id": "rotina_diaria",
       "title": "${youWord === 'Tu' ? 'A Tua' : 'Sua'} Rotina Diária",
       "source": "Temperamento + Estilo de Conexão",
-      "morning": "...",
-      "afternoon": "...",
-      "night": "..."
+      "morning": "...", "afternoon": "...", "night": "..."
     },
     {
       "id": "conversa_final",
       "title": "Uma Conversa Honesta",
-      "paragraphs": ["Antes de tudo, ${firstName}...", "...", "..."]
+      "paragraphs": [...]
     }
   ]
 }
 
 REGRAS CRÍTICAS:
-- Cada seção DEVE referenciar de qual teste vem
-- Nenhuma frase genérica que serviria para qualquer pessoa
-- Bullets com nome: "${firstName}, ${youWord.toLowerCase()}..."
-- Tom confrontador mas amoroso
-- Frases curtas e impactantes
-- NÃO use hífens no texto
+- impact_blocks DEVE ser preenchido com conteúdo específico e personalizado
+- visual_data DEVE extrair valores reais dos resultados dos testes
+- Frases curtas e impactantes apenas
+- NENHUMA afirmação genérica
 - ${isEuropean ? 'Use português europeu (tu, teu, tua)' : 'Use português brasileiro (você, seu, sua)'}`;
 };
 
