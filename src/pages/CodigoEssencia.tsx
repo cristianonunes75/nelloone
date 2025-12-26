@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, type ReactNode } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useAuth } from "@/hooks/useAuth";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { useCodigoEssencia } from "@/hooks/useCodigoEssencia";
@@ -54,7 +55,7 @@ import {
 
 type LangKey = 'pt' | 'pt-pt' | 'en';
 
-const SECTION_CONFIG: Record<string, { title: Record<LangKey, string>; icon: React.ReactNode; color: string }> = {
+const SECTION_CONFIG: Record<string, { title: Record<LangKey, string>; icon: ReactNode; color: string }> = {
   quick_summary: {
     title: { pt: "Seu Código em 60 Segundos", 'pt-pt': "O Teu Código em 60 Segundos", en: "Your Code in 60 Seconds" },
     icon: <Zap className="w-5 h-5" />,
@@ -201,7 +202,7 @@ const TRANSLATIONS = {
   },
 };
 
-const CodigoEssencia = () => {
+const CodigoEssenciaInner = () => {
   const { profile, user } = useAuth();
   const journeyData = useJourneyProgress();
   const codigoData = useCodigoEssencia();
@@ -808,5 +809,11 @@ const CodigoEssencia = () => {
     </div>
   );
 };
+
+const CodigoEssencia = () => (
+  <ErrorBoundary fallbackTitle="Código da Essência">
+    <CodigoEssenciaInner />
+  </ErrorBoundary>
+);
 
 export default CodigoEssencia;
