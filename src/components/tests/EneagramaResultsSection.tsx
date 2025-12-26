@@ -425,9 +425,10 @@ interface EneagramaResult {
 interface EneagramaResultsSectionProps {
   enneagramResults: EneagramaResult;
   lang?: 'pt' | 'pt-pt' | 'en';
+  userName?: string;
 }
 
-export function EneagramaResultsSection({ enneagramResults, lang = 'pt' }: EneagramaResultsSectionProps) {
+export function EneagramaResultsSection({ enneagramResults, lang = 'pt', userName = 'Você' }: EneagramaResultsSectionProps) {
   const [showAllScores, setShowAllScores] = useState(false);
   
   const primaryType = String(enneagramResults.primaryType);
