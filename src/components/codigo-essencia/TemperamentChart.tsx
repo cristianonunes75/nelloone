@@ -32,24 +32,37 @@ const TEMPERAMENT_EMOJI: Record<string, string> = {
 
 export const TemperamentChart = ({ results, language = "pt" }: TemperamentChartProps) => {
   const lang = language === "en" ? "en" : language === "pt-pt" ? "pt-pt" : "pt";
-  
-  const primary = results?.primary?.toLowerCase() || "";
-  const secondary = results?.secondary?.toLowerCase() || "";
-  
+
+  const toKey = (value: unknown) => {
+    if (typeof value === "string") return value.toLowerCase();
+    if (typeof value === "number") return String(value).toLowerCase();
+    if (value && typeof value === "object" && "temperament" in value) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return String((value as any).temperament ?? "").toLowerCase();
+    }
+    return "";
+  };
+
+  const primary = toKey(results?.primary);
+  const secondary = toKey(results?.secondary);
+
   const temperamentData = useMemo(() => {
     if (!results?.scores) return [];
-    
+
     const total = Object.values(results.scores).reduce((sum, val) => sum + (val || 0), 0);
-    
+
     return Object.entries(results.scores)
-      .map(([key, value]) => ({
-        key: key.toLowerCase(),
-        label: TEMPERAMENT_LABELS[key.toLowerCase()]?.[lang] || key,
-        value: value || 0,
-        percentage: total > 0 ? Math.round(((value || 0) / total) * 100) : 0,
-        isPrimary: key.toLowerCase() === primary,
-        isSecondary: key.toLowerCase() === secondary,
-      }))
+      .map(([key, value]) => {
+        const k = toKey(key);
+        return {
+          key: k,
+          label: TEMPERAMENT_LABELS[k]?.[lang] || String(key),
+          value: value || 0,
+          percentage: total > 0 ? Math.round(((value || 0) / total) * 100) : 0,
+          isPrimary: k === primary,
+          isSecondary: k === secondary,
+        };
+      })
       .sort((a, b) => b.value - a.value);
   }, [results, lang, primary, secondary]);
 

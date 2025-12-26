@@ -47,10 +47,10 @@ const STYLE_COLORS = [
 export const ConnectionStyleChart = ({ results, language = "pt" }: ConnectionStyleChartProps) => {
   const lang = language === "en" ? "en" : language === "pt-pt" ? "pt-pt" : "pt";
   
-  const normalizeKey = (key: string) => key.toLowerCase().replace(/\s+/g, "_");
-  
-  const primary = normalizeKey(results?.primary || "");
-  const secondary = normalizeKey(results?.secondary || "");
+  const normalizeKey = (value: unknown) => String(value ?? "").toLowerCase().replace(/\s+/g, "_");
+
+  const primary = normalizeKey(results?.primary);
+  const secondary = normalizeKey(results?.secondary);
   
   const styleData = useMemo(() => {
     if (!results?.scores) return [];

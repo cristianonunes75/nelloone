@@ -312,22 +312,40 @@ const CodigoEssenciaInner = () => {
 
   // Extract test results for charts
   const chartData = useMemo(() => {
+    const toStringSafe = (value: unknown) => (value == null ? "" : String(value));
+    const pickTemperament = (value: unknown) => {
+      if (typeof value === "string") return value;
+      if (value && typeof value === "object" && "temperament" in value) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return toStringSafe((value as any).temperament);
+      }
+      return "";
+    };
+
+    const intelligencesPrimary =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (testResults as any)?.inteligencias_multiplas?.primary ?? (testResults as any)?.inteligencias_multiplas?.top?.[0];
+
+    const connection =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (testResults as any)?.linguagens_amor ?? (testResults as any)?.estilos_conexao_afetiva ?? (testResults as any)?.estilos_conexao;
+
     return {
       disc: testResults?.disc?.scores || visualData?.disc,
       temperament: {
-        primary: testResults?.temperamentos?.primary?.temperament,
-        secondary: testResults?.temperamentos?.secondary?.temperament,
-        scores: visualData?.temperament?.scores
+        primary: pickTemperament(testResults?.temperamentos?.primary),
+        secondary: pickTemperament(testResults?.temperamentos?.secondary),
+        scores: visualData?.temperament?.scores,
       },
       intelligences: {
         scores: testResults?.inteligencias_multiplas?.scores || visualData?.intelligences?.scores,
-        top: testResults?.inteligencias_multiplas?.primary ? [testResults.inteligencias_multiplas.primary] : []
+        top: intelligencesPrimary ? [toStringSafe(intelligencesPrimary)] : [],
       },
       connectionStyle: {
-        primary: testResults?.linguagens_amor?.primary,
-        secondary: testResults?.linguagens_amor?.secondary,
-        scores: testResults?.linguagens_amor?.scores || visualData?.connection_style?.scores
-      }
+        primary: toStringSafe(connection?.primary),
+        secondary: toStringSafe(connection?.secondary),
+        scores: connection?.scores || visualData?.connection_style?.scores,
+      },
     };
   }, [testResults, visualData]);
 
