@@ -55,7 +55,49 @@ export const EssenceRadarChart = ({ disc, temperament, intelligences, language =
       .map((d) => d.dimension);
   }, [radarData]);
 
+  // Generate automatic insights based on data
+  const insights = useMemo(() => {
+    if (radarData.length < 2) return null;
+    const sorted = [...radarData].sort((a, b) => b.value - a.value);
+    const strongest = sorted[0];
+    const weakest = sorted[sorted.length - 1];
+    const gap = strongest.value - weakest.value;
+
+    const labels = {
+      pt: {
+        strongest: `Seu ponto mais forte é **${strongest.dimension}** (${strongest.value}%)`,
+        gap: gap > 40 
+          ? `Maior desequilíbrio: **${strongest.dimension}** vs **${weakest.dimension}** (${gap}pts de diferença)`
+          : `Perfil relativamente equilibrado`,
+        balance: gap <= 20 ? "Você tem versatilidade natural" : null
+      },
+      "pt-pt": {
+        strongest: `O teu ponto mais forte é **${strongest.dimension}** (${strongest.value}%)`,
+        gap: gap > 40 
+          ? `Maior desequilíbrio: **${strongest.dimension}** vs **${weakest.dimension}** (${gap}pts de diferença)`
+          : `Perfil relativamente equilibrado`,
+        balance: gap <= 20 ? "Tens versatilidade natural" : null
+      },
+      en: {
+        strongest: `Your strongest point is **${strongest.dimension}** (${strongest.value}%)`,
+        gap: gap > 40 
+          ? `Biggest imbalance: **${strongest.dimension}** vs **${weakest.dimension}** (${gap}pts gap)`
+          : `Relatively balanced profile`,
+        balance: gap <= 20 ? "You have natural versatility" : null
+      }
+    };
+
+    return labels[language as keyof typeof labels] || labels.pt;
+  }, [radarData, language]);
+
   if (radarData.length === 0) return null;
+
+  const renderBoldText = (text: string) => {
+    const parts = text.split(/\*\*(.*?)\*\*/g);
+    return parts.map((part, i) => 
+      i % 2 === 1 ? <strong key={i}>{part}</strong> : part
+    );
+  };
 
   return (
     <div className="bg-gradient-to-br from-violet-500/10 to-purple-500/10 border border-violet-500/20 rounded-2xl p-6 mb-8">
@@ -98,16 +140,29 @@ export const EssenceRadarChart = ({ disc, temperament, intelligences, language =
           </ResponsiveContainer>
         </div>
 
-        <div>
-          <p className="text-sm text-muted-foreground uppercase tracking-wide mb-3">{t.dominant}</p>
-          <div className="space-y-2">
-            {dominantFactors.map((factor, i) => (
-              <div key={factor} className="flex items-center gap-3 bg-background/50 rounded-lg p-3">
-                <span className="text-lg font-bold text-primary">{i + 1}º</span>
-                <span className="font-medium">{factor}</span>
-              </div>
-            ))}
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm text-muted-foreground uppercase tracking-wide mb-3">{t.dominant}</p>
+            <div className="space-y-2">
+              {dominantFactors.map((factor, i) => (
+                <div key={factor} className="flex items-center gap-3 bg-background/50 rounded-lg p-3">
+                  <span className="text-lg font-bold text-primary">{i + 1}º</span>
+                  <span className="font-medium">{factor}</span>
+                </div>
+              ))}
+            </div>
           </div>
+
+          {/* Auto-generated insights */}
+          {insights && (
+            <div className="bg-primary/5 rounded-lg p-3 space-y-1">
+              <p className="text-sm">{renderBoldText(insights.strongest)}</p>
+              <p className="text-sm text-muted-foreground">{renderBoldText(insights.gap)}</p>
+              {insights.balance && (
+                <p className="text-sm text-emerald-600 dark:text-emerald-400">✨ {insights.balance}</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -15,3 +15,5 @@ export { PurposeManifesto } from "./PurposeManifesto";
 export { CollapsibleSection } from "./CollapsibleSection";
 export { SectionIndex } from "./SectionIndex";
 export { SectionDivider } from "./SectionDivider";
+export { NextStepCard } from "./NextStepCard";
+export { ScoreHighlights } from "./ScoreHighlights";
