@@ -189,9 +189,9 @@ export const MiguelAIManagement = () => {
         <div>
           <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
             <Bot className="w-8 h-8" />
-            Miguel – Controle da IA
+            Nello AI – Controle da IA
           </h2>
-          <p className="text-muted-foreground">Configure prompts, subprompts e comportamento do Miguel</p>
+          <p className="text-muted-foreground">Configure prompts, subprompts e comportamento do Nello AI</p>
         </div>
       </div>
 
@@ -297,7 +297,7 @@ export const MiguelAIManagement = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5" />
-                Playground do Miguel
+                Playground do Nello AI
               </CardTitle>
               <CardDescription>Teste prompts em tempo real</CardDescription>
             </CardHeader>
@@ -305,7 +305,7 @@ export const MiguelAIManagement = () => {
               <div className="space-y-2">
                 <Label>Sua mensagem de teste</Label>
                 <Textarea
-                  placeholder="Digite uma mensagem para testar o Miguel..."
+                  placeholder="Digite uma mensagem para testar o Nello AI..."
                   value={playgroundInput}
                   onChange={(e) => setPlaygroundInput(e.target.value)}
                   rows={4}
@@ -321,7 +321,7 @@ export const MiguelAIManagement = () => {
               </Button>
               {playgroundOutput && (
                 <div className="space-y-2">
-                  <Label>Resposta do Miguel</Label>
+                  <Label>Resposta do Nello AI</Label>
                   <div className="p-4 bg-muted rounded-lg">
                     <p className="whitespace-pre-wrap">{playgroundOutput}</p>
                   </div>

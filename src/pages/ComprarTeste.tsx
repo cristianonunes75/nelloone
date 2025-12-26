@@ -252,14 +252,14 @@ const ComprarTeste = () => {
             </div>
           </div>
 
-          {/* Miguel Message */}
+          {/* Nello AI Message */}
           <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6">
             <div className="flex gap-4">
               <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center shrink-0">
                 <Sparkles className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium mb-1">Miguel diz:</p>
+                <p className="font-medium mb-1">Nello AI diz:</p>
                 <p className="text-sm text-muted-foreground">
                   "{userName}, cada teste revela uma dimensão única de quem você é. 
                   O {test.name} vai te ajudar a entender aspectos importantes da sua essência 

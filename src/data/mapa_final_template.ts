@@ -153,7 +153,7 @@ Cada aspecto descoberto aqui é uma ferramenta para:
 O caminho começa dentro.
 Clareza. Identidade. Propósito.
 
-— Miguel, seu guia NELLO ONE`,
+— Nello AI, seu guia NELLO ONE`,
     templateEn: `You now hold a complete map of your essence.
 
 Remember: this map doesn't define your limits — it reveals your potential.
@@ -167,11 +167,11 @@ Each aspect discovered here is a tool for:
 The path begins within.
 Clarity. Identity. Purpose.
 
-— Miguel, your NELLO ONE guide`
+— Nello AI, your NELLO ONE guide`
   }
 };
 
-// Section-specific generation prompts for Miguel AI
+// Section-specific generation prompts for Nello AI
 export const SECTION_GENERATION_PROMPTS = {
   identidade_central: {
     pt: `Com base nos resultados dos testes:

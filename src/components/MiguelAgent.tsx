@@ -249,7 +249,7 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
       >
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-ink-blue" />
-          <span className="text-sm font-medium">Miguel</span>
+          <span className="text-sm font-medium">Nello AI</span>
           {messages.length > 0 && (
             <span className="bg-ink-blue text-primary-foreground text-xs rounded-full px-2">
               {messages.length}
@@ -269,7 +269,7 @@ export function MiguelAgent({ location, completedTests = [], currentStep, testRe
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="font-semibold">Miguel</h3>
+            <h3 className="font-semibold">Nello AI</h3>
             <p className="text-xs opacity-80">{t.miguel.subtitle}</p>
           </div>
         </div>
