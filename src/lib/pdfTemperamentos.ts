@@ -187,7 +187,7 @@ const getTemperamentContent = (temperament: string, lang: string) => {
         fragilities: ['Dureza no trato pessoal', 'Impaciência com processos lentos', 'Dificuldade em delegar', 'Tendência a controlar demais', 'Pouca tolerância a erros', 'Desconexão emocional sob pressão'],
         light: 'Você abre caminhos que outros têm medo de atravessar. Sua força move montanhas.',
         shadow: 'Quando cansado, sua força vira dureza e sua determinação vira teimosia.',
-        miguelMessage: 'Vejo em você uma força que poucos têm. Sua energia é fogo que ilumina ou queima. Quando você aprende a dosar essa intensidade, você se torna líder de verdade — não por imposição, mas por inspiração.',
+        nelloMessage: 'Vejo em você uma força que poucos têm. Sua energia é fogo que ilumina ou queima. Quando você aprende a dosar essa intensidade, você se torna líder de verdade — não por imposição, mas por inspiração.',
         triggers: ['Lentidão', 'Desorganização', 'Falta de compromisso', 'Incompetência percebida'],
         healing: ['Momentos de silêncio', 'Reconhecimento do esforço', 'Resultados tangíveis', 'Desafios significativos'],
         relationships: {
@@ -233,7 +233,7 @@ const getTemperamentContent = (temperament: string, lang: string) => {
         fragilities: ['Dureza no trato pessoal', 'Impaciência com processos lentos', 'Dificuldade em delegar', 'Tendência a controlar demais', 'Pouca tolerância a erros', 'Desconexão emocional sob pressão'],
         light: 'Tu abres caminhos que outros têm medo de atravessar. A tua força move montanhas.',
         shadow: 'Quando cansado, a tua força vira dureza e a tua determinação vira teimosia.',
-        miguelMessage: 'Vejo em ti uma força que poucos têm. A tua energia é fogo que ilumina ou queima. Quando aprendes a dosar essa intensidade, tornas-te líder de verdade — não por imposição, mas por inspiração.',
+        nelloMessage: 'Vejo em ti uma força que poucos têm. A tua energia é fogo que ilumina ou queima. Quando aprendes a dosar essa intensidade, tornas-te líder de verdade — não por imposição, mas por inspiração.',
         triggers: ['Lentidão', 'Desorganização', 'Falta de compromisso', 'Incompetência percebida'],
         healing: ['Momentos de silêncio', 'Reconhecimento do esforço', 'Resultados tangíveis', 'Desafios significativos'],
         relationships: {
@@ -279,7 +279,7 @@ const getTemperamentContent = (temperament: string, lang: string) => {
         fragilities: ['Harshness in personal dealings', 'Impatience with slow processes', 'Difficulty delegating', 'Tendency to over-control', 'Low tolerance for mistakes', 'Emotional disconnection under pressure'],
         light: 'You open paths that others are afraid to cross. Your strength moves mountains.',
         shadow: 'When tired, your strength becomes harshness and your determination becomes stubbornness.',
-        miguelMessage: 'I see in you a strength that few have. Your energy is fire that illuminates or burns. When you learn to dose this intensity, you become a true leader — not by imposition, but by inspiration.',
+        nelloMessage: 'I see in you a strength that few have. Your energy is fire that illuminates or burns. When you learn to dose this intensity, you become a true leader — not by imposition, but by inspiration.',
         triggers: ['Slowness', 'Disorganization', 'Lack of commitment', 'Perceived incompetence'],
         healing: ['Moments of silence', 'Recognition of effort', 'Tangible results', 'Meaningful challenges'],
         relationships: {
@@ -327,7 +327,7 @@ const getTemperamentContent = (temperament: string, lang: string) => {
         fragilities: ['Dificuldade com disciplina', 'Procrastinação emocional', 'Impulso por agradar', 'Vulnerabilidade a críticas', 'Falta de foco prolongado', 'Superficialidade em vínculos'],
         light: 'Você movimenta corações. Sua presença muda ambientes e ilumina pessoas.',
         shadow: 'Quando cansado, sua alegria vira ansiedade e sua sociabilidade vira dependência.',
-        miguelMessage: 'Sua alma é festa. Você transforma ambientes pesados em lugares leves. Mas cuidado: nem toda alegria é saúde. Às vezes você sorri para esconder. Aprenda a ser leve E profundo.',
+        nelloMessage: 'Sua alma é festa. Você transforma ambientes pesados em lugares leves. Mas cuidado: nem toda alegria é saúde. Às vezes você sorri para esconder. Aprenda a ser leve E profundo.',
         triggers: ['Rejeição social', 'Críticas públicas', 'Solidão prolongada', 'Ambiente pesado'],
         healing: ['Reconhecimento', 'Diversão genuína', 'Conexões profundas', 'Liberdade criativa'],
         relationships: {
@@ -373,7 +373,7 @@ const getTemperamentContent = (temperament: string, lang: string) => {
         fragilities: ['Dificuldade com disciplina', 'Procrastinação emocional', 'Impulso por agradar', 'Vulnerabilidade a críticas', 'Falta de foco prolongado', 'Superficialidade em vínculos'],
         light: 'Tu movimentas corações. A tua presença muda ambientes e ilumina pessoas.',
         shadow: 'Quando cansado, a tua alegria vira ansiedade e a tua sociabilidade vira dependência.',
-        miguelMessage: 'A tua alma é festa. Tu transformas ambientes pesados em lugares leves. Mas cuidado: nem toda alegria é saúde. Às vezes sorris para esconder. Aprende a ser leve E profundo.',
+        nelloMessage: 'A tua alma é festa. Tu transformas ambientes pesados em lugares leves. Mas cuidado: nem toda alegria é saúde. Às vezes sorris para esconder. Aprende a ser leve E profundo.',
         triggers: ['Rejeição social', 'Críticas públicas', 'Solidão prolongada', 'Ambiente pesado'],
         healing: ['Reconhecimento', 'Diversão genuína', 'Conexões profundas', 'Liberdade criativa'],
         relationships: {
@@ -419,7 +419,7 @@ const getTemperamentContent = (temperament: string, lang: string) => {
         fragilities: ['Difficulty with discipline', 'Emotional procrastination', 'Urge to please', 'Vulnerability to criticism', 'Lack of prolonged focus', 'Superficiality in bonds'],
         light: 'You move hearts. Your presence changes environments and illuminates people.',
         shadow: 'When tired, your joy becomes anxiety and your sociability becomes dependency.',
-        miguelMessage: 'Your soul is a celebration. You transform heavy environments into light places. But be careful: not all joy is health. Sometimes you smile to hide. Learn to be light AND deep.',
+        nelloMessage: 'Your soul is a celebration. You transform heavy environments into light places. But be careful: not all joy is health. Sometimes you smile to hide. Learn to be light AND deep.',
         triggers: ['Social rejection', 'Public criticism', 'Prolonged loneliness', 'Heavy environment'],
         healing: ['Recognition', 'Genuine fun', 'Deep connections', 'Creative freedom'],
         relationships: {
@@ -467,7 +467,7 @@ const getTemperamentContent = (temperament: string, lang: string) => {
         fragilities: ['Autocrítica excessiva', 'Timidez emocional', 'Medo de errar', 'Desânimo diante de caos', 'Perfeccionismo paralisante', 'Tendência à melancolia'],
         light: 'Sua alma enxerga o que outros não veem. Você sente com verdade e profundidade.',
         shadow: 'Quando cansado, sua sensibilidade vira vulnerabilidade e sua reflexão vira ruminação.',
-        miguelMessage: 'Você carrega um universo interno que poucos conhecem. Sua profundidade é dom, não fardo. Aprenda a não se afogar no que sente. A clareza vem quando você para de se julgar.',
+        nelloMessage: 'Você carrega um universo interno que poucos conhecem. Sua profundidade é dom, não fardo. Aprenda a não se afogar no que sente. A clareza vem quando você para de se julgar.',
         triggers: ['Crítica injusta', 'Caos emocional', 'Falta de reconhecimento', 'Ambientes superficiais'],
         healing: ['Beleza estética', 'Profundidade relacional', 'Ordem e harmonia', 'Tempo para processar'],
         relationships: {
@@ -513,7 +513,7 @@ const getTemperamentContent = (temperament: string, lang: string) => {
         fragilities: ['Autocrítica excessiva', 'Timidez emocional', 'Medo de errar', 'Desânimo diante de caos', 'Perfeccionismo paralisante', 'Tendência à melancolia'],
         light: 'A tua alma vê o que outros não veem. Sentes com verdade e profundidade.',
         shadow: 'Quando cansado, a tua sensibilidade vira vulnerabilidade e a tua reflexão vira ruminação.',
-        miguelMessage: 'Carregas um universo interno que poucos conhecem. A tua profundidade é dom, não fardo. Aprende a não te afogares no que sentes. A clareza vem quando paras de te julgares.',
+        nelloMessage: 'Carregas um universo interno que poucos conhecem. A tua profundidade é dom, não fardo. Aprende a não te afogares no que sentes. A clareza vem quando paras de te julgares.',
         triggers: ['Crítica injusta', 'Caos emocional', 'Falta de reconhecimento', 'Ambientes superficiais'],
         healing: ['Beleza estética', 'Profundidade relacional', 'Ordem e harmonia', 'Tempo para processar'],
         relationships: {
@@ -559,7 +559,7 @@ const getTemperamentContent = (temperament: string, lang: string) => {
         fragilities: ['Excessive self-criticism', 'Emotional shyness', 'Fear of making mistakes', 'Discouragement in chaos', 'Paralyzing perfectionism', 'Tendency toward melancholy'],
         light: 'Your soul sees what others cannot see. You feel with truth and depth.',
         shadow: 'When tired, your sensitivity becomes vulnerability and your reflection becomes rumination.',
-        miguelMessage: 'You carry an inner universe that few know. Your depth is a gift, not a burden. Learn not to drown in what you feel. Clarity comes when you stop judging yourself.',
+        nelloMessage: 'You carry an inner universe that few know. Your depth is a gift, not a burden. Learn not to drown in what you feel. Clarity comes when you stop judging yourself.',
         triggers: ['Unfair criticism', 'Emotional chaos', 'Lack of recognition', 'Superficial environments'],
         healing: ['Aesthetic beauty', 'Relational depth', 'Order and harmony', 'Time to process'],
         relationships: {
@@ -607,7 +607,7 @@ const getTemperamentContent = (temperament: string, lang: string) => {
         fragilities: ['Medo de conflito', 'Passividade excessiva', 'Dificuldade em decidir', 'Resistência a mudanças', 'Tendência a postergar', 'Dificuldade em expressar necessidades'],
         light: 'Você traz paz onde existe turbulência. Sua calma é refúgio para muitos.',
         shadow: 'Quando cansado, sua calma vira apatia e sua paciência vira conformismo.',
-        miguelMessage: 'Sua paz é rara. Você é âncora em meio à tempestade. Mas cuidado: sua calma não pode virar fuga. Às vezes a paz exige ação. Aprenda a se mover quando necessário.',
+        nelloMessage: 'Sua paz é rara. Você é âncora em meio à tempestade. Mas cuidado: sua calma não pode virar fuga. Às vezes a paz exige ação. Aprenda a se mover quando necessário.',
         triggers: ['Conflito direto', 'Pressão para decidir', 'Mudanças bruscas', 'Ambientes caóticos'],
         healing: ['Rotina tranquila', 'Tempo para adaptação', 'Reconhecimento silencioso', 'Estabilidade relacional'],
         relationships: {
@@ -653,7 +653,7 @@ const getTemperamentContent = (temperament: string, lang: string) => {
         fragilities: ['Medo de conflito', 'Passividade excessiva', 'Dificuldade em decidir', 'Resistência a mudanças', 'Tendência a postergar', 'Dificuldade em expressar necessidades'],
         light: 'Tu trazes paz onde existe turbulência. A tua calma é refúgio para muitos.',
         shadow: 'Quando cansado, a tua calma vira apatia e a tua paciência vira conformismo.',
-        miguelMessage: 'A tua paz é rara. Tu és âncora em meio à tempestade. Mas cuidado: a tua calma não pode virar fuga. Às vezes a paz exige ação. Aprende a moveres-te quando necessário.',
+        nelloMessage: 'A tua paz é rara. Tu és âncora em meio à tempestade. Mas cuidado: a tua calma não pode virar fuga. Às vezes a paz exige ação. Aprende a moveres-te quando necessário.',
         triggers: ['Conflito direto', 'Pressão para decidir', 'Mudanças bruscas', 'Ambientes caóticos'],
         healing: ['Rotina tranquila', 'Tempo para adaptação', 'Reconhecimento silencioso', 'Estabilidade relacional'],
         relationships: {
@@ -699,7 +699,7 @@ const getTemperamentContent = (temperament: string, lang: string) => {
         fragilities: ['Fear of conflict', 'Excessive passivity', 'Difficulty deciding', 'Resistance to change', 'Tendency to procrastinate', 'Difficulty expressing needs'],
         light: 'You bring peace where there is turbulence. Your calm is a refuge for many.',
         shadow: 'When tired, your calm becomes apathy and your patience becomes conformism.',
-        miguelMessage: 'Your peace is rare. You are an anchor in the storm. But be careful: your calm cannot become escape. Sometimes peace requires action. Learn to move when necessary.',
+        nelloMessage: 'Your peace is rare. You are an anchor in the storm. But be careful: your calm cannot become escape. Sometimes peace requires action. Learn to move when necessary.',
         triggers: ['Direct conflict', 'Pressure to decide', 'Sudden changes', 'Chaotic environments'],
         healing: ['Quiet routine', 'Time to adapt', 'Silent recognition', 'Relational stability'],
         relationships: {
