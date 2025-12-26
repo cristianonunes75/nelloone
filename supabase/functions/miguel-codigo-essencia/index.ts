@@ -205,7 +205,92 @@ Based on: Enneagram + Temperament
 }
 
 ═══════════════════════════════════════════
-SECTION 5: YOUR NATURAL PURPOSE
+SECTION 5: YOUR NATURAL TALENTS
+═══════════════════════════════════════════
+
+Section: "seus_talentos"
+Based on: Multiple Intelligences + Archetypes + Nello 16
+
+{
+  "source": "Multiple Intelligences + Archetypes",
+  "items": [
+    { "talent": "[specific natural talent]", "origin": "[which test/combination reveals this]", "application": "[concrete area of application]" },
+    { "talent": "...", "origin": "...", "application": "..." },
+    { "talent": "...", "origin": "...", "application": "..." }
+  ]
+}
+
+═══════════════════════════════════════════
+SECTION 6: YOUR GIFTS
+═══════════════════════════════════════════
+
+Section: "seus_dons"
+Based on: Archetypes + Connection Style + Enneagram
+
+{
+  "source": "Archetypes + Connection Style",
+  "items": [
+    { "gift": "[what you deliver to the world at your best]", "manifestation": "[how this shows up in relationships and work]" },
+    { "gift": "...", "manifestation": "..." }
+  ]
+}
+
+═══════════════════════════════════════════
+SECTION 7: YOUR VOCATION / CALLING FIELDS
+═══════════════════════════════════════════
+
+Section: "sua_vocacao"
+Based on: Archetypes (primary + secondary) + Intelligences + DISC
+
+{
+  "source": "Archetypes + Intelligences",
+  "core_message": "[One powerful sentence about their calling - specific to their profile]",
+  "fields": [
+    { "field": "[area: Leadership, Education, Creation, Care, Communication, Service, Strategy, etc.]", "reason": "[why this suits their profile]", "example": "[optional: type of role or activity]" },
+    { "field": "...", "reason": "...", "example": "..." },
+    { "field": "...", "reason": "...", "example": "..." }
+  ]
+}
+
+═══════════════════════════════════════════
+SECTION 8: HOW ARCHETYPES SHAPE YOUR CALLING
+═══════════════════════════════════════════
+
+Section: "arquetipos_chamado"
+Based on: Primary + Secondary Archetypes
+
+{
+  "source": "Archetypes",
+  "primary": {
+    "archetype": "[name]",
+    "role": "[role in life mission]",
+    "contribution": "[unique contribution]"
+  },
+  "secondary": {
+    "archetype": "[name]",
+    "role": "[complementary role]",
+    "contribution": "[how it supports the primary]"
+  },
+  "synergy": "[how both archetypes work together in their calling]"
+}
+
+═══════════════════════════════════════════
+SECTION 9: CALLING DEVIATION RISKS
+═══════════════════════════════════════════
+
+Section: "riscos_desvio"
+Based on: Archetype shadows + Enneagram passion + Temperament weaknesses
+
+{
+  "source": "Shadows + Patterns",
+  "items": [
+    { "risk": "[how they might deviate from calling]", "trigger": "[what causes this]", "consequence": "[what they lose]" },
+    { "risk": "...", "trigger": "...", "consequence": "..." }
+  ]
+}
+
+═══════════════════════════════════════════
+SECTION 10: YOUR NATURAL PURPOSE
 ═══════════════════════════════════════════
 
 Section: "seu_proposito"
@@ -416,7 +501,92 @@ Baseado em: Eneagrama + Temperamento
 }
 
 ═══════════════════════════════════════════
-SEÇÃO 5: ${youWord === 'Tu' ? 'O TEU' : 'SEU'} PROPÓSITO NATURAL
+SEÇÃO 5: ${youWord === 'Tu' ? 'OS TEUS' : 'SEUS'} TALENTOS NATURAIS
+═══════════════════════════════════════════
+
+Seção: "seus_talentos"
+Baseado em: Inteligências Múltiplas + Arquétipos + Nello 16
+
+{
+  "source": "Inteligências Múltiplas + Arquétipos",
+  "items": [
+    { "talent": "[talento natural específico]", "origin": "[qual teste/combinação revela isso]", "application": "[área concreta de aplicação]" },
+    { "talent": "...", "origin": "...", "application": "..." },
+    { "talent": "...", "origin": "...", "application": "..." }
+  ]
+}
+
+═══════════════════════════════════════════
+SEÇÃO 6: ${youWord === 'Tu' ? 'OS TEUS' : 'SEUS'} DONS
+═══════════════════════════════════════════
+
+Seção: "seus_dons"
+Baseado em: Arquétipos + Estilo de Conexão + Eneagrama
+
+{
+  "source": "Arquétipos + Estilo de Conexão",
+  "items": [
+    { "gift": "[o que ${youWord.toLowerCase()} entrega ao mundo na melhor versão]", "manifestation": "[como isso aparece nos relacionamentos e trabalho]" },
+    { "gift": "...", "manifestation": "..." }
+  ]
+}
+
+═══════════════════════════════════════════
+SEÇÃO 7: ${youWord === 'Tu' ? 'A TUA' : 'SUA'} VOCAÇÃO / CAMPOS DE CHAMADO
+═══════════════════════════════════════════
+
+Seção: "sua_vocacao"
+Baseado em: Arquétipos (principal + secundário) + Inteligências + DISC
+
+{
+  "source": "Arquétipos + Inteligências",
+  "core_message": "[Uma frase poderosa sobre o chamado - específica para este perfil]",
+  "fields": [
+    { "field": "[área: Liderança, Educação, Criação, Cuidado, Comunicação, Serviço, Estratégia, etc.]", "reason": "[por que isso combina com o perfil]", "example": "[opcional: tipo de papel ou atividade]" },
+    { "field": "...", "reason": "...", "example": "..." },
+    { "field": "...", "reason": "...", "example": "..." }
+  ]
+}
+
+═══════════════════════════════════════════
+SEÇÃO 8: COMO ${youWord === 'Tu' ? 'OS TEUS' : 'SEUS'} ARQUÉTIPOS MOLDAM ${youWord === 'Tu' ? 'O TEU' : 'SEU'} CHAMADO
+═══════════════════════════════════════════
+
+Seção: "arquetipos_chamado"
+Baseado em: Arquétipo Principal + Secundário
+
+{
+  "source": "Arquétipos",
+  "primary": {
+    "archetype": "[nome]",
+    "role": "[papel na missão de vida]",
+    "contribution": "[contribuição única]"
+  },
+  "secondary": {
+    "archetype": "[nome]",
+    "role": "[papel complementar]",
+    "contribution": "[como apoia o principal]"
+  },
+  "synergy": "[como ambos arquétipos trabalham juntos no chamado]"
+}
+
+═══════════════════════════════════════════
+SEÇÃO 9: RISCOS DE DESVIO DO CHAMADO
+═══════════════════════════════════════════
+
+Seção: "riscos_desvio"
+Baseado em: Sombras dos arquétipos + Paixão do Eneagrama + Fraquezas do Temperamento
+
+{
+  "source": "Sombras + Padrões",
+  "items": [
+    { "risk": "[como pode desviar do chamado]", "trigger": "[o que causa isso]", "consequence": "[o que perde]" },
+    { "risk": "...", "trigger": "...", "consequence": "..." }
+  ]
+}
+
+═══════════════════════════════════════════
+SEÇÃO 10: ${youWord === 'Tu' ? 'O TEU' : 'SEU'} PROPÓSITO NATURAL
 ═══════════════════════════════════════════
 
 Seção: "seu_proposito"
@@ -514,6 +684,39 @@ ESTRUTURA JSON FINAL
       "title": "${youWord === 'Tu' ? 'As Tuas' : 'Suas'} Sombras e Bloqueios",
       "source": "Eneagrama + Temperamento",
       "items": [...]
+    },
+    {
+      "id": "seus_talentos",
+      "title": "${youWord === 'Tu' ? 'Os Teus' : 'Seus'} Talentos Naturais",
+      "source": "Inteligências Múltiplas + Arquétipos",
+      "items": [{ "talent": "...", "origin": "...", "application": "..." }, ...]
+    },
+    {
+      "id": "seus_dons",
+      "title": "${youWord === 'Tu' ? 'Os Teus' : 'Seus'} Dons",
+      "source": "Arquétipos + Estilo de Conexão",
+      "items": [{ "gift": "...", "manifestation": "..." }, ...]
+    },
+    {
+      "id": "sua_vocacao",
+      "title": "${youWord === 'Tu' ? 'A Tua' : 'Sua'} Vocação",
+      "source": "Arquétipos + Inteligências",
+      "core_message": "...",
+      "fields": [{ "field": "...", "reason": "...", "example": "..." }, ...]
+    },
+    {
+      "id": "arquetipos_chamado",
+      "title": "Arquétipos e Chamado",
+      "source": "Arquétipos",
+      "primary": { "archetype": "...", "role": "...", "contribution": "..." },
+      "secondary": { "archetype": "...", "role": "...", "contribution": "..." },
+      "synergy": "..."
+    },
+    {
+      "id": "riscos_desvio",
+      "title": "Riscos de Desvio",
+      "source": "Sombras + Padrões",
+      "items": [{ "risk": "...", "trigger": "...", "consequence": "..." }, ...]
     },
     {
       "id": "seu_proposito",

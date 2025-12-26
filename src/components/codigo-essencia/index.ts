@@ -17,3 +17,6 @@ export { SectionIndex } from "./SectionIndex";
 export { SectionDivider } from "./SectionDivider";
 export { NextStepCard } from "./NextStepCard";
 export { ScoreHighlights } from "./ScoreHighlights";
+export { TalentsGiftsSection } from "./TalentsGiftsSection";
+export { VocationSection } from "./VocationSection";
+export { ArchetypesMissionSection } from "./ArchetypesMissionSection";

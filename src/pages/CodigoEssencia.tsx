@@ -40,6 +40,9 @@ import {
   SectionDivider,
   NextStepCard,
   ScoreHighlights,
+  TalentsGiftsSection,
+  VocationSection,
+  ArchetypesMissionSection,
 } from "@/components/codigo-essencia";
 
 type LangKey = 'pt' | 'pt-pt' | 'en';
@@ -347,6 +350,11 @@ const CodigoEssenciaInner = () => {
   const conversaSection = generatedSections.find(s => s.id === 'conversa_final');
   const forcasSection = generatedSections.find(s => s.id === 'suas_forcas');
   const sombrasSection = generatedSections.find(s => s.id === 'suas_sombras');
+  const talentosSection = generatedSections.find(s => s.id === 'seus_talentos');
+  const donsSection = generatedSections.find(s => s.id === 'seus_dons');
+  const vocacaoSection = generatedSections.find(s => s.id === 'sua_vocacao');
+  const arquetiposChamadoSection = generatedSections.find(s => s.id === 'arquetipos_chamado');
+  const riscosDesvioSection = generatedSections.find(s => s.id === 'riscos_desvio');
 
   if (isLoading) {
     return (
@@ -519,6 +527,37 @@ const CodigoEssenciaInner = () => {
                 manifesto={purposeData.manifesto}
                 expressions={purposeData.expressions}
                 risk={purposeData.risk}
+                language={lang}
+              />
+            )}
+
+            <SectionDivider variant="dots" />
+
+            {/* === NEW: Talents & Gifts === */}
+            {(talentosSection?.items?.length > 0 || donsSection?.items?.length > 0) && (
+              <TalentsGiftsSection 
+                talents={talentosSection?.items}
+                gifts={donsSection?.items}
+                language={lang}
+              />
+            )}
+
+            {/* === NEW: Vocation === */}
+            {vocacaoSection && (
+              <VocationSection 
+                fields={vocacaoSection.fields}
+                coreMessage={vocacaoSection.core_message}
+                language={lang}
+              />
+            )}
+
+            {/* === NEW: Archetypes Mission & Deviation Risks === */}
+            {(arquetiposChamadoSection || riscosDesvioSection?.items?.length > 0) && (
+              <ArchetypesMissionSection 
+                primary={arquetiposChamadoSection?.primary}
+                secondary={arquetiposChamadoSection?.secondary}
+                synergy={arquetiposChamadoSection?.synergy}
+                deviationRisks={riscosDesvioSection?.items}
                 language={lang}
               />
             )}
