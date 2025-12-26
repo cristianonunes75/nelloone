@@ -83,6 +83,13 @@ class TestResultsErrorBoundary extends Component<
     console.error("TestResults crashed:", error);
   }
 
+  handleRetry = () => {
+    // Reset error state first, then call parent onRetry
+    this.setState({ hasError: false, error: undefined }, () => {
+      this.props.onRetry();
+    });
+  };
+
   render() {
     if (this.state.hasError) {
       return (
@@ -95,7 +102,7 @@ class TestResultsErrorBoundary extends Component<
                 Ocorreu um erro ao renderizar esta página. Você ainda pode voltar para a Área do Cliente e tentar novamente.
               </p>
               <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
-                <Button variant="outline" onClick={this.props.onRetry} className="gap-2">
+                <Button variant="outline" onClick={this.handleRetry} className="gap-2">
                   <RefreshCw className="h-4 w-4" />
                   Tentar novamente
                 </Button>
@@ -148,6 +155,12 @@ function TestResultsInner() {
   const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   const [isRecalculating, setIsRecalculating] = useState(false);
+
+  // Define handleRetry early to avoid hoisting issues
+  const handleRetry = () => {
+    queryClient.invalidateQueries({ queryKey: ["user-test-result", userTestId] });
+    queryClient.invalidateQueries({ queryKey: ["test-result-answers", userTestId] });
+  };
 
   // Check if user is founder and get profile data (including full_name)
   const { data: profile } = useQuery({
@@ -317,11 +330,6 @@ function TestResultsInner() {
     }
   };
 
-  // Retry loading data
-  function handleRetry() {
-    queryClient.invalidateQueries({ queryKey: ["user-test-result", userTestId] });
-    queryClient.invalidateQueries({ queryKey: ["test-result-answers", userTestId] });
-  }
 
   // Recalculate result from answers
   const handleRecalculate = async () => {
