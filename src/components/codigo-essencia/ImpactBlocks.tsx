@@ -13,42 +13,34 @@ export const ImpactBlocks = ({ essence, risk, calling, gift, language = "pt" }: 
   const lang = language === "en" ? "en" : language === "pt-pt" ? "pt-pt" : "pt";
   
   const labels = {
-    essence: { pt: "Essência em uma frase", "pt-pt": "Essência numa frase", en: "Essence in one phrase" },
-    risk: { pt: "Seu maior risco", "pt-pt": "O teu maior risco", en: "Your biggest risk" },
+    essence: { pt: "Você é", "pt-pt": "Tu és", en: "You are" },
+    risk: { pt: "Seu risco", "pt-pt": "O teu risco", en: "Your risk" },
     calling: { pt: "Seu chamado", "pt-pt": "O teu chamado", en: "Your calling" },
-    gift: { pt: "Seu maior dom hoje", "pt-pt": "O teu maior dom hoje", en: "Your greatest gift today" },
+    gift: { pt: "Seu dom", "pt-pt": "O teu dom", en: "Your gift" },
   };
 
   const blocks = [
-    { key: "essence", icon: Flame, value: essence, color: "from-orange-500/20 to-red-500/20 border-orange-500/50", iconColor: "text-orange-500" },
-    { key: "risk", icon: AlertTriangle, value: risk, color: "from-amber-500/20 to-yellow-500/20 border-amber-500/50", iconColor: "text-amber-500" },
-    { key: "calling", icon: Compass, value: calling, color: "from-purple-500/20 to-indigo-500/20 border-purple-500/50", iconColor: "text-purple-500" },
-    { key: "gift", icon: Diamond, value: gift, color: "from-emerald-500/20 to-green-500/20 border-emerald-500/50", iconColor: "text-emerald-500" },
+    { key: "essence", icon: Flame, value: essence, bg: "bg-orange-500/10", iconBg: "bg-orange-500", iconColor: "text-white" },
+    { key: "gift", icon: Diamond, value: gift, bg: "bg-emerald-500/10", iconBg: "bg-emerald-500", iconColor: "text-white" },
+    { key: "calling", icon: Compass, value: calling, bg: "bg-purple-500/10", iconBg: "bg-purple-500", iconColor: "text-white" },
+    { key: "risk", icon: AlertTriangle, value: risk, bg: "bg-rose-500/10", iconBg: "bg-rose-500", iconColor: "text-white" },
   ].filter(b => b.value);
 
   if (blocks.length === 0) return null;
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      {blocks.map(({ key, icon: Icon, value, color, iconColor }) => (
-        <div 
-          key={key}
-          className={cn(
-            "p-4 rounded-xl bg-gradient-to-br border transition-all hover:scale-[1.02]",
-            color
-          )}
-        >
-          <div className="flex items-start gap-3">
-            <div className={cn("p-2 rounded-lg bg-background/50", iconColor)}>
-              <Icon className="w-5 h-5" />
+    <div className="grid gap-2 grid-cols-2 lg:grid-cols-4">
+      {blocks.map(({ key, icon: Icon, value, bg, iconBg, iconColor }) => (
+        <div key={key} className={cn("p-3 rounded-xl", bg)}>
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className={cn("w-6 h-6 rounded-md flex items-center justify-center", iconBg)}>
+              <Icon className={cn("w-3.5 h-3.5", iconColor)} />
             </div>
-            <div className="flex-1">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
-                {labels[key as keyof typeof labels]?.[lang] || key}
-              </p>
-              <p className="font-semibold leading-snug">{value}</p>
-            </div>
+            <span className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
+              {labels[key as keyof typeof labels]?.[lang]}
+            </span>
           </div>
+          <p className="text-xs font-semibold leading-snug line-clamp-3">{value}</p>
         </div>
       ))}
     </div>
