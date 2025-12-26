@@ -304,11 +304,37 @@ const CodigoEssenciaInner = () => {
       const { data, error } = await supabase.functions.invoke('miguel-codigo-essencia', {
         body: { user_id: user.id, locale: lang === 'en' ? 'en' : lang === 'pt-pt' ? 'pt-pt' : 'pt-br' }
       });
-      if (error) throw error;
+
+      // Some failures return as `error`, others return a 200 with an `error` field.
+      if (error) {
+        const status = (error as any)?.status ?? (error as any)?.context?.status;
+        if (status === 402) {
+          toast.error(lang === 'en'
+            ? 'AI credits are insufficient to generate right now.'
+            : 'Créditos de IA insuficientes para gerar agora.');
+          return;
+        }
+        if (status === 429) {
+          toast.error(lang === 'en'
+            ? 'Too many requests. Please try again in a moment.'
+            : 'Muitas tentativas. Tente novamente em instantes.');
+          return;
+        }
+        throw error;
+      }
+
       if (data?.error === 'journey_not_completed') {
         toast.error(lang === 'en' ? 'Complete all 7 tests first.' : 'Complete os 7 testes primeiro.');
         return;
       }
+
+      if (data?.error === 'ai_credits_insufficient') {
+        toast.error(lang === 'en'
+          ? 'AI credits are insufficient to generate right now.'
+          : 'Créditos de IA insuficientes para gerar agora.');
+        return;
+      }
+
       if (data?.sections) {
         setGeneratedSections(data.sections);
         setHasGenerated(true);

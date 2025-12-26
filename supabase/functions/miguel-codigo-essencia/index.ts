@@ -1036,19 +1036,37 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        // Cheaper model to reduce usage/cost while keeping quality.
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+          { role: "user", content: userPrompt },
         ],
         temperature: 0.7,
-        max_tokens: 16000,
+        // Keep output large, but avoid runaway token usage.
+        max_tokens: 8000,
       }),
     });
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
       console.error("AI API error:", aiResponse.status, errorText);
+
+      // Bubble up billing / quota errors so the frontend can show a clear message.
+      if (aiResponse.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "ai_credits_insufficient", details: errorText }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      if (aiResponse.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "ai_rate_limited", details: errorText }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       return new Response(
         JSON.stringify({ error: "ai_generation_failed", details: errorText }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
