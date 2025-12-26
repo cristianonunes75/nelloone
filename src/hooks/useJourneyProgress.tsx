@@ -112,30 +112,8 @@ export function useJourneyProgress() {
         ? "in_progress"
         : baseStatus;
       
-      const previousCompleted = index === 0 || 
-        JOURNEY_ORDER.slice(0, index).every(prevSlug => {
-          const prevTest = testByType.get(prevSlug);
-          if (!prevTest) return true;
-          
-          const prevStatus = getTestStatus(prevTest.id);
-          const prevUserTest = userTests?.find(ut => ut.test_id === prevTest.id);
-          const prevResultData = prevUserTest?.result_data as any;
-          const prevIsPurchased = hasPurchased(prevTest.id);
-          
-          // A freemium test is "completed" for journey purposes if:
-          // 1. It's truly completed (not partial), OR
-          // 2. It completed free version AND user has access to continue (purchased)
-          if (prevTest.is_free && prevResultData?.partial) {
-            // If purchased, user can continue - consider it "in progress" not blocking
-            // If not purchased, they're waiting - still doesn't block journey
-            // For journey progression, free version completion is enough
-            return prevResultData.free_questions_completed || prevStatus === "completed";
-          }
-          
-          return prevStatus === "completed";
-        });
-
-      const isUnlocked = previousCompleted;
+      // All tests are now unlocked - users can start any test in any order
+      const isUnlocked = true;
       
       // Current step is the first incomplete/in-progress test that's unlocked
       const isCurrentStep = !currentStepFound && 
