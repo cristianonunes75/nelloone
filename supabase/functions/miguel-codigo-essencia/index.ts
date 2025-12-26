@@ -505,14 +505,18 @@ SEÇÃO 5: ${youWord === 'Tu' ? 'OS TEUS' : 'SEUS'} TALENTOS NATURAIS
 ═══════════════════════════════════════════
 
 Seção: "seus_talentos"
-Baseado em: Inteligências Múltiplas + Arquétipos + Nello 16
+Baseado em: CRUZAMENTO OBRIGATÓRIO de Inteligências Múltiplas + Arquétipos + Nello 16
+
+REGRA CRÍTICA: Cada talento DEVE cruzar pelo menos 2 testes. Exemplo:
+- "Liderança Estratégica" → Arquétipo Guerreiro + DISC D + Inteligência Lógica
+- "Comunicação Inspiradora" → Arquétipo Mago + Inteligência Linguística + Nello 16 ENFJ
 
 {
   "source": "Inteligências Múltiplas + Arquétipos",
   "items": [
-    { "talent": "[talento natural específico]", "origin": "[qual teste/combinação revela isso]", "application": "[área concreta de aplicação]" },
-    { "talent": "...", "origin": "...", "application": "..." },
-    { "talent": "...", "origin": "...", "application": "..." }
+    { "talent": "[talento específico que CRUZA arquétipo + inteligência]", "origin": "[cite: Arquétipo X + Inteligência Y + Teste Z]", "application": "[área concreta de aplicação]" },
+    { "talent": "...", "origin": "[SEMPRE cite 2-3 testes]", "application": "..." },
+    { "talent": "...", "origin": "[SEMPRE cite 2-3 testes]", "application": "..." }
   ]
 }
 
@@ -521,13 +525,17 @@ SEÇÃO 6: ${youWord === 'Tu' ? 'OS TEUS' : 'SEUS'} DONS
 ═══════════════════════════════════════════
 
 Seção: "seus_dons"
-Baseado em: Arquétipos + Estilo de Conexão + Eneagrama
+Baseado em: CRUZAMENTO OBRIGATÓRIO de Arquétipos + Estilo de Conexão + Eneagrama
+
+REGRA CRÍTICA: Cada dom DEVE ser derivado do arquétipo principal ou secundário + outro teste. Exemplo:
+- Arquétipo Cuidador + Presença Ativa → "Dom de acolher sem julgamento"
+- Arquétipo Sábio + Eneagrama 5 → "Dom de traduzir complexidade em clareza"
 
 {
   "source": "Arquétipos + Estilo de Conexão",
   "items": [
-    { "gift": "[o que ${youWord.toLowerCase()} entrega ao mundo na melhor versão]", "manifestation": "[como isso aparece nos relacionamentos e trabalho]" },
-    { "gift": "...", "manifestation": "..." }
+    { "gift": "[dom derivado do ARQUÉTIPO + outro teste]", "manifestation": "[como isso aparece - cite o arquétipo explicitamente]" },
+    { "gift": "[dom derivado do ARQUÉTIPO secundário + outro teste]", "manifestation": "[cite a conexão com o arquétipo]" }
   ]
 }
 
@@ -536,15 +544,19 @@ SEÇÃO 7: ${youWord === 'Tu' ? 'A TUA' : 'SUA'} VOCAÇÃO / CAMPOS DE CHAMADO
 ═══════════════════════════════════════════
 
 Seção: "sua_vocacao"
-Baseado em: Arquétipos (principal + secundário) + Inteligências + DISC
+Baseado em: CRUZAMENTO OBRIGATÓRIO de Arquétipos (principal + secundário) + Inteligências + DISC
+
+REGRA CRÍTICA: A vocação DEVE ser moldada pelo arquétipo principal. Cite-o explicitamente!
+Exemplo para Arquétipo Explorador + Inteligência Naturalista + DISC I:
+- "Seu chamado é desbravar territórios desconhecidos (Explorador) usando sua conexão com sistemas naturais (Naturalista) e capacidade de inspirar outros (DISC I)."
 
 {
   "source": "Arquétipos + Inteligências",
-  "core_message": "[Uma frase poderosa sobre o chamado - específica para este perfil]",
+  "core_message": "[Frase que MENCIONA o arquétipo principal - ex: 'Como [Arquétipo], seu chamado é...']",
   "fields": [
-    { "field": "[área: Liderança, Educação, Criação, Cuidado, Comunicação, Serviço, Estratégia, etc.]", "reason": "[por que isso combina com o perfil]", "example": "[opcional: tipo de papel ou atividade]" },
-    { "field": "...", "reason": "...", "example": "..." },
-    { "field": "...", "reason": "...", "example": "..." }
+    { "field": "[área conectada ao arquétipo]", "reason": "[CITE: Arquétipo X + Inteligência Y + DISC]", "example": "[papel específico]" },
+    { "field": "...", "reason": "[SEMPRE cite o arquétipo na razão]", "example": "..." },
+    { "field": "...", "reason": "[SEMPRE cite o arquétipo na razão]", "example": "..." }
   ]
 }
 
@@ -1030,7 +1042,7 @@ serve(async (req) => {
           { role: "user", content: userPrompt }
         ],
         temperature: 0.7,
-        max_tokens: 8000,
+        max_tokens: 16000,
       }),
     });
 
@@ -1056,20 +1068,48 @@ serve(async (req) => {
     // Parse the JSON from AI response
     let parsedReport;
     try {
-      // Clean the response if it has markdown code blocks
+      // Clean the response - remove markdown code blocks more robustly
       let cleanContent = generatedContent.trim();
+      
+      // Remove opening markdown
       if (cleanContent.startsWith("```json")) {
-        cleanContent = cleanContent.replace(/^```json\n?/, "").replace(/\n?```$/, "");
+        cleanContent = cleanContent.slice(7);
       } else if (cleanContent.startsWith("```")) {
-        cleanContent = cleanContent.replace(/^```\n?/, "").replace(/\n?```$/, "");
+        cleanContent = cleanContent.slice(3);
+      }
+      
+      // Remove closing markdown - find last occurrence
+      const lastBackticks = cleanContent.lastIndexOf("```");
+      if (lastBackticks !== -1) {
+        cleanContent = cleanContent.slice(0, lastBackticks);
+      }
+      
+      cleanContent = cleanContent.trim();
+      
+      // Attempt to fix truncated JSON by finding the last complete object
+      if (!cleanContent.endsWith("}")) {
+        console.log("JSON appears truncated, attempting repair...");
+        // Find last valid closing brace
+        let braceCount = 0;
+        let lastValidIndex = -1;
+        for (let i = 0; i < cleanContent.length; i++) {
+          if (cleanContent[i] === '{') braceCount++;
+          if (cleanContent[i] === '}') {
+            braceCount--;
+            if (braceCount === 0) lastValidIndex = i;
+          }
+        }
+        if (lastValidIndex > 0) {
+          cleanContent = cleanContent.slice(0, lastValidIndex + 1);
+        }
       }
       
       parsedReport = JSON.parse(cleanContent);
     } catch (parseError) {
       console.error("Failed to parse AI response as JSON:", parseError);
-      console.log("Raw AI response:", generatedContent);
+      console.log("Raw AI response (first 2000 chars):", generatedContent.substring(0, 2000));
       return new Response(
-        JSON.stringify({ error: "invalid_ai_response", raw: generatedContent }),
+        JSON.stringify({ error: "invalid_ai_response", message: "A IA gerou uma resposta incompleta. Tente novamente." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
