@@ -163,15 +163,16 @@ function TestResultsInner() {
   };
 
   // Check if user is founder and get profile data (including full_name)
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["profile-data", user?.id],
     enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
         .select("is_founder, full_name")
         .eq("id", user!.id)
-        .single();
+        .maybeSingle();
       if (error) return null;
       return data;
     },
@@ -194,9 +195,12 @@ function TestResultsInner() {
   const userFirstName = getUserFirstName();
   const canRecalculate = isAdmin || isFounder;
 
-  const { data: userTest, isLoading, isError: isUserTestError, error: userTestError } = useQuery({
+  const { data: userTest, isLoading: userTestLoading, isError: isUserTestError, error: userTestError, isFetching: userTestFetching } = useQuery({
     queryKey: ["user-test-result", userTestId],
     enabled: !!userTestId,
+    staleTime: 30 * 1000, // 30 seconds
+    retry: 2,
+    retryDelay: 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("user_tests")
@@ -218,6 +222,34 @@ function TestResultsInner() {
     },
   });
 
+  // Wait for userTest to load before fetching answers
+  const { data: answers, isLoading: answersLoading, isFetching: answersFetching } = useQuery({
+    queryKey: ["test-result-answers", userTestId],
+    enabled: !!userTestId && !!userTest && userTest.status === 'completed',
+    staleTime: 30 * 1000,
+    retry: 2,
+    retryDelay: 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("test_answers")
+        .select("*, test_questions(*)")
+        .eq("user_test_id", userTestId!);
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Determine if we're still in initial loading phase
+  const isInitialLoading = userTestLoading || (!!userTest && userTest.status === 'completed' && answersLoading);
+  
+  // Show skeleton during initial loading - this is the FIRST check to avoid any rendering with incomplete data
+  if (isInitialLoading) {
+    const loadingStage = userTestLoading ? "test" : "answers";
+    return <TestResultsSkeleton stage={loadingStage} />;
+  }
+
+  // Handle error state AFTER loading check
   if (isUserTestError) {
     return (
       <div className="container mx-auto p-6 flex flex-col items-center justify-center min-h-[60vh]">
@@ -245,25 +277,6 @@ function TestResultsInner() {
       </div>
     );
   }
-
-
-  // Wait for userTest to load before fetching answers
-  const { data: answers, isLoading: answersLoading } = useQuery({
-    queryKey: ["test-result-answers", userTestId],
-    enabled: !!userTestId && !!userTest, // Only fetch after userTest is loaded
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("test_answers")
-        .select("*, test_questions(*)")
-        .eq("user_test_id", userTestId!);
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // Combined loading state - wait for both queries
-  const isFullyLoaded = !isLoading && !answersLoading && userTest;
 
   const { data: hasPurchased } = useQuery({
     queryKey: ["test-purchase", user?.id, userTest?.test_id],
@@ -357,14 +370,7 @@ function TestResultsInner() {
     }
   };
 
-  // Determine loading stage for skeleton
-  const loadingStage = isLoading ? "test" : answersLoading ? "answers" : "calculating";
-
-  // Show skeleton loading until both userTest and answers are loaded
-  if (!isFullyLoaded) {
-    return <TestResultsSkeleton stage={loadingStage} />;
-  }
-
+  // These checks are now handled earlier in the component, but keep as safety fallback
   if (!userTest) {
     return (
       <div className="container mx-auto p-6 flex flex-col items-center justify-center min-h-[60vh]">
