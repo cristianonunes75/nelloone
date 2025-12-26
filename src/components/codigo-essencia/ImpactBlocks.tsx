@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Flame, AlertTriangle, Compass, Diamond } from "lucide-react";
 
@@ -10,6 +11,7 @@ interface ImpactBlocksProps {
 }
 
 export const ImpactBlocks = ({ essence, risk, calling, gift, language = "pt" }: ImpactBlocksProps) => {
+  const [expanded, setExpanded] = useState<string | null>(null);
   const lang = language === "en" ? "en" : language === "pt-pt" ? "pt-pt" : "pt";
   
   const labels = {
@@ -28,21 +30,40 @@ export const ImpactBlocks = ({ essence, risk, calling, gift, language = "pt" }: 
 
   if (blocks.length === 0) return null;
 
+  const toggleExpand = (key: string) => {
+    setExpanded(prev => prev === key ? null : key);
+  };
+
   return (
     <div className="grid gap-2 grid-cols-2 lg:grid-cols-4">
-      {blocks.map(({ key, icon: Icon, value, bg, iconBg, iconColor }) => (
-        <div key={key} className={cn("p-3 rounded-xl", bg)}>
-          <div className="flex items-center gap-2 mb-1.5">
-            <div className={cn("w-6 h-6 rounded-md flex items-center justify-center", iconBg)}>
-              <Icon className={cn("w-3.5 h-3.5", iconColor)} />
+      {blocks.map(({ key, icon: Icon, value, bg, iconBg, iconColor }) => {
+        const isExpanded = expanded === key;
+        return (
+          <div 
+            key={key} 
+            className={cn(
+              "p-3 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md",
+              bg
+            )}
+            onClick={() => toggleExpand(key)}
+          >
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className={cn("w-6 h-6 rounded-md flex items-center justify-center", iconBg)}>
+                <Icon className={cn("w-3.5 h-3.5", iconColor)} />
+              </div>
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
+                {labels[key as keyof typeof labels]?.[lang]}
+              </span>
             </div>
-            <span className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
-              {labels[key as keyof typeof labels]?.[lang]}
-            </span>
+            <p className={cn(
+              "text-xs font-semibold leading-snug transition-all duration-200",
+              !isExpanded && "line-clamp-3"
+            )}>
+              {value}
+            </p>
           </div>
-          <p className="text-xs font-semibold leading-snug line-clamp-3">{value}</p>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
