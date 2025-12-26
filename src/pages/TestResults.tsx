@@ -66,13 +66,19 @@ type TestResultsErrorBoundaryProps = {
 type TestResultsErrorBoundaryState = {
   hasError: boolean;
   error?: unknown;
+  autoRetryAttempts: number;
+  isRecovering: boolean;
 };
 
 class TestResultsErrorBoundary extends Component<
   TestResultsErrorBoundaryProps,
   TestResultsErrorBoundaryState
 > {
-  state: TestResultsErrorBoundaryState = { hasError: false };
+  state: TestResultsErrorBoundaryState = {
+    hasError: false,
+    autoRetryAttempts: 0,
+    isRecovering: false,
+  };
 
   static getDerivedStateFromError(error: unknown) {
     return { hasError: true, error };
@@ -81,17 +87,44 @@ class TestResultsErrorBoundary extends Component<
   componentDidCatch(error: unknown) {
     // eslint-disable-next-line no-console
     console.error("TestResults crashed:", error);
+
+    // Auto-retry once to avoid showing an intermediate error page
+    if (this.state.autoRetryAttempts < 1 && !this.state.isRecovering) {
+      this.setState(
+        (prev) => ({
+          ...prev,
+          isRecovering: true,
+          autoRetryAttempts: prev.autoRetryAttempts + 1,
+        }),
+        () => {
+          this.props.onRetry();
+          // Give React Query a moment to refetch before re-rendering children
+          window.setTimeout(() => {
+            this.setState({ hasError: false, error: undefined, isRecovering: false });
+          }, 150);
+        }
+      );
+    }
   }
 
   handleRetry = () => {
-    // Reset error state first, then call parent onRetry
-    this.setState({ hasError: false, error: undefined }, () => {
-      this.props.onRetry();
-    });
+    this.setState(
+      { hasError: false, error: undefined, isRecovering: false },
+      () => this.props.onRetry()
+    );
   };
 
   render() {
     if (this.state.hasError) {
+      // During auto-recovery we never show the error UI; we keep a loading state.
+      if (this.state.isRecovering) {
+        return (
+          <div className="container mx-auto p-6">
+            <TestResultsSkeleton stage="test" />
+          </div>
+        );
+      }
+
       return (
         <div className="container mx-auto p-6 flex flex-col items-center justify-center min-h-[60vh]">
           <Card className="max-w-md w-full">
