@@ -13,3 +13,5 @@ export { EssenceIndicators } from "./EssenceIndicators";
 export { ConfrontationSection } from "./ConfrontationSection";
 export { PurposeManifesto } from "./PurposeManifesto";
 export { CollapsibleSection } from "./CollapsibleSection";
+export { SectionIndex } from "./SectionIndex";
+export { SectionDivider } from "./SectionDivider";

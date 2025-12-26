@@ -21,7 +21,10 @@ import {
   Shield,
   Compass,
   Clock,
-  MessageCircle
+  MessageCircle,
+  BarChart3,
+  Flame,
+  Activity
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -45,9 +48,26 @@ import {
   ConfrontationSection,
   PurposeManifesto,
   CollapsibleSection,
+  SectionIndex,
+  SectionDivider,
 } from "@/components/codigo-essencia";
 
 const SECTION_CONFIG: Record<string, { title: Record<string, string>; icon: React.ReactNode; color: string }> = {
+  quick_summary: {
+    title: { pt: "Seu Código em 60 Segundos", 'pt-pt': "O Teu Código em 60 Segundos", en: "Your Code in 60 Seconds" },
+    icon: <Zap className="w-5 h-5" />,
+    color: "from-amber-500/20 to-orange-500/20 border-amber-500/30"
+  },
+  mapa_visual: {
+    title: { pt: "Mapa Visual da Essência", 'pt-pt': "Mapa Visual da Essência", en: "Visual Essence Map" },
+    icon: <BarChart3 className="w-5 h-5" />,
+    color: "from-blue-500/20 to-indigo-500/20 border-blue-500/30"
+  },
+  indicadores: {
+    title: { pt: "Seus Indicadores-Chave", 'pt-pt': "Os Teus Indicadores-Chave", en: "Your Key Indicators" },
+    icon: <Activity className="w-5 h-5" />,
+    color: "from-cyan-500/20 to-teal-500/20 border-cyan-500/30"
+  },
   retrato_essencial: { 
     title: { pt: "Seu Retrato Essencial", 'pt-pt': "O Teu Retrato Essencial", en: "Your Essential Portrait" },
     icon: <User className="w-5 h-5" />,
@@ -120,6 +140,8 @@ const TRANSLATIONS = {
     pdfError: "Erro ao gerar PDF.",
     generateCode: "Gerar meu Código",
     closingQuestion: "O que, a partir de hoje, você escolhe viver de forma diferente?",
+    detailedCharts: "Gráficos Detalhados",
+    yourTestResults: "Resultados dos seus testes",
   },
   'pt-pt': {
     title: "Código da Essência",
@@ -145,6 +167,8 @@ const TRANSLATIONS = {
     pdfError: "Erro ao gerar PDF.",
     generateCode: "Gerar o meu Código",
     closingQuestion: "O que, a partir de hoje, escolhes viver de forma diferente?",
+    detailedCharts: "Gráficos Detalhados",
+    yourTestResults: "Resultados dos teus testes",
   },
   en: {
     title: "Essence Code",
@@ -170,6 +194,8 @@ const TRANSLATIONS = {
     pdfError: "Error generating PDF.",
     generateCode: "Generate my Code",
     closingQuestion: "What, starting today, do you choose to live differently?",
+    detailedCharts: "Detailed Charts",
+    yourTestResults: "Your test results",
   },
 };
 
@@ -199,10 +225,32 @@ const CodigoEssencia = () => {
     return getMissingTests(testResults, lang);
   }, [testResults, lang]);
 
+  // Navigation sections for the index
+  const navSections = useMemo(() => {
+    if (!hasGenerated) return [];
+    return [
+      { id: "section-quick-summary", label: SECTION_CONFIG.quick_summary.title[lang], icon: SECTION_CONFIG.quick_summary.icon },
+      { id: "section-mapa-visual", label: SECTION_CONFIG.mapa_visual.title[lang], icon: SECTION_CONFIG.mapa_visual.icon },
+      { id: "section-indicadores", label: SECTION_CONFIG.indicadores.title[lang], icon: SECTION_CONFIG.indicadores.icon },
+      { id: "section-confronto", label: SECTION_CONFIG.confronto.title[lang], icon: SECTION_CONFIG.confronto.icon },
+      { id: "section-proposito", label: SECTION_CONFIG.seu_proposito.title[lang], icon: SECTION_CONFIG.seu_proposito.icon },
+      { id: "section-charts", label: t.detailedCharts, icon: <BarChart3 className="w-4 h-4" /> },
+      { id: "section-90-dias", label: SECTION_CONFIG.plano_90_dias.title[lang], icon: SECTION_CONFIG.plano_90_dias.icon },
+      { id: "section-rotina", label: SECTION_CONFIG.rotina_diaria.title[lang], icon: SECTION_CONFIG.rotina_diaria.icon },
+      { id: "section-conversa", label: SECTION_CONFIG.conversa_final.title[lang], icon: SECTION_CONFIG.conversa_final.icon },
+    ];
+  }, [hasGenerated, lang, t]);
+
   // Extract visual data from sections for the new components
   const visualData = useMemo(() => {
     const retratoSection = generatedSections.find(s => s.id === 'retrato_essencial');
     return retratoSection?.visual_data || null;
+  }, [generatedSections]);
+
+  // Extract impact blocks
+  const impactBlocksData = useMemo(() => {
+    const retratoSection = generatedSections.find(s => s.id === 'retrato_essencial');
+    return retratoSection?.impact_blocks || null;
   }, [generatedSections]);
 
   const quickSummaryData = useMemo(() => {
@@ -210,7 +258,6 @@ const CodigoEssencia = () => {
     const impactBlocks = retratoSection?.impact_blocks;
     const bullets = retratoSection?.bullets || [];
     
-    // Extract strengths (positive bullets) and alerts (shadow bullets)
     const strengths = bullets.filter((_: string, i: number) => i < 3);
     const alerts = bullets.filter((_: string, i: number) => i >= 3);
     
@@ -249,6 +296,27 @@ const CodigoEssencia = () => {
       risk: proposito.common_error || ""
     };
   }, [generatedSections]);
+
+  // Extract test results for charts
+  const chartData = useMemo(() => {
+    return {
+      disc: testResults?.disc?.scores || visualData?.disc,
+      temperament: {
+        primary: testResults?.temperamentos?.primary?.temperament,
+        secondary: testResults?.temperamentos?.secondary?.temperament,
+        scores: visualData?.temperament?.scores
+      },
+      intelligences: {
+        scores: testResults?.inteligencias_multiplas?.scores || visualData?.intelligences?.scores,
+        top: testResults?.inteligencias_multiplas?.primary ? [testResults.inteligencias_multiplas.primary] : []
+      },
+      connectionStyle: {
+        primary: testResults?.linguagens_amor?.primary,
+        secondary: testResults?.linguagens_amor?.secondary,
+        scores: testResults?.linguagens_amor?.scores || visualData?.connection_style?.scores
+      }
+    };
+  }, [testResults, visualData]);
 
   useEffect(() => {
     if (savedCodigo && savedCodigo.sections && savedCodigo.sections.length > 0 && !hasGenerated) {
@@ -326,138 +394,12 @@ const CodigoEssencia = () => {
     await handleGenerateCodigo();
   };
 
-  const renderSection = (section: any) => {
-    const config = SECTION_CONFIG[section.id] || { 
-      title: { pt: "Seção", 'pt-pt': "Secção", en: "Section" },
-      icon: <Sparkles className="w-5 h-5" />, 
-      color: "from-gray-500/20 to-gray-400/20 border-gray-500/30" 
-    };
-
-    // Skip retrato_essencial - handled separately with new components
-    if (section.id === 'retrato_essencial') return null;
-
-    // How You Function - Collapsible
-    if (section.id === 'como_voce_funciona') {
-      return (
-        <CollapsibleSection
-          icon={config.icon}
-          title={section.title || config.title[lang]}
-          color={config.color}
-          synthesis={section.mirror || ""}
-          bullets={[section.strength, section.shadow, section.invitation].filter(Boolean)}
-          deepContent={section.paragraphs?.join('\n') || undefined}
-          language={lang}
-        />
-      );
-    }
-
-    // Strengths with items
-    if (section.id === 'suas_forcas' && section.items) {
-      return (
-        <div className={cn("bg-gradient-to-br border rounded-2xl p-6", config.color)}>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">{config.icon}</div>
-            <h3 className="text-xl font-bold">{section.title || config.title[lang]}</h3>
-          </div>
-          {section.source && <p className="text-xs text-muted-foreground uppercase tracking-wide mb-4">{section.source}</p>}
-          <div className="space-y-3">
-            {section.items.map((item: any, i: number) => (
-              <PatternCard key={i} pattern={item.talent} manifestation={item.example} when_problem={item.warning} variant="strength" language={lang} />
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // Shadows - skip if we have confrontation section
-    if (section.id === 'suas_sombras') {
-      return (
-        <div className={cn("bg-gradient-to-br border rounded-2xl p-6", config.color)}>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">{config.icon}</div>
-            <h3 className="text-xl font-bold">{section.title || config.title[lang]}</h3>
-          </div>
-          {section.source && <p className="text-xs text-muted-foreground uppercase tracking-wide mb-4">{section.source}</p>}
-          {section.items && (
-            <div className="space-y-3">
-              {section.items.slice(1).map((item: any, i: number) => (
-                <PatternCard key={i} pattern={item.pattern} situation={item.situation} exit={item.exit} variant="warning" language={lang} />
-              ))}
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    // Purpose - use new PurposeManifesto
-    if (section.id === 'seu_proposito') {
-      return null; // Handled by purposeData
-    }
-
-    // 90-day plan
-    if (section.id === 'plano_90_dias' && section.months) {
-      return (
-        <div className={cn("bg-gradient-to-br border rounded-2xl p-6", config.color)}>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">{config.icon}</div>
-            <h3 className="text-xl font-bold">{section.title || config.title[lang]}</h3>
-          </div>
-          <TimelinePath months={section.months} language={lang} />
-        </div>
-      );
-    }
-
-    // Daily routine
-    if (section.id === 'rotina_diaria') {
-      return (
-        <div className={cn("bg-gradient-to-br border rounded-2xl p-6", config.color)}>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">{config.icon}</div>
-            <h3 className="text-xl font-bold">{section.title || config.title[lang]}</h3>
-          </div>
-          <DailyRoutineChecklist morning={section.morning} afternoon={section.afternoon} night={section.night} source={section.source} language={lang} />
-        </div>
-      );
-    }
-
-    // Final conversation - simplified
-    if (section.id === 'conversa_final') {
-      return (
-        <div className={cn("bg-gradient-to-br border rounded-2xl p-6", config.color)}>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">{config.icon}</div>
-            <h3 className="text-xl font-bold">{section.title || config.title[lang]}</h3>
-          </div>
-          <div className="space-y-4">
-            {section.paragraphs?.slice(0, 3).map((p: string, i: number) => (
-              <p key={i} className="leading-relaxed text-sm">{p}</p>
-            ))}
-            <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 text-center mt-6">
-              <p className="text-lg font-medium italic">"{t.closingQuestion}"</p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // Default section
-    return (
-      <div className={cn("bg-gradient-to-br border rounded-2xl p-6", config.color)}>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">{config.icon}</div>
-          <h3 className="text-xl font-bold">{section.title || config.title?.[lang]}</h3>
-        </div>
-        {section.source && <p className="text-xs text-muted-foreground uppercase tracking-wide mb-4">{section.source}</p>}
-        <div className="space-y-4">
-          {section.mirror && <div className="flex items-start gap-2"><span>🪞</span><p>{section.mirror}</p></div>}
-          {section.strength && <div className="flex items-start gap-2 bg-emerald-500/10 rounded-lg p-3"><span>🌟</span><p>{section.strength}</p></div>}
-          {section.shadow && <div className="flex items-start gap-2 bg-amber-500/10 rounded-lg p-3"><span>⚠️</span><p>{section.shadow}</p></div>}
-          {section.invitation && <div className="flex items-start gap-2 bg-primary/10 rounded-lg p-3"><span>🎯</span><p className="font-medium">{section.invitation}</p></div>}
-          {section.paragraphs && section.paragraphs.map((p: string, i: number) => <p key={i} className="leading-relaxed">{p}</p>)}
-        </div>
-      </div>
-    );
-  };
+  // Find specific sections
+  const plano90Section = generatedSections.find(s => s.id === 'plano_90_dias');
+  const rotinaSection = generatedSections.find(s => s.id === 'rotina_diaria');
+  const conversaSection = generatedSections.find(s => s.id === 'conversa_final');
+  const forcasSection = generatedSections.find(s => s.id === 'suas_forcas');
+  const sombrasSection = generatedSections.find(s => s.id === 'suas_sombras');
 
   if (isLoading) {
     return (
@@ -506,7 +448,7 @@ const CodigoEssencia = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-10">
+      <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-20">
         <div className="container px-4 py-4 flex items-center justify-between">
           <LogoText className="text-2xl" variant="solid" />
           <div className="flex items-center gap-2 flex-wrap">
@@ -519,104 +461,336 @@ const CodigoEssencia = () => {
       </header>
 
       <main className="container px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="text-4xl font-bold mb-2">{t.title}</h1>
-            <p className="text-lg text-primary font-medium mb-2">{t.subtitle}</p>
-            <p className="text-muted-foreground">{firstName}, {t.description}</p>
-          </div>
-
-          {/* Completed badge */}
-          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-8 flex items-center justify-center gap-3">
-            <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-            <span className="text-emerald-700 dark:text-emerald-400 font-medium">
-              {lang === 'en' ? 'All 7 tests completed!' : 'Todos os 7 testes completos!'}
-            </span>
-          </div>
-
-          {/* Generate button */}
-          {!hasGenerated && canGenerateReport && (
-            <div className="bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 border border-primary/20 rounded-2xl p-8 text-center mb-8">
-              <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-4">{t.generateCode}</h2>
-              <Button size="lg" onClick={handleGenerateCodigo} disabled={isGenerating} className="gap-2">
-                {isGenerating ? <><Loader2 className="w-5 h-5 animate-spin" />{t.generating}</> : <><Sparkles className="w-5 h-5" />{t.generateCode}</>}
-              </Button>
-              {isGenerating && <p className="text-sm text-muted-foreground mt-4">{t.generatingSubtext}</p>}
-            </div>
+        <div className="flex gap-8 max-w-6xl mx-auto">
+          {/* Sidebar navigation - hidden on mobile */}
+          {hasGenerated && navSections.length > 0 && (
+            <aside className="hidden lg:block w-64 flex-shrink-0">
+              <SectionIndex sections={navSections} language={lang} />
+            </aside>
           )}
 
-          {/* Generated content with NEW structure */}
-          {hasGenerated && generatedSections.length > 0 && (
-            <div className="space-y-6 mb-8">
-              {/* 1. Quick Summary - 60 seconds */}
-              {quickSummaryData.strengths.length > 0 && (
-                <QuickSummary 
-                  strengths={quickSummaryData.strengths}
-                  alerts={quickSummaryData.alerts}
-                  direction={quickSummaryData.direction}
-                  language={lang}
-                />
-              )}
-
-              {/* 2. Radar Chart - Visual Map */}
-              {visualData && (
-                <EssenceRadarChart 
-                  disc={visualData.disc}
-                  temperament={visualData.temperament?.scores}
-                  intelligences={visualData.intelligences?.scores}
-                  language={lang}
-                />
-              )}
-
-              {/* 3. Essence Indicators */}
-              {visualData && (
-                <EssenceIndicators 
-                  disc={visualData.disc}
-                  temperament={visualData.temperament}
-                  connectionStyle={visualData.connection_style}
-                  language={lang}
-                />
-              )}
-
-              {/* 4. Confrontation Section */}
-              {confrontationData && confrontationData.title && (
-                <ConfrontationSection 
-                  title={confrontationData.title}
-                  crossReference={confrontationData.crossReference}
-                  strengthens={confrontationData.strengthens}
-                  sabotages={confrontationData.sabotages}
-                  question={confrontationData.question}
-                  language={lang}
-                />
-              )}
-
-              {/* 5. Purpose Manifesto */}
-              {purposeData && purposeData.manifesto && (
-                <PurposeManifesto 
-                  manifesto={purposeData.manifesto}
-                  expressions={purposeData.expressions}
-                  risk={purposeData.risk}
-                  language={lang}
-                />
-              )}
-
-              {/* 6. Remaining sections */}
-              {generatedSections.map((section, index) => {
-                const rendered = renderSection(section);
-                return rendered ? <div key={section.id || index}>{rendered}</div> : null;
-              })}
-
-              {/* Disclaimer */}
-              <div className="bg-muted/50 rounded-xl p-4 text-center">
-                <p className="text-sm text-muted-foreground">{t.disclaimer}</p>
+          {/* Main content */}
+          <div className="flex-1 max-w-4xl">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="w-8 h-8 text-primary" />
               </div>
+              <h1 className="text-4xl font-bold mb-2">{t.title}</h1>
+              <p className="text-lg text-primary font-medium mb-2">{t.subtitle}</p>
+              <p className="text-muted-foreground">{firstName}, {t.description}</p>
             </div>
-          )}
+
+            {/* Completed badge */}
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-8 flex items-center justify-center gap-3">
+              <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+              <span className="text-emerald-700 dark:text-emerald-400 font-medium">
+                {lang === 'en' ? 'All 7 tests completed!' : 'Todos os 7 testes completos!'}
+              </span>
+            </div>
+
+            {/* Generate button */}
+            {!hasGenerated && canGenerateReport && (
+              <div className="bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 border border-primary/20 rounded-2xl p-8 text-center mb-8">
+                <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
+                <h2 className="text-2xl font-bold mb-4">{t.generateCode}</h2>
+                <Button size="lg" onClick={handleGenerateCodigo} disabled={isGenerating} className="gap-2">
+                  {isGenerating ? <><Loader2 className="w-5 h-5 animate-spin" />{t.generating}</> : <><Sparkles className="w-5 h-5" />{t.generateCode}</>}
+                </Button>
+                {isGenerating && <p className="text-sm text-muted-foreground mt-4">{t.generatingSubtext}</p>}
+              </div>
+            )}
+
+            {/* Generated content with NEW structure */}
+            {hasGenerated && generatedSections.length > 0 && (
+              <div className="space-y-8">
+                {/* ========== 1. Quick Summary - 60 seconds ========== */}
+                <section id="section-quick-summary">
+                  {quickSummaryData.strengths.length > 0 && (
+                    <QuickSummary 
+                      strengths={quickSummaryData.strengths}
+                      alerts={quickSummaryData.alerts}
+                      direction={quickSummaryData.direction}
+                      language={lang}
+                    />
+                  )}
+                  
+                  {/* Impact Blocks */}
+                  {impactBlocksData && (
+                    <div className="mt-6">
+                      <ImpactBlocks 
+                        essence={impactBlocksData.essence}
+                        risk={impactBlocksData.risk}
+                        calling={impactBlocksData.calling}
+                        gift={impactBlocksData.gift}
+                        language={lang}
+                      />
+                    </div>
+                  )}
+                </section>
+
+                <SectionDivider variant="gradient" />
+
+                {/* ========== 2. Visual Map - Radar Chart ========== */}
+                <section id="section-mapa-visual">
+                  <div className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-2xl p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">
+                        <BarChart3 className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <h2 className="text-xl font-bold">{SECTION_CONFIG.mapa_visual.title[lang]}</h2>
+                    </div>
+                    
+                    <EssenceRadarChart 
+                      disc={chartData.disc}
+                      temperament={chartData.temperament?.scores}
+                      intelligences={chartData.intelligences?.scores}
+                      language={lang}
+                    />
+                  </div>
+                </section>
+
+                <SectionDivider variant="dots" />
+
+                {/* ========== 3. Key Indicators ========== */}
+                <section id="section-indicadores">
+                  <div className="bg-gradient-to-br from-cyan-500/10 to-teal-500/10 border border-cyan-500/20 rounded-2xl p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">
+                        <Activity className="w-5 h-5 text-cyan-500" />
+                      </div>
+                      <h2 className="text-xl font-bold">{SECTION_CONFIG.indicadores.title[lang]}</h2>
+                    </div>
+                    
+                    <EssenceIndicators 
+                      disc={chartData.disc}
+                      temperament={chartData.temperament}
+                      connectionStyle={chartData.connectionStyle}
+                      language={lang}
+                    />
+                  </div>
+                </section>
+
+                <SectionDivider variant="line" />
+
+                {/* ========== 4. Confrontation Section ========== */}
+                <section id="section-confronto">
+                  {confrontationData && confrontationData.title && (
+                    <ConfrontationSection 
+                      title={confrontationData.title}
+                      crossReference={confrontationData.crossReference}
+                      strengthens={confrontationData.strengthens}
+                      sabotages={confrontationData.sabotages}
+                      question={confrontationData.question}
+                      language={lang}
+                    />
+                  )}
+                </section>
+
+                <SectionDivider variant="wave" />
+
+                {/* ========== 5. Purpose Manifesto ========== */}
+                <section id="section-proposito">
+                  {purposeData && purposeData.manifesto && (
+                    <PurposeManifesto 
+                      manifesto={purposeData.manifesto}
+                      expressions={purposeData.expressions}
+                      risk={purposeData.risk}
+                      language={lang}
+                    />
+                  )}
+                </section>
+
+                <SectionDivider variant="gradient" />
+
+                {/* ========== 6. Detailed Charts Grid ========== */}
+                <section id="section-charts">
+                  <div className="bg-card/50 border border-border rounded-2xl p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <BarChart3 className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold">{t.detailedCharts}</h2>
+                        <p className="text-sm text-muted-foreground">{t.yourTestResults}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {/* DISC Chart */}
+                      {chartData.disc && Object.keys(chartData.disc).length > 0 && (
+                        <div className="bg-background rounded-xl p-4 border border-border">
+                          <h3 className="font-semibold mb-4 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-red-500" />
+                            DISC
+                          </h3>
+                          <DISCChart results={chartData.disc} language={lang} />
+                        </div>
+                      )}
+                      
+                      {/* Temperament Chart */}
+                      {(chartData.temperament?.primary || chartData.temperament?.scores) && (
+                        <div className="bg-background rounded-xl p-4 border border-border">
+                          <h3 className="font-semibold mb-4 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-amber-500" />
+                            {lang === 'en' ? 'Temperaments' : 'Temperamentos'}
+                          </h3>
+                          <TemperamentChart 
+                            results={{
+                              primary: chartData.temperament.primary,
+                              secondary: chartData.temperament.secondary,
+                              scores: chartData.temperament.scores
+                            }} 
+                            language={lang} 
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Intelligence Ranking */}
+                      {(chartData.intelligences?.scores || chartData.intelligences?.top?.length > 0) && (
+                        <div className="bg-background rounded-xl p-4 border border-border">
+                          <h3 className="font-semibold mb-4 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-purple-500" />
+                            {lang === 'en' ? 'Multiple Intelligences' : 'Inteligências Múltiplas'}
+                          </h3>
+                          <IntelligenceRanking 
+                            results={{
+                              scores: chartData.intelligences.scores,
+                              top: chartData.intelligences.top
+                            }} 
+                            language={lang} 
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Connection Style */}
+                      {(chartData.connectionStyle?.primary || chartData.connectionStyle?.scores) && (
+                        <div className="bg-background rounded-xl p-4 border border-border">
+                          <h3 className="font-semibold mb-4 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-rose-500" />
+                            {lang === 'en' ? 'Connection Styles' : 'Estilos de Conexão'}
+                          </h3>
+                          <ConnectionStyleChart 
+                            results={{
+                              primary: chartData.connectionStyle.primary,
+                              secondary: chartData.connectionStyle.secondary,
+                              scores: chartData.connectionStyle.scores
+                            }} 
+                            language={lang} 
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </section>
+
+                {/* Strengths Section - Compact cards */}
+                {forcasSection?.items && forcasSection.items.length > 0 && (
+                  <>
+                    <SectionDivider variant="dots" />
+                    <section id="section-forcas">
+                      <div className={cn("bg-gradient-to-br border rounded-2xl p-6", SECTION_CONFIG.suas_forcas.color)}>
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">{SECTION_CONFIG.suas_forcas.icon}</div>
+                          <h3 className="text-xl font-bold">{SECTION_CONFIG.suas_forcas.title[lang]}</h3>
+                        </div>
+                        {forcasSection.source && <p className="text-xs text-muted-foreground uppercase tracking-wide mb-4">{forcasSection.source}</p>}
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {forcasSection.items.map((item: any, i: number) => (
+                            <PatternCard key={i} pattern={item.talent} manifestation={item.example} when_problem={item.warning} variant="strength" language={lang} />
+                          ))}
+                        </div>
+                      </div>
+                    </section>
+                  </>
+                )}
+
+                {/* Shadows - remaining items */}
+                {sombrasSection?.items && sombrasSection.items.length > 1 && (
+                  <>
+                    <SectionDivider variant="line" />
+                    <section id="section-sombras">
+                      <div className={cn("bg-gradient-to-br border rounded-2xl p-6", SECTION_CONFIG.suas_sombras.color)}>
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">{SECTION_CONFIG.suas_sombras.icon}</div>
+                          <h3 className="text-xl font-bold">{SECTION_CONFIG.suas_sombras.title[lang]}</h3>
+                        </div>
+                        {sombrasSection.source && <p className="text-xs text-muted-foreground uppercase tracking-wide mb-4">{sombrasSection.source}</p>}
+                        <div className="space-y-3">
+                          {sombrasSection.items.slice(1).map((item: any, i: number) => (
+                            <PatternCard key={i} pattern={item.pattern} situation={item.situation} exit={item.exit} variant="warning" language={lang} />
+                          ))}
+                        </div>
+                      </div>
+                    </section>
+                  </>
+                )}
+
+                <SectionDivider variant="gradient" />
+
+                {/* ========== 7. 90-Day Plan ========== */}
+                <section id="section-90-dias">
+                  {plano90Section?.months && (
+                    <div className={cn("bg-gradient-to-br border rounded-2xl p-6", SECTION_CONFIG.plano_90_dias.color)}>
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">{SECTION_CONFIG.plano_90_dias.icon}</div>
+                        <h3 className="text-xl font-bold">{SECTION_CONFIG.plano_90_dias.title[lang]}</h3>
+                      </div>
+                      <TimelinePath months={plano90Section.months} language={lang} />
+                    </div>
+                  )}
+                </section>
+
+                <SectionDivider variant="wave" />
+
+                {/* ========== 8. Daily Routine ========== */}
+                <section id="section-rotina">
+                  {rotinaSection && (
+                    <div className={cn("bg-gradient-to-br border rounded-2xl p-6", SECTION_CONFIG.rotina_diaria.color)}>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">{SECTION_CONFIG.rotina_diaria.icon}</div>
+                        <h3 className="text-xl font-bold">{SECTION_CONFIG.rotina_diaria.title[lang]}</h3>
+                      </div>
+                      <DailyRoutineChecklist 
+                        morning={rotinaSection.morning} 
+                        afternoon={rotinaSection.afternoon} 
+                        night={rotinaSection.night} 
+                        source={rotinaSection.source} 
+                        language={lang} 
+                      />
+                    </div>
+                  )}
+                </section>
+
+                <SectionDivider variant="dots" />
+
+                {/* ========== 9. Final Conversation ========== */}
+                <section id="section-conversa">
+                  {conversaSection && (
+                    <div className={cn("bg-gradient-to-br border rounded-2xl p-6", SECTION_CONFIG.conversa_final.color)}>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-background/50 rounded-lg flex items-center justify-center">{SECTION_CONFIG.conversa_final.icon}</div>
+                        <h3 className="text-xl font-bold">{SECTION_CONFIG.conversa_final.title[lang]}</h3>
+                      </div>
+                      <div className="space-y-4">
+                        {conversaSection.paragraphs?.slice(0, 3).map((p: string, i: number) => (
+                          <p key={i} className="leading-relaxed text-sm">{p}</p>
+                        ))}
+                        <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 text-center mt-6">
+                          <p className="text-lg font-medium italic">"{t.closingQuestion}"</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </section>
+
+                {/* Disclaimer */}
+                <div className="bg-muted/50 rounded-xl p-4 text-center">
+                  <p className="text-sm text-muted-foreground">{t.disclaimer}</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>
