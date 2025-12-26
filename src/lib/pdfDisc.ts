@@ -320,7 +320,7 @@ const TEXTS = {
       'pt-pt': 'Como a tua energia se movimenta nas decisões, emoções e interações', 
       en: 'How your energy moves in decisions, emotions and interactions' 
     },
-    signature: { pt: 'Por Miguel, seu guia no Nello One', 'pt-pt': 'Por Miguel, o teu guia no Nello One', en: 'By Miguel, your guide at Nello One' },
+    signature: { pt: 'Por Nello AI, seu guia no Nello One', 'pt-pt': 'Por Nello AI, o teu guia no Nello One', en: 'By Nello AI, your guide at Nello One' },
     quote: {
       pt: '"Seu comportamento é uma linguagem. Quando você entende essa linguagem, você entende a si mesmo."',
       'pt-pt': '"O teu comportamento é uma linguagem. Quando entendes essa linguagem, entendes-te a ti mesmo."',
@@ -371,7 +371,7 @@ It reveals how your energy moves when you are:
     secondaryTraits: { pt: 'Seus Traços Secundários', 'pt-pt': 'Os Teus Traços Secundários', en: 'Your Secondary Traits' },
     combination: { pt: 'Combinação', 'pt-pt': 'Combinação', en: 'Combination' },
     visualMap: { pt: 'Mapa Visual DISC', 'pt-pt': 'Mapa Visual DISC', en: 'Visual DISC Map' },
-    miguelPatterns: { pt: 'Miguel Revela Seus Padrões', 'pt-pt': 'Miguel Revela os Teus Padrões', en: 'Miguel Reveals Your Patterns' },
+    nelloPatterns: { pt: 'Nello AI Revela Seus Padrões', 'pt-pt': 'Nello AI Revela os Teus Padrões', en: 'Nello AI Reveals Your Patterns' },
     lifeDimensions: { pt: 'Impacto nas Três Dimensões da Vida', 'pt-pt': 'Impacto nas Três Dimensões da Vida', en: 'Impact on the Three Dimensions of Life' },
     work: { pt: 'Trabalho', 'pt-pt': 'Trabalho', en: 'Work' },
     relationships: { pt: 'Relacionamentos', 'pt-pt': 'Relacionamentos', en: 'Relationships' },
@@ -379,9 +379,9 @@ It reveals how your energy moves when you are:
     evolutionPoints: { pt: 'Pontos de Evolução', 'pt-pt': 'Pontos de Evolução', en: 'Evolution Points' },
     sevenDayPlan: { pt: 'Plano de Desenvolvimento (7 dias)', 'pt-pt': 'Plano de Desenvolvimento (7 dias)', en: 'Development Plan (7 days)' },
     selfExam: { pt: 'Pergunta de Autoexame', 'pt-pt': 'Pergunta de Autoexame', en: 'Self-Examination Question' },
-    closing: { pt: 'Encerramento com Miguel', 'pt-pt': 'Encerramento com Miguel', en: 'Closing with Miguel' }
+    closing: { pt: 'Encerramento com Nello AI', 'pt-pt': 'Encerramento com Nello AI', en: 'Closing with Nello AI' }
   },
-  miguel: {
+  nelloAI: {
     patternsIntro: {
       pt: '"Vejo como sua energia se move quando você está seguro… e como ela muda quando o mundo te pressiona. Quando você está alinhado, sua força aparece como virtude. Quando está cansado, essa mesma força vira tensão."',
       'pt-pt': '"Vejo como a tua energia se move quando estás seguro… e como ela muda quando o mundo te pressiona. Quando estás alinhado, a tua força aparece como virtude. Quando estás cansado, essa mesma força vira tensão."',
@@ -694,14 +694,14 @@ export function generateDISCPremiumPDF(data: DISCPDFData): jsPDF {
     yPos += barSpacing;
   });
   
-  // ========== PAGE 6: MIGUEL'S PATTERNS ==========
+  // ========== PAGE 6: NELLO AI'S PATTERNS ==========
   doc.addPage();
   yPos = 30;
   
   doc.setTextColor(31, 46, 75);
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text(`5. ${TEXTS.sections.miguelPatterns[lang]}`, margin, yPos);
+  doc.text(`5. ${TEXTS.sections.nelloPatterns[lang]}`, margin, yPos);
   
   yPos += 15;
   
@@ -710,14 +710,14 @@ export function generateDISCPremiumPDF(data: DISCPDFData): jsPDF {
   doc.setFontSize(10);
   doc.setFont('helvetica', 'italic');
   doc.setTextColor(31, 46, 75);
-  addWrappedText(doc, TEXTS.miguel.patternsIntro[lang], margin + 10, yPos + 12, contentWidth - 20, 5);
+  addWrappedText(doc, TEXTS.nelloAI.patternsIntro[lang], margin + 10, yPos + 12, contentWidth - 20, 5);
   
   yPos += 55;
   
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(60, 60, 60);
-  TEXTS.miguel.patternsList[lang].forEach(pattern => {
+  TEXTS.nelloAI.patternsList[lang].forEach(pattern => {
     doc.text(`• ${pattern}`, margin + 5, yPos);
     yPos += 7;
   });
@@ -858,7 +858,7 @@ export function generateDISCPremiumPDF(data: DISCPDFData): jsPDF {
   
   yPos += 50;
   
-  // Closing with Miguel
+  // Closing with Nello AI
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
   doc.text(`10. ${TEXTS.sections.closing[lang]}`, margin, yPos);
