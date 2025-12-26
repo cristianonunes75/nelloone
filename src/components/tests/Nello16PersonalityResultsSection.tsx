@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
   Brain, 
   Target, 
@@ -20,7 +21,8 @@ import {
   Info,
   Share2,
   BookmarkPlus,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from "lucide-react";
 import { getNello16DisplayCode, NELLO_16_PROFILES } from "@/lib/nello16Personality";
 import { NELLO_16_EXTENDED_DATA, getDeepSummary, getMindInPractice, getSelfExamQuestion, getDevelopmentGuidance, getAIReflection } from "@/lib/nello16ExtendedData";
@@ -253,7 +255,46 @@ export function Nello16PersonalityResultsSection({
   userName, 
   lang 
 }: Nello16PersonalityResultsSectionProps) {
+  // Early return with loading state if data is incomplete
+  if (!mbtiResultData?.type || !mbtiResultData?.scores) {
+    return (
+      <Card className="border-none shadow-xl overflow-hidden">
+        <div className="bg-gradient-to-br from-primary via-primary/90 to-accent text-primary-foreground p-8 md:p-12">
+          <div className="flex flex-col items-center justify-center space-y-6 min-h-[300px]">
+            <Loader2 className="h-12 w-12 animate-spin" />
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold">
+                {lang === 'en' ? 'Preparing your results...' : 'Preparando seus resultados...'}
+              </h2>
+              <p className="text-lg opacity-80">
+                {lang === 'en' ? 'Analyzing your cognitive profile' : 'Analisando seu perfil cognitivo'}
+              </p>
+            </div>
+            <div className="w-full max-w-xs space-y-3">
+              <Skeleton className="h-4 w-full bg-background/20" />
+              <Skeleton className="h-4 w-3/4 bg-background/20" />
+              <Skeleton className="h-4 w-5/6 bg-background/20" />
+            </div>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
   const { type, scores } = mbtiResultData;
+  
+  // Validate scores object has all required properties
+  const validScores = {
+    E: scores?.E ?? 0,
+    I: scores?.I ?? 0,
+    S: scores?.S ?? 0,
+    N: scores?.N ?? 0,
+    T: scores?.T ?? 0,
+    F: scores?.F ?? 0,
+    J: scores?.J ?? 0,
+    P: scores?.P ?? 0
+  };
+  
   const profile = NELLO_16_PROFILES[type];
   const extendedData = NELLO_16_EXTENDED_DATA[type];
   const displayCode = getNello16DisplayCode(type);
@@ -278,10 +319,10 @@ export function Nello16PersonalityResultsSection({
     return { pt: 'Forte', 'pt-pt': 'Forte', en: 'Strong' }[lang];
   };
 
-  const eiPct = calculatePercentage(scores.E, scores.I);
-  const snPct = calculatePercentage(scores.S, scores.N);
-  const tfPct = calculatePercentage(scores.T, scores.F);
-  const jpPct = calculatePercentage(scores.J, scores.P);
+  const eiPct = calculatePercentage(validScores.E, validScores.I);
+  const snPct = calculatePercentage(validScores.S, validScores.N);
+  const tfPct = calculatePercentage(validScores.T, validScores.F);
+  const jpPct = calculatePercentage(validScores.J, validScores.P);
 
   const deepSummary = getDeepSummary(type, lang);
   const mindInPractice = getMindInPractice(type, lang);
@@ -358,8 +399,8 @@ export function Nello16PersonalityResultsSection({
           {/* E/I Dimension */}
           <DimensionBar 
             dimension="EI" 
-            leftScore={scores.E} 
-            rightScore={scores.I}
+            leftScore={validScores.E} 
+            rightScore={validScores.I}
             leftLabel={DIMENSION_LABELS.EI.E[lang]}
             rightLabel={DIMENSION_LABELS.EI.I[lang]}
             title={DIMENSION_LABELS.EI.title[lang]}
@@ -372,8 +413,8 @@ export function Nello16PersonalityResultsSection({
           {/* S/N Dimension */}
           <DimensionBar 
             dimension="SN" 
-            leftScore={scores.S} 
-            rightScore={scores.N}
+            leftScore={validScores.S} 
+            rightScore={validScores.N}
             leftLabel={DIMENSION_LABELS.SN.S[lang]}
             rightLabel={DIMENSION_LABELS.SN.N[lang]}
             title={DIMENSION_LABELS.SN.title[lang]}
@@ -386,8 +427,8 @@ export function Nello16PersonalityResultsSection({
           {/* T/F Dimension */}
           <DimensionBar 
             dimension="TF" 
-            leftScore={scores.T} 
-            rightScore={scores.F}
+            leftScore={validScores.T} 
+            rightScore={validScores.F}
             leftLabel={DIMENSION_LABELS.TF.T[lang]}
             rightLabel={DIMENSION_LABELS.TF.F[lang]}
             title={DIMENSION_LABELS.TF.title[lang]}
@@ -400,8 +441,8 @@ export function Nello16PersonalityResultsSection({
           {/* J/P Dimension */}
           <DimensionBar 
             dimension="JP" 
-            leftScore={scores.J} 
-            rightScore={scores.P}
+            leftScore={validScores.J} 
+            rightScore={validScores.P}
             leftLabel={DIMENSION_LABELS.JP.J[lang]}
             rightLabel={DIMENSION_LABELS.JP.P[lang]}
             title={DIMENSION_LABELS.JP.title[lang]}
