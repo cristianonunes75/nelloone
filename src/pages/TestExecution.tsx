@@ -32,6 +32,8 @@ import TestAnswerOptions from "@/components/tests/TestAnswerOptions";
 import { TestCelebration } from "@/components/tests/TestCelebration";
 import { QuestionTransition, AnimatedProgress, PageTransition } from "@/components/tests/TestTransitions";
 import { motion, AnimatePresence } from "framer-motion";
+import { InteligenciasIntroScreen } from "@/components/tests/inteligencias/InteligenciasIntroScreen";
+import { IntelligenceTooltip, getIntelligenceKeyFromQuestionNumber } from "@/components/tests/inteligencias/IntelligenceTooltip";
 
 export default function TestExecution() {
   const { testId, userTestId } = useParams();
@@ -43,6 +45,7 @@ export default function TestExecution() {
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showInteligenciasIntro, setShowInteligenciasIntro] = useState(true);
   const [showCelebration, setShowCelebration] = useState(false);
   const [navigationDirection, setNavigationDirection] = useState<"left" | "right">("left");
   const [partialArchetypes, setPartialArchetypes] = useState<{
@@ -270,6 +273,8 @@ export default function TestExecution() {
           completed_at: new Date().toISOString(),
           total_questions: questions?.length || 0,
           testType: "inteligencias_multiplas",
+          model_version: "v2_with_explanations",
+          has_explanations: true,
           scores: inteligenciasResults.scores,
           percentages: inteligenciasResults.percentages,
           ranking: inteligenciasResults.ranking,
@@ -368,6 +373,18 @@ export default function TestExecution() {
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     displayOptions = shuffled;
+  }
+
+  // Show intelligence intro screen for inteligencias_multiplas test
+  const langForIntro = (language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt') as 'pt' | 'pt-pt' | 'en';
+  
+  if (testType === 'inteligencias_multiplas' && showInteligenciasIntro && currentQuestionIndex === 0) {
+    return (
+      <InteligenciasIntroScreen 
+        lang={langForIntro}
+        onStart={() => setShowInteligenciasIntro(false)}
+      />
+    );
   }
 
   // Show welcome screen at the start
@@ -777,11 +794,19 @@ export default function TestExecution() {
             direction={navigationDirection}
           >
             <div>
-              <CardTitle className="text-3xl font-light tracking-tight leading-tight mb-3">
-                {currentQuestion.question_text}
-              </CardTitle>
+              <div className="flex items-start gap-1">
+                <CardTitle className="text-3xl font-light tracking-tight leading-tight mb-3">
+                  {currentQuestion.question_text}
+                </CardTitle>
+                {testType === 'inteligencias_multiplas' && currentQuestion.question_number && (
+                  <IntelligenceTooltip 
+                    intelligenceKey={getIntelligenceKeyFromQuestionNumber(currentQuestion.question_number) || ''} 
+                    lang={langForIntro}
+                  />
+                )}
+              </div>
               <CardDescription className="text-base font-light">
-                Responda com sua primeira intuição
+                {language === 'en' ? 'Answer with your first instinct' : 'Responda com sua primeira intuição'}
               </CardDescription>
             </div>
           </QuestionTransition>
