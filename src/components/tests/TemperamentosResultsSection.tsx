@@ -41,24 +41,24 @@ const TEMPERAMENT_DATA = {
       healing: ['Conexões genuínas', 'Ambientes alegres', 'Novidades', 'Reconhecimento social'],
       nelloMessage: 'Você traz leveza aos lugares por onde passa. Mas cuidado: nem toda alegria é saúde. Às vezes você sorri para esconder. Aprenda a ser leve E profundo.',
       relationships: {
-        style: 'Você tende a amar com expressividade e entusiasmo.',
-        affection: 'Demonstra afeto com palavras, presença e gestos espontâneos.',
-        communication: 'Fluida, expressiva, às vezes impulsiva.',
-        challenges: 'Pode ter dificuldade com profundidade e constância.',
-        needs: 'Atenção, validação e companhia.'
+        style: 'No dia a dia, você ama com alegria e espontaneidade. Gosta de estar junto, fazer planos e manter a energia leve.',
+        affection: 'Você mostra amor com palavras carinhosas, surpresas e presença animada. Para você, amor é compartilhar momentos.',
+        communication: 'Você fala com entusiasmo e expressividade, mas às vezes pode falar demais ou não ouvir direito.',
+        challenges: 'Pode parecer superficial ou inconstante. Pessoas próximas podem sentir que você não aprofunda conversas difíceis.',
+        needs: 'Você precisa de atenção, validação e companhia. Solidão prolongada te afeta muito.'
       },
       work: {
-        productivity: 'Alta em ambientes dinâmicos.',
-        rhythm: 'Prefere variedade e interação.',
-        motivation: 'Reconhecimento e novidades.',
-        stress: 'Dispersa ou busca distrações.',
-        leadership: 'Inspirador, mas pode faltar foco.'
+        productivity: 'Você rende bem em ambientes dinâmicos, com interação e variedade. Rotina rígida te sufoca.',
+        rhythm: 'Prefere alternar tarefas e ter novidades. Trabalhos criativos e relacionais te motivam mais.',
+        motivation: 'Reconhecimento e novidades te impulsionam. Elogios e feedback positivo fazem diferença.',
+        stress: 'Sob estresse, você dispersa ou busca distrações (redes sociais, conversas, etc). Foco é um desafio.',
+        leadership: 'Você inspira e motiva, mas pode ter dificuldade com detalhes e acompanhamento.'
       },
       innerLife: {
-        reflection: 'Prefere ação a reflexão profunda.',
-        silence: 'Difícil manter por longos períodos.',
-        growth: 'Através de conexões significativas.',
-        challenge: 'Aceitar momentos de solidão.'
+        reflection: 'Você tende a preferir ação a reflexão profunda. Ficar parado com seus pensamentos é desconfortável.',
+        silence: 'Silêncio prolongado é difícil. Você sente necessidade de estímulo externo constante.',
+        growth: 'Você cresce através de conexões significativas e experiências marcantes com pessoas.',
+        challenge: 'Seu maior desafio é aceitar momentos de solidão e usá-los para se conhecer melhor.'
       },
       expansion: ['Criar rotina emocional', 'Praticar constância', 'Reduzir impulsividade', 'Aprofundar vínculos', 'Aceitar momentos de solidão'],
       sevenDayPlan: [
@@ -149,24 +149,24 @@ const TEMPERAMENT_DATA = {
       healing: ['Momentos de silêncio', 'Reconhecimento do esforço', 'Resultados tangíveis', 'Desafios significativos'],
       nelloMessage: 'Vejo em você uma força que poucos têm. Quando você aprende a dosar essa intensidade, você se torna referência — não por imposição, mas por inspiração.',
       relationships: {
-        style: 'Você tende a amar com intensidade e proteção.',
-        affection: 'Demonstra afeto resolvendo problemas e protegendo.',
-        communication: 'Direta, objetiva, às vezes dura.',
-        challenges: 'Pode parecer distante ou controlador.',
-        needs: 'Respeito, lealdade e espaço para liderar.'
+        style: 'No dia a dia, você costuma demonstrar amor através de atitudes práticas e proteção. Prefere resolver problemas a falar sobre sentimentos.',
+        affection: 'Você mostra que se importa consertando coisas, resolvendo situações e defendendo quem ama. Para você, amor é ação.',
+        communication: 'Você vai direto ao ponto e pode parecer duro sem perceber. Nas discussões do casal ou família, tende a querer "resolver logo".',
+        challenges: 'Pessoas próximas podem sentir que você é distante ou controlador. Ouvir mais e aceitar outros ritmos ajuda.',
+        needs: 'Você precisa sentir respeito e lealdade. Ser questionado o tempo todo te desgasta. Valoriza quem confia no seu julgamento.'
       },
       work: {
-        productivity: 'Alta, especialmente sob pressão.',
-        rhythm: 'Acelerado, orientado a resultados.',
-        motivation: 'Desafios e conquistas.',
-        stress: 'Suporta bem, mas pode explodir.',
-        leadership: 'Diretivo, exigente, eficiente.'
+        productivity: 'Você rende muito, especialmente quando há prazos e metas claras. Pressão te foca, não te paralisa.',
+        rhythm: 'Prefere ritmo acelerado. Reuniões longas e processos lentos te frustram. Trabalha melhor com autonomia.',
+        motivation: 'Desafios novos e conquistas tangíveis te impulsionam. Você precisa ver resultados do seu esforço.',
+        stress: 'Aguenta bem a pressão, mas pode explodir de repente. Irritabilidade é seu sinal de alerta. Pausas curtas ajudam.',
+        leadership: 'Você lidera com clareza e cobrança. Seu time sabe o que fazer, mas pode te achar exigente demais.'
       },
       innerLife: {
-        reflection: 'Prefere ação a reflexão.',
-        silence: 'Difícil no início, mas transformador.',
-        growth: 'Através de desafios superados.',
-        challenge: 'Aceitar vulnerabilidade.'
+        reflection: 'Você tende a preferir agir a refletir. Parar para pensar pode parecer perda de tempo, mas te traz clareza.',
+        silence: 'Silêncio é difícil no início, mas quando você se permite, é onde encontra suas melhores respostas.',
+        growth: 'Você cresce superando desafios. Cada obstáculo vencido te fortalece e te ensina sobre seus limites.',
+        challenge: 'Seu maior desafio interno é aceitar vulnerabilidade. Admitir que não sabe algo não diminui sua força.'
       },
       expansion: ['Suavizar o tom nas conversas', 'Pausar antes de reagir', 'Ampliar a empatia', 'Praticar a escuta ativa', 'Aceitar que nem tudo depende de você'],
       sevenDayPlan: [
@@ -257,24 +257,24 @@ const TEMPERAMENT_DATA = {
       healing: ['Tempo para processar', 'Ambientes calmos', 'Expressão artística', 'Conversas profundas'],
       nelloMessage: 'Você carrega um universo interno que poucos conhecem. Sua profundidade é dom, não fardo. Aprenda a não se afogar no que sente. A clareza vem quando você para de se julgar.',
       relationships: {
-        style: 'Você tende a amar com profundidade e cuidado.',
-        affection: 'Demonstra afeto com gestos pensados e atenção aos detalhes.',
-        communication: 'Cuidadosa, reflexiva, às vezes silenciosa.',
-        challenges: 'Pode ter dificuldade em expressar necessidades.',
-        needs: 'Compreensão, paciência e espaço para sentir.'
+        style: 'No dia a dia, você ama com profundidade e cuidado. Cada gesto é pensado, cada palavra tem peso.',
+        affection: 'Você mostra amor com atenção aos detalhes, lembranças especiais e gestos que fazem sentido para a pessoa.',
+        communication: 'Você pensa antes de falar e prefere conversas profundas. Pode parecer calado, mas está processando.',
+        challenges: 'Pode ser difícil expressar o que precisa. Você espera que o outro perceba, e se frustra quando não acontece.',
+        needs: 'Você precisa de compreensão, paciência e espaço para sentir sem pressa.'
       },
       work: {
-        productivity: 'Alta quando há tempo e qualidade.',
-        rhythm: 'Prefere profundidade a velocidade.',
-        motivation: 'Significado e excelência.',
-        stress: 'Paralisa ou se isola.',
-        leadership: 'Estratégico, cuidadoso, exigente.'
+        productivity: 'Você rende muito quando tem tempo e pode fazer com qualidade. Pressão por velocidade te paralisa.',
+        rhythm: 'Prefere aprofundar do que fazer várias coisas superficialmente. Qualidade antes de quantidade.',
+        motivation: 'Trabalhos com significado e excelência te motivam. Você precisa sentir que seu esforço importa.',
+        stress: 'Sob estresse, você paralisa ou se isola. Autocrítica aumenta e você pode travar.',
+        leadership: 'Você lidera com estratégia e cuidado, mas pode ser exigente demais consigo e com os outros.'
       },
       innerLife: {
-        reflection: 'Natural e profunda.',
-        silence: 'Confortável e necessário.',
-        growth: 'Através de compreensão e autoconhecimento.',
-        challenge: 'Aceitar imperfeição.'
+        reflection: 'Reflexão é natural para você. Você pensa muito sobre suas emoções, decisões e relacionamentos.',
+        silence: 'Você se sente confortável no silêncio. É onde processa e encontra clareza.',
+        growth: 'Você cresce através de compreensão profunda e autoconhecimento. Cada insight te transforma.',
+        challenge: 'Seu maior desafio é aceitar a imperfeição — sua e dos outros. Nem tudo precisa ser perfeito para ser bom.'
       },
       expansion: ['Reduzir autocrítica', 'Simplificar expectativas', 'Praticar ações rápidas', 'Fortalecer coragem emocional', 'Aceitar imperfeição'],
       sevenDayPlan: [
@@ -365,24 +365,24 @@ const TEMPERAMENT_DATA = {
       healing: ['Rotina estável', 'Tempo para processar', 'Ambientes calmos', 'Reconhecimento silencioso'],
       nelloMessage: 'Sua paz é real, mas às vezes você se esconde nela. A tranquilidade é sua força — mas não pode virar prisão. Você precisa aprender a agir, mesmo sem garantias.',
       relationships: {
-        style: 'Você tende a amar com constância e lealdade.',
-        affection: 'Demonstra afeto com presença estável e suporte silencioso.',
-        communication: 'Calma, ponderada, às vezes silenciosa demais.',
-        challenges: 'Pode ter dificuldade em expressar necessidades.',
-        needs: 'Estabilidade, paz e tempo.'
+        style: 'No dia a dia, você ama com constância e lealdade. Não é de grandes gestos, mas está sempre presente.',
+        affection: 'Você mostra amor com presença estável e suporte silencioso. Estar lá quando precisam já é sua declaração.',
+        communication: 'Você fala pouco, mas ouve muito. Nas discussões, tende a evitar conflito e pode guardar ressentimentos.',
+        challenges: 'Pode ser difícil expressar o que você precisa. Outros podem não perceber quando algo te incomoda.',
+        needs: 'Você precisa de estabilidade, paz e tempo para processar as coisas no seu ritmo.'
       },
       work: {
-        productivity: 'Constante e confiável.',
-        rhythm: 'Prefere estabilidade e previsibilidade.',
-        motivation: 'Segurança e harmonia.',
-        stress: 'Paralisa ou se acomoda.',
-        leadership: 'Diplomático, paciente, às vezes passivo.'
+        productivity: 'Você é constante e confiável. Não é o mais rápido, mas entrega com consistência.',
+        rhythm: 'Prefere rotina e previsibilidade. Mudanças frequentes te desequilibram.',
+        motivation: 'Segurança e harmonia no ambiente te motivam. Você rende melhor em times estáveis.',
+        stress: 'Sob estresse, você paralisa ou se acomoda. Pode evitar decisões necessárias.',
+        leadership: 'Você lidera com diplomacia e paciência, mas pode ser passivo demais em momentos de decisão.'
       },
       innerLife: {
-        reflection: 'Presente, mas prática.',
-        silence: 'Natural e restaurador.',
-        growth: 'Através de estabilidade e rotina.',
-        challenge: 'Aceitar mudanças necessárias.'
+        reflection: 'Sua reflexão é prática e tranquila. Você não se perde em pensamentos, mas processa no seu tempo.',
+        silence: 'Silêncio é natural e restaurador para você. É onde você recarrega.',
+        growth: 'Você cresce através de estabilidade e rotina. Mudanças graduais funcionam melhor.',
+        challenge: 'Seu maior desafio é aceitar mudanças necessárias e agir mesmo quando não se sente pronto.'
       },
       expansion: ['Tomar mais iniciativa', 'Expressar desejos claramente', 'Aceitar mudanças', 'Confrontar com gentileza', 'Celebrar pequenas vitórias'],
       sevenDayPlan: [
@@ -495,7 +495,24 @@ const getLabels = (lang: string) => {
       disclaimer: 'Este teste indica tendências, não define sua identidade e não é diagnóstico clínico.',
       radarTitle: 'Mapa Visual dos Temperamentos',
       markAsDone: 'Marcar como feito',
-      completed: 'Concluído'
+      completed: 'Concluído',
+      // Relationship labels
+      rel_style: 'Estilo',
+      rel_affection: 'Demonstração de Afeto',
+      rel_communication: 'Comunicação',
+      rel_challenges: 'Desafios',
+      rel_needs: 'Necessidades',
+      // Work labels
+      work_productivity: 'Produtividade',
+      work_rhythm: 'Ritmo',
+      work_motivation: 'Motivação',
+      work_stress: 'Sob Estresse',
+      work_leadership: 'Liderança',
+      // Inner life labels
+      inner_reflection: 'Reflexão',
+      inner_silence: 'Silêncio',
+      inner_growth: 'Crescimento',
+      inner_challenge: 'Desafio'
     },
     'pt-pt': {
       yourTemperament: 'Temperamentos',
@@ -539,7 +556,24 @@ const getLabels = (lang: string) => {
       disclaimer: 'Este teste indica tendências, não define a tua identidade e não é diagnóstico clínico.',
       radarTitle: 'Mapa Visual dos Temperamentos',
       markAsDone: 'Marcar como feito',
-      completed: 'Concluído'
+      completed: 'Concluído',
+      // Relationship labels
+      rel_style: 'Estilo',
+      rel_affection: 'Demonstração de Afeto',
+      rel_communication: 'Comunicação',
+      rel_challenges: 'Desafios',
+      rel_needs: 'Necessidades',
+      // Work labels
+      work_productivity: 'Produtividade',
+      work_rhythm: 'Ritmo',
+      work_motivation: 'Motivação',
+      work_stress: 'Sob Estresse',
+      work_leadership: 'Liderança',
+      // Inner life labels
+      inner_reflection: 'Reflexão',
+      inner_silence: 'Silêncio',
+      inner_growth: 'Crescimento',
+      inner_challenge: 'Desafio'
     },
     en: {
       yourTemperament: 'Temperaments',
@@ -583,7 +617,24 @@ const getLabels = (lang: string) => {
       disclaimer: 'This test indicates tendencies, does not define your identity, and is not a clinical diagnosis.',
       radarTitle: 'Visual Map of Temperaments',
       markAsDone: 'Mark as done',
-      completed: 'Completed'
+      completed: 'Completed',
+      // Relationship labels
+      rel_style: 'Style',
+      rel_affection: 'Affection',
+      rel_communication: 'Communication',
+      rel_challenges: 'Challenges',
+      rel_needs: 'Needs',
+      // Work labels
+      work_productivity: 'Productivity',
+      work_rhythm: 'Rhythm',
+      work_motivation: 'Motivation',
+      work_stress: 'Under Stress',
+      work_leadership: 'Leadership',
+      // Inner life labels
+      inner_reflection: 'Reflection',
+      inner_silence: 'Silence',
+      inner_growth: 'Growth',
+      inner_challenge: 'Challenge'
     }
   };
   return labels[lang] || labels['pt'];
@@ -1027,12 +1078,16 @@ export function TemperamentosResultsSection({ temperamentosResults, lang, userNa
         <div className="space-y-4">
           <p className="text-muted-foreground">{labels.relationshipsDesc}</p>
           <div className="grid gap-3">
-            {Object.entries(primaryData.relationships).map(([key, value]) => (
-              <div key={key} className="bg-background/80 rounded-lg p-3 border border-border/50">
-                <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}: </span>
-                <span className="text-muted-foreground">{value}</span>
-              </div>
-            ))}
+            {Object.entries(primaryData.relationships).map(([key, value]) => {
+              const labelKey = `rel_${key}` as keyof typeof labels;
+              const translatedLabel = labels[labelKey] || key;
+              return (
+                <div key={key} className="bg-background/80 rounded-lg p-3 border border-border/50">
+                  <span className="font-medium">{translatedLabel}: </span>
+                  <span className="text-muted-foreground">{value}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </CollapsibleSection>
@@ -1041,12 +1096,16 @@ export function TemperamentosResultsSection({ temperamentosResults, lang, userNa
         <div className="space-y-4">
           <p className="text-muted-foreground">{labels.workDesc}</p>
           <div className="grid gap-3">
-            {Object.entries(primaryData.work).map(([key, value]) => (
-              <div key={key} className="bg-background/80 rounded-lg p-3 border border-border/50">
-                <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}: </span>
-                <span className="text-muted-foreground">{value}</span>
-              </div>
-            ))}
+            {Object.entries(primaryData.work).map(([key, value]) => {
+              const labelKey = `work_${key}` as keyof typeof labels;
+              const translatedLabel = labels[labelKey] || key;
+              return (
+                <div key={key} className="bg-background/80 rounded-lg p-3 border border-border/50">
+                  <span className="font-medium">{translatedLabel}: </span>
+                  <span className="text-muted-foreground">{value}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </CollapsibleSection>
@@ -1055,12 +1114,16 @@ export function TemperamentosResultsSection({ temperamentosResults, lang, userNa
         <div className="space-y-4">
           <p className="text-muted-foreground">{labels.innerLifeDesc}</p>
           <div className="grid gap-3">
-            {Object.entries(primaryData.innerLife).map(([key, value]) => (
-              <div key={key} className="bg-background/80 rounded-lg p-3 border border-border/50">
-                <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}: </span>
-                <span className="text-muted-foreground">{value}</span>
-              </div>
-            ))}
+            {Object.entries(primaryData.innerLife).map(([key, value]) => {
+              const labelKey = `inner_${key}` as keyof typeof labels;
+              const translatedLabel = labels[labelKey] || key;
+              return (
+                <div key={key} className="bg-background/80 rounded-lg p-3 border border-border/50">
+                  <span className="font-medium">{translatedLabel}: </span>
+                  <span className="text-muted-foreground">{value}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </CollapsibleSection>
