@@ -20,3 +20,7 @@ export { ScoreHighlights } from "./ScoreHighlights";
 export { TalentsGiftsSection } from "./TalentsGiftsSection";
 export { VocationSection } from "./VocationSection";
 export { ArchetypesMissionSection } from "./ArchetypesMissionSection";
+export { InternalTensionsSection } from "./InternalTensionsSection";
+export { LifeAreasSection } from "./LifeAreasSection";
+export { PeacePressureSection } from "./PeacePressureSection";
+export { ProfileRarityBadge } from "./ProfileRarityBadge";

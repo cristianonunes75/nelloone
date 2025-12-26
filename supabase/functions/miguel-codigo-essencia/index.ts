@@ -601,7 +601,103 @@ Baseado em: Arquétipos + Todos os testes
 }
 
 ═══════════════════════════════════════════
-SEÇÃO 6: CAMINHO DE 90 DIAS
+SEÇÃO 11: TENSÕES INTERNAS (OBRIGATÓRIO)
+═══════════════════════════════════════════
+
+Seção: "tensoes_internas"
+Baseado em: Cruzamento de pelo menos 2 testes conflitantes
+
+{
+  "source": "Cruzamento de Perfis",
+  "items": [
+    { 
+      "tension": "[nome da tensão - ex: Velocidade vs Perfeição]",
+      "tests_involved": "[quais testes geram a tensão - ex: DISC D + Temperamento Melancólico]",
+      "conflict": "[descrição específica do conflito interno]",
+      "practical_impact": "[como isso afeta decisões e comportamentos reais]",
+      "confrontation_question": "[pergunta direta que confronta a pessoa sobre essa tensão]"
+    },
+    { "tension": "...", "tests_involved": "...", "conflict": "...", "practical_impact": "...", "confrontation_question": "..." }
+  ]
+}
+
+OBRIGATÓRIO: Identifique pelo menos 2 tensões reais. Exemplos:
+- DISC D (velocidade) + Melancólico (perfeição) = paralisia antes de decidir
+- Eneagrama 3 (imagem) + Arquétipo Sábio (verdade) = conflito entre parecer e ser
+- Inteligência Interpessoal + DISC C (análise) = dificuldade em confiar na intuição social
+
+═══════════════════════════════════════════
+SEÇÃO 12: LEITURA POR ÁREAS DA VIDA (OBRIGATÓRIO)
+═══════════════════════════════════════════
+
+Seção: "areas_vida"
+Baseado em: Cruzamento de todos os testes aplicados a cada área
+
+{
+  "source": "Análise Integrada por Área",
+  "items": [
+    {
+      "area": "Carreira e Dinheiro",
+      "natural_strength": "[força natural nessa área baseada nos testes]",
+      "main_risk": "[risco principal nessa área]",
+      "practical_direction": "[direção prática específica]"
+    },
+    {
+      "area": "Relacionamentos e Amor",
+      "natural_strength": "[força natural nessa área]",
+      "main_risk": "[risco principal nessa área]",
+      "practical_direction": "[direção prática específica]"
+    },
+    {
+      "area": "Saúde e Energia",
+      "natural_strength": "[força natural nessa área]",
+      "main_risk": "[risco principal nessa área]",
+      "practical_direction": "[direção prática específica]"
+    },
+    {
+      "area": "Espiritualidade e Sentido",
+      "natural_strength": "[força natural nessa área]",
+      "main_risk": "[risco principal nessa área]",
+      "practical_direction": "[direção prática específica]"
+    }
+  ]
+}
+
+═══════════════════════════════════════════
+SEÇÃO 13: PERFIL EM PAZ VS SOB PRESSÃO (OBRIGATÓRIO)
+═══════════════════════════════════════════
+
+Seção: "paz_pressao"
+Baseado em: DISC + Temperamento + Eneagrama
+
+{
+  "source": "DISC + Temperamento + Eneagrama",
+  "in_peace": {
+    "description": "[como a pessoa age quando está equilibrada - específico]",
+    "behaviors": ["[comportamento 1]", "[comportamento 2]", "[comportamento 3]"]
+  },
+  "under_pressure": {
+    "description": "[como a pessoa reage sob estresse - específico]",
+    "behaviors": ["[comportamento 1]", "[comportamento 2]", "[comportamento 3]"]
+  }
+}
+
+═══════════════════════════════════════════
+SEÇÃO 14: RARIDADE DO PERFIL (OBRIGATÓRIO)
+═══════════════════════════════════════════
+
+Seção: "raridade_perfil"
+Baseado em: Combinação de todos os resultados
+
+{
+  "percentage": [número entre 1 e 25 - estimativa de quão rara é essa combinação específica],
+  "explanation": "[explicação de por que essa combinação é incomum - cite os elementos específicos]"
+}
+
+Exemplo: "Apenas ~8% combinam DISC D com Eneagrama 4 e Arquétipo Criador. Isso cria uma tensão rara entre ação e profundidade."
+
+═══════════════════════════════════════════
+SEÇÃO 15: CAMINHO DE 90 DIAS
 ═══════════════════════════════════════════
 
 Seção: "plano_90_dias"
@@ -617,7 +713,7 @@ Seção: "plano_90_dias"
 Faça ESPECÍFICO para o perfil de ${firstName}!
 
 ═══════════════════════════════════════════
-SEÇÃO 7: ROTINA DIÁRIA
+SEÇÃO 16: ROTINA DIÁRIA
 ═══════════════════════════════════════════
 
 Seção: "rotina_diaria"
@@ -632,7 +728,7 @@ Seção: "rotina_diaria"
 Personalizado ao perfil. NÃO genérico.
 
 ═══════════════════════════════════════════
-SEÇÃO 8: CONVERSA HONESTA + PRÓXIMO PASSO
+SEÇÃO 17: CONVERSA HONESTA + PRÓXIMO PASSO
 ═══════════════════════════════════════════
 
 Seção: "conversa_final"
@@ -725,6 +821,31 @@ ESTRUTURA JSON FINAL
       "motivation": "...", "daily_example": "...", "common_error": "...", "invitation": "..."
     },
     {
+      "id": "tensoes_internas",
+      "title": "Tensões Internas",
+      "source": "Cruzamento de Perfis",
+      "items": [{ "tension": "...", "tests_involved": "...", "conflict": "...", "practical_impact": "...", "confrontation_question": "..." }, ...]
+    },
+    {
+      "id": "areas_vida",
+      "title": "Leitura por Áreas da Vida",
+      "source": "Análise Integrada por Área",
+      "items": [{ "area": "...", "natural_strength": "...", "main_risk": "...", "practical_direction": "..." }, ...]
+    },
+    {
+      "id": "paz_pressao",
+      "title": "Perfil em Paz vs Sob Pressão",
+      "source": "DISC + Temperamento + Eneagrama",
+      "in_peace": { "description": "...", "behaviors": [...] },
+      "under_pressure": { "description": "...", "behaviors": [...] }
+    },
+    {
+      "id": "raridade_perfil",
+      "title": "Raridade do Perfil",
+      "percentage": 8,
+      "explanation": "..."
+    },
+    {
       "id": "plano_90_dias",
       "title": "Caminho de 90 Dias",
       "months": [...]
@@ -747,6 +868,10 @@ ESTRUTURA JSON FINAL
 REGRAS CRÍTICAS:
 - impact_blocks DEVE ser preenchido com conteúdo específico e personalizado
 - visual_data DEVE extrair valores reais dos resultados dos testes
+- tensoes_internas é OBRIGATÓRIO - identifique conflitos reais entre testes
+- areas_vida é OBRIGATÓRIO - analise cada área com cruzamento de testes
+- paz_pressao é OBRIGATÓRIO - descreva comportamentos específicos
+- raridade_perfil é OBRIGATÓRIO - estime a raridade e explique
 - Frases curtas e impactantes apenas
 - NENHUMA afirmação genérica
 - ${isEuropean ? 'Use português europeu (tu, teu, tua)' : 'Use português brasileiro (você, seu, sua)'}`;
