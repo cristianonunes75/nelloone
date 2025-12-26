@@ -253,13 +253,25 @@ const Cliente = () => {
         }
         break;
       case "arquetipos_proposito":
+        // Handle both structures: dominantArchetypes.primary and primary.archetype
+        if (resultData.dominantArchetypes?.primary?.archetype) {
+          const primary = resultData.dominantArchetypes.primary.archetype;
+          const secondary = resultData.dominantArchetypes.secondary?.archetype;
+          return `${primary}${secondary ? ` + ${secondary}` : ""}`;
+        }
         if (resultData.primary?.archetype) {
           return `${resultData.primary.archetype}${resultData.secondary?.archetype ? ` + ${resultData.secondary.archetype}` : ""}`;
         }
         break;
       case "inteligencias_multiplas":
+        // Handle both structures: dominant.name and top1
         if (resultData.dominant?.name) {
           return resultData.dominant.name;
+        }
+        if (resultData.top1) {
+          // Convert key to display name (e.g., "naturalista" -> "Naturalista")
+          const intelligenceName = resultData.top1.charAt(0).toUpperCase() + resultData.top1.slice(1).replace(/_/g, ' ');
+          return intelligenceName;
         }
         break;
       case "estilos_conexao":
