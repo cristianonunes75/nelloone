@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { INTELLIGENCES, InteligenciasResult } from "@/lib/inteligenciasMultiplas";
 import { Share2, Brain, Lightbulb, Target, BookOpen, Wrench, AlertTriangle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { IntelligenceMapCards } from "./inteligencias/IntelligenceMapCards";
 
 interface InteligenciasResultsSectionProps {
   inteligenciasResults: InteligenciasResult;
@@ -177,6 +178,9 @@ export function InteligenciasResultsSection({
           </div>
         </CardContent>
       </Card>
+
+      {/* O QUE SIGNIFICA CADA INTELIGÊNCIA */}
+      <IntelligenceMapCards results={inteligenciasResults} lang={lang} />
 
       {/* INTELIGÊNCIAS EM EXCESSO */}
       <Card className="border-2 border-amber-500/30">
