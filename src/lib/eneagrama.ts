@@ -77,6 +77,16 @@ export interface EnneagramResult {
   };
   hasCloseSecondary?: boolean;
   completed_at?: string;
+  // Instinctive subtypes
+  instinct?: 'SP' | 'SO' | 'SX';
+  instinctScores?: {
+    SP: number;
+    SO: number;
+    SX: number;
+  };
+  // Consistency check
+  consistencyScore?: number;
+  isConsistent?: boolean;
 }
 
 /**
@@ -113,12 +123,28 @@ export const getEnneagramResults = (answers: EnneagramAnswer[]): EnneagramResult
     "6": 0, "7": 0, "8": 0, "9": 0
   };
 
-  // Calculate scores for each type
+  // Initialize instinct scores
+  const instinctScores = { SP: 0, SO: 0, SX: 0 };
+  
+  // Consistency tracking
+  let consistencyTotal = 0;
+  let consistencyCount = 0;
+
+  // Calculate scores for each type and instinct
   answers.forEach((answer) => {
     const type = answer.test_questions.options.type;
     const value = answer.answer;
+    
     if (type && scores.hasOwnProperty(type)) {
+      // Type 1-9 question
       scores[type] += value;
+    } else if (type === 'SP' || type === 'SO' || type === 'SX') {
+      // Instinctive subtype question
+      instinctScores[type] += value;
+    } else if (type === 'consistency') {
+      // Consistency question (high scores indicate inconsistency)
+      consistencyTotal += value;
+      consistencyCount++;
     }
   });
 
@@ -134,18 +160,30 @@ export const getEnneagramResults = (answers: EnneagramAnswer[]): EnneagramResult
   const secondaryType = sortedTypes[1][0];
   const secondaryScore = sortedTypes[1][1];
   
-  // Check if secondary is close (within 2 points) - indicates strong secondary influence
-  const hasCloseSecondary = (primaryScore - secondaryScore) <= 2;
+  // Check if secondary is close (within 3 points for 10 questions per type)
+  const hasCloseSecondary = (primaryScore - secondaryScore) <= 3;
 
   // Calculate wing based on adjacent types
   const wing = calculateWing(primaryType, scores);
 
-  // Calculate percentages (each type has 5 questions, max score per type is 25)
-  const maxScorePerType = 25;
+  // Calculate percentages (each type has 10 questions, max score per type is 50)
+  const maxScorePerType = 50;
   const percentages: { [key: string]: number } = {};
   Object.keys(scores).forEach(type => {
     percentages[type] = Math.round((scores[type] / maxScorePerType) * 100);
   });
+
+  // Determine dominant instinct
+  const sortedInstincts = Object.entries(instinctScores)
+    .sort(([, a], [, b]) => b - a);
+  const instinct = sortedInstincts[0][0] as 'SP' | 'SO' | 'SX';
+
+  // Calculate consistency score (lower is better, range 6-30)
+  // Average above 3.5 suggests inconsistent responses
+  const consistencyScore = consistencyCount > 0 
+    ? Math.round((consistencyTotal / consistencyCount) * 10) / 10 
+    : 0;
+  const isConsistent = consistencyScore <= 3.5;
 
   return {
     primaryType,
@@ -154,6 +192,10 @@ export const getEnneagramResults = (answers: EnneagramAnswer[]): EnneagramResult
     scores,
     percentages,
     hasCloseSecondary,
+    instinct,
+    instinctScores,
+    consistencyScore,
+    isConsistent,
     completed_at: new Date().toISOString()
   };
 };
