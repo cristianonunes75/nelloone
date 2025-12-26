@@ -51,6 +51,8 @@ import {
   CollapsibleSection,
   SectionIndex,
   SectionDivider,
+  NextStepCard,
+  ScoreHighlights,
 } from "@/components/codigo-essencia";
 
 type LangKey = 'pt' | 'pt-pt' | 'en';
@@ -557,6 +559,15 @@ const CodigoEssenciaInner = () => {
                     />
                   )}
                   
+                  {/* Score Highlights - visible personalization */}
+                  {generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights && (
+                    <ScoreHighlights 
+                      highlights={generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights || []}
+                      rarityNote={generatedSections.find(s => s.id === 'retrato_essencial')?.rarity_note}
+                      language={lang}
+                    />
+                  )}
+                  
                   {/* Impact Blocks */}
                   {impactBlocksData && (
                     <div className="mt-6">
@@ -815,16 +826,22 @@ const CodigoEssenciaInner = () => {
                         <h3 className="text-xl font-bold">{SECTION_CONFIG.conversa_final.title[lang]}</h3>
                       </div>
                       <div className="space-y-4">
-                        {conversaSection.paragraphs?.slice(0, 3).map((p: string, i: number) => (
+                        {conversaSection.paragraphs?.slice(0, 2).map((p: string, i: number) => (
                           <p key={i} className="leading-relaxed text-sm">{p}</p>
                         ))}
-                        <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 text-center mt-6">
-                          <p className="text-lg font-medium italic">"{t.closingQuestion}"</p>
-                        </div>
                       </div>
                     </div>
                   )}
                 </section>
+
+                {/* ========== 10. Next Step - Actionable Closing ========== */}
+                {conversaSection?.next_step && (
+                  <NextStepCard 
+                    action={conversaSection.next_step.action} 
+                    why={conversaSection.next_step.why} 
+                    language={lang} 
+                  />
+                )}
 
                 {/* Disclaimer */}
                 <div className="bg-muted/50 rounded-xl p-4 text-center">
