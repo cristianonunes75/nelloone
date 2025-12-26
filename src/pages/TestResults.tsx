@@ -149,14 +149,14 @@ function TestResultsInner() {
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   const [isRecalculating, setIsRecalculating] = useState(false);
 
-  // Check if user is founder
+  // Check if user is founder and get profile data (including full_name)
   const { data: profile } = useQuery({
-    queryKey: ["profile-founder", user?.id],
+    queryKey: ["profile-data", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("is_founder")
+        .select("is_founder, full_name")
         .eq("id", user!.id)
         .single();
       if (error) return null;
@@ -165,6 +165,20 @@ function TestResultsInner() {
   });
 
   const isFounder = profile?.is_founder || false;
+  
+  // Extract first name from full_name (prioritize) or email
+  const getUserFirstName = () => {
+    if (profile?.full_name) {
+      const firstName = profile.full_name.split(' ')[0];
+      return firstName || 'Você';
+    }
+    if (user?.email) {
+      return user.email.split('@')[0];
+    }
+    return 'Você';
+  };
+  
+  const userFirstName = getUserFirstName();
   const canRecalculate = isAdmin || isFounder;
 
   const { data: userTest, isLoading, isError: isUserTestError, error: userTestError } = useQuery({
@@ -437,9 +451,8 @@ function TestResultsInner() {
 
   const handleDownloadInteligenciasPDF = () => {
     if (inteligenciasResults) {
-      const userName = user?.email?.split('@')[0] || 'Usuario';
       try {
-        generateInteligenciasPremiumPDF(inteligenciasResults, userName, { language: lang as 'pt' | 'en' });
+        generateInteligenciasPremiumPDF(inteligenciasResults, userFirstName, { language: lang as 'pt' | 'en' });
         toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
       } catch (error) {
         console.error('Error generating PDF:', error);
@@ -453,7 +466,6 @@ function TestResultsInner() {
   // Premium PDF handlers for each test type
   const handleDownloadArquetiposPDF = () => {
     if (dominantArchetypes && archetypeScoresArray) {
-      const userName = user?.email?.split('@')[0] || 'Usuario';
       try {
         generateArquetiposPremiumPDF({
           dominant: dominantArchetypes.primary.archetype,
@@ -461,7 +473,7 @@ function TestResultsInner() {
           tertiary: dominantArchetypes.tertiary?.archetype || '',
           allScores: archetypeScores,
           ranking: archetypeScoresArray.map(s => ({ key: s.archetype, score: s.score, percentage: Math.round((s.score / Math.max(...archetypeScoresArray.map(x => x.score))) * 100) }))
-        }, { userName, language: lang as 'pt' | 'pt-pt' | 'en' });
+        }, { userName: userFirstName, language: lang as 'pt' | 'pt-pt' | 'en' });
         toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
       } catch (error) {
         console.error('Error generating PDF:', error);
@@ -474,10 +486,9 @@ function TestResultsInner() {
 
   const handleDownloadDISCPDF = () => {
     if (discResults) {
-      const userName = user?.email?.split('@')[0] || 'Usuario';
       try {
         downloadDISCPremiumPDF({
-          userName,
+          userName: userFirstName,
           scores: discResults.scores as { D: number; I: number; S: number; C: number },
           dominantProfile: discResults.dominantProfile,
           language: lang as 'pt' | 'pt-pt' | 'en'
@@ -494,13 +505,12 @@ function TestResultsInner() {
 
   const handleDownloadEneagramaPDF = () => {
     if (enneagramResultData?.primaryType) {
-      const userName = user?.email?.split('@')[0] || 'Usuario';
       try {
         generateEneagramaPDF({
           dominantType: parseInt(enneagramResultData.primaryType),
           wing: parseInt(enneagramResultData.primaryType) === 9 ? 1 : parseInt(enneagramResultData.primaryType) + 1,
           scores: enneagramResultData.scores || {}
-        }, { userName, language: lang as 'pt' | 'pt-pt' | 'en' });
+        }, { userName: userFirstName, language: lang as 'pt' | 'pt-pt' | 'en' });
         toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
       } catch (error) {
         console.error('Error generating PDF:', error);
@@ -513,14 +523,13 @@ function TestResultsInner() {
 
   const handleDownloadTemperamentosPDF = () => {
     if (temperamentosResultData) {
-      const userName = user?.email?.split('@')[0] || 'Usuario';
       try {
         generateTemperamentosPDF({
           primary: temperamentosResultData.primary,
           secondary: temperamentosResultData.secondary,
           scores: temperamentosResultData.scores || { sanguineo: 0, colerico: 0, melancolico: 0, fleumatico: 0 },
           interpretation: temperamentosResultData.interpretation || ''
-        }, { userName, language: lang as 'pt' | 'pt-pt' | 'en' });
+        }, { userName: userFirstName, language: lang as 'pt' | 'pt-pt' | 'en' });
         toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
       } catch (error) {
         console.error('Error generating PDF:', error);
@@ -533,10 +542,9 @@ function TestResultsInner() {
 
   const handleDownloadNello16PDF = () => {
     if (mbtiResultData?.type) {
-      const userName = user?.email?.split('@')[0] || 'Usuario';
       try {
         downloadNello16PremiumPDF({
-          userName,
+          userName: userFirstName,
           personalityType: mbtiResultData.type,
           dimensionScores: mbtiResultData.scores || { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 },
           language: lang as 'pt' | 'pt-pt' | 'en'
@@ -553,10 +561,9 @@ function TestResultsInner() {
 
   const handleDownloadEstilosConexaoPDF = () => {
     if (estilosConexaoResults || linguagensAmorResultData) {
-      const userName = user?.email?.split('@')[0] || 'Usuario';
       const result = estilosConexaoResults || linguagensAmorResultData;
       try {
-        generateEstilosConexaoPremiumPDF(result, userName, { language: lang as 'pt' | 'pt-pt' | 'en' });
+        generateEstilosConexaoPremiumPDF(result, userFirstName, { language: lang as 'pt' | 'pt-pt' | 'en' });
         toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
       } catch (error) {
         console.error('Error generating PDF:', error);
@@ -569,9 +576,8 @@ function TestResultsInner() {
 
   // Send PDF by email handler
   const handleSendPDFByEmail = async () => {
-    if (!user?.email || !userTest?.tests?.type) return;
+    if (!user?.id || !userTest?.tests?.type) return;
     
-    const userName = user?.email?.split('@')[0] || 'Usuario';
     const testType = userTest.tests.type;
     const testName = userTest.tests.name || '';
     
@@ -597,8 +603,8 @@ function TestResultsInner() {
     await sendPDFByEmail({
       testType,
       testName,
-      userName,
-      userEmail: user.email,
+      userName: userFirstName,
+      userEmail: user.email || '',
       language: lang as 'pt' | 'pt-pt' | 'en',
       resultData
     });
@@ -751,7 +757,8 @@ function TestResultsInner() {
         {isEnneagramTest && enneagramResultData?.primaryType && (
           <EneagramaResultsSection 
             enneagramResults={enneagramResultData} 
-            lang={lang as 'pt' | 'pt-pt' | 'en'} 
+            lang={lang as 'pt' | 'pt-pt' | 'en'}
+            userName={userFirstName}
           />
         )}
 
@@ -1000,18 +1007,18 @@ function TestResultsInner() {
             secondaryScore={dominantArchetypes.secondary?.score}
             tertiaryScore={dominantArchetypes.tertiary?.score}
             allScores={archetypeScores}
-            userName={user?.email?.split('@')[0] || 'Você'}
+            userName={userFirstName}
           />
         )}
 
         {isDISCTest && discResults && (
-          <DISCResultsSection discResults={discResults} lang={lang as 'pt' | 'pt-pt' | 'en'} />
+          <DISCResultsSection discResults={discResults} lang={lang as 'pt' | 'pt-pt' | 'en'} userName={userFirstName} />
         )}
 
         {isLinguagensAmorTest && (estilosConexaoResults || linguagensAmorResultData) && (
           <EstilosConexaoResultsSection 
             estilosResults={estilosConexaoResults || linguagensAmorResultData}
-            userName={user?.email?.split('@')[0] || 'Você'}
+            userName={userFirstName}
             lang={lang as 'pt' | 'pt-pt' | 'en'}
           />
         )}
@@ -1019,7 +1026,8 @@ function TestResultsInner() {
         {isTemperamentosTest && temperamentosResultData?.primary?.temperament && temperamentosResultData?.secondary?.temperament && temperamentosResultData?.scores && (
           <TemperamentosResultsSection 
             temperamentosResults={temperamentosResultData} 
-            lang={lang as 'pt' | 'pt-pt' | 'en'} 
+            lang={lang as 'pt' | 'pt-pt' | 'en'}
+            userName={userFirstName}
           />
         )}
 
@@ -1027,7 +1035,7 @@ function TestResultsInner() {
         {isInteligenciasTest && inteligenciasResults && (
           <InteligenciasResultsSection 
             inteligenciasResults={inteligenciasResults}
-            userName={user?.email?.split('@')[0] || 'Você'}
+            userName={userFirstName}
             lang={lang as 'pt' | 'pt-pt' | 'en'}
           />
         )}

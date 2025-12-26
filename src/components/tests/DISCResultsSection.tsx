@@ -321,9 +321,10 @@ interface DISCResults {
 interface DISCResultsSectionProps {
   discResults: DISCResults;
   lang: 'pt' | 'pt-pt' | 'en';
+  userName?: string;
 }
 
-export function DISCResultsSection({ discResults, lang }: DISCResultsSectionProps) {
+export function DISCResultsSection({ discResults, lang, userName = 'Você' }: DISCResultsSectionProps) {
   const [showDetails, setShowDetails] = useState(false);
   
   const { scores, dominantProfile } = discResults;

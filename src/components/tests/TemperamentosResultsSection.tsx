@@ -7,6 +7,7 @@ import { TemperamentosResult } from "@/lib/temperamentos";
 interface TemperamentosResultsSectionProps {
   temperamentosResults: TemperamentosResult;
   lang: 'pt' | 'pt-pt' | 'en';
+  userName?: string;
 }
 
 const TEMPERAMENT_DATA = {
@@ -281,7 +282,7 @@ const getLabels = (lang: string) => {
   return labels[lang] || labels['pt'];
 };
 
-export function TemperamentosResultsSection({ temperamentosResults, lang }: TemperamentosResultsSectionProps) {
+export function TemperamentosResultsSection({ temperamentosResults, lang, userName = 'Você' }: TemperamentosResultsSectionProps) {
   const labels = getLabels(lang);
   const effectiveLang = lang === 'pt-pt' ? 'pt' : lang; // pt-pt uses pt content
   
