@@ -21,16 +21,16 @@ export const MiguelSection = () => {
     { icon: Compass, title: "Guia Sábio", description: "Revela os seus padrões com clareza." },
     { icon: Lightbulb, title: "Revelador", description: "Mostra o que antes não conseguia ver." },
   ] : [
-    { icon: Heart, title: "Acolhedor", description: "Miguel recebe você com empatia e gentileza." },
+    { icon: Heart, title: "Acolhedor", description: "Nello AI recebe você com empatia e gentileza." },
     { icon: Compass, title: "Guia Sábio", description: "Ele revela seus padrões com precisão e clareza." },
-    { icon: Lightbulb, title: "Revelador", description: "Miguel te mostra o que antes você não percebia." },
+    { icon: Lightbulb, title: "Revelador", description: "Nello AI te mostra o que antes você não percebia." },
   ];
   
   const quote = language === 'en' 
-    ? "\"I am Miguel, your guide inside Nello One. My mission is to help you see who you truly are, with clarity, depth and lightness.\""
+    ? "\"I am Nello AI, your guide inside Nello One. My mission is to help you see who you truly are, with clarity, depth and lightness.\""
     : language === 'pt-pt'
-    ? "\"Eu sou o Miguel, o seu guia no Nello One. A minha missão é ajudá-lo a ver quem realmente é, com clareza, profundidade e leveza.\""
-    : "\"Eu sou o Miguel, seu guia no Nello One. Minha missão é ajudar você a enxergar quem realmente é, com clareza, profundidade e leveza.\"";
+    ? "\"Eu sou o Nello AI, o seu guia no Nello One. A minha missão é ajudá-lo a ver quem realmente é, com clareza, profundidade e leveza.\""
+    : "\"Eu sou o Nello AI, seu guia no Nello One. Minha missão é ajudar você a enxergar quem realmente é, com clareza, profundidade e leveza.\"";
 
   return (
     <section className="py-16 md:py-24 lg:py-32 gradient-soul">
@@ -81,7 +81,7 @@ export const MiguelSection = () => {
                 <div className="relative w-full h-full rounded-2xl md:rounded-3xl overflow-hidden shadow-large border border-border/30">
                   <img 
                     src={miguelImage} 
-                    alt="Miguel - Your guide in NELLO ONE"
+                    alt="Nello AI - Your guide in NELLO ONE"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-ink-deep/40 to-transparent" />

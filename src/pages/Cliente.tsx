@@ -408,7 +408,7 @@ const Cliente = () => {
               Seu Código da Essência
             </h1>
             <p className="text-sm md:text-lg text-muted-foreground max-w-xl mx-auto px-2">
-              Olá, {displayName}! Miguel vai te acompanhar em cada etapa. Basta seguir o caminho no seu ritmo.
+              Olá, {displayName}! Nello AI vai te acompanhar em cada etapa. Basta seguir o caminho no seu ritmo.
             </p>
           </div>
 
