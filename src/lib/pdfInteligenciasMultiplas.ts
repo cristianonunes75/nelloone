@@ -6,7 +6,7 @@ interface PDFOptions {
 }
 
 const COLORS = {
-  primary: { r: 31, g: 46, b: 75 },      // Miguel Deep Blue
+  primary: { r: 31, g: 46, b: 75 },      // Nello Deep Blue
   accent: { r: 205, g: 174, b: 103 },    // Nello Gold
   background: { r: 252, g: 252, b: 252 }, // White
   text: { r: 50, g: 50, b: 50 },

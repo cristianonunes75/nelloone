@@ -6,7 +6,7 @@ interface PDFOptions {
 }
 
 const COLORS = {
-  primary: { r: 31, g: 46, b: 75 },      // Miguel Deep Blue
+  primary: { r: 31, g: 46, b: 75 },      // Nello Deep Blue
   accent: { r: 205, g: 174, b: 103 },    // Nello Gold
   background: { r: 252, g: 252, b: 252 }, // White
   text: { r: 50, g: 50, b: 50 },
@@ -44,7 +44,7 @@ const STYLE_CONTENT: Record<string, {
   family: { pt: string; 'pt-pt': string; en: string };
   work: { pt: string; 'pt-pt': string; en: string };
   healingPoints: { pt: string[]; 'pt-pt': string[]; en: string[] };
-  miguelAnalysis: { pt: string; 'pt-pt': string; en: string };
+  nelloAnalysis: { pt: string; 'pt-pt': string; en: string };
   selfExamQuestion: { pt: string; 'pt-pt': string; en: string };
 }> = {
   expressao_verbal: {
@@ -143,7 +143,7 @@ const STYLE_CONTENT: Record<string, {
         "Create inner presence practices"
       ]
     },
-    miguelAnalysis: {
+    nelloAnalysis: {
       pt: "Percebo que sua energia emocional se organiza buscando segurança na clareza. Quando você entende o que sente e quando se sente entendido, seu coração expande. Quando não há reciprocidade, você se fecha e tenta resolver pela mente o que deveria ser acolhido pelo coração.",
       'pt-pt': "Percebo que a tua energia emocional se organiza buscando segurança na clareza. Quando tu entendes o que sentes e quando te sentes entendido, o teu coração expande. Quando não há reciprocidade, tu fechas-te e tentas resolver pela mente o que deveria ser acolhido pelo coração.",
       en: "I perceive that your emotional energy organizes itself seeking security in clarity. When you understand what you feel and when you feel understood, your heart expands. When there's no reciprocity, you close off and try to resolve through the mind what should be embraced by the heart."
@@ -250,7 +250,7 @@ const STYLE_CONTENT: Record<string, {
         "Communicate your needs without blaming"
       ]
     },
-    miguelAnalysis: {
+    nelloAnalysis: {
       pt: "Sua energia se estabiliza quando há presença genuína e plena. Você não precisa de muito, precisa de verdade. Quando está plenamente com alguém, você floresce. Quando sente que compete com distrações, sua alma se retrai.",
       'pt-pt': "A tua energia estabiliza-se quando há presença genuína e plena. Tu não precisas de muito, precisas de verdade. Quando estás plenamente com alguém, tu floresces. Quando sentes que competes com distrações, a tua alma retrai-se.",
       en: "Your energy stabilizes when there's genuine and full presence. You don't need much, you need truth. When you're fully with someone, you flourish. When you feel you're competing with distractions, your soul withdraws."
@@ -357,7 +357,7 @@ const STYLE_CONTENT: Record<string, {
         "Rest without needing to produce"
       ]
     },
-    miguelAnalysis: {
+    nelloAnalysis: {
       pt: "Você demonstra amor através da ação. Seu coração se acalma quando pode resolver, cuidar, facilitar. Mas às vezes você se esgota dando, sem perceber que também precisa receber. Seu desafio é permitir ser cuidado.",
       'pt-pt': "Tu demonstras amor através da ação. O teu coração acalma-se quando podes resolver, cuidar, facilitar. Mas às vezes tu esgotas-te a dar, sem perceber que também precisas receber. O teu desafio é permitir ser cuidado.",
       en: "You demonstrate love through action. Your heart calms when you can solve, care, facilitate. But sometimes you exhaust yourself giving, without realizing you also need to receive. Your challenge is allowing yourself to be cared for."
@@ -464,7 +464,7 @@ const STYLE_CONTENT: Record<string, {
         "Don't measure love only by material memories"
       ]
     },
-    miguelAnalysis: {
+    nelloAnalysis: {
       pt: "Para você, o amor precisa ser visível. Não é sobre coisas, é sobre símbolos. Quando alguém lembra de você através de um gesto, você sente que existe no coração dessa pessoa. Quando esquecido, você questiona seu lugar.",
       'pt-pt': "Para ti, o amor precisa ser visível. Não é sobre coisas, é sobre símbolos. Quando alguém lembra de ti através de um gesto, tu sentes que existes no coração dessa pessoa. Quando esquecido, tu questionas o teu lugar.",
       en: "For you, love needs to be visible. It's not about things, it's about symbols. When someone remembers you through a gesture, you feel you exist in that person's heart. When forgotten, you question your place."
@@ -571,7 +571,7 @@ const STYLE_CONTENT: Record<string, {
         "Respect others' physical boundaries"
       ]
     },
-    miguelAnalysis: {
+    nelloAnalysis: {
       pt: "Seu corpo fala antes das palavras. Você se conecta pelo toque, pela proximidade, pela presença física. Quando essa energia é bloqueada, você se sente isolado mesmo cercado de pessoas. Sua porta de conexão é corporal, e isso é legítimo.",
       'pt-pt': "O teu corpo fala antes das palavras. Tu conectas-te pelo toque, pela proximidade, pela presença física. Quando essa energia é bloqueada, tu sentes-te isolado mesmo cercado de pessoas. A tua porta de conexão é corporal, e isso é legítimo.",
       en: "Your body speaks before words. You connect through touch, through proximity, through physical presence. When this energy is blocked, you feel isolated even surrounded by people. Your connection door is bodily, and that is legitimate."
@@ -878,11 +878,11 @@ export const createEstilosConexaoPDF = (
   yPos = 50;
 
   if (primaryContent) {
-    // Miguel intro
+    // Nello AI intro
     doc.setFontSize(11);
     doc.setFont("helvetica", "italic");
     doc.setTextColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-    yPos = writeWrappedText(`"${primaryContent.miguelAnalysis[lang]}"`, margin, yPos, contentWidth);
+    yPos = writeWrappedText(`"${primaryContent.nelloAnalysis[lang]}"`, margin, yPos, contentWidth);
     yPos += 15;
 
     // Pattern sections

@@ -50,7 +50,7 @@ interface ArchetypeProfile {
   drains: { pt: string; 'pt-pt': string; en: string };
   emotionalTrigger: { pt: string; 'pt-pt': string; en: string };
   recognition: { pt: string; 'pt-pt': string; en: string };
-  miguelMessage: { pt: string; 'pt-pt': string; en: string };
+  nelloMessage: { pt: string; 'pt-pt': string; en: string };
 }
 
 const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
@@ -132,7 +132,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
       'pt-pt': "Através de admiração pela originalidade do teu trabalho.",
       en: "Through admiration for the originality of your work."
     },
-    miguelMessage: {
+    nelloMessage: {
       pt: "Vejo que sua energia se movimenta entre inspiração e responsabilidade. Quando você está alinhado, cria com leveza. Quando está sobrecarregado, tenta controlar demais o processo. Sua alma pede equilíbrio entre imaginação e presença.",
       'pt-pt': "Vejo que a tua energia se movimenta entre inspiração e responsabilidade. Quando estás alinhado, crias com leveza. Quando estás sobrecarregado, tentas controlar demais o processo. A tua alma pede equilíbrio entre imaginação e presença.",
       en: "I see your energy moves between inspiration and responsibility. When aligned, you create with lightness. When overloaded, you try to control the process too much. Your soul asks for balance between imagination and presence."
@@ -192,7 +192,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
     drains: { pt: "Superficialidade, ignorância deliberada, pressão para agir sem pensar.", 'pt-pt': "Superficialidade, ignorância deliberada, pressão para agir sem pensar.", en: "Superficiality, deliberate ignorance, pressure to act without thinking." },
     emotionalTrigger: { pt: "Ser considerado ignorante ou ter suas ideias descartadas.", 'pt-pt': "Ser considerado ignorante ou ter as tuas ideias descartadas.", en: "Being considered ignorant or having your ideas dismissed." },
     recognition: { pt: "Através do respeito pela sua sabedoria e conhecimento.", 'pt-pt': "Através do respeito pela tua sabedoria e conhecimento.", en: "Through respect for your wisdom and knowledge." },
-    miguelMessage: {
+    nelloMessage: {
       pt: "Sua mente é um templo de conhecimento. Lembre-se que sabedoria verdadeira inclui saber quando parar de analisar e começar a viver.",
       'pt-pt': "A tua mente é um templo de conhecimento. Lembra-te que sabedoria verdadeira inclui saber quando parar de analisar e começar a viver.",
       en: "Your mind is a temple of knowledge. Remember that true wisdom includes knowing when to stop analyzing and start living."
@@ -228,7 +228,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
     drains: { pt: "Caos, insubordinação, falta de respeito pela autoridade.", 'pt-pt': "Caos, insubordinação, falta de respeito pela autoridade.", en: "Chaos, insubordination, lack of respect for authority." },
     emotionalTrigger: { pt: "Perder o controle ou ser desconsiderado.", 'pt-pt': "Perder o controlo ou ser desconsiderado.", en: "Losing control or being disregarded." },
     recognition: { pt: "Através do respeito pela sua liderança e resultados.", 'pt-pt': "Através do respeito pela tua liderança e resultados.", en: "Through respect for your leadership and results." },
-    miguelMessage: { pt: "Sua força está na capacidade de construir. Lembre-se: verdadeiros líderes servem, não dominam.", 'pt-pt': "A tua força está na capacidade de construir. Lembra-te: verdadeiros líderes servem, não dominam.", en: "Your strength lies in your ability to build. Remember: true leaders serve, they don't dominate." }
+    nelloMessage: { pt: "Sua força está na capacidade de construir. Lembre-se: verdadeiros líderes servem, não dominam.", 'pt-pt': "A tua força está na capacidade de construir. Lembra-te: verdadeiros líderes servem, não dominam.", en: "Your strength lies in your ability to build. Remember: true leaders serve, they don't dominate." }
   },
   caregiver: {
     name: { pt: "O Cuidador", 'pt-pt': "O Cuidador", en: "The Caregiver" },
@@ -260,7 +260,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
     drains: { pt: "Ingratidão, ser ignorado, não poder ajudar.", 'pt-pt': "Ingratidão, ser ignorado, não poder ajudar.", en: "Ingratitude, being ignored, not being able to help." },
     emotionalTrigger: { pt: "Sentir que seu cuidado não é valorizado.", 'pt-pt': "Sentir que o teu cuidado não é valorizado.", en: "Feeling that your care is not valued." },
     recognition: { pt: "Através de gratidão genuína pelo seu cuidado.", 'pt-pt': "Através de gratidão genuína pelo teu cuidado.", en: "Through genuine gratitude for your care." },
-    miguelMessage: { pt: "Seu coração é imenso. Lembre-se: você não pode dar de um copo vazio. Cuide de si para poder cuidar dos outros.", 'pt-pt': "O teu coração é imenso. Lembra-te: não podes dar de um copo vazio. Cuida de ti para poderes cuidar dos outros.", en: "Your heart is immense. Remember: you cannot give from an empty cup. Take care of yourself so you can take care of others." }
+    nelloMessage: { pt: "Seu coração é imenso. Lembre-se: você não pode dar de um copo vazio. Cuide de si para poder cuidar dos outros.", 'pt-pt': "O teu coração é imenso. Lembra-te: não podes dar de um copo vazio. Cuida de ti para poderes cuidar dos outros.", en: "Your heart is immense. Remember: you cannot give from an empty cup. Take care of yourself so you can take care of others." }
   },
   explorer: {
     name: { pt: "O Explorador", 'pt-pt': "O Explorador", en: "The Explorer" },
@@ -292,7 +292,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
     drains: { pt: "Rotina, prisão, controle, monotonia.", 'pt-pt': "Rotina, prisão, controlo, monotonia.", en: "Routine, imprisonment, control, monotony." },
     emotionalTrigger: { pt: "Sentir-se preso ou limitado.", 'pt-pt': "Sentires-te preso ou limitado.", en: "Feeling trapped or limited." },
     recognition: { pt: "Através de admiração pela sua coragem e histórias.", 'pt-pt': "Através de admiração pela tua coragem e histórias.", en: "Through admiration for your courage and stories." },
-    miguelMessage: { pt: "Sua alma é livre. Lembre-se: verdadeira liberdade também significa escolher onde plantar raízes.", 'pt-pt': "A tua alma é livre. Lembra-te: verdadeira liberdade também significa escolher onde plantar raízes.", en: "Your soul is free. Remember: true freedom also means choosing where to plant roots." }
+    nelloMessage: { pt: "Sua alma é livre. Lembre-se: verdadeira liberdade também significa escolher onde plantar raízes.", 'pt-pt': "A tua alma é livre. Lembra-te: verdadeira liberdade também significa escolher onde plantar raízes.", en: "Your soul is free. Remember: true freedom also means choosing where to plant roots." }
   },
   hero: {
     name: { pt: "O Herói", 'pt-pt': "O Herói", en: "The Hero" },
@@ -324,7 +324,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
     drains: { pt: "Covardia alheia, injustiça, falta de propósito.", 'pt-pt': "Covardia alheia, injustiça, falta de propósito.", en: "Others' cowardice, injustice, lack of purpose." },
     emotionalTrigger: { pt: "Ser visto como fraco ou incompetente.", 'pt-pt': "Ser visto como fraco ou incompetente.", en: "Being seen as weak or incompetent." },
     recognition: { pt: "Através de admiração por suas conquistas e coragem.", 'pt-pt': "Através de admiração pelas tuas conquistas e coragem.", en: "Through admiration for your achievements and courage." },
-    miguelMessage: { pt: "Sua força é inspiradora. Lembre-se: os maiores heróis também sabem quando descansar.", 'pt-pt': "A tua força é inspiradora. Lembra-te: os maiores heróis também sabem quando descansar.", en: "Your strength is inspiring. Remember: the greatest heroes also know when to rest." }
+    nelloMessage: { pt: "Sua força é inspiradora. Lembre-se: os maiores heróis também sabem quando descansar.", 'pt-pt': "A tua força é inspiradora. Lembra-te: os maiores heróis também sabem quando descansar.", en: "Your strength is inspiring. Remember: the greatest heroes also know when to rest." }
   },
   lover: {
     name: { pt: "O Amante", 'pt-pt': "O Amante", en: "The Lover" },
@@ -356,7 +356,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
     drains: { pt: "Frieza, rejeição, feiura, solidão.", 'pt-pt': "Frieza, rejeição, feiura, solidão.", en: "Coldness, rejection, ugliness, loneliness." },
     emotionalTrigger: { pt: "Sentir que não é amado ou desejado.", 'pt-pt': "Sentir que não és amado ou desejado.", en: "Feeling unloved or unwanted." },
     recognition: { pt: "Através de amor e admiração sincera.", 'pt-pt': "Através de amor e admiração sincera.", en: "Through sincere love and admiration." },
-    miguelMessage: { pt: "Seu coração transborda amor. Lembre-se: o amor mais importante começa por você mesmo.", 'pt-pt': "O teu coração transborda amor. Lembra-te: o amor mais importante começa por ti mesmo.", en: "Your heart overflows with love. Remember: the most important love starts with yourself." }
+    nelloMessage: { pt: "Seu coração transborda amor. Lembre-se: o amor mais importante começa por você mesmo.", 'pt-pt': "O teu coração transborda amor. Lembra-te: o amor mais importante começa por ti mesmo.", en: "Your heart overflows with love. Remember: the most important love starts with yourself." }
   },
   jester: {
     name: { pt: "O Bobo da Corte", 'pt-pt': "O Bobo da Corte", en: "The Jester" },
@@ -388,7 +388,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
     drains: { pt: "Seriedade excessiva, rigidez, peso, monotonia.", 'pt-pt': "Seriedade excessiva, rigidez, peso, monotonia.", en: "Excessive seriousness, rigidity, heaviness, monotony." },
     emotionalTrigger: { pt: "Ser ignorado ou não conseguir fazer os outros rirem.", 'pt-pt': "Ser ignorado ou não conseguir fazer os outros rirem.", en: "Being ignored or not being able to make others laugh." },
     recognition: { pt: "Através de risadas e apreciação do seu humor.", 'pt-pt': "Através de risadas e apreciação do teu humor.", en: "Through laughter and appreciation of your humor." },
-    miguelMessage: { pt: "Sua alegria é contagiante. Lembre-se: verdadeira leveza não nega a dor, ela a transforma.", 'pt-pt': "A tua alegria é contagiante. Lembra-te: verdadeira leveza não nega a dor, ela transforma-a.", en: "Your joy is contagious. Remember: true lightness doesn't deny pain, it transforms it." }
+    nelloMessage: { pt: "Sua alegria é contagiante. Lembre-se: verdadeira leveza não nega a dor, ela a transforma.", 'pt-pt': "A tua alegria é contagiante. Lembra-te: verdadeira leveza não nega a dor, ela transforma-a.", en: "Your joy is contagious. Remember: true lightness doesn't deny pain, it transforms it." }
   },
   everyman: {
     name: { pt: "O Cara Comum", 'pt-pt': "O Cidadão Comum", en: "The Everyman" },
@@ -420,7 +420,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
     drains: { pt: "Exclusão, elitismo, solidão, pretensão.", 'pt-pt': "Exclusão, elitismo, solidão, pretensão.", en: "Exclusion, elitism, loneliness, pretension." },
     emotionalTrigger: { pt: "Sentir-se excluído ou diferente.", 'pt-pt': "Sentires-te excluído ou diferente.", en: "Feeling excluded or different." },
     recognition: { pt: "Através de inclusão e valorização como parte do grupo.", 'pt-pt': "Através de inclusão e valorização como parte do grupo.", en: "Through inclusion and being valued as part of the group." },
-    miguelMessage: { pt: "Sua humildade é rara. Lembre-se: você é comum e extraordinário ao mesmo tempo.", 'pt-pt': "A tua humildade é rara. Lembra-te: és comum e extraordinário ao mesmo tempo.", en: "Your humility is rare. Remember: you are both common and extraordinary." }
+    nelloMessage: { pt: "Sua humildade é rara. Lembre-se: você é comum e extraordinário ao mesmo tempo.", 'pt-pt': "A tua humildade é rara. Lembra-te: és comum e extraordinário ao mesmo tempo.", en: "Your humility is rare. Remember: you are both common and extraordinary." }
   },
   outlaw: {
     name: { pt: "O Rebelde", 'pt-pt': "O Rebelde", en: "The Outlaw" },
@@ -452,7 +452,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
     drains: { pt: "Conformismo, opressão, hipocrisia, regras injustas.", 'pt-pt': "Conformismo, opressão, hipocrisia, regras injustas.", en: "Conformism, oppression, hypocrisy, unfair rules." },
     emotionalTrigger: { pt: "Sentir-se preso em sistemas injustos.", 'pt-pt': "Sentires-te preso em sistemas injustos.", en: "Feeling trapped in unfair systems." },
     recognition: { pt: "Através de respeito pela sua coragem de ir contra.", 'pt-pt': "Através de respeito pela tua coragem de ir contra.", en: "Through respect for your courage to go against." },
-    miguelMessage: { pt: "Sua força transforma. Lembre-se: destruição consciente deve sempre servir à criação.", 'pt-pt': "A tua força transforma. Lembra-te: destruição consciente deve sempre servir à criação.", en: "Your strength transforms. Remember: conscious destruction must always serve creation." }
+    nelloMessage: { pt: "Sua força transforma. Lembre-se: destruição consciente deve sempre servir à criação.", 'pt-pt': "A tua força transforma. Lembra-te: destruição consciente deve sempre servir à criação.", en: "Your strength transforms. Remember: conscious destruction must always serve creation." }
   },
   magician: {
     name: { pt: "O Mago", 'pt-pt': "O Mago", en: "The Magician" },
@@ -484,7 +484,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
     drains: { pt: "Banalização, ceticismo extremo, superficialidade.", 'pt-pt': "Banalização, ceticismo extremo, superficialidade.", en: "Trivialization, extreme skepticism, superficiality." },
     emotionalTrigger: { pt: "Ter seu poder questionado ou banalizado.", 'pt-pt': "Ter o teu poder questionado ou banalizado.", en: "Having your power questioned or trivialized." },
     recognition: { pt: "Através de reverência pelo seu poder transformador.", 'pt-pt': "Através de reverência pelo teu poder transformador.", en: "Through reverence for your transformative power." },
-    miguelMessage: { pt: "Seu poder é real. Lembre-se: verdadeiros magos usam seu dom para servir, não para controlar.", 'pt-pt': "O teu poder é real. Lembra-te: verdadeiros magos usam o seu dom para servir, não para controlar.", en: "Your power is real. Remember: true magicians use their gift to serve, not to control." }
+    nelloMessage: { pt: "Seu poder é real. Lembre-se: verdadeiros magos usam seu dom para servir, não para controlar.", 'pt-pt': "O teu poder é real. Lembra-te: verdadeiros magos usam o seu dom para servir, não para controlar.", en: "Your power is real. Remember: true magicians use their gift to serve, not to control." }
   },
   innocent: {
     name: { pt: "O Inocente", 'pt-pt': "O Inocente", en: "The Innocent" },
@@ -516,7 +516,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
     drains: { pt: "Cinismo, injustiça, maldade, decepções.", 'pt-pt': "Cinismo, injustiça, maldade, deceções.", en: "Cynicism, injustice, evil, disappointments." },
     emotionalTrigger: { pt: "Ser decepcionado ou traído.", 'pt-pt': "Ser desiludido ou traído.", en: "Being disappointed or betrayed." },
     recognition: { pt: "Através de proteção e valorização da sua pureza.", 'pt-pt': "Através de proteção e valorização da tua pureza.", en: "Through protection and appreciation of your purity." },
-    miguelMessage: { pt: "Sua pureza é preciosa. Lembre-se: você pode manter a fé e ainda assim ver a realidade.", 'pt-pt': "A tua pureza é preciosa. Lembra-te: podes manter a fé e ainda assim ver a realidade.", en: "Your purity is precious. Remember: you can keep faith and still see reality." }
+    nelloMessage: { pt: "Sua pureza é preciosa. Lembre-se: você pode manter a fé e ainda assim ver a realidade.", 'pt-pt': "A tua pureza é preciosa. Lembra-te: podes manter a fé e ainda assim ver a realidade.", en: "Your purity is precious. Remember: you can keep faith and still see reality." }
   },
   realist: {
     name: { pt: "O Realista", 'pt-pt': "O Realista", en: "The Realist" },
@@ -548,7 +548,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
     drains: { pt: "Sonhos sem ação, ineficiência, fantasias impraticáveis.", 'pt-pt': "Sonhos sem ação, ineficiência, fantasias impraticáveis.", en: "Dreams without action, inefficiency, impractical fantasies." },
     emotionalTrigger: { pt: "Ser considerado frio ou sem imaginação.", 'pt-pt': "Ser considerado frio ou sem imaginação.", en: "Being considered cold or unimaginative." },
     recognition: { pt: "Através de resultados concretos e confiança na sua execução.", 'pt-pt': "Através de resultados concretos e confiança na tua execução.", en: "Through concrete results and trust in your execution." },
-    miguelMessage: { pt: "Sua capacidade de executar é rara. Lembre-se: sonhar também é prático quando dá direção.", 'pt-pt': "A tua capacidade de executar é rara. Lembra-te: sonhar também é prático quando dá direção.", en: "Your ability to execute is rare. Remember: dreaming is also practical when it gives direction." }
+    nelloMessage: { pt: "Sua capacidade de executar é rara. Lembre-se: sonhar também é prático quando dá direção.", 'pt-pt': "A tua capacidade de executar é rara. Lembra-te: sonhar também é prático quando dá direção.", en: "Your ability to execute is rare. Remember: dreaming is also practical when it gives direction." }
   }
 };
 
@@ -556,7 +556,7 @@ const ARCHETYPE_PROFILES: Record<string, ArchetypeProfile> = {
 const getTranslations = (lang: 'pt' | 'pt-pt' | 'en') => ({
   pt: {
     subtitle: "Uma jornada para compreender sua essência e seu chamado interior",
-    byMiguel: "Por Miguel, seu guia no Nello One",
+    byMiguel: "Por Nello AI, seu guia no Nello One",
     premiumQuote: "Quando você entende sua essência, sua vida ganha direção.",
     intro1: "Este relatório revela os padrões mais profundos da sua identidade.",
     intro2: "Os arquétipos não são rótulos, são linguagens simbólicas que explicam sua energia no mundo.",
@@ -1042,7 +1042,7 @@ export const createArquetiposPremiumPDF = (
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(10);
   doc.setFont("helvetica", "italic");
-  const miguelLines = doc.splitTextToSize(dominant.miguelMessage[lang], contentWidth - 20);
+  const miguelLines = doc.splitTextToSize(dominant.nelloMessage[lang], contentWidth - 20);
   doc.text(miguelLines, margin + 10, yPos + 15);
   
   yPos += 60;
