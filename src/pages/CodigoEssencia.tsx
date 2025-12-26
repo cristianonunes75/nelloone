@@ -263,7 +263,11 @@ const CodigoEssencia = () => {
   };
 
   const renderSection = (section: any) => {
-    const config = SECTION_CONFIG[section.id] || { icon: <Sparkles className="w-5 h-5" />, color: "from-gray-500/20 to-gray-400/20 border-gray-500/30" };
+    const config = SECTION_CONFIG[section.id] || { 
+      title: { pt: "Seção", 'pt-pt': "Secção", en: "Section" },
+      icon: <Sparkles className="w-5 h-5" />, 
+      color: "from-gray-500/20 to-gray-400/20 border-gray-500/30" 
+    };
 
     // Essential Portrait with visual data
     if (section.id === 'retrato_essencial') {
