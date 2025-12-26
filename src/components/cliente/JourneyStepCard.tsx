@@ -165,6 +165,16 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase, onViewR
     return null;
   };
 
+  // Get recommended order badge (shows for incomplete tests)
+  const getRecommendedOrderBadge = () => {
+    if (isCompleted) return null;
+    return (
+      <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5">
+        <span className="opacity-70">Etapa</span> {step.step}
+      </span>
+    );
+  };
+
   return (
     <div
       className={cn(
@@ -211,6 +221,7 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase, onViewR
             )}>
               {step.name}
             </h3>
+            {getRecommendedOrderBadge()}
             {getStatusBadge()}
           </div>
         </div>
@@ -235,6 +246,7 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase, onViewR
               )}>
                 {step.name}
               </h3>
+              {getRecommendedOrderBadge()}
               {getStatusBadge()}
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3">
