@@ -17,6 +17,7 @@ import { getMBTIResults } from "@/lib/mbti";
 import { getEnneagramResults } from "@/lib/eneagrama";
 import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
+import { getInteligenciasResults } from "@/lib/inteligenciasMultiplas";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -185,7 +186,7 @@ export default function TestExecution() {
     // Calculate full results for paid users
     const { data: allAnswers } = await supabase
       .from("test_answers")
-      .select("*, test_questions(options)")
+      .select("*, test_questions(options, question_number)")
       .eq("user_test_id", userTestId!);
 
     if (allAnswers && allAnswers.length > 0) {
@@ -253,6 +254,29 @@ export default function TestExecution() {
           secondary: temperamentosResults.secondary,
           scores: temperamentosResults.scores,
           interpretation: temperamentosResults.interpretation,
+        }));
+      } else if (testType === "inteligencias_multiplas") {
+        // Transform answers to match InteligenciasAnswer interface
+        const inteligenciasAnswers = allAnswers.map(a => ({
+          question_id: a.question_id,
+          answer: a.answer,
+          test_questions: {
+            question_number: (a as any).test_questions?.question_number || 0,
+            options: (a as any).test_questions?.options
+          }
+        }));
+        const inteligenciasResults = getInteligenciasResults(inteligenciasAnswers as any);
+        resultData = JSON.parse(JSON.stringify({
+          completed_at: new Date().toISOString(),
+          total_questions: questions?.length || 0,
+          testType: "inteligencias_multiplas",
+          scores: inteligenciasResults.scores,
+          percentages: inteligenciasResults.percentages,
+          ranking: inteligenciasResults.ranking,
+          top1: inteligenciasResults.top1,
+          top2: inteligenciasResults.top2,
+          top3: inteligenciasResults.top3,
+          lowest: inteligenciasResults.lowest,
         }));
       } else {
         // Default result format for other tests
