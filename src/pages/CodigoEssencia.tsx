@@ -52,7 +52,9 @@ import {
   SectionDivider,
 } from "@/components/codigo-essencia";
 
-const SECTION_CONFIG: Record<string, { title: Record<string, string>; icon: React.ReactNode; color: string }> = {
+type LangKey = 'pt' | 'pt-pt' | 'en';
+
+const SECTION_CONFIG: Record<string, { title: Record<LangKey, string>; icon: React.ReactNode; color: string }> = {
   quick_summary: {
     title: { pt: "Seu Código em 60 Segundos", 'pt-pt': "O Teu Código em 60 Segundos", en: "Your Code in 60 Seconds" },
     icon: <Zap className="w-5 h-5" />,
@@ -201,8 +203,13 @@ const TRANSLATIONS = {
 
 const CodigoEssencia = () => {
   const { profile, user } = useAuth();
-  const { isJourneyComplete, testResults, completedCount, totalSteps, isLoading: journeyLoading } = useJourneyProgress();
-  const { hasSavedCodigo, savedCodigo, saveCodigo, resetCodigo, isLoading: codigoLoading } = useCodigoEssencia();
+  const journeyData = useJourneyProgress();
+  const codigoData = useCodigoEssencia();
+  
+  // Destructure safely
+  const { isJourneyComplete = false, testResults = {}, completedCount = 0, totalSteps = 7, isLoading: journeyLoading = true } = journeyData || {};
+  const { hasSavedCodigo = false, savedCodigo = null, saveCodigo, resetCodigo, isLoading: codigoLoading = true } = codigoData || {};
+  
   const isLoading = journeyLoading || codigoLoading;
   const navigate = useNavigate();
   const { language } = useLanguage();
@@ -212,17 +219,22 @@ const CodigoEssencia = () => {
   const [generatedSections, setGeneratedSections] = useState<any[]>([]);
   const autoGenAttemptedRef = useRef(false);
 
-  const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
-  const t = TRANSLATIONS[lang];
+  const lang = (language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt') as 'pt' | 'pt-pt' | 'en';
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.pt;
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   const userName = profile?.full_name || (lang === 'en' ? "Traveler" : "Viajante");
-  const firstName = userName.split(' ')[0];
+  const firstName = userName?.split(' ')[0] || (lang === 'en' ? "Traveler" : "Viajante");
 
   const canGenerateReport = isJourneyComplete;
   const canDownloadPdf = isJourneyComplete;
 
   const missingTests = useMemo(() => {
-    return getMissingTests(testResults, lang);
+    try {
+      return getMissingTests(testResults || {}, lang);
+    } catch (e) {
+      console.error("Error in getMissingTests:", e);
+      return [];
+    }
   }, [testResults, lang]);
 
   // Navigation sections for the index
