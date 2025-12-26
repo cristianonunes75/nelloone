@@ -1,3 +1,6 @@
+// Re-export from new premium implementation
+export { generateDISCPDF, generateDISCPDFBase64 } from './pdfDiscNew';
+
 import jsPDF from 'jspdf';
 
 interface DISCScores {
