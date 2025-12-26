@@ -313,11 +313,22 @@ const CodigoEssenciaInner = () => {
   // Extract test results for charts
   const chartData = useMemo(() => {
     const toStringSafe = (value: unknown) => (value == null ? "" : String(value));
+
     const pickTemperament = (value: unknown) => {
       if (typeof value === "string") return value;
       if (value && typeof value === "object" && "temperament" in value) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return toStringSafe((value as any).temperament);
+      }
+      return "";
+    };
+
+    const pickConnectionKey = (value: unknown) => {
+      if (typeof value === "string") return value;
+      if (value && typeof value === "object") {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const v = value as any;
+        return toStringSafe(v.language ?? v.key ?? v.slug ?? v.type ?? "");
       }
       return "";
     };
@@ -342,8 +353,8 @@ const CodigoEssenciaInner = () => {
         top: intelligencesPrimary ? [toStringSafe(intelligencesPrimary)] : [],
       },
       connectionStyle: {
-        primary: toStringSafe(connection?.primary),
-        secondary: toStringSafe(connection?.secondary),
+        primary: pickConnectionKey(connection?.primary),
+        secondary: pickConnectionKey(connection?.secondary),
         scores: connection?.scores || visualData?.connection_style?.scores,
       },
     };

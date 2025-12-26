@@ -349,6 +349,17 @@ const getPrimaryValue = (value: unknown): string => {
   return '';
 };
 
+const getKeyValue = (value: unknown): string => {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number') return String(value);
+  if (value && typeof value === 'object') {
+    const v = value as Record<string, unknown>;
+    const candidate = v.language ?? v.key ?? v.slug ?? v.type ?? '';
+    return typeof candidate === 'string' || typeof candidate === 'number' ? String(candidate) : '';
+  }
+  return '';
+};
+
 const buildCodigoEssenciaDoc = (options: CodigoEssenciaOptions): jsPDF => {
   const { userName, language, testResults } = options;
   const lang = language === 'pt-pt' ? 'pt-pt' : language === 'en' ? 'en' : 'pt';
@@ -370,18 +381,18 @@ const buildCodigoEssenciaDoc = (options: CodigoEssenciaOptions): jsPDF => {
   const goldColor = { r: 205, g: 174, b: 103 }; // Essentia Gold
 
   // Extract results
-  const archetype = testResults.arquetipos_proposito?.primary || '';
+  const archetype = getKeyValue(testResults.arquetipos_proposito?.primary);
   const archetypeName = ARCHETYPE_NAMES[archetype]?.[lang] || archetype;
 
-  const intelligence = testResults.inteligencias_multiplas?.primary || '';
+  const intelligence = getKeyValue(testResults.inteligencias_multiplas?.primary);
   const intelligenceName = INTELLIGENCE_NAMES[intelligence]?.[lang] || intelligence;
 
-  const connectionStyle = testResults.linguagens_amor?.primary || '';
+  const connectionStyle = getKeyValue(testResults.linguagens_amor?.primary);
   const connectionName = CONNECTION_NAMES[connectionStyle]?.[lang] || connectionStyle;
 
-  const nello16Type = testResults.mbti?.type || '';
+  const nello16Type = getKeyValue(testResults.mbti?.type);
 
-  const discProfile = testResults.disc?.dominantProfile || '';
+  const discProfile = getKeyValue(testResults.disc?.dominantProfile);
 
   const enneagramType = Number(testResults.eneagrama?.primaryType) || 0;
   const virtue = ENNEAGRAM_VIRTUES[enneagramType]?.[lang] || '';
