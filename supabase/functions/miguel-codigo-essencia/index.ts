@@ -1114,13 +1114,30 @@ serve(async (req) => {
       );
     }
 
-    // 4. Save the report to mapa_essencia table
+    // 4. Get current version and save the report
+    const { data: existingMapa } = await supabase
+      .from("mapa_essencia")
+      .select("id, version")
+      .eq("user_id", user_id)
+      .maybeSingle();
+
+    const newVersion = (existingMapa?.version || 0) + 1;
+    const generationMetadata = {
+      generated_at: new Date().toISOString(),
+      locale,
+      model: "google/gemini-2.5-pro",
+      tests_used: Object.keys(results),
+    };
+
+    // Save to main table
     const { error: saveError } = await supabase
       .from("mapa_essencia")
       .upsert({
         user_id,
         sections: parsedReport.sections || parsedReport,
         raw_content: generatedContent,
+        version: newVersion,
+        generation_metadata: generationMetadata,
         updated_at: new Date().toISOString(),
       }, {
         onConflict: 'user_id'
@@ -1128,7 +1145,22 @@ serve(async (req) => {
 
     if (saveError) {
       console.error("Error saving report:", saveError);
-      // Don't fail - still return the generated report
+    }
+
+    // Save to history table
+    const { error: historyError } = await supabase
+      .from("mapa_essencia_history")
+      .insert({
+        user_id,
+        version: newVersion,
+        sections: parsedReport.sections || parsedReport,
+        raw_content: generatedContent,
+        generation_metadata: generationMetadata,
+      });
+
+    if (historyError) {
+      console.error("Error saving history:", historyError);
+      // Don't fail - main save already succeeded
     }
 
     console.log("Successfully generated Código da Essência for user:", user_id);

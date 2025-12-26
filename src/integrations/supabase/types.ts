@@ -846,27 +846,63 @@ export type Database = {
       mapa_essencia: {
         Row: {
           created_at: string
+          generation_metadata: Json | null
           id: string
           raw_content: string | null
           sections: Json
           updated_at: string
           user_id: string
+          version: number | null
         }
         Insert: {
           created_at?: string
+          generation_metadata?: Json | null
           id?: string
           raw_content?: string | null
           sections?: Json
           updated_at?: string
           user_id: string
+          version?: number | null
         }
         Update: {
           created_at?: string
+          generation_metadata?: Json | null
           id?: string
           raw_content?: string | null
           sections?: Json
           updated_at?: string
           user_id?: string
+          version?: number | null
+        }
+        Relationships: []
+      }
+      mapa_essencia_history: {
+        Row: {
+          created_at: string
+          generation_metadata: Json | null
+          id: string
+          raw_content: string | null
+          sections: Json
+          user_id: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          generation_metadata?: Json | null
+          id?: string
+          raw_content?: string | null
+          sections?: Json
+          user_id: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          generation_metadata?: Json | null
+          id?: string
+          raw_content?: string | null
+          sections?: Json
+          user_id?: string
+          version?: number
         }
         Relationships: []
       }
