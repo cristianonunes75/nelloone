@@ -1175,6 +1175,33 @@ export type Database = {
         }
         Relationships: []
       }
+      test_evolution_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          day_number: number
+          id: string
+          test_type: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          day_number: number
+          id?: string
+          test_type: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          day_number?: number
+          id?: string
+          test_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       test_purchases: {
         Row: {
           affiliate_code: string | null
