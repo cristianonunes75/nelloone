@@ -67,15 +67,47 @@ interface EnneagramAnswer {
 
 export interface EnneagramResult {
   primaryType: string;
+  secondaryType?: string;
+  wing?: string;
   scores: {
     [key: string]: number;
   };
   percentages: {
     [key: string]: number;
   };
+  hasCloseSecondary?: boolean;
+  completed_at?: string;
 }
 
+/**
+ * Calculate the wing (adjacent type with highest score)
+ * Wings can only be the types immediately adjacent to the primary type
+ * Type 1's wings are 9 and 2, Type 2's are 1 and 3, etc.
+ */
+const calculateWing = (primaryType: string, scores: { [key: string]: number }): string => {
+  const primary = parseInt(primaryType);
+  
+  // Calculate adjacent types (wrap around for 1 and 9)
+  const prevType = primary === 1 ? "9" : String(primary - 1);
+  const nextType = primary === 9 ? "1" : String(primary + 1);
+  
+  const prevScore = scores[prevType] || 0;
+  const nextScore = scores[nextType] || 0;
+  
+  // Return the adjacent type with the higher score
+  return prevScore >= nextScore ? prevType : nextType;
+};
+
+/**
+ * Enhanced Enneagram results calculation with:
+ * - All 9 scores always saved
+ * - Secondary type identification
+ * - Wing calculation
+ * - Tie-breaking logic
+ * - Normalized percentages
+ */
 export const getEnneagramResults = (answers: EnneagramAnswer[]): EnneagramResult => {
+  // Initialize all 9 types with 0
   const scores: { [key: string]: number } = {
     "1": 0, "2": 0, "3": 0, "4": 0, "5": 0,
     "6": 0, "7": 0, "8": 0, "9": 0
@@ -85,13 +117,28 @@ export const getEnneagramResults = (answers: EnneagramAnswer[]): EnneagramResult
   answers.forEach((answer) => {
     const type = answer.test_questions.options.type;
     const value = answer.answer;
-    scores[type] += value;
+    if (type && scores.hasOwnProperty(type)) {
+      scores[type] += value;
+    }
   });
 
-  // Find the primary type (highest score)
-  const primaryType = Object.keys(scores).reduce((a, b) => 
-    scores[a] > scores[b] ? a : b
-  );
+  // Sort types by score (descending)
+  const sortedTypes = Object.entries(scores)
+    .sort(([, a], [, b]) => b - a);
+
+  // Primary type is the highest scoring
+  const primaryType = sortedTypes[0][0];
+  const primaryScore = sortedTypes[0][1];
+  
+  // Secondary type (second highest)
+  const secondaryType = sortedTypes[1][0];
+  const secondaryScore = sortedTypes[1][1];
+  
+  // Check if secondary is close (within 2 points) - indicates strong secondary influence
+  const hasCloseSecondary = (primaryScore - secondaryScore) <= 2;
+
+  // Calculate wing based on adjacent types
+  const wing = calculateWing(primaryType, scores);
 
   // Calculate percentages (each type has 5 questions, max score per type is 25)
   const maxScorePerType = 25;
@@ -102,7 +149,33 @@ export const getEnneagramResults = (answers: EnneagramAnswer[]): EnneagramResult
 
   return {
     primaryType,
+    secondaryType,
+    wing,
     scores,
-    percentages
+    percentages,
+    hasCloseSecondary,
+    completed_at: new Date().toISOString()
   };
+};
+
+/**
+ * Get display name for the type with wing
+ * Example: "4w5" means Type 4 with a 5 wing
+ */
+export const getTypeWithWing = (result: EnneagramResult): string => {
+  if (!result.wing) return result.primaryType;
+  return `${result.primaryType}w${result.wing}`;
+};
+
+/**
+ * Get the center (triad) for a type
+ * Types 2, 3, 4: Heart/Feeling Center
+ * Types 5, 6, 7: Head/Thinking Center  
+ * Types 8, 9, 1: Body/Instinctive Center
+ */
+export const getTypeCenter = (type: string): 'heart' | 'head' | 'body' => {
+  const typeNum = parseInt(type);
+  if ([2, 3, 4].includes(typeNum)) return 'heart';
+  if ([5, 6, 7].includes(typeNum)) return 'head';
+  return 'body';
 };
