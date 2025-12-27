@@ -47,18 +47,29 @@ export const ArchetypesMissionSection = ({
 
   const lang = language === "en" ? "en" : language === "pt-pt" ? "pt-pt" : "pt";
 
-  if (!primary && !secondary && deviationRisks.length === 0) return null;
+  const notIdentifiedLabel = {
+    pt: "Não identificado",
+    "pt-pt": "Não identificado", 
+    en: "Not identified"
+  };
+
+  // Show section if we have at least primary archetype OR deviation risks
+  const hasPrimaryArchetype = primary?.archetype && primary.archetype.trim() !== '';
+  const hasSecondaryArchetype = secondary?.archetype && secondary.archetype.trim() !== '';
+  const hasDeviationRisks = deviationRisks.length > 0;
+  
+  if (!hasPrimaryArchetype && !hasSecondaryArchetype && !hasDeviationRisks) return null;
 
   return (
     <div className="space-y-4">
       {/* Archetypes Mission */}
-      {(primary || secondary) && (
+      {(hasPrimaryArchetype || hasSecondaryArchetype) && (
         <div className="bg-gradient-to-br from-indigo-500/10 to-blue-500/10 border border-indigo-500/20 rounded-xl p-4">
           <h3 className="font-bold text-sm mb-3">{labels.title[lang]}</h3>
           
           <div className="grid md:grid-cols-2 gap-3">
             {/* Primary */}
-            {primary && (
+            {hasPrimaryArchetype && (
               <div 
                 className="bg-background/60 rounded-lg p-3 cursor-pointer hover:bg-background/80 transition-colors"
                 onClick={() => setShowPrimaryDetails(!showPrimaryDetails)}
@@ -70,7 +81,7 @@ export const ArchetypesMissionSection = ({
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">{labels.primary[lang]}</p>
-                      <p className="font-bold text-sm">{primary.archetype}</p>
+                      <p className="font-bold text-sm">{primary?.archetype}</p>
                     </div>
                   </div>
                   <ChevronDown className={cn(
@@ -82,18 +93,22 @@ export const ArchetypesMissionSection = ({
                   "overflow-hidden transition-all duration-200",
                   showPrimaryDetails ? "max-h-40 mt-2" : "max-h-0"
                 )}>
-                  <p className="text-xs text-muted-foreground">
-                    <span className="font-medium text-foreground">{labels.role[lang]}</span> {primary.role}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    <span className="font-medium text-foreground">{labels.contribution[lang]}</span> {primary.contribution}
-                  </p>
+                  {primary?.role && (
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-medium text-foreground">{labels.role[lang]}</span> {primary.role}
+                    </p>
+                  )}
+                  {primary?.contribution && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      <span className="font-medium text-foreground">{labels.contribution[lang]}</span> {primary.contribution}
+                    </p>
+                  )}
                 </div>
               </div>
             )}
 
             {/* Secondary */}
-            {secondary && (
+            {hasSecondaryArchetype && (
               <div 
                 className="bg-background/60 rounded-lg p-3 cursor-pointer hover:bg-background/80 transition-colors"
                 onClick={() => setShowSecondaryDetails(!showSecondaryDetails)}
@@ -105,7 +120,7 @@ export const ArchetypesMissionSection = ({
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">{labels.secondary[lang]}</p>
-                      <p className="font-bold text-sm">{secondary.archetype}</p>
+                      <p className="font-bold text-sm">{secondary?.archetype}</p>
                     </div>
                   </div>
                   <ChevronDown className={cn(
@@ -117,12 +132,16 @@ export const ArchetypesMissionSection = ({
                   "overflow-hidden transition-all duration-200",
                   showSecondaryDetails ? "max-h-40 mt-2" : "max-h-0"
                 )}>
-                  <p className="text-xs text-muted-foreground">
-                    <span className="font-medium text-foreground">{labels.role[lang]}</span> {secondary.role}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    <span className="font-medium text-foreground">{labels.contribution[lang]}</span> {secondary.contribution}
-                  </p>
+                  {secondary?.role && (
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-medium text-foreground">{labels.role[lang]}</span> {secondary.role}
+                    </p>
+                  )}
+                  {secondary?.contribution && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      <span className="font-medium text-foreground">{labels.contribution[lang]}</span> {secondary.contribution}
+                    </p>
+                  )}
                 </div>
               </div>
             )}

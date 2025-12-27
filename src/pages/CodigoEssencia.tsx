@@ -436,13 +436,56 @@ const CodigoEssenciaInner = () => {
   const talentosSection = generatedSections.find(s => s.id === 'seus_talentos');
   const donsSection = generatedSections.find(s => s.id === 'seus_dons');
   const vocacaoSection = generatedSections.find(s => s.id === 'sua_vocacao');
-  const arquetiposChamadoSection = generatedSections.find(s => s.id === 'arquetipos_chamado');
+  const arquetiposChamadoSectionRaw = generatedSections.find(s => s.id === 'arquetipos_chamado');
   const riscosDesvioSection = generatedSections.find(s => s.id === 'riscos_desvio');
   const tensoesSection = generatedSections.find(s => s.id === 'tensoes_internas');
   const areasVidaSection = generatedSections.find(s => s.id === 'areas_vida');
   const pazPressaoSection = generatedSections.find(s => s.id === 'paz_pressao');
   const raridadeSection = generatedSections.find(s => s.id === 'raridade_perfil');
   const tresVerdadesSection = generatedSections.find(s => s.id === 'tres_verdades_centrais');
+
+  // Fallback: extract archetypes from testResults if AI section doesn't have them
+  const arquetiposChamadoSection = useMemo(() => {
+    // If AI generated valid primary archetype, use it
+    if (arquetiposChamadoSectionRaw?.primary?.archetype) {
+      return arquetiposChamadoSectionRaw;
+    }
+    
+    // Fallback: extract from testResults
+    const arquetiposData = (testResults as any)?.arquetipos_proposito || (testResults as any)?.arquetipos;
+    if (!arquetiposData) return arquetiposChamadoSectionRaw;
+    
+    // Extract from dominantArchetypes (new format) or legacy format
+    const primaryArch = 
+      arquetiposData.dominantArchetypes?.primary?.archetype ||
+      arquetiposData.primary?.archetype ||
+      arquetiposData.dominant ||
+      arquetiposData.dominante ||
+      arquetiposData.archetype;
+    
+    const secondaryArch = 
+      arquetiposData.dominantArchetypes?.secondary?.archetype ||
+      arquetiposData.secondary?.archetype ||
+      arquetiposData.secondary ||
+      arquetiposData.secundario;
+    
+    if (!primaryArch) return arquetiposChamadoSectionRaw;
+    
+    return {
+      ...arquetiposChamadoSectionRaw,
+      primary: {
+        archetype: primaryArch,
+        role: arquetiposChamadoSectionRaw?.primary?.role || "",
+        contribution: arquetiposChamadoSectionRaw?.primary?.contribution || "",
+      },
+      secondary: secondaryArch ? {
+        archetype: secondaryArch,
+        role: arquetiposChamadoSectionRaw?.secondary?.role || "",
+        contribution: arquetiposChamadoSectionRaw?.secondary?.contribution || "",
+      } : undefined,
+      synergy: arquetiposChamadoSectionRaw?.synergy || "",
+    };
+  }, [arquetiposChamadoSectionRaw, testResults]);
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
