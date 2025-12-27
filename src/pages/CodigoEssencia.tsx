@@ -68,6 +68,8 @@ import {
   LifeAreasSection,
   PeacePressureSection,
   ProfileRarityBadge,
+  CentralTruths,
+  ProvocativeClosing,
 } from "@/components/codigo-essencia";
 
 // LangKey now imported from codigoEssenciaFallbacks
@@ -440,6 +442,7 @@ const CodigoEssenciaInner = () => {
   const areasVidaSection = generatedSections.find(s => s.id === 'areas_vida');
   const pazPressaoSection = generatedSections.find(s => s.id === 'paz_pressao');
   const raridadeSection = generatedSections.find(s => s.id === 'raridade_perfil');
+  const tresVerdadesSection = generatedSections.find(s => s.id === 'tres_verdades_centrais');
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -558,6 +561,17 @@ const CodigoEssenciaInner = () => {
               }
               return null;
             })()}
+            
+            {/* === NEW: 3 Central Truths (Hierarchy) === */}
+            {tresVerdadesSection?.truths?.length > 0 && (
+              <>
+                <CentralTruths 
+                  truths={tresVerdadesSection.truths}
+                  language={lang}
+                />
+                <SectionDivider variant="gradient" />
+              </>
+            )}
             
             {/* === SECTION 1: Quick Summary + Impact === */}
             {quickSummaryData.strengths.length > 0 && (
@@ -832,12 +846,13 @@ const CodigoEssenciaInner = () => {
 
             {/* === SECTION 9: Closing + Next Step === */}
             {conversaSection && (
-              <div className="bg-gradient-to-br from-rose-500/10 to-pink-500/10 border border-rose-500/20 rounded-xl p-4">
-                <h3 className="font-bold text-sm mb-2">{t.closing}</h3>
-                {conversaSection.paragraphs?.slice(0, 1).map((p: string, i: number) => (
-                  <p key={i} className="text-xs leading-relaxed text-muted-foreground">{p}</p>
-                ))}
-              </div>
+              <ProvocativeClosing 
+                whoYouAre={conversaSection.who_you_are}
+                riskOfNotLiving={conversaSection.risk_of_not_living}
+                invitation={conversaSection.invitation}
+                paragraphs={conversaSection.paragraphs}
+                language={lang}
+              />
             )}
 
             {/* Next Step - Actionable */}

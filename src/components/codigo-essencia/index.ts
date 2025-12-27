@@ -24,3 +24,6 @@ export { InternalTensionsSection } from "./InternalTensionsSection";
 export { LifeAreasSection } from "./LifeAreasSection";
 export { PeacePressureSection } from "./PeacePressureSection";
 export { ProfileRarityBadge } from "./ProfileRarityBadge";
+export { CentralTruths } from "./CentralTruths";
+export { SectionSummary } from "./SectionSummary";
+export { ProvocativeClosing } from "./ProvocativeClosing";
