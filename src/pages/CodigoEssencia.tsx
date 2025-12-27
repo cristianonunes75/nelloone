@@ -330,17 +330,24 @@ const CodigoEssenciaInner = () => {
         throw error;
       }
 
-      if (data?.error === 'journey_not_completed') {
-        toast.error(lang === 'en' ? 'Complete all 7 tests first.' : 'Complete os 7 testes primeiro.');
-        return;
-      }
+       if (data?.error === 'journey_not_completed') {
+         toast.error(lang === 'en' ? 'Complete all 7 tests first.' : 'Complete os 7 testes primeiro.');
+         return;
+       }
 
-      if (data?.error === 'ai_credits_insufficient') {
-        toast.error(lang === 'en'
-          ? 'AI credits are insufficient to generate right now.'
-          : 'Créditos de IA insuficientes para gerar agora.');
-        return;
-      }
+       if (data?.error === 'ai_credits_insufficient') {
+         toast.error(lang === 'en'
+           ? 'AI credits are insufficient to generate right now.'
+           : 'Créditos de IA insuficientes para gerar agora.');
+         return;
+       }
+
+       if (data?.error === 'ai_rate_limited') {
+         toast.error(lang === 'en'
+           ? 'Too many requests. Please try again in a moment.'
+           : 'Muitas tentativas. Tente novamente em instantes.');
+         return;
+       }
 
       if (data?.sections) {
         console.log('[CodigoEssencia] Sections received:', data.sections.map((s: any) => s.id));
@@ -402,12 +409,11 @@ const CodigoEssenciaInner = () => {
   const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
 
   const handleRegenerate = async () => {
+    // IMPORTANT: Don't delete the existing report before we successfully generate a new one.
+    // This prevents users from getting stuck with an empty report if AI credits are insufficient or the request fails.
     toast.info(lang === 'en' ? 'Regenerating...' : 'Regenerando...');
-    await resetCodigo();
-    setGeneratedSections([]);
-    setHasGenerated(false);
-    await handleGenerateCodigo();
     setShowRegenerateConfirm(false);
+    await handleGenerateCodigo();
   };
 
   // Find sections
