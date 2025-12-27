@@ -266,13 +266,22 @@ const CodigoEssenciaInner = () => {
       if (typeof value === "string") return value;
       if (value && typeof value === "object") {
         const v = value as any;
-        return toStringSafe(v.language ?? v.key ?? v.slug ?? v.type ?? "");
+        // Handle both new format (style) and legacy format (language)
+        return toStringSafe(v.style ?? v.language ?? v.key ?? v.slug ?? v.type ?? "");
       }
       return "";
     };
 
     const intelligencesPrimary = (testResults as any)?.inteligencias_multiplas?.primary ?? (testResults as any)?.inteligencias_multiplas?.top?.[0];
-    const connection = (testResults as any)?.linguagens_amor ?? (testResults as any)?.estilos_conexao_afetiva ?? (testResults as any)?.estilos_conexao;
+    const connection = (testResults as any)?.linguagens_amor ?? (testResults as any)?.estilos_conexao_afetiva ?? (testResults as any)?.estilos_conexao ?? (testResults as any)?.estilos_conexao_afetiva_afetiva;
+    console.log('[CodigoEssencia] Connection data:', { 
+      linguagens_amor: (testResults as any)?.linguagens_amor,
+      connection,
+      primary: connection?.primary,
+      primaryStyle: connection?.primary?.style,
+      primaryLanguage: connection?.primary?.language,
+      scores: connection?.scores
+    });
 
     return {
       disc: testResults?.disc?.scores || visualData?.disc,
