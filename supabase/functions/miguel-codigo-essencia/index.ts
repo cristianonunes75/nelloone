@@ -1715,11 +1715,31 @@ function extractKeyResults(testType: string, resultData: any): any {
     case 'arquetipos_proposito':
     case 'arquetipos':
       // Handle multiple data structures for archetypes
-      const primaryArchetype = resultData.primary?.archetype || resultData.archetype || resultData.arquetipo || resultData.dominante || resultData.dominant;
-      const secondaryArchetype = resultData.secondary?.archetype || resultData.secondary || resultData.secundario;
+      // Priority: dominantArchetypes.primary.archetype (new format) > primary.archetype > archetype (legacy)
+      const primaryArchetype = 
+        resultData.dominantArchetypes?.primary?.archetype ||
+        resultData.primary?.archetype || 
+        resultData.archetype || 
+        resultData.arquetipo || 
+        resultData.dominante || 
+        resultData.dominant;
+      const secondaryArchetype = 
+        resultData.dominantArchetypes?.secondary?.archetype ||
+        resultData.secondary?.archetype || 
+        resultData.secondary || 
+        resultData.secundario;
+      const tertiaryArchetype = 
+        resultData.dominantArchetypes?.tertiary?.archetype ||
+        resultData.tertiary?.archetype;
+      
+      // Also extract scores for full data
+      const archetypeScores = resultData.scores || [];
+      
       return {
         dominantArchetype: primaryArchetype,
         secondaryArchetype: secondaryArchetype,
+        tertiaryArchetype: tertiaryArchetype,
+        scores: archetypeScores,
         archetypeOfEssence: resultData.essenceArchetype || resultData.arquetipoEssencia,
         description: resultData.primary?.description || resultData.description || resultData.descricao,
         strengths: resultData.primary?.strengths || resultData.strengths || resultData.forcas,
