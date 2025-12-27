@@ -12,12 +12,10 @@ interface CentralTruthsProps {
 }
 
 export const CentralTruths = ({ truths, language = 'pt' }: CentralTruthsProps) => {
-  if (!truths || truths.length === 0) return null;
-
   const labels = {
-    pt: { title: 'As 3 Verdades Centrais', subtitle: 'Tudo no seu Código deriva destas verdades' },
-    'pt-pt': { title: 'As 3 Verdades Centrais', subtitle: 'Tudo no teu Código deriva destas verdades' },
-    en: { title: 'The 3 Central Truths', subtitle: 'Everything in your Code derives from these truths' },
+    pt: { title: 'As 3 Verdades Centrais', subtitle: 'Tudo no seu Código deriva destas verdades', generating: 'Gerando verdades...' },
+    'pt-pt': { title: 'As 3 Verdades Centrais', subtitle: 'Tudo no teu Código deriva destas verdades', generating: 'A gerar verdades...' },
+    en: { title: 'The 3 Central Truths', subtitle: 'Everything in your Code derives from these truths', generating: 'Generating truths...' },
   };
 
   const t = labels[language as keyof typeof labels] || labels.pt;
@@ -40,6 +38,14 @@ export const CentralTruths = ({ truths, language = 'pt' }: CentralTruthsProps) =
     'text-orange-500',
   ];
 
+  // Check if truths have actual content
+  const validTruths = truths?.filter(truth => truth.title && truth.content) || [];
+  
+  // Don't render if no valid truths
+  if (validTruths.length === 0) {
+    return null;
+  }
+
   return (
     <div className="space-y-4">
       <div className="text-center mb-4">
@@ -48,7 +54,7 @@ export const CentralTruths = ({ truths, language = 'pt' }: CentralTruthsProps) =
       </div>
       
       <div className="grid gap-3">
-        {truths.slice(0, 3).map((truth, index) => (
+        {validTruths.slice(0, 3).map((truth, index) => (
           <div 
             key={index}
             className={`bg-gradient-to-r ${colors[index]} border rounded-xl p-4 transition-all hover:scale-[1.01]`}
