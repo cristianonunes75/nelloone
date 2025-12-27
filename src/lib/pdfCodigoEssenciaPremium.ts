@@ -81,6 +81,12 @@ const TRANSLATIONS = {
     conflict: "Conflito",
     impact_label: "Impacto Prático",
     question: "Pergunta de Confronto",
+    centralTruths: "As 3 Verdades Centrais",
+    centralTruthsSubtitle: "Tudo no seu Código deriva destas verdades",
+    basedOn: "Baseado em",
+    whoYouAre: "Quem você é",
+    riskOfNotLiving: "O risco de não viver isso",
+    theInvitation: "O convite",
   },
   "pt-pt": {
     title: "CÓDIGO DA ESSÊNCIA",
@@ -133,6 +139,12 @@ const TRANSLATIONS = {
     conflict: "Conflito",
     impact_label: "Impacto Prático",
     question: "Pergunta de Confronto",
+    centralTruths: "As 3 Verdades Centrais",
+    centralTruthsSubtitle: "Tudo no teu Código deriva destas verdades",
+    basedOn: "Baseado em",
+    whoYouAre: "Quem tu és",
+    riskOfNotLiving: "O risco de não viveres isto",
+    theInvitation: "O convite",
   },
   en: {
     title: "ESSENCE CODE",
@@ -185,6 +197,12 @@ const TRANSLATIONS = {
     conflict: "Conflict",
     impact_label: "Practical Impact",
     question: "Confrontation Question",
+    centralTruths: "The 3 Central Truths",
+    centralTruthsSubtitle: "Everything in your Code derives from these truths",
+    basedOn: "Based on",
+    whoYouAre: "Who you are",
+    riskOfNotLiving: "The risk of not living this",
+    theInvitation: "The invitation",
   },
 };
 
@@ -306,7 +324,62 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   const dateStr = new Date().toLocaleDateString(dateLocale, { day: "2-digit", month: "long", year: "numeric" });
   doc.text(`${t.generated} ${dateStr}`, pageWidth / 2, pageHeight - 25, { align: "center" });
 
-  // === PAGE 2: IMPACT BLOCKS ===
+  // === PAGE 2: 3 CENTRAL TRUTHS ===
+  const tresVerdadesSection = getSection<{ truths?: Array<{ title: string; content: string; base: string }> }>(sections, "tres_verdades_centrais");
+  if (tresVerdadesSection?.truths && tresVerdadesSection.truths.length > 0) {
+    let y = addPage(t.centralTruths);
+    
+    // Subtitle
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(120, 120, 120);
+    doc.text(t.centralTruthsSubtitle, margin, y);
+    y += 10;
+
+    const truthColors = [
+      { r: 59, g: 130, b: 246 },  // Blue
+      { r: 16, g: 185, b: 129 },  // Emerald
+      { r: 249, g: 115, b: 22 },  // Orange
+    ];
+
+    for (let i = 0; i < Math.min(tresVerdadesSection.truths.length, 3); i++) {
+      const truth = tresVerdadesSection.truths[i];
+      const color = truthColors[i];
+      
+      // Left color bar
+      doc.setFillColor(color.r, color.g, color.b);
+      doc.rect(margin, y - 2, 3, 30, "F");
+      
+      // Truth number and title
+      doc.setTextColor(color.r, color.g, color.b);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text(`${i + 1}. ${truth.title}`, margin + 8, y + 3);
+      
+      // Content
+      doc.setTextColor(60, 60, 60);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      const contentLines = doc.splitTextToSize(truth.content, contentWidth - 12);
+      let contentY = y + 10;
+      for (const line of contentLines) {
+        doc.text(line, margin + 8, contentY);
+        contentY += 4;
+      }
+      
+      // Base
+      if (truth.base) {
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "italic");
+        doc.setTextColor(140, 140, 140);
+        doc.text(`${t.basedOn}: ${truth.base}`, margin + 8, contentY + 2);
+      }
+      
+      y += 40;
+    }
+  }
+
+  // === PAGE 3: IMPACT BLOCKS ===
   const retrato = getSection<{ impact_blocks?: Record<string, string>; score_highlights?: string[]; bullets?: string[] }>(sections, "retrato_essencial");
   const impactBlocks = validateImpactBlocks(retrato?.impact_blocks, lang);
   let scoreHighlights = retrato?.score_highlights || [];
@@ -542,20 +615,82 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   y = addLabelValue(t.afternoon, routine.afternoon, y, { r: TEAL.r, g: TEAL.g, b: TEAL.b });
   y = addLabelValue(t.night, routine.night, y, { r: PURPLE.r, g: PURPLE.g, b: PURPLE.b });
 
-  // === PAGE 13: CLOSING ===
-  const conversaSection = getSection<{ paragraphs?: string[]; next_step?: { action: string; why?: string } }>(sections, "conversa_final");
+  // === PAGE 13: CLOSING (Provocative Structure) ===
+  const conversaSection = getSection<{ 
+    paragraphs?: string[]; 
+    next_step?: { action: string; why?: string };
+    who_you_are?: string;
+    risk_of_not_living?: string;
+    invitation?: string;
+  }>(sections, "conversa_final");
+  
   if (conversaSection) {
     y = addPage(t.closing);
-    if (conversaSection.paragraphs) {
+    
+    // New provocative structure
+    const hasNewStructure = conversaSection.who_you_are || conversaSection.risk_of_not_living || conversaSection.invitation;
+    
+    if (hasNewStructure) {
+      // Who you are - Green bar
+      if (conversaSection.who_you_are) {
+        doc.setFillColor(GREEN.r, GREEN.g, GREEN.b);
+        doc.rect(margin, y - 2, 3, 20, "F");
+        doc.setTextColor(GREEN.r, GREEN.g, GREEN.b);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.text(t.whoYouAre.toUpperCase(), margin + 8, y);
+        doc.setTextColor(60, 60, 60);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        const whoLines = doc.splitTextToSize(conversaSection.who_you_are, contentWidth - 12);
+        doc.text(whoLines, margin + 8, y + 6);
+        y += 25 + (whoLines.length - 1) * 4;
+      }
+      
+      // Risk of not living - Amber bar
+      if (conversaSection.risk_of_not_living) {
+        doc.setFillColor(AMBER.r, AMBER.g, AMBER.b);
+        doc.rect(margin, y - 2, 3, 20, "F");
+        doc.setTextColor(AMBER.r, AMBER.g, AMBER.b);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.text(`⚠ ${t.riskOfNotLiving.toUpperCase()}`, margin + 8, y);
+        doc.setTextColor(60, 60, 60);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        const riskLines = doc.splitTextToSize(conversaSection.risk_of_not_living, contentWidth - 12);
+        doc.text(riskLines, margin + 8, y + 6);
+        y += 25 + (riskLines.length - 1) * 4;
+      }
+      
+      // Invitation - Primary color box
+      if (conversaSection.invitation) {
+        y += 5;
+        doc.setFillColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
+        doc.roundedRect(margin, y - 3, contentWidth, 25, 3, 3, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.text(`→ ${t.theInvitation.toUpperCase()}`, margin + 8, y + 3);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        const inviteLines = doc.splitTextToSize(conversaSection.invitation, contentWidth - 16);
+        doc.text(inviteLines, margin + 8, y + 11);
+        y += 30;
+      }
+    } else if (conversaSection.paragraphs) {
+      // Fallback to old paragraphs structure
       for (const p of conversaSection.paragraphs) {
         y = addText(p, y);
         y += 3;
       }
     }
+    
+    // Next Step
     if (conversaSection.next_step) {
-      y += 5;
-      doc.setFillColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
-      doc.roundedRect(margin, y - 3, contentWidth, 20, 3, 3, "F");
+      y += 8;
+      doc.setFillColor(TEAL.r, TEAL.g, TEAL.b);
+      doc.roundedRect(margin, y - 3, contentWidth, 22, 3, 3, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(10);
       doc.setFont("helvetica", "bold");
@@ -563,7 +698,12 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
       const actionLines = doc.splitTextToSize(conversaSection.next_step.action, contentWidth - 10);
-      doc.text(actionLines, margin + 5, y + 10);
+      doc.text(actionLines, margin + 5, y + 11);
+      if (conversaSection.next_step.why) {
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "italic");
+        doc.text(conversaSection.next_step.why, margin + 5, y + 18);
+      }
     }
   }
 
