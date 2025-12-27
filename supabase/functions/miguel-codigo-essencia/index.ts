@@ -880,14 +880,27 @@ ESTRUTURA JSON FINAL
 REGRAS CRÍTICAS:
 - impact_blocks DEVE ser preenchido com conteúdo específico e personalizado
 - visual_data DEVE extrair valores reais dos resultados dos testes
-- tensoes_internas é OBRIGATÓRIO - identifique conflitos reais entre testes
+- tensoes_internas é OBRIGATÓRIO - identifique MÍNIMO 2 conflitos reais entre testes (se retornar menos de 2, o relatório será rejeitado)
 - areas_vida é OBRIGATÓRIO - analise cada área com cruzamento de testes
-- paz_pressao é OBRIGATÓRIO - descreva comportamentos específicos
-- raridade_perfil é OBRIGATÓRIO - estime a raridade e explique
+- paz_pressao é OBRIGATÓRIO - descreva comportamentos específicos com 3 itens em cada lista (in_peace.behaviors e under_pressure.behaviors), citando qual teste origina cada comportamento
+- raridade_perfil é OBRIGATÓRIO - estime a raridade entre 1-25% e explique citando quais combinações de testes geram essa raridade
 - Frases curtas e impactantes apenas
 - NENHUMA afirmação genérica
-- ${isEuropean ? 'Use português europeu (tu, teu, tua)' : 'Use português brasileiro (você, seu, sua)'}`;
+- ${isEuropean ? 'Use português europeu (tu, teu, tua)' : 'Use português brasileiro (você, seu, sua)'}
+
+VALIDAÇÃO OBRIGATÓRIA DE TENSÕES (tensoes_internas):
+- MÍNIMO 2 tensões, cada uma DEVE conter:
+  - tension: nome claro da tensão (ex: "Velocidade vs Perfeição")
+  - tests_involved: quais 2+ testes geram o conflito (ex: "DISC D + Temperamento Melancólico")
+  - conflict: descrição específica do conflito interno
+  - practical_impact: como afeta decisões reais
+  - confrontation_question: pergunta direta que confronta (sem frases genéricas como "você já pensou nisso?")
+- Exemplos de tensões válidas:
+  - DISC D (velocidade) + Melancólico (perfeição) = paralisia antes de decidir
+  - Eneagrama 3 (imagem) + Arquétipo Sábio (verdade) = conflito entre parecer e ser
+  - Inteligência Interpessoal alta + DISC C alto = dificuldade em confiar na intuição social`;
 };
+
 
 serve(async (req) => {
   // Handle CORS

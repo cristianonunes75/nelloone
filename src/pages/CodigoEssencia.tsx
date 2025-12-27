@@ -4,6 +4,16 @@ import { useAuth } from "@/hooks/useAuth";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { useCodigoEssencia } from "@/hooks/useCodigoEssencia";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { LogoText } from "@/components/LogoText";
 import { 
   ArrowLeft, 
@@ -290,12 +300,8 @@ const CodigoEssenciaInner = () => {
     }
   }, [savedCodigo, hasGenerated]);
 
-  useEffect(() => {
-    if (!user?.id || !isJourneyComplete || hasGenerated || hasSavedCodigo || isGenerating || autoGenAttemptedRef.current) return;
-    autoGenAttemptedRef.current = true;
-    toast.info(lang === 'en' ? 'Generating...' : 'Gerando...');
-    void handleGenerateCodigo();
-  }, [user?.id, isJourneyComplete, hasGenerated, hasSavedCodigo, isGenerating, lang]);
+  // REMOVED: Auto-generation removed to prevent unwanted credit consumption
+  // Users must now click "Generate Code" button explicitly
 
   const handleGenerateCodigo = async () => {
     if (!user?.id) return;
@@ -387,12 +393,15 @@ const CodigoEssenciaInner = () => {
     }
   };
 
+  const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
+
   const handleRegenerate = async () => {
     toast.info(lang === 'en' ? 'Regenerating...' : 'Regenerando...');
     await resetCodigo();
     setGeneratedSections([]);
     setHasGenerated(false);
     await handleGenerateCodigo();
+    setShowRegenerateConfirm(false);
   };
 
   // Find sections
@@ -463,7 +472,7 @@ const CodigoEssenciaInner = () => {
           <LogoText className="text-xl" variant="solid" />
           <div className="flex items-center gap-1.5">
             <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => navigate(`${basePath}/cliente`)}><ArrowLeft className="w-4 h-4" /></Button>
-            <Button variant="outline" size="sm" className="h-8 px-2" onClick={handleRegenerate} disabled={isGenerating}><RefreshCw className="w-4 h-4" /></Button>
+            <Button variant="outline" size="sm" className="h-8 px-2" onClick={() => setShowRegenerateConfirm(true)} disabled={isGenerating}><RefreshCw className="w-4 h-4" /></Button>
             <Button variant="outline" size="sm" className="h-8 px-2" onClick={handleDownloadPDF} disabled={!canDownloadPdf}><Download className="w-4 h-4" /></Button>
             <Button variant="outline" size="sm" className="h-8 px-2" onClick={handleSendEmail} disabled={isSendingEmail || !canDownloadPdf}>{isSendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}</Button>
           </div>
@@ -661,15 +670,13 @@ const CodigoEssenciaInner = () => {
 
             <SectionDivider variant="wave" />
 
-            {/* === SECTION 5: Detailed Charts (Collapsible grid) === */}
-            <details className="group">
-              <summary className="cursor-pointer flex items-center gap-2 p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
-                <BarChart3 className="w-4 h-4" />
-                <span className="font-medium text-sm">{t.detailedCharts}</span>
-                <span className="ml-auto text-xs text-muted-foreground group-open:hidden">+</span>
-                <span className="ml-auto text-xs text-muted-foreground hidden group-open:inline">−</span>
-              </summary>
-              <div className="mt-3 grid md:grid-cols-2 gap-3">
+            {/* === SECTION 5: Detailed Charts (VISIBLE - moved from collapsible) === */}
+            <div className="bg-card/50 border border-border rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart3 className="w-5 h-5 text-primary" />
+                <h2 className="font-bold">{t.detailedCharts}</h2>
+              </div>
+              <div className="grid md:grid-cols-2 gap-3">
                 {chartData.disc && Object.keys(chartData.disc).length > 0 && (
                   <div className="bg-background rounded-lg p-3 border border-border">
                     <h3 className="font-semibold text-xs mb-2 flex items-center gap-1.5">
@@ -703,7 +710,7 @@ const CodigoEssenciaInner = () => {
                   </div>
                 )}
               </div>
-            </details>
+            </div>
 
             {/* === SECTION 6: Strengths & Shadows (Side by side compact cards) === */}
             {(forcasSection?.items?.length > 0 || sombrasSection?.items?.length > 0) && (
@@ -798,6 +805,32 @@ const CodigoEssenciaInner = () => {
           </div>
         )}
       </main>
+
+      {/* Regenerate Confirmation Dialog */}
+      <AlertDialog open={showRegenerateConfirm} onOpenChange={setShowRegenerateConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {lang === 'en' ? 'Regenerate Essence Code?' : 'Regenerar Código da Essência?'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {lang === 'en' 
+                ? 'This action will consume AI credits to generate a new report. Your current report will be replaced. Are you sure you want to continue?'
+                : 'Esta ação vai consumir créditos de IA para gerar um novo relatório. Seu relatório atual será substituído. Tem certeza que deseja continuar?'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {lang === 'en' ? 'Cancel' : 'Cancelar'}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleRegenerate} disabled={isGenerating}>
+              {isGenerating 
+                ? (lang === 'en' ? 'Regenerating...' : 'Regenerando...') 
+                : (lang === 'en' ? 'Yes, regenerate' : 'Sim, regenerar')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
