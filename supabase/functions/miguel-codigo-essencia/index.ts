@@ -1244,11 +1244,11 @@ serve(async (req) => {
 
     // userName already defined above, no need to redeclare
 
-    // 3. Call AI to generate the Código da Essência using OpenAI ChatGPT
-    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    // 3. Call AI to generate the Código da Essência using Lovable AI Gateway
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
-    if (!OPENAI_API_KEY) {
-      console.error("OPENAI_API_KEY not configured");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "ai_not_configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -1265,23 +1265,21 @@ serve(async (req) => {
 
     const userPrompt = getUserPrompt(locale, results, userName);
 
-    console.log("Calling OpenAI ChatGPT to generate Código da Essência for user:", user_id);
+    console.log("Calling Lovable AI Gateway to generate Código da Essência for user:", user_id);
 
-    const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // Using GPT-4o-mini for good quality at lower cost
-        model: "gpt-4o-mini",
+        // Using google/gemini-2.5-flash for good quality
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.7,
-        max_tokens: 8000,
       }),
     });
 
