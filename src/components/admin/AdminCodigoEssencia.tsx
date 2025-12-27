@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { 
-  Search, Loader2, Sparkles, RefreshCw, FileText, Copy, Download, Eye
+  Search, Loader2, Sparkles, RefreshCw, FileText, Copy, Eye, FlaskConical
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -38,6 +38,8 @@ export const AdminCodigoEssencia = () => {
   const [filter, setFilter] = useState("all");
   const [regenerating, setRegenerating] = useState<string | null>(null);
   const [confirmRegenerate, setConfirmRegenerate] = useState<CodigoEssenciaUser | null>(null);
+  const [mockTesting, setMockTesting] = useState(false);
+  const [mockResult, setMockResult] = useState<any>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -126,6 +128,31 @@ export const AdminCodigoEssencia = () => {
     }
   };
 
+  const handleMockTest = async () => {
+    setMockTesting(true);
+    setMockResult(null);
+    try {
+      // Use a dummy user_id for mock testing
+      const { data, error } = await supabase.functions.invoke('miguel-codigo-essencia', {
+        body: { 
+          user_id: '00000000-0000-0000-0000-000000000000',
+          locale: 'pt-br',
+          mock: true
+        }
+      });
+
+      if (error) throw error;
+
+      setMockResult(data);
+      toast.success("Teste mock executado com sucesso! Nenhum crédito foi consumido.");
+    } catch (error) {
+      console.error("Error in mock test:", error);
+      toast.error("Erro no teste mock");
+    } finally {
+      setMockTesting(false);
+    }
+  };
+
   const copyAccessLink = (userId: string) => {
     const link = `${window.location.origin}/codigo-da-essencia/view?user=${userId}`;
     navigator.clipboard.writeText(link);
@@ -169,11 +196,69 @@ export const AdminCodigoEssencia = () => {
           </h1>
           <p className="text-muted-foreground text-xs md:text-sm">Gerencie relatórios premium</p>
         </div>
-        <Button variant="outline" onClick={fetchUsers} className="gap-2">
-          <RefreshCw className="w-4 h-4" />
-          Atualizar
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={handleMockTest} 
+            disabled={mockTesting}
+            className="gap-2"
+          >
+            {mockTesting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <FlaskConical className="w-4 h-4" />
+            )}
+            Teste Mock
+          </Button>
+          <Button variant="outline" onClick={fetchUsers} className="gap-2">
+            <RefreshCw className="w-4 h-4" />
+            Atualizar
+          </Button>
+        </div>
       </div>
+
+      {/* Mock Result Preview */}
+      {mockResult && (
+        <Card className="border-amber-500/30 bg-amber-500/5">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FlaskConical className="w-4 h-4 text-amber-600" />
+                <h3 className="font-semibold text-sm">Resultado do Teste Mock</h3>
+                <Badge variant="outline" className="text-amber-600 border-amber-500/30 text-xs">
+                  Sem consumo de créditos
+                </Badge>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setMockResult(null)}>
+                ✕
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">
+                {mockResult.sections?.length || 0} seções geradas • Modelo: {mockResult.generationMetadata?.model}
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {mockResult.sections?.slice(0, 4).map((section: any) => (
+                  <div key={section.id} className="bg-background rounded p-2 border border-border/50">
+                    <p className="font-medium text-xs truncate">{section.title}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{section.id}</p>
+                  </div>
+                ))}
+              </div>
+              <details className="mt-2">
+                <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
+                  Ver JSON completo
+                </summary>
+                <pre className="mt-2 p-2 bg-muted/50 rounded text-[10px] overflow-auto max-h-60">
+                  {JSON.stringify(mockResult, null, 2)}
+                </pre>
+              </details>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
