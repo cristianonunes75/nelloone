@@ -901,6 +901,202 @@ VALIDAÇÃO OBRIGATÓRIA DE TENSÕES (tensoes_internas):
   - Inteligência Interpessoal alta + DISC C alto = dificuldade em confiar na intuição social`;
 };
 
+// Mock data for development/testing - saves AI credits
+const MOCK_SECTIONS = (userName: string, locale: string) => {
+  const isEnglish = locale === 'en';
+  const firstName = userName.split(' ')[0];
+  
+  return [
+    {
+      id: "retrato_essencial",
+      title: isEnglish ? "Your Essential Portrait" : "Seu Retrato Essencial",
+      impact_blocks: {
+        essence: `${firstName}, ${isEnglish ? "you lead with intensity and depth, but sometimes confuse speed with progress." : "você lidera com intensidade e profundidade, mas às vezes confunde velocidade com progresso."}`,
+        risk: isEnglish ? "Burning out by trying to control everything while appearing calm." : "Burnout ao tentar controlar tudo enquanto aparenta calma.",
+        calling: isEnglish ? "To transform complexity into clarity for others." : "Transformar complexidade em clareza para outros.",
+        gift: isEnglish ? "Strategic vision combined with emotional intelligence." : "Visão estratégica combinada com inteligência emocional."
+      },
+      visual_data: {
+        disc: { D: 72, I: 45, S: 38, C: 65, dominant: "D" },
+        temperament: { primary: isEnglish ? "Choleric" : "Colérico", secondary: isEnglish ? "Melancholic" : "Melancólico", scores: { colerico: 78, melancolico: 62, sanguineo: 35, fleumatico: 25 } },
+        intelligences: { top: [isEnglish ? "Linguistic" : "Linguística", isEnglish ? "Interpersonal" : "Interpessoal", isEnglish ? "Intrapersonal" : "Intrapessoal"], scores: { linguistica: 85, interpessoal: 78, intrapessoal: 72, logica: 65, espacial: 45 } },
+        connection_style: { primary: isEnglish ? "Quality Time" : "Tempo de Qualidade", secondary: isEnglish ? "Words of Affirmation" : "Palavras de Afirmação", scores: { tempo_qualidade: 82, palavras: 68, toque: 45, servico: 52, presentes: 28 } },
+        enneagram: { type: 3, wing: 4 },
+        nello16: { code: "ENTJ", name: isEnglish ? "The Commander" : "O Comandante" },
+        archetypes: { primary: isEnglish ? "Creator" : "Criador", secondary: isEnglish ? "Sage" : "Sábio" }
+      },
+      bullets: [
+        `${firstName}, ${isEnglish ? "you advance fast but sometimes leave people behind." : "você avança rápido, mas às vezes deixa pessoas para trás."}`,
+        `${firstName}, ${isEnglish ? "your perfectionism is fear disguised as excellence." : "seu perfeccionismo é medo disfarçado de excelência."}`,
+        `${firstName}, ${isEnglish ? "you connect deeply but protect yourself before it gets too real." : "você conecta profundamente, mas se protege antes de ficar real demais."}`,
+        `${firstName}, ${isEnglish ? "you lead naturally but struggle to follow." : "você lidera naturalmente, mas tem dificuldade em seguir."}`,
+        `${firstName}, ${isEnglish ? "your independence is strength and prison." : "sua independência é força e prisão."}`
+      ],
+      score_highlights: [isEnglish ? "Choleric 78%" : "Colérico 78%", "DISC D 72%", isEnglish ? "Enneagram 3w4" : "Eneagrama 3w4"]
+    },
+    {
+      id: "como_voce_funciona",
+      title: isEnglish ? "How You Function" : "Como Você Funciona",
+      source: "DISC + Temperamento",
+      mirror: isEnglish ? "You operate in high gear, processing quickly and expecting the same from others. Your mind races ahead while your body follows." : "Você opera em alta velocidade, processando rapidamente e esperando o mesmo dos outros. Sua mente corre à frente enquanto o corpo segue.",
+      strength: isEnglish ? "In crisis, you become calm and strategic - your best version emerges under pressure." : "Em crise, você fica calmo e estratégico - sua melhor versão emerge sob pressão.",
+      shadow: isEnglish ? "When stressed, you become controlling and dismissive of others' pace." : "Quando estressado, você se torna controlador e descarta o ritmo dos outros.",
+      invitation: isEnglish ? "Practice waiting 3 seconds before responding in any conversation today." : "Pratique esperar 3 segundos antes de responder em qualquer conversa hoje."
+    },
+    {
+      id: "suas_forcas",
+      title: isEnglish ? "Your Natural Strengths" : "Suas Forças Naturais",
+      source: isEnglish ? "Multiple Intelligences + Nello 16" : "Inteligências Múltiplas + Nello 16",
+      items: [
+        { talent: isEnglish ? "Strategic Communication" : "Comunicação Estratégica", example: isEnglish ? "You explain complex ideas simply and persuasively." : "Você explica ideias complexas de forma simples e persuasiva.", warning: isEnglish ? "Can become manipulation when stressed." : "Pode virar manipulação quando estressado." },
+        { talent: isEnglish ? "Pattern Recognition" : "Reconhecimento de Padrões", example: isEnglish ? "You see connections others miss." : "Você vê conexões que outros não percebem.", warning: isEnglish ? "Can make you impatient with 'obvious' conclusions." : "Pode te deixar impaciente com conclusões 'óbvias'." },
+        { talent: isEnglish ? "Emotional Calibration" : "Calibração Emocional", example: isEnglish ? "You read rooms and adjust approach instantly." : "Você lê ambientes e ajusta a abordagem instantaneamente.", warning: isEnglish ? "Can disconnect from your own emotions." : "Pode te desconectar das suas próprias emoções." }
+      ]
+    },
+    {
+      id: "suas_sombras",
+      title: isEnglish ? "Your Shadows and Blocks" : "Suas Sombras e Bloqueios",
+      source: isEnglish ? "Enneagram + Temperament" : "Eneagrama + Temperamento",
+      items: [
+        { pattern: isEnglish ? "Achievement Addiction" : "Vício em Conquista", situation: isEnglish ? "When you feel unseen or undervalued." : "Quando você se sente invisível ou desvalorizado.", exit: isEnglish ? "Ask: Who am I without the results?" : "Pergunte: Quem sou eu sem os resultados?" },
+        { pattern: isEnglish ? "Emotional Bypassing" : "Bypass Emocional", situation: isEnglish ? "When feelings threaten your efficiency." : "Quando sentimentos ameaçam sua eficiência.", exit: isEnglish ? "Name the emotion before acting." : "Nomeie a emoção antes de agir." },
+        { pattern: isEnglish ? "Control Illusion" : "Ilusão de Controle", situation: isEnglish ? "When uncertainty feels unbearable." : "Quando a incerteza parece insuportável.", exit: isEnglish ? "List what you actually control. It's less than you think." : "Liste o que você realmente controla. É menos do que pensa." }
+      ]
+    },
+    {
+      id: "seus_talentos",
+      title: isEnglish ? "Your Natural Talents" : "Seus Talentos Naturais",
+      source: isEnglish ? "Multiple Intelligences + Archetypes" : "Inteligências Múltiplas + Arquétipos",
+      items: [
+        { talent: isEnglish ? "Visionary Leadership" : "Liderança Visionária", origin: isEnglish ? "DISC D + Creator Archetype" : "DISC D + Arquétipo Criador", application: isEnglish ? "Building teams and projects from scratch" : "Construir times e projetos do zero" },
+        { talent: isEnglish ? "Deep Listening" : "Escuta Profunda", origin: isEnglish ? "Interpersonal Intelligence + Quality Time" : "Inteligência Interpessoal + Tempo de Qualidade", application: isEnglish ? "Counseling, mentoring, coaching" : "Aconselhamento, mentoria, coaching" },
+        { talent: isEnglish ? "Complex Synthesis" : "Síntese Complexa", origin: isEnglish ? "Linguistic Intelligence + Melancholic" : "Inteligência Linguística + Melancólico", application: isEnglish ? "Writing, teaching, content creation" : "Escrita, ensino, criação de conteúdo" }
+      ]
+    },
+    {
+      id: "seus_dons",
+      title: isEnglish ? "Your Gifts" : "Seus Dons",
+      source: isEnglish ? "Archetypes + Connection Style" : "Arquétipos + Estilo de Conexão",
+      items: [
+        { gift: isEnglish ? "Making people feel truly seen" : "Fazer pessoas se sentirem verdadeiramente vistas", manifestation: isEnglish ? "In conversations, you give full attention that transforms the other person." : "Em conversas, você dá atenção total que transforma a outra pessoa." },
+        { gift: isEnglish ? "Translating chaos into order" : "Traduzir caos em ordem", manifestation: isEnglish ? "You create systems and frameworks that help others navigate complexity." : "Você cria sistemas e frameworks que ajudam outros a navegar complexidade." }
+      ]
+    },
+    {
+      id: "sua_vocacao",
+      title: isEnglish ? "Your Vocation" : "Sua Vocação",
+      source: isEnglish ? "Archetypes + Intelligences" : "Arquétipos + Inteligências",
+      core_message: isEnglish ? "You are meant to create clarity from chaos and lead others to their own insights." : "Você veio para criar clareza a partir do caos e liderar outros às suas próprias descobertas.",
+      fields: [
+        { field: isEnglish ? "Leadership" : "Liderança", reason: isEnglish ? "Your DISC D + Choleric creates natural authority." : "Seu DISC D + Colérico cria autoridade natural.", example: isEnglish ? "CEO, Founder, Team Lead" : "CEO, Fundador, Líder de Time" },
+        { field: isEnglish ? "Education" : "Educação", reason: isEnglish ? "Your Linguistic Intelligence + Sage makes learning transformative." : "Sua Inteligência Linguística + Sábio torna o aprendizado transformador.", example: isEnglish ? "Trainer, Professor, Course Creator" : "Treinador, Professor, Criador de Cursos" },
+        { field: isEnglish ? "Creation" : "Criação", reason: isEnglish ? "Your Creator Archetype + Melancholic depth produces original work." : "Seu Arquétipo Criador + profundidade Melancólica produz trabalho original.", example: isEnglish ? "Writer, Designer, Product Creator" : "Escritor, Designer, Criador de Produto" }
+      ]
+    },
+    {
+      id: "arquetipos_chamado",
+      title: isEnglish ? "Archetypes and Calling" : "Arquétipos e Chamado",
+      source: isEnglish ? "Archetypes" : "Arquétipos",
+      primary: { archetype: isEnglish ? "Creator" : "Criador", role: isEnglish ? "To bring new things into existence" : "Trazer coisas novas à existência", contribution: isEnglish ? "Original vision and execution" : "Visão e execução originais" },
+      secondary: { archetype: isEnglish ? "Sage" : "Sábio", role: isEnglish ? "To understand and share wisdom" : "Compreender e compartilhar sabedoria", contribution: isEnglish ? "Depth and meaning to your creations" : "Profundidade e significado às suas criações" },
+      synergy: isEnglish ? "You create things that teach, and teach through what you create." : "Você cria coisas que ensinam, e ensina através do que cria."
+    },
+    {
+      id: "riscos_desvio",
+      title: isEnglish ? "Deviation Risks" : "Riscos de Desvio",
+      source: isEnglish ? "Shadows + Patterns" : "Sombras + Padrões",
+      items: [
+        { risk: isEnglish ? "Pursuing applause over impact" : "Buscar aplauso em vez de impacto", trigger: isEnglish ? "Feeling invisible or undervalued" : "Sentir-se invisível ou desvalorizado", consequence: isEnglish ? "Creating for validation, not contribution" : "Criar para validação, não contribuição" },
+        { risk: isEnglish ? "Isolation disguised as independence" : "Isolamento disfarçado de independência", trigger: isEnglish ? "Past betrayals or disappointments" : "Traições ou decepções passadas", consequence: isEnglish ? "Missing the collaboration that would elevate your work" : "Perder a colaboração que elevaria seu trabalho" }
+      ]
+    },
+    {
+      id: "seu_proposito",
+      title: isEnglish ? "Your Natural Purpose" : "Seu Propósito Natural",
+      source: isEnglish ? "Archetypes + Integration" : "Arquétipos + Integração",
+      motivation: isEnglish ? "To create clarity from chaos and share it in a way that transforms others." : "Criar clareza a partir do caos e compartilhar de forma que transforme outros.",
+      daily_example: isEnglish ? "In every meeting, you simplify what seemed complex. In every conversation, you see deeper than words." : "Em cada reunião, você simplifica o que parecia complexo. Em cada conversa, você vê além das palavras.",
+      common_error: isEnglish ? "Believing your worth is in what you produce, not who you are." : "Acreditar que seu valor está no que produz, não em quem é.",
+      invitation: isEnglish ? "Today, do something that has no measurable result. Just for the joy of it." : "Hoje, faça algo que não tem resultado mensurável. Só pela alegria."
+    },
+    {
+      id: "tensoes_internas",
+      title: isEnglish ? "Internal Tensions" : "Tensões Internas",
+      source: isEnglish ? "Profile Crossings" : "Cruzamento de Perfis",
+      items: [
+        { tension: isEnglish ? "Speed vs Depth" : "Velocidade vs Profundidade", tests_involved: isEnglish ? "DISC D + Melancholic Temperament" : "DISC D + Temperamento Melancólico", conflict: isEnglish ? "Part of you wants to move fast, another part won't accept anything superficial." : "Parte de você quer ir rápido, outra parte não aceita nada superficial.", practical_impact: isEnglish ? "Paralysis before important decisions or rushed choices you regret." : "Paralisia antes de decisões importantes ou escolhas apressadas que lamenta.", confrontation_question: isEnglish ? "How much have you sacrificed depth for speed - or speed for perfection that never comes?" : "Quanto você já sacrificou profundidade por velocidade - ou velocidade por perfeição que nunca chega?" },
+        { tension: isEnglish ? "Image vs Authenticity" : "Imagem vs Autenticidade", tests_involved: isEnglish ? "Enneagram 3 + Sage Archetype" : "Eneagrama 3 + Arquétipo Sábio", conflict: isEnglish ? "The need to appear successful conflicts with the drive for truth." : "A necessidade de parecer bem-sucedido conflita com a busca por verdade.", practical_impact: isEnglish ? "Filtering what you share based on how it will be perceived." : "Filtrar o que compartilha baseado em como será percebido.", confrontation_question: isEnglish ? "When was the last time you shared something true that might make you look bad?" : "Quando foi a última vez que você compartilhou algo verdadeiro que poderia te fazer parecer mal?" }
+      ]
+    },
+    {
+      id: "areas_vida",
+      title: isEnglish ? "Life Areas Reading" : "Leitura por Áreas da Vida",
+      source: isEnglish ? "Integrated Analysis by Area" : "Análise Integrada por Área",
+      items: [
+        { area: isEnglish ? "Career and Money" : "Carreira e Dinheiro", natural_strength: isEnglish ? "Strategic vision and execution capacity" : "Visão estratégica e capacidade de execução", main_risk: isEnglish ? "Workaholism disguised as ambition" : "Workaholic disfarçado de ambição", practical_direction: isEnglish ? "Define 'enough' before you reach for 'more'" : "Defina 'suficiente' antes de buscar 'mais'" },
+        { area: isEnglish ? "Relationships and Love" : "Relacionamentos e Amor", natural_strength: isEnglish ? "Deep attention and genuine presence" : "Atenção profunda e presença genuína", main_risk: isEnglish ? "Using busyness to avoid intimacy" : "Usar ocupação para evitar intimidade", practical_direction: isEnglish ? "Schedule unproductive time with loved ones" : "Agende tempo improdutivo com quem ama" },
+        { area: isEnglish ? "Health and Energy" : "Saúde e Energia", natural_strength: isEnglish ? "Discipline and self-awareness" : "Disciplina e autoconhecimento", main_risk: isEnglish ? "Ignoring body signals until breakdown" : "Ignorar sinais do corpo até colapso", practical_direction: isEnglish ? "Recovery is not weakness - it's strategy" : "Recuperação não é fraqueza - é estratégia" },
+        { area: isEnglish ? "Spirituality and Meaning" : "Espiritualidade e Sentido", natural_strength: isEnglish ? "Natural depth and questioning" : "Profundidade natural e questionamento", main_risk: isEnglish ? "Intellectualizing instead of experiencing" : "Intelectualizar ao invés de experienciar", practical_direction: isEnglish ? "Less reading about it, more sitting with it" : "Menos ler sobre, mais sentar com isso" }
+      ]
+    },
+    {
+      id: "paz_pressao",
+      title: isEnglish ? "Profile in Peace vs Under Pressure" : "Perfil em Paz vs Sob Pressão",
+      source: "DISC + Temperamento + Eneagrama",
+      in_peace: {
+        description: isEnglish ? "You become generous with time, patient with process, and genuinely curious about others." : "Você se torna generoso com tempo, paciente com processo, e genuinamente curioso sobre outros.",
+        behaviors: [
+          isEnglish ? "Listen fully before responding (Interpersonal Intelligence)" : "Escuta plenamente antes de responder (Inteligência Interpessoal)",
+          isEnglish ? "Accept imperfection as progress (Melancholic balanced)" : "Aceita imperfeição como progresso (Melancólico equilibrado)",
+          isEnglish ? "Share credit and celebrate others (Enneagram 3 healthy)" : "Compartilha crédito e celebra outros (Eneagrama 3 saudável)"
+        ]
+      },
+      under_pressure: {
+        description: isEnglish ? "You become controlling, dismissive, and hyperfocused on results at any cost." : "Você se torna controlador, descartável, e hiperfocado em resultados a qualquer custo.",
+        behaviors: [
+          isEnglish ? "Interrupt and take over (DISC D stress)" : "Interrompe e assume controle (DISC D estresse)",
+          isEnglish ? "Dismiss emotions as inefficiency (Choleric shadow)" : "Descarta emoções como ineficiência (Colérico sombra)",
+          isEnglish ? "Hide struggles to protect image (Enneagram 3 unhealthy)" : "Esconde dificuldades para proteger imagem (Eneagrama 3 não saudável)"
+        ]
+      }
+    },
+    {
+      id: "raridade_perfil",
+      title: isEnglish ? "Profile Rarity" : "Raridade do Perfil",
+      percentage: 7,
+      explanation: isEnglish ? "Only ~7% combine DISC D dominance with Enneagram 3w4 and Creator-Sage archetypes. This creates a rare tension between action and depth, image and truth." : "Apenas ~7% combinam DISC D dominante com Eneagrama 3w4 e arquétipos Criador-Sábio. Isso cria uma tensão rara entre ação e profundidade, imagem e verdade."
+    },
+    {
+      id: "plano_90_dias",
+      title: isEnglish ? "90-Day Path" : "Caminho de 90 Dias",
+      months: [
+        { month: 1, focus: isEnglish ? "Slowing Down" : "Desacelerar", practice: isEnglish ? "3-second pause before every response" : "Pausa de 3 segundos antes de cada resposta", check: isEnglish ? "Did I interrupt less this week?" : "Interrompi menos esta semana?" },
+        { month: 2, focus: isEnglish ? "Emotional Honesty" : "Honestidade Emocional", practice: isEnglish ? "Name one feeling daily to someone you trust" : "Nomeie um sentimento diário para alguém que confia", check: isEnglish ? "Did I share something vulnerable?" : "Compartilhei algo vulnerável?" },
+        { month: 3, focus: isEnglish ? "Being vs Doing" : "Ser vs Fazer", practice: isEnglish ? "One hour weekly with no goals, no productivity" : "Uma hora semanal sem metas, sem produtividade", check: isEnglish ? "Can I be still without feeling useless?" : "Consigo ficar parado sem me sentir inútil?" }
+      ]
+    },
+    {
+      id: "rotina_diaria",
+      title: isEnglish ? "Your Daily Routine" : "Sua Rotina Diária",
+      source: isEnglish ? "Temperament + Connection Style" : "Temperamento + Estilo de Conexão",
+      morning: isEnglish ? "Before checking anything: 5 minutes of silence. What do YOU want today, not what's expected?" : "Antes de checar qualquer coisa: 5 minutos de silêncio. O que VOCÊ quer hoje, não o que esperam?",
+      afternoon: isEnglish ? "At 3pm: check body tension. Where are you holding stress? Release it consciously." : "Às 15h: cheque tensão corporal. Onde está segurando estresse? Libere conscientemente.",
+      night: isEnglish ? "Before sleep: What did I do today just for joy, with no result in mind?" : "Antes de dormir: O que fiz hoje só por alegria, sem resultado em mente?"
+    },
+    {
+      id: "conversa_final",
+      title: isEnglish ? "An Honest Conversation" : "Uma Conversa Honesta",
+      paragraphs: [
+        isEnglish ? `${firstName}, your DISC D at 72% combined with Enneagram 3w4 creates a profile that achieves at high speed but rarely stops to feel the wins.` : `${firstName}, seu DISC D em 72% combinado com Eneagrama 3w4 cria um perfil que conquista em alta velocidade mas raramente para pra sentir as vitórias.`,
+        isEnglish ? "The uncomfortable truth: your independence is as much protection as strength. You've learned to not need anyone - but that's not the same as not wanting anyone." : "A verdade desconfortável: sua independência é tanta proteção quanto força. Você aprendeu a não precisar de ninguém - mas isso não é o mesmo que não querer ninguém."
+      ],
+      next_step: {
+        action: isEnglish ? "This week: share one struggle with someone before you've solved it." : "Esta semana: compartilhe uma dificuldade com alguém antes de ter resolvido.",
+        why: isEnglish ? "Your Enneagram 3 hides struggles to protect image. This breaks the pattern." : "Seu Eneagrama 3 esconde dificuldades para proteger imagem. Isso quebra o padrão."
+      }
+    }
+  ];
+};
 
 serve(async (req) => {
   // Handle CORS
@@ -909,7 +1105,7 @@ serve(async (req) => {
   }
 
   try {
-    const { user_id, locale = 'pt-br' } = await req.json();
+    const { user_id, locale = 'pt-br', mock = false } = await req.json();
 
     if (!user_id) {
       return new Response(
@@ -923,7 +1119,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 1. Validate user has completed the journey
+    // 1. Get user profile
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("journey_status, full_name")
@@ -935,6 +1131,35 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: "user_not_found" }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const userName = profile.full_name || (locale === 'en' ? 'Traveler' : 'Viajante');
+
+    // MOCK MODE: Return mock data without calling AI
+    if (mock) {
+      console.log("🧪 MOCK MODE: Returning mock data for user:", user_id);
+      
+      const mockSections = MOCK_SECTIONS(userName, locale);
+      const generationMetadata = {
+        generated_at: new Date().toISOString(),
+        locale,
+        model: "MOCK_MODE",
+        tests_used: ["mock_data"],
+        is_mock: true
+      };
+
+      // Note: In mock mode, we don't save to database to avoid polluting real data
+      // If you want to test the save flow, uncomment the lines below
+      
+      return new Response(
+        JSON.stringify({
+          success: true,
+          is_mock: true,
+          sections: mockSections,
+          generationMetadata
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -1017,7 +1242,7 @@ serve(async (req) => {
       }
     });
 
-    const userName = profile.full_name || (locale === 'en' ? 'Traveler' : 'Viajante');
+    // userName already defined above, no need to redeclare
 
     // 3. Call AI to generate the Código da Essência using OpenAI ChatGPT
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
