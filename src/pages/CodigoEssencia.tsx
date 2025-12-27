@@ -295,6 +295,7 @@ const CodigoEssenciaInner = () => {
 
   useEffect(() => {
     if (savedCodigo && savedCodigo.sections && savedCodigo.sections.length > 0 && !hasGenerated) {
+      console.log('[CodigoEssencia] Loading from saved:', savedCodigo.sections.map((s: any) => s.id));
       setHasGenerated(true);
       setGeneratedSections(savedCodigo.sections);
     }
@@ -342,10 +343,15 @@ const CodigoEssenciaInner = () => {
       }
 
       if (data?.sections) {
+        console.log('[CodigoEssencia] Sections received:', data.sections.map((s: any) => s.id));
+        console.log('[CodigoEssencia] Full data:', data);
         setGeneratedSections(data.sections);
         setHasGenerated(true);
         await saveCodigo(data.sections, JSON.stringify(data));
         toast.success(lang === 'en' ? 'Code generated!' : 'Código gerado!');
+      } else {
+        console.error('[CodigoEssencia] No sections in response:', data);
+        toast.error(lang === 'en' ? 'No sections generated.' : 'Nenhuma seção gerada.');
       }
     } catch (error) {
       console.error('Error generating codigo:', error);
@@ -509,6 +515,34 @@ const CodigoEssenciaInner = () => {
         {/* Generated Content - Refined Structure */}
         {hasGenerated && generatedSections.length > 0 && (
           <div className="space-y-6">
+            {/* Version/sections info for old reports */}
+            {(() => {
+              const expectedSections = ['retrato_essencial', 'tensoes_internas', 'areas_vida', 'paz_pressao', 'raridade_perfil', 'seus_talentos', 'seus_dons', 'sua_vocacao', 'arquetipos_chamado', 'riscos_desvio', 'plano_90_dias', 'rotina_diaria'];
+              const availableIds = generatedSections.map((s: any) => s.id);
+              const missingSections = expectedSections.filter(id => !availableIds.includes(id));
+              
+              if (missingSections.length > 3) {
+                return (
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-center">
+                    <p className="text-xs text-amber-700 dark:text-amber-400">
+                      {lang === 'en' 
+                        ? 'This report was generated with an older version. Regenerate to get new sections like Tensions, Life Areas, Peace/Pressure, etc.'
+                        : 'Este relatório foi gerado com uma versão anterior. Regenere para obter novas seções como Tensões, Áreas da Vida, Paz/Pressão, etc.'}
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-2 h-7 text-xs"
+                      onClick={() => setShowRegenerateConfirm(true)}
+                    >
+                      <RefreshCw className="w-3 h-3 mr-1" />
+                      {lang === 'en' ? 'Regenerate' : 'Regenerar'}
+                    </Button>
+                  </div>
+                );
+              }
+              return null;
+            })()}
             
             {/* === SECTION 1: Quick Summary + Impact === */}
             {quickSummaryData.strengths.length > 0 && (
@@ -520,22 +554,13 @@ const CodigoEssenciaInner = () => {
               />
             )}
             
-            {/* Score Highlights + Rarity */}
-            {(generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights || raridadeSection) && (
-              <div className="space-y-3">
-                <ScoreHighlights 
-                  highlights={generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights || []}
-                  rarityNote={generatedSections.find(s => s.id === 'retrato_essencial')?.rarity_note}
-                  language={lang}
-                />
-                {raridadeSection && (
-                  <ProfileRarityBadge 
-                    percentage={raridadeSection.percentage}
-                    explanation={raridadeSection.explanation}
-                    language={lang}
-                  />
-                )}
-              </div>
+            {/* Score Highlights */}
+            {generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights && (
+              <ScoreHighlights 
+                highlights={generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights || []}
+                rarityNote={generatedSections.find(s => s.id === 'retrato_essencial')?.rarity_note}
+                language={lang}
+              />
             )}
             
             {/* Impact Blocks - 4 columns on desktop */}
@@ -580,7 +605,7 @@ const CodigoEssenciaInner = () => {
             <SectionDivider variant="line" />
 
             {/* === NEW: Peace vs Pressure === */}
-            {pazPressaoSection && (
+            {pazPressaoSection && (pazPressaoSection.in_peace || pazPressaoSection.under_pressure) && (
               <>
                 <PeacePressureSection 
                   inPeace={pazPressaoSection.in_peace}
@@ -589,6 +614,15 @@ const CodigoEssenciaInner = () => {
                 />
                 <SectionDivider variant="dots" />
               </>
+            )}
+            
+            {/* === NEW: Profile Rarity === */}
+            {raridadeSection && (raridadeSection.percentage || raridadeSection.explanation) && (
+              <ProfileRarityBadge 
+                percentage={raridadeSection.percentage}
+                explanation={raridadeSection.explanation}
+                language={lang}
+              />
             )}
 
             {/* === SECTION 3: Confrontation (Direct, impactful) === */}
@@ -605,7 +639,18 @@ const CodigoEssenciaInner = () => {
 
             <SectionDivider variant="gradient" />
 
-            {/* === NEW: Life Areas Reading === */}
+            {/* === Internal Tensions === */}
+            {tensoesSection?.items?.length > 0 && (
+              <>
+                <InternalTensionsSection 
+                  tensions={tensoesSection.items}
+                  language={lang}
+                />
+                <SectionDivider variant="wave" />
+              </>
+            )}
+
+            {/* === Life Areas Reading === */}
             {areasVidaSection?.items?.length > 0 && (
               <>
                 <LifeAreasSection 
@@ -657,16 +702,7 @@ const CodigoEssenciaInner = () => {
               />
             )}
 
-            {/* === NEW: Internal Tensions === */}
-            {tensoesSection?.items?.length > 0 && (
-              <>
-                <SectionDivider variant="wave" />
-                <InternalTensionsSection 
-                  tensions={tensoesSection.items}
-                  language={lang}
-                />
-              </>
-            )}
+            {/* Internal Tensions already rendered above after Purpose section */}
 
             <SectionDivider variant="wave" />
 
