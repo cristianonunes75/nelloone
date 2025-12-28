@@ -71,6 +71,7 @@ import {
   CentralTruths,
   ProvocativeClosing,
   ExecutiveSummary,
+  ProductHeader,
 } from "@/components/codigo-essencia";
 
 // LangKey now imported from codigoEssenciaFallbacks
@@ -578,6 +579,8 @@ const CodigoEssenciaInner = () => {
         {/* Generated Content - Refined Structure */}
         {hasGenerated && generatedSections.length > 0 && (
           <div className="space-y-6">
+            {/* === PRODUCT HEADER - First Impression === */}
+            <ProductHeader userName={userName} language={lang} />
             {/* Version/sections info for old reports */}
             {(() => {
               const expectedSections = ['retrato_essencial', 'tensoes_internas', 'areas_vida', 'paz_pressao', 'raridade_perfil', 'seus_talentos', 'seus_dons', 'sua_vocacao', 'arquetipos_chamado', 'riscos_desvio', 'plano_90_dias', 'rotina_diaria'];
