@@ -1,3 +1,4 @@
+export { ExecutiveSummary } from "./ExecutiveSummary";
 export { DISCChart } from "./DISCChart";
 export { TemperamentChart } from "./TemperamentChart";
 export { IntelligenceRanking } from "./IntelligenceRanking";
