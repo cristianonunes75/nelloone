@@ -13,7 +13,7 @@ import {
 
 // ===================================================
 // CÓDIGO DA ESSÊNCIA — Premium PDF from AI Data
-// Clean layout matching screen display
+// Complete layout matching screen display - NO CONTENT LIMITS
 // ===================================================
 
 interface AISections {
@@ -79,7 +79,7 @@ const TRANSLATIONS = {
     main_risk: "Risco Principal",
     practical_direction: "Direção Prática",
     conflict: "Conflito",
-    impact_label: "Impacto Prático",
+    impact_label: "Impacto",
     question: "Pergunta de Confronto",
     centralTruths: "As 3 Verdades Centrais",
     centralTruthsSubtitle: "Tudo no seu Código deriva destas verdades",
@@ -87,6 +87,23 @@ const TRANSLATIONS = {
     whoYouAre: "Quem você é",
     riskOfNotLiving: "O risco de não viver isso",
     theInvitation: "O convite",
+    quickSummary: "Seu Código",
+    strengthsLabel: "Forças",
+    alertsLabel: "Riscos",
+    directionLabel: "Direção",
+    profileIndicators: "Indicadores do Perfil",
+    confrontation: "Confronto",
+    crossReference: "Cruzamento",
+    strengthens: "Fortalece",
+    sabotages: "Sabota",
+    purposeManifesto: "Propósito Manifesto",
+    expressions: "Expressões",
+    trigger: "Gatilho",
+    consequence: "Consequência",
+    example: "Exemplo",
+    exit: "Saída",
+    situation: "Situação",
+    pattern: "Padrão",
   },
   "pt-pt": {
     title: "CÓDIGO DA ESSÊNCIA",
@@ -137,7 +154,7 @@ const TRANSLATIONS = {
     main_risk: "Risco Principal",
     practical_direction: "Direção Prática",
     conflict: "Conflito",
-    impact_label: "Impacto Prático",
+    impact_label: "Impacto",
     question: "Pergunta de Confronto",
     centralTruths: "As 3 Verdades Centrais",
     centralTruthsSubtitle: "Tudo no teu Código deriva destas verdades",
@@ -145,6 +162,23 @@ const TRANSLATIONS = {
     whoYouAre: "Quem tu és",
     riskOfNotLiving: "O risco de não viveres isto",
     theInvitation: "O convite",
+    quickSummary: "O Teu Código",
+    strengthsLabel: "Forças",
+    alertsLabel: "Riscos",
+    directionLabel: "Direção",
+    profileIndicators: "Indicadores do Perfil",
+    confrontation: "Confronto",
+    crossReference: "Cruzamento",
+    strengthens: "Fortalece",
+    sabotages: "Sabota",
+    purposeManifesto: "Propósito Manifesto",
+    expressions: "Expressões",
+    trigger: "Gatilho",
+    consequence: "Consequência",
+    example: "Exemplo",
+    exit: "Saída",
+    situation: "Situação",
+    pattern: "Padrão",
   },
   en: {
     title: "ESSENCE CODE",
@@ -195,7 +229,7 @@ const TRANSLATIONS = {
     main_risk: "Main Risk",
     practical_direction: "Practical Direction",
     conflict: "Conflict",
-    impact_label: "Practical Impact",
+    impact_label: "Impact",
     question: "Confrontation Question",
     centralTruths: "The 3 Central Truths",
     centralTruthsSubtitle: "Everything in your Code derives from these truths",
@@ -203,6 +237,23 @@ const TRANSLATIONS = {
     whoYouAre: "Who you are",
     riskOfNotLiving: "The risk of not living this",
     theInvitation: "The invitation",
+    quickSummary: "Your Code",
+    strengthsLabel: "Strengths",
+    alertsLabel: "Risks",
+    directionLabel: "Direction",
+    profileIndicators: "Profile Indicators",
+    confrontation: "Confrontation",
+    crossReference: "Cross Reference",
+    strengthens: "Strengthens",
+    sabotages: "Sabotages",
+    purposeManifesto: "Purpose Manifesto",
+    expressions: "Expressions",
+    trigger: "Trigger",
+    consequence: "Consequence",
+    example: "Example",
+    exit: "Exit",
+    situation: "Situation",
+    pattern: "Pattern",
   },
 };
 
@@ -215,6 +266,8 @@ const TEAL = { r: 20, g: 184, b: 166 };
 const PURPLE = { r: 139, g: 92, b: 246 };
 const BLUE = { r: 59, g: 130, b: 246 };
 const ORANGE = { r: 249, g: 115, b: 22 };
+const ROSE = { r: 244, g: 63, b: 94 };
+const GRAY = { r: 100, g: 100, b: 100 };
 
 const getSection = <T>(sections: AISections[], id: string): T | null => {
   const section = sections.find((s) => s.id === id);
@@ -268,7 +321,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     currentY += 12;
   };
 
-  // Helper: add text block
+  // Helper: add text block - FULL content without slicing
   const addText = (text: string, fontSize = 9, color = { r: 60, g: 60, b: 60 }): void => {
     if (!text) return;
     doc.setFontSize(fontSize);
@@ -283,7 +336,22 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     currentY += 2;
   };
 
-  // Helper: add label + value
+  // Helper: add bullet point
+  const addBullet = (text: string, fontSize = 9, color = { r: 60, g: 60, b: 60 }): void => {
+    if (!text) return;
+    doc.setFontSize(fontSize);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(color.r, color.g, color.b);
+    const lines = doc.splitTextToSize(`• ${text}`, contentWidth - 12);
+    for (const line of lines) {
+      checkPageBreak(5);
+      doc.text(line, margin + 6, currentY);
+      currentY += fontSize * 0.45;
+    }
+    currentY += 1;
+  };
+
+  // Helper: add label + value - FULL content
   const addLabelValue = (label: string, value: string, labelColor = PRIMARY): void => {
     if (!value) return;
     checkPageBreak(10);
@@ -312,6 +380,11 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     doc.setLineWidth(0.3);
     doc.line(margin + 20, currentY, pageWidth - margin - 20, currentY);
     currentY += 6;
+  };
+
+  // Helper: add spacer
+  const addSpacer = (height = 4): void => {
+    currentY += height;
   };
 
   // === COVER PAGE ===
@@ -345,7 +418,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   doc.addPage();
   currentY = margin;
 
-  // --- 3 CENTRAL TRUTHS ---
+  // === 1. 3 CENTRAL TRUTHS (FULL CONTENT) ===
   const tresVerdadesSection = getSection<{ truths?: Array<{ title: string; content: string; base: string }> }>(sections, "tres_verdades_centrais");
   if (tresVerdadesSection?.truths && tresVerdadesSection.truths.length > 0) {
     addSectionTitle(t.centralTruths, BLUE);
@@ -356,53 +429,104 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     currentY += 8;
 
     const truthColors = [BLUE, GREEN, ORANGE];
-    for (let i = 0; i < Math.min(tresVerdadesSection.truths.length, 3); i++) {
+    // NO SLICE - show ALL truths
+    for (let i = 0; i < tresVerdadesSection.truths.length; i++) {
       const truth = tresVerdadesSection.truths[i];
-      const color = truthColors[i];
+      const color = truthColors[i % 3];
       
-      checkPageBreak(25);
+      checkPageBreak(30);
       doc.setFillColor(color.r, color.g, color.b);
-      doc.rect(margin, currentY, 2, 18, "F");
+      doc.rect(margin, currentY, 2, 20, "F");
       
       doc.setTextColor(color.r, color.g, color.b);
       doc.setFontSize(10);
       doc.setFont("helvetica", "bold");
       doc.text(`${i + 1}. ${truth.title}`, margin + 6, currentY + 4);
       
+      // FULL content - no slice
       doc.setTextColor(60, 60, 60);
       doc.setFontSize(9);
       doc.setFont("helvetica", "normal");
       const contentLines = doc.splitTextToSize(truth.content, contentWidth - 10);
       let lineY = currentY + 9;
-      for (const line of contentLines.slice(0, 3)) {
+      for (const line of contentLines) {
+        checkPageBreak(4);
         doc.text(line, margin + 6, lineY);
         lineY += 4;
       }
       
       if (truth.base) {
+        checkPageBreak(6);
         doc.setFontSize(7);
         doc.setFont("helvetica", "italic");
         doc.setTextColor(140, 140, 140);
         doc.text(`${t.basedOn}: ${truth.base}`, margin + 6, lineY + 1);
+        lineY += 5;
       }
       
-      currentY += 25;
+      currentY = lineY + 4;
     }
     addDivider();
   }
 
-  // --- IMPACT BLOCKS ---
-  const retrato = getSection<{ impact_blocks?: Record<string, string>; score_highlights?: string[] }>(sections, "retrato_essencial");
-  const impactBlocks = validateImpactBlocks(retrato?.impact_blocks, lang);
+  // === 2. QUICK SUMMARY ===
+  const retratoSection = getSection<{ impact_blocks?: Record<string, string>; bullets?: string[]; score_highlights?: string[] }>(sections, "retrato_essencial");
+  const impactBlocks = validateImpactBlocks(retratoSection?.impact_blocks, lang);
+  const bullets = retratoSection?.bullets || [];
   
+  if (bullets.length > 0 || impactBlocks.calling) {
+    addSectionTitle(t.quickSummary, PRIMARY);
+    
+    // Strengths
+    const strengths = bullets.filter((_: string, i: number) => i < 2);
+    if (strengths.length > 0) {
+      doc.setTextColor(GREEN.r, GREEN.g, GREEN.b);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "bold");
+      doc.text(t.strengthsLabel.toUpperCase(), margin + 4, currentY);
+      currentY += 4;
+      for (const s of strengths) {
+        addBullet(s, 8, GREEN);
+      }
+    }
+    
+    // Alerts
+    const alerts = bullets.filter((_: string, i: number) => i >= 2 && i < 4);
+    if (alerts.length > 0) {
+      addSpacer(2);
+      doc.setTextColor(AMBER.r, AMBER.g, AMBER.b);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "bold");
+      doc.text(t.alertsLabel.toUpperCase(), margin + 4, currentY);
+      currentY += 4;
+      for (const a of alerts) {
+        addBullet(a, 8, AMBER);
+      }
+    }
+    
+    // Direction
+    if (impactBlocks.calling) {
+      addSpacer(2);
+      doc.setTextColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "bold");
+      doc.text(t.directionLabel.toUpperCase(), margin + 4, currentY);
+      currentY += 4;
+      addText(impactBlocks.calling, 9, PRIMARY);
+    }
+    
+    addDivider();
+  }
+
+  // === 3. IMPACT BLOCKS ===
   addSectionTitle(t.impact, PRIMARY);
   addLabelValue(t.essence, impactBlocks.essence, GREEN);
   addLabelValue(t.risk, impactBlocks.risk, AMBER);
   addLabelValue(t.calling, impactBlocks.calling, TEAL);
   addLabelValue(t.gift, impactBlocks.gift, PURPLE);
   
-  // Score highlights
-  let scoreHighlights = retrato?.score_highlights || [];
+  // Score highlights - FULL
+  let scoreHighlights = retratoSection?.score_highlights || [];
   if (scoreHighlights.length === 0) {
     scoreHighlights = calculateScoreHighlights(testResults, lang);
   }
@@ -410,12 +534,40 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     currentY += 2;
     doc.setFontSize(8);
     doc.setTextColor(100, 100, 100);
-    doc.text(scoreHighlights.join(" • "), margin + 4, currentY);
-    currentY += 6;
+    const highlightLines = doc.splitTextToSize(scoreHighlights.join(" • "), contentWidth - 8);
+    for (const line of highlightLines) {
+      checkPageBreak(4);
+      doc.text(line, margin + 4, currentY);
+      currentY += 4;
+    }
   }
   addDivider();
 
-  // --- PROFILE RARITY ---
+  // === 4. PROFILE INDICATORS ===
+  const discScores = (testResults as any)?.disc?.scores;
+  const tempPrimary = (testResults as any)?.temperamentos?.primary;
+  const connectionPrimary = (testResults as any)?.linguagens_amor?.primary?.style || 
+                           (testResults as any)?.estilos_conexao_afetiva?.primary?.style ||
+                           (testResults as any)?.linguagens_amor?.primary?.language;
+  
+  if (discScores || tempPrimary || connectionPrimary) {
+    addSectionTitle(t.profileIndicators, BLUE);
+    
+    if (discScores) {
+      const discStr = `DISC: D=${discScores.D || 0}% | I=${discScores.I || 0}% | S=${discScores.S || 0}% | C=${discScores.C || 0}%`;
+      addText(discStr, 9);
+    }
+    if (tempPrimary) {
+      const tempStr = typeof tempPrimary === 'string' ? tempPrimary : (tempPrimary as any)?.temperament || '';
+      if (tempStr) addText(`${lang === 'en' ? 'Temperament' : 'Temperamento'}: ${tempStr}`, 9);
+    }
+    if (connectionPrimary) {
+      addText(`${lang === 'en' ? 'Connection Style' : 'Estilo de Conexão'}: ${connectionPrimary}`, 9);
+    }
+    addDivider();
+  }
+
+  // === 5. PROFILE RARITY ===
   const raridadeSection = getSection<{ percentage?: number; explanation?: string }>(sections, "raridade_perfil");
   const rarity = validateRarity(raridadeSection, lang);
   if (rarity.percentage > 0) {
@@ -428,34 +580,71 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     doc.setFont("helvetica", "bold");
     doc.text(`~${rarity.percentage}%`, margin + 25, currentY + 8, { align: "center" });
     currentY += 16;
+    // FULL explanation
     addText(rarity.explanation);
     addDivider();
   }
 
-  // --- PEACE VS PRESSURE ---
+  // === 6. PEACE VS PRESSURE (ALL behaviors) ===
   const pazSection = getSection<{ in_peace?: Record<string, unknown>; under_pressure?: Record<string, unknown> }>(sections, "paz_pressao");
   const paz = validatePeacePressure(pazSection, lang);
   if (paz.in_peace.description || paz.under_pressure.description) {
     addSectionTitle(t.peacePressure, GREEN);
     addLabelValue(t.inPeace, paz.in_peace.description, GREEN);
-    for (const b of paz.in_peace.behaviors.slice(0, 2)) {
-      addText(`• ${b}`, 8);
+    // ALL behaviors - no slice
+    for (const b of paz.in_peace.behaviors) {
+      addBullet(b, 8, GREEN);
     }
-    currentY += 2;
+    currentY += 3;
     addLabelValue(t.underPressure, paz.under_pressure.description, AMBER);
-    for (const b of paz.under_pressure.behaviors.slice(0, 2)) {
-      addText(`• ${b}`, 8);
+    // ALL behaviors - no slice
+    for (const b of paz.under_pressure.behaviors) {
+      addBullet(b, 8, AMBER);
     }
     addDivider();
   }
 
-  // --- INTERNAL TENSIONS ---
+  // === 7. CONFRONTATION ===
+  const sombrasSection = getSection<{ items?: Array<{ pattern: string; situation?: string; exit?: string }>; source?: string }>(sections, "suas_sombras");
+  const funcionaSection = getSection<{ shadow?: string; strength?: string }>(sections, "como_voce_funciona");
+  
+  const mainPattern = sombrasSection?.items?.[0];
+  if (mainPattern?.pattern || funcionaSection?.shadow) {
+    addSectionTitle(t.confrontation, ROSE);
+    
+    const confrontTitle = mainPattern?.pattern || funcionaSection?.shadow || "";
+    if (confrontTitle) {
+      doc.setTextColor(ROSE.r, ROSE.g, ROSE.b);
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      checkPageBreak(8);
+      doc.text(confrontTitle, margin + 4, currentY);
+      currentY += 6;
+    }
+    
+    if (sombrasSection?.source) {
+      addLabelValue(t.crossReference, sombrasSection.source, GRAY);
+    }
+    if (funcionaSection?.strength) {
+      addLabelValue(t.strengthens, funcionaSection.strength, GREEN);
+    }
+    if (mainPattern?.situation || funcionaSection?.shadow) {
+      addLabelValue(t.sabotages, mainPattern?.situation || funcionaSection?.shadow || "", AMBER);
+    }
+    if (mainPattern?.exit) {
+      addLabelValue(t.question, mainPattern.exit, PRIMARY);
+    }
+    addDivider();
+  }
+
+  // === 8. INTERNAL TENSIONS (ALL tensions) ===
   const tensoesSection = getSection<{ items?: unknown[] }>(sections, "tensoes_internas");
   const tensions = validateTensions(tensoesSection, lang);
   if (tensions.length > 0 && tensions[0].tension) {
     addSectionTitle(t.tensions, AMBER);
-    for (const tension of tensions.slice(0, 2)) {
-      checkPageBreak(20);
+    // ALL tensions - no slice
+    for (const tension of tensions) {
+      checkPageBreak(25);
       doc.setFontSize(10);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(60, 60, 60);
@@ -468,13 +657,14 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     addDivider();
   }
 
-  // --- LIFE AREAS ---
+  // === 9. LIFE AREAS (ALL areas) ===
   const areasSection = getSection<{ items?: unknown[] }>(sections, "areas_vida");
   const areas = validateLifeAreas(areasSection, lang);
   if (areas.length > 0) {
     addSectionTitle(t.lifeAreas, TEAL);
-    for (const area of areas.slice(0, 3)) {
-      checkPageBreak(18);
+    // ALL areas - no slice
+    for (const area of areas) {
+      checkPageBreak(25);
       doc.setFontSize(10);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(TEAL.r, TEAL.g, TEAL.b);
@@ -482,132 +672,254 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
       currentY += 5;
       addLabelValue(t.natural_strength, area.natural_strength, GREEN);
       addLabelValue(t.main_risk, area.main_risk, AMBER);
+      if (area.practical_direction) {
+        addLabelValue(t.practical_direction, area.practical_direction, TEAL);
+      }
       currentY += 2;
     }
     addDivider();
   }
 
-  // --- TALENTS & GIFTS ---
+  // === 10. PURPOSE MANIFESTO ===
+  const propositoSection = getSection<{ motivation?: string; daily_example?: string; invitation?: string; common_error?: string }>(sections, "seu_proposito");
+  if (propositoSection?.motivation) {
+    addSectionTitle(t.purposeManifesto, ORANGE);
+    
+    // Main manifesto
+    doc.setFillColor(ORANGE.r, ORANGE.g, ORANGE.b);
+    doc.rect(margin, currentY, 2, 16, "F");
+    doc.setTextColor(60, 60, 60);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "italic");
+    const manifestoLines = doc.splitTextToSize(`"${propositoSection.motivation}"`, contentWidth - 12);
+    let mY = currentY + 4;
+    for (const line of manifestoLines) {
+      checkPageBreak(4);
+      doc.text(line, margin + 6, mY);
+      mY += 4;
+    }
+    currentY = mY + 4;
+    
+    // Expressions
+    const expressions = [propositoSection.daily_example, propositoSection.invitation].filter(Boolean);
+    if (expressions.length > 0) {
+      doc.setTextColor(ORANGE.r, ORANGE.g, ORANGE.b);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "bold");
+      doc.text(t.expressions.toUpperCase(), margin + 4, currentY);
+      currentY += 4;
+      for (const exp of expressions) {
+        addBullet(exp as string, 8);
+      }
+    }
+    
+    // Risk
+    if (propositoSection.common_error) {
+      addSpacer(2);
+      addLabelValue(t.risk, propositoSection.common_error, AMBER);
+    }
+    addDivider();
+  }
+
+  // === 11. TALENTS & GIFTS (ALL items) ===
   const talentosSection = getSection<{ items?: Array<{ talent: string; origin?: string; application?: string }> }>(sections, "seus_talentos");
   const donsSection = getSection<{ items?: Array<{ gift: string; manifestation?: string }> }>(sections, "seus_dons");
   if ((talentosSection?.items?.length || 0) > 0 || (donsSection?.items?.length || 0) > 0) {
     addSectionTitle(t.talents, GOLD);
+    
+    // ALL talents - no slice
     if (talentosSection?.items) {
-      for (const item of talentosSection.items.slice(0, 3)) {
-        checkPageBreak(12);
+      for (const item of talentosSection.items) {
+        checkPageBreak(15);
         doc.setFontSize(9);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(60, 60, 60);
         doc.text(`• ${item.talent}`, margin + 4, currentY);
         currentY += 4;
-        if (item.application) addText(`  ${item.application}`, 8, { r: 100, g: 100, b: 100 });
+        if (item.origin) addText(`  ${t.origin}: ${item.origin}`, 8, GRAY);
+        if (item.application) addText(`  ${t.application}: ${item.application}`, 8, GRAY);
+        currentY += 2;
       }
     }
+    
+    // ALL gifts - no slice
     if (donsSection?.items && donsSection.items.length > 0) {
       currentY += 3;
-      doc.setFontSize(9);
+      doc.setFontSize(10);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(PURPLE.r, PURPLE.g, PURPLE.b);
       doc.text(t.gifts, margin + 4, currentY);
       currentY += 5;
-      for (const item of donsSection.items.slice(0, 2)) {
-        addText(`• ${item.gift}`, 9);
+      for (const item of donsSection.items) {
+        checkPageBreak(12);
+        addBullet(item.gift, 9, PURPLE);
+        if (item.manifestation) addText(`  ${t.manifestation}: ${item.manifestation}`, 8, GRAY);
+        currentY += 2;
       }
     }
     addDivider();
   }
 
-  // --- VOCATION ---
-  const vocacaoSection = getSection<{ core_message?: string; fields?: Array<{ field: string; reason?: string }> }>(sections, "sua_vocacao");
+  // === 12. VOCATION (ALL fields) ===
+  const vocacaoSection = getSection<{ core_message?: string; fields?: Array<{ field: string; reason?: string; example?: string }> }>(sections, "sua_vocacao");
   if (vocacaoSection?.core_message || (vocacaoSection?.fields?.length || 0) > 0) {
     addSectionTitle(t.vocation, TEAL);
     if (vocacaoSection.core_message) {
       addText(vocacaoSection.core_message, 10, { r: 50, g: 50, b: 50 });
     }
+    // ALL fields - no slice
     if (vocacaoSection.fields) {
-      for (const field of vocacaoSection.fields.slice(0, 3)) {
-        addText(`• ${field.field}`, 9);
+      for (const field of vocacaoSection.fields) {
+        checkPageBreak(15);
+        addBullet(field.field, 9, TEAL);
+        if (field.reason) addText(`  ${t.reason}: ${field.reason}`, 8, GRAY);
+        if (field.example) addText(`  ${t.example}: ${field.example}`, 8, GRAY);
+        currentY += 2;
       }
     }
     addDivider();
   }
 
-  // --- ARCHETYPES ---
+  // === 13. ARCHETYPES & MISSION ===
   const arquetiposSection = getSection<{ 
     primary?: { archetype: string; role?: string; contribution?: string };
-    secondary?: { archetype: string; role?: string };
+    secondary?: { archetype: string; role?: string; contribution?: string };
     synergy?: string;
   }>(sections, "arquetipos_chamado");
-  const riscosSection = getSection<{ items?: Array<{ risk: string; trigger?: string }> }>(sections, "riscos_desvio");
+  const riscosSection = getSection<{ items?: Array<{ risk: string; trigger?: string; consequence?: string }> }>(sections, "riscos_desvio");
+  
   if (arquetiposSection?.primary?.archetype || (riscosSection?.items?.length || 0) > 0) {
     addSectionTitle(t.archetypes, PRIMARY);
+    
+    // Primary archetype - FULL
     if (arquetiposSection?.primary?.archetype) {
-      addLabelValue(t.primaryArchetype, arquetiposSection.primary.archetype, PRIMARY);
-      if (arquetiposSection.primary.contribution) addText(arquetiposSection.primary.contribution, 8);
+      doc.setFillColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
+      checkPageBreak(20);
+      doc.roundedRect(margin, currentY, contentWidth / 2 - 5, 12, 2, 2, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "bold");
+      doc.text(t.primaryArchetype, margin + 4, currentY + 4);
+      doc.setFontSize(10);
+      doc.text(arquetiposSection.primary.archetype, margin + 4, currentY + 9);
+      currentY += 15;
+      if (arquetiposSection.primary.role) addLabelValue("Papel", arquetiposSection.primary.role);
+      if (arquetiposSection.primary.contribution) addText(arquetiposSection.primary.contribution, 8, GRAY);
     }
+    
+    // Secondary archetype - FULL
     if (arquetiposSection?.secondary?.archetype) {
-      addLabelValue(t.secondaryArchetype, arquetiposSection.secondary.archetype);
+      addSpacer(2);
+      doc.setFillColor(BLUE.r, BLUE.g, BLUE.b);
+      checkPageBreak(20);
+      doc.roundedRect(margin, currentY, contentWidth / 2 - 5, 12, 2, 2, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "bold");
+      doc.text(t.secondaryArchetype, margin + 4, currentY + 4);
+      doc.setFontSize(10);
+      doc.text(arquetiposSection.secondary.archetype, margin + 4, currentY + 9);
+      currentY += 15;
+      if (arquetiposSection.secondary.role) addLabelValue("Papel", arquetiposSection.secondary.role);
+      if (arquetiposSection.secondary.contribution) addText(arquetiposSection.secondary.contribution, 8, GRAY);
     }
+    
+    // Synergy
     if (arquetiposSection?.synergy) {
+      addSpacer(2);
       addLabelValue(t.synergy, arquetiposSection.synergy, TEAL);
     }
+    
+    // ALL deviation risks - no slice
     if (riscosSection?.items && riscosSection.items.length > 0) {
-      currentY += 3;
+      currentY += 4;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(ROSE.r, ROSE.g, ROSE.b);
+      doc.text(t.deviationRisks, margin + 4, currentY);
+      currentY += 6;
+      for (const risk of riscosSection.items) {
+        checkPageBreak(18);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(AMBER.r, AMBER.g, AMBER.b);
+        doc.text(`⚠ ${risk.risk}`, margin + 4, currentY);
+        currentY += 4;
+        if (risk.trigger) addText(`  ${t.trigger}: ${risk.trigger}`, 8, GRAY);
+        if (risk.consequence) addText(`  ${t.consequence}: ${risk.consequence}`, 8, GRAY);
+        currentY += 2;
+      }
+    }
+    addDivider();
+  }
+
+  // === 14. STRENGTHS & SHADOWS (ALL items) ===
+  const forcasSection = getSection<{ items?: Array<{ talent: string; example?: string }> }>(sections, "suas_forcas");
+  if ((forcasSection?.items?.length || 0) > 0 || (sombrasSection?.items?.length || 0) > 0) {
+    addSectionTitle(`${t.strengths} & ${t.shadows}`, GREEN);
+    
+    // ALL strengths - no slice
+    if (forcasSection?.items) {
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(GREEN.r, GREEN.g, GREEN.b);
+      doc.text(t.strengths, margin + 4, currentY);
+      currentY += 5;
+      for (const item of forcasSection.items) {
+        checkPageBreak(12);
+        addBullet(item.talent, 9, GREEN);
+        if (item.example) addText(`  ${t.example}: ${item.example}`, 8, GRAY);
+        currentY += 2;
+      }
+    }
+    
+    // ALL shadows - no slice
+    if (sombrasSection?.items) {
+      currentY += 4;
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(AMBER.r, AMBER.g, AMBER.b);
-      doc.text(t.deviationRisks, margin + 4, currentY);
+      doc.text(t.shadows, margin + 4, currentY);
       currentY += 5;
-      for (const risk of riscosSection.items.slice(0, 2)) {
-        addText(`⚠ ${risk.risk}`, 9, AMBER);
+      for (const item of sombrasSection.items) {
+        checkPageBreak(18);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(AMBER.r, AMBER.g, AMBER.b);
+        doc.text(`⚠ ${item.pattern}`, margin + 4, currentY);
+        currentY += 4;
+        if (item.situation) addText(`  ${t.situation}: ${item.situation}`, 8, GRAY);
+        if (item.exit) addText(`  ${t.exit}: ${item.exit}`, 8, GREEN);
+        currentY += 2;
       }
     }
     addDivider();
   }
 
-  // --- STRENGTHS & SHADOWS ---
-  const forcasSection = getSection<{ items?: Array<{ talent: string; example?: string }> }>(sections, "suas_forcas");
-  const sombrasSection = getSection<{ items?: Array<{ pattern: string; situation?: string; exit?: string }> }>(sections, "suas_sombras");
-  if ((forcasSection?.items?.length || 0) > 0 || (sombrasSection?.items?.length || 0) > 0) {
-    addSectionTitle(`${t.strengths} & ${t.shadows}`, GREEN);
-    if (forcasSection?.items) {
-      for (const item of forcasSection.items.slice(0, 2)) {
-        addText(`✓ ${item.talent}`, 9, GREEN);
-        if (item.example) addText(`  ${item.example}`, 8, { r: 100, g: 100, b: 100 });
-      }
-    }
-    if (sombrasSection?.items) {
-      currentY += 3;
-      for (const item of sombrasSection.items.slice(0, 2)) {
-        addText(`⚠ ${item.pattern}`, 9, AMBER);
-        if (item.exit) addText(`  → ${item.exit}`, 8, { r: 100, g: 100, b: 100 });
-      }
-    }
-    addDivider();
-  }
-
-  // --- 90-DAY PLAN ---
+  // === 15. 90-DAY PLAN (ALL months) ===
   const plano90Section = getSection<{ months?: unknown[] }>(sections, "plano_90_dias");
   const plan = validatePlan90(plano90Section, lang);
   if (plan.months.length > 0) {
     addSectionTitle(t.plan90, TEAL);
+    // ALL months - no slice
     for (const month of plan.months) {
-      checkPageBreak(18);
+      checkPageBreak(25);
       doc.setFillColor(TEAL.r, TEAL.g, TEAL.b);
-      doc.roundedRect(margin, currentY - 2, 18, 6, 1, 1, "F");
+      doc.roundedRect(margin, currentY - 2, 22, 7, 1, 1, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(8);
       doc.setFont("helvetica", "bold");
       doc.text(`${t.month} ${month.month}`, margin + 2, currentY + 2);
-      currentY += 8;
+      currentY += 10;
       addLabelValue(t.focus, month.focus);
       addLabelValue(t.practice, month.practice);
-      currentY += 2;
+      if (month.check) addLabelValue(t.check, month.check);
+      currentY += 3;
     }
     addDivider();
   }
 
-  // --- DAILY ROUTINE ---
+  // === 16. DAILY ROUTINE (FULL) ===
   const rotinaSection = getSection<{ morning?: string; afternoon?: string; night?: string }>(sections, "rotina_diaria");
   const routine = validateRoutine(rotinaSection, lang);
   if (routine.morning || routine.afternoon || routine.night) {
@@ -618,7 +930,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     addDivider();
   }
 
-  // --- CLOSING ---
+  // === 17. PROVOCATIVE CLOSING (FULL) ===
   const conversaSection = getSection<{ 
     paragraphs?: string[]; 
     next_step?: { action: string; why?: string };
@@ -630,11 +942,11 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   if (conversaSection) {
     addSectionTitle(t.closing, PRIMARY);
     
-    // New structure
+    // New structure - FULL content
     if (conversaSection.who_you_are) {
-      checkPageBreak(18);
+      checkPageBreak(25);
       doc.setFillColor(GREEN.r, GREEN.g, GREEN.b);
-      doc.rect(margin, currentY, 2, 14, "F");
+      doc.rect(margin, currentY, 2, 18, "F");
       doc.setTextColor(GREEN.r, GREEN.g, GREEN.b);
       doc.setFontSize(8);
       doc.setFont("helvetica", "bold");
@@ -642,15 +954,21 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
       doc.setTextColor(60, 60, 60);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
+      // FULL content - no slice
       const lines = doc.splitTextToSize(conversaSection.who_you_are, contentWidth - 10);
-      doc.text(lines.slice(0, 2), margin + 6, currentY + 8);
-      currentY += 18;
+      let lineY = currentY + 8;
+      for (const line of lines) {
+        checkPageBreak(4);
+        doc.text(line, margin + 6, lineY);
+        lineY += 4;
+      }
+      currentY = lineY + 4;
     }
     
     if (conversaSection.risk_of_not_living) {
-      checkPageBreak(18);
+      checkPageBreak(25);
       doc.setFillColor(AMBER.r, AMBER.g, AMBER.b);
-      doc.rect(margin, currentY, 2, 14, "F");
+      doc.rect(margin, currentY, 2, 18, "F");
       doc.setTextColor(AMBER.r, AMBER.g, AMBER.b);
       doc.setFontSize(8);
       doc.setFont("helvetica", "bold");
@@ -658,47 +976,77 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
       doc.setTextColor(60, 60, 60);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
+      // FULL content - no slice
       const lines = doc.splitTextToSize(conversaSection.risk_of_not_living, contentWidth - 10);
-      doc.text(lines.slice(0, 2), margin + 6, currentY + 8);
-      currentY += 18;
+      let lineY = currentY + 8;
+      for (const line of lines) {
+        checkPageBreak(4);
+        doc.text(line, margin + 6, lineY);
+        lineY += 4;
+      }
+      currentY = lineY + 4;
     }
     
     if (conversaSection.invitation) {
-      checkPageBreak(22);
+      checkPageBreak(30);
       doc.setFillColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
-      doc.roundedRect(margin, currentY, contentWidth, 18, 2, 2, "F");
+      const invLines = doc.splitTextToSize(conversaSection.invitation, contentWidth - 12);
+      const boxHeight = Math.max(20, invLines.length * 4 + 12);
+      doc.roundedRect(margin, currentY, contentWidth, boxHeight, 2, 2, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(8);
       doc.setFont("helvetica", "bold");
       doc.text(`→ ${t.theInvitation.toUpperCase()}`, margin + 5, currentY + 5);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
-      const lines = doc.splitTextToSize(conversaSection.invitation, contentWidth - 12);
-      doc.text(lines.slice(0, 2), margin + 5, currentY + 11);
-      currentY += 22;
+      // FULL content - no slice
+      let invY = currentY + 11;
+      for (const line of invLines) {
+        doc.text(line, margin + 5, invY);
+        invY += 4;
+      }
+      currentY += boxHeight + 4;
     }
     
-    // Fallback paragraphs
+    // Fallback paragraphs - ALL paragraphs
     if (!conversaSection.who_you_are && conversaSection.paragraphs) {
-      for (const p of conversaSection.paragraphs.slice(0, 3)) {
+      for (const p of conversaSection.paragraphs) {
         addText(p);
       }
     }
     
-    // Next Step
+    // === 18. NEXT STEP (FULL) ===
     if (conversaSection.next_step) {
-      checkPageBreak(20);
+      checkPageBreak(30);
       currentY += 4;
+      const actionLines = doc.splitTextToSize(conversaSection.next_step.action, contentWidth - 12);
+      const whyLines = conversaSection.next_step.why ? doc.splitTextToSize(conversaSection.next_step.why, contentWidth - 12) : [];
+      const boxHeight = Math.max(20, (actionLines.length + whyLines.length) * 4 + 14);
+      
       doc.setFillColor(TEAL.r, TEAL.g, TEAL.b);
-      doc.roundedRect(margin, currentY, contentWidth, 16, 2, 2, "F");
+      doc.roundedRect(margin, currentY, contentWidth, boxHeight, 2, 2, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
       doc.text(t.nextStep, margin + 5, currentY + 5);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
-      const actionLines = doc.splitTextToSize(conversaSection.next_step.action, contentWidth - 12);
-      doc.text(actionLines.slice(0, 2), margin + 5, currentY + 11);
+      // FULL action
+      let actionY = currentY + 11;
+      for (const line of actionLines) {
+        doc.text(line, margin + 5, actionY);
+        actionY += 4;
+      }
+      // FULL why
+      if (whyLines.length > 0) {
+        actionY += 2;
+        doc.setFontSize(7);
+        doc.setTextColor(200, 255, 255);
+        for (const line of whyLines) {
+          doc.text(line, margin + 5, actionY);
+          actionY += 3;
+        }
+      }
     }
   }
 
