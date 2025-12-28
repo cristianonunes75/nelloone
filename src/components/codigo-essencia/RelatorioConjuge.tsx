@@ -19,8 +19,10 @@ import {
   HelpCircle,
   Ban,
   Sparkles,
+  Mail,
 } from "lucide-react";
 import { toast } from "sonner";
+import { generateRelatorioConjugePDF, generateRelatorioConjugePDFBase64 } from "@/lib/pdfRelatorioConjuge";
 
 interface RelatorioConjugeProps {
   language: 'pt' | 'pt-pt' | 'en';
@@ -140,14 +142,16 @@ const SECTION_ICONS: Record<string, React.ReactNode> = {
 };
 
 export const RelatorioConjuge = ({ language, hasSavedCodigo }: RelatorioConjugeProps) => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [isGenerating, setIsGenerating] = useState(false);
   const [report, setReport] = useState<any>(null);
   const [spouseName, setSpouseName] = useState("");
   const [linkCopied, setLinkCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   const t = TRANSLATIONS[language];
+  const userName = profile?.full_name || (language === 'en' ? "User" : "Usuário");
 
   // Load existing report
   useEffect(() => {
@@ -206,12 +210,87 @@ export const RelatorioConjuge = ({ language, hasSavedCodigo }: RelatorioConjugeP
   const handleCopyLink = () => {
     if (!report?.public_token) return;
     
-    const link = `${window.location.origin}/relatorio-conjuge/${report.public_token}`;
+    const basePath = language === 'en' ? '/en/spouse-report' : language === 'pt-pt' ? '/pt-pt/relatorio-conjuge' : '/relatorio-conjuge';
+    const link = `${window.location.origin}${basePath}/${report.public_token}`;
     navigator.clipboard.writeText(link);
     setLinkCopied(true);
     toast.success(t.linkCopied);
     
     setTimeout(() => setLinkCopied(false), 3000);
+  };
+
+  const handleDownloadPDF = () => {
+    if (!report?.content) return;
+    
+    try {
+      const content = report.content;
+      generateRelatorioConjugePDF({
+        userName,
+        spouseName: spouseName || undefined,
+        language,
+        content: {
+          abertura: content.abertura_etica,
+          quemTentaSer: content.quem_ele_tenta_ser?.conteudo,
+          comoAma: content.como_ama_em_paz?.conteudo,
+          comoErra: content.como_erra_sob_pressao?.conteudo,
+          oQueMachuca: content.o_que_mais_machuca?.conteudo,
+          compromissos: content.compromissos_de_mudanca?.compromissos,
+          comoAjudar: content.como_voce_pode_ajudar?.conteudo,
+          naoAceitar: content.o_que_nao_deve_aceitar?.conteudo,
+          perguntas: content.perguntas_para_conversa?.perguntas,
+          fechamento: content.fechamento?.conteudo,
+        }
+      });
+      toast.success(language === 'en' ? 'PDF downloaded!' : 'PDF baixado!');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error(language === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+    }
+  };
+
+  const handleSendEmail = async () => {
+    if (!user?.email || !report?.content) return;
+    
+    setIsSendingEmail(true);
+    try {
+      const content = report.content;
+      const pdfBase64 = generateRelatorioConjugePDFBase64({
+        userName,
+        spouseName: spouseName || undefined,
+        language,
+        content: {
+          abertura: content.abertura_etica,
+          quemTentaSer: content.quem_ele_tenta_ser?.conteudo,
+          comoAma: content.como_ama_em_paz?.conteudo,
+          comoErra: content.como_erra_sob_pressao?.conteudo,
+          oQueMachuca: content.o_que_mais_machuca?.conteudo,
+          compromissos: content.compromissos_de_mudanca?.compromissos,
+          comoAjudar: content.como_voce_pode_ajudar?.conteudo,
+          naoAceitar: content.o_que_nao_deve_aceitar?.conteudo,
+          perguntas: content.perguntas_para_conversa?.perguntas,
+          fechamento: content.fechamento?.conteudo,
+        }
+      });
+
+      const { error } = await supabase.functions.invoke('send-pdf-email', {
+        body: {
+          to: user.email,
+          name: userName,
+          testName: language === 'en' ? 'Spouse Report' : 'Relatório para o Cônjuge',
+          testType: 'relatorio_conjuge',
+          pdfBase64,
+          language
+        }
+      });
+
+      if (error) throw error;
+      toast.success(language === 'en' ? 'PDF sent to your email!' : 'PDF enviado para seu email!');
+    } catch (error) {
+      console.error('Error sending email:', error);
+      toast.error(language === 'en' ? 'Error sending email' : 'Erro ao enviar email');
+    } finally {
+      setIsSendingEmail(false);
+    }
   };
 
   const renderContent = (content: any) => {
@@ -330,7 +409,7 @@ export const RelatorioConjuge = ({ language, hasSavedCodigo }: RelatorioConjugeP
               <Link className="w-4 h-4" />
               {t.shareTitle}
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -339,6 +418,25 @@ export const RelatorioConjuge = ({ language, hasSavedCodigo }: RelatorioConjugeP
               >
                 {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 {linkCopied ? t.linkCopied : t.copyLink}
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleDownloadPDF}
+                className="gap-1"
+              >
+                <Download className="w-4 h-4" />
+                {t.downloadPdf}
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleSendEmail}
+                disabled={isSendingEmail}
+                className="gap-1"
+              >
+                {isSendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                Email
               </Button>
               <span className="text-xs text-muted-foreground">{t.linkExpires}</span>
             </div>

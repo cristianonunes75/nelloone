@@ -34,6 +34,7 @@ import Fundadores from "./pages/Fundadores";
 import FundadorFeedback from "./pages/FundadorFeedback";
 import DiagnosticoPDF from "./pages/DiagnosticoPDF";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
+import RelatorioConjugePublico from "./pages/RelatorioConjugePublico";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,11 @@ const AppRoutes = () => (
     <Route path="/" element={<Landing />} />
     <Route path="/auth" element={<Auth />} />
     <Route path="/fundadores" element={<Fundadores />} />
+    
+    {/* Public spouse report route */}
+    <Route path="/relatorio-conjuge/:token" element={<RelatorioConjugePublico />} />
+    <Route path="/en/spouse-report/:token" element={<RelatorioConjugePublico />} />
+    <Route path="/pt-pt/relatorio-conjuge/:token" element={<RelatorioConjugePublico />} />
     
     {/* Checkout success - verifies payment server-side */}
     <Route path="/checkout/success" element={<CheckoutSuccess />} />
