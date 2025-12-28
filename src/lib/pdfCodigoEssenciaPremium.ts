@@ -36,7 +36,9 @@ const TRANSLATIONS = {
     brand: "NELLO ONE",
     methodBadge: "MÉTODO NELLO ONE™",
     tagline: "Isso não é um teste. É um código que você vai viver.",
-    promise: "Este documento revela quem você realmente é — não quem você tenta ser. Use-o para tomar decisões melhores, construir relacionamentos mais honestos e viver com mais clareza.",
+    promiseLine1: "Este documento traz uma leitura profunda sobre seus padrões, forças e riscos, com base nos testes que você respondeu.",
+    promiseLine2: "Use este material como um espelho para refletir, tomar decisões melhores, construir relacionamentos mais honestos e viver com mais clareza.",
+    promiseLine3: "Este não é um diagnóstico, nem define quem você é. É um convite à consciência, ao desenvolvimento e à melhoria contínua.",
     warning: "Aviso: O que você está prestes a ler pode incomodar. Verdade costuma fazer isso.",
     pillar1: "Precisão · 7 testes integrados",
     pillar2: "Confronto · Verdades que libertam",
@@ -125,7 +127,9 @@ const TRANSLATIONS = {
     brand: "NELLO ONE",
     methodBadge: "MÉTODO NELLO ONE™",
     tagline: "Isto não é um teste. É um código que vais viver.",
-    promise: "Este documento revela quem tu realmente és — não quem tu tentas ser. Usa-o para tomar decisões melhores, construir relacionamentos mais honestos e viver com mais clareza.",
+    promiseLine1: "Este documento traz uma leitura profunda sobre os teus padrões, forças e riscos, com base nos testes que respondeste.",
+    promiseLine2: "Usa este material como um espelho para refletir, tomar decisões melhores, construir relacionamentos mais honestos e viver com mais clareza.",
+    promiseLine3: "Este não é um diagnóstico, nem define quem tu és. É um convite à consciência, ao desenvolvimento e à melhoria contínua.",
     warning: "Aviso: O que estás prestes a ler pode incomodar. A verdade costuma fazer isso.",
     pillar1: "Precisão · 7 testes integrados",
     pillar2: "Confronto · Verdades que libertam",
@@ -214,7 +218,9 @@ const TRANSLATIONS = {
     brand: "NELLO ONE",
     methodBadge: "NELLO ONE™ METHOD",
     tagline: "This is not a test. It's a code you will live.",
-    promise: "This document reveals who you really are — not who you try to be. Use it to make better decisions, build more honest relationships, and live with greater clarity.",
+    promiseLine1: "This document offers a deep reading of your patterns, strengths and risks, based on the tests you completed.",
+    promiseLine2: "Use this material as a mirror to reflect, make better decisions, build more honest relationships, and live with greater clarity.",
+    promiseLine3: "This is not a diagnosis, nor does it define who you are. It's an invitation to awareness, development, and continuous improvement.",
     warning: "Warning: What you're about to read may be uncomfortable. Truth often is.",
     pillar1: "Precision · 7 integrated tests",
     pillar2: "Confrontation · Truths that free",
@@ -516,13 +522,28 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   // Promise box
   doc.setFillColor(255, 255, 255);
   doc.setDrawColor(220, 215, 200);
-  doc.roundedRect(margin + 10, 140, contentWidth - 20, 35, 3, 3, "FD");
+  doc.roundedRect(margin + 10, 140, contentWidth - 20, 50, 3, 3, "FD");
   doc.setTextColor(70, 65, 55);
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
-  const promiseLines = doc.splitTextToSize(t.promise, contentWidth - 30);
-  let promiseY = 152;
-  for (const line of promiseLines) {
+  
+  let promiseY = 148;
+  const line1 = doc.splitTextToSize(t.promiseLine1, contentWidth - 30);
+  for (const line of line1) {
+    doc.text(line, pageWidth / 2, promiseY, { align: "center" });
+    promiseY += 5;
+  }
+  promiseY += 2;
+  const line2 = doc.splitTextToSize(t.promiseLine2, contentWidth - 30);
+  for (const line of line2) {
+    doc.text(line, pageWidth / 2, promiseY, { align: "center" });
+    promiseY += 5;
+  }
+  promiseY += 2;
+  doc.setFont("helvetica", "italic");
+  doc.setTextColor(100, 95, 85);
+  const line3 = doc.splitTextToSize(t.promiseLine3, contentWidth - 30);
+  for (const line of line3) {
     doc.text(line, pageWidth / 2, promiseY, { align: "center" });
     promiseY += 5;
   }
