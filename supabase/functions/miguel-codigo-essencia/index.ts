@@ -118,20 +118,43 @@ Sempre que mencionar:
 ❌ NÃO deixar blocos técnicos sem interpretação emocional.
 
 ═══════════════════════════════════════════
-✂️ REGRA DO ENXUGAMENTO (20-30% MENOR)
+✂️ REGRA DO ENXUGAMENTO EXTREMO (40-50% MENOR)
 ═══════════════════════════════════════════
 
-Audite CADA parágrafo:
-"Isso adiciona algo NOVO ou só reforça o que já foi dito?"
+🚨 REGRA ABSOLUTA: Todo texto DEVE passar no filtro:
+"Isso gera INSIGHT NOVO, DECISÃO ou INCÔMODO PRODUTIVO?"
 
-Se for reforço → CORTAR ou FUNDIR
+Se NÃO gera nenhum dos 3 → CORTAR IMEDIATAMENTE
 
-Objetivo: relatório 20-30% mais curto que o padrão, mantendo ou aumentando o impacto.
+ANTES de escrever qualquer parágrafo, pergunte:
+1. Isso revela algo que o leitor não sabia sobre si mesmo? (insight)
+2. Isso leva a uma escolha concreta? (decisão)
+3. Isso incomoda de forma que liberta? (incômodo produtivo)
 
-- Máximo 3 linhas por parágrafo
-- Frases de IMPACTO que causam "nossa, sou eu"
-- Use bullets e negritos
-- Sem rodeios: vá direto ao ponto
+Se a resposta for NÃO para os 3 → NÃO ESCREVA
+
+❌ CORTAR IMPIEDOSAMENTE:
+- Explicações óbvias
+- Contextualizações desnecessárias
+- Frases que "preparam" o leitor
+- Parágrafos introdutórios
+- Repetições disfarçadas de "reforço"
+- Adjetivos decorativos
+- Frases que só "soam bonitas"
+
+✅ MANTER APENAS:
+- Frases que causam "nossa, sou eu" (insight)
+- Frases que exigem ação (decisão)
+- Frases que doem mas libertam (incômodo)
+
+FORMATO OBRIGATÓRIO:
+- Máximo 2 linhas por parágrafo
+- Frases curtas e diretas
+- Zero rodeios
+- Vá direto ao ponto mais doloroso/revelador
+- Bullets sempre que possível
+
+TESTE FINAL: Se o leitor pode "pular" um trecho sem perder nada → esse trecho não deveria existir.
 
 ═══════════════════════════════════════════
 🎭 MÉTODO NELLO (RITUAIS PRÓPRIOS)
@@ -320,25 +343,40 @@ MANDATORY CONTEXTS (use varied):
 - moment of forced solitude or reflection
 
 ═══════════════════════════════════════════
+✂️ EXTREME TRIMMING RULE (40-50% SHORTER)
+═══════════════════════════════════════════
+
+🚨 ABSOLUTE RULE: All text MUST pass this filter:
+"Does this generate NEW INSIGHT, DECISION, or PRODUCTIVE DISCOMFORT?"
+
+If it generates NONE of the 3 → CUT IMMEDIATELY
+
+❌ CUT RUTHLESSLY:
+- Obvious explanations
+- Unnecessary contextualizations
+- Sentences that "prepare" the reader
+- Introductory paragraphs
+- Repetitions disguised as "reinforcement"
+- Decorative adjectives
+- Sentences that just "sound nice"
+
+✅ KEEP ONLY:
+- Phrases that cause "wow, that's me" (insight)
+- Phrases that demand action (decision)
+- Phrases that hurt but liberate (productive discomfort)
+
+FORMAT: Maximum 2 lines per paragraph. Short sentences. Zero preambles.
+
+═══════════════════════════════════════════
 🎭 NELLO METHOD (PROPRIETARY RITUALS)
 ═══════════════════════════════════════════
 
-Transform ALL generic advice into rituals with PROPRIETARY NAME:
-
-❌ Instead of: "delegate more"
-✅ Create: "Imperfect Delegation Ritual"
-
-❌ Instead of: "practice active listening"
-✅ Create: "5-Minute Presence Challenge"
-
-❌ Instead of: "set time to reflect"
-✅ Create: "Silent General's Journal"
+Transform ALL generic advice into rituals with PROPRIETARY NAME.
 
 EVERY exercise/ritual MUST have:
 - Memorable proprietary name
 - Clear duration (5min, 7 days, 1x per week)
 - Direct objective
-- Explicit connection to profile
 
 ═══════════════════════════════════════════
 💔 REAL PAIN RULE (3 POINTS MINIMUM)
@@ -459,19 +497,38 @@ CONTEXTOS OBRIGATÓRIOS (usa variados):
 - conflito familiar ou com parceiro(a)
 
 ═══════════════════════════════════════════
+✂️ REGRA DO ENXUGAMENTO EXTREMO (40-50% MENOR)
+═══════════════════════════════════════════
+
+🚨 REGRA ABSOLUTA: Todo texto DEVE passar no filtro:
+"Isto gera INSIGHT NOVO, DECISÃO ou INCÓMODO PRODUTIVO?"
+
+Se NÃO gera nenhum dos 3 → CORTAR IMEDIATAMENTE
+
+❌ CORTAR IMPIEDOSAMENTE:
+- Explicações óbvias
+- Contextualizações desnecessárias
+- Frases que "preparam" o leitor
+- Parágrafos introdutórios
+- Repetições disfarçadas de "reforço"
+
+✅ MANTER APENAS:
+- Frases que causam "nossa, sou eu" (insight)
+- Frases que exigem ação (decisão)
+- Frases que doem mas libertam (incómodo)
+
+FORMATO: Máximo 2 linhas por parágrafo. Frases curtas. Zero rodeios.
+
+═══════════════════════════════════════════
 🎭 MÉTODO NELLO (RITUAIS PRÓPRIOS)
 ═══════════════════════════════════════════
 
-Transforma TODOS os conselhos genéricos em rituais com NOME PRÓPRIO:
-
-❌ Em vez de: "delega mais"
-✅ Criar: "Ritual da Delegação Imperfeita"
+Transforma TODOS os conselhos genéricos em rituais com NOME PRÓPRIO.
 
 TODO exercício/ritual DEVE ter:
 - Nome próprio memorável
 - Duração clara
 - Objetivo direto
-- Conexão explícita com o perfil
 
 ═══════════════════════════════════════════
 💔 REGRA DA DOR REAL (3 PONTOS MÍNIMOS)
