@@ -70,6 +70,7 @@ import {
   ProfileRarityBadge,
   CentralTruths,
   ProvocativeClosing,
+  ExecutiveSummary,
 } from "@/components/codigo-essencia";
 
 // LangKey now imported from codigoEssenciaFallbacks
@@ -443,6 +444,7 @@ const CodigoEssenciaInner = () => {
   const pazPressaoSection = generatedSections.find(s => s.id === 'paz_pressao');
   const raridadeSection = generatedSections.find(s => s.id === 'raridade_perfil');
   const tresVerdadesSection = generatedSections.find(s => s.id === 'tres_verdades_centrais');
+  const resumoExecutivoSection = generatedSections.find(s => s.id === 'resumo_executivo');
 
   // Fallback: extract archetypes from testResults if AI section doesn't have them
   const arquetiposChamadoSection = useMemo(() => {
@@ -605,6 +607,22 @@ const CodigoEssenciaInner = () => {
               return null;
             })()}
             
+            {/* === NEW: Executive Summary (Your Code in 1 Page) - FIRST === */}
+            {resumoExecutivoSection && (resumoExecutivoSection.quem_voce_e || resumoExecutivoSection.frase_sintese) && (
+              <>
+                <ExecutiveSummary 
+                  quemVoceE={resumoExecutivoSection.quem_voce_e || ""}
+                  maiorForca={resumoExecutivoSection.maior_forca || ""}
+                  maiorRisco={resumoExecutivoSection.maior_risco || ""}
+                  tensaoCentral={resumoExecutivoSection.tensao_central || ""}
+                  direcao90Dias={resumoExecutivoSection.direcao_90_dias || ""}
+                  fraseSintese={resumoExecutivoSection.frase_sintese || ""}
+                  language={lang}
+                />
+                <SectionDivider variant="wave" />
+              </>
+            )}
+
             {/* === NEW: 3 Central Truths (Hierarchy) === */}
             {tresVerdadesSection?.truths?.length > 0 && (
               <>

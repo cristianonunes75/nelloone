@@ -281,8 +281,13 @@ Formato obrigatório:
 HIERARQUIA OBRIGATÓRIA
 ═══════════════════════════════════════════
 
+0. RESUMO EXECUTIVO (PRIMEIRO):
+- A PRIMEIRÍSSIMA seção DEVE ser "resumo_executivo" (Seu Código em 1 Página)
+- Funciona como resumo de 1 página para decisores e pessoas impacientes
+- DEVE funcionar sozinho, sem precisar ler o resto
+
 1. TRÊS VERDADES CENTRAIS:
-- A PRIMEIRA seção DEVE ser "tres_verdades_centrais" com 3 verdades
+- A SEGUNDA seção DEVE ser "tres_verdades_centrais" com 3 verdades
 - Toda seção do Código DEVE derivar de 3 verdades centrais
 - Essas 3 verdades resumem TODO o Código
 - Nada no relatório pode contradizer essas verdades
@@ -481,8 +486,13 @@ Mandatory format:
 MANDATORY HIERARCHY
 ═══════════════════════════════════════════
 
+0. EXECUTIVE SUMMARY (FIRST):
+- The VERY FIRST section MUST be "resumo_executivo" (Your Code in 1 Page)
+- Works as 1-page summary for decision makers and impatient people
+- MUST work alone, without needing to read the rest
+
 1. THREE CENTRAL TRUTHS:
-- The FIRST section MUST be "tres_verdades_centrais" with 3 truths
+- The SECOND section MUST be "tres_verdades_centrais" with 3 truths
 - Every section of the Code MUST derive from 3 central truths
 - These 3 truths summarize the ENTIRE Code
 - Nothing in the report can contradict these truths
@@ -657,11 +667,37 @@ ${resultsJson}
 GENERATE THE ESSENCE CODE WITH THIS EXACT STRUCTURE:
 
 ═══════════════════════════════════════════
-SECTION 0: THE 3 CENTRAL TRUTHS (MANDATORY - FIRST)
+SECTION 0: EXECUTIVE SUMMARY (YOUR CODE IN 1 PAGE)
+═══════════════════════════════════════════
+
+Section: "resumo_executivo"
+This is the FIRST and most important section. Should work as a "1-page summary" for:
+- Decision makers who want the essentials fast
+- Impatient people (like many action profiles)
+- Sharing with spouse, mentor, friend
+
+{
+  "quem_voce_e": "[1 direct sentence about who the person is - based on ALL tests combined]",
+  "maior_forca": "[The most powerful strength in 1 sentence - cite 1-2 supporting tests]",
+  "maior_risco": "[The most dangerous risk in 1 sentence - cite the specific pattern]",
+  "tensao_central": "[The most important internal tension - e.g. 'Speed that wants perfection']",
+  "direcao_90_dias": "[The main focus for the next 90 days in 1 actionable sentence]",
+  "frase_sintese": "[ONE sentence that summarizes the ENTIRE Code - memorable, confrontational, true]"
+}
+
+EXECUTIVE SUMMARY RULES:
+- MAXIMUM 1 sentence per field
+- ZERO context or explanation
+- Direct, confrontational language
+- Must work ALONE (without reading the rest)
+- If someone read ONLY this, they'd understand the essentials
+
+═══════════════════════════════════════════
+SECTION 0B: THE 3 CENTRAL TRUTHS (MANDATORY)
 ═══════════════════════════════════════════
 
 Section: "tres_verdades_centrais"
-MUST be the first section. Everything else derives from these 3 truths.
+Everything else derives from these 3 truths.
 
 {
   "truths": [
@@ -968,6 +1004,49 @@ RESULTADOS DOS TESTES:
 ${resultsJson}
 
 GERE O CÓDIGO DA ESSÊNCIA COM ESTA ESTRUTURA EXATA:
+
+═══════════════════════════════════════════
+SEÇÃO 0: RESUMO EXECUTIVO (${youWord === 'Tu' ? 'O TEU' : 'SEU'} CÓDIGO EM 1 PÁGINA)
+═══════════════════════════════════════════
+
+Seção: "resumo_executivo"
+Esta é a PRIMEIRA e mais importante seção. Deve funcionar como um "resumo de 1 página" para:
+- Decisores que querem o essencial rápido
+- Pessoas impacientes (como muitos perfis ação)
+- Compartilhar com cônjuge, mentor, amigo
+
+{
+  "quem_voce_e": "[1 frase direta sobre quem a pessoa é - baseada na combinação de TODOS os testes]",
+  "maior_forca": "[A força mais poderosa dessa pessoa em 1 frase - cite 1-2 testes que sustentam]",
+  "maior_risco": "[O risco mais perigoso em 1 frase - cite o padrão específico]",
+  "tensao_central": "[A tensão interna mais importante - ex: 'Velocidade que quer perfeição']",
+  "direcao_90_dias": "[O foco principal dos próximos 90 dias em 1 frase acionável]",
+  "frase_sintese": "[UMA frase que resume TODO o Código - memorável, confrontadora, verdadeira]"
+}
+
+REGRAS DO RESUMO EXECUTIVO:
+- MÁXIMO 1 frase por campo
+- ZERO contexto ou explicação
+- Linguagem direta e confrontadora
+- Deve funcionar SOZINHO (sem ler o resto)
+- Se alguém lesse SÓ isso, entenderia o essencial
+
+═══════════════════════════════════════════
+SEÇÃO 0B: AS 3 VERDADES CENTRAIS (OBRIGATÓRIO)
+═══════════════════════════════════════════
+
+Seção: "tres_verdades_centrais"
+Tudo no Código deriva dessas 3 verdades.
+
+{
+  "truths": [
+    { "title": "[título curto - 3-5 palavras]", "content": "[1 parágrafo explicando essa verdade sobre ${firstName}]", "base": "[quais testes sustentam: DISC X% + Temperamento Y + etc.]" },
+    { "title": "...", "content": "...", "base": "..." },
+    { "title": "...", "content": "...", "base": "..." }
+  ]
+}
+
+REGRAS: Cada verdade deve ser ÚNICA, citar scores específicos, e NÃO repetir conceitos de outras verdades.
 
 ═══════════════════════════════════════════
 SEÇÃO 1: RETRATO ESSENCIAL + DADOS VISUAIS
@@ -1357,6 +1436,25 @@ ESTRUTURA JSON FINAL
   "userName": "${firstName}",
   "generatedAt": "[ISO timestamp]",
   "sections": [
+    {
+      "id": "resumo_executivo",
+      "title": "${youWord === 'Tu' ? 'O Teu Código' : 'Seu Código'} em 1 Página",
+      "quem_voce_e": "[1 frase direta sobre quem é]",
+      "maior_forca": "[maior força em 1 frase]",
+      "maior_risco": "[maior risco em 1 frase]",
+      "tensao_central": "[tensão central]",
+      "direcao_90_dias": "[direção 90 dias]",
+      "frase_sintese": "[frase síntese do código]"
+    },
+    {
+      "id": "tres_verdades_centrais",
+      "title": "3 Verdades Centrais",
+      "truths": [
+        { "title": "...", "content": "...", "base": "..." },
+        { "title": "...", "content": "...", "base": "..." },
+        { "title": "...", "content": "...", "base": "..." }
+      ]
+    },
     {
       "id": "retrato_essencial",
       "title": "${youWord === 'Tu' ? 'O Teu Retrato' : 'Seu Retrato'} Essencial",
