@@ -1,4 +1,5 @@
-import { Diamond } from "lucide-react";
+import { Diamond, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 
 interface ProfileRarityBadgeProps {
   percentage?: number;
@@ -7,12 +8,14 @@ interface ProfileRarityBadgeProps {
 }
 
 export const ProfileRarityBadge = ({ percentage, explanation, language = 'pt' }: ProfileRarityBadgeProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   if (!percentage && !explanation) return null;
 
   const labels = {
-    pt: { title: 'Raridade do Perfil', among: 'Entre 100 pessoas' },
-    'pt-pt': { title: 'Raridade do Perfil', among: 'Entre 100 pessoas' },
-    en: { title: 'Profile Rarity', among: 'Among 100 people' },
+    pt: { title: 'Raridade do Perfil', among: 'Entre 100 pessoas', showMore: 'Ver mais', showLess: 'Ver menos' },
+    'pt-pt': { title: 'Raridade do Perfil', among: 'Entre 100 pessoas', showMore: 'Ver mais', showLess: 'Ver menos' },
+    en: { title: 'Profile Rarity', among: 'Among 100 people', showMore: 'Show more', showLess: 'Show less' },
   };
 
   const t = labels[language as keyof typeof labels] || labels.pt;
@@ -32,9 +35,11 @@ export const ProfileRarityBadge = ({ percentage, explanation, language = 'pt' }:
     return language === 'en' ? "Uncommon" : "Incomum";
   };
 
+  const shouldShowToggle = explanation && explanation.length > 120;
+
   return (
-    <div className={`bg-gradient-to-r ${getRarityColor()} border rounded-xl p-3 flex items-center gap-3`}>
-      <div className="w-10 h-10 rounded-full bg-background/50 flex items-center justify-center flex-shrink-0">
+    <div className={`bg-gradient-to-r ${getRarityColor()} border rounded-xl p-3 flex items-start gap-3`}>
+      <div className="w-10 h-10 rounded-full bg-background/50 flex items-center justify-center flex-shrink-0 mt-0.5">
         <Diamond className="w-5 h-5 text-primary" />
       </div>
       <div className="flex-1 min-w-0">
@@ -47,7 +52,29 @@ export const ProfileRarityBadge = ({ percentage, explanation, language = 'pt' }:
           )}
         </div>
         {explanation && (
-          <p className="text-xs text-muted-foreground mt-0.5">{explanation}</p>
+          <div className="mt-1">
+            <p className={`text-xs text-muted-foreground ${!isExpanded && shouldShowToggle ? 'line-clamp-2' : ''}`}>
+              {explanation}
+            </p>
+            {shouldShowToggle && (
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 mt-1 transition-colors"
+              >
+                {isExpanded ? (
+                  <>
+                    <ChevronUp className="w-3 h-3" />
+                    {t.showLess}
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-3 h-3" />
+                    {t.showMore}
+                  </>
+                )}
+              </button>
+            )}
+          </div>
         )}
         {percentage && (
           <p className="text-xs text-muted-foreground mt-0.5">
