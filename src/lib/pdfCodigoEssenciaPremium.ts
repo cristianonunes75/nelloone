@@ -489,85 +489,83 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   doc.setFillColor(GOLD.r, GOLD.g, GOLD.b);
   doc.rect(0, 0, pageWidth, 4, "F");
 
-  // Method Badge (top)
-  doc.setFillColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
-  doc.roundedRect(pageWidth / 2 - 35, 35, 70, 12, 2, 2, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(7);
-  doc.setFont("helvetica", "bold");
-  doc.text(t.methodBadge, pageWidth / 2, 43, { align: "center" });
-
-  // Title
+  // Title - large and bold at top
   doc.setTextColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
-  doc.setFontSize(32);
+  doc.setFontSize(28);
   doc.setFont("helvetica", "bold");
-  doc.text(t.title, pageWidth / 2, 75, { align: "center" });
+  doc.text(t.title, pageWidth / 2, 40, { align: "center" });
 
-  // Tagline
-  doc.setFontSize(11);
+  // Tagline in quotes
+  doc.setFontSize(10);
   doc.setFont("helvetica", "italic");
   doc.setTextColor(100, 90, 75);
-  doc.text(`"${t.tagline}"`, pageWidth / 2, 90, { align: "center" });
+  doc.text(`"${t.tagline}"`, pageWidth / 2, 55, { align: "center" });
 
-  // Name card
+  // Name card - centered with border
   doc.setFillColor(255, 255, 255);
-  doc.setDrawColor(230, 224, 212);
+  doc.setDrawColor(200, 195, 185);
   doc.setLineWidth(0.5);
-  doc.roundedRect(pageWidth / 2 - 45, 105, 90, 20, 3, 3, "FD");
+  doc.roundedRect(pageWidth / 2 - 50, 70, 100, 22, 3, 3, "FD");
   doc.setTextColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
-  doc.text(userName, pageWidth / 2, 118, { align: "center" });
+  doc.text(userName, pageWidth / 2, 84, { align: "center" });
 
-  // Promise box
-  doc.setFillColor(255, 255, 255);
+  // Promise box - with proper spacing for 3 paragraphs
+  const promiseBoxY = 105;
+  const promiseBoxHeight = 70;
+  doc.setFillColor(252, 251, 249);
   doc.setDrawColor(220, 215, 200);
-  doc.roundedRect(margin + 10, 140, contentWidth - 20, 50, 3, 3, "FD");
-  doc.setTextColor(70, 65, 55);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(margin + 5, promiseBoxY, contentWidth - 10, promiseBoxHeight, 4, 4, "FD");
+  
+  // First paragraph
+  doc.setTextColor(60, 55, 50);
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
-  
-  let promiseY = 148;
-  const line1 = doc.splitTextToSize(t.promiseLine1, contentWidth - 30);
+  const line1Text = t.promiseLine1.replace("{name}", userName.split(" ")[0]);
+  const line1 = doc.splitTextToSize(line1Text, contentWidth - 25);
+  let textY = promiseBoxY + 12;
   for (const line of line1) {
-    doc.text(line, pageWidth / 2, promiseY, { align: "center" });
-    promiseY += 5;
+    doc.text(line, pageWidth / 2, textY, { align: "center" });
+    textY += 5;
   }
-  promiseY += 2;
-  const line2 = doc.splitTextToSize(t.promiseLine2, contentWidth - 30);
+  
+  // Second paragraph
+  textY += 4;
+  const line2 = doc.splitTextToSize(t.promiseLine2, contentWidth - 25);
   for (const line of line2) {
-    doc.text(line, pageWidth / 2, promiseY, { align: "center" });
-    promiseY += 5;
+    doc.text(line, pageWidth / 2, textY, { align: "center" });
+    textY += 5;
   }
-  promiseY += 2;
+  
+  // Third paragraph - italic and lighter
+  textY += 4;
   doc.setFont("helvetica", "italic");
-  doc.setTextColor(100, 95, 85);
-  const line3 = doc.splitTextToSize(t.promiseLine3, contentWidth - 30);
+  doc.setTextColor(90, 85, 80);
+  const line3 = doc.splitTextToSize(t.promiseLine3, contentWidth - 25);
   for (const line of line3) {
-    doc.text(line, pageWidth / 2, promiseY, { align: "center" });
-    promiseY += 5;
+    doc.text(line, pageWidth / 2, textY, { align: "center" });
+    textY += 5;
   }
 
-  // Warning
+  // Warning - amber colored
   doc.setTextColor(AMBER.r, AMBER.g, AMBER.b);
   doc.setFontSize(8);
   doc.setFont("helvetica", "bold");
-  doc.text(t.warning, pageWidth / 2, 190, { align: "center" });
+  doc.text(t.warning, pageWidth / 2, promiseBoxY + promiseBoxHeight + 15, { align: "center" });
 
-  // Three Pillars
-  const pillarY = 210;
+  // Three Pillars - spaced evenly at bottom of content area
+  const pillarY = 215;
   const pillars = [t.pillar1, t.pillar2, t.pillar3];
-  const icons = ["🎯", "🔥", "🗺️"];
-  const pillarWidth = (contentWidth - 10) / 3;
+  const pillarWidth = contentWidth / 3;
   
   for (let i = 0; i < 3; i++) {
-    const pillarX = margin + 5 + i * pillarWidth + pillarWidth / 2;
-    doc.setFontSize(14);
-    doc.text(icons[i], pillarX, pillarY, { align: "center" });
+    const pillarX = margin + i * pillarWidth + pillarWidth / 2;
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(80, 75, 65);
-    doc.text(pillars[i], pillarX, pillarY + 8, { align: "center" });
+    doc.text(pillars[i], pillarX, pillarY, { align: "center" });
   }
 
   // Footer brand
