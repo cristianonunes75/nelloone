@@ -119,61 +119,81 @@ Para CADA seção, pergunte:
 3. O leitor vai ter um "ah, isso sou eu" novo? → SE NÃO, CORTAR
 
 ═══════════════════════════════════════════
-🎯 REGRA DA CONCRETUDE (EXEMPLOS VARIADOS)
+🎯 REGRA DA CONCRETUDE (EXEMPLOS DE VIDA REAL)
 ═══════════════════════════════════════════
 
-Para CADA insight, inclua exemplos de DIFERENTES ÁREAS DA VIDA.
+🚨 REGRA ABSOLUTA: MÁXIMO 40% DOS EXEMPLOS PODEM SER PROFISSIONAIS!
 
-📋 BANCO DE CONTEXTOS (use no mínimo 1 de cada categoria):
+O relatório NÃO PODE parecer um feedback de performance corporativa.
+Deve parecer um espelho de TODA a vida da pessoa.
 
-TRABALHO/CARREIRA:
-- reunião onde alguém discorda da sua ideia
-- feedback negativo de um superior
-- deadline apertado com recursos limitados
+📋 BANCO DE CONTEXTOS OBRIGATÓRIO:
 
-FAMÍLIA/FILHOS:
-- filho que não obedece na primeira vez
-- decisão sobre escola/educação dos filhos
-- momento de birra ou desobediência
-- conversa difícil sobre limites com adolescente
+1. FAMÍLIA/FILHOS (mínimo 4 exemplos no relatório):
+   - Filho que não obedece na primeira vez
+   - Decisão sobre escola/educação dos filhos
+   - Momento de birra ou desobediência
+   - Conversa difícil sobre limites com adolescente
+   - Quando o filho quer só "ficar junto" e você está impaciente
+   - Presença real vs. presença física com a mente no trabalho
 
-CÔNJUGE/PARCEIRO(A):
-- discussão sobre dinheiro ou prioridades
-- parceiro(a) que pede mais tempo junto
-- decisão conjunta onde vocês discordam
-- momento íntimo onde você está "ausente"
+2. CÔNJUGE/PARCEIRO(A) (mínimo 3 exemplos no relatório):
+   - Discussão sobre dinheiro ou prioridades
+   - Parceiro(a) que pede mais tempo junto
+   - Decisão conjunta onde vocês discordam
+   - Momento íntimo onde você está "ausente"
+   - Quando seu parceiro(a) quer só conversar sem resolver nada
 
-AMIZADES/SOCIAL:
-- amigo que cancela planos em cima da hora
-- grupo social onde você não tem controle
-- pedido de ajuda que você não quer atender
+3. DESCANSO/LAZER (mínimo 2 exemplos no relatório):
+   - Férias que você não consegue curtir
+   - Fim de semana "vazio" sem agenda
+   - Hobby que você abandonou por "falta de tempo"
+   - Dificuldade de fazer nada sem se sentir improdutivo
+   - Culpa por descansar quando "poderia estar produzindo"
 
-DECISÕES PESSOAIS:
-- escolha entre duas opções boas
-- gastar dinheiro consigo mesmo
-- dizer "não" para algo que você quer
+4. FÉ/ESPIRITUALIDADE (mínimo 2 exemplos no relatório):
+   - Momento de oração ou meditação interrompido por pensamentos
+   - Culpa por não praticar o que acredita
+   - Dúvida sobre propósito ou sentido
+   - Quando o silêncio parece perda de tempo
+   - Fé vivida na correria vs. fé contemplativa
 
-DESCANSO/LAZER:
-- férias que você não consegue curtir
-- fim de semana "vazio" sem agenda
-- hobby que você abandonou por "falta de tempo"
+5. DECISÕES PESSOAIS (mínimo 2 exemplos no relatório):
+   - Escolha entre duas opções boas
+   - Gastar dinheiro consigo mesmo
+   - Dizer "não" para algo que você quer
+   - Pedir ajuda a alguém
 
-FÉ/ESPIRITUALIDADE:
-- momento de oração ou meditação interrompido por pensamentos
-- culpa por não praticar o que acredita
-- dúvida sobre propósito ou sentido
+6. AMIZADES/SOCIAL (mínimo 1 exemplo no relatório):
+   - Amigo que cancela planos em cima da hora
+   - Grupo social onde você não tem controle
+   - Pedido de ajuda que você não quer atender
 
-SAÚDE:
-- exame médico que você adia
-- sintoma físico que você ignora
-- exercício que você "não tem tempo"
+7. SAÚDE (mínimo 1 exemplo no relatório):
+   - Exame médico que você adia
+   - Sintoma físico que você ignora
+   - Exercício que você "não tem tempo"
 
-❌ PROIBIDO usar termos vagos:
-- "em projetos" / "em ambientes" / "em desafios" / "em situações"
+8. TRABALHO/CARREIRA (máximo 40% dos exemplos totais):
+   - Reunião onde alguém discorda da sua ideia
+   - Feedback negativo de um superior
+   - Deadline apertado com recursos limitados
 
-✅ OBRIGATÓRIO:
-- Cada seção deve ter exemplos de pelo menos 2 CATEGORIAS DIFERENTES
-- O relatório inteiro deve cobrir TODAS as 8 categorias acima
+❌ PROIBIDO:
+- Usar termos vagos: "em projetos" / "em ambientes" / "em desafios"
+- Concentrar exemplos em liderança, equipes, resultados, metas
+- Fazer o relatório parecer avaliação de desempenho corporativa
+
+✅ VERIFICAÇÃO OBRIGATÓRIA ANTES DE GERAR:
+Conte os exemplos por categoria:
+- FAMÍLIA/FILHOS: precisa ter ≥4
+- CÔNJUGE: precisa ter ≥3
+- DESCANSO: precisa ter ≥2
+- FÉ: precisa ter ≥2
+- DECISÕES PESSOAIS: precisa ter ≥2
+- AMIZADES: precisa ter ≥1
+- SAÚDE: precisa ter ≥1
+- TRABALHO: não pode exceder 40% do total
 
 ═══════════════════════════════════════════
 🔄 REGRA DA TRADUÇÃO HUMANA
@@ -413,31 +433,81 @@ EACH SECTION MUST:
 - "In spirituality, the risk is [DIFFERENT MANIFESTATION]"
 
 ═══════════════════════════════════════════
-🎯 CONCRETENESS RULE (VARIED EXAMPLES)
+🎯 CONCRETENESS RULE (REAL LIFE EXAMPLES)
 ═══════════════════════════════════════════
 
-For EACH insight, include examples from DIFFERENT LIFE AREAS.
+🚨 ABSOLUTE RULE: MAXIMUM 40% OF EXAMPLES CAN BE WORK-RELATED!
 
-📋 CONTEXT BANK (use at least 1 from each category):
+The report CANNOT read like a corporate performance review.
+It must mirror the person's WHOLE life.
 
-WORK/CAREER: meeting disagreements, negative feedback, tight deadlines
+📋 MANDATORY CONTEXT BANK:
 
-FAMILY/CHILDREN: child disobedience, education decisions, teen boundaries
+1. FAMILY/CHILDREN (minimum 4 examples in report):
+   - Child who doesn't obey the first time
+   - School/education decisions for children
+   - Tantrum or disobedience moments
+   - Difficult conversation about limits with teenager
+   - When your child just wants to "be together" and you're impatient
+   - Being physically present but mentally at work
 
-SPOUSE/PARTNER: money discussions, requests for more time, intimate moments
+2. SPOUSE/PARTNER (minimum 3 examples in report):
+   - Discussion about money or priorities
+   - Partner asking for more time together
+   - Joint decision where you disagree
+   - Intimate moment where you're "absent"
+   - When your partner wants to just talk without solving anything
 
-FRIENDSHIPS: canceled plans, social situations without control
+3. REST/LEISURE (minimum 2 examples in report):
+   - Vacation you can't enjoy
+   - "Empty" weekend with no agenda
+   - Hobby abandoned for "lack of time"
+   - Difficulty doing nothing without feeling unproductive
+   - Guilt for resting when you "could be producing"
 
-PERSONAL DECISIONS: choosing between good options, spending on yourself, saying "no"
+4. FAITH/SPIRITUALITY (minimum 2 examples in report):
+   - Prayer or meditation interrupted by thoughts
+   - Guilt for not practicing what you believe
+   - Doubt about purpose or meaning
+   - When silence feels like wasted time
+   - Faith lived in rush vs. contemplative faith
 
-REST/LEISURE: vacations you can't enjoy, "empty" weekends, abandoned hobbies
+5. PERSONAL DECISIONS (minimum 2 examples in report):
+   - Choosing between two good options
+   - Spending money on yourself
+   - Saying "no" to something you want
+   - Asking someone for help
 
-FAITH/SPIRITUALITY: interrupted prayer, guilt, doubt about purpose
+6. FRIENDSHIPS/SOCIAL (minimum 1 example):
+   - Friend who cancels plans last minute
+   - Social group where you have no control
+   - Request for help you don't want to fulfill
 
-HEALTH: postponed exams, ignored symptoms, skipped exercise
+7. HEALTH (minimum 1 example):
+   - Medical exam you keep postponing
+   - Physical symptom you ignore
+   - Exercise you "don't have time" for
 
-✅ MANDATORY: Each section must have examples from at least 2 DIFFERENT CATEGORIES.
-The entire report must cover ALL 8 categories above.
+8. WORK/CAREER (maximum 40% of total examples):
+   - Meeting where someone disagrees with your idea
+   - Negative feedback from a superior
+   - Tight deadline with limited resources
+
+❌ FORBIDDEN:
+- Vague terms: "in projects" / "in environments" / "in challenges"
+- Concentrating examples on leadership, teams, results, goals
+- Making the report sound like a corporate performance review
+
+✅ MANDATORY CHECK BEFORE GENERATING:
+Count examples by category:
+- FAMILY/CHILDREN: must have ≥4
+- SPOUSE: must have ≥3
+- REST: must have ≥2
+- FAITH: must have ≥2
+- PERSONAL DECISIONS: must have ≥2
+- FRIENDSHIPS: must have ≥1
+- HEALTH: must have ≥1
+- WORK: cannot exceed 40% of total
 
 ═══════════════════════════════════════════
 ✂️ EXTREME TRIMMING RULE (40-50% SHORTER)
@@ -593,21 +663,25 @@ CADA SECÇÃO DEVE:
 3. Trazer ALGO NOVO: consequência, exemplo, situação, risco
 
 ═══════════════════════════════════════════
-🎯 REGRA DA CONCRETUDE (EXEMPLOS VARIADOS)
+🎯 REGRA DA CONCRETUDE (EXEMPLOS DE VIDA REAL)
 ═══════════════════════════════════════════
 
-📋 BANCO DE CONTEXTOS (usa pelo menos 1 de cada categoria):
+🚨 REGRA ABSOLUTA: MÁXIMO 40% DOS EXEMPLOS PODEM SER PROFISSIONAIS!
 
-TRABALHO: reuniões, feedback, deadlines
-FAMÍLIA/FILHOS: desobediência, decisões de educação, limites
-CÔNJUGE: discussões sobre dinheiro, pedidos de tempo, momentos íntimos
-AMIZADES: planos cancelados, situações sem controlo
-DECISÕES PESSOAIS: escolhas difíceis, gastar contigo, dizer "não"
-DESCANSO: férias que não consegues curtir, fins de semana vazios
-FÉ: oração interrompida, culpa, dúvida sobre propósito
-SAÚDE: exames adiados, sintomas ignorados
+O relatório NÃO PODE parecer uma avaliação de performance corporativa.
 
-✅ OBRIGATÓRIO: Cada secção com exemplos de 2+ CATEGORIAS DIFERENTES.
+📋 BANCO DE CONTEXTOS OBRIGATÓRIO:
+
+1. FAMÍLIA/FILHOS (mínimo 4 exemplos): desobediência, educação, birras, presença real vs física
+2. CÔNJUGE (mínimo 3 exemplos): dinheiro, tempo junto, decisões, momentos íntimos
+3. DESCANSO (mínimo 2 exemplos): férias, fins de semana vazios, culpa por descansar
+4. FÉ (mínimo 2 exemplos): oração interrompida, silêncio como perda de tempo, fé na correria
+5. DECISÕES PESSOAIS (mínimo 2 exemplos): escolhas, gastar contigo, pedir ajuda
+6. AMIZADES (mínimo 1 exemplo): planos cancelados, pedidos de ajuda
+7. SAÚDE (mínimo 1 exemplo): exames adiados, sintomas ignorados
+8. TRABALHO (máximo 40%): reuniões, feedback, deadlines
+
+✅ VERIFICAÇÃO: Conta os exemplos por categoria antes de gerar.
 
 ═══════════════════════════════════════════
 ✂️ REGRA DO ENXUGAMENTO EXTREMO (40-50% MENOR)
