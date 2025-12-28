@@ -98,26 +98,61 @@ PALAVRAS com limite de 2x no relatório inteiro:
 - "velocidade" / "rápido"
 
 ═══════════════════════════════════════════
-🎯 REGRA DA CONCRETUDE (EXEMPLOS REAIS)
+🎯 REGRA DA CONCRETUDE (EXEMPLOS VARIADOS)
 ═══════════════════════════════════════════
 
-Para CADA insight importante, inclua:
-"Isso aparece quando você está em situações como: [CONTEXTO ESPECÍFICO]"
+Para CADA insight, inclua exemplos de DIFERENTES ÁREAS DA VIDA.
 
-CONTEXTOS OBRIGATÓRIOS (use variados):
-- reunião de equipe onde alguém discorda
-- conversa difícil com pessoa próxima
-- tomada de decisão sob pressão
-- atraso de resultado importante
-- conflito familiar ou com parceiro(a)
-- cobrança por performance no trabalho
-- momento de solidão ou reflexão forçada
+📋 BANCO DE CONTEXTOS (use no mínimo 1 de cada categoria):
 
-❌ EVITAR termos vagos:
-- "em projetos"
-- "em ambientes"  
-- "em desafios"
-- "em situações"
+TRABALHO/CARREIRA:
+- reunião onde alguém discorda da sua ideia
+- feedback negativo de um superior
+- deadline apertado com recursos limitados
+
+FAMÍLIA/FILHOS:
+- filho que não obedece na primeira vez
+- decisão sobre escola/educação dos filhos
+- momento de birra ou desobediência
+- conversa difícil sobre limites com adolescente
+
+CÔNJUGE/PARCEIRO(A):
+- discussão sobre dinheiro ou prioridades
+- parceiro(a) que pede mais tempo junto
+- decisão conjunta onde vocês discordam
+- momento íntimo onde você está "ausente"
+
+AMIZADES/SOCIAL:
+- amigo que cancela planos em cima da hora
+- grupo social onde você não tem controle
+- pedido de ajuda que você não quer atender
+
+DECISÕES PESSOAIS:
+- escolha entre duas opções boas
+- gastar dinheiro consigo mesmo
+- dizer "não" para algo que você quer
+
+DESCANSO/LAZER:
+- férias que você não consegue curtir
+- fim de semana "vazio" sem agenda
+- hobby que você abandonou por "falta de tempo"
+
+FÉ/ESPIRITUALIDADE:
+- momento de oração ou meditação interrompido por pensamentos
+- culpa por não praticar o que acredita
+- dúvida sobre propósito ou sentido
+
+SAÚDE:
+- exame médico que você adia
+- sintoma físico que você ignora
+- exercício que você "não tem tempo"
+
+❌ PROIBIDO usar termos vagos:
+- "em projetos" / "em ambientes" / "em desafios" / "em situações"
+
+✅ OBRIGATÓRIO:
+- Cada seção deve ter exemplos de pelo menos 2 CATEGORIAS DIFERENTES
+- O relatório inteiro deve cobrir TODAS as 8 categorias acima
 
 ═══════════════════════════════════════════
 🔄 REGRA DA TRADUÇÃO HUMANA
@@ -352,20 +387,31 @@ EACH SECTION MUST:
 - "In spirituality, the risk is [DIFFERENT MANIFESTATION]"
 
 ═══════════════════════════════════════════
-🎯 CONCRETENESS RULE (REAL EXAMPLES)
+🎯 CONCRETENESS RULE (VARIED EXAMPLES)
 ═══════════════════════════════════════════
 
-For EVERY important insight, include:
-"This appears when you're in situations like: [SPECIFIC CONTEXT]"
+For EACH insight, include examples from DIFFERENT LIFE AREAS.
 
-MANDATORY CONTEXTS (use varied):
-- team meeting where someone disagrees
-- difficult conversation with someone close
-- decision-making under pressure
-- delayed important results
-- family or partner conflict
-- work performance pressure
-- moment of forced solitude or reflection
+📋 CONTEXT BANK (use at least 1 from each category):
+
+WORK/CAREER: meeting disagreements, negative feedback, tight deadlines
+
+FAMILY/CHILDREN: child disobedience, education decisions, teen boundaries
+
+SPOUSE/PARTNER: money discussions, requests for more time, intimate moments
+
+FRIENDSHIPS: canceled plans, social situations without control
+
+PERSONAL DECISIONS: choosing between good options, spending on yourself, saying "no"
+
+REST/LEISURE: vacations you can't enjoy, "empty" weekends, abandoned hobbies
+
+FAITH/SPIRITUALITY: interrupted prayer, guilt, doubt about purpose
+
+HEALTH: postponed exams, ignored symptoms, skipped exercise
+
+✅ MANDATORY: Each section must have examples from at least 2 DIFFERENT CATEGORIES.
+The entire report must cover ALL 8 categories above.
 
 ═══════════════════════════════════════════
 ✂️ EXTREME TRIMMING RULE (40-50% SHORTER)
@@ -516,17 +562,21 @@ CADA SECÇÃO DEVE:
 3. Trazer ALGO NOVO: consequência, exemplo, situação, risco
 
 ═══════════════════════════════════════════
-🎯 REGRA DA CONCRETUDE (EXEMPLOS REAIS)
+🎯 REGRA DA CONCRETUDE (EXEMPLOS VARIADOS)
 ═══════════════════════════════════════════
 
-Para CADA insight importante, inclui:
-"Isto aparece quando tu estás em situações como: [CONTEXTO ESPECÍFICO]"
+📋 BANCO DE CONTEXTOS (usa pelo menos 1 de cada categoria):
 
-CONTEXTOS OBRIGATÓRIOS (usa variados):
-- reunião de equipa onde alguém discorda
-- conversa difícil com pessoa próxima
-- tomada de decisão sob pressão
-- conflito familiar ou com parceiro(a)
+TRABALHO: reuniões, feedback, deadlines
+FAMÍLIA/FILHOS: desobediência, decisões de educação, limites
+CÔNJUGE: discussões sobre dinheiro, pedidos de tempo, momentos íntimos
+AMIZADES: planos cancelados, situações sem controlo
+DECISÕES PESSOAIS: escolhas difíceis, gastar contigo, dizer "não"
+DESCANSO: férias que não consegues curtir, fins de semana vazios
+FÉ: oração interrompida, culpa, dúvida sobre propósito
+SAÚDE: exames adiados, sintomas ignorados
+
+✅ OBRIGATÓRIO: Cada secção com exemplos de 2+ CATEGORIAS DIFERENTES.
 
 ═══════════════════════════════════════════
 ✂️ REGRA DO ENXUGAMENTO EXTREMO (40-50% MENOR)
