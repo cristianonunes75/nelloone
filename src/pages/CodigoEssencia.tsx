@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { useCodigoEssencia } from "@/hooks/useCodigoEssencia";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +26,7 @@ import {
   AlertCircle,
   Mail,
   BarChart3,
+  Heart,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getMissingTests } from "@/lib/pdfCodigoEssencia";
@@ -72,6 +74,7 @@ import {
   ProvocativeClosing,
   ExecutiveSummary,
   ProductHeader,
+  RelatorioConjuge,
 } from "@/components/codigo-essencia";
 
 // LangKey now imported from codigoEssenciaFallbacks
@@ -106,6 +109,8 @@ const TRANSLATIONS = {
     plan90: "Plano 90 Dias",
     routine: "Rotina Diária",
     closing: "Fechamento",
+    tabCode: "Código",
+    tabSpouse: "Cônjuge",
   },
   'pt-pt': {
     title: "Código da Essência",
@@ -136,6 +141,8 @@ const TRANSLATIONS = {
     plan90: "Plano 90 Dias",
     routine: "Rotina Diária",
     closing: "Fechamento",
+    tabCode: "Código",
+    tabSpouse: "Cônjuge",
   },
   en: {
     title: "Essence Code",
@@ -166,6 +173,8 @@ const TRANSLATIONS = {
     plan90: "90-Day Plan",
     routine: "Daily Routine",
     closing: "Closing",
+    tabCode: "Code",
+    tabSpouse: "Spouse",
   },
 };
 
@@ -565,16 +574,30 @@ const CodigoEssenciaInner = () => {
           <span className="text-emerald-700 dark:text-emerald-400 text-sm font-medium">{t.allComplete}</span>
         </div>
 
-        {/* Generate button */}
-        {!hasGenerated && canGenerateReport && (
-          <div className="bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 rounded-xl p-6 text-center mb-6">
-            <Sparkles className="w-10 h-10 text-primary mx-auto mb-3" />
-            <Button onClick={handleGenerateCodigo} disabled={isGenerating} className="gap-2">
-              {isGenerating ? <><Loader2 className="w-4 h-4 animate-spin" />{t.generating}</> : <><Sparkles className="w-4 h-4" />{t.generateCode}</>}
-            </Button>
-            {isGenerating && <p className="text-xs text-muted-foreground mt-2">{t.generatingSubtext}</p>}
-          </div>
-        )}
+        {/* Tabs: Código | Cônjuge */}
+        <Tabs defaultValue="codigo" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="codigo" className="gap-2">
+              <Sparkles className="w-4 h-4" />
+              {t.tabCode}
+            </TabsTrigger>
+            <TabsTrigger value="conjuge" className="gap-2">
+              <Heart className="w-4 h-4" />
+              {t.tabSpouse}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="codigo" className="mt-0">
+            {/* Generate button */}
+            {!hasGenerated && canGenerateReport && (
+              <div className="bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 rounded-xl p-6 text-center mb-6">
+                <Sparkles className="w-10 h-10 text-primary mx-auto mb-3" />
+                <Button onClick={handleGenerateCodigo} disabled={isGenerating} className="gap-2">
+                  {isGenerating ? <><Loader2 className="w-4 h-4 animate-spin" />{t.generating}</> : <><Sparkles className="w-4 h-4" />{t.generateCode}</>}
+                </Button>
+                {isGenerating && <p className="text-xs text-muted-foreground mt-2">{t.generatingSubtext}</p>}
+              </div>
+            )}
 
         {/* Generated Content - Refined Structure */}
         {hasGenerated && generatedSections.length > 0 && (
@@ -935,6 +958,12 @@ const CodigoEssenciaInner = () => {
             </div>
           </div>
         )}
+          </TabsContent>
+
+          <TabsContent value="conjuge" className="mt-0">
+            <RelatorioConjuge language={lang} hasSavedCodigo={hasSavedCodigo} />
+          </TabsContent>
+        </Tabs>
       </main>
 
       {/* Regenerate Confirmation Dialog */}
