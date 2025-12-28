@@ -1,21 +1,20 @@
 import { TestDetailLayout } from "@/components/tests/TestDetailLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { testContent } from "@/lib/testContent";
 
 const DISC = () => {
+  const { language } = useLanguage();
+  const content = testContent.disc[language as keyof typeof testContent.disc] || testContent.disc.pt;
+
   return (
     <TestDetailLayout
-      title="DISC"
-      subtitle="Descubra seu perfil comportamental"
-      storytelling="Este teste identifica o seu perfil comportamental natural. A metodologia DISC revela como você reage, decide, comunica e contribui em diferentes contextos da vida e do trabalho.
-
-Cada pessoa tem um ritmo único de ação. O DISC mostra como você se expressa, toma decisões e se relaciona. No NELLO ONE, esse teste ajuda você a compreender o que move suas atitudes e como gerar impacto com equilíbrio e autenticidade."
-      benefits={[
-        "Seu perfil comportamental predominante (D, I, S ou C)",
-        "Como usar sua energia natural sem se sobrecarregar",
-        "Como fortalecer relacionamentos e liderança",
-        "Seu caminho de crescimento pessoal"
-      ]}
-      audience="Profissionais, gestores, mentores e missionários que desejam liderar com empatia e propósito."
+      title={content.title}
+      subtitle={content.subtitle}
+      storytelling={content.storytelling}
+      benefits={content.benefits}
+      audience={content.audience}
       testType="disc"
+      about={content.about}
     />
   );
 };

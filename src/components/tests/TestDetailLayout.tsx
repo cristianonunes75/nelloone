@@ -19,6 +19,12 @@ interface TestDetailLayoutProps {
   audience: string;
   testType: string;
   price?: string;
+  about?: {
+    acronym?: string;
+    origin: string;
+    objective: string;
+    methodology: string;
+  };
 }
 
 export const TestDetailLayout = ({
@@ -29,6 +35,7 @@ export const TestDetailLayout = ({
   audience,
   testType,
   price = "R$19",
+  about,
 }: TestDetailLayoutProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -49,6 +56,11 @@ export const TestDetailLayout = ({
   const lockedText = language === 'en' ? '🔒 Purchase Test' : '🔒 Adquirir Teste';
   const loginText = language === 'en' ? 'Login to Start' : 'Fazer Login para Começar';
   const bundleText = language === 'en' ? 'See Full Bundle' : 'Ver Pacote Completo';
+  const aboutTitle = language === 'en' ? 'About this Test' : 'Sobre este Teste';
+  const acronymLabel = language === 'en' ? 'What the name means:' : 'O que significa a sigla:';
+  const originLabel = language === 'en' ? 'Origin:' : 'Origem:';
+  const objectiveLabel = language === 'en' ? 'Objective:' : 'Objetivo:';
+  const methodologyLabel = language === 'en' ? 'Methodology:' : 'Metodologia:';
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -94,6 +106,36 @@ export const TestDetailLayout = ({
               </p>
             ))}
           </div>
+
+          {/* About this Test */}
+          {about && (
+            <div className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-xl p-6 md:p-8 mb-12">
+              <h2 className="text-2xl font-semibold mb-6 text-foreground flex items-center gap-2">
+                <span className="text-primary">📚</span>
+                {aboutTitle}
+              </h2>
+              <div className="space-y-4">
+                {about.acronym && (
+                  <div>
+                    <h3 className="font-medium text-foreground mb-1">{acronymLabel}</h3>
+                    <p className="text-foreground/80">{about.acronym}</p>
+                  </div>
+                )}
+                <div>
+                  <h3 className="font-medium text-foreground mb-1">{originLabel}</h3>
+                  <p className="text-foreground/80">{about.origin}</p>
+                </div>
+                <div>
+                  <h3 className="font-medium text-foreground mb-1">{objectiveLabel}</h3>
+                  <p className="text-foreground/80">{about.objective}</p>
+                </div>
+                <div>
+                  <h3 className="font-medium text-foreground mb-1">{methodologyLabel}</h3>
+                  <p className="text-foreground/80">{about.methodology}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* What you improve - Growth Card */}
           <TestImprovementsCard testType={testType} className="mb-12" />
