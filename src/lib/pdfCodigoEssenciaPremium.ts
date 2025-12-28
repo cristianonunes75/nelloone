@@ -34,8 +34,22 @@ const TRANSLATIONS = {
     title: "CÓDIGO DA ESSÊNCIA",
     subtitle: "Síntese Profunda da Sua Essência",
     brand: "NELLO ONE",
+    methodBadge: "MÉTODO NELLO ONE™",
+    tagline: "Isso não é um teste. É um código que você vai viver.",
+    promise: "Este documento revela quem você realmente é — não quem você tenta ser. Use-o para tomar decisões melhores, construir relacionamentos mais honestos e viver com mais clareza.",
+    warning: "Aviso: O que você está prestes a ler pode incomodar. Verdade costuma fazer isso.",
+    pillar1: "Precisão · 7 testes integrados",
+    pillar2: "Confronto · Verdades que libertam",
+    pillar3: "Direção · Plano de 90 dias",
     generated: "Gerado em",
     summary: "Resumo do Perfil",
+    executiveSummary: "Seu Código em 1 Página",
+    whoYouAreLabel: "Quem Você É",
+    greatestStrength: "Maior Força",
+    greatestRisk: "Maior Risco",
+    centralTension: "Tensão Central",
+    direction90Days: "Direção 90 Dias",
+    codeSynthesis: "Síntese do Código",
     impact: "Blocos de Impacto",
     essence: "Essência",
     risk: "Risco",
@@ -109,8 +123,22 @@ const TRANSLATIONS = {
     title: "CÓDIGO DA ESSÊNCIA",
     subtitle: "Síntese Profunda da Tua Essência",
     brand: "NELLO ONE",
+    methodBadge: "MÉTODO NELLO ONE™",
+    tagline: "Isto não é um teste. É um código que vais viver.",
+    promise: "Este documento revela quem tu realmente és — não quem tu tentas ser. Usa-o para tomar decisões melhores, construir relacionamentos mais honestos e viver com mais clareza.",
+    warning: "Aviso: O que estás prestes a ler pode incomodar. A verdade costuma fazer isso.",
+    pillar1: "Precisão · 7 testes integrados",
+    pillar2: "Confronto · Verdades que libertam",
+    pillar3: "Direção · Plano de 90 dias",
     generated: "Gerado em",
     summary: "Resumo do Perfil",
+    executiveSummary: "O Teu Código em 1 Página",
+    whoYouAreLabel: "Quem Tu És",
+    greatestStrength: "Maior Força",
+    greatestRisk: "Maior Risco",
+    centralTension: "Tensão Central",
+    direction90Days: "Direção 90 Dias",
+    codeSynthesis: "Síntese do Código",
     impact: "Blocos de Impacto",
     essence: "Essência",
     risk: "Risco",
@@ -184,8 +212,22 @@ const TRANSLATIONS = {
     title: "ESSENCE CODE",
     subtitle: "Deep Synthesis of Your Essence",
     brand: "NELLO ONE",
+    methodBadge: "NELLO ONE™ METHOD",
+    tagline: "This is not a test. It's a code you will live.",
+    promise: "This document reveals who you really are — not who you try to be. Use it to make better decisions, build more honest relationships, and live with greater clarity.",
+    warning: "Warning: What you're about to read may be uncomfortable. Truth often is.",
+    pillar1: "Precision · 7 integrated tests",
+    pillar2: "Confrontation · Truths that free",
+    pillar3: "Direction · 90-day plan",
     generated: "Generated on",
     summary: "Profile Summary",
+    executiveSummary: "Your Code in 1 Page",
+    whoYouAreLabel: "Who You Are",
+    greatestStrength: "Greatest Strength",
+    greatestRisk: "Greatest Risk",
+    centralTension: "Central Tension",
+    direction90Days: "90-Day Direction",
+    codeSynthesis: "Code Synthesis",
     impact: "Impact Blocks",
     essence: "Essence",
     risk: "Risk",
@@ -433,40 +475,85 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     return barY;
   };
 
-  // === COVER PAGE (match screen: warm editorial) ===
+  // === COVER PAGE (Premium Product Branding) ===
   doc.setFillColor(250, 248, 245); // warm cream
   doc.rect(0, 0, pageWidth, pageHeight, "F");
 
   // subtle top glow band
   doc.setFillColor(GOLD.r, GOLD.g, GOLD.b);
-  doc.rect(0, 0, pageWidth, 3, "F");
+  doc.rect(0, 0, pageWidth, 4, "F");
+
+  // Method Badge (top)
+  doc.setFillColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
+  doc.roundedRect(pageWidth / 2 - 35, 35, 70, 12, 2, 2, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "bold");
+  doc.text(t.methodBadge, pageWidth / 2, 43, { align: "center" });
 
   // Title
   doc.setTextColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
-  doc.setFontSize(30);
+  doc.setFontSize(32);
   doc.setFont("helvetica", "bold");
-  doc.text(t.title, pageWidth / 2, pageHeight / 2 - 28, { align: "center" });
+  doc.text(t.title, pageWidth / 2, 75, { align: "center" });
 
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(120, 110, 95);
-  doc.text(t.subtitle, pageWidth / 2, pageHeight / 2 - 16, { align: "center" });
+  // Tagline
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "italic");
+  doc.setTextColor(100, 90, 75);
+  doc.text(`"${t.tagline}"`, pageWidth / 2, 90, { align: "center" });
 
   // Name card
   doc.setFillColor(255, 255, 255);
   doc.setDrawColor(230, 224, 212);
-  doc.setLineWidth(0.4);
-  doc.roundedRect(pageWidth / 2 - 42, pageHeight / 2 - 2, 84, 18, 3, 3, "FD");
+  doc.setLineWidth(0.5);
+  doc.roundedRect(pageWidth / 2 - 45, 105, 90, 20, 3, 3, "FD");
   doc.setTextColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
-  doc.text(userName, pageWidth / 2, pageHeight / 2 + 10, { align: "center" });
+  doc.text(userName, pageWidth / 2, 118, { align: "center" });
+
+  // Promise box
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(220, 215, 200);
+  doc.roundedRect(margin + 10, 140, contentWidth - 20, 35, 3, 3, "FD");
+  doc.setTextColor(70, 65, 55);
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  const promiseLines = doc.splitTextToSize(t.promise, contentWidth - 30);
+  let promiseY = 152;
+  for (const line of promiseLines) {
+    doc.text(line, pageWidth / 2, promiseY, { align: "center" });
+    promiseY += 5;
+  }
+
+  // Warning
+  doc.setTextColor(AMBER.r, AMBER.g, AMBER.b);
+  doc.setFontSize(8);
+  doc.setFont("helvetica", "bold");
+  doc.text(t.warning, pageWidth / 2, 190, { align: "center" });
+
+  // Three Pillars
+  const pillarY = 210;
+  const pillars = [t.pillar1, t.pillar2, t.pillar3];
+  const icons = ["🎯", "🔥", "🗺️"];
+  const pillarWidth = (contentWidth - 10) / 3;
+  
+  for (let i = 0; i < 3; i++) {
+    const pillarX = margin + 5 + i * pillarWidth + pillarWidth / 2;
+    doc.setFontSize(14);
+    doc.text(icons[i], pillarX, pillarY, { align: "center" });
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(80, 75, 65);
+    doc.text(pillars[i], pillarX, pillarY + 8, { align: "center" });
+  }
 
   // Footer brand
-  doc.setFontSize(9);
+  doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(GOLD.r, GOLD.g, GOLD.b);
-  doc.text(t.brand, pageWidth / 2, pageHeight - 26, { align: "center" });
+  doc.text(t.brand, pageWidth / 2, pageHeight - 28, { align: "center" });
 
   doc.setFontSize(8);
   doc.setFont("helvetica", "normal");
@@ -475,9 +562,132 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   const dateStr = new Date().toLocaleDateString(dateLocale, { day: "2-digit", month: "long", year: "numeric" });
   doc.text(`${t.generated} ${dateStr}`, pageWidth / 2, pageHeight - 18, { align: "center" });
 
+  // Bottom gold band
+  doc.setFillColor(GOLD.r, GOLD.g, GOLD.b);
+  doc.rect(0, pageHeight - 4, pageWidth, 4, "F");
+
   // === START CONTENT ===
   doc.addPage();
   currentY = margin;
+
+  // === 0. EXECUTIVE SUMMARY (Your Code in 1 Page) ===
+  const resumoExecutivoSection = getSection<{
+    quem_voce_e?: string;
+    maior_forca?: string;
+    maior_risco?: string;
+    tensao_central?: string;
+    direcao_90_dias?: string;
+    frase_sintese?: string;
+  }>(sections, "resumo_executivo");
+
+  if (resumoExecutivoSection && (resumoExecutivoSection.quem_voce_e || resumoExecutivoSection.frase_sintese)) {
+    addSectionTitle(t.executiveSummary, PRIMARY);
+    
+    // Who You Are box
+    if (resumoExecutivoSection.quem_voce_e) {
+      checkPageBreak(20);
+      doc.setFillColor(245, 245, 250);
+      doc.roundedRect(margin, currentY, contentWidth, 18, 2, 2, "F");
+      doc.setTextColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
+      doc.setFontSize(7);
+      doc.setFont("helvetica", "bold");
+      doc.text(t.whoYouAreLabel.toUpperCase(), margin + 4, currentY + 5);
+      doc.setTextColor(50, 50, 50);
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      const whoLines = doc.splitTextToSize(resumoExecutivoSection.quem_voce_e, contentWidth - 8);
+      doc.text(whoLines[0] || "", margin + 4, currentY + 12);
+      currentY += 22;
+    }
+
+    // 2x2 Grid: Strength, Risk, Tension, Direction
+    const gridItems = [
+      { label: t.greatestStrength, value: resumoExecutivoSection.maior_forca, color: GREEN },
+      { label: t.greatestRisk, value: resumoExecutivoSection.maior_risco, color: ROSE },
+      { label: t.centralTension, value: resumoExecutivoSection.tensao_central, color: AMBER },
+      { label: t.direction90Days, value: resumoExecutivoSection.direcao_90_dias, color: BLUE },
+    ];
+
+    const boxWidth = (contentWidth - 4) / 2;
+    const boxHeight = 22;
+    let gridX = margin;
+    let gridY = currentY;
+
+    for (let i = 0; i < gridItems.length; i++) {
+      const item = gridItems[i];
+      if (!item.value) continue;
+      
+      if (i === 2) {
+        gridX = margin;
+        gridY += boxHeight + 4;
+      }
+      
+      checkPageBreak(boxHeight + 10);
+      
+      // Box background
+      doc.setFillColor(item.color.r, item.color.g, item.color.b);
+      doc.setGState(new (doc as any).GState({ opacity: 0.1 }));
+      doc.roundedRect(gridX, gridY, boxWidth, boxHeight, 2, 2, "F");
+      doc.setGState(new (doc as any).GState({ opacity: 1 }));
+      
+      // Border
+      doc.setDrawColor(item.color.r, item.color.g, item.color.b);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(gridX, gridY, boxWidth, boxHeight, 2, 2, "S");
+      
+      // Label
+      doc.setTextColor(item.color.r, item.color.g, item.color.b);
+      doc.setFontSize(6);
+      doc.setFont("helvetica", "bold");
+      doc.text(item.label.toUpperCase(), gridX + 3, gridY + 5);
+      
+      // Value
+      doc.setTextColor(50, 50, 50);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      const valLines = doc.splitTextToSize(item.value, boxWidth - 6);
+      doc.text(valLines[0] || "", gridX + 3, gridY + 13);
+      if (valLines[1]) {
+        doc.text(valLines[1], gridX + 3, gridY + 18);
+      }
+      
+      gridX += boxWidth + 4;
+    }
+    
+    currentY = gridY + boxHeight + 8;
+
+    // Code Synthesis Quote
+    if (resumoExecutivoSection.frase_sintese) {
+      checkPageBreak(25);
+      doc.setFillColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
+      doc.setGState(new (doc as any).GState({ opacity: 0.05 }));
+      doc.roundedRect(margin, currentY, contentWidth, 20, 2, 2, "F");
+      doc.setGState(new (doc as any).GState({ opacity: 1 }));
+      
+      doc.setDrawColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(margin, currentY, contentWidth, 20, 2, 2, "S");
+      
+      // Left accent bar
+      doc.setFillColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
+      doc.rect(margin, currentY, 3, 20, "F");
+      
+      doc.setTextColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
+      doc.setFontSize(6);
+      doc.setFont("helvetica", "bold");
+      doc.text(t.codeSynthesis.toUpperCase(), margin + 6, currentY + 5);
+      
+      doc.setTextColor(50, 50, 50);
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "italic");
+      const synthLines = doc.splitTextToSize(`"${resumoExecutivoSection.frase_sintese}"`, contentWidth - 12);
+      doc.text(synthLines[0] || "", margin + 6, currentY + 13);
+      
+      currentY += 26;
+    }
+
+    addDivider();
+  }
 
   // === 1. 3 CENTRAL TRUTHS (FULL CONTENT) ===
   const tresVerdadesSection = getSection<{ truths?: Array<{ title: string; content: string; base: string }> }>(sections, "tres_verdades_centrais");
