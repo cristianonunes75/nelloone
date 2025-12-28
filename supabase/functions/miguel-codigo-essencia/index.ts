@@ -52,24 +52,42 @@ MOVIMENTO 3: NOVO PADRÃO
 Todas as seções DEVEM se conectar a um desses 3 movimentos.
 
 ═══════════════════════════════════════════
-🔴 REGRA ANTI-REPETIÇÃO (ABSOLUTA)
+🔴 REGRA DO NÚCLEO ÚNICO (ANTI-REPETIÇÃO)
 ═══════════════════════════════════════════
 
-ANTES de escrever cada seção:
-1. Identifique as 3 ideias centrais do perfil
-2. Permita que cada ideia apareça com FORÇA apenas UMA vez
-3. Nas demais seções: aprofunde, aplique em contextos diferentes, NUNCA repita
+🚨 TODO o Código gira em torno de 3 FORÇAS CENTRAIS definidas na seção "tres_verdades_centrais".
 
-❌ PROIBIDO repetir múltiplas vezes:
-- "você é executor e líder"
-- "você faz tudo sozinho"  
-- "precisa se conectar mais"
-- "sua força vira fraqueza"
+REGRA ABSOLUTA:
+- As 3 verdades centrais são o NÚCLEO. Aparecem com força total UMA VEZ.
+- TODAS as outras seções são APLICAÇÕES dessas verdades em contextos específicos.
+- NUNCA repita a verdade em si - mostre como ela se MANIFESTA em cada área.
 
-Se aparecer de novo, DEVE trazer:
-- Outro ângulo prático
-- Outra consequência específica
-- Outro contexto concreto (reunião, família, decisão sob pressão)
+CADA SEÇÃO DEVE:
+1. Referenciar qual das 3 verdades está sendo aplicada (implícita ou explicitamente)
+2. Mostrar a MANIFESTAÇÃO CONCRETA naquele contexto específico
+3. Trazer ALGO NOVO: consequência, exemplo, situação, risco
+
+❌ PROIBIDO EM QUALQUER SEÇÃO:
+- Repetir o conceito central com outras palavras
+- Explicar de novo "quem a pessoa é"
+- Reafirmar força/sombra já explicada
+
+✅ CORRETO:
+- "Na carreira, isso aparece quando você [COMPORTAMENTO ESPECÍFICO]"
+- "Em relacionamentos, o preço é [CONSEQUÊNCIA NOVA]"
+- "Na espiritualidade, o risco é [MANIFESTAÇÃO DIFERENTE]"
+
+EXEMPLO DO QUE NÃO FAZER:
+❌ Forças: "Você é executor forte"
+❌ Carreira: "Você lidera com força e executa"
+❌ Relacionamentos: "Sua força de execução impacta..."
+❌ Fechamento: "Como executor forte..."
+
+EXEMPLO DO QUE FAZER:
+✅ Verdade Central: "Você é executor forte que faz sozinho"
+✅ Carreira: "Em reuniões tensas, você corta o debate cedo demais. O time para de contribuir."
+✅ Relacionamentos: "Seu parceiro(a) se sente útil só para operação, não para decisão."
+✅ Fechamento: "A pergunta é: você quer resultados solitários ou impacto compartilhado?"
 
 PALAVRAS com limite de 2x no relatório inteiro:
 - "liderança" / "liderar"
@@ -308,23 +326,30 @@ MOVEMENT 3: NEW PATTERN
 All sections MUST connect to one of these 3 movements.
 
 ═══════════════════════════════════════════
-🔴 ANTI-REPETITION RULE (ABSOLUTE)
+🔴 SINGLE CORE RULE (ANTI-REPETITION)
 ═══════════════════════════════════════════
 
-BEFORE writing each section:
-1. Identify the 3 central ideas of the profile
-2. Allow each idea to appear with STRENGTH only ONCE
-3. In other sections: deepen, apply in different contexts, NEVER repeat
+🚨 The ENTIRE Code revolves around 3 CENTRAL TRUTHS defined in "tres_verdades_centrais".
 
-❌ FORBIDDEN to repeat multiple times:
-- "you are executor and leader"
-- "you do everything alone"
-- "need to connect more"
+ABSOLUTE RULE:
+- The 3 central truths are the CORE. They appear with full force ONCE.
+- ALL other sections are APPLICATIONS of these truths in specific contexts.
+- NEVER repeat the truth itself - show how it MANIFESTS in each area.
 
-If it appears again, MUST bring:
-- Another practical angle
-- Another specific consequence
-- Another concrete context (meeting, family, decision under pressure)
+EACH SECTION MUST:
+1. Reference which of the 3 truths is being applied (implicitly or explicitly)
+2. Show the CONCRETE MANIFESTATION in that specific context
+3. Bring SOMETHING NEW: consequence, example, situation, risk
+
+❌ FORBIDDEN IN ANY SECTION:
+- Repeating the core concept with different words
+- Explaining again "who the person is"
+- Reaffirming strength/shadow already explained
+
+✅ CORRECT:
+- "In career, this appears when you [SPECIFIC BEHAVIOR]"
+- "In relationships, the price is [NEW CONSEQUENCE]"
+- "In spirituality, the risk is [DIFFERENT MANIFESTATION]"
 
 ═══════════════════════════════════════════
 🎯 CONCRETENESS RULE (REAL EXAMPLES)
@@ -475,13 +500,20 @@ MOVIMENTO 3: NOVO PADRÃO
 → Como construir um novo padrão nos próximos 90 dias
 
 ═══════════════════════════════════════════
-🔴 REGRA ANTI-REPETIÇÃO (ABSOLUTA)
+🔴 REGRA DO NÚCLEO ÚNICO (ANTI-REPETIÇÃO)
 ═══════════════════════════════════════════
 
-ANTES de escrever cada secção:
-1. Identifica as 3 ideias centrais do perfil
-2. Permite que cada ideia apareça com FORÇA apenas UMA vez
-3. Nas demais secções: aprofunda, aplica em contextos diferentes, NUNCA repitas
+🚨 TODO o Código gira em torno de 3 FORÇAS CENTRAIS definidas em "tres_verdades_centrais".
+
+REGRA ABSOLUTA:
+- As 3 verdades são o NÚCLEO. Aparecem com força total UMA VEZ.
+- TODAS as outras secções são APLICAÇÕES dessas verdades em contextos específicos.
+- NUNCA repitas a verdade em si - mostra como ela se MANIFESTA em cada área.
+
+CADA SECÇÃO DEVE:
+1. Referenciar qual das 3 verdades está sendo aplicada
+2. Mostrar a MANIFESTAÇÃO CONCRETA naquele contexto
+3. Trazer ALGO NOVO: consequência, exemplo, situação, risco
 
 ═══════════════════════════════════════════
 🎯 REGRA DA CONCRETUDE (EXEMPLOS REAIS)
