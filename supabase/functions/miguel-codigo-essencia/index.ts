@@ -52,50 +52,71 @@ MOVIMENTO 3: NOVO PADRÃO
 Todas as seções DEVEM se conectar a um desses 3 movimentos.
 
 ═══════════════════════════════════════════
-🔴 REGRA DO NÚCLEO ÚNICO (ANTI-REPETIÇÃO)
+🔴 REGRA DO NÚCLEO ÚNICO (ANTI-REPETIÇÃO MÁXIMA)
 ═══════════════════════════════════════════
 
-🚨 TODO o Código gira em torno de 3 FORÇAS CENTRAIS definidas na seção "tres_verdades_centrais".
+🚨 O CÓDIGO INTEIRO gira em torno de 3 FORÇAS CENTRAIS.
 
-REGRA ABSOLUTA:
-- As 3 verdades centrais são o NÚCLEO. Aparecem com força total UMA VEZ.
-- TODAS as outras seções são APLICAÇÕES dessas verdades em contextos específicos.
-- NUNCA repita a verdade em si - mostre como ela se MANIFESTA em cada área.
+ESTRUTURA OBRIGATÓRIA:
+1. resumo_executivo: inclui campo "tres_forcas_centrais" = ["Força 1", "Força 2", "Força 3"]
+   → Exemplo: ["Execução implacável", "Foco solitário", "Aversão a dependência"]
+   → Essas 3 forças DEFINEM todo o resto do relatório
+   
+2. tres_verdades_centrais: desenvolve cada força com base nos testes
 
-CADA SEÇÃO DEVE:
-1. Referenciar qual das 3 verdades está sendo aplicada (implícita ou explicitamente)
-2. Mostrar a MANIFESTAÇÃO CONCRETA naquele contexto específico
-3. Trazer ALGO NOVO: consequência, exemplo, situação, risco
+3. TODAS as outras seções: são APLICAÇÕES das 3 forças em contextos específicos
+   → Carreira = Como as 3 forças aparecem no trabalho
+   → Amor = Como as 3 forças impactam relacionamentos
+   → Saúde = Como as 3 forças afetam autocuidado
+   
+REGRA DE OURO:
+O leitor deve poder ler APENAS o resumo_executivo.tres_forcas_centrais
+e depois VER COMO cada seção aplica essas forças em contextos diferentes.
 
-❌ PROIBIDO EM QUALQUER SEÇÃO:
-- Repetir o conceito central com outras palavras
-- Explicar de novo "quem a pessoa é"
-- Reafirmar força/sombra já explicada
+❌ O QUE CADA SEÇÃO NÃO PODE FAZER:
+- RE-EXPLICAR o que é a força (já foi explicada nas verdades centrais)
+- REPETIR que a pessoa é forte/líder/executor/intenso
+- USAR as mesmas palavras para descrever o padrão
+- REAFIRMAR características já ditas
 
-✅ CORRETO:
-- "Na carreira, isso aparece quando você [COMPORTAMENTO ESPECÍFICO]"
-- "Em relacionamentos, o preço é [CONSEQUÊNCIA NOVA]"
-- "Na espiritualidade, o risco é [MANIFESTAÇÃO DIFERENTE]"
+✅ O QUE CADA SEÇÃO DEVE FAZER:
+- APLICAR a força ao contexto específico com EXEMPLO CONCRETO
+- Mostrar CONSEQUÊNCIA NOVA que só aparece naquele contexto
+- Revelar SITUAÇÃO ESPECÍFICA onde o padrão se manifesta
+- Trazer DOR REAL que o leitor reconhece
 
-EXEMPLO DO QUE NÃO FAZER:
-❌ Forças: "Você é executor forte"
-❌ Carreira: "Você lidera com força e executa"
-❌ Relacionamentos: "Sua força de execução impacta..."
-❌ Fechamento: "Como executor forte..."
+FORMATO MENTAL PARA CADA SEÇÃO:
+"Dado que você já sabe que [FORÇA X do resumo], 
+na área de [CONTEXTO], isso aparece quando você [COMPORTAMENTO ESPECÍFICO],
+e o preço que você paga é [CONSEQUÊNCIA CONCRETA NOVA]."
 
-EXEMPLO DO QUE FAZER:
-✅ Verdade Central: "Você é executor forte que faz sozinho"
-✅ Carreira: "Em reuniões tensas, você corta o debate cedo demais. O time para de contribuir."
-✅ Relacionamentos: "Seu parceiro(a) se sente útil só para operação, não para decisão."
-✅ Fechamento: "A pergunta é: você quer resultados solitários ou impacto compartilhado?"
+EXEMPLO PRÁTICO:
+→ tres_forcas_centrais: ["Execução solitária", "Impaciência com lentidão", "Dificuldade de pedir ajuda"]
 
-PALAVRAS com limite de 2x no relatório inteiro:
-- "liderança" / "liderar"
+→ Carreira (NÃO FAZER): "Você é executor forte que lidera com intensidade..."
+→ Carreira (FAZER): "Em reuniões, você corta debates cedo demais. O time para de contribuir ideias."
+
+→ Amor (NÃO FAZER): "Sua força de execução aparece nos relacionamentos..."  
+→ Amor (FAZER): "Seu parceiro(a) já desistiu de sugerir programas diferentes. Você sempre decide."
+
+→ Saúde (NÃO FAZER): "Sua intensidade aparece na relação com o corpo..."
+→ Saúde (FAZER): "Você adia exames há quanto tempo? O corpo cobra em silêncio."
+
+PALAVRAS COM LIMITE ABSOLUTO DE 2x NO RELATÓRIO INTEIRO:
+- "liderança" / "liderar" / "líder"
 - "controle" / "controlar"
 - "profundidade" / "profundo"  
 - "intensidade" / "intenso"
 - "ação" / "agir"
 - "velocidade" / "rápido"
+- "executor" / "executar"
+- "força" / "forte"
+
+VERIFICAÇÃO FINAL ANTES DE GERAR:
+Para CADA seção, pergunte:
+1. Estou explicando a força de novo? → SE SIM, CORTAR
+2. Estou mostrando aplicação nova? → SE NÃO, REESCREVER
+3. O leitor vai ter um "ah, isso sou eu" novo? → SE NÃO, CORTAR
 
 ═══════════════════════════════════════════
 🎯 REGRA DA CONCRETUDE (EXEMPLOS VARIADOS)
@@ -677,13 +698,20 @@ This is the FIRST and most important section. Should work as a "1-page summary" 
 - Sharing with spouse, mentor, friend
 
 {
-  "quem_voce_e": "[1 direct sentence about who the person is - based on ALL tests combined]",
+  "tres_forcas_centrais": ["[Central Force 1 - 2-4 words]", "[Central Force 2]", "[Central Force 3]"],
+  "quem_voce_e": "[1 direct sentence about who the person is - BASED ON the 3 central forces]",
   "maior_forca": "[The most powerful strength in 1 sentence - cite 1-2 supporting tests]",
   "maior_risco": "[The most dangerous risk in 1 sentence - cite the specific pattern]",
   "tensao_central": "[The most important internal tension - e.g. 'Speed that wants perfection']",
   "direcao_90_dias": "[The main focus for the next 90 days in 1 actionable sentence]",
   "frase_sintese": "[ONE sentence that summarizes the ENTIRE Code - memorable, confrontational, true]"
 }
+
+TRES_FORCAS_CENTRAIS RULES:
+- These 3 forces DEFINE the entire report
+- Each force should be 2-4 words maximum (e.g. "Relentless execution", "Solitary focus", "Aversion to dependency")
+- ALL other sections are APPLICATIONS of these 3 forces in specific contexts
+- The reader should be able to read ONLY these 3 forces and understand the entire profile
 
 EXECUTIVE SUMMARY RULES:
 - MAXIMUM 1 sentence per field
@@ -1439,7 +1467,8 @@ ESTRUTURA JSON FINAL
     {
       "id": "resumo_executivo",
       "title": "${youWord === 'Tu' ? 'O Teu Código' : 'Seu Código'} em 1 Página",
-      "quem_voce_e": "[1 frase direta sobre quem é]",
+      "tres_forcas_centrais": ["[Força Central 1]", "[Força Central 2]", "[Força Central 3]"],
+      "quem_voce_e": "[1 frase direta sobre quem é, baseada nas 3 forças]",
       "maior_forca": "[maior força em 1 frase]",
       "maior_risco": "[maior risco em 1 frase]",
       "tensao_central": "[tensão central]",
