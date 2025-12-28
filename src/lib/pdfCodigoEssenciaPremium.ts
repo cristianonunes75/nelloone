@@ -387,32 +387,47 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     currentY += height;
   };
 
-  // === COVER PAGE ===
-  doc.setFillColor(15, 15, 20);
+  // === COVER PAGE (match screen: warm editorial) ===
+  doc.setFillColor(250, 248, 245); // warm cream
   doc.rect(0, 0, pageWidth, pageHeight, "F");
+
+  // subtle top glow band
   doc.setFillColor(GOLD.r, GOLD.g, GOLD.b);
-  doc.rect(0, pageHeight / 3 - 1, pageWidth, 2, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(32);
+  doc.rect(0, 0, pageWidth, 3, "F");
+
+  // Title
+  doc.setTextColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
+  doc.setFontSize(30);
   doc.setFont("helvetica", "bold");
-  doc.text(t.title, pageWidth / 2, pageHeight / 2 - 20, { align: "center" });
+  doc.text(t.title, pageWidth / 2, pageHeight / 2 - 28, { align: "center" });
+
   doc.setFontSize(12);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(GOLD.r, GOLD.g, GOLD.b);
-  doc.text(t.subtitle, pageWidth / 2, pageHeight / 2 - 8, { align: "center" });
-  doc.setFontSize(16);
-  doc.setTextColor(200, 200, 200);
-  doc.text(userName, pageWidth / 2, pageHeight / 2 + 12, { align: "center" });
-  doc.setFontSize(10);
+  doc.setTextColor(120, 110, 95);
+  doc.text(t.subtitle, pageWidth / 2, pageHeight / 2 - 16, { align: "center" });
+
+  // Name card
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(230, 224, 212);
+  doc.setLineWidth(0.4);
+  doc.roundedRect(pageWidth / 2 - 42, pageHeight / 2 - 2, 84, 18, 3, 3, "FD");
+  doc.setTextColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text(userName, pageWidth / 2, pageHeight / 2 + 10, { align: "center" });
+
+  // Footer brand
+  doc.setFontSize(9);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(GOLD.r, GOLD.g, GOLD.b);
-  doc.text(t.brand, pageWidth / 2, pageHeight - 30, { align: "center" });
+  doc.text(t.brand, pageWidth / 2, pageHeight - 26, { align: "center" });
+
   doc.setFontSize(8);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(150, 150, 150);
-  const dateLocale = lang === "en" ? "en-US" : "pt-BR";
+  doc.setTextColor(145, 135, 120);
+  const dateLocale = lang === "en" ? "en-US" : lang === "pt-pt" ? "pt-PT" : "pt-BR";
   const dateStr = new Date().toLocaleDateString(dateLocale, { day: "2-digit", month: "long", year: "numeric" });
-  doc.text(`${t.generated} ${dateStr}`, pageWidth / 2, pageHeight - 22, { align: "center" });
+  doc.text(`${t.generated} ${dateStr}`, pageWidth / 2, pageHeight - 18, { align: "center" });
 
   // === START CONTENT ===
   doc.addPage();
@@ -469,79 +484,180 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     addDivider();
   }
 
-  // === 2. QUICK SUMMARY ===
+  // === 2. QUICK SUMMARY (cards layout like screen) ===
   const retratoSection = getSection<{ impact_blocks?: Record<string, string>; bullets?: string[]; score_highlights?: string[] }>(sections, "retrato_essencial");
   const impactBlocks = validateImpactBlocks(retratoSection?.impact_blocks, lang);
   const bullets = retratoSection?.bullets || [];
-  
+
+  // Small helpers for card layout
+  const getLines = (text: string, width: number, fontSize: number) => doc.splitTextToSize(text, width);
+  const lineH = (fontSize: number) => Math.max(3.6, fontSize * 0.45);
+
+  const drawCard = (x: number, y: number, w: number, h: number, fill: { r: number; g: number; b: number }, border = { r: 226, g: 220, b: 210 }) => {
+    doc.setFillColor(fill.r, fill.g, fill.b);
+    doc.setDrawColor(border.r, border.g, border.b);
+    doc.setLineWidth(0.35);
+    doc.roundedRect(x, y, w, h, 3, 3, "FD");
+  };
+
   if (bullets.length > 0 || impactBlocks.calling) {
     addSectionTitle(t.quickSummary, PRIMARY);
-    
-    // Strengths
+
+    const cardGap = 4;
+    const cardW = (contentWidth - cardGap * 2) / 3;
+    const cardX = [margin, margin + cardW + cardGap, margin + (cardW + cardGap) * 2];
+    const baseY = currentY;
+
     const strengths = bullets.filter((_: string, i: number) => i < 2);
-    if (strengths.length > 0) {
-      doc.setTextColor(GREEN.r, GREEN.g, GREEN.b);
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "bold");
-      doc.text(t.strengthsLabel.toUpperCase(), margin + 4, currentY);
-      currentY += 4;
-      for (const s of strengths) {
-        addBullet(s, 8, GREEN);
-      }
-    }
-    
-    // Alerts
     const alerts = bullets.filter((_: string, i: number) => i >= 2 && i < 4);
-    if (alerts.length > 0) {
-      addSpacer(2);
-      doc.setTextColor(AMBER.r, AMBER.g, AMBER.b);
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "bold");
-      doc.text(t.alertsLabel.toUpperCase(), margin + 4, currentY);
-      currentY += 4;
-      for (const a of alerts) {
-        addBullet(a, 8, AMBER);
-      }
+    const direction = impactBlocks.calling;
+
+    const contentWCard = cardW - 10;
+
+    const strengthsText = strengths.map((s) => `• ${s}`).join("\n");
+    const alertsText = alerts.map((a) => `• ${a}`).join("\n");
+
+    const strengthsLines = strengthsText ? getLines(strengthsText, contentWCard, 8) : [];
+    const alertsLines = alertsText ? getLines(alertsText, contentWCard, 8) : [];
+    const directionLines = direction ? getLines(direction, contentWCard, 8) : [];
+
+    const cardH = Math.max(
+      26,
+      12 + strengthsLines.length * lineH(8),
+      12 + alertsLines.length * lineH(8),
+      12 + directionLines.length * lineH(8)
+    );
+
+    checkPageBreak(cardH + 6);
+
+    // Strengths card
+    drawCard(cardX[0], baseY, cardW, cardH, { r: 245, g: 252, b: 249 });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(GREEN.r, GREEN.g, GREEN.b);
+    doc.text(t.strengthsLabel.toUpperCase(), cardX[0] + 5, baseY + 7);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(70, 70, 70);
+    let y = baseY + 12;
+    for (const l of strengthsLines) {
+      doc.text(l, cardX[0] + 5, y);
+      y += lineH(8);
     }
-    
-    // Direction
-    if (impactBlocks.calling) {
-      addSpacer(2);
-      doc.setTextColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "bold");
-      doc.text(t.directionLabel.toUpperCase(), margin + 4, currentY);
-      currentY += 4;
-      addText(impactBlocks.calling, 9, PRIMARY);
+
+    // Alerts card
+    drawCard(cardX[1], baseY, cardW, cardH, { r: 255, g: 250, b: 240 });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(AMBER.r, AMBER.g, AMBER.b);
+    doc.text(t.alertsLabel.toUpperCase(), cardX[1] + 5, baseY + 7);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(70, 70, 70);
+    y = baseY + 12;
+    for (const l of alertsLines) {
+      doc.text(l, cardX[1] + 5, y);
+      y += lineH(8);
     }
-    
+
+    // Direction card
+    drawCard(cardX[2], baseY, cardW, cardH, { r: 245, g: 247, b: 255 });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
+    doc.text(t.directionLabel.toUpperCase(), cardX[2] + 5, baseY + 7);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(70, 70, 70);
+    y = baseY + 12;
+    for (const l of directionLines) {
+      doc.text(l, cardX[2] + 5, y);
+      y += lineH(8);
+    }
+
+    currentY = baseY + cardH + 8;
     addDivider();
   }
 
-  // === 3. IMPACT BLOCKS ===
-  addSectionTitle(t.impact, PRIMARY);
-  addLabelValue(t.essence, impactBlocks.essence, GREEN);
-  addLabelValue(t.risk, impactBlocks.risk, AMBER);
-  addLabelValue(t.calling, impactBlocks.calling, TEAL);
-  addLabelValue(t.gift, impactBlocks.gift, PURPLE);
-  
-  // Score highlights - FULL
-  let scoreHighlights = retratoSection?.score_highlights || [];
-  if (scoreHighlights.length === 0) {
-    scoreHighlights = calculateScoreHighlights(testResults, lang);
-  }
-  if (scoreHighlights.length > 0) {
-    currentY += 2;
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    const highlightLines = doc.splitTextToSize(scoreHighlights.join(" • "), contentWidth - 8);
-    for (const line of highlightLines) {
-      checkPageBreak(4);
-      doc.text(line, margin + 4, currentY);
-      currentY += 4;
+  // === 3. IMPACT BLOCKS (2x2 grid like screen) ===
+  if (impactBlocks.essence || impactBlocks.risk || impactBlocks.calling || impactBlocks.gift) {
+    addSectionTitle(t.impact, PRIMARY);
+
+    const gap = 5;
+    const colW = (contentWidth - gap) / 2;
+    const rowHMin = 26;
+
+    const blocks = [
+      { title: t.essence, value: impactBlocks.essence, color: GREEN, bg: { r: 243, g: 252, b: 248 } },
+      { title: t.risk, value: impactBlocks.risk, color: AMBER, bg: { r: 255, g: 250, b: 240 } },
+      { title: t.calling, value: impactBlocks.calling, color: TEAL, bg: { r: 242, g: 251, b: 251 } },
+      { title: t.gift, value: impactBlocks.gift, color: PURPLE, bg: { r: 248, g: 244, b: 255 } },
+    ].filter((b) => Boolean(b.value));
+
+    // render as grid rows of 2
+    for (let i = 0; i < blocks.length; i += 2) {
+      const left = blocks[i];
+      const right = blocks[i + 1];
+
+      const leftLines = left?.value ? getLines(String(left.value), colW - 10, 8) : [];
+      const rightLines = right?.value ? getLines(String(right.value), colW - 10, 8) : [];
+      const rowH = Math.max(rowHMin, 14 + leftLines.length * lineH(8), 14 + rightLines.length * lineH(8));
+
+      checkPageBreak(rowH + 4);
+
+      // left card
+      if (left) {
+        drawCard(margin, currentY, colW, rowH, left.bg);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.setTextColor(left.color.r, left.color.g, left.color.b);
+        doc.text(left.title.toUpperCase(), margin + 5, currentY + 7);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(70, 70, 70);
+        let y = currentY + 12;
+        for (const l of leftLines) {
+          doc.text(l, margin + 5, y);
+          y += lineH(8);
+        }
+      }
+
+      // right card
+      if (right) {
+        const x = margin + colW + gap;
+        drawCard(x, currentY, colW, rowH, right.bg);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.setTextColor(right.color.r, right.color.g, right.color.b);
+        doc.text(right.title.toUpperCase(), x + 5, currentY + 7);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(70, 70, 70);
+        let y = currentY + 12;
+        for (const l of rightLines) {
+          doc.text(l, x + 5, y);
+          y += lineH(8);
+        }
+      }
+
+      currentY += rowH + 6;
     }
+
+    // Score highlights - FULL
+    let scoreHighlights = retratoSection?.score_highlights || [];
+    if (scoreHighlights.length === 0) {
+      scoreHighlights = calculateScoreHighlights(testResults, lang);
+    }
+    if (scoreHighlights.length > 0) {
+      checkPageBreak(10);
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(230, 224, 212);
+      doc.roundedRect(margin, currentY, contentWidth, 10, 3, 3, "FD");
+      doc.setFontSize(8);
+      doc.setTextColor(120, 110, 95);
+      const highlightLines = doc.splitTextToSize(scoreHighlights.join(" • "), contentWidth - 10);
+      doc.text(highlightLines[0], margin + 5, currentY + 6);
+      currentY += 14;
+    }
+
+    addDivider();
   }
-  addDivider();
+
 
   // === 4. PROFILE INDICATORS ===
   const discScores = (testResults as any)?.disc?.scores;
@@ -585,22 +701,63 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     addDivider();
   }
 
-  // === 6. PEACE VS PRESSURE (ALL behaviors) ===
+  // === 6. PEACE VS PRESSURE (two-column cards like screen) ===
   const pazSection = getSection<{ in_peace?: Record<string, unknown>; under_pressure?: Record<string, unknown> }>(sections, "paz_pressao");
   const paz = validatePeacePressure(pazSection, lang);
   if (paz.in_peace.description || paz.under_pressure.description) {
     addSectionTitle(t.peacePressure, GREEN);
-    addLabelValue(t.inPeace, paz.in_peace.description, GREEN);
-    // ALL behaviors - no slice
-    for (const b of paz.in_peace.behaviors) {
-      addBullet(b, 8, GREEN);
+
+    const gap = 6;
+    const colW = (contentWidth - gap) / 2;
+
+    const leftText = [paz.in_peace.description, ...(paz.in_peace.behaviors || []).map((b) => `• ${b}`)].filter(Boolean).join("\n");
+    const rightText = [paz.under_pressure.description, ...(paz.under_pressure.behaviors || []).map((b) => `• ${b}`)].filter(Boolean).join("\n");
+
+    const leftLines = doc.splitTextToSize(leftText, colW - 10);
+    const rightLines = doc.splitTextToSize(rightText, colW - 10);
+
+    const fontSize = 8;
+    const lh = Math.max(3.6, fontSize * 0.45);
+    const cardH = Math.max(30, 14 + Math.max(leftLines.length, rightLines.length) * lh);
+
+    checkPageBreak(cardH + 6);
+
+    // Left (In Peace)
+    doc.setFillColor(243, 252, 248);
+    doc.setDrawColor(226, 220, 210);
+    doc.roundedRect(margin, currentY, colW, cardH, 3, 3, "FD");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(GREEN.r, GREEN.g, GREEN.b);
+    doc.text(t.inPeace.toUpperCase(), margin + 5, currentY + 8);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(fontSize);
+    doc.setTextColor(70, 70, 70);
+    let y = currentY + 13;
+    for (const l of leftLines) {
+      doc.text(l, margin + 5, y);
+      y += lh;
     }
-    currentY += 3;
-    addLabelValue(t.underPressure, paz.under_pressure.description, AMBER);
-    // ALL behaviors - no slice
-    for (const b of paz.under_pressure.behaviors) {
-      addBullet(b, 8, AMBER);
+
+    // Right (Under Pressure)
+    const x = margin + colW + gap;
+    doc.setFillColor(255, 250, 240);
+    doc.setDrawColor(226, 220, 210);
+    doc.roundedRect(x, currentY, colW, cardH, 3, 3, "FD");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(AMBER.r, AMBER.g, AMBER.b);
+    doc.text(t.underPressure.toUpperCase(), x + 5, currentY + 8);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(fontSize);
+    doc.setTextColor(70, 70, 70);
+    y = currentY + 13;
+    for (const l of rightLines) {
+      doc.text(l, x + 5, y);
+      y += lh;
     }
+
+    currentY += cardH + 10;
     addDivider();
   }
 
@@ -919,14 +1076,81 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     addDivider();
   }
 
-  // === 16. DAILY ROUTINE (FULL) ===
-  const rotinaSection = getSection<{ morning?: string; afternoon?: string; night?: string }>(sections, "rotina_diaria");
-  const routine = validateRoutine(rotinaSection, lang);
-  if (routine.morning || routine.afternoon || routine.night) {
+  // === 16. DAILY ROUTINE (cards like screen; supports {practice, ritual_name}) ===
+  const rotinaRaw = getSection<{ morning?: any; afternoon?: any; night?: any }>(sections, "rotina_diaria") || {};
+
+  const pickRoutine = (v: any): { text?: string; ritual?: string } => {
+    if (!v) return {};
+    if (typeof v === "string") return { text: v };
+    if (typeof v === "object") {
+      const ritual = typeof v.ritual_name === "string" ? v.ritual_name : undefined;
+      const text = typeof v.practice === "string" ? v.practice : typeof v.text === "string" ? v.text : ritual;
+      return { text, ritual };
+    }
+    return { text: String(v) };
+  };
+
+  const rMorning = pickRoutine(rotinaRaw.morning);
+  const rAfternoon = pickRoutine(rotinaRaw.afternoon);
+  const rNight = pickRoutine(rotinaRaw.night);
+
+  if (rMorning.text || rAfternoon.text || rNight.text) {
     addSectionTitle(t.routine, GOLD);
-    addLabelValue(t.morning, routine.morning, GOLD);
-    addLabelValue(t.afternoon, routine.afternoon, TEAL);
-    addLabelValue(t.night, routine.night, PURPLE);
+
+    const gap = 5;
+    const colW = (contentWidth - gap * 2) / 3;
+    const baseY = currentY;
+
+    const items = [
+      { title: t.morning, ...rMorning, color: { r: 245, g: 158, b: 11 }, bg: { r: 255, g: 250, b: 240 } },
+      { title: t.afternoon, ...rAfternoon, color: { r: 59, g: 130, b: 246 }, bg: { r: 245, g: 248, b: 255 } },
+      { title: t.night, ...rNight, color: { r: 139, g: 92, b: 246 }, bg: { r: 248, g: 244, b: 255 } },
+    ].filter((i) => Boolean(i.text));
+
+    const maxLines = Math.max(
+      ...items.map((i) => doc.splitTextToSize(i.text as string, colW - 10).length),
+      2
+    );
+    const fs = 8;
+    const lh = Math.max(3.6, fs * 0.45);
+    const cardH = Math.max(26, 14 + maxLines * lh + 6);
+
+    checkPageBreak(cardH + 10);
+
+    for (let idx = 0; idx < items.length; idx++) {
+      const x = margin + idx * (colW + gap);
+      const it = items[idx];
+
+      doc.setFillColor(it.bg.r, it.bg.g, it.bg.b);
+      doc.setDrawColor(226, 220, 210);
+      doc.setLineWidth(0.35);
+      doc.roundedRect(x, baseY, colW, cardH, 3, 3, "FD");
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(it.color.r, it.color.g, it.color.b);
+      doc.text(it.title.toUpperCase(), x + 5, baseY + 8);
+
+      let y = baseY + 13;
+      if (it.ritual) {
+        doc.setFont("helvetica", "italic");
+        doc.setFontSize(7);
+        doc.setTextColor(120, 110, 95);
+        doc.text(`"${it.ritual}"`, x + 5, y);
+        y += 4;
+      }
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(fs);
+      doc.setTextColor(70, 70, 70);
+      const lines = doc.splitTextToSize(it.text as string, colW - 10);
+      for (const l of lines) {
+        doc.text(l, x + 5, y);
+        y += lh;
+      }
+    }
+
+    currentY = baseY + cardH + 10;
     addDivider();
   }
 
