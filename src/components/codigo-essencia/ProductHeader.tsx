@@ -13,7 +13,9 @@ export const ProductHeader = ({ userName, language = "pt" }: ProductHeaderProps)
       badge: "MÉTODO NELLO ONE™",
       title: "Código da Essência",
       tagline: "Isso não é um teste. É um código que você vai viver.",
-      promise: `${firstName}, este documento revela quem você realmente é — não quem você tenta ser. Use-o para tomar decisões melhores, construir relacionamentos mais honestos e viver com mais clareza.`,
+      promiseLine1: `${firstName}, este documento traz uma leitura profunda sobre seus padrões, forças e riscos, com base nos testes que você respondeu.`,
+      promiseLine2: "Use este material como um espelho para refletir, tomar decisões melhores, construir relacionamentos mais honestos e viver com mais clareza.",
+      promiseLine3: "Este não é um diagnóstico, nem define quem você é. É um convite à consciência, ao desenvolvimento e à melhoria contínua.",
       warning: "Aviso: O que você está prestes a ler pode incomodar. Verdade costuma fazer isso.",
       pillars: [
         { icon: "🎯", label: "Precisão", desc: "7 testes integrados" },
@@ -25,7 +27,9 @@ export const ProductHeader = ({ userName, language = "pt" }: ProductHeaderProps)
       badge: "MÉTODO NELLO ONE™",
       title: "Código da Essência",
       tagline: "Isto não é um teste. É um código que vais viver.",
-      promise: `${firstName}, este documento revela quem tu realmente és — não quem tu tentas ser. Usa-o para tomar decisões melhores, construir relacionamentos mais honestos e viver com mais clareza.`,
+      promiseLine1: `${firstName}, este documento traz uma leitura profunda sobre os teus padrões, forças e riscos, com base nos testes que respondeste.`,
+      promiseLine2: "Usa este material como um espelho para refletir, tomar decisões melhores, construir relacionamentos mais honestos e viver com mais clareza.",
+      promiseLine3: "Este não é um diagnóstico, nem define quem tu és. É um convite à consciência, ao desenvolvimento e à melhoria contínua.",
       warning: "Aviso: O que estás prestes a ler pode incomodar. A verdade costuma fazer isso.",
       pillars: [
         { icon: "🎯", label: "Precisão", desc: "7 testes integrados" },
@@ -37,7 +41,9 @@ export const ProductHeader = ({ userName, language = "pt" }: ProductHeaderProps)
       badge: "NELLO ONE™ METHOD",
       title: "Essence Code",
       tagline: "This is not a test. It's a code you will live.",
-      promise: `${firstName}, this document reveals who you really are — not who you try to be. Use it to make better decisions, build more honest relationships, and live with greater clarity.`,
+      promiseLine1: `${firstName}, this document offers a deep reading of your patterns, strengths and risks, based on the tests you completed.`,
+      promiseLine2: "Use this material as a mirror to reflect, make better decisions, build more honest relationships, and live with greater clarity.",
+      promiseLine3: "This is not a diagnosis, nor does it define who you are. It's an invitation to awareness, development, and continuous improvement.",
       warning: "Warning: What you're about to read may be uncomfortable. Truth often is.",
       pillars: [
         { icon: "🎯", label: "Precision", desc: "7 integrated tests" },
@@ -79,9 +85,15 @@ export const ProductHeader = ({ userName, language = "pt" }: ProductHeaderProps)
 
         {/* Promise Box */}
         <div className="max-w-2xl mx-auto mb-6">
-          <div className="bg-background/80 backdrop-blur border border-border rounded-xl p-5">
+          <div className="bg-background/80 backdrop-blur border border-border rounded-xl p-5 space-y-3">
             <p className="text-sm md:text-base leading-relaxed text-center">
-              {t.promise}
+              {t.promiseLine1}
+            </p>
+            <p className="text-sm md:text-base leading-relaxed text-center">
+              {t.promiseLine2}
+            </p>
+            <p className="text-sm md:text-base leading-relaxed text-center text-muted-foreground italic">
+              {t.promiseLine3}
             </p>
           </div>
         </div>
