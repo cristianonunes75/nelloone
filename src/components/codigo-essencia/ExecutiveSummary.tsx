@@ -1,6 +1,7 @@
-import { User, Zap, AlertTriangle, Scale, Target, Quote } from "lucide-react";
+import { User, Zap, AlertTriangle, Scale, Target, Quote, Compass } from "lucide-react";
 
 interface ExecutiveSummaryProps {
+  tresForcasCentrais?: string[];
   quemVoceE: string;
   maiorForca: string;
   maiorRisco: string;
@@ -11,6 +12,7 @@ interface ExecutiveSummaryProps {
 }
 
 export const ExecutiveSummary = ({
+  tresForcasCentrais,
   quemVoceE,
   maiorForca,
   maiorRisco,
@@ -23,6 +25,7 @@ export const ExecutiveSummary = ({
     pt: {
       title: "Seu Código em 1 Página",
       subtitle: "O essencial sobre quem você é",
+      centralForces: "Seu Código gira em torno de 3 forças centrais",
       whoYouAre: "Quem Você É",
       greatestStrength: "Maior Força",
       greatestRisk: "Maior Risco",
@@ -33,6 +36,7 @@ export const ExecutiveSummary = ({
     "pt-pt": {
       title: "O Teu Código em 1 Página",
       subtitle: "O essencial sobre quem tu és",
+      centralForces: "O teu Código gira em torno de 3 forças centrais",
       whoYouAre: "Quem Tu És",
       greatestStrength: "Maior Força",
       greatestRisk: "Maior Risco",
@@ -43,6 +47,7 @@ export const ExecutiveSummary = ({
     en: {
       title: "Your Code in 1 Page",
       subtitle: "The essentials about who you are",
+      centralForces: "Your Code revolves around 3 central forces",
       whoYouAre: "Who You Are",
       greatestStrength: "Greatest Strength",
       greatestRisk: "Greatest Risk",
@@ -65,8 +70,28 @@ export const ExecutiveSummary = ({
         <p className="text-xs text-muted-foreground">{t.subtitle}</p>
       </div>
 
-      {/* Main Grid */}
+      {/* Main Content */}
       <div className="space-y-4">
+        {/* 3 Central Forces - New Section */}
+        {tresForcasCentrais && tresForcasCentrais.length > 0 && (
+          <div className="bg-gradient-to-r from-primary/20 to-accent/20 border-2 border-primary/40 rounded-xl p-5 mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Compass className="w-5 h-5 text-primary" />
+              <span className="font-bold text-primary text-sm">{t.centralForces}:</span>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {tresForcasCentrais.map((forca, index) => (
+                <span
+                  key={index}
+                  className="bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold shadow-md"
+                >
+                  {index + 1}. {forca}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Who You Are - Full Width */}
         <div className="bg-background/80 border border-primary/20 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">

@@ -614,6 +614,7 @@ const CodigoEssenciaInner = () => {
             {resumoExecutivoSection && (resumoExecutivoSection.quem_voce_e || resumoExecutivoSection.frase_sintese) && (
               <>
                 <ExecutiveSummary 
+                  tresForcasCentrais={resumoExecutivoSection.tres_forcas_centrais}
                   quemVoceE={resumoExecutivoSection.quem_voce_e || ""}
                   maiorForca={resumoExecutivoSection.maior_forca || ""}
                   maiorRisco={resumoExecutivoSection.maior_risco || ""}
