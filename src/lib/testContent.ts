@@ -2,6 +2,12 @@
 export interface TestContent {
   title: string;
   subtitle: string;
+  about: {
+    acronym?: string; // Full name behind acronym (if applicable)
+    origin: string; // Who created/where it comes from
+    objective: string; // Main goal of the test
+    methodology: string; // How it works conceptually
+  };
   storytelling: string;
   benefits: string[];
   audience: string;
@@ -36,6 +42,11 @@ export const testContent: Record<string, TestContentMap> = {
     pt: {
       title: "Arquétipos",
       subtitle: "Descubra o símbolo que habita em você",
+      about: {
+        origin: "Criado por Carl Jung (1875-1961), psiquiatra suíço, e popularizado por Carol S. Pearson para aplicação em marcas e comunicação.",
+        objective: "Identificar os padrões universais de comportamento e imagem que moldam como você se apresenta ao mundo e se conecta com os outros.",
+        methodology: "Baseado em 12 arquétipos universais (Herói, Mago, Sábio, etc.), o teste mapeia quais símbolos dominam sua personalidade e como eles influenciam sua comunicação e presença.",
+      },
       storytelling: `Antes de qualquer palavra, o mundo já sente quem você é.
 Essa presença é o reflexo do seu arquétipo — a energia que comunica sua verdade antes mesmo que você fale.
 
@@ -64,6 +75,11 @@ Mais do que marketing, é um mapa espiritual da sua comunicação.`,
     en: {
       title: "Archetypes",
       subtitle: "Discover the symbol that lives within you",
+      about: {
+        origin: "Created by Carl Jung (1875-1961), Swiss psychiatrist, and popularized by Carol S. Pearson for application in branding and communication.",
+        objective: "Identify the universal behavior and image patterns that shape how you present yourself to the world and connect with others.",
+        methodology: "Based on 12 universal archetypes (Hero, Magician, Sage, etc.), the test maps which symbols dominate your personality and how they influence your communication and presence.",
+      },
       storytelling: `Before any words are spoken, the world already senses who you are.
 This presence is a reflection of your archetype — the energy that communicates your truth before you even speak.
 
@@ -94,6 +110,12 @@ More than marketing, it's a spiritual map of your communication.`,
     pt: {
       title: "DISC",
       subtitle: "Descubra seu perfil comportamental",
+      about: {
+        acronym: "D = Dominância, I = Influência, S = Estabilidade (Steadiness), C = Conformidade (Conscientiousness)",
+        origin: "Desenvolvido por William Moulton Marston em 1928 no livro 'Emotions of Normal People'. Hoje é uma das ferramentas comportamentais mais usadas no mundo corporativo.",
+        objective: "Mapear seu estilo natural de comportamento para entender como você age, se comunica e toma decisões em diferentes situações.",
+        methodology: "Avalia 4 dimensões comportamentais: como você lida com desafios (D), influencia pessoas (I), responde ao ritmo do ambiente (S) e segue regras e procedimentos (C).",
+      },
       storytelling: `Este teste identifica o seu perfil comportamental natural. A metodologia DISC revela como você reage, decide, comunica e contribui em diferentes contextos da vida e do trabalho.
 
 Cada pessoa tem um ritmo único de ação. O DISC mostra como você se expressa, toma decisões e se relaciona. No NELLO ONE, esse teste ajuda você a compreender o que move suas atitudes e como gerar impacto com equilíbrio e autenticidade.`,
@@ -121,6 +143,12 @@ Cada pessoa tem um ritmo único de ação. O DISC mostra como você se expressa,
     en: {
       title: "DISC",
       subtitle: "Discover your behavioral profile",
+      about: {
+        acronym: "D = Dominance, I = Influence, S = Steadiness, C = Conscientiousness",
+        origin: "Developed by William Moulton Marston in 1928 in the book 'Emotions of Normal People'. Today it is one of the most widely used behavioral tools in the corporate world.",
+        objective: "Map your natural behavioral style to understand how you act, communicate and make decisions in different situations.",
+        methodology: "Evaluates 4 behavioral dimensions: how you deal with challenges (D), influence people (I), respond to the pace of the environment (S) and follow rules and procedures (C).",
+      },
       storytelling: `This test identifies your natural behavioral profile. The DISC methodology reveals how you react, decide, communicate and contribute in different life and work contexts.
 
 Each person has a unique rhythm of action. DISC shows how you express yourself, make decisions and relate to others. In NELLO ONE, this test helps you understand what drives your attitudes and how to create impact with balance and authenticity.`,
@@ -150,6 +178,11 @@ Each person has a unique rhythm of action. DISC shows how you express yourself, 
     pt: {
       title: "Temperamentos",
       subtitle: "Conheça sua natureza essencial",
+      about: {
+        origin: "Teoria criada por Hipócrates (460-370 a.C.), o pai da medicina, e aprofundada por Galeno. É uma das mais antigas formas de compreender a personalidade humana.",
+        objective: "Revelar sua natureza emocional fundamental — o 'motor interno' que influencia suas reações, ritmo de vida e forma de se relacionar.",
+        methodology: "Classifica em 4 temperamentos: Sanguíneo (expansivo, sociável), Colérico (decidido, intenso), Melancólico (profundo, detalhista) e Fleumático (calmo, observador). Cada pessoa tem um dominante e um secundário.",
+      },
       storytelling: `Desde Hipócrates, o ser humano busca entender as quatro formas fundamentais de ser: sanguíneo, colérico, melancólico e fleumático.
 
 Esse teste revela a base da sua personalidade — e como harmonizar suas tendências naturais com propósito e equilíbrio.`,
@@ -176,6 +209,11 @@ Esse teste revela a base da sua personalidade — e como harmonizar suas tendên
     en: {
       title: "Temperaments",
       subtitle: "Know your essential nature",
+      about: {
+        origin: "Theory created by Hippocrates (460-370 BC), the father of medicine, and deepened by Galen. It is one of the oldest ways to understand human personality.",
+        objective: "Reveal your fundamental emotional nature — the 'internal engine' that influences your reactions, pace of life and way of relating.",
+        methodology: "Classifies into 4 temperaments: Sanguine (expansive, sociable), Choleric (decisive, intense), Melancholic (deep, detailed) and Phlegmatic (calm, observant). Each person has a dominant and a secondary one.",
+      },
       storytelling: `Since Hippocrates, humanity has sought to understand the four fundamental ways of being: sanguine, choleric, melancholic and phlegmatic.
 
 This test reveals the foundation of your personality — and how to harmonize your natural tendencies with purpose and balance.`,
@@ -204,6 +242,11 @@ This test reveals the foundation of your personality — and how to harmonize yo
     pt: {
       title: "Mapa dos Estilos de Conexão Afetiva",
       subtitle: "Como você se conecta emocionalmente?",
+      about: {
+        origin: "Inspirado no trabalho de Gary Chapman ('As 5 Linguagens do Amor', 1992), adaptado pelo Nello para uma perspectiva mais ampla de conexão emocional.",
+        objective: "Descobrir como você expressa e recebe afeto, melhorando a qualidade dos seus relacionamentos pessoais e profissionais.",
+        methodology: "Mapeia 5 estilos de conexão: Tempo de Qualidade (presença), Palavras de Afirmação (reconhecimento verbal), Atos de Serviço (ajuda prática), Presentes (gestos simbólicos) e Toque Físico (contato). Identifica seu estilo primário e secundário.",
+      },
       storytelling: `Cada pessoa se conecta emocionalmente de formas diferentes: através da presença, das palavras, do cuidado prático, de gestos simbólicos ou do contato físico.
 
 Este teste revela seu estilo primário de conexão afetiva — e como você pode cultivar relacionamentos mais profundos e autênticos.`,
@@ -230,6 +273,11 @@ Este teste revela seu estilo primário de conexão afetiva — e como você pode
     en: {
       title: "Affection Connection Styles",
       subtitle: "How do you emotionally connect?",
+      about: {
+        origin: "Inspired by Gary Chapman's work ('The 5 Love Languages', 1992), adapted by Nello for a broader perspective on emotional connection.",
+        objective: "Discover how you express and receive affection, improving the quality of your personal and professional relationships.",
+        methodology: "Maps 5 connection styles: Quality Time (presence), Words of Affirmation (verbal recognition), Acts of Service (practical help), Gifts (symbolic gestures) and Physical Touch (contact). Identifies your primary and secondary style.",
+      },
       storytelling: `Each person connects emotionally in different ways: through presence, words, practical care, symbolic gestures or physical contact.
 
 This test reveals your primary affection connection style — and how you can cultivate deeper and more authentic relationships.`,
@@ -256,6 +304,11 @@ This test reveals your primary affection connection style — and how you can cu
     'pt-pt': {
       title: "Mapa dos Estilos de Conexão Afetiva",
       subtitle: "Como te conectas emocionalmente?",
+      about: {
+        origin: "Inspirado no trabalho de Gary Chapman ('As 5 Linguagens do Amor', 1992), adaptado pelo Nello para uma perspetiva mais ampla de conexão emocional.",
+        objective: "Descobrir como expressas e recebes afeto, melhorando a qualidade dos teus relacionamentos pessoais e profissionais.",
+        methodology: "Mapeia 5 estilos de conexão: Tempo de Qualidade (presença), Palavras de Afirmação (reconhecimento verbal), Atos de Serviço (ajuda prática), Presentes (gestos simbólicos) e Toque Físico (contacto). Identifica o teu estilo primário e secundário.",
+      },
       storytelling: `Cada pessoa conecta-se emocionalmente de formas diferentes: através da presença, das palavras, do cuidado prático, de gestos simbólicos ou do contacto físico.
 
 Este teste revela o teu estilo primário de conexão afetiva — e como podes cultivar relacionamentos mais profundos e autênticos.`,
@@ -284,6 +337,11 @@ Este teste revela o teu estilo primário de conexão afetiva — e como podes cu
     pt: {
       title: "Inteligências Múltiplas",
       subtitle: "Reconheça seus dons e talentos",
+      about: {
+        origin: "Teoria desenvolvida por Howard Gardner em 1983 (Harvard), revolucionando a visão de que inteligência não é única, mas múltipla.",
+        objective: "Mapear suas 8 inteligências para descobrir onde estão seus maiores talentos naturais e como desenvolvê-los estrategicamente.",
+        methodology: "Avalia 8 tipos de inteligência: Linguística (palavras), Lógico-Matemática (raciocínio), Musical (ritmo e sons), Corporal-Cinestésica (movimento), Espacial (visualização), Interpessoal (pessoas), Intrapessoal (autoconhecimento) e Naturalista (natureza e padrões).",
+      },
       storytelling: `Cada pessoa tem uma combinação única de talentos e formas de pensar. O teste das Inteligências Múltiplas mostra quais áreas da sua mente têm mais energia — e como usá-las no trabalho, na vocação e na vida.`,
       benefits: [
         "Gráfico com suas 8 inteligências mapeadas",
@@ -308,6 +366,11 @@ Este teste revela o teu estilo primário de conexão afetiva — e como podes cu
     en: {
       title: "Multiple Intelligences",
       subtitle: "Recognize your gifts and talents",
+      about: {
+        origin: "Theory developed by Howard Gardner in 1983 (Harvard), revolutionizing the view that intelligence is not unique, but multiple.",
+        objective: "Map your 8 intelligences to discover where your greatest natural talents lie and how to develop them strategically.",
+        methodology: "Evaluates 8 types of intelligence: Linguistic (words), Logical-Mathematical (reasoning), Musical (rhythm and sounds), Bodily-Kinesthetic (movement), Spatial (visualization), Interpersonal (people), Intrapersonal (self-knowledge) and Naturalistic (nature and patterns).",
+      },
       storytelling: `Each person has a unique combination of talents and ways of thinking. The Multiple Intelligences test shows which areas of your mind have the most energy — and how to use them in work, vocation and life.`,
       benefits: [
         "Graph with your 8 intelligences mapped",
@@ -334,6 +397,12 @@ Este teste revela o teu estilo primário de conexão afetiva — e como podes cu
     pt: {
       title: "Eneagrama",
       subtitle: "O mapa das motivações da alma",
+      about: {
+        acronym: "Do grego 'ennea' (nove) + 'gramma' (figura/desenho) = figura de nove pontas",
+        origin: "Sistema com raízes antigas (tradição Sufi, séculos 14-15), modernizado por Oscar Ichazo e Claudio Naranjo nos anos 1960-70.",
+        objective: "Revelar suas motivações inconscientes, medos centrais e caminhos de crescimento pessoal e espiritual.",
+        methodology: "Identifica 9 tipos de personalidade (1-Perfeccionista, 2-Ajudador, 3-Realizador, 4-Romântico, 5-Observador, 6-Questionador, 7-Entusiasta, 8-Desafiador, 9-Pacificador), cada um com suas motivações, medos e caminhos de evolução únicos.",
+      },
       storytelling: `Por trás de cada atitude, existe uma motivação. O Eneagrama revela o que move seu coração — as virtudes e desafios que moldam seu modo de amar, trabalhar e viver.
 
 No NELLO ONE, ele é uma chave para a liberdade interior.`,
@@ -361,6 +430,12 @@ No NELLO ONE, ele é uma chave para a liberdade interior.`,
     en: {
       title: "Enneagram",
       subtitle: "The map of the soul's motivations",
+      about: {
+        acronym: "From Greek 'ennea' (nine) + 'gramma' (figure/drawing) = nine-pointed figure",
+        origin: "System with ancient roots (Sufi tradition, 14th-15th centuries), modernized by Oscar Ichazo and Claudio Naranjo in the 1960s-70s.",
+        objective: "Reveal your unconscious motivations, core fears and paths for personal and spiritual growth.",
+        methodology: "Identifies 9 personality types (1-Perfectionist, 2-Helper, 3-Achiever, 4-Romantic, 5-Observer, 6-Questioner, 7-Enthusiast, 8-Challenger, 9-Peacemaker), each with their unique motivations, fears and evolution paths.",
+      },
       storytelling: `Behind every attitude, there is a motivation. The Enneagram reveals what moves your heart — the virtues and challenges that shape how you love, work and live.
 
 In NELLO ONE, it is a key to inner freedom.`,
@@ -390,6 +465,12 @@ In NELLO ONE, it is a key to inner freedom.`,
     pt: {
       title: "Nello 16 Personality Map",
       subtitle: "Descubra seu perfil psicológico em 4 letras",
+      about: {
+        acronym: "As 4 letras representam: E/I (Extroversão/Introversão), S/N (Sensação/Intuição), T/F (Pensamento/Sentimento), J/P (Julgamento/Percepção)",
+        origin: "Baseado nas teorias de Carl Jung (1921) e desenvolvido por Katharine Briggs e Isabel Myers. Adaptado pelo Nello para uma versão moderna e acessível.",
+        objective: "Revelar seu tipo psicológico único entre 16 perfis possíveis, mostrando como você percebe o mundo e toma decisões.",
+        methodology: "Avalia 4 dimensões: de onde vem sua energia (E/I), como você coleta informações (S/N), como você toma decisões (T/F) e como você organiza sua vida (J/P).",
+      },
       storytelling: `O Nello 16 Personality Map é um sistema exclusivo do Nello One que traduz as teorias de Carl Jung em um modelo moderno de 16 perfis psicológicos.
 
 Ele identifica como você percebe o mundo, processa informações, toma decisões e se relaciona com diferentes ambientes.
@@ -418,6 +499,12 @@ Em poucos minutos, você descobre seus pontos fortes naturais, seus desafios emo
     en: {
       title: "Nello 16 Personality Map",
       subtitle: "Discover your 4-letter psychological type",
+      about: {
+        acronym: "The 4 letters represent: E/I (Extraversion/Introversion), S/N (Sensing/Intuition), T/F (Thinking/Feeling), J/P (Judging/Perceiving)",
+        origin: "Based on Carl Jung's theories (1921) and developed by Katharine Briggs and Isabel Myers. Adapted by Nello for a modern and accessible version.",
+        objective: "Reveal your unique psychological type among 16 possible profiles, showing how you perceive the world and make decisions.",
+        methodology: "Evaluates 4 dimensions: where your energy comes from (E/I), how you gather information (S/N), how you make decisions (T/F) and how you organize your life (J/P).",
+      },
       storytelling: `The Nello 16 Personality Map is a proprietary Nello One system inspired by Carl Jung's psychological type theory and redesigned for the modern world.
 
 It helps you understand how you perceive reality, process information, make decisions, and interact with different environments.
@@ -446,6 +533,12 @@ In just a few minutes, you'll discover your natural strengths, your emotional ch
     'pt-pt': {
       title: "Mapa das 16 Personalidades Nello",
       subtitle: "Descubra o seu perfil psicológico em 4 letras",
+      about: {
+        acronym: "As 4 letras representam: E/I (Extroversão/Introversão), S/N (Sensação/Intuição), T/F (Pensamento/Sentimento), J/P (Julgamento/Perceção)",
+        origin: "Baseado nas teorias de Carl Jung (1921) e desenvolvido por Katharine Briggs e Isabel Myers. Adaptado pelo Nello para uma versão moderna e acessível.",
+        objective: "Revelar o seu tipo psicológico único entre 16 perfis possíveis, mostrando como percebe o mundo e toma decisões.",
+        methodology: "Avalia 4 dimensões: de onde vem a sua energia (E/I), como recolhe informações (S/N), como toma decisões (T/F) e como organiza a sua vida (J/P).",
+      },
       storytelling: `O Mapa das 16 Personalidades Nello é um sistema exclusivo do Nello One que transforma as teorias de Carl Jung num modelo moderno composto por 16 perfis psicológicos.
 
 Ele identifica a forma como percebe o mundo, processa informação, toma decisões e se adapta a diferentes contextos.

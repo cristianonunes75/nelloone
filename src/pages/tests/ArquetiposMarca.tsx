@@ -1,22 +1,20 @@
 import { TestDetailLayout } from "@/components/tests/TestDetailLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { testContent } from "@/lib/testContent";
 
 const ArquetiposMarca = () => {
+  const { language } = useLanguage();
+  const content = testContent.arquetipos[language as keyof typeof testContent.arquetipos] || testContent.arquetipos.pt;
+
   return (
     <TestDetailLayout
-      title="Arquétipos de Marca"
-      subtitle="Descubra o símbolo que habita em você"
-      storytelling="Antes de qualquer palavra, o mundo já sente quem você é.
-Essa presença é o reflexo do seu arquétipo — a energia que comunica sua verdade antes mesmo que você fale.
-
-No NELLO ONE, esse teste revela as forças simbólicas que movem sua personalidade, sua imagem e sua missão.
-Mais do que marketing, é um mapa da sua comunicação."
-      benefits={[
-        "Seu arquétipo principal e o complementar",
-        "Como traduzir propósito em presença",
-        "Como alinhar sua imagem à sua verdade interior",
-      ]}
-      audience="Líderes, empreendedores e comunicadores que desejam se posicionar com fé, autoridade e autenticidade."
+      title={content.title}
+      subtitle={content.subtitle}
+      storytelling={content.storytelling}
+      benefits={content.benefits}
+      audience={content.audience}
       testType="arquetipos"
+      about={content.about}
     />
   );
 };

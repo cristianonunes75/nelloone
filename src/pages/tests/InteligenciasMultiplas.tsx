@@ -1,20 +1,20 @@
 import { TestDetailLayout } from "@/components/tests/TestDetailLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { testContent } from "@/lib/testContent";
 
 const InteligenciasMultiplas = () => {
+  const { language } = useLanguage();
+  const content = testContent.inteligencias_multiplas[language as keyof typeof testContent.inteligencias_multiplas] || testContent.inteligencias_multiplas.pt;
+
   return (
     <TestDetailLayout
-      title="Inteligências Múltiplas"
-      subtitle="Reconheça seus dons e talentos"
-      storytelling="Cada pessoa tem uma combinação única de talentos e formas de pensar. O teste das Inteligências Múltiplas mostra quais áreas da sua mente têm mais energia — e como usá-las no trabalho, na vocação e na vida."
-      benefits={[
-        "40 perguntas para revelar como sua mente aprende, cria e realiza",
-        "Relatório de 10 páginas com leitura simbólica + plano de ação pessoal",
-        "Gráfico com suas 8 inteligências mapeadas",
-        "Recomendações personalizadas de desenvolvimento",
-        "Acesso completo ao seu perfil de inteligências"
-      ]}
-      audience="Profissionais, educadores, artistas e empreendedores que desejam alinhar talento, propósito e fé."
+      title={content.title}
+      subtitle={content.subtitle}
+      storytelling={content.storytelling}
+      benefits={content.benefits}
+      audience={content.audience}
       testType="inteligencias_multiplas"
+      about={content.about}
     />
   );
 };
