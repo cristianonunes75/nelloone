@@ -1103,6 +1103,53 @@ export type Database = {
         }
         Relationships: []
       }
+      relatorio_conjuge: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          is_public_active: boolean
+          mapa_essencia_id: string | null
+          public_token: string
+          public_token_expires_at: string | null
+          raw_content: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_public_active?: boolean
+          mapa_essencia_id?: string | null
+          public_token?: string
+          public_token_expires_at?: string | null
+          raw_content?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_public_active?: boolean
+          mapa_essencia_id?: string | null
+          public_token?: string
+          public_token_expires_at?: string | null
+          raw_content?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relatorio_conjuge_mapa_essencia_id_fkey"
+            columns: ["mapa_essencia_id"]
+            isOneToOne: false
+            referencedRelation: "mapa_essencia"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       system_settings: {
         Row: {
           category: string

@@ -29,3 +29,4 @@ export { ProfileRarityBadge } from "./ProfileRarityBadge";
 export { CentralTruths } from "./CentralTruths";
 export { SectionSummary } from "./SectionSummary";
 export { ProvocativeClosing } from "./ProvocativeClosing";
+export { RelatorioConjuge } from "./RelatorioConjuge";
