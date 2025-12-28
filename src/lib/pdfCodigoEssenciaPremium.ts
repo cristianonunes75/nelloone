@@ -297,12 +297,23 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
 
   let currentY = margin;
 
-  // Helper: check page break
+  // Helper: check page break - ensures section doesn't split
   const checkPageBreak = (neededHeight: number): void => {
     if (currentY + neededHeight > pageHeight - 20) {
       doc.addPage();
       currentY = margin;
       // Footer on new page
+      doc.setFontSize(7);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`${t.brand}`, margin, pageHeight - 8);
+    }
+  };
+
+  // Helper: ensure section starts on new page if not enough space
+  const ensureSectionFits = (estimatedHeight: number): void => {
+    if (currentY + estimatedHeight > pageHeight - 25) {
+      doc.addPage();
+      currentY = margin;
       doc.setFontSize(7);
       doc.setTextColor(150, 150, 150);
       doc.text(`${t.brand}`, margin, pageHeight - 8);
@@ -321,7 +332,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     currentY += 12;
   };
 
-  // Helper: add text block - FULL content without slicing
+  // Helper: add text block - ALWAYS left-aligned
   const addText = (text: string, fontSize = 9, color = { r: 60, g: 60, b: 60 }): void => {
     if (!text) return;
     doc.setFontSize(fontSize);
@@ -330,13 +341,13 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     const lines = doc.splitTextToSize(text, contentWidth - 8);
     for (const line of lines) {
       checkPageBreak(5);
-      doc.text(line, margin + 4, currentY);
+      doc.text(line, margin + 4, currentY, { align: "left" });
       currentY += fontSize * 0.45;
     }
     currentY += 2;
   };
 
-  // Helper: add bullet point
+  // Helper: add bullet point - left-aligned
   const addBullet = (text: string, fontSize = 9, color = { r: 60, g: 60, b: 60 }): void => {
     if (!text) return;
     doc.setFontSize(fontSize);
@@ -345,20 +356,20 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     const lines = doc.splitTextToSize(`• ${text}`, contentWidth - 12);
     for (const line of lines) {
       checkPageBreak(5);
-      doc.text(line, margin + 6, currentY);
+      doc.text(line, margin + 6, currentY, { align: "left" });
       currentY += fontSize * 0.45;
     }
     currentY += 1;
   };
 
-  // Helper: add label + value - FULL content
+  // Helper: add label + value - left-aligned
   const addLabelValue = (label: string, value: string, labelColor = PRIMARY): void => {
     if (!value) return;
     checkPageBreak(10);
     doc.setTextColor(labelColor.r, labelColor.g, labelColor.b);
     doc.setFontSize(8);
     doc.setFont("helvetica", "bold");
-    doc.text(label.toUpperCase(), margin + 4, currentY);
+    doc.text(label.toUpperCase(), margin + 4, currentY, { align: "left" });
     currentY += 4;
     doc.setTextColor(70, 70, 70);
     doc.setFont("helvetica", "normal");
@@ -366,7 +377,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
     const lines = doc.splitTextToSize(value, contentWidth - 8);
     for (const line of lines) {
       checkPageBreak(5);
-      doc.text(line, margin + 4, currentY);
+      doc.text(line, margin + 4, currentY, { align: "left" });
       currentY += 4;
     }
     currentY += 2;
@@ -385,6 +396,41 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   // Helper: add spacer
   const addSpacer = (height = 4): void => {
     currentY += height;
+  };
+
+  // Helper: draw horizontal bar chart (for DISC, Indicators)
+  const drawBarChart = (
+    bars: { label: string; value: number; color: { r: number; g: number; b: number } }[],
+    x: number,
+    y: number,
+    width: number
+  ): number => {
+    const barHeight = 6;
+    const barGap = 8;
+    let barY = y;
+    
+    for (const bar of bars) {
+      // Label and percentage
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(60, 60, 60);
+      doc.text(bar.label, x, barY, { align: "left" });
+      doc.text(`${bar.value}%`, x + width, barY, { align: "right" });
+      barY += 3;
+      
+      // Background bar
+      doc.setFillColor(230, 230, 230);
+      doc.roundedRect(x, barY, width, barHeight, 1, 1, "F");
+      
+      // Value bar
+      const barWidth = Math.max(2, (bar.value / 100) * width);
+      doc.setFillColor(bar.color.r, bar.color.g, bar.color.b);
+      doc.roundedRect(x, barY, barWidth, barHeight, 1, 1, "F");
+      
+      barY += barGap;
+    }
+    
+    return barY;
   };
 
   // === COVER PAGE (match screen: warm editorial) ===
@@ -659,27 +705,95 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   }
 
 
-  // === 4. PROFILE INDICATORS ===
+  // === 4. PROFILE INDICATORS with DISC Chart & Essence Indicators ===
   const discScores = (testResults as any)?.disc?.scores;
   const tempPrimary = (testResults as any)?.temperamentos?.primary;
+  const tempScores = (testResults as any)?.temperamentos?.scores;
   const connectionPrimary = (testResults as any)?.linguagens_amor?.primary?.style || 
                            (testResults as any)?.estilos_conexao_afetiva?.primary?.style ||
                            (testResults as any)?.linguagens_amor?.primary?.language;
   
   if (discScores || tempPrimary || connectionPrimary) {
+    // Estimate section height to avoid page break in the middle
+    ensureSectionFits(90);
     addSectionTitle(t.profileIndicators, BLUE);
     
+    // === DISC BAR CHART ===
     if (discScores) {
-      const discStr = `DISC: D=${discScores.D || 0}% | I=${discScores.I || 0}% | S=${discScores.S || 0}% | C=${discScores.C || 0}%`;
-      addText(discStr, 9);
+      const discTotal = (discScores.D || 0) + (discScores.I || 0) + (discScores.S || 0) + (discScores.C || 0) || 1;
+      
+      // Title
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(PRIMARY.r, PRIMARY.g, PRIMARY.b);
+      doc.text("DISC", margin + 4, currentY, { align: "left" });
+      currentY += 6;
+      
+      const discBars = [
+        { label: lang === "en" ? "Dominance (D)" : "Dominância (D)", value: Math.round(((discScores.D || 0) / discTotal) * 100), color: { r: 239, g: 68, b: 68 } },
+        { label: lang === "en" ? "Influence (I)" : "Influência (I)", value: Math.round(((discScores.I || 0) / discTotal) * 100), color: { r: 234, g: 179, b: 8 } },
+        { label: lang === "en" ? "Steadiness (S)" : "Estabilidade (S)", value: Math.round(((discScores.S || 0) / discTotal) * 100), color: { r: 34, g: 197, b: 94 } },
+        { label: lang === "en" ? "Conscientiousness (C)" : "Conformidade (C)", value: Math.round(((discScores.C || 0) / discTotal) * 100), color: { r: 59, g: 130, b: 246 } },
+      ];
+      
+      currentY = drawBarChart(discBars, margin + 4, currentY, contentWidth - 8);
+      currentY += 4;
     }
+    
+    // === ESSENCE INDICATORS (calculated from DISC) ===
+    if (discScores) {
+      const total = (discScores.D || 0) + (discScores.I || 0) + (discScores.S || 0) + (discScores.C || 0) || 1;
+      
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(TEAL.r, TEAL.g, TEAL.b);
+      doc.text(lang === "en" ? "Essence Indicators" : "Indicadores de Essência", margin + 4, currentY, { align: "left" });
+      currentY += 6;
+      
+      const actionValue = Math.round(((discScores.D + discScores.I) / total) * 100);
+      const relationValue = Math.round(((discScores.I + discScores.S) / total) * 100);
+      const reflectionValue = Math.round(((discScores.S + discScores.C) / total) * 100);
+      const resultsValue = Math.round(((discScores.D + discScores.C) / total) * 100);
+      
+      // Openness from temperament
+      let opennessValue = 50;
+      if (tempScores) {
+        const sanguine = tempScores.sanguineo || tempScores.sanguine || 0;
+        const phlegmatic = tempScores.fleumatico || tempScores.phlegmatic || 0;
+        opennessValue = Math.min(100, Math.round((sanguine + phlegmatic) * 1.5));
+      }
+      
+      const essenceBars = [
+        { label: lang === "en" ? "🔥 Action Intensity" : "🔥 Intensidade de Ação", value: actionValue, color: ORANGE },
+        { label: lang === "en" ? "💬 Relational Depth" : "💬 Profundidade Relacional", value: relationValue, color: BLUE },
+        { label: lang === "en" ? "🧠 Reflection Level" : "🧠 Nível de Reflexão", value: reflectionValue, color: PURPLE },
+        { label: lang === "en" ? "🎯 Results Focus" : "🎯 Foco em Resultados", value: resultsValue, color: GREEN },
+        { label: lang === "en" ? "🌱 Openness to Change" : "🌱 Abertura à Transformação", value: opennessValue, color: TEAL },
+      ];
+      
+      currentY = drawBarChart(essenceBars, margin + 4, currentY, contentWidth - 8);
+      currentY += 4;
+    }
+    
+    // Temperament and Connection style text
     if (tempPrimary) {
       const tempStr = typeof tempPrimary === 'string' ? tempPrimary : (tempPrimary as any)?.temperament || '';
-      if (tempStr) addText(`${lang === 'en' ? 'Temperament' : 'Temperamento'}: ${tempStr}`, 9);
+      if (tempStr) {
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(70, 70, 70);
+        doc.text(`${lang === 'en' ? 'Temperament' : 'Temperamento'}: ${tempStr}`, margin + 4, currentY, { align: "left" });
+        currentY += 5;
+      }
     }
     if (connectionPrimary) {
-      addText(`${lang === 'en' ? 'Connection Style' : 'Estilo de Conexão'}: ${connectionPrimary}`, 9);
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(70, 70, 70);
+      doc.text(`${lang === 'en' ? 'Connection Style' : 'Estilo de Conexão'}: ${connectionPrimary}`, margin + 4, currentY, { align: "left" });
+      currentY += 5;
     }
+    
     addDivider();
   }
 
@@ -687,6 +801,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   const raridadeSection = getSection<{ percentage?: number; explanation?: string }>(sections, "raridade_perfil");
   const rarity = validateRarity(raridadeSection, lang);
   if (rarity.percentage > 0) {
+    ensureSectionFits(40);
     addSectionTitle(t.rarity, PURPLE);
     checkPageBreak(18);
     doc.setFillColor(PURPLE.r, PURPLE.g, PURPLE.b);
@@ -705,6 +820,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   const pazSection = getSection<{ in_peace?: Record<string, unknown>; under_pressure?: Record<string, unknown> }>(sections, "paz_pressao");
   const paz = validatePeacePressure(pazSection, lang);
   if (paz.in_peace.description || paz.under_pressure.description) {
+    ensureSectionFits(60);
     addSectionTitle(t.peacePressure, GREEN);
 
     const gap = 6;
@@ -767,6 +883,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   
   const mainPattern = sombrasSection?.items?.[0];
   if (mainPattern?.pattern || funcionaSection?.shadow) {
+    ensureSectionFits(50);
     addSectionTitle(t.confrontation, ROSE);
     
     const confrontTitle = mainPattern?.pattern || funcionaSection?.shadow || "";
@@ -798,6 +915,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   const tensoesSection = getSection<{ items?: unknown[] }>(sections, "tensoes_internas");
   const tensions = validateTensions(tensoesSection, lang);
   if (tensions.length > 0 && tensions[0].tension) {
+    ensureSectionFits(40);
     addSectionTitle(t.tensions, AMBER);
     // ALL tensions - no slice
     for (const tension of tensions) {
@@ -818,6 +936,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   const areasSection = getSection<{ items?: unknown[] }>(sections, "areas_vida");
   const areas = validateLifeAreas(areasSection, lang);
   if (areas.length > 0) {
+    ensureSectionFits(50);
     addSectionTitle(t.lifeAreas, TEAL);
     // ALL areas - no slice
     for (const area of areas) {
@@ -840,6 +959,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   // === 10. PURPOSE MANIFESTO ===
   const propositoSection = getSection<{ motivation?: string; daily_example?: string; invitation?: string; common_error?: string }>(sections, "seu_proposito");
   if (propositoSection?.motivation) {
+    ensureSectionFits(50);
     addSectionTitle(t.purposeManifesto, ORANGE);
     
     // Main manifesto
@@ -882,6 +1002,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   const talentosSection = getSection<{ items?: Array<{ talent: string; origin?: string; application?: string }> }>(sections, "seus_talentos");
   const donsSection = getSection<{ items?: Array<{ gift: string; manifestation?: string }> }>(sections, "seus_dons");
   if ((talentosSection?.items?.length || 0) > 0 || (donsSection?.items?.length || 0) > 0) {
+    ensureSectionFits(40);
     addSectionTitle(t.talents, GOLD);
     
     // ALL talents - no slice
@@ -920,6 +1041,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   // === 12. VOCATION (ALL fields) ===
   const vocacaoSection = getSection<{ core_message?: string; fields?: Array<{ field: string; reason?: string; example?: string }> }>(sections, "sua_vocacao");
   if (vocacaoSection?.core_message || (vocacaoSection?.fields?.length || 0) > 0) {
+    ensureSectionFits(40);
     addSectionTitle(t.vocation, TEAL);
     if (vocacaoSection.core_message) {
       addText(vocacaoSection.core_message, 10, { r: 50, g: 50, b: 50 });
@@ -946,6 +1068,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   const riscosSection = getSection<{ items?: Array<{ risk: string; trigger?: string; consequence?: string }> }>(sections, "riscos_desvio");
   
   if (arquetiposSection?.primary?.archetype || (riscosSection?.items?.length || 0) > 0) {
+    ensureSectionFits(50);
     addSectionTitle(t.archetypes, PRIMARY);
     
     // Primary archetype - FULL
@@ -1013,6 +1136,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   // === 14. STRENGTHS & SHADOWS (ALL items) ===
   const forcasSection = getSection<{ items?: Array<{ talent: string; example?: string }> }>(sections, "suas_forcas");
   if ((forcasSection?.items?.length || 0) > 0 || (sombrasSection?.items?.length || 0) > 0) {
+    ensureSectionFits(50);
     addSectionTitle(`${t.strengths} & ${t.shadows}`, GREEN);
     
     // ALL strengths - no slice
@@ -1057,6 +1181,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   const plano90Section = getSection<{ months?: unknown[] }>(sections, "plano_90_dias");
   const plan = validatePlan90(plano90Section, lang);
   if (plan.months.length > 0) {
+    ensureSectionFits(70);
     addSectionTitle(t.plan90, TEAL);
     // ALL months - no slice
     for (const month of plan.months) {
@@ -1095,6 +1220,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   const rNight = pickRoutine(rotinaRaw.night);
 
   if (rMorning.text || rAfternoon.text || rNight.text) {
+    ensureSectionFits(50);
     addSectionTitle(t.routine, GOLD);
 
     const gap = 5;
@@ -1164,6 +1290,7 @@ const buildPremiumPDF = (options: PDFOptions): jsPDF => {
   }>(sections, "conversa_final");
   
   if (conversaSection) {
+    ensureSectionFits(80);
     addSectionTitle(t.closing, PRIMARY);
     
     // New structure - FULL content
