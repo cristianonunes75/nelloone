@@ -30,3 +30,4 @@ export { CentralTruths } from "./CentralTruths";
 export { SectionSummary } from "./SectionSummary";
 export { ProvocativeClosing } from "./ProvocativeClosing";
 export { RelatorioConjuge } from "./RelatorioConjuge";
+export { SaintPatronSection } from "./SaintPatronSection";

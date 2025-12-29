@@ -1749,6 +1749,38 @@ ESTRUTURA JSON FINAL
       "night": { "ritual_name": "...", "practice": "..." }
     },
     {
+      "id": "santo_padroeiro",
+      "title": "${youWord === 'Tu' ? 'O Teu' : 'Seu'} Santo Padroeiro",
+      "source": "Temperamento + Arquétipos + Virtudes",
+      "saint": {
+        "name": "[Nome do Santo - ex: São João Paulo II]",
+        "title": "[Título ou epíteto - ex: O Papa Peregrino]",
+        "lived": "[Período de vida - ex: 1920-2005]",
+        "feast_day": "[Dia da festa - ex: 22 de outubro]"
+      },
+      "connection": {
+        "temperament_match": "[Como o temperamento do santo se conecta com o perfil - 1-2 frases]",
+        "virtue_match": "[Virtude principal que o santo desenvolveu e que o perfil precisa desenvolver]",
+        "mission_match": "[Como a missão do santo ressoa com o propósito identificado no perfil]"
+      },
+      "biography": "[Breve biografia focada nos aspectos que conectam com o perfil - 3-4 frases. Inclua desafios que o santo enfrentou similares aos do perfil]",
+      "quote": {
+        "text": "[Citação autêntica do santo - máximo 2 frases]",
+        "source": "[Fonte da citação - ex: Homilia de 1985, Carta Encíclica, etc.]"
+      },
+      "reflection": "[Reflexão de 2-3 frases aplicando a citação ao perfil específico do usuário. Conecte com as tensões e desafios identificados no Código]",
+      "virtues_in_common": [
+        { "virtue": "[Virtude 1]", "in_saint": "[Como apareceu na vida do santo]", "in_you": "[Como aparece no perfil do usuário]" },
+        { "virtue": "[Virtude 2]", "in_saint": "[Como apareceu na vida do santo]", "in_you": "[Como aparece no perfil do usuário]" },
+        { "virtue": "[Virtude 3]", "in_saint": "[Como apareceu na vida do santo]", "in_you": "[Como aparece no perfil do usuário]" }
+      ],
+      "prayer": {
+        "title": "[Título da oração/invocação - ex: Oração a São João Paulo II]",
+        "text": "[Oração breve e autêntica ao santo - 3-4 frases. Se não houver oração oficial, criar invocação respeitosa pedindo intercessão específica relacionada aos desafios do perfil]"
+      },
+      "daily_practice": "[Prática diária inspirada no santo para os próximos 30 dias - ex: 'Como São Francisco, pratique 5 minutos de silêncio contemplativo antes de tomar decisões importantes']"
+    },
+    {
       "id": "conversa_final",
       "title": "Uma Conversa Honesta",
       "who_you_are": "[1 frase reafirmando identidade]",
@@ -1759,6 +1791,48 @@ ESTRUTURA JSON FINAL
     }
   ]
 }
+
+═══════════════════════════════════════════
+🙏 REGRA DO SANTO PADROEIRO (OBRIGATÓRIA)
+═══════════════════════════════════════════
+
+A seção santo_padroeiro conecta o perfil do usuário com um santo católico 
+que compartilha características similares ou desenvolveu virtudes que o perfil precisa.
+
+📋 BIBLIOTECA DE SANTOS POR PERFIL:
+
+TEMPERAMENTOS:
+- COLÉRICO: São Paulo, Santa Catarina de Sena, São João Paulo II, Santa Teresa de Ávila, São Pedro
+- SANGUÍNEO: São Francisco de Assis, São Filipe Néri, Santa Teresinha, São João Bosco, Santa Clara
+- MELANCÓLICO: Santo Agostinho, São Tomás de Aquino, Santa Teresa de Lisieux, São João da Cruz, Beata Chiara Luce
+- FLEUMÁTICO: São José, São Francisco de Sales, Santa Mônica, São Bento, Santa Maria Goretti
+
+ARQUÉTIPOS:
+- HERÓI: São Jorge, Santa Joana D'Arc, São Miguel Arcanjo, São Sebastião
+- SÁBIO: São Tomás de Aquino, Santo Agostinho, São João da Cruz, Santa Edith Stein
+- CRIADOR: Fra Angelico, Santa Hildegarda de Bingen, São João Paulo II
+- CUIDADOR: Madre Teresa de Calcutá, São Vicente de Paulo, São Camilo de Lellis
+- GOVERNANTE: São Luís IX, Santa Isabel da Hungria, São Henrique
+- MAGO: São Padre Pio, São João Maria Vianney, Santa Faustina
+- INOCENTE: Santa Teresinha do Menino Jesus, São Francisco de Assis, Santa Bernadette
+- EXPLORADOR: São Francisco Xavier, São Paulo, Santa Rosa de Lima
+- REBELDE: São João Batista, São Tomás More, São Maximiliano Kolbe
+- AMANTE: São João, Santa Maria Madalena, São Valentim
+- BOBO DA CORTE: São Filipe Néri, São João Bosco, Beato Pier Giorgio Frassati
+- HOMEM COMUM: São José, Santa Gianna Beretta Molla, Beatos Luigi e Maria Beltrame Quattrocchi
+
+REGRAS DE SELEÇÃO:
+1. COMBINE temperamento + arquétipo para escolher o santo mais adequado
+2. PRIORIZE santos cujas histórias de vida ressoam com os DESAFIOS do perfil
+3. ESCOLHA citações AUTÊNTICAS e VERIFICÁVEIS do santo
+4. A oração deve ser REAL (se existir) ou uma invocação RESPEITOSA
+5. A prática diária deve ser ESPECÍFICA e APLICÁVEL
+
+EXEMPLOS POR COMBINAÇÃO:
+- Colérico + Herói → São Paulo (converteu sua força em missão)
+- Melancólico + Sábio → Santo Agostinho (transformou inquietação em busca de Deus)
+- Sanguíneo + Criador → São João Bosco (alegria a serviço dos jovens)
+- Fleumático + Cuidador → São José (silêncio protetor e fidelidade)
 
 REGRAS CRÍTICAS - LAPIDAÇÃO V6:
 - impact_blocks DEVE ser preenchido com conteúdo específico e personalizado
