@@ -31,7 +31,7 @@ Tom: humano, respeitoso, direto, sem linguagem técnica ou siglas.
 🧭 PRINCÍPIOS OBRIGATÓRIOS
 
 1. Perfil explica, mas não justifica.
-   Deixar claro em vários momentos: "Isso ajuda a entender, mas não torna aceitável."
+   Use a frase "Isso ajuda a entender, mas não torna aceitável." APENAS UMA VEZ por seção, no máximo. Não repita essa frase em cada parágrafo.
 
 2. Convite à conversa, não ao controle.
    O relatório deve ter perguntas abertas.
@@ -44,7 +44,9 @@ Tom: humano, respeitoso, direto, sem linguagem técnica ou siglas.
 📌 REGRAS DE LINGUAGEM
 
 ❌ Não usar: DISC, eneagrama, arquétipos, percentuais, siglas, termos técnicos.
-✅ Usar: linguagem simples, frases humanas, exemplos de vida real, tom de carta e não de laudo.
+❌ EVITAR REPETIÇÕES: Não repita a mesma frase ou ideia múltiplas vezes. Cada parágrafo deve trazer informação nova.
+✅ Usar: linguagem simples, frases humanas, tom de carta e não de laudo.
+✅ OBRIGATÓRIO: Incluir exemplos concretos do cotidiano em cada seção. Ex: "Quando chega em casa cansado e você quer conversar, ele pode...", "No meio de uma discussão sobre as contas, ele tende a...", "Num domingo em família, ele costuma..."
 
 Responda APENAS em JSON válido com a estrutura especificada. Sem texto fora do JSON.`;
 
@@ -73,7 +75,7 @@ Tone: human, respectful, direct, without technical language or acronyms.
 🧭 MANDATORY PRINCIPLES
 
 1. Profile explains, but doesn't justify.
-   Make clear multiple times: "This helps understand, but doesn't make it acceptable."
+   Use the phrase "This helps understand, but doesn't make it acceptable." ONLY ONCE per section, at most. Do not repeat this phrase in every paragraph.
 
 2. Invitation to conversation, not control.
    The report should have open questions.
@@ -86,7 +88,9 @@ Tone: human, respectful, direct, without technical language or acronyms.
 📌 LANGUAGE RULES
 
 ❌ Don't use: DISC, enneagram, archetypes, percentages, acronyms, technical terms.
-✅ Use: simple language, human phrases, real life examples, letter tone not report tone.
+❌ AVOID REPETITIONS: Do not repeat the same phrase or idea multiple times. Each paragraph should bring new information.
+✅ Use: simple language, human phrases, letter tone not report tone.
+✅ REQUIRED: Include concrete everyday examples in each section. E.g.: "When he comes home tired and you want to talk, he might...", "In the middle of a discussion about bills, he tends to...", "On a family Sunday, he usually..."
 
 Respond ONLY in valid JSON with the specified structure. No text outside JSON.`;
 
@@ -112,10 +116,25 @@ Criar um material que ajude o cônjuge a entender:
 
 Tom: humano, respeitoso, direto, sem linguagem técnica ou siglas.
 
+🧭 PRINCÍPIOS OBRIGATÓRIOS
+
+1. Perfil explica, mas não justifica.
+   Usa a frase "Isto ajuda a entender, mas não torna aceitável." APENAS UMA VEZ por secção, no máximo. Não repitas essa frase em cada parágrafo.
+
+2. Convite à conversa, não ao controlo.
+   O relatório deve ter perguntas abertas.
+
+3. Responsabilidade pessoal explícita.
+   Mostrar sempre:
+   - O que a pessoa está a assumir como compromisso de mudança
+   - E que o cônjuge tem direito de esperar isso
+
 📌 REGRAS DE LINGUAGEM
 
 ❌ Não usar: DISC, eneagrama, arquétipos, percentuais, siglas, termos técnicos.
-✅ Usar: linguagem simples, frases humanas, exemplos de vida real, tom de carta e não de laudo.
+❌ EVITAR REPETIÇÕES: Não repitas a mesma frase ou ideia múltiplas vezes. Cada parágrafo deve trazer informação nova.
+✅ Usar: linguagem simples, frases humanas, tom de carta e não de laudo.
+✅ OBRIGATÓRIO: Incluir exemplos concretos do quotidiano em cada secção. Ex: "Quando chega a casa cansado e tu queres conversar, ele pode...", "No meio de uma discussão sobre as contas, ele tende a...", "Num domingo em família, ele costuma..."
 
 Responde APENAS em JSON válido com a estrutura especificada. Sem texto fora do JSON.`;
 
@@ -152,7 +171,7 @@ Generate the SPOUSE REPORT with this EXACT JSON structure:
   
   "como_erra_sob_pressao": {
     "titulo": "How they usually make mistakes when under pressure",
-    "conteudo": "Clearly describe error patterns, attitudes that hurt, silences, controls, explosions, distancing. Always with the phrase: 'This helps understand, but doesn't make it acceptable.' (3-4 paragraphs)"
+    "conteudo": "Clearly describe error patterns, attitudes that hurt, silences, controls, explosions, distancing. Use everyday examples (e.g.: 'During a money discussion, they might...', 'When running late for an appointment, they tend to...'). Use the phrase 'This helps understand, but doesn't make it acceptable.' ONLY ONCE at the end of the section, not in every paragraph. (3-4 paragraphs, each with different information, no repetitions)"
   },
   
   "o_que_mais_machuca": {
@@ -217,7 +236,7 @@ Gera o RELATÓRIO PARA O CÔNJUGE com esta estrutura JSON EXATA:
   
   "como_erra_sob_pressao": {
     "titulo": "Como ele costuma errar quando está sob pressão",
-    "conteudo": "Descrever claramente padrões de erro, atitudes que magoam, silêncios, controlos, explosões, distanciamentos. Sempre com a frase: 'Isto ajuda a entender, mas não torna aceitável.' (3-4 parágrafos)"
+    "conteudo": "Descrever claramente padrões de erro, atitudes que magoam, silêncios, controlos, explosões, distanciamentos. Usa exemplos do quotidiano (ex: 'Numa discussão sobre dinheiro, ele pode...', 'Quando está atrasado para um compromisso, ele tende a...'). Usa a frase 'Isto ajuda a entender, mas não torna aceitável.' APENAS UMA VEZ no final da secção, não em cada parágrafo. (3-4 parágrafos, cada um com informação diferente, sem repetições)"
   },
   
   "o_que_mais_machuca": {
@@ -282,7 +301,7 @@ Gere o RELATÓRIO PARA O CÔNJUGE com esta estrutura JSON EXATA:
   
   "como_erra_sob_pressao": {
     "titulo": "Como ele costuma errar quando está sob pressão",
-    "conteudo": "Descrever claramente padrões de erro, atitudes que machucam, silêncios, controles, explosões, distanciamentos. Sempre com a frase: 'Isso ajuda a entender, mas não torna aceitável.' (3-4 parágrafos)"
+    "conteudo": "Descrever claramente padrões de erro, atitudes que machucam, silêncios, controles, explosões, distanciamentos. Use exemplos do cotidiano (ex: 'Numa discussão sobre dinheiro, ele pode...', 'Quando está atrasado para um compromisso, ele tende a...'). Use a frase 'Isso ajuda a entender, mas não torna aceitável.' APENAS UMA VEZ no final da seção, não em cada parágrafo. (3-4 parágrafos, cada um com informação diferente, sem repetições)"
   },
   
   "o_que_mais_machuca": {
