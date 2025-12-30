@@ -342,6 +342,7 @@ export default function TestExecution() {
   const options = currentQuestion.options as any;
   const isLikertScale = options && (options.scale || options.type === "likert");
   const isMultipleChoice = options && options.type === "multiple_choice";
+  const isSituational = options && options.type === "situational";
   
   // Get test type for randomization logic
   const testType = testDetails?.type || '';
@@ -352,8 +353,11 @@ export default function TestExecution() {
         value: String(options.min + i),
         label: options.labels?.[String(options.min + i)] || String(options.min + i)
       })))
-    : isMultipleChoice
-    ? options.options
+    : isMultipleChoice || isSituational
+    ? (options.options || []).map((opt: any) => ({
+        value: opt.intelligence_key || String(opt.value),
+        label: opt.label || opt.text || String(opt.value)
+      }))
     : (Array.isArray(options) 
         ? options.map((opt: any) => ({
             value: String(opt.value),
