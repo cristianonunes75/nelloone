@@ -5,12 +5,12 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Copy, Percent, DollarSign, Clock, Users, RefreshCw, Ticket } from "lucide-react";
+import { Plus, Copy, Percent, DollarSign, Clock, Users, RefreshCw, Ticket, Trash2, ExternalLink } from "lucide-react";
 
 interface StripeCoupon {
   id: string;
@@ -24,6 +24,7 @@ interface StripeCoupon {
   times_redeemed: number;
   valid: boolean;
   created: number;
+  redeem_by?: number | null;
 }
 
 export const CouponsManagement = () => {
@@ -99,6 +100,16 @@ export const CouponsManagement = () => {
       });
 
       if (error) throw error;
+      
+      // Check if the response contains an error
+      if (data?.error) {
+        if (data.error.includes("already exists")) {
+          toast.error(`O cupom "${couponName}" já existe! Use um nome diferente ou delete o existente.`);
+        } else {
+          throw new Error(data.error);
+        }
+        return;
+      }
 
       toast.success(`Cupom "${couponName}" criado com sucesso!`);
       setDialogOpen(false);
@@ -106,9 +117,34 @@ export const CouponsManagement = () => {
       fetchCoupons();
     } catch (error) {
       console.error("Error creating coupon:", error);
-      toast.error("Erro ao criar cupom. Verifique o console.");
+      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+      if (errorMessage.includes("already exists")) {
+        toast.error(`O cupom "${couponName}" já existe! Use um nome diferente.`);
+      } else {
+        toast.error(`Erro ao criar cupom: ${errorMessage}`);
+      }
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleDeleteCoupon = async (couponId: string, couponName: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('update-stripe-coupon', {
+        body: {
+          coupon_id: couponId,
+          action: 'deactivate'
+        }
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast.success(`Cupom "${couponName}" deletado com sucesso!`);
+      fetchCoupons();
+    } catch (error) {
+      console.error("Error deleting coupon:", error);
+      toast.error("Erro ao deletar cupom");
     }
   };
 
@@ -167,6 +203,10 @@ export const CouponsManagement = () => {
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp * 1000).toLocaleDateString("pt-BR");
+  };
+
+  const openStripeLink = (couponId: string) => {
+    window.open(`https://dashboard.stripe.com/coupons/${couponId}`, '_blank');
   };
 
   return (
@@ -441,14 +481,55 @@ export const CouponsManagement = () => {
                       </Badge>
                     </TableCell>
                     <TableCell>{formatDate(coupon.created)}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right space-x-1">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => copyCheckoutLink(coupon.name || coupon.id)}
+                        title="Copiar link"
                       >
                         <Copy className="h-4 w-4" />
                       </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openStripeLink(coupon.id)}
+                        title="Ver no Stripe"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                      {coupon.valid && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                              title="Deletar cupom"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Deletar cupom?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Tem certeza que deseja deletar o cupom <strong>{coupon.name || coupon.id}</strong>?
+                                Esta ação não pode ser desfeita e o cupom não poderá mais ser usado.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteCoupon(coupon.id, coupon.name || coupon.id)}
+                                className="bg-destructive hover:bg-destructive/90"
+                              >
+                                Deletar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
