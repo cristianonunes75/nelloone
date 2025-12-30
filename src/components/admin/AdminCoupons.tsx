@@ -10,8 +10,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Loader2, Plus, Ticket, RefreshCw, Copy, ExternalLink } from "lucide-react";
+import { Loader2, Plus, Ticket, RefreshCw, Copy, ExternalLink, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -155,9 +166,27 @@ export const AdminCoupons = () => {
   };
 
   const copyCheckoutLink = (couponId: string) => {
-    const link = `https://checkout.stripe.com/pay/XXXX?prefilled_promo_code=${couponId}`;
-    navigator.clipboard.writeText(link);
-    toast.success("Link copiado (substitua XXXX pelo session ID)");
+    const baseUrl = window.location.origin;
+    const ptLink = `${baseUrl}/pt/pricing?promo=${couponId}`;
+    navigator.clipboard.writeText(ptLink);
+    toast.success("Link copiado!");
+  };
+
+  const handleDeleteCoupon = async (couponId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("update-stripe-coupon", {
+        body: { coupon_id: couponId, action: "deactivate" },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast.success(`Cupom ${couponId} deletado!`);
+      fetchCoupons();
+    } catch (error) {
+      console.error("Error deleting coupon:", error);
+      toast.error("Erro ao deletar cupom");
+    }
   };
 
   const stats = {
@@ -266,9 +295,45 @@ export const AdminCoupons = () => {
                     <Button variant="ghost" size="sm" onClick={() => copyCheckoutLink(coupon.id)} title="Copiar link">
                       <Copy className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => window.open(`https://dashboard.stripe.com/coupons/${coupon.id}`, '_blank')} title="Ver no Stripe">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => window.open(`https://dashboard.stripe.com/coupons/${coupon.id}`, "_blank")}
+                      title="Ver no Stripe"
+                    >
                       <ExternalLink className="w-4 h-4" />
                     </Button>
+                    {coupon.valid && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:text-destructive"
+                            title="Deletar cupom"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Deletar cupom?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Tem certeza que deseja deletar o cupom <strong>{coupon.id}</strong>? Esta ação não pode ser desfeita.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteCoupon(coupon.id)}
+                              className="bg-destructive hover:bg-destructive/90"
+                            >
+                              Deletar
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                   </div>
                 </div>
               </div>
