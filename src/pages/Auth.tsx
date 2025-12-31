@@ -12,6 +12,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { z } from "zod";
 import { Info, Eye, EyeOff } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { PasswordStrengthIndicator } from "@/components/PasswordStrengthIndicator";
 
 const authSchema = z.object({
   email: z.string().email({ message: "Email inválido" }),
@@ -346,6 +347,7 @@ const Auth = () => {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
+            {!isLogin && <PasswordStrengthIndicator password={password} language={language} />}
           </div>
 
           {!isLogin && (

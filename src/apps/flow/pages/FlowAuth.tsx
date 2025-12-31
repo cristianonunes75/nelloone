@@ -7,6 +7,7 @@ import { Zap, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { SEOHead } from '@/components/SEOHead';
+import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 
 export default function FlowAuth() {
   const [searchParams] = useSearchParams();
@@ -152,6 +153,7 @@ export default function FlowAuth() {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                {mode === 'signup' && <PasswordStrengthIndicator password={password} />}
               </div>
               
               {mode === 'signup' && (
