@@ -35,7 +35,7 @@ import FundadorFeedback from "./pages/FundadorFeedback";
 import DiagnosticoPDF from "./pages/DiagnosticoPDF";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import RelatorioConjugePublico from "./pages/RelatorioConjugePublico";
-
+import ResetPassword from "./pages/ResetPassword";
 const queryClient = new QueryClient();
 
 // Reusable route definitions
@@ -44,6 +44,7 @@ const AppRoutes = () => (
     {/* Public routes */}
     <Route path="/" element={<Landing />} />
     <Route path="/auth" element={<Auth />} />
+    <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/fundadores" element={<Fundadores />} />
     
     {/* Public spouse report route */}
@@ -79,6 +80,7 @@ const AppRoutes = () => (
     {/* EN Landing and Auth */}
     <Route path="/en" element={<Landing />} />
     <Route path="/en/auth" element={<Auth />} />
+    <Route path="/en/reset-password" element={<ResetPassword />} />
     
     {/* Legal pages - EN with prefix */}
     <Route path="/en/terms" element={<TermsOfService />} />
@@ -257,6 +259,7 @@ const AppRoutes = () => (
       }
     />
     <Route path="/pt-pt/auth" element={<Auth />} />
+    <Route path="/pt-pt/reset-password" element={<ResetPassword />} />
     <Route path="/pt-pt" element={<Landing />} />
     
     {/* Founder Feedback Routes */}
