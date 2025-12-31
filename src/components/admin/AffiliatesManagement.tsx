@@ -49,7 +49,7 @@ interface Affiliate {
   email?: string;
 }
 
-interface Founder {
+interface AvailableUser {
   id: string;
   full_name: string;
   phone: string;
@@ -76,8 +76,9 @@ interface Referral {
 
 export const AffiliatesManagement = () => {
   const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
-  const [founders, setFounders] = useState<Founder[]>([]);
+  const [availableUsers, setAvailableUsers] = useState<AvailableUser[]>([]);
   const [referrals, setReferrals] = useState<Referral[]>([]);
+  const [userSearchTerm, setUserSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAffiliate, setSelectedAffiliate] = useState<Affiliate | null>(null);
@@ -149,17 +150,18 @@ export const AffiliatesManagement = () => {
 
       if (affError) throw affError;
 
-      // Get emails from auth
+      // Get affiliate user IDs to exclude from available users
       const affiliateUserIds = affiliatesData?.map(a => a.user_id) || [];
       
-      // Fetch founders who are NOT yet affiliates
-      const { data: foundersData, error: foundersError } = await supabase
+      // Fetch ALL users who are NOT yet affiliates (not just founders)
+      const { data: usersData, error: usersError } = await supabase
         .from("profiles")
         .select("id, full_name, phone, is_founder")
-        .eq("is_founder", true)
-        .not("id", "in", `(${affiliateUserIds.length > 0 ? affiliateUserIds.join(",") : "00000000-0000-0000-0000-000000000000"})`);
+        .eq("is_deleted", false)
+        .not("id", "in", `(${affiliateUserIds.length > 0 ? affiliateUserIds.join(",") : "00000000-0000-0000-0000-000000000000"})`)
+        .order("full_name", { ascending: true });
 
-      if (foundersError) throw foundersError;
+      if (usersError) throw usersError;
 
       // Fetch all referrals with affiliate info
       const { data: referralsData, error: refError } = await supabase
@@ -176,7 +178,7 @@ export const AffiliatesManagement = () => {
       if (refError) throw refError;
 
       setAffiliates(affiliatesData || []);
-      setFounders(foundersData || []);
+      setAvailableUsers(usersData || []);
       setReferrals(referralsData || []);
     } catch (error: any) {
       console.error("Error fetching data:", error);
@@ -523,7 +525,7 @@ export const AffiliatesManagement = () => {
               Pagamentos ({pendingReferrals.length})
             </Button>
           )}
-          <Button onClick={() => setShowAddDialog(true)} disabled={founders.length === 0 || !systemEnabled}>
+          <Button onClick={() => setShowAddDialog(true)} disabled={availableUsers.length === 0 || !systemEnabled}>
             <Plus className="h-4 w-4 mr-2" />
             Novo Afiliado
           </Button>
@@ -931,69 +933,127 @@ export const AffiliatesManagement = () => {
       </Dialog>
 
       {/* Add Affiliate Dialog */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent>
+      <Dialog open={showAddDialog} onOpenChange={(open) => {
+        setShowAddDialog(open);
+        if (!open) {
+          setUserSearchTerm("");
+          setSelectedFounder("");
+          setNewCode("");
+          setNewCommission("10");
+        }
+      }}>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Adicionar Afiliado</DialogTitle>
             <DialogDescription>
-              Transforme um fundador em afiliado para ganhar comissões
+              Escolha qualquer usuário do sistema para transformar em afiliado
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Fundador</Label>
-              <select
-                className="w-full p-2 border rounded-md bg-background"
-                value={selectedFounder}
-                onChange={(e) => {
-                  setSelectedFounder(e.target.value);
-                  const founder = founders.find(f => f.id === e.target.value);
-                  if (founder) {
-                    setNewCode(generateAffiliateCode(founder.full_name));
-                  }
-                }}
-              >
-                <option value="">Selecione um fundador...</option>
-                {founders.map((founder) => (
-                  <option key={founder.id} value={founder.id}>
-                    {founder.full_name}
-                  </option>
-                ))}
-              </select>
-              {founders.length === 0 && (
-                <p className="text-xs text-amber-600">
-                  Todos os fundadores já são afiliados
+              <Label>Buscar Usuário</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Digite o nome do usuário..."
+                  value={userSearchTerm}
+                  onChange={(e) => setUserSearchTerm(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Selecionar Usuário</Label>
+              <div className="max-h-48 overflow-y-auto border rounded-md bg-background">
+                {availableUsers.filter(user => {
+                  const search = userSearchTerm.toLowerCase();
+                  return user.full_name?.toLowerCase().includes(search) || 
+                         user.phone?.toLowerCase().includes(search);
+                }).length === 0 ? (
+                  <div className="p-4 text-center text-sm text-muted-foreground">
+                    {userSearchTerm ? "Nenhum usuário encontrado" : "Todos os usuários já são afiliados"}
+                  </div>
+                ) : (
+                  availableUsers
+                    .filter(user => {
+                      const search = userSearchTerm.toLowerCase();
+                      return user.full_name?.toLowerCase().includes(search) || 
+                             user.phone?.toLowerCase().includes(search);
+                    })
+                    .slice(0, 20)
+                    .map((user) => (
+                      <div
+                        key={user.id}
+                        className={`flex items-center gap-3 p-3 cursor-pointer transition-colors hover:bg-muted/50 border-b last:border-b-0 ${
+                          selectedFounder === user.id ? 'bg-primary/10 border-l-2 border-l-primary' : ''
+                        }`}
+                        onClick={() => {
+                          setSelectedFounder(user.id);
+                          setNewCode(generateAffiliateCode(user.full_name));
+                        }}
+                      >
+                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{user.full_name}</p>
+                          <p className="text-xs text-muted-foreground truncate">{user.phone || "Sem telefone"}</p>
+                        </div>
+                        {user.is_founder && (
+                          <Badge variant="outline" className="text-amber-600 border-amber-600/30 text-xs">
+                            <Star className="h-3 w-3 mr-1" />
+                            Fundador
+                          </Badge>
+                        )}
+                        {selectedFounder === user.id && (
+                          <CheckCircle className="h-5 w-5 text-primary" />
+                        )}
+                      </div>
+                    ))
+                )}
+              </div>
+              {availableUsers.filter(user => {
+                const search = userSearchTerm.toLowerCase();
+                return user.full_name?.toLowerCase().includes(search);
+              }).length > 20 && (
+                <p className="text-xs text-muted-foreground">
+                  Mostrando 20 de {availableUsers.filter(u => u.full_name?.toLowerCase().includes(userSearchTerm.toLowerCase())).length} usuários. Refine sua busca.
                 </p>
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label>Código do Afiliado</Label>
-              <Input
-                value={newCode}
-                onChange={(e) => setNewCode(e.target.value.toUpperCase())}
-                placeholder="CODIGO123"
-                className="font-mono uppercase"
-              />
-              <p className="text-xs text-muted-foreground">
-                Código único que será usado nos links de referência
-              </p>
-            </div>
+            {selectedFounder && (
+              <>
+                <div className="space-y-2">
+                  <Label>Código do Afiliado</Label>
+                  <Input
+                    value={newCode}
+                    onChange={(e) => setNewCode(e.target.value.toUpperCase())}
+                    placeholder="CODIGO123"
+                    className="font-mono uppercase"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Código único que será usado nos links de referência
+                  </p>
+                </div>
 
-            <div className="space-y-2">
-              <Label>Comissão (%)</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={newCommission}
-                  onChange={(e) => setNewCommission(e.target.value)}
-                  className="font-mono"
-                />
-                <Percent className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </div>
+                <div className="space-y-2">
+                  <Label>Comissão (%)</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={newCommission}
+                      onChange={(e) => setNewCommission(e.target.value)}
+                      className="font-mono"
+                    />
+                    <Percent className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setShowAddDialog(false)}>
