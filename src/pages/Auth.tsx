@@ -10,23 +10,35 @@ import { useAuth } from "@/hooks/useAuth";
 import { LogoText } from "@/components/LogoText";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { z } from "zod";
-import { Info } from "lucide-react";
+import { Info, Eye, EyeOff } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const authSchema = z.object({
   email: z.string().email({ message: "Email inválido" }),
   password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
+  confirmPassword: z.string().optional(),
   fullName: z.string().min(2, { message: "Nome deve ter pelo menos 2 caracteres" }).optional(),
   phone: z.string().optional(),
   termsAccepted: z.boolean().refine((val) => val === true, {
     message: "Você deve aceitar os termos para continuar",
   }).optional(),
+}).refine((data) => {
+  if (data.confirmPassword !== undefined) {
+    return data.password === data.confirmPassword;
+  }
+  return true;
+}, {
+  message: "As senhas não coincidem",
+  path: ["confirmPassword"],
 });
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -97,6 +109,8 @@ const Auth = () => {
       : (language === 'pt-pt'
         ? 'Para comprar e realizar os testes, é necessário criar uma conta. Os seus resultados ficarão guardados para consulta futura.'
         : 'Para comprar e realizar os testes, é necessário criar uma conta. Seus resultados ficarão salvos para consulta futura.'),
+    confirmPassword: language === 'en' ? 'Confirm password' : 'Confirmar senha',
+    passwordsDoNotMatch: language === 'en' ? 'Passwords do not match' : 'As senhas não coincidem',
   };
 
   // Redirect if already logged in
@@ -118,6 +132,7 @@ const Auth = () => {
       const validation = authSchema.safeParse({
         email,
         password,
+        confirmPassword: isLogin ? undefined : confirmPassword,
         fullName: isLogin ? undefined : fullName,
         phone: isLogin ? undefined : phone,
         termsAccepted: isLogin ? undefined : termsAccepted,
@@ -313,15 +328,49 @@ const Auth = () => {
 
           <div>
             <Label htmlFor="password">{language === 'en' ? 'Password' : 'Senha'}</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder={texts.minChars}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder={texts.minChars}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
+
+          {!isLogin && (
+            <div>
+              <Label htmlFor="confirmPassword">{texts.confirmPassword}</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  placeholder={texts.minChars}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+          )}
 
           {!isLogin && (
             <div className="flex items-start space-x-3 p-4 bg-accent/10 rounded-lg border border-border">
