@@ -27,8 +27,19 @@ import { toast } from "sonner";
 import { 
   Users, Percent, DollarSign, TrendingUp, Search, 
   Copy, ExternalLink, Plus, Edit, Loader2, Star,
-  CreditCard, CheckCircle, Clock, Calendar, Download, BarChart3
+  CreditCard, CheckCircle, Clock, Calendar, Download, BarChart3,
+  Trash2
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -85,11 +96,14 @@ export const AffiliatesManagement = () => {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [editCommission, setEditCommission] = useState("10");
+  const [editCode, setEditCode] = useState("");
   const [selectedFounder, setSelectedFounder] = useState<string>("");
   const [newCode, setNewCode] = useState("");
   const [newCommission, setNewCommission] = useState("10");
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [selectedReferrals, setSelectedReferrals] = useState<string[]>([]);
   const [paymentFilter, setPaymentFilter] = useState<"pending" | "paid" | "all">("pending");
   const [systemEnabled, setSystemEnabled] = useState(true);
@@ -231,14 +245,20 @@ export const AffiliatesManagement = () => {
     }
   };
 
-  const handleUpdateCommission = async () => {
+  const handleUpdateAffiliate = async () => {
     if (!selectedAffiliate) return;
+
+    if (!editCode.trim()) {
+      toast.error("O código do afiliado é obrigatório");
+      return;
+    }
 
     setSaving(true);
     try {
       const { error } = await supabase
         .from("affiliates")
         .update({ 
+          affiliate_code: editCode.toUpperCase().trim(),
           commission_percent: parseFloat(editCommission) || 10,
           updated_at: new Date().toISOString()
         })
@@ -246,14 +266,51 @@ export const AffiliatesManagement = () => {
 
       if (error) throw error;
 
-      toast.success("Comissão atualizada!");
+      toast.success("Afiliado atualizado!");
       setShowEditDialog(false);
       fetchData();
     } catch (error: any) {
       console.error("Error updating:", error);
-      toast.error("Erro ao atualizar");
+      if (error.code === "23505") {
+        toast.error("Este código já está em uso por outro afiliado");
+      } else {
+        toast.error("Erro ao atualizar");
+      }
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteAffiliate = async () => {
+    if (!selectedAffiliate) return;
+
+    setDeleting(true);
+    try {
+      // First delete any referrals for this affiliate
+      const { error: refError } = await supabase
+        .from("affiliate_referrals")
+        .delete()
+        .eq("affiliate_id", selectedAffiliate.id);
+
+      if (refError) throw refError;
+
+      // Then delete the affiliate
+      const { error } = await supabase
+        .from("affiliates")
+        .delete()
+        .eq("id", selectedAffiliate.id);
+
+      if (error) throw error;
+
+      toast.success("Afiliado removido com sucesso!");
+      setShowDeleteDialog(false);
+      setSelectedAffiliate(null);
+      fetchData();
+    } catch (error: any) {
+      console.error("Error deleting:", error);
+      toast.error("Erro ao remover afiliado");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -723,8 +780,10 @@ export const AffiliatesManagement = () => {
                             onClick={() => {
                               setSelectedAffiliate(affiliate);
                               setEditCommission(affiliate.commission_percent.toString());
+                              setEditCode(affiliate.affiliate_code);
                               setShowEditDialog(true);
                             }}
+                            title="Editar afiliado"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -733,8 +792,21 @@ export const AffiliatesManagement = () => {
                             size="icon"
                             className="h-8 w-8"
                             onClick={() => copyAffiliateLink(affiliate.affiliate_code)}
+                            title="Copiar link"
                           >
                             <ExternalLink className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => {
+                              setSelectedAffiliate(affiliate);
+                              setShowDeleteDialog(true);
+                            }}
+                            title="Excluir afiliado"
+                          >
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </TableCell>
@@ -891,16 +963,29 @@ export const AffiliatesManagement = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Edit Commission Dialog */}
+      {/* Edit Affiliate Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Editar Comissão</DialogTitle>
+            <DialogTitle>Editar Afiliado</DialogTitle>
             <DialogDescription>
-              Altere o percentual de comissão para {selectedAffiliate?.profile?.full_name}
+              Edite os dados de {selectedAffiliate?.profile?.full_name}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Código do Afiliado</Label>
+              <Input
+                value={editCode}
+                onChange={(e) => setEditCode(e.target.value.toUpperCase())}
+                placeholder="CODIGO123"
+                className="font-mono uppercase"
+              />
+              <p className="text-xs text-muted-foreground">
+                Link de referência: {window.location.origin}/?ref={editCode || "CODIGO"}
+              </p>
+            </div>
+
             <div className="space-y-2">
               <Label>Percentual de Comissão (%)</Label>
               <div className="flex items-center gap-2">
@@ -924,13 +1009,45 @@ export const AffiliatesManagement = () => {
             <Button variant="outline" onClick={() => setShowEditDialog(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleUpdateCommission} disabled={saving}>
+            <Button onClick={handleUpdateAffiliate} disabled={saving || !editCode.trim()}>
               {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Salvar
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Affiliate Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Afiliado</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o afiliado <strong>{selectedAffiliate?.profile?.full_name}</strong>?
+              <br /><br />
+              Esta ação irá remover permanentemente:
+              <ul className="list-disc ml-4 mt-2">
+                <li>Os dados do afiliado</li>
+                <li>Todo o histórico de comissões</li>
+                <li>O código de referência ({selectedAffiliate?.affiliate_code})</li>
+              </ul>
+              <br />
+              <span className="text-destructive font-medium">Esta ação não pode ser desfeita.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAffiliate}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Excluir Afiliado
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Add Affiliate Dialog */}
       <Dialog open={showAddDialog} onOpenChange={(open) => {
