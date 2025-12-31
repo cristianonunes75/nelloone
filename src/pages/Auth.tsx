@@ -70,6 +70,13 @@ const Auth = () => {
     return '/';
   };
 
+  // Helper to get reset password path
+  const getResetPasswordPath = () => {
+    if (language === 'en') return '/en/reset-password';
+    if (language === 'pt-pt') return '/pt-pt/reset-password';
+    return '/reset-password';
+  };
+
   // Localized text
   const texts = {
     login: language === 'en' ? 'Sign In' : 'Entrar',
@@ -112,6 +119,7 @@ const Auth = () => {
         : 'Para comprar e realizar os testes, é necessário criar uma conta. Seus resultados ficarão salvos para consulta futura.'),
     confirmPassword: language === 'en' ? 'Confirm password' : 'Confirmar senha',
     passwordsDoNotMatch: language === 'en' ? 'Passwords do not match' : 'As senhas não coincidem',
+    forgotPassword: language === 'en' ? 'Forgot your password?' : (language === 'pt-pt' ? 'Esqueceu a sua senha?' : 'Esqueceu sua senha?'),
   };
 
   // Redirect if already logged in
@@ -423,7 +431,16 @@ const Auth = () => {
           </Button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 text-center space-y-2">
+          {isLogin && (
+            <button
+              type="button"
+              onClick={() => navigate(getResetPasswordPath())}
+              className="text-sm text-gold hover:text-gold/80 transition-colors block w-full"
+            >
+              {texts.forgotPassword}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setIsLogin(!isLogin)}
