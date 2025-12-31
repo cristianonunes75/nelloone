@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { InstallAppButton } from "@/components/landing/InstallAppButton";
+import { UpdateAppButton } from "@/components/landing/UpdateAppButton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -114,6 +115,7 @@ export const NavSection = () => {
 
           {/* Desktop CTA / Profile */}
           <div className="hidden md:flex items-center gap-3">
+            <UpdateAppButton variant="gold" size="sm" />
             <InstallAppButton variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" />
             <LanguageToggle variant="minimal" />
             
@@ -170,8 +172,8 @@ export const NavSection = () => {
             )}
           </div>
 
-          {/* Mobile: Install button + menu button */}
           <div className="md:hidden flex items-center gap-2">
+            <UpdateAppButton variant="gold" size="sm" />
             <InstallAppButton variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" />
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
