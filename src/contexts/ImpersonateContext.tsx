@@ -1,12 +1,20 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+
+const IMPERSONATION_STORAGE_KEY = "nello_impersonation_session";
+
+interface StoredImpersonation {
+  userId: string;
+  userName: string;
+  sessionToken: string;
+}
 
 interface ImpersonateContextType {
   impersonatedUserId: string | null;
   impersonatedUserName: string | null;
   isImpersonating: boolean;
-  setImpersonation: (userId: string, userName: string) => void;
+  setImpersonation: (userId: string, userName: string, sessionToken: string) => void;
   clearImpersonation: () => void;
 }
 
@@ -21,80 +29,82 @@ const ImpersonateContext = createContext<ImpersonateContextType>({
 export const ImpersonateProvider = ({ children }: { children: ReactNode }) => {
   const [impersonatedUserId, setImpersonatedUserId] = useState<string | null>(null);
   const [impersonatedUserName, setImpersonatedUserName] = useState<string | null>(null);
-  const [searchParams] = useSearchParams();
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const initializeImpersonation = async () => {
-      const impersonateToken = searchParams.get("impersonate");
+      // Check sessionStorage for existing impersonation session (not URL)
+      const storedSession = sessionStorage.getItem(IMPERSONATION_STORAGE_KEY);
       
-      if (impersonateToken) {
+      if (storedSession) {
         try {
-          // Fetch the impersonation session
-          const { data: session, error: sessionError } = await supabase
-            .from("impersonation_sessions")
-            .select("target_user_id, is_active")
-            .eq("session_token", impersonateToken)
-            .eq("is_active", true)
-            .single();
+          const parsed: StoredImpersonation = JSON.parse(storedSession);
+          
+          // Validate the session is still active via edge function
+          const { data, error } = await supabase.functions.invoke('impersonate-user', {
+            body: { 
+              action: 'validate', 
+              sessionToken: parsed.sessionToken 
+            }
+          });
 
-          if (sessionError || !session) {
-            console.error("Invalid or expired impersonation session");
+          if (error || !data?.valid) {
+            console.log("Impersonation session expired or invalid");
+            sessionStorage.removeItem(IMPERSONATION_STORAGE_KEY);
             return;
           }
 
-          // Fetch the target user's profile
-          const { data: profile, error: profileError } = await supabase
-            .from("profiles")
-            .select("id, full_name")
-            .eq("id", session.target_user_id)
-            .single();
-
-          if (profileError || !profile) {
-            console.error("Could not find impersonated user profile");
-            return;
-          }
-
-          setImpersonatedUserId(profile.id);
-          setImpersonatedUserName(profile.full_name);
-
-          // Remove the query param from URL to keep it clean
-          const url = new URL(window.location.href);
-          url.searchParams.delete("impersonate");
-          window.history.replaceState({}, "", url.toString());
+          // Restore the impersonation state
+          setImpersonatedUserId(parsed.userId);
+          setImpersonatedUserName(parsed.userName);
+          setSessionToken(parsed.sessionToken);
         } catch (error) {
-          console.error("Error initializing impersonation:", error);
+          console.error("Error restoring impersonation session:", error);
+          sessionStorage.removeItem(IMPERSONATION_STORAGE_KEY);
         }
       }
     };
 
     initializeImpersonation();
-  }, [searchParams]);
+  }, []);
 
-  const setImpersonation = (userId: string, userName: string) => {
+  const setImpersonation = (userId: string, userName: string, token: string) => {
     setImpersonatedUserId(userId);
     setImpersonatedUserName(userName);
+    setSessionToken(token);
+    
+    // Store in sessionStorage (secure: not in URL, cleared on browser close)
+    const session: StoredImpersonation = {
+      userId,
+      userName,
+      sessionToken: token
+    };
+    sessionStorage.setItem(IMPERSONATION_STORAGE_KEY, JSON.stringify(session));
   };
 
   const clearImpersonation = async () => {
-    // End the impersonation session in the database
-    if (impersonatedUserId) {
+    // End the impersonation session via edge function
+    if (sessionToken) {
       try {
-        await supabase
-          .from("impersonation_sessions")
-          .update({ 
-            is_active: false, 
-            ended_at: new Date().toISOString() 
-          })
-          .eq("target_user_id", impersonatedUserId)
-          .eq("is_active", true);
+        await supabase.functions.invoke('impersonate-user', {
+          body: { 
+            action: 'end', 
+            sessionToken: sessionToken 
+          }
+        });
       } catch (error) {
         console.error("Error ending impersonation session:", error);
       }
     }
 
+    // Clear state
     setImpersonatedUserId(null);
     setImpersonatedUserName(null);
+    setSessionToken(null);
+    
+    // Remove from sessionStorage
+    sessionStorage.removeItem(IMPERSONATION_STORAGE_KEY);
     
     // Navigate back to admin
     navigate("/admin");

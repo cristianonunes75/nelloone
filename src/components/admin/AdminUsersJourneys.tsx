@@ -124,29 +124,28 @@ export const AdminUsersJourneys = () => {
     setImpersonating(user.id);
     
     try {
-      const { data: session, error } = await supabase
-        .from("impersonation_sessions")
-        .insert({
-          admin_id: (await supabase.auth.getUser()).data.user?.id,
-          target_user_id: user.id,
-          session_token: crypto.randomUUID(),
-          ip_address: 'unknown',
-          user_agent: navigator.userAgent,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      await supabase.rpc('log_audit', {
-        p_action: 'impersonate_user',
-        p_table_name: 'impersonation_sessions',
-        p_record_id: session.id,
-        p_new_data: { target_user_id: user.id, target_user_name: user.full_name }
+      // Use edge function to create session securely
+      const { data, error } = await supabase.functions.invoke('impersonate-user', {
+        body: { 
+          action: 'create', 
+          targetUserId: user.id 
+        }
       });
 
-      const impersonateUrl = `${window.location.origin}/cliente?impersonate=${session.session_token}`;
-      window.open(impersonateUrl, '_blank');
+      if (error || !data?.success) {
+        throw new Error(data?.error || 'Failed to create session');
+      }
+
+      // Store session in sessionStorage (not URL) for security
+      const sessionData = {
+        userId: user.id,
+        userName: user.full_name,
+        sessionToken: data.sessionToken
+      };
+      sessionStorage.setItem('nello_impersonation_session', JSON.stringify(sessionData));
+
+      // Open client page without token in URL
+      window.open(`${window.location.origin}/cliente`, '_blank');
       
       toast.success(`Simulando como ${user.full_name}`);
     } catch (error) {
