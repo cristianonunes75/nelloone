@@ -170,17 +170,20 @@ export const NavSection = () => {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 hover:bg-secondary/50 rounded-xl transition-colors"
-          >
-            {isMobileMenuOpen ? (
-              <X className="w-5 h-5" strokeWidth={1.5} />
-            ) : (
-              <Menu className="w-5 h-5" strokeWidth={1.5} />
-            )}
-          </button>
+          {/* Mobile: Install button + menu button */}
+          <div className="md:hidden flex items-center gap-2">
+            <InstallAppButton variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" />
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 hover:bg-secondary/50 rounded-xl transition-colors"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5" strokeWidth={1.5} />
+              ) : (
+                <Menu className="w-5 h-5" strokeWidth={1.5} />
+              )}
+            </button>
+          </div>
         </nav>
       </div>
 
