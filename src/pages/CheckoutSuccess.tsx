@@ -16,10 +16,12 @@ const MESSAGES = {
     pending: "Pagamento pendente",
     error: "Erro na verificação",
     successDesc: "Seu acesso foi liberado com sucesso. Você será redirecionado em instantes.",
+    successDescContinue: "Seu acesso foi liberado! Vamos continuar de onde você parou.",
     alreadyDesc: "Esta compra já foi processada anteriormente.",
     pendingDesc: "Seu pagamento ainda está sendo processado. Tente novamente em alguns segundos.",
     errorDesc: "Não foi possível verificar seu pagamento. Entre em contato com o suporte.",
     goToDashboard: "Ir para Minha Jornada",
+    continueTest: "Continuar Teste",
     tryAgain: "Tentar novamente",
   },
   en: {
@@ -29,10 +31,12 @@ const MESSAGES = {
     pending: "Payment pending",
     error: "Verification error",
     successDesc: "Your access has been granted. You will be redirected shortly.",
+    successDescContinue: "Your access has been granted! Let's continue where you left off.",
     alreadyDesc: "This purchase was already processed.",
     pendingDesc: "Your payment is still being processed. Please try again in a few seconds.",
     errorDesc: "Could not verify your payment. Please contact support.",
     goToDashboard: "Go to My Journey",
+    continueTest: "Continue Test",
     tryAgain: "Try again",
   },
   "pt-pt": {
@@ -42,10 +46,12 @@ const MESSAGES = {
     pending: "Pagamento pendente",
     error: "Erro na verificação",
     successDesc: "O seu acesso foi libertado com sucesso. Será redirecionado em instantes.",
+    successDescContinue: "O seu acesso foi libertado! Vamos continuar de onde parou.",
     alreadyDesc: "Esta compra já foi processada anteriormente.",
     pendingDesc: "O seu pagamento ainda está a ser processado. Tente novamente em alguns segundos.",
     errorDesc: "Não foi possível verificar o seu pagamento. Entre em contacto com o suporte.",
     goToDashboard: "Ir para A Minha Jornada",
+    continueTest: "Continuar Teste",
     tryAgain: "Tentar novamente",
   },
 };
@@ -59,6 +65,40 @@ export default function CheckoutSuccess() {
 
   const t = MESSAGES[language as keyof typeof MESSAGES] || MESSAGES.pt;
   const sessionId = searchParams.get("session_id");
+
+  // Check for pending test redirect
+  const pendingTestId = sessionStorage.getItem("pendingTestId");
+  const pendingUserTestId = sessionStorage.getItem("pendingUserTestId");
+  const hasPendingTest = pendingTestId && pendingUserTestId;
+
+  const getBasePath = () => {
+    return language === "en" ? "/en" : language === "pt-pt" ? "/pt-pt" : "";
+  };
+
+  const getDashboardPath = () => {
+    return `${getBasePath()}/cliente`;
+  };
+
+  const getTestPath = () => {
+    if (hasPendingTest) {
+      return `${getBasePath()}/test/${pendingTestId}/${pendingUserTestId}`;
+    }
+    return getDashboardPath();
+  };
+
+  const clearPendingTest = () => {
+    sessionStorage.removeItem("pendingTestId");
+    sessionStorage.removeItem("pendingUserTestId");
+  };
+
+  const handleRedirect = () => {
+    if (hasPendingTest) {
+      clearPendingTest();
+      navigate(getTestPath());
+    } else {
+      navigate(getDashboardPath());
+    }
+  };
 
   const verifyCheckout = async () => {
     if (!sessionId) {
@@ -87,11 +127,10 @@ export default function CheckoutSuccess() {
         } else {
           setStatus("success");
         }
-        // Auto-redirect after 3 seconds
+        // Auto-redirect after 2 seconds (faster for better UX)
         setTimeout(() => {
-          const dashboardPath = language === "en" ? "/en/cliente" : language === "pt-pt" ? "/pt-pt/cliente" : "/cliente";
-          navigate(dashboardPath);
-        }, 3000);
+          handleRedirect();
+        }, 2000);
       } else if (data.status === "open" || data.payment_status === "unpaid") {
         setStatus("pending");
       } else {
@@ -108,10 +147,6 @@ export default function CheckoutSuccess() {
   useEffect(() => {
     verifyCheckout();
   }, [sessionId]);
-
-  const getDashboardPath = () => {
-    return language === "en" ? "/en/cliente" : language === "pt-pt" ? "/pt-pt/cliente" : "/cliente";
-  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -131,10 +166,12 @@ export default function CheckoutSuccess() {
               <CheckCircle2 className="w-16 h-16 mx-auto text-emerald-500" />
               <div className="space-y-2">
                 <h1 className="text-xl font-semibold text-emerald-600">{t.success}</h1>
-                <p className="text-muted-foreground text-sm">{t.successDesc}</p>
+                <p className="text-muted-foreground text-sm">
+                  {hasPendingTest ? t.successDescContinue : t.successDesc}
+                </p>
               </div>
-              <Button onClick={() => navigate(getDashboardPath())} className="w-full">
-                {t.goToDashboard}
+              <Button onClick={handleRedirect} className="w-full">
+                {hasPendingTest ? t.continueTest : t.goToDashboard}
               </Button>
             </>
           )}
@@ -146,8 +183,8 @@ export default function CheckoutSuccess() {
                 <h1 className="text-xl font-semibold text-blue-600">{t.already_processed}</h1>
                 <p className="text-muted-foreground text-sm">{t.alreadyDesc}</p>
               </div>
-              <Button onClick={() => navigate(getDashboardPath())} className="w-full">
-                {t.goToDashboard}
+              <Button onClick={handleRedirect} className="w-full">
+                {hasPendingTest ? t.continueTest : t.goToDashboard}
               </Button>
             </>
           )}

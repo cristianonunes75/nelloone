@@ -733,6 +733,7 @@ export default function TestExecution() {
           price={testDetails?.price_brl ? parseFloat(testDetails.price_brl.toString()) : 29}
           isFreeTest={isFreeTest}
           answeredQuestions={currentQuestionIndex}
+          userTestId={userTestId}
         />
       </div>
     );
