@@ -6,9 +6,9 @@ interface FreePlanBenefitsProps {
 
 export const FreePlanBenefits = ({ variant = "light" }: FreePlanBenefitsProps) => {
   const benefits = [
-    "Gratuito para começar",
-    "Sem cartão de crédito",
-    "Cancele quando quiser"
+    "5 perguntas grátis",
+    "Resultados parciais",
+    "Jornada completa disponível"
   ];
 
   const textColor = variant === "dark" ? "text-white/80" : "text-foreground/90";

@@ -3,8 +3,12 @@ import { NavSection } from "@/components/landing/v2/NavSection";
 import { NelloOneLanding } from "@/components/landing/v2/NelloOneLanding";
 import { FooterSection } from "@/components/landing/v2/FooterSection";
 import { MiguelAgent } from "@/components/MiguelAgent";
+import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 
 const Landing = () => {
+  // Track visitors for real-time analytics
+  useVisitorTracking();
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead page="landing" />
