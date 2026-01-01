@@ -2,7 +2,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { NavSection } from "@/components/landing/v2/NavSection";
 import { NelloOneLanding } from "@/components/landing/v2/NelloOneLanding";
 import { FooterSection } from "@/components/landing/v2/FooterSection";
-import { MiguelAgent } from "@/components/MiguelAgent";
+import { NelloAgent } from "@/components/NelloAgent";
 import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 
 const Landing = () => {
@@ -20,7 +20,7 @@ const Landing = () => {
       <NelloOneLanding />
       
       <FooterSection />
-      <MiguelAgent location="landing" />
+      <NelloAgent location="landing" />
     </div>
   );
 };

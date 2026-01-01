@@ -90,7 +90,7 @@ const getTranslations = (lang: 'pt' | 'pt-pt' | 'en') => {
       
       // Block 5 - Patterns (Miguel explains)
       block5Title: "Padrões e Tendências",
-      miguelIntro: "Eu sou Miguel, seu guia. Aqui mostro, sem julgamentos, o que sua energia tende a fazer quando está em equilíbrio e quando está em tensão.",
+      miguelIntro: "Eu sou Nello, seu guia. Aqui mostro, sem julgamentos, o que sua energia tende a fazer quando está em equilíbrio e quando está em tensão.",
       dominantPattern: "Padrão dominante",
       emotionalMovement: "Movimento emocional interno",
       decisionBias: "Vieses de decisão",
@@ -132,7 +132,7 @@ const getTranslations = (lang: 'pt' | 'pt-pt' | 'en') => {
       // Block 10 - Final Phrase
       block10Title: "Mensagem Final",
       finalPhrase: "Clareza é o primeiro passo para a transformação. Caminho com você.",
-      signature: "— Miguel, seu guia no NELLO ONE",
+      signature: "— Nello, seu guia no NELLO ONE",
       
       // Common
       footer: "NELLO ONE — Clareza gera poder.",
@@ -169,7 +169,7 @@ const getTranslations = (lang: 'pt' | 'pt-pt' | 'en') => {
       block4Title: "Mapa Visual",
       
       block5Title: "Padrões e Tendências",
-      miguelIntro: "Eu sou o Miguel, o teu guia. Aqui mostro, sem julgamentos, o que a tua energia tende a fazer quando está em equilíbrio e quando está em tensão.",
+      miguelIntro: "Eu sou o Nello, o teu guia. Aqui mostro, sem julgamentos, o que a tua energia tende a fazer quando está em equilíbrio e quando está em tensão.",
       dominantPattern: "Padrão dominante",
       emotionalMovement: "Movimento emocional interno",
       decisionBias: "Vieses de decisão",
@@ -206,7 +206,7 @@ const getTranslations = (lang: 'pt' | 'pt-pt' | 'en') => {
       
       block10Title: "Mensagem Final",
       finalPhrase: "Clareza é o primeiro passo para a transformação. Caminho contigo.",
-      signature: "— Miguel, o teu guia no NELLO ONE",
+      signature: "— Nello, o teu guia no NELLO ONE",
       
       footer: "NELLO ONE — Clareza gera poder.",
       score: "Pontuação",
@@ -241,7 +241,7 @@ const getTranslations = (lang: 'pt' | 'pt-pt' | 'en') => {
       block4Title: "Visual Map",
       
       block5Title: "Patterns and Tendencies",
-      miguelIntro: "I am Miguel, your guide. Here I show, without judgment, what your energy tends to do when in balance and when in tension.",
+      miguelIntro: "I am Nello, your guide. Here I show, without judgment, what your energy tends to do when in balance and when in tension.",
       dominantPattern: "Dominant pattern",
       emotionalMovement: "Internal emotional movement",
       decisionBias: "Decision biases",
@@ -278,7 +278,7 @@ const getTranslations = (lang: 'pt' | 'pt-pt' | 'en') => {
       
       block10Title: "Final Message",
       finalPhrase: "Clarity is the first step to transformation. I walk with you.",
-      signature: "— Miguel, your guide at NELLO ONE",
+      signature: "— Nello, your guide at NELLO ONE",
       
       footer: "NELLO ONE — Clarity generates power.",
       score: "Score",

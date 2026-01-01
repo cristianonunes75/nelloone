@@ -16,14 +16,14 @@ interface QuickReply {
   action: string;
 }
 
-interface MiguelAgentProps {
+interface NelloAgentProps {
   location: "landing" | "cliente";
   completedTests?: string[];
   currentStep?: number;
   testResults?: Record<string, any>;
 }
 
-export function MiguelAgent({ location, completedTests = [], currentStep, testResults }: MiguelAgentProps) {
+export function NelloAgent({ location, completedTests = [], currentStep, testResults }: NelloAgentProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);

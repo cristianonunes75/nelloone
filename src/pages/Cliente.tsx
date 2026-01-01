@@ -16,7 +16,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { MiguelAgent } from "@/components/MiguelAgent";
+import { NelloAgent } from "@/components/NelloAgent";
 import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { testSlugs } from "@/lib/testContent";
@@ -584,7 +584,7 @@ const Cliente = () => {
         </div>
       )}
 
-      <MiguelAgent 
+      <NelloAgent 
         location="cliente" 
         completedTests={completedTests}
         currentStep={currentStep}
