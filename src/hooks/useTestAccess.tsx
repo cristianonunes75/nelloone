@@ -25,7 +25,7 @@ export const useTestAccess = () => {
 
   const isFounder = profile?.is_founder || false;
 
-  // Fetch test purchases for current user - include test type for cross-language matching
+  // Fetch test purchases for current user - include test type and purchase_category for cross-language and bundle matching
   const { data: purchases } = useQuery({
     queryKey: ["test-purchases", user?.id],
     enabled: !!user,
@@ -34,7 +34,7 @@ export const useTestAccess = () => {
 
       const { data, error } = await supabase
         .from("test_purchases")
-        .select("test_id, payment_status, tests(type)")
+        .select("test_id, payment_status, purchase_category, tests(type)")
         .eq("user_id", user.id)
         .eq("payment_status", "completed");
 
@@ -42,6 +42,12 @@ export const useTestAccess = () => {
       return data || [];
     },
   });
+
+  // Check if user has full journey access via bundle purchase (jornada_completa or fundadores)
+  const hasFullJourneyAccess = purchases?.some(p => 
+    (p as any).purchase_category === 'jornada_completa' || 
+    (p as any).purchase_category === 'fundadores'
+  ) || false;
 
   // Fetch all tests to enable cross-language matching by type
   const { data: allTests } = useQuery({
@@ -75,6 +81,9 @@ export const useTestAccess = () => {
     // Founders have access to all tests
     if (isFounder) return true;
     
+    // Users with full journey purchase have access to all tests
+    if (hasFullJourneyAccess) return true;
+    
     // Free tests are accessible to everyone
     if (isFree) return true;
     
@@ -98,6 +107,9 @@ export const useTestAccess = () => {
     // Founders have access to all tests (full version)
     if (isFounder) return true;
     
+    // Users with full journey purchase have access to all tests
+    if (hasFullJourneyAccess) return true;
+    
     // Check direct purchase
     if (purchases?.some((p) => p.test_id === testId)) {
       return true;
@@ -112,5 +124,5 @@ export const useTestAccess = () => {
     return false;
   };
 
-  return { hasAccess, hasPurchased, purchases, isFounder };
+  return { hasAccess, hasPurchased, purchases, isFounder, hasFullJourneyAccess };
 };
