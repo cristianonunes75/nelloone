@@ -725,9 +725,40 @@ function TestResultsInner() {
       // View results of completed test
       navigate(`${basePath}/test-results/${nextTestInfo.userTestId}`);
     } else if (nextTestInfo.test) {
-      // Start or continue the next test
-      navigate(`${basePath}/cliente`);
-      toast.info(lang === 'en' ? `Next: ${nextTestInfo.test.name}` : `Próximo: ${nextTestInfo.test.name}`);
+      // Start or continue the next test directly
+      if (nextTestInfo.userTestId) {
+        // User already started this test, continue it
+        navigate(`${basePath}/test/${nextTestInfo.test.id}/${nextTestInfo.userTestId}`);
+      } else {
+        // Create new user_test and start the test
+        if (!user?.id) {
+          navigate(`${basePath}/cliente`);
+          return;
+        }
+        
+        try {
+          const { data: newUserTest, error } = await supabase
+            .from("user_tests")
+            .insert({ 
+              user_id: user.id, 
+              test_id: nextTestInfo.test.id,
+              status: "in_progress",
+              started_at: new Date().toISOString()
+            })
+            .select("id")
+            .single();
+          
+          if (error) throw error;
+          
+          if (newUserTest) {
+            navigate(`${basePath}/test/${nextTestInfo.test.id}/${newUserTest.id}`);
+          }
+        } catch (err) {
+          console.error("Error creating user test:", err);
+          toast.error(lang === 'en' ? 'Error starting test' : 'Erro ao iniciar teste');
+          navigate(`${basePath}/cliente`);
+        }
+      }
     }
   };
   return (
