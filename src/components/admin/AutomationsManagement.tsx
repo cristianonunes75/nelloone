@@ -60,7 +60,7 @@ const TRIGGER_EVENTS = [
 
 const ACTION_TYPES = [
   { value: "send_email", label: "Enviar Email", icon: Mail },
-  { value: "miguel_message", label: "Mensagem do Miguel", icon: MessageSquare },
+  { value: "miguel_message", label: "Mensagem do Nello", icon: MessageSquare },
   { value: "notification", label: "Notificação", icon: Bell },
   { value: "webhook", label: "Webhook Externo", icon: Zap },
 ];

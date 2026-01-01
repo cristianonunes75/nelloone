@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useScrollAnimation, getStaggerDelay } from "@/hooks/useScrollAnimation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
-import miguelImage from "@/assets/miguel-presence.jpg";
+import nelloImage from "@/assets/nello-presence.jpg";
 
-export const MiguelSection = () => {
+export const NelloSection = () => {
   const navigate = useNavigate();
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
   const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation();
@@ -77,10 +77,10 @@ export const MiguelSection = () => {
                 {/* Glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-bruma-blue/30 to-ink-blue/20 rounded-full blur-3xl subtle-pulse" />
                 
-                {/* Miguel image */}
+                {/* Nello image */}
                 <div className="relative w-full h-full rounded-2xl md:rounded-3xl overflow-hidden shadow-large border border-border/30">
                   <img 
-                    src={miguelImage} 
+                    src={nelloImage} 
                     alt="Nello AI - Your guide in NELLO ONE"
                     className="w-full h-full object-cover"
                   />

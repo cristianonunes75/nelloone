@@ -25,7 +25,7 @@ import heroDawn from "@/assets/hero-dawn.jpg";
 import reflectionWindow from "@/assets/reflection-window.jpg";
 import pathTogether from "@/assets/path-together.jpg";
 import horizonSunrise from "@/assets/horizon-sunrise.jpg";
-import miguelPresence from "@/assets/miguel-presence.jpg";
+import nelloPresence from "@/assets/nello-presence.jpg";
 
 export const NelloOneLanding = () => {
   const { t, language } = useLanguage();
@@ -66,8 +66,8 @@ export const NelloOneLanding = () => {
     { number: "07", title: "Viver", desc: "Você caminha com mais clareza e propósito" },
   ];
 
-  // Capacidades do Miguel
-  const miguelCapabilities = [
+  // Capacidades do Nello
+  const nelloCapabilities = [
     "Interpreta seus testes com profundidade",
     "Conecta padrões entre diferentes dimensões",
     "Sugere caminhos práticos de aplicação",
@@ -95,7 +95,7 @@ export const NelloOneLanding = () => {
     { icon: BookOpen, title: "7 testes progressivos", desc: "Cada um revela uma dimensão diferente" },
     { icon: Eye, title: "Leitura simbólica integrada", desc: "Resultados conectados entre si" },
     { icon: FileText, title: "Código da Essência", desc: "Sua síntese final em PDF" },
-    { icon: Users, title: "Miguel como guia", desc: "IA que acompanha sua jornada" },
+    { icon: Users, title: "Nello como guia", desc: "IA que acompanha sua jornada" },
   ];
 
   return (
@@ -278,7 +278,7 @@ export const NelloOneLanding = () => {
         </div>
       </section>
 
-      {/* ========== 5️⃣ VOCÊ NÃO CAMINHA SOZINHO - MIGUEL ========== */}
+      {/* ========== 5️⃣ VOCÊ NÃO CAMINHA SOZINHO - NELLO ========== */}
       <section className="py-20 md:py-28 px-5 sm:px-6 lg:px-8 bg-background">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
@@ -286,8 +286,8 @@ export const NelloOneLanding = () => {
             <div className="relative order-2 md:order-1">
               <div className="relative">
                 <img 
-                  src={miguelPresence}
-                  alt="Miguel - Guia de IA para sua jornada de autoconhecimento"
+                  src={nelloPresence}
+                  alt="Nello - Guia de IA para sua jornada de autoconhecimento"
                   className="w-64 md:w-72 aspect-square object-cover rounded-2xl mx-auto shadow-xl shadow-black/10"
                 />
                 {/* Decorative frames */}
@@ -303,13 +303,13 @@ export const NelloOneLanding = () => {
               </h2>
               
               <p className="text-base md:text-lg text-foreground/80 leading-relaxed mb-6">
-                Miguel é uma inteligência artificial treinada para ser seu guia de clareza. 
+                Nello é uma inteligência artificial treinada para ser seu guia de clareza. 
                 Ele interpreta seus resultados, conecta padrões e ajuda você a aplicar 
                 o que descobriu na vida real.
               </p>
               
               <ul className="space-y-3 mb-8">
-                {miguelCapabilities.map((item, i) => (
+                {nelloCapabilities.map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-foreground/80">
                     <Check className="w-5 h-5 text-nello-gold mt-0.5 shrink-0" />
                     <span>{item}</span>

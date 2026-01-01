@@ -8,7 +8,7 @@ import heroDawn from "@/assets/hero-dawn.jpg";
 import reflectionWindow from "@/assets/reflection-window.jpg";
 import pathTogether from "@/assets/path-together.jpg";
 import horizonSunrise from "@/assets/horizon-sunrise.jpg";
-import miguelPresence from "@/assets/miguel-presence.jpg";
+import nelloPresence from "@/assets/nello-presence.jpg";
 
 // Componente para exibir versículos bíblicos com estilo destacado
 const ScriptureVerse = ({ 
@@ -226,8 +226,8 @@ export const ValidationLanding = () => {
           <div className="bg-secondary/40 rounded-xl sm:rounded-2xl p-5 sm:p-8 space-y-5 sm:space-y-6 border border-border/30">
             <div className="flex items-center gap-4 justify-center">
               <img 
-                src={miguelPresence} 
-                alt="Miguel" 
+                src={nelloPresence} 
+                alt="Nello" 
                 className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-nello-gold/30 shadow-md"
               />
             </div>
