@@ -303,9 +303,8 @@ export const NelloOneLanding = () => {
               </h2>
               
               <p className="text-base md:text-lg text-foreground/80 leading-relaxed mb-6">
-                Nello é uma inteligência artificial treinada para ser seu guia de clareza. 
-                Ele interpreta seus resultados, conecta padrões e ajuda você a aplicar 
-                o que descobriu na vida real.
+                Nello é seu guia de clareza. Ele interpreta seus resultados, 
+                conecta padrões e ajuda você a aplicar o que descobriu na vida real.
               </p>
               
               <ul className="space-y-3 mb-8">
