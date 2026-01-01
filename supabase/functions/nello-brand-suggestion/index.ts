@@ -40,6 +40,12 @@ Responda com um JSON contendo os campos relevantes para este tipo de card:
 ${cardType === "quote" ? `- scripture: Uma passagem bíblica relevante (máximo 15 palavras)
 - scriptureRef: Referência bíblica (ex: "João 8:32")` : ""}
 ${cardType === "cta" ? `- cta: Texto do botão de ação (2-4 palavras)` : ""}
+- caption: Uma legenda completa para a postagem no Instagram/LinkedIn com:
+  * Texto envolvente relacionado ao tema do card (3-4 parágrafos curtos)
+  * 2-3 perguntas reflexivas para engajamento
+  * Uma chamada para ação
+  * 5-8 hashtags relevantes (ex: #autoconhecimento #nelloone #proposito)
+  * Emojis adequados ao tom (use com moderação)
 
 Responda SOMENTE com o JSON, sem código markdown ou explicações.`;
 
