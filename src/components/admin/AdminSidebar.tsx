@@ -11,6 +11,7 @@ import {
   UserCheck,
   Route,
   MessageSquareHeart,
+  Palette,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -45,6 +46,12 @@ const menuSections = [
       { title: "Cupons", url: "/admin/cupons", icon: Ticket },
       { title: "Depoimentos", url: "/admin/depoimentos", icon: MessageSquareHeart },
       { title: "Código da Essência", url: "/admin/codigo-essencia", icon: Sparkles },
+    ]
+  },
+  {
+    label: "MARKETING",
+    items: [
+      { title: "Identidade Visual", url: "/admin/identidade-visual", icon: Palette },
     ]
   },
   {
