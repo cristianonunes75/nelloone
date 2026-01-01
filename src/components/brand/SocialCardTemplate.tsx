@@ -42,12 +42,12 @@ export const SocialCardTemplate = ({
   const isLight = theme === "light";
   
   const bgClass = isLight 
-    ? "bg-gradient-to-br from-[hsl(40,30%,97%)] to-[hsl(38,25%,92%)]" 
-    : "bg-gradient-to-br from-[hsl(30,15%,12%)] to-[hsl(25,12%,18%)]";
+    ? "bg-gradient-to-br from-[#FAF8F5] to-[#F0EDE8]" 
+    : "bg-gradient-to-br from-[#1C1917] to-[#292524]";
   
-  const textPrimary = isLight ? "text-ink-deep" : "text-white";
-  const textSecondary = isLight ? "text-ink-light" : "text-white/70";
-  const accentColor = "text-primary";
+  const textPrimary = isLight ? "text-[#1C1917]" : "text-white";
+  const textSecondary = isLight ? "text-[#57534e]" : "text-white/80";
+  const accentColor = isLight ? "text-[#C9A227]" : "text-[#D4AF37]";
   
   const renderContent = () => {
     switch (type) {
@@ -231,17 +231,17 @@ export const SocialCardTemplate = ({
       }}
     >
       {/* Subtle decorative elements */}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div 
           className={cn(
-            "absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-10",
-            isLight ? "bg-primary" : "bg-white"
+            "absolute -top-20 -right-20 w-40 h-40 rounded-full",
+            isLight ? "bg-[#C9A227]/10" : "bg-white/5"
           )} 
         />
         <div 
           className={cn(
-            "absolute -bottom-10 -left-10 w-32 h-32 rounded-full opacity-5",
-            isLight ? "bg-primary" : "bg-white"
+            "absolute -bottom-10 -left-10 w-32 h-32 rounded-full",
+            isLight ? "bg-[#C9A227]/5" : "bg-white/3"
           )} 
         />
       </div>
