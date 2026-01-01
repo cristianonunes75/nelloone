@@ -259,7 +259,7 @@ interface CardPreviewProps extends SocialCardTemplateProps {
   showLabel?: boolean;
 }
 
-export const SocialCardPreview = ({ showLabel = true, ...props }: CardPreviewProps) => {
+export const SocialCardPreview = ({ showLabel = false, ...props }: CardPreviewProps) => {
   const dimensions = formatDimensions[props.format];
   
   return (
