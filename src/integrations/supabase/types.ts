@@ -1150,6 +1150,51 @@ export type Database = {
           },
         ]
       }
+      site_visitors: {
+        Row: {
+          city: string | null
+          country: string | null
+          first_seen_at: string
+          id: string
+          is_active: boolean | null
+          is_mobile: boolean | null
+          last_seen_at: string
+          page_path: string
+          referrer: string | null
+          session_id: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          first_seen_at?: string
+          id?: string
+          is_active?: boolean | null
+          is_mobile?: boolean | null
+          last_seen_at?: string
+          page_path?: string
+          referrer?: string | null
+          session_id: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          first_seen_at?: string
+          id?: string
+          is_active?: boolean | null
+          is_mobile?: boolean | null
+          last_seen_at?: string
+          page_path?: string
+          referrer?: string | null
+          session_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           category: string

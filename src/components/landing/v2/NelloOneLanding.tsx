@@ -545,7 +545,7 @@ export const NelloOneLanding = () => {
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
             <p className="text-white/60 text-sm">
-              Gratuito para começar. Sem cartão de crédito.
+              5 perguntas grátis · Resultados parciais · Jornada completa disponível
             </p>
             <p className="text-white/40 text-sm italic">
               Sem pressa. Um passo de cada vez.

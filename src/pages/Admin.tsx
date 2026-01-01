@@ -21,6 +21,7 @@ const FundadoresAdmin = lazy(() => import("@/components/admin/FundadoresAdmin").
 const AffiliatesManagement = lazy(() => import("@/components/admin/AffiliatesManagement").then(m => ({ default: m.AffiliatesManagement })));
 const TestimonialsManagement = lazy(() => import("@/components/admin/TestimonialsManagement").then(m => ({ default: m.TestimonialsManagement })));
 const AdminBrandIdentity = lazy(() => import("@/components/admin/AdminBrandIdentity").then(m => ({ default: m.AdminBrandIdentity })));
+const AdminRealtimeVisitors = lazy(() => import("@/components/admin/AdminRealtimeVisitors").then(m => ({ default: m.AdminRealtimeVisitors })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -63,6 +64,7 @@ const Admin = () => {
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
                 <Route path="/" element={<AdminDashboard />} />
+                <Route path="/visitantes" element={<AdminRealtimeVisitors />} />
                 <Route path="/jornadas" element={<AdminJourneyDashboard />} />
                 <Route path="/fundadores" element={<FundadoresAdmin />} />
                 <Route path="/afiliados" element={<AffiliatesManagement />} />
