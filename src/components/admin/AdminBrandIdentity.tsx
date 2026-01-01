@@ -6,12 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Download, Copy, Sun, Moon, Image } from "lucide-react";
+import { Download, Sun, Moon, Sparkles, Loader2 } from "lucide-react";
 import { NelloSymbol, NelloSymbolN, NelloSymbolOne } from "@/components/brand/NelloSymbol";
 import { NelloWordmark } from "@/components/brand/NelloWordmark";
 import { SocialCardPreview } from "@/components/brand/SocialCardTemplate";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
+import { supabase } from "@/integrations/supabase/client";
 
 type CardFormat = "instagram-feed" | "instagram-portrait" | "stories" | "linkedin";
 type CardType = "institutional" | "educational" | "quote" | "cta" | "feature";
@@ -27,8 +28,48 @@ export const AdminBrandIdentity = () => {
   const [cardScripture, setCardScripture] = useState("Conhecereis a verdade, e a verdade vos libertará");
   const [cardScriptureRef, setCardScriptureRef] = useState("João 8:32");
   const [cardCta, setCardCta] = useState("Começar agora");
+  const [isGenerating, setIsGenerating] = useState(false);
   
   const cardRef = useRef<HTMLDivElement>(null);
+
+  const generateNelloSuggestion = async () => {
+    setIsGenerating(true);
+    
+    try {
+      const typeDescriptions: Record<CardType, string> = {
+        institutional: "Um card institucional sobre a marca NELLO ONE - plataforma de autoconhecimento cristão",
+        educational: "Um card educativo sobre autoconhecimento, personalidade ou psicologia",
+        quote: "Uma reflexão profunda sobre identidade, propósito ou autoconhecimento com passagem bíblica",
+        cta: "Um card com chamada para ação convidando a pessoa a iniciar sua jornada de autoconhecimento",
+        feature: "Um card destacando uma funcionalidade do NELLO ONE (testes de personalidade, Código da Essência, etc)"
+      };
+
+      const { data, error } = await supabase.functions.invoke("nello-brand-suggestion", {
+        body: {
+          cardType,
+          typeDescription: typeDescriptions[cardType]
+        }
+      });
+
+      if (error) throw error;
+
+      if (data) {
+        if (data.title) setCardTitle(data.title);
+        if (data.subtitle) setCardSubtitle(data.subtitle);
+        if (data.content) setCardContent(data.content);
+        if (data.scripture) setCardScripture(data.scripture);
+        if (data.scriptureRef) setCardScriptureRef(data.scriptureRef);
+        if (data.cta) setCardCta(data.cta);
+        
+        toast.success("Sugestão do Nello aplicada!");
+      }
+    } catch (error) {
+      console.error("Erro ao gerar sugestão:", error);
+      toast.error("Erro ao gerar sugestão. Tente novamente.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const downloadElement = async (element: HTMLElement | null, filename: string) => {
     if (!element) return;
@@ -363,13 +404,28 @@ export const AdminBrandIdentity = () => {
                   )}
                 </div>
 
-                <Button 
-                  className="w-full mt-4"
-                  onClick={() => downloadElement(cardRef.current, `nello-${cardType}-${cardFormat}`)}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Baixar PNG
-                </Button>
+                <div className="flex gap-2 mt-4">
+                  <Button 
+                    variant="outline"
+                    className="flex-1"
+                    onClick={generateNelloSuggestion}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-4 w-4 mr-2" />
+                    )}
+                    Sugestão do Nello
+                  </Button>
+                  <Button 
+                    className="flex-1"
+                    onClick={() => downloadElement(cardRef.current, `nello-${cardType}-${cardFormat}`)}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Baixar PNG
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
