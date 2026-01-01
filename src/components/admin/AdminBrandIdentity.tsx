@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Download, Sun, Moon, Sparkles, Loader2 } from "lucide-react";
+import { Download, Sun, Moon, Sparkles, Loader2, Copy, Check } from "lucide-react";
 import { NelloSymbol, NelloSymbolN, NelloSymbolOne } from "@/components/brand/NelloSymbol";
 import { NelloWordmark } from "@/components/brand/NelloWordmark";
 import { SocialCardPreview } from "@/components/brand/SocialCardTemplate";
@@ -28,7 +28,9 @@ export const AdminBrandIdentity = () => {
   const [cardScripture, setCardScripture] = useState("Conhecereis a verdade, e a verdade vos libertará");
   const [cardScriptureRef, setCardScriptureRef] = useState("João 8:32");
   const [cardCta, setCardCta] = useState("Começar agora");
+  const [postCaption, setPostCaption] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [captionCopied, setCaptionCopied] = useState(false);
   
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -60,6 +62,7 @@ export const AdminBrandIdentity = () => {
         if (data.scripture) setCardScripture(data.scripture);
         if (data.scriptureRef) setCardScriptureRef(data.scriptureRef);
         if (data.cta) setCardCta(data.cta);
+        if (data.caption) setPostCaption(data.caption);
         
         toast.success("Sugestão do Nello aplicada!");
       }
@@ -450,6 +453,32 @@ export const AdminBrandIdentity = () => {
                     />
                   </div>
                 </div>
+
+                {/* Caption Suggestion */}
+                {postCaption && (
+                  <div className="mt-4 p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-xs font-medium">Legenda sugerida para a postagem</Label>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          navigator.clipboard.writeText(postCaption);
+                          setCaptionCopied(true);
+                          toast.success("Legenda copiada!");
+                          setTimeout(() => setCaptionCopied(false), 2000);
+                        }}
+                      >
+                        {captionCopied ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">{postCaption}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
