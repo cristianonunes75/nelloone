@@ -1,11 +1,6 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
-import { 
-  Crown, Shield, Heart, Sparkles, Target, Users, 
-  Brain, Music, Compass, MessageCircle, Star, Flame,
-  Mountain, Waves, Wind, Sun, Eye, Lightbulb
-} from "lucide-react";
 
 interface AnswerOption {
   value: string;
@@ -17,7 +12,35 @@ interface TestAnswerOptionsProps {
   options: AnswerOption[];
   selectedAnswer: string;
   onAnswerChange: (value: string) => void;
+  questionId?: string; // Used for consistent randomization per question
 }
+
+// Seeded random number generator for consistent shuffling
+const seededRandom = (seed: string) => {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    const char = seed.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return () => {
+    hash = (hash * 1103515245 + 12345) & 0x7fffffff;
+    return hash / 0x7fffffff;
+  };
+};
+
+// Shuffle array using Fisher-Yates with seeded randomization
+const shuffleWithSeed = <T,>(array: T[], seed: string): T[] => {
+  const result = [...array];
+  const random = seededRandom(seed);
+  
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  
+  return result;
+};
 
 // Test-specific styling configurations with static Tailwind classes
 const testStyles = {
@@ -35,7 +58,6 @@ const testStyles = {
     badgeText: 'text-violet-600',
     dotBg: 'bg-violet-500',
     dotBorder: 'border-violet-500',
-    optionIcons: [Crown, Shield, Heart, Sparkles, Target]
   },
   arquetipos_proposito: {
     layout: 'cards' as const,
@@ -51,7 +73,6 @@ const testStyles = {
     badgeText: 'text-violet-600',
     dotBg: 'bg-violet-500',
     dotBorder: 'border-violet-500',
-    optionIcons: [Crown, Shield, Heart, Sparkles, Target]
   },
   disc: {
     layout: 'grid' as const,
@@ -67,7 +88,6 @@ const testStyles = {
     badgeText: 'text-blue-600',
     dotBg: 'bg-blue-500',
     dotBorder: 'border-blue-500',
-    optionIcons: [Target, Users, Shield, Compass, Star]
   },
   eneagrama: {
     layout: 'list' as const,
@@ -84,7 +104,6 @@ const testStyles = {
     dotBg: 'bg-purple-500',
     dotBorder: 'border-purple-500',
     borderLeft: 'border-l-purple-500',
-    optionIcons: [Star, Crown, Heart, Target, Eye, Shield, Sparkles, Compass, Flame]
   },
   temperamentos: {
     layout: 'buttons' as const,
@@ -100,7 +119,6 @@ const testStyles = {
     badgeText: 'text-amber-600',
     dotBg: 'bg-amber-500',
     dotBorder: 'border-amber-500',
-    optionIcons: [Flame, Wind, Mountain, Waves, Sun]
   },
   inteligencias_multiplas: {
     layout: 'grid' as const,
@@ -116,7 +134,6 @@ const testStyles = {
     badgeText: 'text-emerald-600',
     dotBg: 'bg-emerald-500',
     dotBorder: 'border-emerald-500',
-    optionIcons: [Brain, Music, Compass, Users, Lightbulb]
   },
   linguagens_amor: {
     layout: 'cards' as const,
@@ -132,7 +149,6 @@ const testStyles = {
     badgeText: 'text-rose-600',
     dotBg: 'bg-rose-500',
     dotBorder: 'border-rose-400',
-    optionIcons: [Heart, MessageCircle, Star, Users, Sparkles]
   },
   solis: {
     layout: 'cards' as const,
@@ -148,7 +164,6 @@ const testStyles = {
     badgeText: 'text-rose-600',
     dotBg: 'bg-rose-500',
     dotBorder: 'border-rose-400',
-    optionIcons: [Heart, MessageCircle, Star, Users, Sparkles]
   },
   mbti: {
     layout: 'scale' as const,
@@ -164,7 +179,6 @@ const testStyles = {
     badgeText: 'text-slate-600',
     dotBg: 'bg-slate-500',
     dotBorder: 'border-slate-500',
-    optionIcons: [Brain, Heart, Eye, Compass, Sun]
   }
 };
 
@@ -187,12 +201,9 @@ const CardsLayout = ({
   onAnswerChange: (v: string) => void;
   style: TestStyle;
 }) => {
-  const icons = style.optionIcons || [Crown, Shield, Heart, Sparkles, Target];
-  
   return (
     <div className="space-y-4">
       {options.map((option, index) => {
-        const Icon = icons[index % icons.length];
         const isSelected = selectedAnswer === option.value;
         
         return (
@@ -218,19 +229,19 @@ const CardsLayout = ({
             `}
             onClick={() => onAnswerChange(option.value)}
           >
-            {/* Icon */}
+            {/* Neutral letter indicator instead of predictable icons */}
             <motion.div 
-              animate={isSelected ? { rotate: [0, -10, 10, 0] } : {}}
-              transition={{ duration: 0.4 }}
+              animate={isSelected ? { scale: [1, 1.1, 1] } : {}}
+              transition={{ duration: 0.3 }}
               className={`
-                flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300
+                flex items-center justify-center w-12 h-12 rounded-xl text-lg font-medium transition-all duration-300
                 ${isSelected 
                   ? `${style.iconBgSelected} text-white shadow-md` 
                   : `${style.iconBg} ${style.iconText}`
                 }
               `}
             >
-              <Icon size={22} strokeWidth={1.5} />
+              {String.fromCharCode(65 + index)}
             </motion.div>
             
             {/* Content */}
@@ -424,12 +435,9 @@ const ButtonsLayout = ({
   onAnswerChange: (v: string) => void;
   style: TestStyle;
 }) => {
-  const icons = style.optionIcons || [Flame, Wind, Mountain, Waves, Sun];
-  
   return (
     <div className="flex flex-col gap-3">
       {options.map((option, index) => {
-        const Icon = icons[index % icons.length];
         const isSelected = selectedAnswer === option.value;
         
         return (
@@ -446,11 +454,12 @@ const ButtonsLayout = ({
             `}
             onClick={() => onAnswerChange(option.value)}
           >
+            {/* Neutral letter indicator instead of predictable icons */}
             <div className={`
-              flex items-center justify-center w-10 h-10 rounded-full
+              flex items-center justify-center w-10 h-10 rounded-full text-base font-medium
               ${isSelected ? `${style.iconBgSelected} text-white` : `${style.iconBg} ${style.iconText}`}
             `}>
-              <Icon size={18} strokeWidth={1.5} />
+              {String.fromCharCode(65 + index)}
             </div>
             <span className="flex-1 font-light text-base">{option.label}</span>
             <div className={`
@@ -574,15 +583,23 @@ export default function TestAnswerOptions({
   testType,
   options,
   selectedAnswer,
-  onAnswerChange
+  onAnswerChange,
+  questionId
 }: TestAnswerOptionsProps) {
   const style = getStyle(testType);
+  
+  // Shuffle options if questionId is provided (consistent per question)
+  // Don't shuffle scale/likert type questions as order matters there
+  const shouldShuffle = questionId && style.layout !== 'scale';
+  const displayOptions = shouldShuffle 
+    ? shuffleWithSeed(options, questionId) 
+    : options;
 
   return (
     <RadioGroup value={selectedAnswer} onValueChange={onAnswerChange}>
       {style.layout === 'cards' && (
         <CardsLayout 
-          options={options} 
+          options={displayOptions} 
           selectedAnswer={selectedAnswer} 
           onAnswerChange={onAnswerChange}
           style={style}
@@ -590,7 +607,7 @@ export default function TestAnswerOptions({
       )}
       {style.layout === 'grid' && (
         <GridLayout 
-          options={options} 
+          options={displayOptions} 
           selectedAnswer={selectedAnswer} 
           onAnswerChange={onAnswerChange}
           style={style}
@@ -598,7 +615,7 @@ export default function TestAnswerOptions({
       )}
       {style.layout === 'list' && (
         <ListLayout 
-          options={options} 
+          options={displayOptions} 
           selectedAnswer={selectedAnswer} 
           onAnswerChange={onAnswerChange}
           style={style}
@@ -606,7 +623,7 @@ export default function TestAnswerOptions({
       )}
       {style.layout === 'buttons' && (
         <ButtonsLayout 
-          options={options} 
+          options={displayOptions} 
           selectedAnswer={selectedAnswer} 
           onAnswerChange={onAnswerChange}
           style={style}

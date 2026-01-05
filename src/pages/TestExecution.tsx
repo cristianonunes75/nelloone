@@ -828,6 +828,7 @@ export default function TestExecution() {
               options={displayOptions || []}
               selectedAnswer={selectedAnswer}
               onAnswerChange={handleAnswerChange}
+              questionId={currentQuestion.id}
             />
           </QuestionTransition>
 
