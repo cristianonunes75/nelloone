@@ -58,7 +58,6 @@ async function notifyAffiliateNewCommission(
     
     // Map product type to display name
     const productNames: Record<string, string> = {
-      fundadores: "NELLO ONE Fundadores",
       jornada_completa: "NELLO ONE Completo",
       test_avulso: "Teste Avulso NELLO ONE",
       codigo_essencia: "Código da Essência",
@@ -265,122 +264,10 @@ serve(async (req) => {
         await processAffiliateReferral(session, affiliateCode, userId);
       }
 
-      // ====== FUNDADORES PURCHASE ======
+      // ====== LEGACY FUNDADORES REDIRECT - Now treated as jornada_completa ======
       if (productType === "fundadores") {
-        logStep("Processing Fundadores purchase", { userId });
-        
-        if (!userId || userId === "guest") {
-          logStep("ERROR: Fundadores requires authenticated user");
-          return new Response(JSON.stringify({ error: "User authentication required" }), {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          });
-        }
-
-        // Fundadores gets: Full journey access + Código da Essência + Founder flag
-        const { error: updateError } = await supabase
-          .from("profiles")
-          .update({ 
-            codigo_essencia_unlocked: true,
-            journey_status: "in_progress",
-            journey_started_at: new Date().toISOString(),
-            is_founder: true,
-          })
-          .eq("id", userId);
-
-        if (updateError) {
-          logStep("ERROR: Failed to unlock Fundadores access", { error: updateError });
-          throw updateError;
-        }
-
-        // Fetch all 7 tests
-        const { data: allTests } = await supabase
-          .from("tests")
-          .select("id, name, type")
-          .eq("active", true);
-
-        if (allTests && allTests.length > 0) {
-          const amountPaid = (session.amount_total || 0) / 100;
-          const pricePerTest = amountPaid / allTests.length;
-
-          // Record purchases for all tests
-          const purchaseRecords = allTests.map(test => ({
-            user_id: userId,
-            test_id: test.id,
-            price_paid: pricePerTest,
-            payment_status: "completed" as const,
-            payment_method: "stripe",
-            transaction_id: session.payment_intent as string,
-            purchase_category: "fundadores",
-            test_slug: test.type,
-            metadata: {
-              session_id: session.id,
-              product_type: "fundadores",
-              total_tests: allTests.length,
-            },
-          }));
-
-          const { error: purchaseError } = await supabase
-            .from("test_purchases")
-            .upsert(purchaseRecords, {
-              onConflict: "user_id,test_id",
-              ignoreDuplicates: false,
-            });
-
-          if (purchaseError) {
-            logStep("ERROR: Failed to record Fundadores purchases", { error: purchaseError });
-          } else {
-            logStep("Fundadores purchases recorded", { count: allTests.length });
-          }
-        }
-
-        logStep("Fundadores access unlocked successfully", { userId });
-
-        // Send confirmation email
-        try {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("full_name")
-            .eq("id", userId)
-            .single();
-
-          const { data: userAuth } = await supabase.auth.admin.getUserById(userId);
-          const userEmail = userAuth?.user?.email;
-
-          if (userEmail) {
-            const language = session.metadata?.language || "pt";
-            const amountPaid = (session.amount_total || 0) / 100;
-
-            await fetch(`${supabaseUrl}/functions/v1/send-email`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${supabaseServiceKey}`,
-              },
-              body: JSON.stringify({
-                type: "purchase_confirmation",
-                to: userEmail,
-                data: {
-                  name: profile?.full_name || userEmail.split("@")[0],
-                  testNames: ["Fundadores Nello One - Acesso Completo"],
-                  amount: amountPaid,
-                  currency: "R$",
-                  language,
-                  isFundadores: true,
-                },
-              }),
-            });
-
-            logStep("Fundadores confirmation email sent", { userEmail });
-          }
-        } catch (emailError) {
-          logStep("WARN: Failed to send Fundadores email", { error: emailError });
-        }
-
-        return new Response(JSON.stringify({ received: true, product: "fundadores" }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        });
+        logStep("Redirecting legacy Fundadores purchase to jornada_completa flow", { userId });
+        // Fall through to jornada_completa handling below
       }
 
       // ====== CÓDIGO DA ESSÊNCIA PURCHASE ======

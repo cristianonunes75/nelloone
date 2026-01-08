@@ -22,7 +22,7 @@ import { LogoText } from "@/components/LogoText";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { ImpersonateBanner } from "@/components/ImpersonateBanner";
 import { OnboardingModal } from "@/components/cliente/OnboardingModal";
-import { LogOut, User, Sparkles, Map, Lock, ShoppingCart, Star, MessageSquare } from "lucide-react";
+import { LogOut, User, Sparkles, Map, Lock, ShoppingCart } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -520,43 +520,6 @@ const Cliente = () => {
             onPurchaseCodigo={handleGenerateCode}
           />
 
-          {/* Affiliate Panel - Only visible to founders after completing journey */}
-          {profile?.is_founder && isJourneyComplete && (
-            <AffiliatePanel />
-          )}
-
-          {/* Founder Card - Only visible to founders */}
-          {profile?.is_founder && (
-            <Card className="border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-amber-600/10 mb-6">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-amber-500/10 rounded-full">
-                    <Star className="w-5 h-5 text-amber-500" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-base">Fundador NELLO ONE</CardTitle>
-                    <CardDescription className="text-xs">
-                      Você faz parte da primeira geração
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-sm text-muted-foreground mb-3">
-                  Se você notar qualquer falha, bug ou tiver uma sugestão, pode relatar por aqui.
-                </p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => navigate(`${getBasePath()}/cliente/fundador-feedback`)}
-                  className="gap-2"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Reportar problema ou sugestão
-                </Button>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Consolidated Results Summary - Shows completed tests */}
           {completedResultsForSummary.length > 0 && (

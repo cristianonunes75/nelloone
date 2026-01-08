@@ -18,7 +18,6 @@ const AdminCoupons = lazy(() => import("@/components/admin/AdminCoupons").then(m
 const AdminCodigoEssencia = lazy(() => import("@/components/admin/AdminCodigoEssencia").then(m => ({ default: m.AdminCodigoEssencia })));
 const AdminLogs = lazy(() => import("@/components/admin/AdminLogs").then(m => ({ default: m.AdminLogs })));
 const AdminSettings = lazy(() => import("@/components/admin/AdminSettings").then(m => ({ default: m.AdminSettings })));
-const FundadoresAdmin = lazy(() => import("@/components/admin/FundadoresAdmin").then(m => ({ default: m.FundadoresAdmin })));
 const AffiliatesManagement = lazy(() => import("@/components/admin/AffiliatesManagement").then(m => ({ default: m.AffiliatesManagement })));
 const TestimonialsManagement = lazy(() => import("@/components/admin/TestimonialsManagement").then(m => ({ default: m.TestimonialsManagement })));
 const AdminBrandIdentity = lazy(() => import("@/components/admin/AdminBrandIdentity").then(m => ({ default: m.AdminBrandIdentity })));
@@ -75,8 +74,8 @@ const Admin = () => {
                 <Route path="/relatorios" element={<ReportsManagement2 />} />
                 <Route path="/visitantes" element={<AdminRealtimeVisitors />} />
                 <Route path="/jornadas" element={<AdminJourneyDashboard />} />
-                <Route path="/fundadores" element={<FundadoresAdmin />} />
                 <Route path="/afiliados" element={<AffiliatesManagement />} />
+                <Route path="/usuarios" element={<AdminUsersJourneys />} />
                 <Route path="/usuarios" element={<AdminUsersJourneys />} />
                 <Route path="/pedidos" element={<AdminOrdersPayments />} />
                 <Route path="/produtos" element={<AdminProductsTests />} />
