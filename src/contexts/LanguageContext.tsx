@@ -4,9 +4,9 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import enLanding from '@/locales/en/landing.json';
 import ptLanding from '@/locales/pt/landing.json';
 import ptPtLanding from '@/locales/pt-pt/landing.json';
-import enMiguel from '@/locales/en/miguel.json';
-import ptMiguel from '@/locales/pt/miguel.json';
-import ptPtMiguel from '@/locales/pt-pt/miguel.json';
+import enNello from '@/locales/en/nello.json';
+import ptNello from '@/locales/pt/nello.json';
+import ptPtNello from '@/locales/pt-pt/nello.json';
 import enUser from '@/locales/en/user.json';
 import ptUser from '@/locales/pt/user.json';
 import ptPtUser from '@/locales/pt-pt/user.json';
@@ -16,23 +16,23 @@ export type Language = 'en' | 'pt' | 'pt-pt';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface Translations {
   landing: Record<string, any>;
-  miguel: Record<string, any>;
+  nello: Record<string, any>;
 }
 
 const translations: Record<Language, Translations & { user: typeof enUser }> = {
   en: {
     landing: enLanding,
-    miguel: enMiguel,
+    nello: enNello,
     user: enUser,
   },
   pt: {
     landing: ptLanding,
-    miguel: ptMiguel,
+    nello: ptNello,
     user: ptUser,
   },
   'pt-pt': {
     landing: ptPtLanding,
-    miguel: ptPtMiguel,
+    nello: ptPtNello,
     user: ptPtUser,
   },
 };

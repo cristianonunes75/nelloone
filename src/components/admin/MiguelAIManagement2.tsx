@@ -88,10 +88,10 @@ export const MiguelAIManagement2 = () => {
   const [playgroundLoading, setPlaygroundLoading] = useState(false);
 
   // Persona fields
-  const [personaTitle, setPersonaTitle] = useState("Miguel");
+  const [personaTitle, setPersonaTitle] = useState("Nello");
   const [personaDescription, setPersonaDescription] = useState("Seu guia espiritual e emocional na jornada de autoconhecimento");
   const [personaTone, setPersonaTone] = useState("Acolhedor, profundo, humano");
-  const [welcomeMessage, setWelcomeMessage] = useState("Olá! Sou Miguel, seu guia nesta jornada de autoconhecimento.");
+  const [welcomeMessage, setWelcomeMessage] = useState("Olá! Sou Nello, seu guia nesta jornada de autoconhecimento.");
 
   // Subprompt CRUD
   const [isSubpromptDialogOpen, setIsSubpromptDialogOpen] = useState(false);
@@ -330,7 +330,7 @@ export const MiguelAIManagement2 = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/miguel-agent`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nello-agent`,
         {
           method: "POST",
           headers: {

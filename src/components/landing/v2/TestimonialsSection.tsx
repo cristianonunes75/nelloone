@@ -13,7 +13,7 @@ export const TestimonialsSection = () => {
     {
       name: "Mariana S.",
       role: "Designer",
-      content: "It was like looking in the mirror for the first time. Miguel asked questions that made me stop and think deeply about who I really am.",
+      content: "It was like looking in the mirror for the first time. Nello asked questions that made me stop and think deeply about who I really am.",
       rating: 5,
     },
     {
@@ -32,7 +32,7 @@ export const TestimonialsSection = () => {
     {
       name: "Mariana S.",
       role: "Designer",
-      content: "Foi como olhar no espelho pela primeira vez. Miguel fez perguntas que me fizeram parar e pensar profundamente sobre quem eu realmente sou.",
+      content: "Foi como olhar no espelho pela primeira vez. Nello fez perguntas que me fizeram parar e pensar profundamente sobre quem eu realmente sou.",
       rating: 5,
     },
     {

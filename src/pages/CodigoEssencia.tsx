@@ -331,7 +331,7 @@ const CodigoEssenciaInner = () => {
     if (!user?.id) return;
     setIsGenerating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('miguel-codigo-essencia', {
+      const { data, error } = await supabase.functions.invoke('nello-codigo-essencia', {
         body: { user_id: user.id, locale: lang === 'en' ? 'en' : lang === 'pt-pt' ? 'pt-pt' : 'pt-br' }
       });
 

@@ -583,7 +583,7 @@ export const SimulationMode = () => {
     
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/miguel-agent`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nello-agent`,
         {
           method: "POST",
           headers: {

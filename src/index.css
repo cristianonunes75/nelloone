@@ -38,10 +38,10 @@
     --ink-deep: 28 20% 18%;
     --ink-light: 32 15% 45%;
 
-    /* Miguel - Warm Graphite */
-    --miguel-deep: 30 10% 15%;
-    --miguel-midnight: 30 8% 10%;
-    --miguel-silver: 30 5% 70%;
+    /* Nello - Warm Graphite */
+    --nello-deep: 30 10% 15%;
+    --nello-midnight: 30 8% 10%;
+    --nello-silver: 30 5% 70%;
 
     /* Secondary - Warm Beige */
     --secondary: 38 25% 92%; /* Warm beige #F0EBE3 */
@@ -131,9 +131,9 @@
     --ink-deep: 30 15% 10%;
     --ink-light: 35 15% 60%;
 
-    --miguel-deep: 38 15% 85%;
-    --miguel-midnight: 30 10% 8%;
-    --miguel-silver: 30 8% 45%;
+    --nello-deep: 38 15% 85%;
+    --nello-midnight: 30 10% 8%;
+    --nello-silver: 30 8% 45%;
 
     --secondary: 30 15% 18%;
     --secondary-foreground: 38 25% 90%;
@@ -198,8 +198,8 @@
     font-weight: 400;
   }
   
-  /* Serifada elegante para frases do Miguel */
-  .font-miguel {
+  /* Serifada elegante para frases do Nello */
+  .font-nello {
     font-family: 'Crimson Pro', Georgia, serif;
     font-weight: 500;
     font-style: normal;
