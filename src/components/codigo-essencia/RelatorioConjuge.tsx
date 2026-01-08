@@ -183,7 +183,7 @@ export const RelatorioConjuge = ({ language, hasSavedCodigo }: RelatorioConjugeP
     
     setIsGenerating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('miguel-relatorio-conjuge', {
+      const { data, error } = await supabase.functions.invoke('nello-relatorio-conjuge', {
         body: { 
           userId: user.id, 
           locale: language,

@@ -98,7 +98,7 @@ const Contact = () => {
           <Button
             variant="ghost"
             onClick={() => navigate("/")}
-            className="mb-8 text-miguel-deep hover:text-miguel-deep/80"
+          className="mb-8 text-nello-deep hover:text-nello-deep/80"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
@@ -108,10 +108,10 @@ const Contact = () => {
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-10 h-10 text-green-600" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-semibold text-miguel-deep font-display mb-4">
+            <h1 className="text-3xl md:text-4xl font-semibold text-nello-deep font-display mb-4">
               Mensagem enviada!
             </h1>
-            <p className="text-miguel-deep/70 max-w-md mx-auto leading-relaxed mb-8">
+            <p className="text-nello-deep/70 max-w-md mx-auto leading-relaxed mb-8">
               Recebemos sua mensagem e nossa equipe responderá em até 2 dias úteis pelo email informado.
             </p>
             <Button
@@ -132,7 +132,7 @@ const Contact = () => {
         <Button
           variant="ghost"
           onClick={() => navigate("/")}
-          className="mb-8 text-miguel-deep hover:text-miguel-deep/80"
+          className="mb-8 text-nello-deep hover:text-nello-deep/80"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Voltar
@@ -140,10 +140,10 @@ const Contact = () => {
 
         <div className="text-center mb-12">
           <LogoText variant="solid" className="text-4xl mb-4" />
-          <h1 className="text-3xl md:text-4xl font-semibold text-miguel-deep font-display">
+          <h1 className="text-3xl md:text-4xl font-semibold text-nello-deep font-display">
             Estamos aqui para você.
           </h1>
-          <p className="text-miguel-deep/70 mt-4 max-w-xl mx-auto leading-relaxed">
+          <p className="text-nello-deep/70 mt-4 max-w-xl mx-auto leading-relaxed">
             Para dúvidas, suporte ou solicitações sobre sua experiência no NELLO ONE, 
             preencha o formulário abaixo.
           </p>
@@ -232,9 +232,9 @@ const Contact = () => {
             </Button>
 
             <div className="flex items-center gap-3 pt-4 border-t border-soul-sand/30">
-              <Clock className="w-5 h-5 text-miguel-silver" strokeWidth={1.5} />
-              <p className="text-miguel-deep/70 text-sm">
-                <strong className="text-miguel-deep">Tempo médio de resposta:</strong> 1 a 2 dias úteis
+              <Clock className="w-5 h-5 text-nello-silver" strokeWidth={1.5} />
+              <p className="text-nello-deep/70 text-sm">
+                <strong className="text-nello-deep">Tempo médio de resposta:</strong> 1 a 2 dias úteis
               </p>
             </div>
           </form>

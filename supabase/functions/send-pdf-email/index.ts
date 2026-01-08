@@ -47,7 +47,7 @@ const getEmailContent = (name: string, testName: string, lang: string) => {
               <li>Descrição detalhada do seu resultado</li>
               <li>Pontos de luz e sombra</li>
               <li>Impacto nas três dimensões da vida</li>
-              <li>Análise do Miguel</li>
+              <li>Análise do Nello</li>
               <li>Plano de evolução de 7 dias</li>
             </ul>
             
@@ -95,7 +95,7 @@ const getEmailContent = (name: string, testName: string, lang: string) => {
               <li>Detailed description of your result</li>
               <li>Light and shadow points</li>
               <li>Impact on three life dimensions</li>
-              <li>Miguel's analysis</li>
+              <li>Nello's analysis</li>
               <li>7-day evolution plan</li>
             </ul>
             
@@ -143,7 +143,7 @@ const getEmailContent = (name: string, testName: string, lang: string) => {
               <li>Descrição detalhada do teu resultado</li>
               <li>Pontos de luz e sombra</li>
               <li>Impacto nas três dimensões da vida</li>
-              <li>Análise do Miguel</li>
+              <li>Análise do Nello</li>
               <li>Plano de evolução de 7 dias</li>
             </ul>
             

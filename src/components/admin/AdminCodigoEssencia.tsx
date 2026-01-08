@@ -104,8 +104,8 @@ export const AdminCodigoEssencia = () => {
   const handleRegenerate = async (user: CodigoEssenciaUser) => {
     setRegenerating(user.id);
     try {
-      // Call the miguel-codigo-essencia edge function
-      const { data, error } = await supabase.functions.invoke('miguel-codigo-essencia', {
+      // Call the nello-codigo-essencia edge function
+      const { data, error } = await supabase.functions.invoke('nello-codigo-essencia', {
         body: { 
           user_id: user.id,
           locale: user.locale || 'pt',
@@ -166,7 +166,7 @@ export const AdminCodigoEssencia = () => {
     setMockResult(null);
     try {
       // Use a dummy user_id for mock testing
-      const { data, error } = await supabase.functions.invoke('miguel-codigo-essencia', {
+      const { data, error } = await supabase.functions.invoke('nello-codigo-essencia', {
         body: { 
           user_id: '00000000-0000-0000-0000-000000000000',
           locale: 'pt-br',

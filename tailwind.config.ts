@@ -18,7 +18,7 @@ export default {
         display: ['Crimson Pro', 'Georgia', 'serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
         premium: ['Crimson Pro', 'Georgia', 'serif'],
-        miguel: ['Crimson Pro', 'Georgia', 'serif'],
+        nello: ['Crimson Pro', 'Georgia', 'serif'],
         heading: ['Crimson Pro', 'Georgia', 'serif'],
         scripture: ['Crimson Pro', 'Georgia', 'serif'],
       },
@@ -64,6 +64,9 @@ export default {
           graphite: "hsl(var(--nello-graphite))",
           "graphite-light": "hsl(var(--nello-graphite-light))",
           "graphite-deep": "hsl(var(--nello-graphite-deep))",
+          deep: "hsl(var(--nello-deep))",
+          midnight: "hsl(var(--nello-midnight))",
+          silver: "hsl(var(--nello-silver))",
         },
         ink: {
           DEFAULT: "hsl(var(--ink-brown))",
@@ -83,11 +86,8 @@ export default {
           light: "hsl(var(--gold-light))",
           dark: "hsl(var(--gold-dark))",
         },
-        miguel: {
-          deep: "hsl(var(--miguel-deep))",
-          midnight: "hsl(var(--miguel-midnight))",
-          silver: "hsl(var(--miguel-silver))",
-        },
+        // Legacy support - remove when all miguel references are updated
+        // miguel: { ... } - REMOVED, use nello.deep, nello.midnight, nello.silver instead
         soul: {
           sand: "hsl(var(--bruma-warm))",
           amber: "hsl(var(--bruma-deep))",

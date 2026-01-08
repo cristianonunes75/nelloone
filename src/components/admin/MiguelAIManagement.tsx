@@ -146,7 +146,7 @@ export const MiguelAIManagement = () => {
     setPlaygroundOutput("");
 
     try {
-      const { data, error } = await supabase.functions.invoke("miguel-agent", {
+      const { data, error } = await supabase.functions.invoke("nello-agent", {
         body: {
           message: playgroundInput,
           context: "playground",

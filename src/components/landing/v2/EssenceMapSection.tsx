@@ -59,8 +59,8 @@ export const EssenceMapSection = () => {
               </p>
               <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8 leading-relaxed">
                 {language === 'en' 
-                  ? 'After completing the 7 tests, Miguel synthesizes all your results into a single, personalized document: the NELLO ONE Map. The panel that brings all your results together in a clear and visual map.'
-                  : 'Ao completar os 7 testes, Miguel sintetiza todos os seus resultados em um documento único e personalizado: o Mapa NELLO ONE. O painel que une todos os seus resultados em um mapa claro e visual.'}
+                  ? 'After completing the 7 tests, Nello synthesizes all your results into a single, personalized document: the NELLO ONE Map. The panel that brings all your results together in a clear and visual map.'
+                  : 'Ao completar os 7 testes, Nello sintetiza todos os seus resultados em um documento único e personalizado: o Mapa NELLO ONE. O painel que une todos os seus resultados em um mapa claro e visual.'}
               </p>
 
               <div className="space-y-2 md:space-y-3 mb-8 md:mb-10">

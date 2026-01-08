@@ -230,8 +230,8 @@ export function generateDiagnosticoPDF(data: DiagnosticData = { generatedAt: new
   addTableRow(["Function", "Status"], true, [100, 70]);
   addTableRow(["create-checkout", "Implementada"], false, [100, 70]);
   addTableRow(["stripe-webhook", "Implementada"], false, [100, 70]);
-  addTableRow(["miguel-agent", "Implementada"], false, [100, 70]);
-  addTableRow(["miguel-codigo-essencia", "Implementada"], false, [100, 70]);
+  addTableRow(["nello-agent", "Implementada"], false, [100, 70]);
+  addTableRow(["nello-codigo-essencia", "Implementada"], false, [100, 70]);
   addTableRow(["send-email", "Implementada"], false, [100, 70]);
   addTableRow(["send-pdf-email", "Implementada"], false, [100, 70]);
   addTableRow(["admin-delete-user", "Implementada"], false, [100, 70]);

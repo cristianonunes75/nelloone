@@ -37,7 +37,7 @@ export function NelloAgent({ location, completedTests = [], currentStep, testRes
 
   // Get initial quick replies based on location and language
   const getInitialQuickReplies = useCallback((): QuickReply[] => {
-    const replies = t.miguel.quickReplies;
+    const replies = t.nello.quickReplies;
     if (location === "landing") {
       return [
         { text: replies.landing.whatIs, action: replies.landing.whatIsAction },
@@ -56,7 +56,7 @@ export function NelloAgent({ location, completedTests = [], currentStep, testRes
 
   // Get after-response quick replies
   const getAfterResponseQuickReplies = useCallback((): QuickReply[] => {
-    const replies = t.miguel.quickReplies.afterResponse;
+    const replies = t.nello.quickReplies.afterResponse;
     if (location === "landing") {
       return [
         { text: replies.landing.signup, action: replies.landing.signupAction },
@@ -96,21 +96,21 @@ export function NelloAgent({ location, completedTests = [], currentStep, testRes
     const nameStr = userName ? `, ${userName}` : '';
 
     if (location === "landing") {
-      return t.miguel.landingGreeting.replace('{name}', nameStr);
+      return t.nello.landingGreeting.replace('{name}', nameStr);
     }
 
     let progress: string;
     if (completedTests.length === 0) {
-      progress = t.miguel.clienteGreetingNew;
+      progress = t.nello.clienteGreetingNew;
     } else if (completedTests.length < 7) {
-      progress = t.miguel.clienteGreetingProgress
+      progress = t.nello.clienteGreetingProgress
         .replace('{count}', completedTests.length.toString())
         .replace('{plural}', completedTests.length > 1 ? 's' : '');
     } else {
-      progress = t.miguel.clienteGreetingComplete;
+      progress = t.nello.clienteGreetingComplete;
     }
 
-    return t.miguel.clienteGreetingIntro
+    return t.nello.clienteGreetingIntro
       .replace('{name}', nameStr)
       .replace('{progress}', progress);
   }, [t, location, profile, completedTests]);
@@ -137,7 +137,7 @@ export function NelloAgent({ location, completedTests = [], currentStep, testRes
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/miguel-agent`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nello-agent`,
         {
           method: "POST",
           headers: {
@@ -212,12 +212,12 @@ export function NelloAgent({ location, completedTests = [], currentStep, testRes
       setQuickReplies(getAfterResponseQuickReplies());
 
     } catch (error) {
-      console.error("Miguel error:", error);
+      console.error("Nello error:", error);
       setMessages(prev => [
         ...prev,
         {
           role: "assistant",
-          content: t.miguel.error,
+          content: t.nello.error,
         },
       ]);
     } finally {
@@ -270,7 +270,7 @@ export function NelloAgent({ location, completedTests = [], currentStep, testRes
           </div>
           <div>
             <h3 className="font-semibold">Nello</h3>
-            <p className="text-xs opacity-80">{t.miguel.subtitle}</p>
+            <p className="text-xs opacity-80">{t.nello.subtitle}</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -354,7 +354,7 @@ export function NelloAgent({ location, completedTests = [], currentStep, testRes
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={t.miguel.placeholder}
+            placeholder={t.nello.placeholder}
             disabled={isStreaming}
             className="flex-1 bg-muted border-0 focus-visible:ring-1 focus-visible:ring-ink-blue"
           />

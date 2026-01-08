@@ -12,7 +12,7 @@ verify_jwt = false
 [functions.essentia-concierge]
 verify_jwt = false
 
-[functions.miguel-agent]
+[functions.nello-agent]
 verify_jwt = false
 
 [functions.impersonate-user]
@@ -33,10 +33,10 @@ verify_jwt = false
 [functions.send-pdf-email]
 verify_jwt = true
 
-[functions.miguel-codigo-essencia]
+[functions.nello-codigo-essencia]
 verify_jwt = true
 
-[functions.miguel-relatorio-conjuge]
+[functions.nello-relatorio-conjuge]
 verify_jwt = true
 
 [functions.admin-delete-user]
