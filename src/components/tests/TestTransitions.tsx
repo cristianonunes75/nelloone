@@ -255,3 +255,109 @@ export function PageTransition({ children }: PageTransitionProps) {
     </motion.div>
   );
 }
+
+// Test completion celebration animation
+interface TestCompletionTransitionProps {
+  children: ReactNode;
+  show: boolean;
+}
+
+export function TestCompletionTransition({ children, show }: TestCompletionTransitionProps) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, y: 50 }}
+          animate={{ 
+            opacity: 1, 
+            scale: 1, 
+            y: 0,
+          }}
+          exit={{ opacity: 0, scale: 0.9, y: -20 }}
+          transition={{
+            type: "spring",
+            stiffness: 200,
+            damping: 20,
+            delay: 0.2,
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            {children}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// Confetti-like celebration dots
+export function CelebrationDots() {
+  const dots = Array.from({ length: 12 });
+  
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {dots.map((_, i) => {
+        const angle = (i / 12) * 360;
+        const delay = i * 0.05;
+        
+        return (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 rounded-full bg-primary"
+            style={{
+              left: '50%',
+              top: '50%',
+            }}
+            initial={{ 
+              x: 0, 
+              y: 0, 
+              opacity: 0, 
+              scale: 0 
+            }}
+            animate={{
+              x: Math.cos(angle * Math.PI / 180) * 100,
+              y: Math.sin(angle * Math.PI / 180) * 100,
+              opacity: [0, 1, 0],
+              scale: [0, 1, 0.5],
+            }}
+            transition={{
+              duration: 1,
+              delay,
+              ease: "easeOut",
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+// Smooth step transition for multi-step tests
+interface StepTransitionProps {
+  children: ReactNode;
+  stepKey: string | number;
+}
+
+export function StepTransition({ children, stepKey }: StepTransitionProps) {
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={stepKey}
+        initial={{ opacity: 0, x: 30 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -30 }}
+        transition={{
+          type: "spring",
+          stiffness: 400,
+          damping: 30,
+        }}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
