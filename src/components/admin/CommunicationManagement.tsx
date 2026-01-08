@@ -37,6 +37,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PushNotificationToggle } from "./PushNotificationToggle";
+import { useNewTicketSound } from "@/hooks/useNewTicketSound";
 
 interface Ticket {
   id: string;
@@ -80,6 +81,9 @@ export const CommunicationManagement = () => {
   const [replyMessage, setReplyMessage] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const { toast } = useToast();
+  
+  // Hook for new ticket sound notifications
+  useNewTicketSound();
 
   useEffect(() => {
     fetchTickets();
