@@ -50,15 +50,26 @@ export const NelloOneLanding = () => {
     { number: "07", title: "Viver" },
   ];
 
-  // O que você vai descobrir - versão compacta
-  const discoveries = [
-    { icon: Heart, title: "Suas emoções", desc: "Como você sente e processa o mundo" },
-    { icon: Brain, title: "Suas decisões", desc: "Como você pensa e escolhe" },
-    { icon: Flame, title: "Suas motivações", desc: "O que te move e bloqueia" },
-    { icon: Lightbulb, title: "Seus talentos", desc: "Suas formas de aprender" },
-    { icon: Target, title: "Seus padrões", desc: "Ciclos de comportamento" },
-    { icon: Compass, title: "Seu propósito", desc: "O que dá sentido à vida" },
-  ];
+  // O que você vai descobrir - usa textos do landing.json com nomes dos testes
+  const improvementsItems = (t.landing as any)?.improvements?.items || [];
+  const discoveryIcons = [Heart, Brain, Flame, Lightbulb, Target];
+  
+  const discoveries = improvementsItems.map((item: string, index: number) => {
+    // Extrai o texto principal e o nome do teste entre parênteses
+    const match = item.match(/^(.+?)\s*\(([^)]+)\)$/);
+    if (match) {
+      return {
+        icon: discoveryIcons[index] || Compass,
+        mainText: match[1].trim(),
+        testName: match[2].trim(),
+      };
+    }
+    return {
+      icon: discoveryIcons[index] || Compass,
+      mainText: item,
+      testName: null,
+    };
+  });
 
   // Para quem é / não é - compacto
   const forWho = [
@@ -213,7 +224,7 @@ export const NelloOneLanding = () => {
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {discoveries.map((item, index) => (
+            {discoveries.map((item: any, index: number) => (
               <div 
                 key={index}
                 className="p-4 bg-muted/30 rounded-xl border border-border/50"
@@ -223,8 +234,12 @@ export const NelloOneLanding = () => {
                     <item.icon className="w-4 h-4 text-nello-gold" strokeWidth={1.5} />
                   </div>
                   <div>
-                    <h4 className="font-medium text-foreground text-sm mb-0.5">{item.title}</h4>
-                    <p className="text-xs text-foreground/60">{item.desc}</p>
+                    <p className="text-foreground text-sm leading-relaxed">
+                      {item.mainText}
+                      {item.testName && (
+                        <span className="text-foreground/40 text-xs ml-1">({item.testName})</span>
+                      )}
+                    </p>
                   </div>
                 </div>
               </div>
