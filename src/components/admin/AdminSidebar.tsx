@@ -14,6 +14,7 @@ import {
   Palette,
   Eye,
   Trash2,
+  Bell,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -60,6 +61,7 @@ const menuSections = [
   {
     label: "SISTEMA",
     items: [
+      { title: "Notificações", url: "/admin/notificacoes", icon: Bell },
       { title: "Limpeza de Dados", url: "/admin/limpeza", icon: Trash2 },
       { title: "Logs & Auditoria", url: "/admin/logs", icon: Activity },
       { title: "Configurações", url: "/admin/configuracoes", icon: Settings },
