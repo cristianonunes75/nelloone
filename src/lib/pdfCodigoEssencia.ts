@@ -1066,8 +1066,8 @@ export const getMissingTests = (testResults: TestResults, language: 'pt' | 'pt-p
   const testNames: Record<string, Record<string, string>> = {
     arquetipos_proposito: { pt: 'Arquétipos com Propósito', 'pt-pt': 'Arquétipos com Propósito', en: 'Purpose Archetypes' },
     inteligencias_multiplas: { pt: 'Inteligências Múltiplas', 'pt-pt': 'Inteligências Múltiplas', en: 'Multiple Intelligences' },
-    linguagens_amor: { pt: 'Estilos de Conexão Afetiva', 'pt-pt': 'Estilos de Conexão Afetiva', en: 'Affection Connection Styles' },
-    mbti: { pt: 'Nello 16 Personality', 'pt-pt': 'Nello 16 Personality', en: 'Nello 16 Personality' },
+    estilos_conexao: { pt: 'Estilos de Conexão Afetiva', 'pt-pt': 'Estilos de Conexão Afetiva', en: 'Affection Connection Styles' },
+    nello16: { pt: 'Nello 16 Personality', 'pt-pt': 'Nello 16 Personality', en: 'Nello 16 Personality' },
     disc: { pt: 'DISC', 'pt-pt': 'DISC', en: 'DISC' },
     eneagrama: { pt: 'Eneagrama', 'pt-pt': 'Eneagrama', en: 'Enneagram' },
     temperamentos: { pt: 'Temperamentos', 'pt-pt': 'Temperamentos', en: 'Temperaments' },
@@ -1076,10 +1076,27 @@ export const getMissingTests = (testResults: TestResults, language: 'pt' | 'pt-p
   const missing: string[] = [];
   const lang = language === 'pt-pt' ? 'pt-pt' : language === 'en' ? 'en' : 'pt';
 
-  if (!testResults.arquetipos_proposito?.primary) missing.push(testNames.arquetipos_proposito[lang]);
-  if (!testResults.inteligencias_multiplas?.primary) missing.push(testNames.inteligencias_multiplas[lang]);
-  if (!testResults.linguagens_amor?.primary) missing.push(testNames.linguagens_amor[lang]);
-  if (!testResults.mbti?.type) missing.push(testNames.mbti[lang]);
+  // Check for arquetipos - handle multiple possible keys
+  const hasArquetipos = testResults.arquetipos_proposito?.primary || 
+    (testResults as any).arquetipos?.primary;
+  if (!hasArquetipos) missing.push(testNames.arquetipos_proposito[lang]);
+  
+  // Check for inteligencias - handle multiple possible data shapes
+  const hasInteligencias = testResults.inteligencias_multiplas?.primary || 
+    testResults.inteligencias_multiplas?.scores ||
+    (testResults as any).inteligencias_multiplas?.top1;
+  if (!hasInteligencias) missing.push(testNames.inteligencias_multiplas[lang]);
+  
+  // Check for estilos_conexao - handle multiple possible keys (linguagens_amor, estilos_conexao, etc.)
+  const hasEstilosConexao = (testResults as any).estilos_conexao?.primary || 
+    (testResults as any).estilos_conexao_afetiva?.primary ||
+    (testResults as any).linguagens_amor?.primary;
+  if (!hasEstilosConexao) missing.push(testNames.estilos_conexao[lang]);
+  
+  // Check for nello16 (was mbti)
+  const hasNello16 = (testResults as any).nello16?.type || testResults.mbti?.type;
+  if (!hasNello16) missing.push(testNames.nello16[lang]);
+  
   if (!testResults.disc?.dominantProfile) missing.push(testNames.disc[lang]);
   if (!testResults.eneagrama?.primaryType) missing.push(testNames.eneagrama[lang]);
   if (!testResults.temperamentos?.primary) missing.push(testNames.temperamentos[lang]);

@@ -5,6 +5,16 @@ import { useCodigoEssenciaAccess } from "@/hooks/useCodigoEssenciaAccess";
 import { useImpersonate } from "@/contexts/ImpersonateContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { JourneyStepCard } from "@/components/cliente/JourneyStepCard";
 import { JourneyResultsSummary } from "@/components/cliente/JourneyResultsSummary";
 import { LogoText } from "@/components/LogoText";
@@ -13,7 +23,7 @@ import { ImpersonateBanner } from "@/components/ImpersonateBanner";
 import { OnboardingModal } from "@/components/cliente/OnboardingModal";
 import { LogOut, User, Sparkles, Map, Lock, ShoppingCart, Star, MessageSquare } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { NelloAgent } from "@/components/NelloAgent";
@@ -53,6 +63,10 @@ const Cliente = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { language } = useLanguage();
+  
+  // State for reset confirmation dialog
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
+  const [stepToReset, setStepToReset] = useState<typeof journeySteps[0] | null>(null);
 
   // Handle payment success callback
   useEffect(() => {
@@ -186,8 +200,21 @@ const Cliente = () => {
     });
   };
 
-  const handleResetTest = (step: typeof journeySteps[0]) => {
-    resetTest(step.testId);
+  const handleResetTestClick = (step: typeof journeySteps[0]) => {
+    setStepToReset(step);
+    setResetConfirmOpen(true);
+  };
+
+  const handleConfirmReset = () => {
+    if (stepToReset) {
+      resetTest(stepToReset.testId);
+      toast({
+        title: "Teste reiniciado",
+        description: `O teste "${stepToReset.name}" foi reiniciado. Você pode refazê-lo agora.`,
+      });
+    }
+    setResetConfirmOpen(false);
+    setStepToReset(null);
   };
 
   const handleShareResult = (testName: string, summary: string) => {
@@ -233,7 +260,11 @@ const Cliente = () => {
       case "disc":
         if (resultData.dominantProfile) {
           const profile = DISC_PROFILES[resultData.dominantProfile as keyof typeof DISC_PROFILES];
-          return `${resultData.dominantProfile} - ${profile?.name || ""}`;
+          // Safely extract name - handle both string and object formats
+          const profileName = typeof profile?.name === 'object' 
+            ? (profile?.name as any)?.pt || (profile?.name as any)?.en || "" 
+            : (profile?.name || "");
+          return `${resultData.dominantProfile} - ${profileName}`;
         }
         break;
       case "eneagrama":
@@ -421,12 +452,19 @@ const Cliente = () => {
               </span>
             </div>
             <Progress value={progressPercentage} className="h-1.5 md:h-2 mb-2" />
-            <p className="text-[10px] md:text-xs text-muted-foreground">
-              {isJourneyComplete 
-                ? "🎉 Parabéns! Sua essência está pronta para ser revelada."
-                : `Etapa atual: ${currentStep} de ${totalSteps}`
-              }
-            </p>
+            {isJourneyComplete ? (
+              <p className="text-[10px] md:text-xs text-primary font-medium">
+                🎉 Parabéns! Sua essência está pronta para ser revelada.
+              </p>
+            ) : completedCount > 0 ? (
+              <p className="text-[10px] md:text-xs text-muted-foreground">
+                Continue sua jornada - próxima etapa: {currentStep} de {totalSteps}
+              </p>
+            ) : (
+              <p className="text-[10px] md:text-xs text-muted-foreground">
+                Comece sua jornada de autoconhecimento
+              </p>
+            )}
           </div>
 
           {/* Jornada Nello Card - Progress Overview */}
@@ -514,7 +552,7 @@ const Cliente = () => {
                 onContinue={() => handleContinueTest(step)}
                 onPurchase={() => navigate(`${getBasePath()}/cliente/comprar/${step.testId}`)}
                 onViewResult={() => handleViewResult(step)}
-                onReset={() => handleResetTest(step)}
+                onReset={() => handleResetTestClick(step)}
                 onShare={() => {
                   const summary = getResultSummary(step);
                   if (summary) handleShareResult(step.name, summary);
@@ -583,6 +621,25 @@ const Cliente = () => {
           </Button>
         </div>
       )}
+
+      {/* Reset confirmation dialog */}
+      <AlertDialog open={resetConfirmOpen} onOpenChange={setResetConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reiniciar teste?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja reiniciar o teste "{stepToReset?.name}"? 
+              Seu resultado anterior será perdido e você precisará refazer todas as perguntas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setStepToReset(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmReset} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Sim, reiniciar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <NelloAgent 
         location="cliente" 
