@@ -53,18 +53,26 @@ const Contact = () => {
 
       if (error) throw error;
 
-      // Notify admins via push notification
+      // Notify admins via push notification and email
       try {
         await supabase.functions.invoke("send-push", {
           body: {
             title: "📩 Novo ticket de suporte",
             body: `${formData.name}: ${formData.subject || formData.category}`,
             url: "/admin/comunicacao",
-            notifyAdmins: true
+            notifyAdmins: true,
+            sendEmail: true,
+            ticketData: {
+              name: formData.name,
+              email: formData.email,
+              category: formData.category,
+              subject: formData.subject,
+              message: formData.message
+            }
           }
         });
       } catch (pushError) {
-        console.log("Push notification failed (non-critical):", pushError);
+        console.log("Notification failed (non-critical):", pushError);
       }
 
       setSubmitted(true);

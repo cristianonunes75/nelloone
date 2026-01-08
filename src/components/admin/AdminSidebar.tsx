@@ -72,6 +72,7 @@ const menuSections = [
     label: "COMUNICAÇÃO",
     items: [
       { title: "Inbox", url: "/admin/comunicacao", icon: MessageSquareHeart },
+      { title: "Histórico Push", url: "/admin/notificacoes-historico", icon: Bell },
     ]
   },
   {

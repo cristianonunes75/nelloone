@@ -1157,6 +1157,39 @@ export type Database = {
         }
         Relationships: []
       }
+      push_notifications_log: {
+        Row: {
+          body: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          status: string | null
+          title: string
+          url: string | null
+          user_id: string | null
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          status?: string | null
+          title: string
+          url?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          body?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          status?: string | null
+          title?: string
+          url?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           auth_key: string
