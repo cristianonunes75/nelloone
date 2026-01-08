@@ -123,7 +123,7 @@ const PrivacyPolicy = () => {
                 Basta enviar solicitação para:
               </p>
               <p className="text-primary mt-2">
-                📧 privacidade@nelloone.app
+                📧 privacidade@nello.one
               </p>
             </section>
 
@@ -182,7 +182,7 @@ const PrivacyPolicy = () => {
                 Para dúvidas:
               </p>
               <p className="text-primary mt-2">
-                📧 privacidade@nelloone.app
+                📧 privacidade@nello.one
               </p>
             </section>
           </div>

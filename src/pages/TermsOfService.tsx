@@ -223,7 +223,7 @@ const TermsOfService = () => {
                 Para dúvidas, suporte ou solicitações:
               </p>
               <p className="text-primary mt-2">
-                📧 suporte@nelloone.app
+                📧 suporte@nello.one
               </p>
             </section>
 

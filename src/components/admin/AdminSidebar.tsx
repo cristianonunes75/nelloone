@@ -69,6 +69,12 @@ const menuSections = [
     ]
   },
   {
+    label: "COMUNICAÇÃO",
+    items: [
+      { title: "Inbox", url: "/admin/comunicacao", icon: MessageSquareHeart },
+    ]
+  },
+  {
     label: "SISTEMA",
     items: [
       { title: "Permissões", url: "/admin/permissoes", icon: Shield },

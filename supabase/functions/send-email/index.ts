@@ -17,7 +17,8 @@ type EmailType =
   | "commission_paid"
   | "new_commission"
   | "new_testimonial"
-  | "testimonial_response";
+  | "testimonial_response"
+  | "support_reply";
 
 interface EmailRequest {
   type: EmailType;
@@ -417,6 +418,43 @@ ${data.message || "Obrigado pelo seu feedback!"}
           </div>
         `,
       },
+      support_reply: {
+        subject: `Re: ${data.subject || "Sua mensagem de suporte"} - NELLO ONE`,
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">Equipe de Suporte</p>
+            </div>
+            
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Olá, ${name}!</h2>
+              <p style="color: #444; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+                Recebemos sua mensagem e aqui está nossa resposta:
+              </p>
+              
+              <div style="background: #F8F9FA; border-left: 4px solid #1F2E4B; border-radius: 4px; padding: 20px; margin: 24px 0;">
+                <div style="color: #1A1A1A; font-size: 16px; line-height: 1.8; white-space: pre-wrap;">${data.message || ""}</div>
+              </div>
+              
+              <p style="color: #666; font-size: 14px; line-height: 1.6;">
+                Se você tiver mais dúvidas, basta responder a este email ou entrar em contato novamente.
+              </p>
+              
+              <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee;">
+                <a href="https://nello.one/cliente" 
+                   style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500;">
+                  Acessar Minha Conta
+                </a>
+              </div>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. Todos os direitos reservados.
+            </p>
+          </div>
+        `,
+      },
     },
     en: {
       purchase_confirmation: {
@@ -779,6 +817,43 @@ ${data.message || "Thank you for your feedback!"}
                 <a href="https://nello.one/en/cliente" 
                    style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500;">
                   Continue My Journey
+                </a>
+              </div>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. All rights reserved.
+            </p>
+          </div>
+        `,
+      },
+      support_reply: {
+        subject: `Re: ${data.subject || "Your support message"} - NELLO ONE`,
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">Support Team</p>
+            </div>
+            
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Hello, ${name}!</h2>
+              <p style="color: #444; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+                We received your message and here is our response:
+              </p>
+              
+              <div style="background: #F8F9FA; border-left: 4px solid #1F2E4B; border-radius: 4px; padding: 20px; margin: 24px 0;">
+                <div style="color: #1A1A1A; font-size: 16px; line-height: 1.8; white-space: pre-wrap;">${data.message || ""}</div>
+              </div>
+              
+              <p style="color: #666; font-size: 14px; line-height: 1.6;">
+                If you have any more questions, simply reply to this email or contact us again.
+              </p>
+              
+              <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee;">
+                <a href="https://nello.one/cliente" 
+                   style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500;">
+                  Access My Account
                 </a>
               </div>
             </div>

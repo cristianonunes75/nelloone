@@ -27,6 +27,7 @@ const DataCleanupTool = lazy(() => import("@/components/admin/DataCleanupTool").
 const NotificationAutomation = lazy(() => import("@/components/admin/NotificationAutomation").then(m => ({ default: m.NotificationAutomation })));
 const AdminPermissionsManager = lazy(() => import("@/components/admin/AdminPermissionsManager").then(m => ({ default: m.AdminPermissionsManager })));
 const ReportsManagement2 = lazy(() => import("@/components/admin/ReportsManagement2").then(m => ({ default: m.ReportsManagement2 })));
+const CommunicationManagement = lazy(() => import("@/components/admin/CommunicationManagement").then(m => ({ default: m.CommunicationManagement })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -82,6 +83,7 @@ const Admin = () => {
                 <Route path="/depoimentos" element={<TestimonialsManagement />} />
                 <Route path="/codigo-essencia" element={<AdminCodigoEssencia />} />
                 <Route path="/identidade-visual" element={<AdminBrandIdentity />} />
+                <Route path="/comunicacao" element={<CommunicationManagement />} />
                 <Route path="/permissoes" element={<AdminPermissionsManager />} />
                 <Route path="/limpeza" element={<DataCleanupTool />} />
                 <Route path="/notificacoes" element={<NotificationAutomation />} />
