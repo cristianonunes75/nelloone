@@ -185,7 +185,7 @@ const CodigoEssenciaInner = () => {
   const codigoData = useCodigoEssencia();
   
   const { isJourneyComplete = false, testResults = {}, completedCount = 0, totalSteps = 7, isLoading: journeyLoading = true } = journeyData || {};
-  const { hasSavedCodigo = false, savedCodigo = null, saveCodigo, resetCodigo, isLoading: codigoLoading = true, canRegenerate = true } = codigoData || {};
+  const { hasSavedCodigo = false, savedCodigo = null, saveCodigo, resetCodigo, isLoading: codigoLoading = true, canRegenerate = false, isAdmin = false } = codigoData || {};
   
   const isLoading = journeyLoading || codigoLoading;
   const navigate = useNavigate();
@@ -553,7 +553,10 @@ const CodigoEssenciaInner = () => {
           <LogoText className="text-xl" variant="solid" />
           <div className="flex items-center gap-1.5">
             <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => navigate(`${basePath}/cliente`)}><ArrowLeft className="w-4 h-4" /></Button>
-            <Button variant="outline" size="sm" className="h-8 px-2" onClick={() => setShowRegenerateConfirm(true)} disabled={isGenerating || !canRegenerate} title={!canRegenerate ? (lang === 'en' ? 'Already regenerated once' : 'Já regenerado uma vez') : ''}><RefreshCw className="w-4 h-4" /></Button>
+            {/* Only show regenerate button for admins */}
+            {isAdmin && (
+              <Button variant="outline" size="sm" className="h-8 px-2" onClick={() => setShowRegenerateConfirm(true)} disabled={isGenerating} title={lang === 'en' ? 'Regenerate (Admin only)' : 'Regenerar (Somente admin)'}><RefreshCw className="w-4 h-4" /></Button>
+            )}
             <Button variant="outline" size="sm" className="h-8 px-2" onClick={handleDownloadPDF} disabled={!canDownloadPdf}><Download className="w-4 h-4" /></Button>
             <Button variant="outline" size="sm" className="h-8 px-2" onClick={handleSendEmail} disabled={isSendingEmail || !canDownloadPdf}>{isSendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}</Button>
           </div>
@@ -616,21 +619,22 @@ const CodigoEssenciaInner = () => {
                 return (
                   <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-center">
                     <p className="text-xs text-amber-700 dark:text-amber-400">
-                      {lang === 'en' 
-                        ? 'This report was generated with an older version. Regenerate to get new sections like Tensions, Life Areas, Peace/Pressure, etc.'
-                        : 'Este relatório foi gerado com uma versão anterior. Regenere para obter novas seções como Tensões, Áreas da Vida, Paz/Pressão, etc.'}
-                    </p>
-                    {canRegenerate && (
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-2 h-7 text-xs"
-                        onClick={() => setShowRegenerateConfirm(true)}
-                      >
-                        <RefreshCw className="w-3 h-3 mr-1" />
-                        {lang === 'en' ? 'Regenerate' : 'Regenerar'}
-                      </Button>
-                    )}
+                    {lang === 'en' 
+                      ? 'This report was generated with an older version. Contact support if you need to update it.'
+                      : 'Este relatório foi gerado com uma versão anterior. Entre em contato se precisar atualizar.'}
+                  </p>
+                  {/* Only show regenerate button for admins */}
+                  {isAdmin && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-2 h-7 text-xs"
+                      onClick={() => setShowRegenerateConfirm(true)}
+                    >
+                      <RefreshCw className="w-3 h-3 mr-1" />
+                      {lang === 'en' ? 'Regenerate (Admin)' : 'Regenerar (Admin)'}
+                    </Button>
+                  )}
                   </div>
                 );
               }

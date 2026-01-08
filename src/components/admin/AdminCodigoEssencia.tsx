@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { 
-  Search, Loader2, Sparkles, RefreshCw, FileText, Copy, Eye, FlaskConical
+  Search, Loader2, Sparkles, RefreshCw, FileText, Copy, Eye, FlaskConical, Unlock
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -28,6 +28,7 @@ interface CodigoEssenciaUser {
   purchase_date?: string;
   has_mapa: boolean;
   mapa_id?: string;
+  mapa_version?: number;
   locale?: string;
 }
 
@@ -38,6 +39,8 @@ export const AdminCodigoEssencia = () => {
   const [filter, setFilter] = useState("all");
   const [regenerating, setRegenerating] = useState<string | null>(null);
   const [confirmRegenerate, setConfirmRegenerate] = useState<CodigoEssenciaUser | null>(null);
+  const [confirmUnlock, setConfirmUnlock] = useState<CodigoEssenciaUser | null>(null);
+  const [unlocking, setUnlocking] = useState<string | null>(null);
   const [mockTesting, setMockTesting] = useState(false);
   const [mockResult, setMockResult] = useState<any>(null);
 
@@ -56,7 +59,7 @@ export const AdminCodigoEssencia = () => {
 
       if (error) throw error;
 
-      const { data: mapas } = await supabase.from("mapa_essencia").select("id, user_id, created_at");
+      const { data: mapas } = await supabase.from("mapa_essencia").select("id, user_id, created_at, version");
       const { data: purchases } = await supabase
         .from("test_purchases")
         .select("user_id, purchased_at, metadata")
@@ -84,6 +87,7 @@ export const AdminCodigoEssencia = () => {
             purchase_date: purchaseMap.get(profile.id),
             has_mapa: !!mapa,
             mapa_id: mapa?.id,
+            mapa_version: mapa?.version ?? undefined,
             locale: 'pt', // Default
           };
         });
@@ -125,6 +129,35 @@ export const AdminCodigoEssencia = () => {
       toast.error("Erro ao regenerar. Verifique se o usuário completou todos os testes.");
     } finally {
       setRegenerating(null);
+    }
+  };
+
+  // Unlock regeneration for a user (set version to 0)
+  const handleUnlockRegeneration = async (user: CodigoEssenciaUser) => {
+    setUnlocking(user.id);
+    try {
+      const { error } = await supabase
+        .from("mapa_essencia")
+        .update({ version: 0 })
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      await supabase.rpc('log_audit', {
+        p_action: 'unlock_regeneration',
+        p_table_name: 'mapa_essencia',
+        p_record_id: user.mapa_id || user.id,
+        p_new_data: { unlocked_by: 'admin', user_id: user.id }
+      });
+
+      toast.success(`Regeneração liberada para ${user.full_name}`);
+      setConfirmUnlock(null);
+      fetchUsers();
+    } catch (error) {
+      console.error("Error unlocking regeneration:", error);
+      toast.error("Erro ao liberar regeneração");
+    } finally {
+      setUnlocking(null);
     }
   };
 
@@ -334,10 +367,17 @@ export const AdminCodigoEssencia = () => {
                   </TableCell>
                   <TableCell>
                     {user.has_mapa ? (
-                      <Badge className="bg-primary/10 text-primary border-primary/20 text-xs gap-1">
-                        <FileText className="w-3 h-3" />
-                        Gerado
-                      </Badge>
+                      <div className="flex items-center gap-1.5">
+                        <Badge className="bg-primary/10 text-primary border-primary/20 text-xs gap-1">
+                          <FileText className="w-3 h-3" />
+                          Gerado
+                        </Badge>
+                        {user.mapa_version === 0 && (
+                          <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs">
+                            Regen liberada
+                          </Badge>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-xs text-muted-foreground">—</span>
                     )}
@@ -376,12 +416,29 @@ export const AdminCodigoEssencia = () => {
                           size="sm"
                           onClick={() => setConfirmRegenerate(user)}
                           disabled={regenerating === user.id}
-                          title="Regenerar relatório"
+                          title="Regenerar relatório (Admin)"
                         >
                           {regenerating === user.id ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
                             <RefreshCw className="w-4 h-4" />
+                          )}
+                        </Button>
+                      )}
+                      {/* Unlock regeneration for user (only if mapa exists and version > 0) */}
+                      {user.has_mapa && user.mapa_version !== 0 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setConfirmUnlock(user)}
+                          disabled={unlocking === user.id}
+                          title="Liberar regeneração para o usuário"
+                          className="text-amber-600 hover:text-amber-700 hover:bg-amber-500/10"
+                        >
+                          {unlocking === user.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Unlock className="w-4 h-4" />
                           )}
                         </Button>
                       )}
@@ -418,6 +475,32 @@ export const AdminCodigoEssencia = () => {
               disabled={!!regenerating}
             >
               {regenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Regenerar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Confirm Unlock Regeneration Dialog */}
+      <AlertDialog open={!!confirmUnlock} onOpenChange={() => setConfirmUnlock(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Liberar Regeneração</AlertDialogTitle>
+            <AlertDialogDescription>
+              Deseja liberar uma nova geração do Código da Essência para <strong>{confirmUnlock?.full_name}</strong>?
+              <br /><br />
+              O usuário poderá acessar a página e clicar em "Gerar Código" novamente. Isso consumirá créditos de IA.
+              <br /><br />
+              <span className="text-amber-600">Use apenas em casos de erro ou quando o cliente pagar por uma nova geração.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => confirmUnlock && handleUnlockRegeneration(confirmUnlock)}
+              disabled={!!unlocking}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              {unlocking ? <Loader2 className="w-4 h-4 animate-spin" /> : "Liberar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
