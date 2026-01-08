@@ -32,7 +32,6 @@ interface JourneyUser {
   journey_tests_status: Record<string, string>;
   journey_started_at: string | null;
   updated_at: string;
-  is_founder: boolean;
 }
 
 const TEST_NAMES: Record<string, string> = {
@@ -76,11 +75,20 @@ export function AdminJourneyDashboard() {
 
       if (error) throw error;
 
-      // Get emails via edge function or use placeholder
-      // Note: In production, you'd need an admin API endpoint
+      // Fetch real emails from edge function
+      let emailMap: Record<string, string> = {};
+      try {
+        const { data: emailData, error: emailError } = await supabase.functions.invoke("get-user-emails");
+        if (!emailError && emailData?.emails) {
+          emailMap = emailData.emails;
+        }
+      } catch (e) {
+        console.warn("Could not fetch emails:", e);
+      }
+
       const usersWithEmail: JourneyUser[] = (profiles || []).map(p => ({
         id: p.id,
-        email: "—", // Email requires admin API access
+        email: emailMap[p.id] || "—",
         full_name: p.full_name,
         phone: p.phone,
         journey_status: p.journey_status,
@@ -88,7 +96,6 @@ export function AdminJourneyDashboard() {
         journey_tests_status: (p.journey_tests_status as Record<string, string>) || {},
         journey_started_at: p.journey_started_at,
         updated_at: p.updated_at,
-        is_founder: p.is_founder || false,
       }));
 
       setUsers(usersWithEmail);
@@ -435,12 +442,7 @@ export function AdminJourneyDashboard() {
                   return (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                          {user.full_name}
-                          {user.is_founder && (
-                            <Badge variant="outline" className="text-xs">Fundador</Badge>
-                          )}
-                        </div>
+                        {user.full_name}
                       </TableCell>
                       <TableCell className="text-muted-foreground">{user.email}</TableCell>
                       <TableCell>{getStatusBadge(user.journey_status)}</TableCell>

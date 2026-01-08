@@ -74,3 +74,6 @@ verify_jwt = true
 
 [functions.send-push]
 verify_jwt = false
+
+[functions.get-user-emails]
+verify_jwt = true
