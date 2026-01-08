@@ -22,6 +22,7 @@ const AffiliatesManagement = lazy(() => import("@/components/admin/AffiliatesMan
 const TestimonialsManagement = lazy(() => import("@/components/admin/TestimonialsManagement").then(m => ({ default: m.TestimonialsManagement })));
 const AdminBrandIdentity = lazy(() => import("@/components/admin/AdminBrandIdentity").then(m => ({ default: m.AdminBrandIdentity })));
 const AdminRealtimeVisitors = lazy(() => import("@/components/admin/AdminRealtimeVisitors").then(m => ({ default: m.AdminRealtimeVisitors })));
+const DataCleanupTool = lazy(() => import("@/components/admin/DataCleanupTool").then(m => ({ default: m.DataCleanupTool })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -75,6 +76,7 @@ const Admin = () => {
                 <Route path="/depoimentos" element={<TestimonialsManagement />} />
                 <Route path="/codigo-essencia" element={<AdminCodigoEssencia />} />
                 <Route path="/identidade-visual" element={<AdminBrandIdentity />} />
+                <Route path="/limpeza" element={<DataCleanupTool />} />
                 <Route path="/logs" element={<AdminLogs />} />
                 <Route path="/configuracoes" element={<AdminSettings />} />
               </Routes>

@@ -34,6 +34,7 @@ import { QuestionTransition, AnimatedProgress, PageTransition } from "@/componen
 import { motion, AnimatePresence } from "framer-motion";
 import { InteligenciasIntroScreen } from "@/components/tests/inteligencias/InteligenciasIntroScreen";
 import { IntelligenceTooltip, getIntelligenceKeyFromQuestionNumber } from "@/components/tests/inteligencias/IntelligenceTooltip";
+import { TestTimeEstimate } from "@/components/tests/TestTimeEstimate";
 
 export default function TestExecution() {
   const { testId, userTestId } = useParams();
@@ -48,6 +49,7 @@ export default function TestExecution() {
   const [showInteligenciasIntro, setShowInteligenciasIntro] = useState(true);
   const [showCelebration, setShowCelebration] = useState(false);
   const [navigationDirection, setNavigationDirection] = useState<"left" | "right">("left");
+  const [testStartTime] = useState<Date>(new Date());
   const [partialArchetypes, setPartialArchetypes] = useState<{
     primary: { archetype: string; score: number };
     secondary?: { archetype: string; score: number };
@@ -774,13 +776,20 @@ export default function TestExecution() {
           {/* Test type badge and question indicator */}
           <div className="flex items-center justify-between mb-6">
             <TestTypeBadge testType={testDetails?.type || 'disc'} />
-            <div className="text-sm text-muted-foreground font-light">
-              Questão {currentQuestionIndex + 1} de {questions?.length}
-              {!hasPaidAccess && !isFreeTest && (
-                <span className="ml-2 text-xs text-primary/80">
-                  (Versão gratuita)
-                </span>
-              )}
+            <div className="flex items-center gap-3">
+              <TestTimeEstimate
+                currentQuestionIndex={currentQuestionIndex}
+                totalQuestions={questions?.length || 0}
+                testStartTime={testStartTime}
+              />
+              <div className="text-sm text-muted-foreground font-light">
+                Questão {currentQuestionIndex + 1} de {questions?.length}
+                {!hasPaidAccess && !isFreeTest && (
+                  <span className="ml-2 text-xs text-primary/80">
+                    (Versão gratuita)
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
