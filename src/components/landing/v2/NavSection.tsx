@@ -74,11 +74,11 @@ export const NavSection = () => {
     { label: t.landing.nav.pricing, action: () => scrollToSection("#precos"), icon: HelpCircle },
   ];
 
-  // Links for logged users
+  // Links for logged users - Results scrolls to results section
   const authLinks = [
     { label: t.landing.nav.tests, action: () => handleNavigation("/cliente"), icon: FileText },
     { label: language === 'en' ? 'My Journey' : 'Minha Jornada', action: () => handleNavigation("/cliente"), icon: Map },
-    { label: language === 'en' ? 'Results' : 'Resultados', action: () => handleNavigation("/cliente"), icon: BarChart3 },
+    { label: language === 'en' ? 'Results' : 'Resultados', action: () => handleNavigation("/cliente#resultados"), icon: BarChart3 },
   ];
 
   const navLinks = isLoggedIn ? authLinks : publicLinks;

@@ -824,7 +824,9 @@ function TestResultsInner() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Respostas</p>
-                    <p className="text-2xl font-bold">{answers?.length || 0}</p>
+                    <p className="text-2xl font-bold">
+                      {answers?.length || userTest.tests?.questions_count || 0}
+                    </p>
                   </div>
                 </div>
               </div>
