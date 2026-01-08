@@ -65,3 +65,12 @@ verify_jwt = true
 
 [functions.flow-customer-portal]
 verify_jwt = true
+
+[functions.nello-brand-suggestion]
+verify_jwt = true
+
+[functions.update-stripe-coupon]
+verify_jwt = true
+
+[functions.send-push]
+verify_jwt = false
