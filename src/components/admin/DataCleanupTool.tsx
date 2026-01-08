@@ -4,7 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, AlertTriangle, Users, Merge, Search, RefreshCw, CheckCircle } from "lucide-react";
+import { 
+  Trash2, 
+  AlertTriangle, 
+  Users, 
+  Merge, 
+  Search, 
+  RefreshCw, 
+  CheckCircle, 
+  Activity, 
+  Clock, 
+  CreditCard,
+  TrendingDown,
+  Heart,
+  AlertCircle,
+  ArrowRight
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -26,6 +41,9 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 interface UserData {
   id: string;
@@ -45,6 +63,40 @@ interface DuplicateGroup {
   users: UserData[];
 }
 
+interface HealthMetrics {
+  totalUsers: number;
+  activeUsers: number;
+  inactiveUsers: number;
+  incompleteTests: number;
+  pendingPurchases: number;
+  abandonedJourneys: number;
+  healthScore: number;
+}
+
+interface InactiveUser {
+  id: string;
+  full_name: string;
+  created_at: string;
+  days_inactive: number;
+}
+
+interface IncompleteTest {
+  id: string;
+  user_name: string;
+  test_name: string;
+  started_at: string;
+  days_pending: number;
+}
+
+interface PendingPurchase {
+  id: string;
+  user_name: string;
+  test_name: string;
+  created_at: string;
+  price_paid: number;
+  days_pending: number;
+}
+
 export const DataCleanupTool = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [testUsers, setTestUsers] = useState<UserData[]>([]);
@@ -52,8 +104,19 @@ export const DataCleanupTool = () => {
   const [loading, setLoading] = useState(true);
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [merging, setMerging] = useState(false);
+  const [selectedMergeGroup, setSelectedMergeGroup] = useState<DuplicateGroup | null>(null);
+  const [primaryUserId, setPrimaryUserId] = useState<string>("");
+  
+  // Health metrics
+  const [healthMetrics, setHealthMetrics] = useState<HealthMetrics | null>(null);
+  const [inactiveUsers, setInactiveUsers] = useState<InactiveUser[]>([]);
+  const [incompleteTests, setIncompleteTests] = useState<IncompleteTest[]>([]);
+  const [pendingPurchases, setPendingPurchases] = useState<PendingPurchase[]>([]);
+  
   const { toast } = useToast();
 
   useEffect(() => {
@@ -63,60 +126,10 @@ export const DataCleanupTool = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch all profiles with related data counts
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, full_name, created_at, is_founder, is_deleted, journey_status")
-        .eq("is_deleted", false)
-        .order("created_at", { ascending: false });
-
-      if (profilesError) throw profilesError;
-
-      // Get test counts and purchase counts
-      const enrichedUsers = await Promise.all(
-        (profiles || []).map(async (profile) => {
-          const [testRes, purchaseRes] = await Promise.all([
-            supabase.from("user_tests").select("id", { count: "exact", head: true }).eq("user_id", profile.id),
-            supabase.from("test_purchases").select("id", { count: "exact", head: true }).eq("user_id", profile.id),
-          ]);
-
-          const testCount = testRes.count || 0;
-          const purchaseCount = purchaseRes.count || 0;
-
-          // Detect test users
-          const { isTestUser, reason } = detectTestUser(profile.full_name, profile.is_founder, testCount, purchaseCount);
-
-          return {
-            ...profile,
-            test_count: testCount,
-            purchase_count: purchaseCount,
-            is_test_user: isTestUser,
-            test_user_reason: reason,
-          };
-        })
-      );
-
-      setUsers(enrichedUsers);
-      setTestUsers(enrichedUsers.filter((u) => u.is_test_user));
-
-      // Find duplicates (same name)
-      const nameGroups = new Map<string, UserData[]>();
-      enrichedUsers.forEach((user) => {
-        const normalizedName = user.full_name.toLowerCase().trim();
-        if (!nameGroups.has(normalizedName)) {
-          nameGroups.set(normalizedName, []);
-        }
-        nameGroups.get(normalizedName)!.push(user);
-      });
-
-      const duplicateGroups: DuplicateGroup[] = [];
-      nameGroups.forEach((users, name) => {
-        if (users.length > 1) {
-          duplicateGroups.push({ name, users });
-        }
-      });
-
-      setDuplicates(duplicateGroups);
+      await Promise.all([
+        fetchUsersAndDuplicates(),
+        fetchHealthMetrics(),
+      ]);
     } catch (error: any) {
       toast({
         title: "Erro ao carregar dados",
@@ -128,6 +141,165 @@ export const DataCleanupTool = () => {
     }
   };
 
+  const fetchUsersAndDuplicates = async () => {
+    const { data: profiles, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, full_name, created_at, is_founder, is_deleted, journey_status")
+      .eq("is_deleted", false)
+      .order("created_at", { ascending: false });
+
+    if (profilesError) throw profilesError;
+
+    const enrichedUsers = await Promise.all(
+      (profiles || []).map(async (profile) => {
+        const [testRes, purchaseRes] = await Promise.all([
+          supabase.from("user_tests").select("id", { count: "exact", head: true }).eq("user_id", profile.id),
+          supabase.from("test_purchases").select("id", { count: "exact", head: true }).eq("user_id", profile.id),
+        ]);
+
+        const testCount = testRes.count || 0;
+        const purchaseCount = purchaseRes.count || 0;
+        const { isTestUser, reason } = detectTestUser(profile.full_name, profile.is_founder, testCount, purchaseCount);
+
+        return {
+          ...profile,
+          test_count: testCount,
+          purchase_count: purchaseCount,
+          is_test_user: isTestUser,
+          test_user_reason: reason,
+        };
+      })
+    );
+
+    setUsers(enrichedUsers);
+    setTestUsers(enrichedUsers.filter((u) => u.is_test_user));
+
+    // Find duplicates
+    const nameGroups = new Map<string, UserData[]>();
+    enrichedUsers.forEach((user) => {
+      const normalizedName = user.full_name.toLowerCase().trim();
+      if (!nameGroups.has(normalizedName)) {
+        nameGroups.set(normalizedName, []);
+      }
+      nameGroups.get(normalizedName)!.push(user);
+    });
+
+    const duplicateGroups: DuplicateGroup[] = [];
+    nameGroups.forEach((users, name) => {
+      if (users.length > 1) {
+        duplicateGroups.push({ name, users });
+      }
+    });
+
+    setDuplicates(duplicateGroups);
+  };
+
+  const fetchHealthMetrics = async () => {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    // Fetch inactive users (no activity in 30 days)
+    const { data: allProfiles } = await supabase
+      .from("profiles")
+      .select("id, full_name, created_at, updated_at")
+      .eq("is_deleted", false);
+
+    const inactive: InactiveUser[] = [];
+    for (const profile of allProfiles || []) {
+      const { count: recentTests } = await supabase
+        .from("user_tests")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", profile.id)
+        .gte("updated_at", thirtyDaysAgo.toISOString());
+
+      if (recentTests === 0) {
+        const createdDate = new Date(profile.created_at);
+        const daysInactive = Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysInactive > 30) {
+          inactive.push({
+            id: profile.id,
+            full_name: profile.full_name,
+            created_at: profile.created_at,
+            days_inactive: daysInactive,
+          });
+        }
+      }
+    }
+    setInactiveUsers(inactive.sort((a, b) => b.days_inactive - a.days_inactive).slice(0, 20));
+
+    // Fetch incomplete tests (started but not completed for more than 7 days)
+    const { data: incompletedTests } = await supabase
+      .from("user_tests")
+      .select(`
+        id,
+        started_at,
+        user_id,
+        profiles!inner(full_name),
+        tests!inner(name)
+      `)
+      .eq("status", "in_progress")
+      .lt("started_at", sevenDaysAgo.toISOString());
+
+    const incompleteList: IncompleteTest[] = (incompletedTests || []).map((test: any) => {
+      const startedDate = new Date(test.started_at);
+      return {
+        id: test.id,
+        user_name: test.profiles?.full_name || "Desconhecido",
+        test_name: test.tests?.name || "Teste",
+        started_at: test.started_at,
+        days_pending: Math.floor((now.getTime() - startedDate.getTime()) / (1000 * 60 * 60 * 24)),
+      };
+    });
+    setIncompleteTests(incompleteList.sort((a, b) => b.days_pending - a.days_pending).slice(0, 20));
+
+    // Fetch pending purchases (payment_status = pending for more than 7 days)
+    const { data: pendingPurchasesData } = await supabase
+      .from("test_purchases")
+      .select(`
+        id,
+        created_at,
+        price_paid,
+        user_id,
+        profiles!inner(full_name),
+        tests!inner(name)
+      `)
+      .eq("payment_status", "pending")
+      .lt("purchased_at", sevenDaysAgo.toISOString());
+
+    const pendingList: PendingPurchase[] = (pendingPurchasesData || []).map((purchase: any) => {
+      const createdDate = new Date(purchase.created_at);
+      return {
+        id: purchase.id,
+        user_name: purchase.profiles?.full_name || "Desconhecido",
+        test_name: purchase.tests?.name || "Produto",
+        created_at: purchase.created_at,
+        price_paid: purchase.price_paid,
+        days_pending: Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24)),
+      };
+    });
+    setPendingPurchases(pendingList.sort((a, b) => b.days_pending - a.days_pending).slice(0, 20));
+
+    // Calculate health score
+    const totalUsers = allProfiles?.length || 1;
+    const activeUsers = totalUsers - inactive.length;
+    const healthScore = Math.round(
+      ((activeUsers / totalUsers) * 40) +
+      ((1 - Math.min(incompleteList.length / totalUsers, 1)) * 30) +
+      ((1 - Math.min(pendingList.length / totalUsers, 1)) * 30)
+    );
+
+    setHealthMetrics({
+      totalUsers,
+      activeUsers,
+      inactiveUsers: inactive.length,
+      incompleteTests: incompleteList.length,
+      pendingPurchases: pendingList.length,
+      abandonedJourneys: inactive.filter(u => u.days_inactive > 60).length,
+      healthScore: Math.max(0, Math.min(100, healthScore)),
+    });
+  };
+
   const detectTestUser = (
     fullName: string,
     isFounder: boolean,
@@ -136,7 +308,6 @@ export const DataCleanupTool = () => {
   ): { isTestUser: boolean; reason?: string } => {
     const name = fullName.toLowerCase().trim();
 
-    // Pattern detection for test users
     const testPatterns = [
       { pattern: /^[a-z]{1,3}$/i, reason: "Nome muito curto (possível teste)" },
       { pattern: /^test/i, reason: "Nome começa com 'test'" },
@@ -156,7 +327,6 @@ export const DataCleanupTool = () => {
       }
     }
 
-    // Founders with no activity might be test accounts
     if (isFounder && testCount === 0 && purchaseCount === 0) {
       return { isTestUser: true, reason: "Fundador sem atividade" };
     }
@@ -175,8 +345,7 @@ export const DataCleanupTool = () => {
   };
 
   const selectAllTestUsers = () => {
-    const allTestUserIds = new Set(testUsers.map((u) => u.id));
-    setSelectedUsers(allTestUserIds);
+    setSelectedUsers(new Set(testUsers.map((u) => u.id)));
   };
 
   const clearSelection = () => {
@@ -193,19 +362,15 @@ export const DataCleanupTool = () => {
         const { data: { session } } = await supabase.auth.getSession();
         const response = await supabase.functions.invoke("admin-delete-user", {
           body: { target_user_id: userId },
-          headers: {
-            Authorization: `Bearer ${session?.access_token}`,
-          },
+          headers: { Authorization: `Bearer ${session?.access_token}` },
         });
 
         if (response.error) {
-          console.error(`Error deleting ${userId}:`, response.error);
           errorCount++;
         } else {
           successCount++;
         }
       } catch (error) {
-        console.error(`Error deleting ${userId}:`, error);
         errorCount++;
       }
     }
@@ -223,6 +388,107 @@ export const DataCleanupTool = () => {
     fetchData();
   };
 
+  const openMergeDialog = (group: DuplicateGroup) => {
+    setSelectedMergeGroup(group);
+    // Auto-select the user with most activity as primary
+    const sorted = [...group.users].sort((a, b) => 
+      (b.test_count + b.purchase_count) - (a.test_count + a.purchase_count)
+    );
+    setPrimaryUserId(sorted[0]?.id || "");
+    setMergeDialogOpen(true);
+  };
+
+  const handleMergeUsers = async () => {
+    if (!selectedMergeGroup || !primaryUserId) return;
+
+    setMerging(true);
+    const secondaryUserIds = selectedMergeGroup.users
+      .filter(u => u.id !== primaryUserId)
+      .map(u => u.id);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      // Transfer all data from secondary users to primary user
+      for (const secondaryId of secondaryUserIds) {
+        // Transfer user_tests
+        await supabase
+          .from("user_tests")
+          .update({ user_id: primaryUserId })
+          .eq("user_id", secondaryId);
+
+        // Transfer test_purchases
+        await supabase
+          .from("test_purchases")
+          .update({ user_id: primaryUserId })
+          .eq("user_id", secondaryId);
+
+        // Transfer test_answers via user_tests (already transferred above, but ensure consistency)
+        
+        // Transfer ai_conversations
+        await supabase
+          .from("ai_conversations")
+          .update({ user_id: primaryUserId })
+          .eq("user_id", secondaryId);
+
+        // Transfer mapa_essencia
+        await supabase
+          .from("mapa_essencia")
+          .update({ user_id: primaryUserId })
+          .eq("user_id", secondaryId);
+
+        // Delete the secondary user
+        await supabase.functions.invoke("admin-delete-user", {
+          body: { target_user_id: secondaryId },
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+        });
+      }
+
+      // Log the merge action
+      await supabase.rpc("log_audit", {
+        p_action: "MERGE_USERS",
+        p_table_name: "profiles",
+        p_record_id: primaryUserId,
+        p_new_data: {
+          primary_user_id: primaryUserId,
+          merged_user_ids: secondaryUserIds,
+          merged_at: new Date().toISOString(),
+        },
+      });
+
+      toast({
+        title: "Merge concluído",
+        description: `${secondaryUserIds.length} conta(s) consolidada(s) com sucesso`,
+      });
+
+      setMergeDialogOpen(false);
+      setSelectedMergeGroup(null);
+      setPrimaryUserId("");
+      fetchData();
+    } catch (error: any) {
+      toast({
+        title: "Erro ao fazer merge",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setMerging(false);
+    }
+  };
+
+  const getHealthScoreColor = (score: number) => {
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-yellow-600";
+    return "text-red-600";
+  };
+
+  const getHealthScoreLabel = (score: number) => {
+    if (score >= 80) return "Excelente";
+    if (score >= 60) return "Bom";
+    if (score >= 40) return "Regular";
+    return "Crítico";
+  };
+
   const filteredTestUsers = testUsers.filter((user) =>
     user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -233,7 +499,7 @@ export const DataCleanupTool = () => {
         <div>
           <h2 className="text-2xl font-bold">Limpeza de Dados</h2>
           <p className="text-muted-foreground">
-            Identificar e remover usuários de teste e consolidar duplicados
+            Saúde dos dados, usuários de teste e consolidação de duplicados
           </p>
         </div>
         <Button variant="outline" onClick={fetchData} disabled={loading}>
@@ -242,78 +508,250 @@ export const DataCleanupTool = () => {
         </Button>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Users className="h-5 w-5 text-muted-foreground" />
-              Total de Usuários
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{users.length}</div>
-          </CardContent>
-        </Card>
-
-        <Card className={testUsers.length > 0 ? "border-destructive/50" : ""}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
-              Usuários de Teste
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-destructive">{testUsers.length}</div>
-          </CardContent>
-        </Card>
-
-        <Card className={duplicates.length > 0 ? "border-warning/50" : ""}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Merge className="h-5 w-5 text-amber-500" />
-              Grupos Duplicados
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-amber-500">{duplicates.length}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="test-users" className="space-y-4">
-        <TabsList>
+      <Tabs defaultValue="health" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="health" className="flex items-center gap-2">
+            <Heart className="h-4 w-4" />
+            Saúde
+          </TabsTrigger>
           <TabsTrigger value="test-users" className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4" />
-            Usuários de Teste ({testUsers.length})
+            Teste ({testUsers.length})
           </TabsTrigger>
           <TabsTrigger value="duplicates" className="flex items-center gap-2">
             <Merge className="h-4 w-4" />
             Duplicados ({duplicates.length})
           </TabsTrigger>
+          <TabsTrigger value="issues" className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4" />
+            Problemas
+          </TabsTrigger>
         </TabsList>
 
+        {/* Health Tab */}
+        <TabsContent value="health" className="space-y-4">
+          {healthMetrics && (
+            <>
+              {/* Health Score Card */}
+              <Card className="border-2">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <Heart className="h-5 w-5" />
+                      Índice de Saúde dos Dados
+                    </span>
+                    <span className={`text-3xl font-bold ${getHealthScoreColor(healthMetrics.healthScore)}`}>
+                      {healthMetrics.healthScore}%
+                    </span>
+                  </CardTitle>
+                  <CardDescription>
+                    Status: <span className={`font-semibold ${getHealthScoreColor(healthMetrics.healthScore)}`}>
+                      {getHealthScoreLabel(healthMetrics.healthScore)}
+                    </span>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Progress 
+                    value={healthMetrics.healthScore} 
+                    className="h-3"
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Metrics Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      Total
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{healthMetrics.totalUsers}</div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Activity className="h-4 w-4 text-green-500" />
+                      Ativos
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-green-600">{healthMetrics.activeUsers}</div>
+                  </CardContent>
+                </Card>
+
+                <Card className={healthMetrics.inactiveUsers > 5 ? "border-amber-500/50" : ""}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <TrendingDown className="h-4 w-4 text-amber-500" />
+                      Inativos (30d)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-amber-500">{healthMetrics.inactiveUsers}</div>
+                  </CardContent>
+                </Card>
+
+                <Card className={healthMetrics.incompleteTests > 0 ? "border-orange-500/50" : ""}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-orange-500" />
+                      Testes Parados
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-orange-500">{healthMetrics.incompleteTests}</div>
+                  </CardContent>
+                </Card>
+
+                <Card className={healthMetrics.pendingPurchases > 0 ? "border-red-500/50" : ""}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <CreditCard className="h-4 w-4 text-red-500" />
+                      Pagamentos Pend.
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-red-500">{healthMetrics.pendingPurchases}</div>
+                  </CardContent>
+                </Card>
+
+                <Card className={healthMetrics.abandonedJourneys > 0 ? "border-purple-500/50" : ""}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 text-purple-500" />
+                      Abandonos (60d)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-purple-500">{healthMetrics.abandonedJourneys}</div>
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          )}
+        </TabsContent>
+
+        {/* Issues Tab */}
+        <TabsContent value="issues" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Inactive Users */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <TrendingDown className="h-5 w-5 text-amber-500" />
+                  Usuários Inativos
+                </CardTitle>
+                <CardDescription>Sem atividade há mais de 30 dias</CardDescription>
+              </CardHeader>
+              <CardContent className="max-h-80 overflow-auto">
+                {inactiveUsers.length === 0 ? (
+                  <div className="text-center py-4 text-muted-foreground">
+                    <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                    Todos os usuários estão ativos!
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {inactiveUsers.map((user) => (
+                      <div key={user.id} className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
+                        <span className="text-sm font-medium truncate flex-1">{user.full_name}</span>
+                        <Badge variant="outline" className="ml-2 text-amber-600">
+                          {user.days_inactive}d
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Incomplete Tests */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-orange-500" />
+                  Testes Incompletos
+                </CardTitle>
+                <CardDescription>Iniciados há mais de 7 dias</CardDescription>
+              </CardHeader>
+              <CardContent className="max-h-80 overflow-auto">
+                {incompleteTests.length === 0 ? (
+                  <div className="text-center py-4 text-muted-foreground">
+                    <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                    Nenhum teste parado!
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {incompleteTests.map((test) => (
+                      <div key={test.id} className="p-2 bg-muted/50 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium truncate">{test.user_name}</span>
+                          <Badge variant="outline" className="text-orange-600">
+                            {test.days_pending}d
+                          </Badge>
+                        </div>
+                        <span className="text-xs text-muted-foreground">{test.test_name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Pending Purchases */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-red-500" />
+                  Compras Pendentes
+                </CardTitle>
+                <CardDescription>Aguardando pagamento há mais de 7 dias</CardDescription>
+              </CardHeader>
+              <CardContent className="max-h-80 overflow-auto">
+                {pendingPurchases.length === 0 ? (
+                  <div className="text-center py-4 text-muted-foreground">
+                    <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                    Nenhuma compra pendente!
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {pendingPurchases.map((purchase) => (
+                      <div key={purchase.id} className="p-2 bg-muted/50 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium truncate">{purchase.user_name}</span>
+                          <Badge variant="outline" className="text-red-600">
+                            R$ {purchase.price_paid}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">{purchase.test_name}</span>
+                          <span className="text-xs text-muted-foreground">{purchase.days_pending}d</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Test Users Tab */}
         <TabsContent value="test-users" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Usuários Identificados como Teste</span>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={selectAllTestUsers}
-                    disabled={testUsers.length === 0}
-                  >
+              <CardTitle className="flex items-center justify-between flex-wrap gap-2">
+                <span>Usuários de Teste</span>
+                <div className="flex gap-2 flex-wrap">
+                  <Button variant="outline" size="sm" onClick={selectAllTestUsers} disabled={testUsers.length === 0}>
                     Selecionar Todos
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={clearSelection}
-                    disabled={selectedUsers.size === 0}
-                  >
-                    Limpar Seleção
+                  <Button variant="outline" size="sm" onClick={clearSelection} disabled={selectedUsers.size === 0}>
+                    Limpar
                   </Button>
                   <Button
                     variant="destructive"
@@ -322,20 +760,17 @@ export const DataCleanupTool = () => {
                     disabled={selectedUsers.size === 0}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Deletar Selecionados ({selectedUsers.size})
+                    Deletar ({selectedUsers.size})
                   </Button>
                 </div>
               </CardTitle>
-              <CardDescription>
-                Usuários detectados automaticamente com base em padrões de nome e atividade
-              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-4 mb-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
-                    placeholder="Filtrar por nome..."
+                    placeholder="Filtrar..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -348,7 +783,7 @@ export const DataCleanupTool = () => {
               ) : filteredTestUsers.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground flex flex-col items-center gap-2">
                   <CheckCircle className="h-12 w-12 text-green-500" />
-                  <p>Nenhum usuário de teste detectado!</p>
+                  <p>Nenhum usuário de teste!</p>
                 </div>
               ) : (
                 <Table>
@@ -359,8 +794,7 @@ export const DataCleanupTool = () => {
                       <TableHead>Motivo</TableHead>
                       <TableHead>Testes</TableHead>
                       <TableHead>Compras</TableHead>
-                      <TableHead>Fundador</TableHead>
-                      <TableHead>Criado em</TableHead>
+                      <TableHead>Criado</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -374,20 +808,13 @@ export const DataCleanupTool = () => {
                         </TableCell>
                         <TableCell className="font-medium">{user.full_name}</TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
+                          <Badge variant="outline" className="bg-destructive/10 text-destructive">
                             {user.test_user_reason}
                           </Badge>
                         </TableCell>
                         <TableCell>{user.test_count}</TableCell>
                         <TableCell>{user.purchase_count}</TableCell>
-                        <TableCell>
-                          {user.is_founder && (
-                            <Badge variant="secondary">Fundador</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {new Date(user.created_at).toLocaleDateString("pt-BR")}
-                        </TableCell>
+                        <TableCell>{new Date(user.created_at).toLocaleDateString("pt-BR")}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -397,12 +824,13 @@ export const DataCleanupTool = () => {
           </Card>
         </TabsContent>
 
+        {/* Duplicates Tab */}
         <TabsContent value="duplicates" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Usuários com Nomes Duplicados</CardTitle>
+              <CardTitle>Usuários Duplicados</CardTitle>
               <CardDescription>
-                Grupos de usuários com o mesmo nome que podem precisar de consolidação
+                Clique em "Consolidar" para mesclar contas mantendo o histórico
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -411,69 +839,41 @@ export const DataCleanupTool = () => {
               ) : duplicates.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground flex flex-col items-center gap-2">
                   <CheckCircle className="h-12 w-12 text-green-500" />
-                  <p>Nenhum usuário duplicado encontrado!</p>
+                  <p>Nenhum duplicado encontrado!</p>
                 </div>
               ) : (
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {duplicates.map((group) => (
                     <Card key={group.name} className="border-amber-500/50">
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-lg capitalize">{group.name}</CardTitle>
-                        <CardDescription>{group.users.length} contas com este nome</CardDescription>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <CardTitle className="text-lg capitalize">{group.name}</CardTitle>
+                            <CardDescription>{group.users.length} contas</CardDescription>
+                          </div>
+                          <Button size="sm" onClick={() => openMergeDialog(group)}>
+                            <Merge className="mr-2 h-4 w-4" />
+                            Consolidar
+                          </Button>
+                        </div>
                       </CardHeader>
                       <CardContent>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="w-12"></TableHead>
-                              <TableHead>ID (parcial)</TableHead>
-                              <TableHead>Jornada</TableHead>
-                              <TableHead>Testes</TableHead>
-                              <TableHead>Compras</TableHead>
-                              <TableHead>Fundador</TableHead>
-                              <TableHead>Criado em</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {group.users.map((user) => (
-                              <TableRow key={user.id} className={selectedUsers.has(user.id) ? "bg-destructive/10" : ""}>
-                                <TableCell>
-                                  <Checkbox
-                                    checked={selectedUsers.has(user.id)}
-                                    onCheckedChange={() => toggleUserSelection(user.id)}
-                                  />
-                                </TableCell>
-                                <TableCell className="font-mono text-xs">
-                                  {user.id.substring(0, 8)}...
-                                </TableCell>
-                                <TableCell>
-                                  <Badge
-                                    variant={
-                                      user.journey_status === "completed"
-                                        ? "default"
-                                        : user.journey_status === "in_progress"
-                                        ? "secondary"
-                                        : "outline"
-                                    }
-                                  >
-                                    {user.journey_status}
-                                  </Badge>
-                                </TableCell>
-                                <TableCell>{user.test_count}</TableCell>
-                                <TableCell>{user.purchase_count}</TableCell>
-                                <TableCell>
-                                  {user.is_founder && <Badge variant="secondary">Fundador</Badge>}
-                                </TableCell>
-                                <TableCell>
-                                  {new Date(user.created_at).toLocaleDateString("pt-BR")}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                        <p className="text-xs text-muted-foreground mt-2 italic">
-                          💡 Recomendação: Manter a conta com mais atividade (testes/compras) e deletar as outras.
-                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {group.users.map((user) => (
+                            <div key={user.id} className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-xs">{user.id.substring(0, 8)}...</span>
+                                <Badge variant={user.journey_status === "completed" ? "default" : "outline"}>
+                                  {user.journey_status}
+                                </Badge>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <span>{user.test_count} testes</span>
+                                <span>{user.purchase_count} compras</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -484,7 +884,7 @@ export const DataCleanupTool = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -492,24 +892,9 @@ export const DataCleanupTool = () => {
               <AlertTriangle className="h-5 w-5 text-destructive" />
               Confirmar Exclusão
             </AlertDialogTitle>
-            <AlertDialogDescription className="space-y-2">
-              <p>
-                Você está prestes a deletar permanentemente{" "}
-                <strong className="text-destructive">{selectedUsers.size} usuário(s)</strong>.
-              </p>
-              <p className="text-sm">
-                Esta ação irá remover:
-              </p>
-              <ul className="text-sm list-disc list-inside space-y-1">
-                <li>Todas as respostas de testes</li>
-                <li>Histórico de compras</li>
-                <li>Conversas com IA</li>
-                <li>Mapas de essência</li>
-                <li>Conta de autenticação</li>
-              </ul>
-              <p className="text-destructive font-semibold mt-4">
-                Esta ação NÃO pode ser desfeita!
-              </p>
+            <AlertDialogDescription>
+              Deletar permanentemente <strong className="text-destructive">{selectedUsers.size}</strong> usuário(s)?
+              Esta ação NÃO pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -519,7 +904,86 @@ export const DataCleanupTool = () => {
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting ? "Deletando..." : `Deletar ${selectedUsers.size} usuário(s)`}
+              {deleting ? "Deletando..." : "Deletar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Merge Dialog */}
+      <AlertDialog open={mergeDialogOpen} onOpenChange={setMergeDialogOpen}>
+        <AlertDialogContent className="max-w-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Merge className="h-5 w-5 text-blue-500" />
+              Consolidar Contas
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Selecione a conta principal que receberá todo o histórico das outras contas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {selectedMergeGroup && (
+            <div className="py-4">
+              <RadioGroup value={primaryUserId} onValueChange={setPrimaryUserId}>
+                {selectedMergeGroup.users.map((user) => (
+                  <div key={user.id} className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50">
+                    <RadioGroupItem value={user.id} id={user.id} />
+                    <Label htmlFor={user.id} className="flex-1 cursor-pointer">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="font-mono text-xs">{user.id.substring(0, 8)}...</span>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant={user.journey_status === "completed" ? "default" : "outline"} className="text-xs">
+                              {user.journey_status}
+                            </Badge>
+                            {user.is_founder && <Badge variant="secondary" className="text-xs">Fundador</Badge>}
+                          </div>
+                        </div>
+                        <div className="text-right text-sm text-muted-foreground">
+                          <div>{user.test_count} testes</div>
+                          <div>{user.purchase_count} compras</div>
+                        </div>
+                      </div>
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+
+              <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  <strong>O que acontecerá:</strong>
+                </p>
+                <ul className="text-sm text-muted-foreground mt-2 space-y-1">
+                  <li className="flex items-center gap-2">
+                    <ArrowRight className="h-3 w-3" />
+                    Testes serão transferidos para a conta principal
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ArrowRight className="h-3 w-3" />
+                    Compras serão transferidas para a conta principal
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ArrowRight className="h-3 w-3" />
+                    Conversas com IA serão preservadas
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ArrowRight className="h-3 w-3" />
+                    Outras contas serão deletadas
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={merging}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleMergeUsers}
+              disabled={merging || !primaryUserId}
+              className="bg-blue-600 text-white hover:bg-blue-700"
+            >
+              {merging ? "Consolidando..." : "Consolidar Contas"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
