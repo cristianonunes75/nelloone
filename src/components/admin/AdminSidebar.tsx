@@ -15,6 +15,9 @@ import {
   Eye,
   Trash2,
   Bell,
+  Zap,
+  Shield,
+  BarChart3,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -32,38 +35,46 @@ import { cn } from "@/lib/utils";
 
 const menuSections = [
   {
-    label: "VISÃO GERAL",
+    label: "MÉTRICAS",
     items: [
       { title: "Dashboard", url: "/admin", icon: Home, exact: true },
-      { title: "Visitantes ao Vivo", url: "/admin/visitantes", icon: Eye },
-      { title: "Jornadas & Lembretes", url: "/admin/jornadas", icon: Route },
+      { title: "Tempo Real", url: "/admin/tempo-real", icon: Zap },
+      { title: "Relatórios", url: "/admin/relatorios", icon: BarChart3 },
+      { title: "Visitantes", url: "/admin/visitantes", icon: Eye },
     ]
   },
   {
-    label: "GESTÃO",
+    label: "USUÁRIOS",
     items: [
+      { title: "Gestão de Usuários", url: "/admin/usuarios", icon: Users },
+      { title: "Jornadas", url: "/admin/jornadas", icon: Route },
       { title: "Fundadores", url: "/admin/fundadores", icon: Star },
       { title: "Afiliados", url: "/admin/afiliados", icon: UserCheck },
-      { title: "Usuários & Jornadas", url: "/admin/usuarios", icon: Users },
-      { title: "Pedidos & Pagamentos", url: "/admin/pedidos", icon: CreditCard },
-      { title: "Produtos & Testes", url: "/admin/produtos", icon: Package },
-      { title: "Cupons", url: "/admin/cupons", icon: Ticket },
-      { title: "Depoimentos", url: "/admin/depoimentos", icon: MessageSquareHeart },
-      { title: "Código da Essência", url: "/admin/codigo-essencia", icon: Sparkles },
     ]
   },
   {
-    label: "MARKETING",
+    label: "VENDAS",
     items: [
+      { title: "Pedidos", url: "/admin/pedidos", icon: CreditCard },
+      { title: "Produtos & Testes", url: "/admin/produtos", icon: Package },
+      { title: "Cupons", url: "/admin/cupons", icon: Ticket },
+    ]
+  },
+  {
+    label: "CONTEÚDO",
+    items: [
+      { title: "Código da Essência", url: "/admin/codigo-essencia", icon: Sparkles },
+      { title: "Depoimentos", url: "/admin/depoimentos", icon: MessageSquareHeart },
       { title: "Identidade Visual", url: "/admin/identidade-visual", icon: Palette },
     ]
   },
   {
     label: "SISTEMA",
     items: [
+      { title: "Permissões", url: "/admin/permissoes", icon: Shield },
       { title: "Notificações", url: "/admin/notificacoes", icon: Bell },
       { title: "Limpeza de Dados", url: "/admin/limpeza", icon: Trash2 },
-      { title: "Logs & Auditoria", url: "/admin/logs", icon: Activity },
+      { title: "Logs", url: "/admin/logs", icon: Activity },
       { title: "Configurações", url: "/admin/configuracoes", icon: Settings },
     ]
   }
