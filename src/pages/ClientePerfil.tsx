@@ -76,7 +76,7 @@ const ClientePerfil = () => {
             className="mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
+            {language === 'en' ? 'Back' : 'Voltar'}
           </Button>
 
           <h1 className="text-4xl font-bold mb-2">Meu Perfil</h1>

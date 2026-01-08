@@ -7,6 +7,7 @@ import { useLocalizedPath } from "@/components/LanguageRoute";
 import { cn } from "@/lib/utils";
 import { getPriceForLanguage, getBundlePriceForLanguage } from "@/lib/priceConfig";
 import { getTestPath } from "@/lib/testContent";
+import { PaymentFAQSection } from "./PaymentFAQSection";
 
 // Ultrathin custom icons
 const SunIcon = ({ className }: { className?: string }) => (
@@ -295,6 +296,9 @@ export const PricingSection = () => {
               ))}
             </div>
           </div>
+          
+          {/* Payment FAQ Section */}
+          <PaymentFAQSection />
         </div>
       </div>
     </section>
