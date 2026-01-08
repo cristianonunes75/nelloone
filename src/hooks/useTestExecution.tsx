@@ -13,7 +13,7 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const { hasPurchased, isFounder } = useTestAccess();
+  const { hasPurchased } = useTestAccess();
   const { language } = useLanguage();
   
   // Auto-save state
@@ -57,12 +57,11 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   });
 
   // For freemium test (Archetypes): limit to 5 questions if not purchased/founder
-  // Founders always get full access to all questions
   // If user has paid, show ALL questions (full version)
   const FREEMIUM_QUESTION_LIMIT = 5;
   
-  // Founders and paid users get full access regardless of is_free flag
-  const questions = (isFreeTest && !hasPaidAccess && !isFounder)
+  // Paid users get full access regardless of is_free flag
+  const questions = (isFreeTest && !hasPaidAccess)
     ? allQuestions?.slice(0, FREEMIUM_QUESTION_LIMIT)
     : allQuestions;
 
@@ -259,6 +258,5 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
     hasPaidAccess,
     isFreeTest,
     totalQuestions: allQuestions?.length || 0,
-    isFounder,
   };
 };

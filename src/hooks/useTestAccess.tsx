@@ -5,26 +5,6 @@ import { useAuth } from "./useAuth";
 export const useTestAccess = () => {
   const { user, userRole } = useAuth();
 
-  // Fetch user profile to check founder status
-  const { data: profile } = useQuery({
-    queryKey: ["user-profile-access", user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      if (!user) return null;
-      
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("is_founder")
-        .eq("id", user.id)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const isFounder = profile?.is_founder || false;
-
   // Fetch test purchases for current user - include test type and purchase_category for cross-language and bundle matching
   const { data: purchases } = useQuery({
     queryKey: ["test-purchases", user?.id],
@@ -43,10 +23,9 @@ export const useTestAccess = () => {
     },
   });
 
-  // Check if user has full journey access via bundle purchase (jornada_completa or fundadores)
+  // Check if user has full journey access via bundle purchase
   const hasFullJourneyAccess = purchases?.some(p => 
-    (p as any).purchase_category === 'jornada_completa' || 
-    (p as any).purchase_category === 'fundadores'
+    (p as any).purchase_category === 'jornada_completa'
   ) || false;
 
   // Fetch all tests to enable cross-language matching by type
@@ -78,9 +57,6 @@ export const useTestAccess = () => {
     // Admins have access to all tests
     if (userRole === "admin") return true;
     
-    // Founders have access to all tests
-    if (isFounder) return true;
-    
     // Users with full journey purchase have access to all tests
     if (hasFullJourneyAccess) return true;
     
@@ -101,12 +77,9 @@ export const useTestAccess = () => {
     return false;
   };
 
-  // Check if user has purchased a test (or is founder)
+  // Check if user has purchased a test
   // Also supports cross-language matching
   const hasPurchased = (testId: string) => {
-    // Founders have access to all tests (full version)
-    if (isFounder) return true;
-    
     // Users with full journey purchase have access to all tests
     if (hasFullJourneyAccess) return true;
     
@@ -124,5 +97,5 @@ export const useTestAccess = () => {
     return false;
   };
 
-  return { hasAccess, hasPurchased, purchases, isFounder, hasFullJourneyAccess };
+  return { hasAccess, hasPurchased, purchases, hasFullJourneyAccess };
 };

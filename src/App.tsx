@@ -30,8 +30,6 @@ import { TestDetailPage } from "./components/tests/TestDetailPage";
 import CodigoEssencia from "./pages/CodigoEssencia";
 // CodigoEssencia sales pages removed - now included in journey
 import ComprarTeste from "./pages/ComprarTeste";
-import Fundadores from "./pages/Fundadores";
-import FundadorFeedback from "./pages/FundadorFeedback";
 import DiagnosticoPDF from "./pages/DiagnosticoPDF";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import RelatorioConjugePublico from "./pages/RelatorioConjugePublico";
@@ -45,7 +43,6 @@ const AppRoutes = () => (
     <Route path="/" element={<Landing />} />
     <Route path="/auth" element={<Auth />} />
     <Route path="/reset-password" element={<ResetPassword />} />
-    <Route path="/fundadores" element={<Fundadores />} />
     
     {/* Public spouse report route */}
     <Route path="/relatorio-conjuge/:token" element={<RelatorioConjugePublico />} />
@@ -261,32 +258,6 @@ const AppRoutes = () => (
     <Route path="/pt-pt/auth" element={<Auth />} />
     <Route path="/pt-pt/reset-password" element={<ResetPassword />} />
     <Route path="/pt-pt" element={<Landing />} />
-    
-    {/* Founder Feedback Routes */}
-    <Route
-      path="/cliente/fundador-feedback"
-      element={
-        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
-          <FundadorFeedback />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/en/cliente/fundador-feedback"
-      element={
-        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
-          <FundadorFeedback />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/pt-pt/cliente/fundador-feedback"
-      element={
-        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
-          <FundadorFeedback />
-        </ProtectedRoute>
-      }
-    />
     
     {/* Journey redirect - /jornada -> /cliente */}
     <Route path="/jornada" element={<Cliente />} />

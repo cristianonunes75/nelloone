@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { 
-  Search, Eye, UserCog, Loader2, Map, Download, Ban, CheckCircle, X, RefreshCw, Trash2, Star
+  Search, Eye, UserCog, Loader2, Map, Download, Ban, CheckCircle, X, RefreshCw, Trash2
 } from "lucide-react";
 import { DeleteUserDialog } from "./DeleteUserDialog";
 import { useAuth } from "@/hooks/useAuth";
@@ -41,7 +41,6 @@ interface UserWithDetails {
   journey_tests_status: Record<string, string>;
   codigo_essencia_unlocked: boolean;
   is_blocked: boolean;
-  is_founder: boolean;
   roles: string[];
 }
 
@@ -99,9 +98,8 @@ export const AdminUsersJourneys = () => {
           journey_status: profile.journey_status || 'not_started',
           journey_completed_tests: profile.journey_completed_tests || 0,
           journey_tests_status: (profile.journey_tests_status as Record<string, string>) || {},
-          codigo_essencia_unlocked: profile.journey_status === 'completed', // Auto when complete
+          codigo_essencia_unlocked: profile.journey_status === 'completed',
           is_blocked: (profile as any).is_blocked || false,
-          is_founder: profile.is_founder || false,
           roles: userRoles,
         };
       });
@@ -298,14 +296,12 @@ export const AdminUsersJourneys = () => {
     if (filter === "not_started") return matchesSearch && user.journey_status === "not_started";
     if (filter === "with_codigo") return matchesSearch && user.codigo_essencia_unlocked;
     if (filter === "blocked") return matchesSearch && user.is_blocked;
-    if (filter === "founders") return matchesSearch && user.is_founder;
     
     return matchesSearch;
   });
 
   const stats = {
     total: users.length,
-    founders: users.filter(u => u.is_founder).length,
     inProgress: users.filter(u => u.journey_status === "in_progress").length,
     completed: users.filter(u => u.journey_status === "completed").length,
     withCodigo: users.filter(u => u.codigo_essencia_unlocked).length,
@@ -345,14 +341,10 @@ export const AdminUsersJourneys = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
         <Card className="p-3 md:p-4 border-border/50">
           <p className="text-lg md:text-2xl font-semibold">{stats.total}</p>
           <p className="text-[10px] md:text-xs text-muted-foreground">Total</p>
-        </Card>
-        <Card className="p-3 md:p-4 border-border/50 border-amber-500/30 bg-amber-500/5">
-          <p className="text-lg md:text-2xl font-semibold text-amber-600">{stats.founders}</p>
-          <p className="text-[10px] md:text-xs text-muted-foreground">Fundadores</p>
         </Card>
         <Card className="p-3 md:p-4 border-border/50">
           <p className="text-lg md:text-2xl font-semibold text-blue-600">{stats.inProgress}</p>
@@ -387,7 +379,6 @@ export const AdminUsersJourneys = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="founders">Fundadores</SelectItem>
                 <SelectItem value="in_progress">Em andamento</SelectItem>
                 <SelectItem value="completed">Jornada completa</SelectItem>
                 <SelectItem value="not_started">Não iniciada</SelectItem>
@@ -404,7 +395,6 @@ export const AdminUsersJourneys = () => {
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
                   <TableHead>Usuário</TableHead>
-                  <TableHead>Fundador</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-center">Jornada</TableHead>
                   <TableHead className="text-center">Código</TableHead>
@@ -423,15 +413,6 @@ export const AdminUsersJourneys = () => {
                           <p className="text-xs text-muted-foreground">{user.phone || "—"}</p>
                         </div>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      {user.is_founder ? (
-                        <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">
-                          Fundador
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
                     </TableCell>
                     <TableCell>{getStatusBadge(user.journey_status)}</TableCell>
                     <TableCell className="text-center">

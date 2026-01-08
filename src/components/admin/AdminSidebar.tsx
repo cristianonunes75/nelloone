@@ -48,7 +48,6 @@ const menuSections = [
     items: [
       { title: "Gestão de Usuários", url: "/admin/usuarios", icon: Users },
       { title: "Jornadas", url: "/admin/jornadas", icon: Route },
-      { title: "Fundadores", url: "/admin/fundadores", icon: Star },
       { title: "Afiliados", url: "/admin/afiliados", icon: UserCheck },
     ]
   },

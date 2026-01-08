@@ -51,7 +51,6 @@ interface UserData {
   id: string;
   full_name: string;
   created_at: string;
-  is_founder: boolean;
   is_deleted: boolean;
   journey_status: string;
   test_count: number;
@@ -146,7 +145,7 @@ export const DataCleanupTool = () => {
   const fetchUsersAndDuplicates = async () => {
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("id, full_name, created_at, is_founder, is_deleted, journey_status")
+      .select("id, full_name, created_at, is_deleted, journey_status")
       .eq("is_deleted", false)
       .order("created_at", { ascending: false });
 
@@ -161,7 +160,7 @@ export const DataCleanupTool = () => {
 
         const testCount = testRes.count || 0;
         const purchaseCount = purchaseRes.count || 0;
-        const { isTestUser, reason } = detectTestUser(profile.full_name, profile.is_founder, testCount, purchaseCount);
+        const { isTestUser, reason } = detectTestUser(profile.full_name, testCount, purchaseCount);
 
         return {
           ...profile,
@@ -304,7 +303,6 @@ export const DataCleanupTool = () => {
 
   const detectTestUser = (
     fullName: string,
-    isFounder: boolean,
     testCount: number,
     purchaseCount: number
   ): { isTestUser: boolean; reason?: string } => {
@@ -327,10 +325,6 @@ export const DataCleanupTool = () => {
       if (pattern.test(name)) {
         return { isTestUser: true, reason };
       }
-    }
-
-    if (isFounder && testCount === 0 && purchaseCount === 0) {
-      return { isTestUser: true, reason: "Fundador sem atividade" };
     }
 
     return { isTestUser: false };
@@ -1113,7 +1107,6 @@ export const DataCleanupTool = () => {
                             <Badge variant={user.journey_status === "completed" ? "default" : "outline"} className="text-xs">
                               {user.journey_status}
                             </Badge>
-                            {user.is_founder && <Badge variant="secondary" className="text-xs">Fundador</Badge>}
                           </div>
                         </div>
                         <div className="text-right text-sm text-muted-foreground">
