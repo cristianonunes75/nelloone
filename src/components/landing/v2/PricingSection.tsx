@@ -180,16 +180,29 @@ export const PricingSection = () => {
                     <p className="text-xs md:text-sm text-muted-foreground line-through mb-1">
                       {pricing.from} {bundle.symbol} {bundle.original}
                     </p>
-                    <div className="flex items-baseline justify-center md:justify-end gap-2">
+                  <div className="flex items-baseline justify-center md:justify-end gap-2">
                       <span className="text-xs md:text-sm text-muted-foreground">{pricing.now}</span>
                       <span className="font-display text-3xl md:text-4xl text-foreground">
                         {bundle.symbol} {bundle.price}
                       </span>
                     </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {language === 'en' ? 'or 12x of' : 'ou 12x de'} {bundle.symbol} {Math.ceil(bundle.price / 12)}
+                    </p>
                     <p className="text-xs md:text-sm text-ink-blue mt-1">
                       {pricing.save} {bundle.symbol} {savings}
                     </p>
                   </div>
+                  {/* Guarantee Badge */}
+                  <div className="flex items-center justify-center md:justify-end gap-2 mb-3">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                      <Check className="w-3.5 h-3.5 text-emerald-600" strokeWidth={2} />
+                      <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                        {language === 'en' ? '7-day guarantee' : 'Garantia de 7 dias'}
+                      </span>
+                    </div>
+                  </div>
+                  
                   <Button 
                     size="lg" 
                     className="group h-11 md:h-12 px-5 md:px-6 text-sm md:text-base rounded-full w-full md:w-auto bg-ink-blue hover:bg-ink-deep text-primary-foreground hover-lift press-effect"

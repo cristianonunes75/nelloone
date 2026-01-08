@@ -288,6 +288,11 @@ const AppRoutes = () => (
       }
     />
     
+    {/* Journey redirect - /jornada -> /cliente */}
+    <Route path="/jornada" element={<Cliente />} />
+    <Route path="/en/journey" element={<Cliente />} />
+    <Route path="/pt-pt/jornada" element={<Cliente />} />
+    
     {/* Protected client routes */}
     <Route
       path="/cliente"
