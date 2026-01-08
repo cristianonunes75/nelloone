@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import jsPDF from "jspdf";
 import { 
   Trash2, 
   AlertTriangle, 
@@ -18,7 +19,8 @@ import {
   TrendingDown,
   Heart,
   AlertCircle,
-  ArrowRight
+  ArrowRight,
+  FileDown
 } from "lucide-react";
 import {
   Table,
@@ -489,6 +491,174 @@ export const DataCleanupTool = () => {
     return "Crítico";
   };
 
+  const exportHealthReportPDF = () => {
+    if (!healthMetrics) return;
+
+    const doc = new jsPDF();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("pt-BR");
+    const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+    // Header
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("Relatório de Saúde dos Dados", 20, 25);
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100);
+    doc.text(`Gerado em ${dateStr} às ${timeStr}`, 20, 33);
+    doc.setTextColor(0);
+
+    // Health Score Section
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Índice de Saúde", 20, 50);
+    
+    doc.setFontSize(28);
+    const scoreColor = healthMetrics.healthScore >= 80 ? [34, 197, 94] : 
+                       healthMetrics.healthScore >= 60 ? [234, 179, 8] : [239, 68, 68];
+    doc.setTextColor(scoreColor[0], scoreColor[1], scoreColor[2]);
+    doc.text(`${healthMetrics.healthScore}%`, 20, 65);
+    
+    doc.setFontSize(12);
+    doc.text(getHealthScoreLabel(healthMetrics.healthScore), 55, 65);
+    doc.setTextColor(0);
+
+    // Metrics Grid
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Métricas Gerais", 20, 85);
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    
+    const metrics = [
+      { label: "Total de Usuários", value: healthMetrics.totalUsers },
+      { label: "Usuários Ativos", value: healthMetrics.activeUsers },
+      { label: "Usuários Inativos (30d)", value: healthMetrics.inactiveUsers },
+      { label: "Testes Parados (7d+)", value: healthMetrics.incompleteTests },
+      { label: "Pagamentos Pendentes", value: healthMetrics.pendingPurchases },
+      { label: "Jornadas Abandonadas (60d+)", value: healthMetrics.abandonedJourneys },
+    ];
+
+    let yPos = 95;
+    metrics.forEach((metric, i) => {
+      doc.text(`• ${metric.label}:`, 25, yPos);
+      doc.setFont("helvetica", "bold");
+      doc.text(metric.value.toString(), 120, yPos);
+      doc.setFont("helvetica", "normal");
+      yPos += 8;
+    });
+
+    // Issues Section
+    yPos += 10;
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Problemas Identificados", 20, yPos);
+    yPos += 10;
+
+    // Inactive Users
+    doc.setFontSize(11);
+    doc.text(`Usuários Inativos (Top 10)`, 25, yPos);
+    yPos += 6;
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    
+    inactiveUsers.slice(0, 10).forEach((user) => {
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 20;
+      }
+      doc.text(`  - ${user.full_name} (${user.days_inactive} dias)`, 30, yPos);
+      yPos += 5;
+    });
+
+    // Incomplete Tests
+    yPos += 5;
+    if (yPos > 250) {
+      doc.addPage();
+      yPos = 20;
+    }
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Testes Incompletos (Top 10)`, 25, yPos);
+    yPos += 6;
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    
+    incompleteTests.slice(0, 10).forEach((test) => {
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 20;
+      }
+      doc.text(`  - ${test.user_name}: ${test.test_name} (${test.days_pending} dias)`, 30, yPos);
+      yPos += 5;
+    });
+
+    // Pending Purchases
+    yPos += 5;
+    if (yPos > 250) {
+      doc.addPage();
+      yPos = 20;
+    }
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Compras Pendentes (Top 10)`, 25, yPos);
+    yPos += 6;
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    
+    pendingPurchases.slice(0, 10).forEach((purchase) => {
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 20;
+      }
+      doc.text(`  - ${purchase.user_name}: R$ ${purchase.price_paid} (${purchase.days_pending} dias)`, 30, yPos);
+      yPos += 5;
+    });
+
+    // Duplicates Summary
+    yPos += 10;
+    if (yPos > 250) {
+      doc.addPage();
+      yPos = 20;
+    }
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Grupos Duplicados: ${duplicates.length}`, 25, yPos);
+    yPos += 6;
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    
+    duplicates.slice(0, 10).forEach((group) => {
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 20;
+      }
+      doc.text(`  - "${group.name}" (${group.users.length} contas)`, 30, yPos);
+      yPos += 5;
+    });
+
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(`NELLO ONE - Relatório de Saúde dos Dados - Página ${i} de ${pageCount}`, 20, 285);
+    }
+
+    // Save
+    const fileName = `relatorio-saude-dados-${now.toISOString().split("T")[0]}.pdf`;
+    doc.save(fileName);
+
+    toast({
+      title: "PDF exportado!",
+      description: `Arquivo ${fileName} baixado com sucesso`,
+    });
+  };
+
   const filteredTestUsers = testUsers.filter((user) =>
     user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -502,10 +672,16 @@ export const DataCleanupTool = () => {
             Saúde dos dados, usuários de teste e consolidação de duplicados
           </p>
         </div>
-        <Button variant="outline" onClick={fetchData} disabled={loading}>
-          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-          Atualizar
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportHealthReportPDF} disabled={!healthMetrics}>
+            <FileDown className="mr-2 h-4 w-4" />
+            Exportar PDF
+          </Button>
+          <Button variant="outline" onClick={fetchData} disabled={loading}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            Atualizar
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="health" className="space-y-4">
