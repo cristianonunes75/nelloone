@@ -3,6 +3,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import type { Json } from "@/integrations/supabase/types";
 
+// Check if user has admin role
+const checkIsAdmin = async (userId: string): Promise<boolean> => {
+  const { data } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .maybeSingle();
+  return !!data;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface CodigoSection {
   id: string;
@@ -24,6 +35,18 @@ export const useCodigoEssencia = () => {
   const { user } = useAuth();
   const [savedCodigo, setSavedCodigo] = useState<SavedCodigo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Check admin status
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (user?.id) {
+        const admin = await checkIsAdmin(user.id);
+        setIsAdmin(admin);
+      }
+    };
+    checkAdmin();
+  }, [user?.id]);
 
   // Load existing codigo from database (using mapa_essencia table for now)
   useEffect(() => {
@@ -135,8 +158,38 @@ export const useCodigoEssencia = () => {
     }
   }, [user?.id]);
 
-  // Allow only 1 regeneration (version 1 = first generation, version 2 = regenerated once)
-  const canRegenerate = !savedCodigo || (savedCodigo.version || 1) < 2;
+  // Users can only generate ONCE (version 0 = not generated, version 1 = generated)
+  // Admins can always regenerate
+  // If version is explicitly set to 0 by admin, user can regenerate once more
+  const canRegenerate = isAdmin || !savedCodigo || (savedCodigo.version || 1) === 0;
+
+  // Admin function to reset version to 0, allowing user to regenerate
+  const unlockRegeneration = useCallback(async (targetUserId?: string) => {
+    const userId = targetUserId || user?.id;
+    if (!userId) return false;
+
+    try {
+      const { error } = await supabase
+        .from("mapa_essencia")
+        .update({ version: 0 })
+        .eq("user_id", userId);
+
+      if (error) {
+        console.error("Error unlocking regeneration:", error);
+        return false;
+      }
+
+      // If it's the current user, update local state
+      if (userId === user?.id && savedCodigo) {
+        setSavedCodigo({ ...savedCodigo, version: 0 });
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error unlocking regeneration:", error);
+      return false;
+    }
+  }, [user?.id, savedCodigo]);
 
   return {
     savedCodigo,
@@ -146,5 +199,7 @@ export const useCodigoEssencia = () => {
     hasSavedCodigo: !!savedCodigo,
     canRegenerate,
     currentVersion: savedCodigo?.version || 0,
+    isAdmin,
+    unlockRegeneration,
   };
 };
