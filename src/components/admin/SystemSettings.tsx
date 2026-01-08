@@ -225,7 +225,7 @@ export const SystemSettings = () => {
                 <Input
                   value={formData.instagram_url || ""}
                   onChange={(e) => updateField("instagram_url", e.target.value)}
-                  placeholder="https://instagram.com/nelloone.app"
+                  placeholder="https://instagram.com/nello.one"
                 />
               </div>
               <div className="space-y-2">

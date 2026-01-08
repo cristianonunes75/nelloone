@@ -67,7 +67,7 @@ export const UsersManagement = () => {
           // In production, you'd need a separate API endpoint with proper permissions
           return {
             ...profile,
-            email: profile.id === currentUser?.id ? currentUser.email : "user@nelloone.app",
+            email: profile.id === currentUser?.id ? currentUser.email : "user@nello.one",
             roles: userRoles,
           };
         })
