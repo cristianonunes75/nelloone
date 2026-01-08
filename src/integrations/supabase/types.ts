@@ -1057,6 +1057,7 @@ export type Database = {
           journey_status: string
           journey_tests_status: Json
           journey_total_tests: number
+          notification_preferences: Json | null
           phone: string | null
           profession: string | null
           updated_at: string
@@ -1077,6 +1078,7 @@ export type Database = {
           journey_status?: string
           journey_tests_status?: Json
           journey_total_tests?: number
+          notification_preferences?: Json | null
           phone?: string | null
           profession?: string | null
           updated_at?: string
@@ -1097,6 +1099,7 @@ export type Database = {
           journey_status?: string
           journey_tests_status?: Json
           journey_total_tests?: number
+          notification_preferences?: Json | null
           phone?: string | null
           profession?: string | null
           updated_at?: string

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
@@ -15,6 +15,11 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const { hasPurchased, isFounder } = useTestAccess();
   const { language } = useLanguage();
+  
+  // Auto-save state
+  const [pendingAnswer, setPendingAnswer] = useState<{questionId: string; answer: any} | null>(null);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
   
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
 
@@ -78,7 +83,60 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
     },
   });
 
-  // Save answer mutation
+  // Auto-save effect: debounce saves with 1.5 second delay
+  useEffect(() => {
+    if (!pendingAnswer) return;
+
+    // Clear any existing timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+
+    // Set new timeout for auto-save
+    autoSaveTimeoutRef.current = setTimeout(async () => {
+      if (!userTestId || !user || !pendingAnswer) return;
+
+      setIsAutoSaving(true);
+      try {
+        await supabase
+          .from("test_answers")
+          .upsert(
+            {
+              user_test_id: userTestId,
+              question_id: pendingAnswer.questionId,
+              answer: pendingAnswer.answer,
+            },
+            {
+              onConflict: "user_test_id,question_id",
+            }
+          );
+        
+        queryClient.invalidateQueries({ queryKey: ["test-answers", userTestId] });
+      } catch (error) {
+        console.error("Auto-save failed:", error);
+      } finally {
+        setIsAutoSaving(false);
+        setPendingAnswer(null);
+      }
+    }, 1500);
+
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, [pendingAnswer, userTestId, user, queryClient]);
+
+  // Cleanup on unmount - save any pending answer immediately
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Save answer mutation (immediate save)
   const saveAnswer = useMutation({
     mutationFn: async ({
       questionId,
@@ -88,6 +146,9 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
       answer: any;
     }) => {
       if (!userTestId || !user) throw new Error("User test not initialized");
+
+      // Set pending for auto-save
+      setPendingAnswer({ questionId, answer });
 
       const { data, error } = await supabase
         .from("test_answers")
@@ -109,10 +170,11 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["test-answers", userTestId] });
+      setPendingAnswer(null);
     },
     onError: (error: any) => {
       toast({
-        title: "Erro ao salvar resposta",
+        title: language === 'en' ? "Error saving answer" : "Erro ao salvar resposta",
         description: error.message,
         variant: "destructive",
       });

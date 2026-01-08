@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { JourneyStepCard } from "@/components/cliente/JourneyStepCard";
 import { JourneyResultsSummary } from "@/components/cliente/JourneyResultsSummary";
+import { JourneyTimeline } from "@/components/cliente/JourneyTimeline";
 import { LogoText } from "@/components/LogoText";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { ImpersonateBanner } from "@/components/ImpersonateBanner";
@@ -466,6 +467,33 @@ const Cliente = () => {
               </p>
             )}
           </div>
+
+          {/* Journey Timeline - Visual Progress */}
+          <Card className="mb-6 md:mb-8">
+            <CardContent className="p-4 md:p-6">
+              <JourneyTimeline
+                steps={journeySteps.map(step => ({
+                  id: step.testId,
+                  name: step.name,
+                  status: step.status === "completed" ? "completed" 
+                    : step.status === "in_progress" ? "in_progress"
+                    : "not_started",
+                  completedAt: userTests?.find(ut => ut.test_id === step.testId && ut.status === "completed")?.completed_at,
+                }))}
+                currentStep={currentStep - 1}
+                onStepClick={(stepId) => {
+                  const step = journeySteps.find(s => s.testId === stepId);
+                  if (step?.status === "completed") {
+                    handleViewResult(step);
+                  } else if (step?.status === "in_progress") {
+                    handleContinueTest(step);
+                  } else if (step) {
+                    handleStartTest(step);
+                  }
+                }}
+              />
+            </CardContent>
+          </Card>
 
           {/* Jornada Nello Card - Progress Overview */}
           {/* Use profile journey_status as source of truth when available */}
