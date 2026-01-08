@@ -185,7 +185,7 @@ const CodigoEssenciaInner = () => {
   const codigoData = useCodigoEssencia();
   
   const { isJourneyComplete = false, testResults = {}, completedCount = 0, totalSteps = 7, isLoading: journeyLoading = true } = journeyData || {};
-  const { hasSavedCodigo = false, savedCodigo = null, saveCodigo, resetCodigo, isLoading: codigoLoading = true } = codigoData || {};
+  const { hasSavedCodigo = false, savedCodigo = null, saveCodigo, resetCodigo, isLoading: codigoLoading = true, canRegenerate = true } = codigoData || {};
   
   const isLoading = journeyLoading || codigoLoading;
   const navigate = useNavigate();
@@ -553,7 +553,7 @@ const CodigoEssenciaInner = () => {
           <LogoText className="text-xl" variant="solid" />
           <div className="flex items-center gap-1.5">
             <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => navigate(`${basePath}/cliente`)}><ArrowLeft className="w-4 h-4" /></Button>
-            <Button variant="outline" size="sm" className="h-8 px-2" onClick={() => setShowRegenerateConfirm(true)} disabled={isGenerating}><RefreshCw className="w-4 h-4" /></Button>
+            <Button variant="outline" size="sm" className="h-8 px-2" onClick={() => setShowRegenerateConfirm(true)} disabled={isGenerating || !canRegenerate} title={!canRegenerate ? (lang === 'en' ? 'Already regenerated once' : 'Já regenerado uma vez') : ''}><RefreshCw className="w-4 h-4" /></Button>
             <Button variant="outline" size="sm" className="h-8 px-2" onClick={handleDownloadPDF} disabled={!canDownloadPdf}><Download className="w-4 h-4" /></Button>
             <Button variant="outline" size="sm" className="h-8 px-2" onClick={handleSendEmail} disabled={isSendingEmail || !canDownloadPdf}>{isSendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}</Button>
           </div>
@@ -620,15 +620,17 @@ const CodigoEssenciaInner = () => {
                         ? 'This report was generated with an older version. Regenerate to get new sections like Tensions, Life Areas, Peace/Pressure, etc.'
                         : 'Este relatório foi gerado com uma versão anterior. Regenere para obter novas seções como Tensões, Áreas da Vida, Paz/Pressão, etc.'}
                     </p>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="mt-2 h-7 text-xs"
-                      onClick={() => setShowRegenerateConfirm(true)}
-                    >
-                      <RefreshCw className="w-3 h-3 mr-1" />
-                      {lang === 'en' ? 'Regenerate' : 'Regenerar'}
-                    </Button>
+                    {canRegenerate && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="mt-2 h-7 text-xs"
+                        onClick={() => setShowRegenerateConfirm(true)}
+                      >
+                        <RefreshCw className="w-3 h-3 mr-1" />
+                        {lang === 'en' ? 'Regenerate' : 'Regenerar'}
+                      </Button>
+                    )}
                   </div>
                 );
               }

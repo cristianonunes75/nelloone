@@ -17,6 +17,7 @@ interface SavedCodigo {
   raw_content: string;
   created_at: string;
   updated_at: string;
+  version: number;
 }
 
 export const useCodigoEssencia = () => {
@@ -48,6 +49,7 @@ export const useCodigoEssencia = () => {
             raw_content: data.raw_content || "",
             created_at: data.created_at,
             updated_at: data.updated_at,
+            version: data.version || 1,
           });
         }
       } catch (error) {
@@ -77,11 +79,13 @@ export const useCodigoEssencia = () => {
 
         let result;
         if (existing) {
+          // Increment version on regeneration
           result = await supabase
             .from("mapa_essencia")
             .update({
               sections: sectionsJson,
               raw_content: rawContent,
+              version: (savedCodigo?.version || 1) + 1,
             })
             .eq("user_id", user.id)
             .select()
@@ -93,6 +97,7 @@ export const useCodigoEssencia = () => {
               user_id: user.id,
               sections: sectionsJson,
               raw_content: rawContent,
+              version: 1,
             })
             .select()
             .single();
@@ -109,12 +114,13 @@ export const useCodigoEssencia = () => {
           raw_content: result.data.raw_content || "",
           created_at: result.data.created_at,
           updated_at: result.data.updated_at,
+          version: result.data.version || 1,
         });
       } catch (error) {
         console.error("Error saving codigo:", error);
       }
     },
-    [user?.id]
+    [user?.id, savedCodigo?.version]
   );
 
   // Delete and regenerate codigo
@@ -129,11 +135,16 @@ export const useCodigoEssencia = () => {
     }
   }, [user?.id]);
 
+  // Allow only 1 regeneration (version 1 = first generation, version 2 = regenerated once)
+  const canRegenerate = !savedCodigo || (savedCodigo.version || 1) < 2;
+
   return {
     savedCodigo,
     isLoading,
     saveCodigo,
     resetCodigo,
     hasSavedCodigo: !!savedCodigo,
+    canRegenerate,
+    currentVersion: savedCodigo?.version || 0,
   };
 };
