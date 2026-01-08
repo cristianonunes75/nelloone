@@ -7,8 +7,9 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { Loader2 } from "lucide-react";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 
-// Lazy load new admin modules
+// Lazy load admin modules
 const AdminDashboard = lazy(() => import("@/components/admin/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
+const RealtimeDashboard = lazy(() => import("@/components/admin/RealtimeDashboard").then(m => ({ default: m.RealtimeDashboard })));
 const AdminJourneyDashboard = lazy(() => import("@/components/admin/AdminJourneyDashboard").then(m => ({ default: m.AdminJourneyDashboard })));
 const AdminUsersJourneys = lazy(() => import("@/components/admin/AdminUsersJourneys").then(m => ({ default: m.AdminUsersJourneys })));
 const AdminOrdersPayments = lazy(() => import("@/components/admin/AdminOrdersPayments").then(m => ({ default: m.AdminOrdersPayments })));
@@ -24,6 +25,8 @@ const AdminBrandIdentity = lazy(() => import("@/components/admin/AdminBrandIdent
 const AdminRealtimeVisitors = lazy(() => import("@/components/admin/AdminRealtimeVisitors").then(m => ({ default: m.AdminRealtimeVisitors })));
 const DataCleanupTool = lazy(() => import("@/components/admin/DataCleanupTool").then(m => ({ default: m.DataCleanupTool })));
 const NotificationAutomation = lazy(() => import("@/components/admin/NotificationAutomation").then(m => ({ default: m.NotificationAutomation })));
+const AdminPermissionsManager = lazy(() => import("@/components/admin/AdminPermissionsManager").then(m => ({ default: m.AdminPermissionsManager })));
+const ReportsManagement2 = lazy(() => import("@/components/admin/ReportsManagement2").then(m => ({ default: m.ReportsManagement2 })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -66,6 +69,8 @@ const Admin = () => {
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
                 <Route path="/" element={<AdminDashboard />} />
+                <Route path="/tempo-real" element={<RealtimeDashboard />} />
+                <Route path="/relatorios" element={<ReportsManagement2 />} />
                 <Route path="/visitantes" element={<AdminRealtimeVisitors />} />
                 <Route path="/jornadas" element={<AdminJourneyDashboard />} />
                 <Route path="/fundadores" element={<FundadoresAdmin />} />
@@ -77,6 +82,7 @@ const Admin = () => {
                 <Route path="/depoimentos" element={<TestimonialsManagement />} />
                 <Route path="/codigo-essencia" element={<AdminCodigoEssencia />} />
                 <Route path="/identidade-visual" element={<AdminBrandIdentity />} />
+                <Route path="/permissoes" element={<AdminPermissionsManager />} />
                 <Route path="/limpeza" element={<DataCleanupTool />} />
                 <Route path="/notificacoes" element={<NotificationAutomation />} />
                 <Route path="/logs" element={<AdminLogs />} />

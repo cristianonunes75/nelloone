@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_permissions: {
+        Row: {
+          can_delete_data: boolean | null
+          can_impersonate: boolean | null
+          can_manage_payments: boolean | null
+          can_manage_products: boolean | null
+          can_manage_settings: boolean | null
+          can_manage_users: boolean | null
+          can_send_notifications: boolean | null
+          can_view_reports: boolean | null
+          created_at: string
+          created_by: string | null
+          id: string
+          permission_level: Database["public"]["Enums"]["admin_permission_level"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          can_delete_data?: boolean | null
+          can_impersonate?: boolean | null
+          can_manage_payments?: boolean | null
+          can_manage_products?: boolean | null
+          can_manage_settings?: boolean | null
+          can_manage_users?: boolean | null
+          can_send_notifications?: boolean | null
+          can_view_reports?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          permission_level?: Database["public"]["Enums"]["admin_permission_level"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          can_delete_data?: boolean | null
+          can_impersonate?: boolean | null
+          can_manage_payments?: boolean | null
+          can_manage_products?: boolean | null
+          can_manage_settings?: boolean | null
+          can_manage_users?: boolean | null
+          can_send_notifications?: boolean | null
+          can_view_reports?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          permission_level?: Database["public"]["Enums"]["admin_permission_level"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       affiliate_referrals: {
         Row: {
           affiliate_id: string
@@ -1620,6 +1671,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      get_admin_permission_level: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["admin_permission_level"]
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -1629,6 +1684,10 @@ export type Database = {
         Returns: {
           role: Database["public"]["Enums"]["app_role"]
         }[]
+      }
+      has_admin_permission: {
+        Args: { _permission: string; _user_id: string }
+        Returns: boolean
       }
       has_role: {
         Args: {
@@ -1656,6 +1715,7 @@ export type Database = {
       }
     }
     Enums: {
+      admin_permission_level: "super_admin" | "suporte" | "visualizador"
       app_role: "admin" | "fotografo" | "cliente"
       test_status: "not_started" | "in_progress" | "completed"
       test_type:
@@ -1795,6 +1855,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      admin_permission_level: ["super_admin", "suporte", "visualizador"],
       app_role: ["admin", "fotografo", "cliente"],
       test_status: ["not_started", "in_progress", "completed"],
       test_type: [
