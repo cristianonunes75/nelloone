@@ -75,7 +75,8 @@ export const usePDFEmail = () => {
           break;
           
         case "inteligencias_multiplas":
-          doc = createInteligenciasPremiumPDF(resultData, userName, { language: language as 'pt' | 'en' });
+          // pdfInteligenciasMultiplas only accepts 'pt' | 'en', map pt-pt → pt
+          doc = createInteligenciasPremiumPDF(resultData, userName, { language: language === 'pt-pt' ? 'pt' : language });
           break;
           
         case "arquetipos_proposito":

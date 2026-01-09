@@ -255,8 +255,44 @@ const DAY_LABELS = {
 export function Nello16PersonalityResultsSection({ 
   mbtiResultData, 
   userName, 
-  lang 
+  lang,
+  onContinue 
 }: Nello16PersonalityResultsSectionProps) {
+  // Handlers for CTA buttons
+  const handleSave = () => {
+    // O resultado já fica salvo automaticamente no histórico (user_tests).
+    toast.success(lang === 'en' ? 'Saved to your history.' : lang === 'pt-pt' ? 'Guardado no teu histórico.' : 'Salvo no seu histórico.');
+  };
+
+  const handleShare = async () => {
+    const displayCode = getNello16DisplayCode(mbtiResultData?.type || '');
+    const shareText = lang === 'en'
+      ? `I discovered my profile (${displayCode}) on NELLO ONE. Discover yours at nello.one`
+      : `Descobri meu perfil (${displayCode}) no NELLO ONE. Descubra o seu em nello.one`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: lang === 'en' ? 'My NELLO ONE result' : 'Meu resultado NELLO ONE',
+          text: shareText,
+          url: "https://nello.one",
+        });
+        return;
+      }
+
+      await navigator.clipboard.writeText(`${shareText} https://nello.one`);
+      toast.success(lang === 'en' ? 'Link copied.' : 'Link copiado.');
+    } catch {
+      toast.error(lang === 'en' ? 'Could not share.' : 'Não foi possível compartilhar.');
+    }
+  };
+
+  const handleContinue = () => {
+    if (onContinue) return onContinue();
+    // Fallback: scroll to continue journey card at bottom of page
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  };
+
   // Early return with loading state if data is incomplete
   if (!mbtiResultData?.type || !mbtiResultData?.scores) {
     return (
