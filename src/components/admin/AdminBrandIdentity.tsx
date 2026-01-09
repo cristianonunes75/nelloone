@@ -11,7 +11,7 @@ import { Slider } from "@/components/ui/slider";
 import { Download, Sun, Moon, Sparkles, Loader2, Copy, Check, Image, Upload, Languages } from "lucide-react";
 import { NelloSymbol, NelloSymbolN, NelloSymbolOne } from "@/components/brand/NelloSymbol";
 import { NelloWordmark } from "@/components/brand/NelloWordmark";
-import { SocialCardPreview } from "@/components/brand/SocialCardTemplate";
+import { SocialCardPreview, SocialCardTemplate } from "@/components/brand/SocialCardTemplate";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import { supabase } from "@/integrations/supabase/client";
@@ -630,7 +630,7 @@ export const AdminBrandIdentity = () => {
               <CardContent>
                 <div className="flex justify-center p-4 bg-muted/30 rounded-lg min-h-[500px]">
                   <div ref={cardRef}>
-                    <SocialCardPreview
+                    <SocialCardTemplate
                       format={cardFormat}
                       type={cardType}
                       theme={cardTheme}
