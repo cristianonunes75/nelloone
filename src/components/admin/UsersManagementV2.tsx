@@ -246,7 +246,6 @@ export const UsersManagementV2 = () => {
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case "admin": return "destructive";
-      case "fotografo": return "secondary";
       default: return "outline";
     }
   };

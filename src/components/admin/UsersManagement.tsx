@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Search, UserX, UserCheck, Shield, Trash2 } from "lucide-react";
+import { Search, Shield } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -85,7 +85,7 @@ export const UsersManagement = () => {
     }
   };
 
-  const toggleUserRole = async (userId: string, role: "admin" | "fotografo" | "cliente", currentRoles: string[]) => {
+  const toggleUserRole = async (userId: string, role: "admin" | "cliente", currentRoles: string[]) => {
     try {
       const hasRole = currentRoles.includes(role);
       
@@ -150,7 +150,6 @@ export const UsersManagement = () => {
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case "admin": return "bg-red-500/10 text-red-500 border-red-500/20";
-      case "fotografo": return "bg-blue-500/10 text-blue-500 border-blue-500/20";
       default: return "bg-green-500/10 text-green-500 border-green-500/20";
     }
   };
@@ -215,14 +214,6 @@ export const UsersManagement = () => {
                         title={user.roles.includes("admin") ? "Remover Admin" : "Adicionar Admin"}
                       >
                         <Shield className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={user.roles.includes("fotografo") ? "default" : "ghost"}
-                        onClick={() => toggleUserRole(user.id, "fotografo", user.roles)}
-                        title={user.roles.includes("fotografo") ? "Remover Fotógrafo" : "Adicionar Fotógrafo"}
-                      >
-                        <UserCheck className="w-4 h-4" />
                       </Button>
                     </div>
                   </TableCell>
