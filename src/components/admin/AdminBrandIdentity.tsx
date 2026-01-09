@@ -151,13 +151,28 @@ export const AdminBrandIdentity = () => {
     }
   };
 
+  const formatDimensions = {
+    "instagram-feed": { width: 400, height: 400 },
+    "instagram-portrait": { width: 400, height: 500 },
+    "stories": { width: 270, height: 480 },
+    "linkedin": { width: 520, height: 273 }
+  };
+
   const downloadElement = async (element: HTMLElement | null, filename: string) => {
     if (!element) return;
     
     try {
+      const dimensions = formatDimensions[cardFormat];
+      
       const canvas = await html2canvas(element, {
         backgroundColor: null,
-        scale: 2
+        scale: 2,
+        width: dimensions.width,
+        height: dimensions.height,
+        windowWidth: dimensions.width,
+        windowHeight: dimensions.height,
+        useCORS: true,
+        logging: false
       });
       
       const link = document.createElement("a");
@@ -629,7 +644,14 @@ export const AdminBrandIdentity = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex justify-center p-4 bg-muted/30 rounded-lg min-h-[500px]">
-                  <div ref={cardRef}>
+                  <div 
+                    ref={cardRef}
+                    style={{
+                      width: formatDimensions[cardFormat].width,
+                      height: formatDimensions[cardFormat].height,
+                      overflow: 'hidden'
+                    }}
+                  >
                     <SocialCardTemplate
                       format={cardFormat}
                       type={cardType}

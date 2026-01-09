@@ -227,13 +227,14 @@ export const SocialCardTemplate = ({
   return (
     <div 
       className={cn(
-        "relative overflow-hidden rounded-lg shadow-lg",
+        "relative rounded-lg shadow-lg",
         bgClass,
         className
       )}
       style={{
         width: dimensions.width,
-        height: dimensions.height
+        height: dimensions.height,
+        overflow: 'hidden'
       }}
     >
       {/* Background Image Layer */}
