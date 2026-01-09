@@ -130,31 +130,25 @@ export const UsersManagement2 = () => {
     setImpersonating(user.id);
     
     try {
-      const { data: session, error } = await supabase
-        .from("impersonation_sessions")
-        .insert({
-          admin_id: (await supabase.auth.getUser()).data.user?.id,
-          target_user_id: user.id,
-          session_token: crypto.randomUUID(),
-          ip_address: 'unknown',
-          user_agent: navigator.userAgent,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      await supabase.rpc('log_audit', {
-        p_action: 'impersonate_user',
-        p_table_name: 'impersonation_sessions',
-        p_record_id: session.id,
-        p_new_data: { target_user_id: user.id, target_user_name: user.full_name }
+      // Use edge function to create session securely (instead of direct insert)
+      const { data, error } = await supabase.functions.invoke('impersonate-user', {
+        body: { 
+          action: 'create', 
+          targetUserId: user.id 
+        }
       });
 
-      const impersonateUrl = `${window.location.origin}/cliente?impersonate=${session.session_token}`;
+      if (error || !data?.success) {
+        throw new Error(data?.error || 'Failed to create session');
+      }
+
+      // Open client page WITH token in URL (required for new tab to receive the session)
+      const impersonateUrl = `${window.location.origin}/cliente?impersonate=${data.sessionToken}`;
       window.open(impersonateUrl, '_blank');
       
-      toast.success(`Simulando como ${user.full_name}`);
+      toast.success(`Simulando como ${user.full_name}`, {
+        description: "Uma nova aba foi aberta com a sessão do usuário"
+      });
     } catch (error) {
       console.error("Error creating impersonation session:", error);
       toast.error("Erro ao criar sessão de simulação");
