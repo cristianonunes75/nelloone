@@ -54,7 +54,11 @@ const JOURNEY_ORDER = [
   "nello16",
 ];
 
-export function AdminJourneyDashboard() {
+interface AdminJourneyDashboardProps {
+  hideHeader?: boolean;
+}
+
+export function AdminJourneyDashboard({ hideHeader = false }: AdminJourneyDashboardProps) {
   const [users, setUsers] = useState<JourneyUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -256,19 +260,31 @@ export function AdminJourneyDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Dashboard de Jornadas</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Acompanhe o progresso dos usuários e envie lembretes
-          </p>
+      {/* Header - only show if not hidden */}
+      {!hideHeader && (
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Dashboard de Jornadas</h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              Acompanhe o progresso dos usuários e envie lembretes
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={fetchUsers}>
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Atualizar
+          </Button>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchUsers}>
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Atualizar
-        </Button>
-      </div>
+      )}
+      
+      {/* Refresh button when header is hidden */}
+      {hideHeader && (
+        <div className="flex justify-end">
+          <Button variant="outline" size="sm" onClick={fetchUsers}>
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Atualizar
+          </Button>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
