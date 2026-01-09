@@ -11,7 +11,7 @@ import { RoleSwitcher } from "@/components/RoleSwitcher";
 const AdminDashboard = lazy(() => import("@/components/admin/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
 const RealtimeDashboard = lazy(() => import("@/components/admin/RealtimeDashboard").then(m => ({ default: m.RealtimeDashboard })));
 const AdminJourneyDashboard = lazy(() => import("@/components/admin/AdminJourneyDashboard").then(m => ({ default: m.AdminJourneyDashboard })));
-const AdminUsersJourneys = lazy(() => import("@/components/admin/AdminUsersJourneys").then(m => ({ default: m.AdminUsersJourneys })));
+const AdminUsersUnified = lazy(() => import("@/components/admin/AdminUsersUnified").then(m => ({ default: m.default })));
 const AdminOrdersPayments = lazy(() => import("@/components/admin/AdminOrdersPayments").then(m => ({ default: m.AdminOrdersPayments })));
 const AdminProductsTests = lazy(() => import("@/components/admin/AdminProductsTests").then(m => ({ default: m.AdminProductsTests })));
 const AdminCoupons = lazy(() => import("@/components/admin/AdminCoupons").then(m => ({ default: m.AdminCoupons })));
@@ -77,7 +77,7 @@ const Admin = () => {
                 <Route path="visitantes" element={<AdminRealtimeVisitors />} />
                 <Route path="jornadas" element={<AdminJourneyDashboard />} />
                 <Route path="afiliados" element={<AffiliatesManagement />} />
-                <Route path="usuarios" element={<AdminUsersJourneys />} />
+                <Route path="usuarios" element={<AdminUsersUnified />} />
                 <Route path="pedidos" element={<AdminOrdersPayments />} />
                 <Route path="produtos" element={<AdminProductsTests />} />
                 <Route path="cupons" element={<AdminCoupons />} />

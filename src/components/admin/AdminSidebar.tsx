@@ -9,7 +9,6 @@ import {
   Activity,
   Star,
   UserCheck,
-  Route,
   MessageSquareHeart,
   Palette,
   Eye,
@@ -48,8 +47,7 @@ const menuSections = [
   {
     label: "USUÁRIOS",
     items: [
-      { title: "Gestão de Usuários", url: "/admin/usuarios", icon: Users },
-      { title: "Jornadas", url: "/admin/jornadas", icon: Route },
+      { title: "Usuários & Jornadas", url: "/admin/usuarios", icon: Users },
       { title: "Afiliados", url: "/admin/afiliados", icon: UserCheck },
     ]
   },

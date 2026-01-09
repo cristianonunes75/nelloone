@@ -54,7 +54,11 @@ const TEST_DISPLAY_NAMES: Record<JourneyTestSlug, string> = {
   temperamentos: "Temperamentos",
 };
 
-export const AdminUsersJourneys = () => {
+interface AdminUsersJourneysProps {
+  hideHeader?: boolean;
+}
+
+export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysProps) => {
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<UserWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
@@ -328,17 +332,29 @@ export const AdminUsersJourneys = () => {
 
   return (
     <div className="space-y-4 md:space-y-6 max-w-7xl">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Usuários & Jornadas</h1>
-          <p className="text-muted-foreground text-xs md:text-sm">Gerencie usuários e acompanhe suas jornadas</p>
+      {/* Header - only show if not hidden */}
+      {!hideHeader && (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-1">
+            <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Usuários & Jornadas</h1>
+            <p className="text-muted-foreground text-xs md:text-sm">Gerencie usuários e acompanhe suas jornadas</p>
+          </div>
+          <Button variant="outline" onClick={exportCSV} className="gap-2">
+            <Download className="w-4 h-4" />
+            Exportar CSV
+          </Button>
         </div>
-        <Button variant="outline" onClick={exportCSV} className="gap-2">
-          <Download className="w-4 h-4" />
-          Exportar CSV
-        </Button>
-      </div>
+      )}
+      
+      {/* Export button when header is hidden */}
+      {hideHeader && (
+        <div className="flex justify-end">
+          <Button variant="outline" onClick={exportCSV} className="gap-2">
+            <Download className="w-4 h-4" />
+            Exportar CSV
+          </Button>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
