@@ -193,14 +193,10 @@ const Auth = () => {
             .eq("user_id", (await supabase.auth.getUser()).data.user?.id);
           
           const roles = (rolesData || []).map((r: any) => r.role);
-          const primaryRole = roles.find((r: string) => r === "admin") || 
-                             roles.find((r: string) => r === "fotografo") || 
-                             "cliente";
+          const primaryRole = roles.find((r: string) => r === "admin") || "cliente";
           
           if (primaryRole === "admin") {
             navigate("/admin");
-          } else if (primaryRole === "fotografo") {
-            navigate("/fotografo");
           } else {
             navigate(getLocalizedPath("/cliente"));
           }
@@ -253,14 +249,10 @@ const Auth = () => {
               .eq("user_id", (await supabase.auth.getUser()).data.user?.id);
             
             const roles = (rolesData || []).map((r: any) => r.role);
-            const primaryRole = roles.find((r: string) => r === "admin") || 
-                               roles.find((r: string) => r === "fotografo") || 
-                               "cliente";
+            const primaryRole = roles.find((r: string) => r === "admin") || "cliente";
             
             if (primaryRole === "admin") {
               navigate("/admin");
-            } else if (primaryRole === "fotografo") {
-              navigate("/fotografo");
             } else {
               navigate(getLocalizedPath("/cliente"));
             }

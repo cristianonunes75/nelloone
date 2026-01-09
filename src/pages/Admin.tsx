@@ -29,7 +29,7 @@ const ReportsManagement2 = lazy(() => import("@/components/admin/ReportsManageme
 const CommunicationManagement = lazy(() => import("@/components/admin/CommunicationManagement").then(m => ({ default: m.CommunicationManagement })));
 const AdminNotificationsHistory = lazy(() => import("@/components/admin/AdminNotificationsHistory").then(m => ({ default: m.AdminNotificationsHistory })));
 const AdminSendReports = lazy(() => import("@/components/admin/AdminSendReports").then(m => ({ default: m.AdminSendReports })));
-const AdminEngagementCenter = lazy(() => import("@/components/admin/AdminEngagementCenter"));
+const AdminEngagementCenter = lazy(() => import("@/components/admin/AdminEngagementCenter").then(m => ({ default: m.default })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">

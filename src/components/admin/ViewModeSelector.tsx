@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Camera, User, Eye } from "lucide-react";
+import { User, Eye } from "lucide-react";
 
 export const ViewModeSelector = () => {
   const navigate = useNavigate();
@@ -9,21 +9,12 @@ export const ViewModeSelector = () => {
   const viewModes = [
     {
       title: "Visualizar como Cliente",
-      description: "Acesse a área do cliente para ver a experiência completa dos testes e sessões",
+      description: "Acesse a área do cliente para ver a experiência completa dos testes e resultados",
       icon: User,
       path: "/cliente",
       color: "text-blue-500",
       bgColor: "bg-blue-500/10",
       borderColor: "border-blue-500/20",
-    },
-    {
-      title: "Visualizar como Fotógrafo",
-      description: "Veja como os fotógrafos gerenciam clientes, sessões e galerias",
-      icon: Camera,
-      path: "/fotografo",
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
-      borderColor: "border-purple-500/20",
     },
   ];
 

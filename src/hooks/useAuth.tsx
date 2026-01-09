@@ -3,7 +3,7 @@ import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-type UserRole = "admin" | "fotografo" | "cliente";
+type UserRole = "admin" | "cliente";
 
 interface Profile {
   id: string;
@@ -70,10 +70,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUserRoles(roles);
       
       // Prioritize admin role
-      const primaryRole = roles.find(r => r === "admin") || 
-                         roles.find(r => r === "fotografo") || 
-                         roles[0] || "cliente";
-      setUserRole(primaryRole);
+      const primaryRole = roles.find(r => r === "admin") || roles[0] || "cliente";
+      setUserRole(primaryRole as UserRole);
 
       // Fetch profile
       const { data: profileData, error: profileError } = await supabase
