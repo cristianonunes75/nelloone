@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-export type NelloApp = 'flow' | 'life' | 'one' | 'main';
+export type NelloApp = 'flow' | 'life' | 'one' | 'business' | 'main';
 
 interface SubdomainConfig {
   app: NelloApp;
@@ -17,6 +17,7 @@ const SUBDOMAIN_MAP: Record<string, NelloApp> = {
   'flow': 'flow',
   'life': 'life', 
   'one': 'one',
+  'business': 'business',
 };
 
 // For local development, you can force a subdomain

@@ -416,6 +416,417 @@ export type Database = {
         }
         Relationships: []
       }
+      business_pricing_tiers: {
+        Row: {
+          created_at: string
+          discount_percent: number | null
+          id: string
+          is_active: boolean | null
+          is_featured: boolean | null
+          max_collaborators: number | null
+          min_collaborators: number
+          price_per_collaborator: number
+          stripe_price_id_brl: string | null
+          stripe_price_id_eur: string | null
+          stripe_price_id_usd: string | null
+          tier_description: string | null
+          tier_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          discount_percent?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          max_collaborators?: number | null
+          min_collaborators: number
+          price_per_collaborator: number
+          stripe_price_id_brl?: string | null
+          stripe_price_id_eur?: string | null
+          stripe_price_id_usd?: string | null
+          tier_description?: string | null
+          tier_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          discount_percent?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          max_collaborators?: number | null
+          min_collaborators?: number
+          price_per_collaborator?: number
+          stripe_price_id_brl?: string | null
+          stripe_price_id_eur?: string | null
+          stripe_price_id_usd?: string | null
+          tier_description?: string | null
+          tier_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      companies: {
+        Row: {
+          billing_email: string | null
+          created_at: string
+          created_by: string | null
+          employee_count_range: string | null
+          id: string
+          industry: string | null
+          logo_url: string | null
+          name: string
+          settings: Json | null
+          slug: string
+          stripe_customer_id: string | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          billing_email?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_count_range?: string | null
+          id?: string
+          industry?: string | null
+          logo_url?: string | null
+          name: string
+          settings?: Json | null
+          slug: string
+          stripe_customer_id?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          billing_email?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_count_range?: string | null
+          id?: string
+          industry?: string | null
+          logo_url?: string | null
+          name?: string
+          settings?: Json | null
+          slug?: string
+          stripe_customer_id?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      company_audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          company_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: string | null
+          target_user_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          company_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          company_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_audit_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_invites: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          company_id: string
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invite_token: string
+          invited_by: string
+          role: Database["public"]["Enums"]["business_role"]
+          sent_at: string | null
+          status: Database["public"]["Enums"]["invite_status"] | null
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          company_id: string
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invite_token: string
+          invited_by: string
+          role?: Database["public"]["Enums"]["business_role"]
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["invite_status"] | null
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          company_id?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invite_token?: string
+          invited_by?: string
+          role?: Database["public"]["Enums"]["business_role"]
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["invite_status"] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_invites_accepted_by_fkey"
+            columns: ["accepted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_invites_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_subscriptions: {
+        Row: {
+          company_id: string
+          created_at: string
+          current_collaborators: number | null
+          current_period_end: string | null
+          current_period_start: string | null
+          discount_percent: number | null
+          id: string
+          max_collaborators: number | null
+          plan_tier: string | null
+          price_per_collaborator: number | null
+          status:
+            | Database["public"]["Enums"]["company_subscription_status"]
+            | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          current_collaborators?: number | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          discount_percent?: number | null
+          id?: string
+          max_collaborators?: number | null
+          plan_tier?: string | null
+          price_per_collaborator?: number | null
+          status?:
+            | Database["public"]["Enums"]["company_subscription_status"]
+            | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          current_collaborators?: number | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          discount_percent?: number | null
+          id?: string
+          max_collaborators?: number | null
+          plan_tier?: string | null
+          price_per_collaborator?: number | null
+          status?:
+            | Database["public"]["Enums"]["company_subscription_status"]
+            | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_subscriptions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_team_insights: {
+        Row: {
+          calculation_member_count: number | null
+          communication_styles: Json | null
+          company_id: string
+          completed_assessments: number | null
+          conflict_risk_areas: Json | null
+          created_at: string
+          disc_distribution: Json | null
+          enneagram_distribution: Json | null
+          id: string
+          last_calculated_at: string | null
+          leadership_potential_indicators: Json | null
+          management_recommendations: Json | null
+          team_building_suggestions: Json | null
+          team_growth_areas: Json | null
+          team_strengths: Json | null
+          temperament_distribution: Json | null
+          total_members: number | null
+          updated_at: string
+        }
+        Insert: {
+          calculation_member_count?: number | null
+          communication_styles?: Json | null
+          company_id: string
+          completed_assessments?: number | null
+          conflict_risk_areas?: Json | null
+          created_at?: string
+          disc_distribution?: Json | null
+          enneagram_distribution?: Json | null
+          id?: string
+          last_calculated_at?: string | null
+          leadership_potential_indicators?: Json | null
+          management_recommendations?: Json | null
+          team_building_suggestions?: Json | null
+          team_growth_areas?: Json | null
+          team_strengths?: Json | null
+          temperament_distribution?: Json | null
+          total_members?: number | null
+          updated_at?: string
+        }
+        Update: {
+          calculation_member_count?: number | null
+          communication_styles?: Json | null
+          company_id?: string
+          completed_assessments?: number | null
+          conflict_risk_areas?: Json | null
+          created_at?: string
+          disc_distribution?: Json | null
+          enneagram_distribution?: Json | null
+          id?: string
+          last_calculated_at?: string | null
+          leadership_potential_indicators?: Json | null
+          management_recommendations?: Json | null
+          team_building_suggestions?: Json | null
+          team_growth_areas?: Json | null
+          team_strengths?: Json | null
+          temperament_distribution?: Json | null
+          total_members?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_team_insights_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_users: {
+        Row: {
+          company_id: string
+          consent_given: boolean | null
+          consent_given_at: string | null
+          consent_text_version: string | null
+          created_at: string
+          id: string
+          invited_by: string | null
+          is_active: boolean | null
+          joined_at: string | null
+          onboarding_completed: boolean | null
+          onboarding_completed_at: string | null
+          role: Database["public"]["Enums"]["business_role"]
+          share_report_with_company: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          consent_given?: boolean | null
+          consent_given_at?: string | null
+          consent_text_version?: string | null
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          is_active?: boolean | null
+          joined_at?: string | null
+          onboarding_completed?: boolean | null
+          onboarding_completed_at?: string | null
+          role?: Database["public"]["Enums"]["business_role"]
+          share_report_with_company?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          consent_given?: boolean | null
+          consent_given_at?: string | null
+          consent_text_version?: string | null
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          is_active?: boolean | null
+          joined_at?: string | null
+          onboarding_completed?: boolean | null
+          onboarding_completed_at?: string | null
+          role?: Database["public"]["Enums"]["business_role"]
+          share_report_with_company?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_users_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coupons: {
         Row: {
           allowed_product_type: string | null
@@ -1922,6 +2333,14 @@ export type Database = {
     Enums: {
       admin_permission_level: "super_admin" | "suporte" | "visualizador"
       app_role: "admin" | "fotografo" | "cliente"
+      business_role: "super_admin" | "company_admin" | "collaborator"
+      company_subscription_status:
+        | "trialing"
+        | "active"
+        | "past_due"
+        | "canceled"
+        | "incomplete"
+      invite_status: "pending" | "accepted" | "expired" | "revoked"
       test_status: "not_started" | "in_progress" | "completed"
       test_type:
         | "disc"
@@ -2062,6 +2481,15 @@ export const Constants = {
     Enums: {
       admin_permission_level: ["super_admin", "suporte", "visualizador"],
       app_role: ["admin", "fotografo", "cliente"],
+      business_role: ["super_admin", "company_admin", "collaborator"],
+      company_subscription_status: [
+        "trialing",
+        "active",
+        "past_due",
+        "canceled",
+        "incomplete",
+      ],
+      invite_status: ["pending", "accepted", "expired", "revoked"],
       test_status: ["not_started", "in_progress", "completed"],
       test_type: [
         "disc",
