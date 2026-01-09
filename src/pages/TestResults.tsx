@@ -500,7 +500,9 @@ function TestResultsInner() {
   const handleDownloadInteligenciasPDF = () => {
     if (inteligenciasResults) {
       try {
-        generateInteligenciasPremiumPDF(inteligenciasResults, userFirstName, { language: lang as 'pt' | 'en' });
+        // pdfInteligenciasMultiplas only accepts 'pt' | 'en', map pt-pt → pt
+        const pdfLang = lang === 'pt-pt' ? 'pt' : lang;
+        generateInteligenciasPremiumPDF(inteligenciasResults, userFirstName, { language: pdfLang as 'pt' | 'en' });
         toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
       } catch (error) {
         console.error('Error generating PDF:', error);

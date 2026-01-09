@@ -58,7 +58,7 @@ const Cliente = () => {
     canPurchase: canPurchaseCodigo,
     hasUnlocked: hasCodigoUnlocked
   } = useCodigoEssenciaAccess();
-  const { isImpersonating, impersonatedUserName } = useImpersonate();
+  const { isImpersonating, impersonatedUserName, setImpersonation } = useImpersonate();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
@@ -68,6 +68,76 @@ const Cliente = () => {
   // State for reset confirmation dialog
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [stepToReset, setStepToReset] = useState<typeof journeySteps[0] | null>(null);
+
+  // Handle impersonation token from URL (when admin opens this page in new tab)
+  useEffect(() => {
+    const impersonateToken = searchParams.get("impersonate");
+    
+    if (impersonateToken && !isImpersonating) {
+      // Validate the impersonation token with the edge function
+      const validateAndSetImpersonation = async () => {
+        try {
+          const { data, error } = await supabase.functions.invoke('impersonate-user', {
+            body: { 
+              action: 'validate', 
+              sessionToken: impersonateToken 
+            }
+          });
+
+          if (error || !data?.valid) {
+            toast({
+              title: "Sessão de simulação inválida",
+              description: "O token expirou ou não é válido.",
+              variant: "destructive",
+            });
+            // Remove the invalid token from URL
+            searchParams.delete("impersonate");
+            setSearchParams(searchParams);
+            return;
+          }
+
+          // Get target user info from session
+          const { data: sessionData, error: sessionError } = await supabase
+            .from("impersonation_sessions")
+            .select("target_user_id, profiles:target_user_id(full_name)")
+            .eq("session_token", impersonateToken)
+            .eq("is_active", true)
+            .single();
+
+          if (sessionError || !sessionData) {
+            toast({
+              title: "Erro ao carregar sessão",
+              description: "Não foi possível identificar o usuário.",
+              variant: "destructive",
+            });
+            searchParams.delete("impersonate");
+            setSearchParams(searchParams);
+            return;
+          }
+
+          const targetUserName = (sessionData.profiles as any)?.full_name || "Usuário";
+          
+          // Set the impersonation context (this also stores in sessionStorage)
+          setImpersonation(sessionData.target_user_id, targetUserName, impersonateToken);
+          
+          // Remove the token from URL for security
+          searchParams.delete("impersonate");
+          setSearchParams(searchParams);
+          
+          toast({
+            title: `Modo Simulação Ativado`,
+            description: `Você está visualizando a conta de ${targetUserName}`,
+          });
+        } catch (err) {
+          console.error("Error validating impersonation:", err);
+          searchParams.delete("impersonate");
+          setSearchParams(searchParams);
+        }
+      };
+
+      validateAndSetImpersonation();
+    }
+  }, [searchParams, isImpersonating, setImpersonation, setSearchParams, toast]);
 
   // Handle payment success callback
   useEffect(() => {

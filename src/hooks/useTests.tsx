@@ -3,12 +3,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useToast } from "./use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useImpersonate } from "@/contexts/ImpersonateContext";
 
 export const useTests = () => {
   const { user } = useAuth();
+  const { impersonatedUserId, isImpersonating } = useImpersonate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { language, t } = useLanguage();
+
+  // When impersonating, use the impersonated user's ID for data queries
+  const effectiveUserId = isImpersonating ? impersonatedUserId : user?.id;
 
   // Fetch all available tests filtered by language
   const { data: tests, isLoading: testsLoading } = useQuery({
@@ -28,11 +33,12 @@ export const useTests = () => {
   });
 
   // Fetch user's test progress (uses test type to link across languages)
+  // When impersonating, fetch the impersonated user's tests
   const { data: userTests, isLoading: userTestsLoading } = useQuery({
-    queryKey: ["user-tests", user?.id, language],
-    enabled: !!user,
+    queryKey: ["user-tests", effectiveUserId, language],
+    enabled: !!effectiveUserId,
     queryFn: async () => {
-      if (!user) return [];
+      if (!effectiveUserId) return [];
 
       // First get tests in current language
       const { data: languageTests } = await supabase
@@ -43,11 +49,11 @@ export const useTests = () => {
 
       if (!languageTests) return [];
 
-      // Get user tests
+      // Get user tests for the effective user (current or impersonated)
       const { data, error } = await supabase
         .from("user_tests")
         .select("*, tests(*)")
-        .eq("user_id", user.id);
+        .eq("user_id", effectiveUserId!);
 
       if (error) throw error;
 
