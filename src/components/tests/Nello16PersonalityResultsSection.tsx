@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 import { 
   Brain, 
   Target, 
@@ -43,6 +44,7 @@ interface Nello16PersonalityResultsSectionProps {
   };
   userName: string;
   lang: 'pt' | 'pt-pt' | 'en';
+  onContinue?: () => void;
 }
 
 const TEXTS = {
@@ -708,15 +710,15 @@ export function Nello16PersonalityResultsSection({
 
       {/* 13. CTA Final */}
       <div className="flex flex-wrap justify-center gap-4 pt-4">
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2" onClick={handleSave}>
           <BookmarkPlus className="h-4 w-4" />
           {TEXTS.cta.save[lang]}
         </Button>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2" onClick={handleShare}>
           <Share2 className="h-4 w-4" />
           {TEXTS.cta.share[lang]}
         </Button>
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={handleContinue}>
           {TEXTS.cta.continue[lang]}
           <ArrowRight className="h-4 w-4" />
         </Button>

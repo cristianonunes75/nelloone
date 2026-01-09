@@ -23,6 +23,17 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
 
+  // IMPORTANT: when navigating between tests (same route, different params), React Router may reuse
+  // the same component instance. Reset internal state so the next test always starts from the beginning.
+  useEffect(() => {
+    setCurrentQuestionIndex(0);
+    setPendingAnswer(null);
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+      autoSaveTimeoutRef.current = null;
+    }
+  }, [testId, userTestId]);
+
   // Get test info to check if it's paid
   const { data: testInfo } = useQuery({
     queryKey: ["test-info", testId],

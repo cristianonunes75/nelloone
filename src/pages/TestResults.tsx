@@ -885,12 +885,20 @@ function TestResultsInner() {
           />
         )}
 
-        {/* Inteligências Múltiplas Results */}
         {isInteligenciasTest && inteligenciasResults && (
           <InteligenciasResultsSection 
             inteligenciasResults={inteligenciasResults}
             userName={userFirstName}
             lang={lang as 'pt' | 'pt-pt' | 'en'}
+          />
+        )}
+
+        {isMBTITest && mbtiResultData?.type && (
+          <Nello16PersonalityResultsSection
+            mbtiResultData={mbtiResultData}
+            userName={userFirstName}
+            lang={lang as 'pt' | 'pt-pt' | 'en'}
+            onContinue={handleContinueJourney}
           />
         )}
       </div>
