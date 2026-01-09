@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, useLocation } from "react-router-dom";
 
-type UserRole = "admin" | "fotografo" | "cliente";
+type UserRole = "admin" | "cliente";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -39,9 +39,6 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
       switch (userRole) {
         case "admin":
           navigate("/admin");
-          break;
-        case "fotografo":
-          navigate("/fotografo");
           break;
         case "cliente":
           navigate(`${basePath}/cliente`);

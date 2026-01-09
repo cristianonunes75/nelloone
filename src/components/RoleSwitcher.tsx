@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Shield, User, ChevronDown } from "lucide-react";
 
-type UserRole = "admin" | "fotografo" | "cliente";
+type UserRole = "admin" | "cliente";
 
 const roleIcons: Record<string, React.ReactNode> = {
   admin: <Shield className="w-4 h-4" />,
@@ -32,8 +32,8 @@ export const RoleSwitcher = () => {
   const { userRoles, userRole, setActiveRole } = useAuth();
   const navigate = useNavigate();
 
-  // Filter out fotografo role - only show admin and cliente
-  const availableRoles = userRoles?.filter(role => role === "admin" || role === "cliente") || [];
+  // Only show admin and cliente roles
+  const availableRoles = userRoles?.filter((role): role is UserRole => role === "admin" || role === "cliente") || [];
 
   // Only show switcher if user has admin role (can switch between admin/cliente)
   if (!availableRoles.includes("admin")) {
@@ -45,8 +45,7 @@ export const RoleSwitcher = () => {
     navigate(roleRoutes[role]);
   };
 
-  // Determine current display role (map fotografo to cliente for display)
-  const displayRole = userRole === "fotografo" ? "cliente" : userRole;
+  const displayRole = userRole as UserRole;
 
   return (
     <DropdownMenu>
