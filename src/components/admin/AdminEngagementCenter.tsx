@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { 
   Users, 
@@ -20,9 +21,12 @@ import {
   UserX,
   Loader2,
   Copy,
-  Check
+  Check,
+  History
 } from "lucide-react";
 import { differenceInDays } from "date-fns";
+import { CampaignHistory } from "./CampaignHistory";
+import { useAuth } from "@/hooks/useAuth";
 
 type Objective = "welcome" | "reactivation" | "discount" | "urgency" | "testimonial" | "custom";
 
@@ -62,6 +66,8 @@ const objectiveLabels: Record<Objective, { pt: string; icon: React.ReactNode }> 
 };
 
 export default function AdminEngagementCenter() {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<"campaign" | "history">("campaign");
   const [users, setUsers] = useState<InactiveUser[]>([]);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(true);
@@ -207,18 +213,18 @@ export default function AdminEngagementCenter() {
     let errorCount = 0;
 
     try {
-      for (const user of selectedUsers) {
-        if (!user.email) continue;
+      for (const u of selectedUsers) {
+        if (!u.email) continue;
 
         try {
           // Personalize greeting with user's first name
-          const firstName = user.full_name.split(" ")[0];
+          const firstName = u.full_name.split(" ")[0];
           const personalizedGreeting = editedCopy.greeting.replace(/\b(Olá|Oi|Hey|Hi)\s+\w+/i, `$1 ${firstName}`);
 
           const { error } = await supabase.functions.invoke("send-engagement-email", {
             body: {
-              to: user.email,
-              name: user.full_name,
+              to: u.email,
+              name: u.full_name,
               subject: editedCopy.subject,
               greeting: personalizedGreeting,
               body: editedCopy.body,
@@ -234,9 +240,28 @@ export default function AdminEngagementCenter() {
           // Small delay to avoid rate limiting
           await new Promise(resolve => setTimeout(resolve, 500));
         } catch (err) {
-          console.error(`Error sending to ${user.email}:`, err);
+          console.error(`Error sending to ${u.email}:`, err);
           errorCount++;
         }
+      }
+
+      // Save campaign to history
+      if (user?.id) {
+        await supabase.from("engagement_campaigns").insert({
+          objective,
+          coupon_id: selectedCoupon !== "none" ? selectedCoupon : null,
+          coupon_code: selectedCouponData?.code || null,
+          subject: editedCopy.subject,
+          body: editedCopy.body,
+          cta: editedCopy.cta,
+          whatsapp_version: editedCopy.whatsappVersion,
+          recipients_count: selectedUsers.length,
+          sent_count: successCount,
+          failed_count: errorCount,
+          recipient_ids: selectedUsers.map(u => u.id),
+          created_by: user.id,
+          completed_at: new Date().toISOString()
+        });
       }
 
       if (successCount > 0) {
@@ -295,6 +320,25 @@ export default function AdminEngagementCenter() {
           Atualizar
         </Button>
       </div>
+
+      {/* Tabs for Campaign / History */}
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "campaign" | "history")}>
+        <TabsList>
+          <TabsTrigger value="campaign" className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4" />
+            Criar Campanha
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <History className="w-4 h-4" />
+            Histórico
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="history" className="mt-6">
+          <CampaignHistory />
+        </TabsContent>
+
+        <TabsContent value="campaign" className="mt-6 space-y-6">
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -628,6 +672,8 @@ export default function AdminEngagementCenter() {
           )}
         </CardContent>
       </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

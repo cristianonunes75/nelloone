@@ -469,6 +469,77 @@ export type Database = {
           },
         ]
       }
+      engagement_campaigns: {
+        Row: {
+          body: string
+          clicked_count: number
+          completed_at: string | null
+          converted_count: number
+          coupon_code: string | null
+          coupon_id: string | null
+          created_at: string
+          created_by: string | null
+          cta: string | null
+          failed_count: number
+          id: string
+          objective: string
+          opened_count: number
+          recipient_ids: string[] | null
+          recipients_count: number
+          sent_count: number
+          subject: string
+          whatsapp_version: string | null
+        }
+        Insert: {
+          body: string
+          clicked_count?: number
+          completed_at?: string | null
+          converted_count?: number
+          coupon_code?: string | null
+          coupon_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          cta?: string | null
+          failed_count?: number
+          id?: string
+          objective: string
+          opened_count?: number
+          recipient_ids?: string[] | null
+          recipients_count?: number
+          sent_count?: number
+          subject: string
+          whatsapp_version?: string | null
+        }
+        Update: {
+          body?: string
+          clicked_count?: number
+          completed_at?: string | null
+          converted_count?: number
+          coupon_code?: string | null
+          coupon_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          cta?: string | null
+          failed_count?: number
+          id?: string
+          objective?: string
+          opened_count?: number
+          recipient_ids?: string[] | null
+          recipients_count?: number
+          sent_count?: number
+          subject?: string
+          whatsapp_version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagement_campaigns_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       flow_chats: {
         Row: {
           created_at: string | null

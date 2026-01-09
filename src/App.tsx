@@ -42,6 +42,7 @@ const AppRoutes = () => (
     {/* Public routes */}
     <Route path="/" element={<Landing />} />
     <Route path="/auth" element={<Auth />} />
+    <Route path="/login" element={<Auth />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     
     {/* Public spouse report route */}
@@ -77,6 +78,7 @@ const AppRoutes = () => (
     {/* EN Landing and Auth */}
     <Route path="/en" element={<Landing />} />
     <Route path="/en/auth" element={<Auth />} />
+    <Route path="/en/login" element={<Auth />} />
     <Route path="/en/reset-password" element={<ResetPassword />} />
     
     {/* Legal pages - EN with prefix */}
