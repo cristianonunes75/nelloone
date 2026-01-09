@@ -29,6 +29,7 @@ const ReportsManagement2 = lazy(() => import("@/components/admin/ReportsManageme
 const CommunicationManagement = lazy(() => import("@/components/admin/CommunicationManagement").then(m => ({ default: m.CommunicationManagement })));
 const AdminNotificationsHistory = lazy(() => import("@/components/admin/AdminNotificationsHistory").then(m => ({ default: m.AdminNotificationsHistory })));
 const AdminSendReports = lazy(() => import("@/components/admin/AdminSendReports").then(m => ({ default: m.AdminSendReports })));
+const AdminEngagementCenter = lazy(() => import("@/components/admin/AdminEngagementCenter"));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -85,6 +86,7 @@ const Admin = () => {
                 <Route path="/codigo-essencia" element={<AdminCodigoEssencia />} />
                 <Route path="/identidade-visual" element={<AdminBrandIdentity />} />
                 <Route path="/comunicacao" element={<CommunicationManagement />} />
+                <Route path="/engajamento" element={<AdminEngagementCenter />} />
                 <Route path="/enviar-relatorios" element={<AdminSendReports />} />
                 <Route path="/notificacoes-historico" element={<AdminNotificationsHistory />} />
                 <Route path="/permissoes" element={<AdminPermissionsManager />} />
