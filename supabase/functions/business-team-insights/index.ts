@@ -1,0 +1,374 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const logStep = (step: string, details?: Record<string, unknown>) => {
+  console.log(`[business-team-insights] ${step}`, details ? JSON.stringify(details) : "");
+};
+
+serve(async (req: Request): Promise<Response> => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Get user from authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      throw new Error("No authorization header");
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      throw new Error("Invalid authentication");
+    }
+
+    logStep("User authenticated", { userId: user.id });
+
+    const { company_id } = await req.json();
+
+    if (!company_id) {
+      throw new Error("Missing company_id");
+    }
+
+    // Verify user is company admin
+    const { data: companyUser, error: cuError } = await supabase
+      .from("company_users")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("company_id", company_id)
+      .eq("is_active", true)
+      .single();
+
+    if (cuError || !companyUser) {
+      throw new Error("User is not part of this company");
+    }
+
+    if (companyUser.role !== "company_admin" && companyUser.role !== "super_admin") {
+      throw new Error("User does not have permission to view insights");
+    }
+
+    logStep("User authorized", { userRole: companyUser.role });
+
+    // Get all collaborators who share reports
+    const { data: collaborators, error: collabError } = await supabase
+      .from("company_users")
+      .select("user_id")
+      .eq("company_id", company_id)
+      .eq("is_active", true)
+      .eq("share_report_with_company", true)
+      .eq("role", "collaborator");
+
+    if (collabError) {
+      throw new Error("Failed to fetch collaborators");
+    }
+
+    const userIds = collaborators?.map(c => c.user_id) || [];
+    logStep("Found collaborators sharing reports", { count: userIds.length });
+
+    if (userIds.length === 0) {
+      // Return empty insights
+      return new Response(
+        JSON.stringify({
+          success: true,
+          insights: {
+            total_members: 0,
+            completed_assessments: 0,
+            temperament_distribution: {},
+            disc_distribution: {},
+            enneagram_distribution: {},
+            team_strengths: [],
+            team_growth_areas: [],
+            communication_styles: {},
+            conflict_risk_areas: [],
+            leadership_potential_indicators: [],
+            team_building_suggestions: [],
+            management_recommendations: [],
+          },
+        }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Get test results for these users
+    const { data: testResults, error: resultsError } = await supabase
+      .from("test_results")
+      .select("user_id, test_type, scores, primary_result, secondary_result")
+      .in("user_id", userIds);
+
+    if (resultsError) {
+      logStep("Error fetching test results", { error: resultsError.message });
+    }
+
+    logStep("Fetched test results", { count: testResults?.length || 0 });
+
+    // Calculate aggregated insights (without revealing individual data)
+    const insights = calculateTeamInsights(testResults || [], userIds.length);
+
+    // Get total company members
+    const { count: totalMembers } = await supabase
+      .from("company_users")
+      .select("*", { count: "exact", head: true })
+      .eq("company_id", company_id)
+      .eq("is_active", true);
+
+    insights.total_members = totalMembers || 0;
+
+    // Save insights to database
+    const { error: upsertError } = await supabase
+      .from("company_team_insights")
+      .upsert({
+        company_id,
+        ...insights,
+        calculation_member_count: userIds.length,
+        last_calculated_at: new Date().toISOString(),
+      }, {
+        onConflict: "company_id",
+      });
+
+    if (upsertError) {
+      logStep("Error saving insights", { error: upsertError.message });
+    }
+
+    // Log audit
+    await supabase.from("company_audit_logs").insert({
+      company_id,
+      actor_id: user.id,
+      action: "insights_calculated",
+      details: { member_count: userIds.length },
+    });
+
+    return new Response(
+      JSON.stringify({ success: true, insights }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    logStep("Error", { error: errorMessage });
+    
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+});
+
+interface TestResult {
+  user_id: string;
+  test_type: string;
+  scores: Record<string, number> | null;
+  primary_result: string | null;
+  secondary_result: string | null;
+}
+
+function calculateTeamInsights(results: TestResult[], memberCount: number) {
+  const temperamentCounts: Record<string, number> = {};
+  const discCounts: Record<string, number> = {};
+  const enneagramCounts: Record<string, number> = {};
+  const communicationStyles: Record<string, number> = {};
+  
+  const completedUsers = new Set<string>();
+
+  results.forEach(result => {
+    completedUsers.add(result.user_id);
+
+    switch (result.test_type) {
+      case "temperamentos":
+        if (result.primary_result) {
+          temperamentCounts[result.primary_result] = (temperamentCounts[result.primary_result] || 0) + 1;
+        }
+        break;
+      case "disc":
+        if (result.primary_result) {
+          discCounts[result.primary_result] = (discCounts[result.primary_result] || 0) + 1;
+        }
+        break;
+      case "eneagrama":
+        if (result.primary_result) {
+          enneagramCounts[result.primary_result] = (enneagramCounts[result.primary_result] || 0) + 1;
+        }
+        break;
+      case "estilos_conexao":
+        if (result.primary_result) {
+          communicationStyles[result.primary_result] = (communicationStyles[result.primary_result] || 0) + 1;
+        }
+        break;
+    }
+  });
+
+  // Calculate distribution percentages
+  const temperamentDistribution = calculatePercentages(temperamentCounts);
+  const discDistribution = calculatePercentages(discCounts);
+  const enneagramDistribution = calculatePercentages(enneagramCounts);
+
+  // Generate insights based on distributions
+  const teamStrengths = generateStrengths(temperamentDistribution, discDistribution);
+  const teamGrowthAreas = generateGrowthAreas(temperamentDistribution, discDistribution);
+  const conflictRiskAreas = generateConflictRisks(temperamentDistribution, discDistribution);
+  const leadershipIndicators = generateLeadershipIndicators(discDistribution, enneagramDistribution);
+  const teamBuildingSuggestions = generateTeamBuildingSuggestions(temperamentDistribution);
+  const managementRecommendations = generateManagementRecommendations(discDistribution, temperamentDistribution);
+
+  return {
+    total_members: memberCount,
+    completed_assessments: completedUsers.size,
+    temperament_distribution: temperamentDistribution,
+    disc_distribution: discDistribution,
+    enneagram_distribution: enneagramDistribution,
+    team_strengths: teamStrengths,
+    team_growth_areas: teamGrowthAreas,
+    communication_styles: calculatePercentages(communicationStyles),
+    conflict_risk_areas: conflictRiskAreas,
+    leadership_potential_indicators: leadershipIndicators,
+    team_building_suggestions: teamBuildingSuggestions,
+    management_recommendations: managementRecommendations,
+  };
+}
+
+function calculatePercentages(counts: Record<string, number>): Record<string, number> {
+  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+  if (total === 0) return {};
+  
+  const percentages: Record<string, number> = {};
+  for (const [key, count] of Object.entries(counts)) {
+    percentages[key] = Math.round((count / total) * 100);
+  }
+  return percentages;
+}
+
+function generateStrengths(temperament: Record<string, number>, disc: Record<string, number>): string[] {
+  const strengths: string[] = [];
+  
+  if ((temperament["Colérico"] || 0) > 30) {
+    strengths.push("Alta capacidade de execução e liderança");
+  }
+  if ((temperament["Sanguíneo"] || 0) > 30) {
+    strengths.push("Excelente comunicação e entusiasmo");
+  }
+  if ((temperament["Fleumático"] || 0) > 30) {
+    strengths.push("Estabilidade e trabalho em equipe consistente");
+  }
+  if ((temperament["Melancólico"] || 0) > 30) {
+    strengths.push("Atenção a detalhes e qualidade");
+  }
+  
+  if ((disc["D"] || 0) > 30) {
+    strengths.push("Orientação para resultados");
+  }
+  if ((disc["I"] || 0) > 30) {
+    strengths.push("Influência e persuasão");
+  }
+  if ((disc["S"] || 0) > 30) {
+    strengths.push("Cooperação e suporte mútuo");
+  }
+  if ((disc["C"] || 0) > 30) {
+    strengths.push("Precisão e conformidade com padrões");
+  }
+  
+  return strengths.length > 0 ? strengths : ["Dados insuficientes para análise"];
+}
+
+function generateGrowthAreas(temperament: Record<string, number>, disc: Record<string, number>): string[] {
+  const areas: string[] = [];
+  
+  if ((temperament["Colérico"] || 0) < 10 && (disc["D"] || 0) < 10) {
+    areas.push("Desenvolver mais assertividade na tomada de decisões");
+  }
+  if ((temperament["Sanguíneo"] || 0) < 10 && (disc["I"] || 0) < 10) {
+    areas.push("Melhorar comunicação e networking interno");
+  }
+  if ((temperament["Fleumático"] || 0) < 10 && (disc["S"] || 0) < 10) {
+    areas.push("Fortalecer estabilidade e processos");
+  }
+  if ((temperament["Melancólico"] || 0) < 10 && (disc["C"] || 0) < 10) {
+    areas.push("Aumentar foco em qualidade e detalhes");
+  }
+  
+  return areas.length > 0 ? areas : ["Equipe bem equilibrada"];
+}
+
+function generateConflictRisks(temperament: Record<string, number>, disc: Record<string, number>): string[] {
+  const risks: string[] = [];
+  
+  if ((temperament["Colérico"] || 0) > 40) {
+    risks.push("Alto índice de personalidades dominantes pode gerar conflitos de poder");
+  }
+  if ((disc["D"] || 0) > 40 && (disc["S"] || 0) > 30) {
+    risks.push("Tensão entre perfis de ação rápida e perfis de estabilidade");
+  }
+  if ((temperament["Melancólico"] || 0) > 40 && (temperament["Sanguíneo"] || 0) > 30) {
+    risks.push("Diferenças entre perfis detalhistas e perfis mais flexíveis");
+  }
+  
+  return risks.length > 0 ? risks : ["Nenhum risco significativo identificado"];
+}
+
+function generateLeadershipIndicators(disc: Record<string, number>, enneagram: Record<string, number>): string[] {
+  const indicators: string[] = [];
+  
+  if ((disc["D"] || 0) > 20) {
+    indicators.push("Presença de perfis com potencial de liderança diretiva");
+  }
+  if ((disc["I"] || 0) > 20) {
+    indicators.push("Potencial para liderança inspiracional");
+  }
+  if ((enneagram["8"] || 0) > 15) {
+    indicators.push("Líderes naturais orientados a resultados");
+  }
+  if ((enneagram["3"] || 0) > 15) {
+    indicators.push("Perfis orientados a conquistas e metas");
+  }
+  
+  return indicators.length > 0 ? indicators : ["Dados insuficientes para análise de liderança"];
+}
+
+function generateTeamBuildingSuggestions(temperament: Record<string, number>): string[] {
+  const suggestions: string[] = [];
+  
+  suggestions.push("Organizar atividades que equilibrem ação e reflexão");
+  
+  if ((temperament["Sanguíneo"] || 0) > 20) {
+    suggestions.push("Incluir dinâmicas de grupo e interação social");
+  }
+  if ((temperament["Melancólico"] || 0) > 20) {
+    suggestions.push("Reservar tempo para planejamento e preparação individual");
+  }
+  if ((temperament["Fleumático"] || 0) > 20) {
+    suggestions.push("Criar ambiente de confiança e colaboração");
+  }
+  
+  return suggestions;
+}
+
+function generateManagementRecommendations(disc: Record<string, number>, temperament: Record<string, number>): string[] {
+  const recommendations: string[] = [];
+  
+  if ((disc["D"] || 0) > 30) {
+    recommendations.push("Oferecer autonomia e desafios claros para perfis D");
+  }
+  if ((disc["I"] || 0) > 30) {
+    recommendations.push("Criar oportunidades de reconhecimento público para perfis I");
+  }
+  if ((disc["S"] || 0) > 30) {
+    recommendations.push("Manter consistência e comunicação clara para perfis S");
+  }
+  if ((disc["C"] || 0) > 30) {
+    recommendations.push("Fornecer dados e tempo de análise para perfis C");
+  }
+  
+  if ((temperament["Colérico"] || 0) > 30) {
+    recommendations.push("Canalizar energia em projetos de alto impacto");
+  }
+  
+  return recommendations.length > 0 ? recommendations : ["Aplicar gestão situacional conforme perfil individual"];
+}
