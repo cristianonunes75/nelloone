@@ -69,7 +69,8 @@ export default function AdminEngagementCenter() {
   const [sending, setSending] = useState(false);
   
   const [objective, setObjective] = useState<Objective>("reactivation");
-  const [selectedCoupon, setSelectedCoupon] = useState<string>("");
+  // Radix SelectItem não permite value=""; usamos "none" como sentinela
+  const [selectedCoupon, setSelectedCoupon] = useState<string>("none");
   const [customPrompt, setCustomPrompt] = useState("");
   const [generatedCopy, setGeneratedCopy] = useState<GeneratedCopy | null>(null);
   const [editedCopy, setEditedCopy] = useState<GeneratedCopy | null>(null);
@@ -402,7 +403,7 @@ export default function AdminEngagementCenter() {
                   <SelectValue placeholder="Nenhum cupom" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum cupom</SelectItem>
+                  <SelectItem value="none">Nenhum cupom</SelectItem>
                   {coupons.map(c => (
                     <SelectItem key={c.id} value={c.id}>
                       <span className="flex items-center gap-2">
