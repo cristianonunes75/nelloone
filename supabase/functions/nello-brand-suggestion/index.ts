@@ -11,14 +11,15 @@ serve(async (req) => {
   }
 
   try {
-    const { cardType, typeDescription } = await req.json();
+    const { cardType, typeDescription, language = "pt" } = await req.json();
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `Você é o Nello, o guia espiritual e coach de autoconhecimento do NELLO ONE.
+    const systemPrompts: Record<string, string> = {
+      pt: `Você é o Nello, o guia espiritual e coach de autoconhecimento do NELLO ONE.
 O NELLO ONE é uma plataforma de autoconhecimento baseada em ciência e fé cristã, que ajuda pessoas a descobrirem sua essência através de testes de personalidade e análises profundas.
 
 Seu papel é gerar conteúdo para cards de redes sociais da marca. O conteúdo deve ser:
@@ -28,9 +29,23 @@ Seu papel é gerar conteúdo para cards de redes sociais da marca. O conteúdo d
 - Focado em autoconhecimento, identidade e propósito
 - Elegante e sofisticado no tom
 
-IMPORTANTE: Responda APENAS com um JSON válido, sem markdown, sem explicações adicionais.`;
+IMPORTANTE: Responda APENAS com um JSON válido, sem markdown, sem explicações adicionais.`,
+      
+      en: `You are Nello, the spiritual guide and self-knowledge coach of NELLO ONE.
+NELLO ONE is a self-knowledge platform based on science and Christian faith, helping people discover their essence through personality tests and deep analysis.
 
-    const userPrompt = `Gere conteúdo para um card do tipo: ${cardType}
+Your role is to generate content for the brand's social media cards. The content should be:
+- Deep yet accessible
+- Inspiring and reflective
+- Aligned with Christian values (without being forced or invasive)
+- Focused on self-knowledge, identity and purpose
+- Elegant and sophisticated in tone
+
+IMPORTANT: Respond ONLY with valid JSON, no markdown, no additional explanations.`
+    };
+
+    const userPromptTemplates: Record<string, (cardType: string, typeDescription: string) => string> = {
+      pt: (cardType: string, typeDescription: string) => `Gere conteúdo para um card do tipo: ${cardType}
 Descrição: ${typeDescription}
 
 Responda com um JSON contendo os campos relevantes para este tipo de card:
@@ -47,7 +62,30 @@ ${cardType === "cta" ? `- cta: Texto do botão de ação (2-4 palavras)` : ""}
   * 5-8 hashtags relevantes (ex: #autoconhecimento #nelloone #proposito)
   * Emojis adequados ao tom (use com moderação)
 
-Responda SOMENTE com o JSON, sem código markdown ou explicações.`;
+Responda SOMENTE com o JSON, sem código markdown ou explicações.`,
+
+      en: (cardType: string, typeDescription: string) => `Generate content for a ${cardType} card.
+Description: ${typeDescription}
+
+Respond with a JSON containing the relevant fields for this card type:
+- title: Main title (maximum 8 words)
+- subtitle: Category or subtitle (2-3 words)
+- content: Main text (maximum 30 words)
+${cardType === "quote" ? `- scripture: A relevant biblical passage (maximum 15 words)
+- scriptureRef: Biblical reference (e.g., "John 8:32")` : ""}
+${cardType === "cta" ? `- cta: Call-to-action button text (2-4 words)` : ""}
+- caption: A complete caption for Instagram/LinkedIn post with:
+  * Engaging text related to the card theme (3-4 short paragraphs)
+  * 2-3 reflective questions for engagement
+  * A call to action
+  * 5-8 relevant hashtags (e.g., #selfknowledge #nelloone #purpose)
+  * Appropriate emojis (use sparingly)
+
+Respond ONLY with JSON, no markdown code or explanations.`
+    };
+
+    const systemPrompt = systemPrompts[language] || systemPrompts.pt;
+    const userPrompt = (userPromptTemplates[language] || userPromptTemplates.pt)(cardType, typeDescription);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

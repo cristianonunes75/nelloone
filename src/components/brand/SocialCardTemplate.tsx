@@ -17,6 +17,8 @@ interface SocialCardTemplateProps {
   scriptureRef?: string;
   ctaText?: string;
   className?: string;
+  backgroundImage?: string;
+  imageOpacity?: number;
 }
 
 const formatDimensions = {
@@ -36,14 +38,18 @@ export const SocialCardTemplate = ({
   scripture,
   scriptureRef,
   ctaText,
-  className
+  className,
+  backgroundImage,
+  imageOpacity = 0.3
 }: SocialCardTemplateProps) => {
   const dimensions = formatDimensions[format];
   const isLight = theme === "light";
   
-  const bgClass = isLight 
-    ? "bg-gradient-to-br from-[#FAF8F5] to-[#F0EDE8]" 
-    : "bg-gradient-to-br from-[#1C1917] to-[#292524]";
+  const bgClass = backgroundImage 
+    ? "" 
+    : isLight 
+      ? "bg-gradient-to-br from-[#FAF8F5] to-[#F0EDE8]" 
+      : "bg-gradient-to-br from-[#1C1917] to-[#292524]";
   
   const textPrimary = isLight ? "text-[#1C1917]" : "text-white";
   const textSecondary = isLight ? "text-[#57534e]" : "text-white/80";
@@ -230,6 +236,28 @@ export const SocialCardTemplate = ({
         height: dimensions.height
       }}
     >
+      {/* Background Image Layer */}
+      {backgroundImage && (
+        <>
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${backgroundImage})`,
+              opacity: imageOpacity
+            }}
+          />
+          {/* Overlay for text readability */}
+          <div 
+            className={cn(
+              "absolute inset-0",
+              isLight 
+                ? "bg-gradient-to-br from-[#FAF8F5]/80 to-[#F0EDE8]/70" 
+                : "bg-gradient-to-br from-[#1C1917]/80 to-[#292524]/70"
+            )}
+          />
+        </>
+      )}
+      
       {/* Subtle decorative elements */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div 

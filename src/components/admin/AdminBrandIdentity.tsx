@@ -6,7 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Download, Sun, Moon, Sparkles, Loader2, Copy, Check } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Download, Sun, Moon, Sparkles, Loader2, Copy, Check, Image, Upload, Languages } from "lucide-react";
 import { NelloSymbol, NelloSymbolN, NelloSymbolOne } from "@/components/brand/NelloSymbol";
 import { NelloWordmark } from "@/components/brand/NelloWordmark";
 import { SocialCardPreview } from "@/components/brand/SocialCardTemplate";
@@ -16,12 +18,15 @@ import { supabase } from "@/integrations/supabase/client";
 
 type CardFormat = "instagram-feed" | "instagram-portrait" | "stories" | "linkedin";
 type CardType = "institutional" | "educational" | "quote" | "cta" | "feature";
+type ImageStyle = "silhouette" | "hands" | "nature" | "abstract";
+type CardLanguage = "pt" | "en";
 
 export const AdminBrandIdentity = () => {
   const [activeSymbol, setActiveSymbol] = useState<"portal" | "n" | "one">("one");
   const [cardFormat, setCardFormat] = useState<CardFormat>("instagram-feed");
   const [cardType, setCardType] = useState<CardType>("institutional");
   const [cardTheme, setCardTheme] = useState<"light" | "dark">("light");
+  const [cardLanguage, setCardLanguage] = useState<CardLanguage>("pt");
   const [cardTitle, setCardTitle] = useState("Descubra quem você é");
   const [cardSubtitle, setCardSubtitle] = useState("Autoconhecimento");
   const [cardContent, setCardContent] = useState("O caminho começa dentro. Descubra sua essência através de uma jornada guiada por ciência e propósito.");
@@ -32,24 +37,57 @@ export const AdminBrandIdentity = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [captionCopied, setCaptionCopied] = useState(false);
   
+  // Image states
+  const [useImage, setUseImage] = useState(false);
+  const [cardImage, setCardImage] = useState<string | null>(null);
+  const [imageStyle, setImageStyle] = useState<ImageStyle>("silhouette");
+  const [imageOpacity, setImageOpacity] = useState(0.4);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  
   const cardRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const typeDescriptions: Record<CardLanguage, Record<CardType, string>> = {
+    pt: {
+      institutional: "Um card institucional sobre a marca NELLO ONE - plataforma de autoconhecimento cristão",
+      educational: "Um card educativo sobre autoconhecimento, personalidade ou psicologia",
+      quote: "Uma reflexão profunda sobre identidade, propósito ou autoconhecimento com passagem bíblica",
+      cta: "Um card com chamada para ação convidando a pessoa a iniciar sua jornada de autoconhecimento",
+      feature: "Um card destacando uma funcionalidade do NELLO ONE (testes de personalidade, Código da Essência, etc)"
+    },
+    en: {
+      institutional: "An institutional card about the NELLO ONE brand - a Christian self-knowledge platform",
+      educational: "An educational card about self-knowledge, personality or psychology",
+      quote: "A deep reflection about identity, purpose or self-knowledge with a biblical passage",
+      cta: "A call-to-action card inviting people to start their self-knowledge journey",
+      feature: "A card highlighting a NELLO ONE feature (personality tests, Essence Code, etc)"
+    }
+  };
+
+  const imageStyleLabels: Record<CardLanguage, Record<ImageStyle, string>> = {
+    pt: {
+      silhouette: "Silhueta",
+      hands: "Mãos",
+      nature: "Natureza",
+      abstract: "Abstrato"
+    },
+    en: {
+      silhouette: "Silhouette",
+      hands: "Hands",
+      nature: "Nature",
+      abstract: "Abstract"
+    }
+  };
 
   const generateNelloSuggestion = async () => {
     setIsGenerating(true);
     
     try {
-      const typeDescriptions: Record<CardType, string> = {
-        institutional: "Um card institucional sobre a marca NELLO ONE - plataforma de autoconhecimento cristão",
-        educational: "Um card educativo sobre autoconhecimento, personalidade ou psicologia",
-        quote: "Uma reflexão profunda sobre identidade, propósito ou autoconhecimento com passagem bíblica",
-        cta: "Um card com chamada para ação convidando a pessoa a iniciar sua jornada de autoconhecimento",
-        feature: "Um card destacando uma funcionalidade do NELLO ONE (testes de personalidade, Código da Essência, etc)"
-      };
-
       const { data, error } = await supabase.functions.invoke("nello-brand-suggestion", {
         body: {
           cardType,
-          typeDescription: typeDescriptions[cardType]
+          typeDescription: typeDescriptions[cardLanguage][cardType],
+          language: cardLanguage
         }
       });
 
@@ -64,13 +102,52 @@ export const AdminBrandIdentity = () => {
         if (data.cta) setCardCta(data.cta);
         if (data.caption) setPostCaption(data.caption);
         
-        toast.success("Sugestão do Nello aplicada!");
+        toast.success(cardLanguage === "pt" ? "Sugestão do Nello aplicada!" : "Nello's suggestion applied!");
       }
     } catch (error) {
       console.error("Erro ao gerar sugestão:", error);
-      toast.error("Erro ao gerar sugestão. Tente novamente.");
+      toast.error(cardLanguage === "pt" ? "Erro ao gerar sugestão. Tente novamente." : "Error generating suggestion. Try again.");
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const generateImage = async () => {
+    setIsGeneratingImage(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke("nello-brand-image", {
+        body: {
+          style: imageStyle,
+          language: cardLanguage
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.imageUrl) {
+        setCardImage(data.imageUrl);
+        setUseImage(true);
+        toast.success(cardLanguage === "pt" ? "Imagem gerada com sucesso!" : "Image generated successfully!");
+      }
+    } catch (error) {
+      console.error("Erro ao gerar imagem:", error);
+      toast.error(cardLanguage === "pt" ? "Erro ao gerar imagem. Tente novamente." : "Error generating image. Try again.");
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCardImage(reader.result as string);
+        setUseImage(true);
+        toast.success(cardLanguage === "pt" ? "Imagem carregada!" : "Image uploaded!");
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -289,7 +366,8 @@ export const AdminBrandIdentity = () => {
                 <CardTitle className="font-heading">Editor de Cards</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
+                {/* Format, Type, Language Row */}
+                <div className="grid grid-cols-3 gap-3">
                   <div>
                     <Label className="text-xs">Formato</Label>
                     <Select value={cardFormat} onValueChange={(v) => setCardFormat(v as CardFormat)}>
@@ -319,8 +397,21 @@ export const AdminBrandIdentity = () => {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div>
+                    <Label className="text-xs">Idioma</Label>
+                    <Select value={cardLanguage} onValueChange={(v) => setCardLanguage(v as CardLanguage)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pt">🇧🇷 Português</SelectItem>
+                        <SelectItem value="en">🇺🇸 English</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
+                {/* Theme Toggle */}
                 <div className="flex gap-2">
                   <Button
                     variant={cardTheme === "light" ? "default" : "outline"}
@@ -328,7 +419,7 @@ export const AdminBrandIdentity = () => {
                     onClick={() => setCardTheme("light")}
                     className="flex-1"
                   >
-                    <Sun className="h-4 w-4 mr-1" /> Claro
+                    <Sun className="h-4 w-4 mr-1" /> {cardLanguage === "pt" ? "Claro" : "Light"}
                   </Button>
                   <Button
                     variant={cardTheme === "dark" ? "default" : "outline"}
@@ -336,8 +427,107 @@ export const AdminBrandIdentity = () => {
                     onClick={() => setCardTheme("dark")}
                     className="flex-1"
                   >
-                    <Moon className="h-4 w-4 mr-1" /> Escuro
+                    <Moon className="h-4 w-4 mr-1" /> {cardLanguage === "pt" ? "Escuro" : "Dark"}
                   </Button>
+                </div>
+
+                {/* Image Section */}
+                <div className="space-y-3 pt-4 border-t">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-medium flex items-center gap-2">
+                      <Image className="h-3 w-3" />
+                      {cardLanguage === "pt" ? "Imagem de Fundo" : "Background Image"}
+                    </Label>
+                    <Switch
+                      checked={useImage}
+                      onCheckedChange={setUseImage}
+                    />
+                  </div>
+
+                  {useImage && (
+                    <div className="space-y-3 p-3 bg-muted/30 rounded-lg">
+                      <div>
+                        <Label className="text-xs">{cardLanguage === "pt" ? "Estilo" : "Style"}</Label>
+                        <Select value={imageStyle} onValueChange={(v) => setImageStyle(v as ImageStyle)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="silhouette">{imageStyleLabels[cardLanguage].silhouette}</SelectItem>
+                            <SelectItem value="hands">{imageStyleLabels[cardLanguage].hands}</SelectItem>
+                            <SelectItem value="nature">{imageStyleLabels[cardLanguage].nature}</SelectItem>
+                            <SelectItem value="abstract">{imageStyleLabels[cardLanguage].abstract}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={generateImage}
+                          disabled={isGeneratingImage}
+                        >
+                          {isGeneratingImage ? (
+                            <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                          ) : (
+                            <Sparkles className="h-4 w-4 mr-1" />
+                          )}
+                          {cardLanguage === "pt" ? "Gerar IA" : "Generate AI"}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <Upload className="h-4 w-4 mr-1" />
+                          {cardLanguage === "pt" ? "Upload" : "Upload"}
+                        </Button>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                        />
+                      </div>
+
+                      <div>
+                        <Label className="text-xs">{cardLanguage === "pt" ? "Opacidade" : "Opacity"}: {Math.round(imageOpacity * 100)}%</Label>
+                        <Slider
+                          value={[imageOpacity]}
+                          onValueChange={(v) => setImageOpacity(v[0])}
+                          min={0.1}
+                          max={1}
+                          step={0.1}
+                          className="mt-2"
+                        />
+                      </div>
+
+                      {cardImage && (
+                        <div className="relative">
+                          <img
+                            src={cardImage}
+                            alt="Preview"
+                            className="w-full h-20 object-cover rounded"
+                          />
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-1 right-1 h-6 w-6 p-0"
+                            onClick={() => {
+                              setCardImage(null);
+                              setUseImage(false);
+                            }}
+                          >
+                            ×
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-3 pt-4 border-t">
@@ -450,6 +640,8 @@ export const AdminBrandIdentity = () => {
                       scripture={cardScripture}
                       scriptureRef={cardScriptureRef}
                       ctaText={cardCta}
+                      backgroundImage={useImage ? cardImage || undefined : undefined}
+                      imageOpacity={imageOpacity}
                     />
                   </div>
                 </div>

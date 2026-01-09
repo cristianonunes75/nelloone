@@ -69,6 +69,9 @@ verify_jwt = true
 [functions.nello-brand-suggestion]
 verify_jwt = true
 
+[functions.nello-brand-image]
+verify_jwt = true
+
 [functions.update-stripe-coupon]
 verify_jwt = true
 
