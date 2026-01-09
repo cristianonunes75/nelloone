@@ -71,29 +71,29 @@ const Admin = () => {
           <main className="flex-1 p-6 lg:p-8 overflow-auto">
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
-                <Route path="/" element={<AdminDashboard />} />
-                <Route path="/tempo-real" element={<RealtimeDashboard />} />
-                <Route path="/relatorios" element={<ReportsManagement2 />} />
-                <Route path="/visitantes" element={<AdminRealtimeVisitors />} />
-                <Route path="/jornadas" element={<AdminJourneyDashboard />} />
-                <Route path="/afiliados" element={<AffiliatesManagement />} />
-                <Route path="/usuarios" element={<AdminUsersJourneys />} />
-                <Route path="/usuarios" element={<AdminUsersJourneys />} />
-                <Route path="/pedidos" element={<AdminOrdersPayments />} />
-                <Route path="/produtos" element={<AdminProductsTests />} />
-                <Route path="/cupons" element={<AdminCoupons />} />
-                <Route path="/depoimentos" element={<TestimonialsManagement />} />
-                <Route path="/codigo-essencia" element={<AdminCodigoEssencia />} />
-                <Route path="/identidade-visual" element={<AdminBrandIdentity />} />
-                <Route path="/comunicacao" element={<CommunicationManagement />} />
-                <Route path="/engajamento" element={<AdminEngagementCenter />} />
-                <Route path="/enviar-relatorios" element={<AdminSendReports />} />
-                <Route path="/notificacoes-historico" element={<AdminNotificationsHistory />} />
-                <Route path="/permissoes" element={<AdminPermissionsManager />} />
-                <Route path="/limpeza" element={<DataCleanupTool />} />
-                <Route path="/notificacoes" element={<NotificationAutomation />} />
-                <Route path="/logs" element={<AdminLogs />} />
-                <Route path="/configuracoes" element={<AdminSettings />} />
+                <Route index element={<AdminDashboard />} />
+                <Route path="tempo-real" element={<RealtimeDashboard />} />
+                <Route path="relatorios" element={<ReportsManagement2 />} />
+                <Route path="visitantes" element={<AdminRealtimeVisitors />} />
+                <Route path="jornadas" element={<AdminJourneyDashboard />} />
+                <Route path="afiliados" element={<AffiliatesManagement />} />
+                <Route path="usuarios" element={<AdminUsersJourneys />} />
+                <Route path="pedidos" element={<AdminOrdersPayments />} />
+                <Route path="produtos" element={<AdminProductsTests />} />
+                <Route path="cupons" element={<AdminCoupons />} />
+                <Route path="depoimentos" element={<TestimonialsManagement />} />
+                <Route path="codigo-essencia" element={<AdminCodigoEssencia />} />
+                <Route path="identidade-visual" element={<AdminBrandIdentity />} />
+                <Route path="comunicacao" element={<CommunicationManagement />} />
+                <Route path="engajamento" element={<AdminEngagementCenter />} />
+                <Route path="enviar-relatorios" element={<AdminSendReports />} />
+                <Route path="notificacoes-historico" element={<AdminNotificationsHistory />} />
+                <Route path="permissoes" element={<AdminPermissionsManager />} />
+                <Route path="limpeza" element={<DataCleanupTool />} />
+                <Route path="notificacoes" element={<NotificationAutomation />} />
+                <Route path="logs" element={<AdminLogs />} />
+                <Route path="configuracoes" element={<AdminSettings />} />
+                <Route path="*" element={<AdminDashboard />} />
               </Routes>
             </Suspense>
           </main>
