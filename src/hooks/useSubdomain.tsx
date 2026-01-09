@@ -127,6 +127,8 @@ export function getNelloAppUrl(app: NelloApp): string {
       return `https://flow.${baseDomain}`;
     case 'life':
       return `https://life.${baseDomain}`;
+    case 'business':
+      return `https://business.${baseDomain}`;
     case 'one':
       return `https://one.${baseDomain}`;
     case 'main':

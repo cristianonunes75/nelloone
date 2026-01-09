@@ -86,3 +86,9 @@ verify_jwt = true
 
 [functions.send-engagement-email]
 verify_jwt = true
+
+[functions.business-invite]
+verify_jwt = true
+
+[functions.business-team-insights]
+verify_jwt = true

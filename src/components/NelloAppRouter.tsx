@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { useNelloApp } from '@/contexts/NelloAppContext';
 import FlowApp from '@/apps/flow/FlowApp';
 import LifeApp from '@/apps/life/LifeApp';
+import BusinessApp from '@/apps/business/BusinessApp';
 
 interface NelloAppRouterProps {
   children: ReactNode; // Nello One routes (default)
@@ -12,6 +13,7 @@ interface NelloAppRouterProps {
  * 
  * - flow.nello.one → Nello Flow
  * - life.nello.one → Nello Life  
+ * - business.nello.one → Nello One Business
  * - one.nello.one or nello.one → Nello One (default)
  */
 export function NelloAppRouter({ children }: NelloAppRouterProps) {
@@ -22,6 +24,8 @@ export function NelloAppRouter({ children }: NelloAppRouterProps) {
       return <FlowApp />;
     case 'life':
       return <LifeApp />;
+    case 'business':
+      return <BusinessApp />;
     case 'one':
     case 'main':
     default:
