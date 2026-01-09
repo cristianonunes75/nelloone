@@ -28,7 +28,7 @@ import {
   BarChart3,
   Heart,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { getMissingTests } from "@/lib/pdfCodigoEssencia";
 import { generateCodigoEssenciaPremiumPDF, generateCodigoEssenciaPremiumPDFBase64 } from "@/lib/pdfCodigoEssenciaPremium";
 import { 
@@ -181,11 +181,14 @@ const TRANSLATIONS = {
 
 const CodigoEssenciaInner = () => {
   const { profile, user } = useAuth();
-  const journeyData = useJourneyProgress();
-  const codigoData = useCodigoEssencia();
+  const [searchParams] = useSearchParams();
+  const targetUserId = searchParams.get('user') || undefined;
+  
+  const journeyData = useJourneyProgress(targetUserId);
+  const codigoData = useCodigoEssencia(targetUserId);
   
   const { isJourneyComplete = false, testResults = {}, completedCount = 0, totalSteps = 7, isLoading: journeyLoading = true } = journeyData || {};
-  const { hasSavedCodigo = false, savedCodigo = null, saveCodigo, resetCodigo, isLoading: codigoLoading = true, canRegenerate = false, isAdmin = false } = codigoData || {};
+  const { hasSavedCodigo = false, savedCodigo = null, saveCodigo, resetCodigo, isLoading: codigoLoading = true, canRegenerate = false, isAdmin = false, targetProfile, isViewingOtherUser = false } = codigoData || {};
   
   const isLoading = journeyLoading || codigoLoading;
   const navigate = useNavigate();
@@ -199,7 +202,12 @@ const CodigoEssenciaInner = () => {
   const lang = (language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt') as LangKey;
   const t = TRANSLATIONS[lang];
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
-  const userName = profile?.full_name || (lang === 'en' ? "Traveler" : "Viajante");
+  
+  // Use target profile name when viewing as admin, otherwise use current user's profile
+  const displayName = isViewingOtherUser && targetProfile?.full_name 
+    ? targetProfile.full_name 
+    : (profile?.full_name || (lang === 'en' ? "Traveler" : "Viajante"));
+  const userName = displayName;
   const firstName = userName?.split(' ')[0] || (lang === 'en' ? "Traveler" : "Viajante");
 
   const canGenerateReport = isJourneyComplete;

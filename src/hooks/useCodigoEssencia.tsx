@@ -31,11 +31,15 @@ interface SavedCodigo {
   version: number;
 }
 
-export const useCodigoEssencia = () => {
+export const useCodigoEssencia = (targetUserId?: string) => {
   const { user } = useAuth();
   const [savedCodigo, setSavedCodigo] = useState<SavedCodigo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [targetProfile, setTargetProfile] = useState<{ full_name: string } | null>(null);
+
+  // The userId to use - either the target (for admin viewing another user) or current user
+  const effectiveUserId = targetUserId || user?.id;
 
   // Check admin status
   useEffect(() => {
@@ -48,10 +52,27 @@ export const useCodigoEssencia = () => {
     checkAdmin();
   }, [user?.id]);
 
+  // Load target user profile when viewing as admin
+  useEffect(() => {
+    const loadTargetProfile = async () => {
+      if (targetUserId && targetUserId !== user?.id) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", targetUserId)
+          .maybeSingle();
+        setTargetProfile(data);
+      } else {
+        setTargetProfile(null);
+      }
+    };
+    loadTargetProfile();
+  }, [targetUserId, user?.id]);
+
   // Load existing codigo from database (using mapa_essencia table for now)
   useEffect(() => {
     const loadCodigo = async () => {
-      if (!user?.id) {
+      if (!effectiveUserId) {
         setIsLoading(false);
         return;
       }
@@ -60,7 +81,7 @@ export const useCodigoEssencia = () => {
         const { data, error } = await supabase
           .from("mapa_essencia")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", effectiveUserId)
           .maybeSingle();
 
         if (error) {
@@ -83,7 +104,7 @@ export const useCodigoEssencia = () => {
     };
 
     loadCodigo();
-  }, [user?.id]);
+  }, [effectiveUserId]);
 
   // Save codigo to database
   const saveCodigo = useCallback(
@@ -201,5 +222,7 @@ export const useCodigoEssencia = () => {
     currentVersion: savedCodigo?.version || 0,
     isAdmin,
     unlockRegeneration,
+    targetProfile,
+    isViewingOtherUser: !!targetUserId && targetUserId !== user?.id,
   };
 };

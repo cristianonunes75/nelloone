@@ -1,6 +1,9 @@
 import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTests } from "./useTests";
 import { useTestAccess } from "./useTestAccess";
+import { useAuth } from "./useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { TEST_TYPE_TO_SLUG } from "@/utils/journey";
 
 // Define the sequential order of tests in the NELLO ONE journey
@@ -43,9 +46,31 @@ export interface JourneyStep {
   needsContinuation: boolean; // User paid, needs to continue full version
 }
 
-export function useJourneyProgress() {
-  const { tests, userTests, getTestStatus, isLoading } = useTests();
+export function useJourneyProgress(targetUserId?: string) {
+  const { user } = useAuth();
+  const effectiveUserId = targetUserId || user?.id;
+  const isViewingOther = !!targetUserId && targetUserId !== user?.id;
+  
+  const { tests, userTests: currentUserTests, getTestStatus, isLoading: testsLoading } = useTests();
   const { hasPurchased } = useTestAccess();
+
+  // When viewing another user (admin), fetch their user_tests directly
+  const { data: targetUserTests, isLoading: targetLoading } = useQuery({
+    queryKey: ["target-user-tests", targetUserId],
+    enabled: isViewingOther,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_tests")
+        .select("*, tests(*)")
+        .eq("user_id", targetUserId!);
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Use target user tests when viewing another user, otherwise use current user's
+  const userTests = isViewingOther ? targetUserTests : currentUserTests;
+  const isLoading = testsLoading || (isViewingOther && targetLoading);
 
   const journeySteps = useMemo<JourneyStep[]>(() => {
     if (!tests) return [];
@@ -71,11 +96,20 @@ export function useJourneyProgress() {
       const test = testByType.get(journeySlug);
       if (!test) return null;
 
-      const baseStatus = getTestStatus(test.id);
-      const isPurchased = hasPurchased(test.id);
+      // When viewing another user, derive status from their user_tests directly
+      const userTest = userTests?.find(ut => {
+        // Match by test type since test IDs may differ across languages
+        const utTest = ut.tests as any;
+        return utTest?.type === test.type || ut.test_id === test.id;
+      });
       
-      // Find the user_test record to check result_data
-      const userTest = userTests?.find(ut => ut.test_id === test.id);
+      // Get base status from userTest or fallback
+      const baseStatus = isViewingOther 
+        ? (userTest?.status as "not_started" | "in_progress" | "completed" || "not_started")
+        : getTestStatus(test.id);
+      
+      const isPurchased = isViewingOther ? true : hasPurchased(test.id); // Assume purchased for admin view
+      
       const resultData = userTest?.result_data as any;
       
       // Determine extended status for freemium tests
@@ -142,7 +176,7 @@ export function useJourneyProgress() {
         needsContinuation,
       };
     }).filter(Boolean) as JourneyStep[];
-  }, [tests, userTests, getTestStatus, hasPurchased]);
+  }, [tests, userTests, getTestStatus, hasPurchased, isViewingOther]);
 
   const completedTests = useMemo(() => {
     return journeySteps.filter(step => 
