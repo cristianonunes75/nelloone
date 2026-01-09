@@ -19,6 +19,7 @@ import {
   Shield,
   BarChart3,
   Send,
+  Target,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -71,6 +72,7 @@ const menuSections = [
   {
     label: "COMUNICAÇÃO",
     items: [
+      { title: "Engajamento", url: "/admin/engajamento", icon: Target },
       { title: "Inbox", url: "/admin/comunicacao", icon: MessageSquareHeart },
       { title: "Enviar Relatórios", url: "/admin/enviar-relatorios", icon: Send },
       { title: "Histórico Push", url: "/admin/notificacoes-historico", icon: Bell },
