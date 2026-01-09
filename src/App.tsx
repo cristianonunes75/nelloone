@@ -353,6 +353,15 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     />
+    {/* Admin view route for viewing any user's codigo */}
+    <Route
+      path="/codigo-da-essencia/view"
+      element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+          <CodigoEssencia />
+        </ProtectedRoute>
+      }
+    />
     <Route
       path="/essence-code"
       element={
