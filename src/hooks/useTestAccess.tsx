@@ -1,21 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useImpersonate } from "@/contexts/ImpersonateContext";
 
 export const useTestAccess = () => {
   const { user, userRole } = useAuth();
+  const { impersonatedUserId, isImpersonating } = useImpersonate();
+  
+  // Use impersonated user if active
+  const effectiveUserId = isImpersonating ? impersonatedUserId : user?.id;
 
-  // Fetch test purchases for current user - include test type and purchase_category for cross-language and bundle matching
+  // Fetch test purchases for effective user - include test type and purchase_category for cross-language and bundle matching
   const { data: purchases } = useQuery({
-    queryKey: ["test-purchases", user?.id],
-    enabled: !!user,
+    queryKey: ["test-purchases", effectiveUserId],
+    enabled: !!effectiveUserId,
     queryFn: async () => {
-      if (!user) return [];
+      if (!effectiveUserId) return [];
 
       const { data, error } = await supabase
         .from("test_purchases")
         .select("test_id, payment_status, purchase_category, tests(type)")
-        .eq("user_id", user.id)
+        .eq("user_id", effectiveUserId)
         .eq("payment_status", "completed");
 
       if (error) throw error;

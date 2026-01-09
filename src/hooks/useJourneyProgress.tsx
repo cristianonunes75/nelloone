@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTests } from "./useTests";
 import { useTestAccess } from "./useTestAccess";
 import { useAuth } from "./useAuth";
+import { useImpersonate } from "@/contexts/ImpersonateContext";
 import { supabase } from "@/integrations/supabase/client";
 import { TEST_TYPE_TO_SLUG } from "@/utils/journey";
 
@@ -48,21 +49,24 @@ export interface JourneyStep {
 
 export function useJourneyProgress(targetUserId?: string) {
   const { user } = useAuth();
-  const effectiveUserId = targetUserId || user?.id;
-  const isViewingOther = !!targetUserId && targetUserId !== user?.id;
+  const { impersonatedUserId, isImpersonating } = useImpersonate();
+  
+  // Use impersonated user if active, otherwise use targetUserId or current user
+  const effectiveUserId = targetUserId || (isImpersonating ? impersonatedUserId : user?.id);
+  const isViewingOther = (!!targetUserId && targetUserId !== user?.id) || isImpersonating;
   
   const { tests, userTests: currentUserTests, getTestStatus, isLoading: testsLoading } = useTests();
   const { hasPurchased } = useTestAccess();
 
-  // When viewing another user (admin), fetch their user_tests directly
+  // When viewing another user (admin impersonate), fetch their user_tests directly
   const { data: targetUserTests, isLoading: targetLoading } = useQuery({
-    queryKey: ["target-user-tests", targetUserId],
-    enabled: isViewingOther,
+    queryKey: ["target-user-tests", effectiveUserId],
+    enabled: isViewingOther && !!effectiveUserId,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("user_tests")
         .select("*, tests(*)")
-        .eq("user_id", targetUserId!);
+        .eq("user_id", effectiveUserId!);
       if (error) throw error;
       return data || [];
     },
