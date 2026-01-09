@@ -138,18 +138,13 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
         throw new Error(data?.error || 'Failed to create session');
       }
 
-      // Store session in sessionStorage (not URL) for security
-      const sessionData = {
-        userId: user.id,
-        userName: user.full_name,
-        sessionToken: data.sessionToken
-      };
-      sessionStorage.setItem('nello_impersonation_session', JSON.stringify(sessionData));
-
-      // Open client page without token in URL
-      window.open(`${window.location.origin}/cliente`, '_blank');
+      // Open client page WITH token in URL (required for new tab to receive the session)
+      const impersonateUrl = `${window.location.origin}/cliente?impersonate=${data.sessionToken}`;
+      window.open(impersonateUrl, '_blank');
       
-      toast.success(`Simulando como ${user.full_name}`);
+      toast.success(`Simulando como ${user.full_name}`, {
+        description: "Uma nova aba foi aberta com a sessão do usuário"
+      });
     } catch (error) {
       console.error("Error creating impersonation session:", error);
       toast.error("Erro ao criar sessão de simulação");
