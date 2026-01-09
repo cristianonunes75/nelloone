@@ -989,20 +989,29 @@ export const getInteligenciasResults = (answers: InteligenciasAnswer[]): Intelig
   answers.forEach((answer) => {
     const questionNumber = answer.test_questions.question_number;
     const intelligence = QUESTION_INTELLIGENCE_MAP[questionNumber];
-    
-    if (intelligence) {
-      // Handle different answer formats
-      let value = 0;
-      if (typeof answer.answer === 'number') {
-        value = answer.answer;
-      } else if (typeof answer.answer === 'object' && answer.answer?.value !== undefined) {
-        value = answer.answer.value;
-      } else if (typeof answer.answer === 'string') {
-        value = parseInt(answer.answer, 10) || 0;
+
+    if (!intelligence) return;
+
+    // Handle different answer formats safely
+    const coerceToNumber = (v: unknown): number => {
+      if (typeof v === "number") return Number.isFinite(v) ? v : 0;
+      if (typeof v === "string") {
+        const n = Number(v);
+        if (Number.isFinite(n)) return n;
+        const intN = parseInt(v, 10);
+        return Number.isFinite(intN) ? intN : 0;
       }
-      
-      scores[intelligence] += value;
-    }
+      if (typeof v === "boolean") return v ? 1 : 0;
+      return 0;
+    };
+
+    const raw =
+      typeof answer.answer === "object" && answer.answer !== null && "value" in (answer.answer as any)
+        ? (answer.answer as any).value
+        : answer.answer;
+
+    const value = coerceToNumber(raw);
+    scores[intelligence] = (scores[intelligence] || 0) + value;
   });
 
   // Max score per intelligence (5 questions × 5 max points = 25)

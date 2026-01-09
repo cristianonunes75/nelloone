@@ -61,6 +61,16 @@ export default function TestExecution() {
     tertiary?: { archetype: string; score: number };
   } | null>(null);
 
+  // Reset UI-only state when switching between tests (route params change, component may be reused)
+  useEffect(() => {
+    setSelectedAnswer("");
+    setShowUpgradeDialog(false);
+    setShowWelcome(true);
+    setShowInteligenciasIntro(true);
+    setShowCelebration(false);
+    setPartialArchetypes(null);
+  }, [testId, userTestId]);
+
   // Get bundle price for the current language
   const bundlePrice = getBundlePriceForLanguage(language);
 
