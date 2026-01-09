@@ -5,13 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle, CreditCard, Sparkles, Check } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { calculateArchetypeScores, getDominantArchetypes } from "@/lib/archetypes";
 import { getArchetypeText, getArchetypeEmoji, getArchetypeTitle } from "@/lib/archetypeCopyLibrary";
+import { getBundlePriceForLanguage, getCurrencyForLanguage } from "@/lib/priceConfig";
+import { getAffiliateCode } from "@/hooks/useAffiliateTracking";
+import { useToast } from "@/hooks/use-toast";
 import { getDISCResults } from "@/lib/disc";
 import { getMBTIResults } from "@/lib/mbti";
 import { getEnneagramResults } from "@/lib/eneagrama";
@@ -50,11 +53,78 @@ export default function TestExecution() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [navigationDirection, setNavigationDirection] = useState<"left" | "right">("left");
   const [testStartTime] = useState<Date>(new Date());
+  const [isProcessingPurchase, setIsProcessingPurchase] = useState(false);
+  const { toast } = useToast();
   const [partialArchetypes, setPartialArchetypes] = useState<{
     primary: { archetype: string; score: number };
     secondary?: { archetype: string; score: number };
     tertiary?: { archetype: string; score: number };
   } | null>(null);
+
+  // Get bundle price for the current language
+  const bundlePrice = getBundlePriceForLanguage(language);
+
+  // Handle purchase of the complete journey
+  const handlePurchaseJourney = async () => {
+    try {
+      setIsProcessingPurchase(true);
+      
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      
+      if (!currentUser) {
+        navigate("/auth?redirect=purchase");
+        return;
+      }
+
+      // Save pending test info for redirect after payment
+      if (testId && userTestId) {
+        sessionStorage.setItem("pendingTestId", testId);
+        sessionStorage.setItem("pendingUserTestId", userTestId);
+      }
+
+      // Create checkout session for the complete journey bundle
+      const currency = getCurrencyForLanguage(language).toLowerCase();
+      const affiliateCode = getAffiliateCode();
+      
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: {
+          isBundle: true,
+          productType: "jornada_completa",
+          userId: currentUser.id,
+          userEmail: currentUser.email,
+          language: language,
+          currency: currency,
+          affiliateCode: affiliateCode,
+        },
+      });
+
+      if (error) throw error;
+
+      // Handle cross-trade block
+      if (data?.code === "CURRENCY_MISMATCH") {
+        toast({
+          title: language === 'en' ? "Currency Error" : "Erro de Moeda",
+          description: data.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Redirect to Stripe checkout
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error: any) {
+      console.error("Purchase error:", error);
+      toast({
+        title: language === 'en' ? "Payment Error" : "Erro ao processar pagamento",
+        description: error.message || (language === 'en' ? "Try again shortly." : "Tente novamente em alguns instantes."),
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessingPurchase(false);
+    }
+  };
 
   const {
     questions,
@@ -702,41 +772,80 @@ export default function TestExecution() {
                 </p>
               </div>
 
-              {/* CTAs */}
-              <div className="flex flex-col gap-4 max-w-md mx-auto">
-                <Button
-                  onClick={() => navigate(`${basePath}/cliente`)}
+              {/* Purchase CTA - Complete Journey Offer */}
+              <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-xl p-8 border border-primary/20 space-y-6">
+                <div className="text-center space-y-2">
+                  <div className="flex items-center justify-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    <h3 className="text-xl font-semibold">
+                      {language === 'en' ? 'Unlock Your Complete Journey' : 'Desbloqueie sua Jornada Completa'}
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {language === 'en' 
+                      ? 'Your first answers have already revealed powerful insights about you.'
+                      : 'Suas primeiras respostas já revelaram insights poderosos sobre você.'}
+                  </p>
+                </div>
+
+                {/* Benefits list */}
+                <div className="space-y-2">
+                  {[
+                    language === 'en' ? '7 complete personality tests' : '7 testes de personalidade completos',
+                    language === 'en' ? 'Essence Code (Your unique identity map)' : 'Código da Essência (Mapa único de quem você é)',
+                    language === 'en' ? 'Premium PDF reports' : 'Relatórios Premium em PDF',
+                    language === 'en' ? 'Lifetime access to all results' : 'Acesso vitalício a todos os resultados',
+                  ].map((benefit, index) => (
+                    <div key={index} className="flex items-center gap-2 text-sm">
+                      <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                      <span>{benefit}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Price box */}
+                <div className="bg-background/50 border border-primary/20 rounded-lg p-4">
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-sm text-muted-foreground line-through">
+                      {language === 'en' ? 'From ' : 'De '}{bundlePrice.symbol}{bundlePrice.original}
+                    </span>
+                    <span className="text-2xl font-bold text-primary">
+                      {bundlePrice.symbol}{bundlePrice.price}
+                    </span>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={handlePurchaseJourney} 
+                  disabled={isProcessingPurchase}
+                  className="w-full h-14 text-lg font-medium"
                   size="lg"
-                  className="w-full h-14 text-lg font-light bg-foreground text-background hover:bg-foreground/90"
                 >
-                  Continuar Jornada
+                  <CreditCard className="w-5 h-5 mr-2" />
+                  {isProcessingPurchase 
+                    ? (language === 'en' ? 'Processing...' : 'Processando...')
+                    : (language === 'en' ? 'Unlock Complete Journey' : 'Desbloquear Jornada Completa')}
                 </Button>
+
+                <div className="text-xs text-center text-muted-foreground space-y-1">
+                  <p>✅ {language === 'en' ? 'Instant access after payment' : 'Acesso imediato após pagamento'}</p>
+                  <p>✅ {language === 'en' ? 'Continue where you left off' : 'Continua de onde parou'}</p>
+                </div>
+              </div>
+
+              {/* Secondary CTA */}
+              <div className="flex flex-col gap-3 max-w-md mx-auto">
                 <Button
                   variant="ghost"
                   onClick={() => navigate(`${basePath}/cliente`)}
                   className="w-full font-light text-muted-foreground"
                 >
-                  Ver depois
+                  {language === 'en' ? 'View later' : 'Ver depois'}
                 </Button>
               </div>
             </div>
           </CardContent>
         </Card>
-
-        <PurchaseTestDialog
-          open={!showUpgradeDialog && testDetails !== undefined}
-          onOpenChange={(open) => {
-            if (!open) {
-              setShowUpgradeDialog(true);
-            }
-          }}
-          testId={testId!}
-          testName={testDetails?.name || ""}
-          price={testDetails?.price_brl ? parseFloat(testDetails.price_brl.toString()) : 29}
-          isFreeTest={isFreeTest}
-          answeredQuestions={currentQuestionIndex}
-          userTestId={userTestId}
-        />
       </div>
     );
   }
