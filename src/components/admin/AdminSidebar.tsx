@@ -19,6 +19,7 @@ import {
   BarChart3,
   Send,
   Target,
+  Building2,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -39,6 +40,7 @@ const menuSections = [
     label: "MÉTRICAS",
     items: [
       { title: "Dashboard", url: "/admin", icon: Home, exact: true },
+      { title: "Business", url: "/admin/business", icon: Building2 },
       { title: "Tempo Real", url: "/admin/tempo-real", icon: Zap },
       { title: "Relatórios", url: "/admin/relatorios", icon: BarChart3 },
       { title: "Visitantes", url: "/admin/visitantes", icon: Eye },

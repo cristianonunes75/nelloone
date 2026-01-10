@@ -9,6 +9,7 @@ import { RoleSwitcher } from "@/components/RoleSwitcher";
 
 // Lazy load admin modules
 const AdminDashboard = lazy(() => import("@/components/admin/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
+const AdminBusinessDashboard = lazy(() => import("@/components/admin/AdminBusinessDashboard").then(m => ({ default: m.AdminBusinessDashboard })));
 const RealtimeDashboard = lazy(() => import("@/components/admin/RealtimeDashboard").then(m => ({ default: m.RealtimeDashboard })));
 const AdminJourneyDashboard = lazy(() => import("@/components/admin/AdminJourneyDashboard").then(m => ({ default: m.AdminJourneyDashboard })));
 const AdminUsersUnified = lazy(() => import("@/components/admin/AdminUsersUnified").then(m => ({ default: m.default })));
@@ -72,6 +73,7 @@ const Admin = () => {
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
                 <Route index element={<AdminDashboard />} />
+                <Route path="business" element={<AdminBusinessDashboard />} />
                 <Route path="tempo-real" element={<RealtimeDashboard />} />
                 <Route path="relatorios" element={<ReportsManagement2 />} />
                 <Route path="visitantes" element={<AdminRealtimeVisitors />} />
