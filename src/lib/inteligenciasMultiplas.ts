@@ -987,6 +987,11 @@ export const getInteligenciasResults = (answers: InteligenciasAnswer[]): Intelig
 
   // Calculate scores based on question number
   answers.forEach((answer) => {
+    // Defensive check: ensure test_questions exists
+    if (!answer.test_questions || typeof answer.test_questions.question_number !== 'number') {
+      return;
+    }
+    
     const questionNumber = answer.test_questions.question_number;
     const intelligence = QUESTION_INTELLIGENCE_MAP[questionNumber];
 

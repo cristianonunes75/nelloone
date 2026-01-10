@@ -487,8 +487,26 @@ function TestResultsInner() {
 
   // Calculate Inteligencias Multiplas results
   let inteligenciasResults: InteligenciasResult | null = null;
-  if (isInteligenciasTest && answers && answers.length > 0) {
-    inteligenciasResults = getInteligenciasResults(answers as any);
+  if (isInteligenciasTest) {
+    // Try to calculate from answers first
+    if (answers && answers.length > 0) {
+      inteligenciasResults = getInteligenciasResults(answers as any);
+    }
+    
+    // Fallback to result_data if calculation failed or no answers
+    // Validate that scores are actual numbers (not corrupted strings)
+    if (!inteligenciasResults || !inteligenciasResults.ranking?.length) {
+      const savedData = userTest.result_data as any;
+      if (savedData?.ranking && Array.isArray(savedData.ranking) && savedData.ranking.length > 0) {
+        // Validate scores are numbers, not corrupted strings
+        const hasValidScores = savedData.ranking.every(
+          (r: any) => typeof r.score === 'number' && typeof r.percentage === 'number'
+        );
+        if (hasValidScores) {
+          inteligenciasResults = savedData as InteligenciasResult;
+        }
+      }
+    }
   }
 
   // Calculate Estilos de Conexão Afetiva results
@@ -887,12 +905,46 @@ function TestResultsInner() {
           />
         )}
 
-        {isInteligenciasTest && inteligenciasResults && (
+        {isInteligenciasTest && inteligenciasResults && inteligenciasResults.ranking?.length > 0 && (
           <InteligenciasResultsSection 
             inteligenciasResults={inteligenciasResults}
             userName={userFirstName}
             lang={lang as 'pt' | 'pt-pt' | 'en'}
           />
+        )}
+
+        {/* Fallback for Inteligencias when results couldn't be calculated */}
+        {isInteligenciasTest && (!inteligenciasResults || !inteligenciasResults.ranking?.length) && answers && answers.length > 0 && (
+          <Card className="border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20">
+            <CardContent className="pt-6 text-center space-y-4">
+              <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto" />
+              <h2 className="text-xl font-semibold">
+                {lang === 'en' ? 'Results need recalculation' : 'Resultados precisam ser recalculados'}
+              </h2>
+              <p className="text-muted-foreground text-sm max-w-md mx-auto">
+                {lang === 'en' 
+                  ? 'There was an issue loading your results. Click below to recalculate from your answers.'
+                  : 'Houve um problema ao carregar seus resultados. Clique abaixo para recalcular a partir das suas respostas.'}
+              </p>
+              <Button 
+                onClick={handleRecalculate} 
+                disabled={isRecalculating}
+                className="gap-2"
+              >
+                {isRecalculating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {lang === 'en' ? 'Recalculating...' : 'Recalculando...'}
+                  </>
+                ) : (
+                  <>
+                    <Calculator className="h-4 w-4" />
+                    {lang === 'en' ? 'Recalculate Results' : 'Recalcular Resultados'}
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
         )}
 
         {isMBTITest && mbtiResultData?.type && (
@@ -913,7 +965,7 @@ function TestResultsInner() {
       )}
 
       <div className="flex flex-col sm:flex-row gap-4">
-        {isInteligenciasTest && inteligenciasResults ? (
+        {isInteligenciasTest && inteligenciasResults && inteligenciasResults.ranking?.length > 0 ? (
           <Button onClick={handleDownloadInteligenciasPDF} className="flex-1">
             <FileText className="mr-2 h-4 w-4" />
             {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
