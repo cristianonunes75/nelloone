@@ -15,6 +15,7 @@ import { AvatarUpload } from "@/components/cliente/AvatarUpload";
 import { DeleteAccountDialog } from "@/components/cliente/DeleteAccountDialog";
 import { PurchaseHistory } from "@/components/cliente/PurchaseHistory";
 import { NotificationPreferences } from "@/components/cliente/NotificationPreferences";
+import { BusinessSharingToggle } from "@/components/cliente/BusinessSharingToggle";
 
 const ClientePerfil = () => {
   const { user, profile, signOut } = useAuth();
@@ -200,6 +201,9 @@ const ClientePerfil = () => {
                 </form>
               </CardContent>
             </Card>
+
+            {/* Business Sharing Toggle (only shows for company collaborators) */}
+            <BusinessSharingToggle />
 
             {/* Notification Preferences */}
             <NotificationPreferences />
