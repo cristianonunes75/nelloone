@@ -32,3 +32,5 @@ export { ProvocativeClosing } from "./ProvocativeClosing";
 export { RelatorioConjuge } from "./RelatorioConjuge";
 export { SaintPatronSection } from "./SaintPatronSection";
 export { PersonalitiesReferenceSection } from "./PersonalitiesReferenceSection";
+export { RelatorioContextual } from "./RelatorioContextual";
+export { RelatorioSelector } from "./RelatorioSelector";

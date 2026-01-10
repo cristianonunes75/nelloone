@@ -33,6 +33,7 @@ import ComprarTeste from "./pages/ComprarTeste";
 import DiagnosticoPDF from "./pages/DiagnosticoPDF";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import RelatorioConjugePublico from "./pages/RelatorioConjugePublico";
+import RelatorioContextualPublico from "./pages/RelatorioContextualPublico";
 import ResetPassword from "./pages/ResetPassword";
 const queryClient = new QueryClient();
 
@@ -45,10 +46,15 @@ const AppRoutes = () => (
     <Route path="/login" element={<Auth />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     
-    {/* Public spouse report route */}
+    {/* Public spouse report route (legacy) */}
     <Route path="/relatorio-conjuge/:token" element={<RelatorioConjugePublico />} />
     <Route path="/en/spouse-report/:token" element={<RelatorioConjugePublico />} />
     <Route path="/pt-pt/relatorio-conjuge/:token" element={<RelatorioConjugePublico />} />
+    
+    {/* Public contextual reports routes (new unified system) */}
+    <Route path="/relatorio/:tipo/:token" element={<RelatorioContextualPublico />} />
+    <Route path="/en/report/:tipo/:token" element={<RelatorioContextualPublico />} />
+    <Route path="/pt-pt/relatorio/:tipo/:token" element={<RelatorioContextualPublico />} />
     
     {/* Checkout success - verifies payment server-side */}
     <Route path="/checkout/success" element={<CheckoutSuccess />} />
