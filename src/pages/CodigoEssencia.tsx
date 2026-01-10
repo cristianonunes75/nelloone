@@ -77,6 +77,7 @@ import {
   RelatorioConjuge,
   SaintPatronSection,
   PersonalitiesReferenceSection,
+  RelatorioSelector,
 } from "@/components/codigo-essencia";
 
 // LangKey now imported from codigoEssenciaFallbacks
