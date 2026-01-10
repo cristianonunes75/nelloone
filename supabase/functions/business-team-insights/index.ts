@@ -100,17 +100,82 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // Get test results for these users
-    const { data: testResults, error: resultsError } = await supabase
-      .from("test_results")
-      .select("user_id, test_type, scores, primary_result, secondary_result")
-      .in("user_id", userIds);
+    // Get test results for these users from user_tests (the actual source of truth)
+    // Note: test_results table doesn't exist - data is in user_tests.result_data
+    const { data: userTestsData, error: resultsError } = await supabase
+      .from("user_tests")
+      .select(`
+        user_id,
+        result_data,
+        tests!inner(type)
+      `)
+      .in("user_id", userIds)
+      .eq("status", "completed");
 
     if (resultsError) {
       logStep("Error fetching test results", { error: resultsError.message });
     }
 
-    logStep("Fetched test results", { count: testResults?.length || 0 });
+    logStep("Fetched user tests", { count: userTestsData?.length || 0 });
+
+    // Transform user_tests data to the format expected by calculateTeamInsights
+    const testResults: TestResult[] = (userTestsData || []).map(ut => {
+      const resultData = ut.result_data as Record<string, any> || {};
+      const testType = (ut.tests as any)?.type || '';
+      
+      // Extract primary result based on test type
+      let primaryResult: string | null = null;
+      let secondaryResult: string | null = null;
+      let scores: Record<string, number> | null = null;
+
+      switch (testType) {
+        case 'temperamentos':
+          // Handle both object and string formats
+          primaryResult = typeof resultData.primary === 'object' 
+            ? resultData.primary?.name 
+            : resultData.primary;
+          secondaryResult = typeof resultData.secondary === 'object'
+            ? resultData.secondary?.name
+            : resultData.secondary;
+          scores = resultData.scores || null;
+          break;
+        case 'disc':
+          primaryResult = resultData.dominantProfile || resultData.primary || null;
+          scores = resultData.scores || null;
+          break;
+        case 'eneagrama':
+          primaryResult = resultData.primaryType?.toString() || null;
+          secondaryResult = resultData.wing?.toString() || null;
+          scores = resultData.scores || null;
+          break;
+        case 'estilos_conexao':
+        case 'linguagens_amor':
+          primaryResult = typeof resultData.primary?.name === 'object'
+            ? resultData.primary?.name?.pt
+            : resultData.primary?.name || resultData.primary || null;
+          break;
+        case 'inteligencias_multiplas':
+          primaryResult = resultData.dominant?.name || resultData.top1 || null;
+          break;
+        case 'nello16':
+          primaryResult = resultData.type || null;
+          break;
+        case 'arquetipos_proposito':
+          primaryResult = resultData.dominantArchetypes?.primary?.archetype 
+            || resultData.primary?.archetype || null;
+          secondaryResult = resultData.dominantArchetypes?.secondary?.archetype
+            || resultData.secondary?.archetype || null;
+          break;
+      }
+
+      return {
+        user_id: ut.user_id,
+        test_type: testType,
+        scores,
+        primary_result: primaryResult,
+        secondary_result: secondaryResult,
+      };
+    });
 
     // Calculate aggregated insights (without revealing individual data)
     const insights = calculateTeamInsights(testResults || [], userIds.length);

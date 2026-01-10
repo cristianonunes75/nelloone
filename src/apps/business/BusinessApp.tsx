@@ -8,7 +8,7 @@ import BusinessInvite from './pages/BusinessInvite';
 import BusinessReports from './pages/BusinessReports';
 import BusinessSettings from './pages/BusinessSettings';
 import BusinessAcceptInvite from './pages/BusinessAcceptInvite';
-import BusinessCollaboratorDashboard from './pages/BusinessCollaboratorDashboard';
+import BusinessCollaboratorRedirect from './pages/BusinessCollaboratorRedirect';
 import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
 
 /**
@@ -17,6 +17,11 @@ import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
  * 
  * Enterprise solution for companies to apply self-knowledge tests
  * to their teams with consolidated reports and privacy-first approach.
+ * 
+ * ARCHITECTURE:
+ * - Collaborators execute tests in the CORE (/cliente) - single source of truth
+ * - Business only handles: company association, invites, aggregated insights
+ * - No duplicate journey logic - Business READS from Core
  */
 export default function BusinessApp() {
   return (
@@ -58,10 +63,10 @@ export default function BusinessApp() {
         </BusinessProtectedRoute>
       } />
       
-      {/* Collaborator routes */}
+      {/* Collaborator routes - redirect to Core with company context */}
       <Route path="/my-journey" element={
         <BusinessProtectedRoute requiredRole="collaborator">
-          <BusinessCollaboratorDashboard />
+          <BusinessCollaboratorRedirect />
         </BusinessProtectedRoute>
       } />
       
