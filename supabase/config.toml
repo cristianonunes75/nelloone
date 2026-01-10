@@ -92,3 +92,12 @@ verify_jwt = true
 
 [functions.business-team-insights]
 verify_jwt = true
+
+[functions.business-checkout]
+verify_jwt = true
+
+[functions.business-check-subscription]
+verify_jwt = true
+
+[functions.business-customer-portal]
+verify_jwt = true

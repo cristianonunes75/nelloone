@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Building2, 
   CreditCard, 
   Bell,
   Users,
   Save,
-  Loader2
+  Loader2,
+  ExternalLink,
+  Crown
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,23 +15,45 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { BusinessLayout } from '../components/BusinessLayout';
+import { BusinessPricingCard } from '../components/BusinessPricingCard';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
+import { useBusinessSubscription, BUSINESS_TIERS } from '../hooks/useBusinessSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export default function BusinessSettings() {
   const { company, refetch } = useBusinessAuth();
+  const { 
+    subscription, 
+    isLoading: isSubLoading, 
+    isCheckingOut,
+    startCheckout, 
+    openCustomerPortal,
+    remainingSlots,
+  } = useBusinessSubscription();
+  
   const [isLoading, setIsLoading] = useState(false);
   
   // Company info
-  const [companyName, setCompanyName] = useState(company?.name || '');
+  const [companyName, setCompanyName] = useState('');
   const [website, setWebsite] = useState('');
   const [billingEmail, setBillingEmail] = useState('');
   
   // Notifications
   const [emailOnComplete, setEmailOnComplete] = useState(true);
   const [emailWeekly, setEmailWeekly] = useState(true);
+
+  // Initialize form values when company loads
+  useEffect(() => {
+    if (company) {
+      setCompanyName(company.name || '');
+      setWebsite(company.website || '');
+      setBillingEmail(company.billing_email || '');
+    }
+  }, [company]);
 
   const handleSaveCompany = async () => {
     if (!company) return;
@@ -54,9 +78,30 @@ export default function BusinessSettings() {
     }
   };
 
+  const getStatusBadge = () => {
+    if (!subscription) return null;
+    
+    switch (subscription.status) {
+      case 'active':
+        return <Badge className="bg-green-500">Ativo</Badge>;
+      case 'trial':
+        return <Badge variant="secondary">Trial</Badge>;
+      case 'cancelled':
+        return <Badge variant="destructive">Cancelado</Badge>;
+      case 'past_due':
+        return <Badge variant="destructive">Pagamento pendente</Badge>;
+      default:
+        return null;
+    }
+  };
+
+  const collaboratorUsagePercent = subscription 
+    ? (subscription.currentCollaborators / subscription.maxCollaborators) * 100
+    : 0;
+
   return (
     <BusinessLayout>
-      <div className="space-y-6 max-w-2xl">
+      <div className="space-y-6 max-w-4xl">
         <div>
           <h1 className="text-2xl font-bold">Configurações</h1>
           <p className="text-muted-foreground">
@@ -64,7 +109,7 @@ export default function BusinessSettings() {
           </p>
         </div>
 
-        <Tabs defaultValue="company">
+        <Tabs defaultValue="billing">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="company">Empresa</TabsTrigger>
             <TabsTrigger value="billing">Assinatura</TabsTrigger>
@@ -123,44 +168,125 @@ export default function BusinessSettings() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="billing" className="mt-6">
+          <TabsContent value="billing" className="mt-6 space-y-6">
+            {/* Current Plan */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="w-5 h-5" />
-                  Assinatura
+                  <Crown className="w-5 h-5" />
+                  Seu Plano
+                  {getStatusBadge()}
                 </CardTitle>
                 <CardDescription>
                   Gerencie seu plano e forma de pagamento
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="p-4 bg-muted rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">Plano atual</span>
-                    <span className="text-primary font-semibold">Trial</span>
+                {isSubLoading ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Você está no período de teste gratuito de 14 dias
-                  </p>
-                </div>
-                
-                <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-lg border border-primary/20">
-                  <Users className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="font-medium">Limite de colaboradores</p>
-                    <p className="text-sm text-muted-foreground">
-                      0/10 colaboradores utilizados
-                    </p>
-                  </div>
-                </div>
+                ) : subscription ? (
+                  <>
+                    <div className="p-4 bg-muted rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium">Plano atual</span>
+                        <span className="text-primary font-semibold capitalize">
+                          {BUSINESS_TIERS[subscription.tier]?.name || subscription.tier}
+                        </span>
+                      </div>
+                      {subscription.status === 'trial' && (
+                        <p className="text-sm text-muted-foreground">
+                          Você está no período de teste gratuito de 14 dias
+                        </p>
+                      )}
+                      {subscription.subscriptionEnd && subscription.status === 'active' && (
+                        <p className="text-sm text-muted-foreground">
+                          Próxima cobrança: {new Date(subscription.subscriptionEnd).toLocaleDateString('pt-BR')}
+                        </p>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Users className="w-5 h-5 text-primary" />
+                          <div>
+                            <p className="font-medium">Colaboradores</p>
+                            <p className="text-sm text-muted-foreground">
+                              {subscription.currentCollaborators}/{subscription.maxCollaborators} utilizados
+                            </p>
+                          </div>
+                        </div>
+                        <span className="text-sm text-muted-foreground">
+                          {remainingSlots} {remainingSlots === 1 ? 'vaga' : 'vagas'} restantes
+                        </span>
+                      </div>
+                      <Progress value={collaboratorUsagePercent} className="h-2" />
+                    </div>
 
-                <Button variant="outline" className="w-full">
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Gerenciar assinatura
-                </Button>
+                    {subscription.subscribed && (
+                      <Button 
+                        variant="outline" 
+                        className="w-full gap-2"
+                        onClick={openCustomerPortal}
+                        disabled={isSubLoading}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        Gerenciar assinatura no Stripe
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-4 text-muted-foreground">
+                    Carregando informações...
+                  </div>
+                )}
               </CardContent>
             </Card>
+
+            {/* Pricing Plans */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Escolha seu plano</h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                <BusinessPricingCard
+                  tier="starter"
+                  name={BUSINESS_TIERS.starter.name}
+                  price={BUSINESS_TIERS.starter.pricePerMonth}
+                  features={BUSINESS_TIERS.starter.features}
+                  isCurrentPlan={subscription?.tier === 'starter'}
+                  onSelect={() => startCheckout('starter')}
+                  isLoading={isCheckingOut}
+                  disabled={subscription?.subscribed}
+                />
+                <BusinessPricingCard
+                  tier="growth"
+                  name={BUSINESS_TIERS.growth.name}
+                  price={BUSINESS_TIERS.growth.pricePerMonth}
+                  features={BUSINESS_TIERS.growth.features}
+                  isCurrentPlan={subscription?.tier === 'growth'}
+                  isPopular
+                  onSelect={() => startCheckout('growth')}
+                  isLoading={isCheckingOut}
+                  disabled={subscription?.subscribed}
+                />
+                <BusinessPricingCard
+                  tier="enterprise"
+                  name={BUSINESS_TIERS.enterprise.name}
+                  price={BUSINESS_TIERS.enterprise.pricePerMonth}
+                  features={BUSINESS_TIERS.enterprise.features}
+                  isCurrentPlan={subscription?.tier === 'enterprise'}
+                  onSelect={() => startCheckout('enterprise')}
+                  isLoading={isCheckingOut}
+                  disabled={subscription?.subscribed}
+                />
+              </div>
+              {subscription?.subscribed && (
+                <p className="text-sm text-muted-foreground text-center mt-4">
+                  Para alterar seu plano, use o portal de gerenciamento acima
+                </p>
+              )}
+            </div>
           </TabsContent>
 
           <TabsContent value="notifications" className="mt-6">
