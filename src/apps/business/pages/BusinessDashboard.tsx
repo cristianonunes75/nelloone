@@ -15,6 +15,10 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
+import { useBusinessEnforcement } from '../hooks/useBusinessEnforcement';
+import { SubscriptionStatusBanner } from '../components/SubscriptionStatusBanner';
+import { SubscriptionStatusCard } from '../components/SubscriptionStatusCard';
+import { BlockedAccessOverlay } from '../components/BlockedAccessOverlay';
 import { supabase } from '@/integrations/supabase/client';
 
 interface DashboardStats {
@@ -26,6 +30,7 @@ interface DashboardStats {
 
 export default function BusinessDashboard() {
   const { company } = useBusinessAuth();
+  const enforcement = useBusinessEnforcement();
   const [stats, setStats] = useState<DashboardStats>({
     totalMembers: 0,
     pendingInvites: 0,
@@ -84,7 +89,13 @@ export default function BusinessDashboard() {
 
   return (
     <BusinessLayout>
+      {/* Blocked overlay when trial expired or suspended */}
+      <BlockedAccessOverlay />
+      
       <div className="space-y-8">
+        {/* Subscription Status Banner */}
+        <SubscriptionStatusBanner />
+        
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -94,74 +105,84 @@ export default function BusinessDashboard() {
             </p>
           </div>
           <Link to="/invite">
-            <Button className="gap-2">
+            <Button 
+              className="gap-2"
+              disabled={!enforcement.canInviteCollaborators}
+            >
               <UserPlus className="w-4 h-4" />
               Convidar colaboradores
             </Button>
           </Link>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total de membros
-              </CardTitle>
-              <Users className="w-4 h-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalMembers}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                colaboradores ativos
-              </p>
-            </CardContent>
-          </Card>
+        {/* Stats Grid + Subscription Card */}
+        <div className="grid gap-6 lg:grid-cols-4">
+          <div className="lg:col-span-3 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Total de membros
+                </CardTitle>
+                <Users className="w-4 h-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalMembers}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  de {enforcement.maxCollaborators} colaboradores
+                </p>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Convites pendentes
-              </CardTitle>
-              <Clock className="w-4 h-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.pendingInvites}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                aguardando aceite
-              </p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Convites pendentes
+                </CardTitle>
+                <Clock className="w-4 h-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.pendingInvites}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  aguardando aceite
+                </p>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Jornadas completas
-              </CardTitle>
-              <CheckCircle2 className="w-4 h-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.completedAssessments}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {completionRate}% de conclusão
-              </p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Jornadas completas
+                </CardTitle>
+                <CheckCircle2 className="w-4 h-4 text-green-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.completedAssessments}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {completionRate}% de conclusão
+                </p>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Em andamento
-              </CardTitle>
-              <AlertCircle className="w-4 h-4 text-yellow-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.inProgressAssessments}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                jornadas em progresso
-              </p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Em andamento
+                </CardTitle>
+                <AlertCircle className="w-4 h-4 text-yellow-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.inProgressAssessments}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  jornadas em progresso
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Subscription status card on the side */}
+          <div className="lg:col-span-1">
+            <SubscriptionStatusCard />
+          </div>
         </div>
 
         {/* Progress Section */}
@@ -188,8 +209,8 @@ export default function BusinessDashboard() {
 
         {/* Quick Actions */}
         <div className="grid gap-4 md:grid-cols-2">
-          <Card className="hover:border-primary/50 transition-colors cursor-pointer">
-            <Link to="/reports">
+          <Card className={`transition-colors ${enforcement.canViewInsights ? 'hover:border-primary/50 cursor-pointer' : 'opacity-60'}`}>
+            <Link to="/reports" className={enforcement.canViewInsights ? '' : 'pointer-events-none'}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -199,7 +220,10 @@ export default function BusinessDashboard() {
                 </div>
                 <CardTitle className="mt-4">Ver relatórios da equipe</CardTitle>
                 <CardDescription>
-                  Acesse insights consolidados sobre os perfis e tendências da sua equipe
+                  {enforcement.canViewInsights 
+                    ? 'Acesse insights consolidados sobre os perfis e tendências da sua equipe'
+                    : 'Faça upgrade para acessar os insights da equipe'
+                  }
                 </CardDescription>
               </CardHeader>
             </Link>

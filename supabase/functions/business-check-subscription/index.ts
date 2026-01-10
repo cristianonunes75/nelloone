@@ -19,6 +19,8 @@ const BUSINESS_TIERS = {
   'prod_TlWOhSZJpVB1Xe': { name: 'enterprise', maxCollaborators: 100 },
 };
 
+const TRIAL_DURATION_DAYS = 14;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -64,25 +66,67 @@ serve(async (req) => {
     }
     logStep("User company verified", { role: companyUser.role });
 
+    // Get existing subscription record
+    const { data: existingSub } = await supabaseClient
+      .from('company_subscriptions')
+      .select('*')
+      .eq('company_id', companyId)
+      .maybeSingle();
+
     // Get company Stripe customer ID
     const { data: company, error: companyError } = await supabaseClient
       .from('companies')
-      .select('stripe_customer_id')
+      .select('stripe_customer_id, created_at')
       .eq('id', companyId)
       .single();
 
     if (companyError) throw new Error("Failed to fetch company details");
 
+    // Count current collaborators
+    const { count: collaboratorCount } = await supabaseClient
+      .from('company_users')
+      .select('id', { count: 'exact', head: true })
+      .eq('company_id', companyId)
+      .eq('is_active', true);
+
+    const currentCollaborators = collaboratorCount || 0;
+
+    // If no Stripe customer - check trial status
     if (!company?.stripe_customer_id) {
-      logStep("No Stripe customer found for company");
+      logStep("No Stripe customer found for company - checking trial");
       
-      // Update company_subscriptions table to reflect no subscription
+      // Calculate trial end date
+      let trialEndsAt = existingSub?.trial_ends_at;
+      
+      if (!trialEndsAt) {
+        // New trial - set based on company creation date
+        const companyCreatedAt = new Date(company.created_at);
+        const trialEnd = new Date(companyCreatedAt);
+        trialEnd.setDate(trialEnd.getDate() + TRIAL_DURATION_DAYS);
+        trialEndsAt = trialEnd.toISOString();
+      }
+
+      // Check if trial is expired
+      const now = new Date();
+      const trialEndDate = new Date(trialEndsAt);
+      const isTrialExpired = now > trialEndDate;
+      const status = isTrialExpired ? 'trial_expired' : 'trial';
+
+      logStep("Trial status calculated", { 
+        trialEndsAt, 
+        isTrialExpired, 
+        status,
+        daysRemaining: Math.ceil((trialEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+      });
+
+      // Update or create subscription record
       await supabaseClient
         .from('company_subscriptions')
         .upsert({
           company_id: companyId,
-          status: 'trial',
-          current_collaborators: 0,
+          status,
+          trial_ends_at: trialEndsAt,
+          current_collaborators: currentCollaborators,
           max_collaborators: 10,
           plan_tier: 'trial',
           updated_at: new Date().toISOString(),
@@ -90,9 +134,12 @@ serve(async (req) => {
 
       return new Response(JSON.stringify({ 
         subscribed: false,
-        status: 'trial',
+        status,
         tier: 'trial',
         maxCollaborators: 10,
+        currentCollaborators,
+        subscriptionEnd: trialEndsAt,
+        isTrialExpired,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -113,11 +160,13 @@ serve(async (req) => {
     let maxCollaborators = 10;
     let subscriptionEnd: string | null = null;
     let stripeSubscriptionId: string | null = null;
+    let status = 'trial';
 
     if (hasActiveSub) {
       const subscription = subscriptions.data[0];
       stripeSubscriptionId = subscription.id;
       subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+      status = 'active';
       
       const productId = subscription.items.data[0].price.product as string;
       const tierInfo = BUSINESS_TIERS[productId as keyof typeof BUSINESS_TIERS];
@@ -134,24 +183,44 @@ serve(async (req) => {
         endDate: subscriptionEnd 
       });
     } else {
-      logStep("No active subscription found");
+      // Check for past_due or cancelled
+      const pastDueSubscriptions = await stripe.subscriptions.list({
+        customer: company.stripe_customer_id,
+        status: "past_due",
+        limit: 1,
+      });
+
+      if (pastDueSubscriptions.data.length > 0) {
+        status = 'past_due';
+        logStep("Past due subscription found");
+      } else {
+        // Check trial status
+        let trialEndsAt = existingSub?.trial_ends_at;
+        if (trialEndsAt) {
+          const now = new Date();
+          const trialEndDate = new Date(trialEndsAt);
+          if (now > trialEndDate) {
+            status = 'trial_expired';
+          }
+        }
+        logStep("No active subscription - checking trial", { status });
+      }
     }
 
-    // Count current collaborators
-    const { count: collaboratorCount } = await supabaseClient
-      .from('company_users')
-      .select('id', { count: 'exact', head: true })
-      .eq('company_id', companyId)
-      .eq('is_active', true);
+    // Check for over limit
+    const isOverLimit = currentCollaborators > maxCollaborators;
+    if (isOverLimit && status === 'active') {
+      logStep("Company is over collaborator limit", { current: currentCollaborators, max: maxCollaborators });
+    }
 
     // Update company_subscriptions table
     await supabaseClient
       .from('company_subscriptions')
       .upsert({
         company_id: companyId,
-        status: hasActiveSub ? 'active' : 'trial',
+        status,
         stripe_subscription_id: stripeSubscriptionId,
-        current_collaborators: collaboratorCount || 0,
+        current_collaborators: currentCollaborators,
         max_collaborators: maxCollaborators,
         plan_tier: tier,
         current_period_end: subscriptionEnd,
@@ -160,11 +229,12 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
-      status: hasActiveSub ? 'active' : 'trial',
+      status,
       tier,
       maxCollaborators,
-      currentCollaborators: collaboratorCount || 0,
+      currentCollaborators,
       subscriptionEnd,
+      isOverLimit,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
