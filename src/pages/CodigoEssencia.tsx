@@ -76,6 +76,7 @@ import {
   ProductHeader,
   RelatorioConjuge,
   SaintPatronSection,
+  PersonalitiesReferenceSection,
 } from "@/components/codigo-essencia";
 
 // LangKey now imported from codigoEssenciaFallbacks
@@ -465,6 +466,7 @@ const CodigoEssenciaInner = () => {
   const tresVerdadesSection = generatedSections.find(s => s.id === 'tres_verdades_centrais');
   const resumoExecutivoSection = generatedSections.find(s => s.id === 'resumo_executivo');
   const santoPadreiroSection = generatedSections.find(s => s.id === 'santo_padroeiro');
+  const personalidadesSection = generatedSections.find(s => s.id === 'personalidades_referencia');
 
   // Fallback: extract archetypes from testResults if AI section doesn't have them
   const arquetiposChamadoSection = useMemo(() => {
@@ -952,6 +954,14 @@ const CodigoEssenciaInner = () => {
             {santoPadreiroSection && (
               <>
                 <SaintPatronSection data={santoPadreiroSection} language={lang} />
+                <SectionDivider variant="dots" />
+              </>
+            )}
+
+            {/* === SECTION 10: Personalities Reference === */}
+            {personalidadesSection && (
+              <>
+                <PersonalitiesReferenceSection data={personalidadesSection} language={lang} />
                 <SectionDivider variant="gradient" />
               </>
             )}
