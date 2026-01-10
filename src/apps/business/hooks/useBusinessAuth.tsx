@@ -23,6 +23,10 @@ interface Company {
   slug: string;
   logo_url: string | null;
   industry: string | null;
+  website: string | null;
+  billing_email: string | null;
+  employee_count_range: string | null;
+  stripe_customer_id: string | null;
   settings: Record<string, unknown>;
 }
 
