@@ -8,6 +8,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
+import { useBusinessEnforcement } from '../hooks/useBusinessEnforcement';
+import { SubscriptionStatusBanner } from '../components/SubscriptionStatusBanner';
+import { CollaboratorLimitWarning } from '../components/CollaboratorLimitWarning';
+import { BlockedAccessOverlay } from '../components/BlockedAccessOverlay';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
@@ -15,6 +19,7 @@ import { useAuth } from '@/hooks/useAuth';
 export default function BusinessInvite() {
   const { company } = useBusinessAuth();
   const { user } = useAuth();
+  const enforcement = useBusinessEnforcement();
   const [emails, setEmails] = useState<string[]>([]);
   const [currentEmail, setCurrentEmail] = useState('');
   const [customMessage, setCustomMessage] = useState('');
@@ -24,6 +29,18 @@ export default function BusinessInvite() {
   const addEmail = () => {
     const email = currentEmail.trim().toLowerCase();
     if (!email) return;
+    
+    // Check if can add more collaborators
+    if (!enforcement.canInviteCollaborators) {
+      toast.error(`Limite de ${enforcement.maxCollaborators} colaboradores atingido`);
+      return;
+    }
+    
+    // Check remaining slots vs emails to be invited
+    if (emails.length >= enforcement.remainingSlots) {
+      toast.error(`Você só pode convidar mais ${enforcement.remainingSlots} colaborador(es)`);
+      return;
+    }
     
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -54,6 +71,17 @@ export default function BusinessInvite() {
 
   const handleSendInvites = async () => {
     if (!company || !user || emails.length === 0) return;
+    
+    // Final enforcement check
+    if (!enforcement.canInviteCollaborators) {
+      toast.error('Não é possível enviar convites no momento');
+      return;
+    }
+    
+    if (emails.length > enforcement.remainingSlots) {
+      toast.error(`Você só pode convidar mais ${enforcement.remainingSlots} colaborador(es)`);
+      return;
+    }
     
     setIsSending(true);
     const successfulEmails: string[] = [];
@@ -102,13 +130,22 @@ export default function BusinessInvite() {
 
   return (
     <BusinessLayout>
+      {/* Blocked overlay when trial expired or suspended */}
+      <BlockedAccessOverlay />
+      
       <div className="space-y-6 max-w-2xl">
+        {/* Subscription Status Banner */}
+        <SubscriptionStatusBanner />
+        
         <div>
           <h1 className="text-2xl font-bold">Convidar colaboradores</h1>
           <p className="text-muted-foreground">
             Envie convites por email para sua equipe começar a jornada de autoconhecimento
           </p>
         </div>
+
+        {/* Limit Warning */}
+        <CollaboratorLimitWarning action="invite" />
 
         <Card>
           <CardHeader>
@@ -118,6 +155,11 @@ export default function BusinessInvite() {
             </CardTitle>
             <CardDescription>
               Adicione os emails dos colaboradores que deseja convidar
+              {enforcement.remainingSlots > 0 && (
+                <span className="ml-1">
+                  ({enforcement.remainingSlots} vagas disponíveis)
+                </span>
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -131,8 +173,14 @@ export default function BusinessInvite() {
                   value={currentEmail}
                   onChange={(e) => setCurrentEmail(e.target.value)}
                   onKeyDown={handleKeyDown}
+                  disabled={!enforcement.canInviteCollaborators}
                 />
-                <Button type="button" variant="outline" onClick={addEmail}>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={addEmail}
+                  disabled={!enforcement.canInviteCollaborators}
+                >
                   Adicionar
                 </Button>
               </div>
@@ -169,12 +217,13 @@ export default function BusinessInvite() {
                 value={customMessage}
                 onChange={(e) => setCustomMessage(e.target.value)}
                 rows={3}
+                disabled={!enforcement.canInviteCollaborators}
               />
             </div>
 
             <Button
               onClick={handleSendInvites}
-              disabled={emails.length === 0 || isSending}
+              disabled={emails.length === 0 || isSending || !enforcement.canInviteCollaborators}
               className="w-full gap-2"
             >
               {isSending ? (

@@ -7,13 +7,19 @@ import {
   TrendingUp,
   MessageSquare,
   Shield,
-  Target
+  Target,
+  Lock
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
+import { useBusinessEnforcement } from '../hooks/useBusinessEnforcement';
+import { SubscriptionStatusBanner } from '../components/SubscriptionStatusBanner';
+import { BlockedAccessOverlay } from '../components/BlockedAccessOverlay';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TeamInsights {
@@ -29,6 +35,7 @@ interface TeamInsights {
 
 export default function BusinessReports() {
   const { company } = useBusinessAuth();
+  const enforcement = useBusinessEnforcement();
   const [insights, setInsights] = useState<TeamInsights | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -74,9 +81,39 @@ export default function BusinessReports() {
     );
   }
 
+  // Show blocked overlay if insights not accessible
+  if (!enforcement.canViewInsights && !enforcement.isLoading) {
+    return (
+      <BusinessLayout>
+        <BlockedAccessOverlay />
+        <div className="space-y-6">
+          <SubscriptionStatusBanner />
+          <Card className="max-w-md mx-auto">
+            <CardContent className="text-center py-12">
+              <Lock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-medium mb-2">Acesso restrito</h3>
+              <p className="text-muted-foreground mb-4">
+                {enforcement.blockReason || 'Faça upgrade para acessar os relatórios da equipe.'}
+              </p>
+              <Link to="/settings">
+                <Button>Ver planos</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </BusinessLayout>
+    );
+  }
+
   return (
     <BusinessLayout>
+      {/* Blocked overlay when trial expired or suspended */}
+      <BlockedAccessOverlay />
+      
       <div className="space-y-6">
+        {/* Subscription Status Banner */}
+        <SubscriptionStatusBanner />
+        
         <div>
           <h1 className="text-2xl font-bold">Relatórios da Equipe</h1>
           <p className="text-muted-foreground">
