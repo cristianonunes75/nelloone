@@ -1749,6 +1749,59 @@ export type Database = {
           },
         ]
       }
+      relatorios_contextuais: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          is_public_active: boolean | null
+          mapa_essencia_id: string | null
+          public_token: string | null
+          public_token_expires_at: string | null
+          raw_content: string | null
+          recipient_name: string | null
+          report_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_public_active?: boolean | null
+          mapa_essencia_id?: string | null
+          public_token?: string | null
+          public_token_expires_at?: string | null
+          raw_content?: string | null
+          recipient_name?: string | null
+          report_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_public_active?: boolean | null
+          mapa_essencia_id?: string | null
+          public_token?: string | null
+          public_token_expires_at?: string | null
+          raw_content?: string | null
+          recipient_name?: string | null
+          report_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relatorios_contextuais_mapa_essencia_id_fkey"
+            columns: ["mapa_essencia_id"]
+            isOneToOne: false
+            referencedRelation: "mapa_essencia"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_visitors: {
         Row: {
           city: string | null
@@ -2341,6 +2394,12 @@ export type Database = {
         | "canceled"
         | "incomplete"
       invite_status: "pending" | "accepted" | "expired" | "revoked"
+      report_type_enum:
+        | "parceiro"
+        | "pai_para_filho"
+        | "filho_para_pai"
+        | "para_gestor"
+        | "para_equipe"
       test_status: "not_started" | "in_progress" | "completed"
       test_type:
         | "disc"
@@ -2490,6 +2549,13 @@ export const Constants = {
         "incomplete",
       ],
       invite_status: ["pending", "accepted", "expired", "revoked"],
+      report_type_enum: [
+        "parceiro",
+        "pai_para_filho",
+        "filho_para_pai",
+        "para_gestor",
+        "para_equipe",
+      ],
       test_status: ["not_started", "in_progress", "completed"],
       test_type: [
         "disc",
