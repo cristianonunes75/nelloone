@@ -17,12 +17,16 @@ import {
   Ban,
   RotateCcw,
   Loader2,
-  Share2
+  Share2,
+  History,
+  XCircle,
+  AlertOctagon
 } from "lucide-react";
-import { format, parseISO, differenceInDays } from "date-fns";
+import { format, parseISO, differenceInDays, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AdminBusinessCompanyDetail } from "./AdminBusinessCompanyDetail";
 import { toast } from "sonner";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Company {
   id: string;
@@ -40,6 +44,7 @@ interface CompanySubscription {
   trial_ends_at: string | null;
   max_collaborators: number | null;
   current_period_end: string | null;
+  current_collaborators: number | null;
 }
 
 interface CompanyMetrics {
@@ -51,6 +56,18 @@ interface CompanyMetrics {
   sharingEnabled: number;
   lastActivity: string | null;
   activationRate: number;
+  isTrialExpired: boolean;
+  isOverLimit: boolean;
+}
+
+interface StatusHistoryEntry {
+  id: string;
+  company_id: string;
+  previous_status: string | null;
+  new_status: string;
+  reason: string | null;
+  created_at: string;
+  company_name?: string;
 }
 
 interface GlobalStats {
@@ -58,6 +75,8 @@ interface GlobalStats {
   companiesInTrial: number;
   companiesActive: number;
   companiesSuspended: number;
+  companiesTrialExpired: number;
+  companiesOverLimit: number;
   companiesNoCollaborators: number;
   companiesNoTests: number;
   totalCollaborators: number;
@@ -73,6 +92,8 @@ export const AdminBusinessDashboard = () => {
     companiesInTrial: 0,
     companiesActive: 0,
     companiesSuspended: 0,
+    companiesTrialExpired: 0,
+    companiesOverLimit: 0,
     companiesNoCollaborators: 0,
     companiesNoTests: 0,
     totalCollaborators: 0,
@@ -83,6 +104,8 @@ export const AdminBusinessDashboard = () => {
   const [companies, setCompanies] = useState<CompanyMetrics[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [statusHistory, setStatusHistory] = useState<StatusHistoryEntry[]>([]);
+  const [activeTab, setActiveTab] = useState("all");
 
   useEffect(() => {
     fetchData();
@@ -116,6 +139,13 @@ export const AdminBusinessDashboard = () => {
           role,
           updated_at
         `);
+
+      // Fetch status history
+      const { data: historyData } = await supabase
+        .from("company_status_history")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
 
       // Fetch user test completion data
       const userIds = [...new Set((companyUsersData || []).map(cu => cu.user_id))];
@@ -151,6 +181,15 @@ export const AdminBusinessDashboard = () => {
           ? (testsCompleted / activeUsers.length) * 100 
           : 0;
 
+        // Check trial expiration
+        const isTrialExpired = subscription?.status === 'trialing' && 
+          subscription?.trial_ends_at && 
+          isPast(parseISO(subscription.trial_ends_at));
+
+        // Check over limit
+        const maxCollaborators = subscription?.max_collaborators || 5;
+        const isOverLimit = activeUsers.length > maxCollaborators;
+
         metricsMap.set(company.id, {
           company,
           subscription: subscription || null,
@@ -160,18 +199,29 @@ export const AdminBusinessDashboard = () => {
           sharingEnabled,
           lastActivity,
           activationRate,
+          isTrialExpired,
+          isOverLimit,
         });
       }
 
       const companiesList = Array.from(metricsMap.values());
       setCompanies(companiesList);
 
+      // Map status history with company names
+      const historyWithNames: StatusHistoryEntry[] = (historyData || []).map(h => ({
+        ...h,
+        company_name: companiesList.find(c => c.company.id === h.company_id)?.company.name || 'Empresa desconhecida',
+      }));
+      setStatusHistory(historyWithNames);
+
       // Calculate global stats
       const stats: GlobalStats = {
         totalCompanies: companiesList.length,
-        companiesInTrial: companiesList.filter(c => c.subscription?.status === 'trialing').length,
+        companiesInTrial: companiesList.filter(c => c.subscription?.status === 'trialing' && !c.isTrialExpired).length,
         companiesActive: companiesList.filter(c => c.subscription?.status === 'active').length,
         companiesSuspended: companiesList.filter(c => c.subscription?.status === 'suspended' || c.subscription?.status === 'canceled').length,
+        companiesTrialExpired: companiesList.filter(c => c.isTrialExpired).length,
+        companiesOverLimit: companiesList.filter(c => c.isOverLimit).length,
         companiesNoCollaborators: companiesList.filter(c => c.activeCollaborators === 0).length,
         companiesNoTests: companiesList.filter(c => c.testsCompleted === 0 && c.activeCollaborators > 0).length,
         totalCollaborators: companiesList.reduce((sum, c) => sum + c.activeCollaborators, 0),
@@ -367,6 +417,42 @@ export const AdminBusinessDashboard = () => {
         </Card>
       </div>
 
+      {/* Enforcement Alerts */}
+      {(globalStats.companiesTrialExpired > 0 || globalStats.companiesOverLimit > 0) && (
+        <Card className="p-4 md:p-6 border-destructive/30 bg-destructive/5 rounded-2xl shadow-soft">
+          <h3 className="text-sm font-medium mb-4 text-destructive flex items-center gap-2">
+            <AlertOctagon className="w-4 h-4" />
+            Alertas de Enforcement
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {globalStats.companiesTrialExpired > 0 && (
+              <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <XCircle className="w-5 h-5 text-destructive" />
+                  <p className="text-lg font-semibold text-destructive">{globalStats.companiesTrialExpired}</p>
+                </div>
+                <p className="text-sm text-destructive/80">Trial Expirado</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Empresas bloqueadas, aguardando pagamento
+                </p>
+              </div>
+            )}
+            {globalStats.companiesOverLimit > 0 && (
+              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle className="w-5 h-5 text-amber-600" />
+                  <p className="text-lg font-semibold text-amber-600">{globalStats.companiesOverLimit}</p>
+                </div>
+                <p className="text-sm text-amber-600">Acima do Limite</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Empresas com mais colaboradores que o plano permite
+                </p>
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
+
       {/* Product Health Alerts */}
       <Card className="p-4 md:p-6 border-border/40 rounded-2xl shadow-soft">
         <h3 className="text-sm font-medium mb-4 text-ink flex items-center gap-2">
@@ -396,19 +482,37 @@ export const AdminBusinessDashboard = () => {
         </div>
       </Card>
 
-      {/* Companies List */}
+      {/* Companies List with Tabs */}
       <Card className="border-border/40 rounded-2xl shadow-soft overflow-hidden">
         <div className="p-4 md:p-6 border-b border-border/40">
-          <h3 className="text-sm font-medium text-ink">Empresas Cadastradas</h3>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="bg-muted/50">
+              <TabsTrigger value="all" className="text-xs">
+                Todas ({companies.length})
+              </TabsTrigger>
+              <TabsTrigger value="trial_expired" className="text-xs">
+                <XCircle className="w-3 h-3 mr-1 text-destructive" />
+                Trial Expirado ({companies.filter(c => c.isTrialExpired).length})
+              </TabsTrigger>
+              <TabsTrigger value="over_limit" className="text-xs">
+                <AlertTriangle className="w-3 h-3 mr-1 text-amber-600" />
+                Over Limit ({companies.filter(c => c.isOverLimit).length})
+              </TabsTrigger>
+              <TabsTrigger value="suspended" className="text-xs">
+                <Ban className="w-3 h-3 mr-1" />
+                Bloqueadas ({companies.filter(c => c.subscription?.status === 'suspended' || c.subscription?.status === 'canceled').length})
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
         
         <div className="divide-y divide-border/40">
-          {companies.length === 0 ? (
+          {getFilteredCompanies().length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
-              Nenhuma empresa cadastrada
+              {activeTab === 'all' ? 'Nenhuma empresa cadastrada' : 'Nenhuma empresa nesta categoria'}
             </div>
           ) : (
-            companies.map((metrics) => {
+            getFilteredCompanies().map((metrics) => {
               const health = getHealthIndicator(metrics);
               const HealthIcon = health.icon;
               
@@ -416,9 +520,21 @@ export const AdminBusinessDashboard = () => {
                 <div key={metrics.company.id} className="p-4 md:p-5 hover:bg-muted/30 transition-colors">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h4 className="font-medium text-ink truncate">{metrics.company.name}</h4>
                         {getStatusBadge(metrics.subscription)}
+                        {metrics.isTrialExpired && (
+                          <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
+                            <XCircle className="w-3 h-3 mr-1" />
+                            Trial Expirado
+                          </Badge>
+                        )}
+                        {metrics.isOverLimit && (
+                          <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20">
+                            <AlertTriangle className="w-3 h-3 mr-1" />
+                            Over Limit ({metrics.activeCollaborators}/{metrics.subscription?.max_collaborators || 5})
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
@@ -446,7 +562,7 @@ export const AdminBusinessDashboard = () => {
                         Detalhes
                       </Button>
                       
-                      {metrics.subscription?.status === 'suspended' ? (
+                      {metrics.subscription?.status === 'suspended' || metrics.subscription?.status === 'canceled' ? (
                         <Button
                           variant="outline"
                           size="sm"
@@ -485,6 +601,69 @@ export const AdminBusinessDashboard = () => {
           )}
         </div>
       </Card>
+
+      {/* Status History */}
+      <Card className="border-border/40 rounded-2xl shadow-soft overflow-hidden">
+        <div className="p-4 md:p-6 border-b border-border/40">
+          <h3 className="text-sm font-medium text-ink flex items-center gap-2">
+            <History className="w-4 h-4" />
+            Histórico de Mudanças de Status
+          </h3>
+        </div>
+        
+        <ScrollArea className="h-[300px]">
+          <div className="divide-y divide-border/40">
+            {statusHistory.length === 0 ? (
+              <div className="p-8 text-center text-muted-foreground">
+                Nenhuma mudança de status registrada
+              </div>
+            ) : (
+              statusHistory.map((entry) => (
+                <div key={entry.id} className="p-4 hover:bg-muted/30 transition-colors">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-ink text-sm">{entry.company_name}</p>
+                      <div className="flex items-center gap-2 mt-1 text-xs">
+                        <Badge variant="outline" className="text-muted-foreground">
+                          {entry.previous_status || 'novo'}
+                        </Badge>
+                        <span className="text-muted-foreground">→</span>
+                        <Badge variant="outline" className={
+                          entry.new_status === 'active' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' :
+                          entry.new_status === 'suspended' || entry.new_status === 'canceled' ? 'bg-destructive/10 text-destructive border-destructive/20' :
+                          entry.new_status === 'trialing' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' :
+                          ''
+                        }>
+                          {entry.new_status}
+                        </Badge>
+                      </div>
+                      {entry.reason && (
+                        <p className="text-xs text-muted-foreground mt-1">{entry.reason}</p>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground whitespace-nowrap">
+                      {format(parseISO(entry.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </ScrollArea>
+      </Card>
     </div>
   );
+
+  function getFilteredCompanies(): CompanyMetrics[] {
+    switch (activeTab) {
+      case 'trial_expired':
+        return companies.filter(c => c.isTrialExpired);
+      case 'over_limit':
+        return companies.filter(c => c.isOverLimit);
+      case 'suspended':
+        return companies.filter(c => c.subscription?.status === 'suspended' || c.subscription?.status === 'canceled');
+      default:
+        return companies;
+    }
+  }
 };
