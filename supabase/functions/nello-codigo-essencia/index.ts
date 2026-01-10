@@ -1781,6 +1781,36 @@ ESTRUTURA JSON FINAL
       "daily_practice": "[Prática diária inspirada no santo para os próximos 30 dias - ex: 'Como São Francisco, pratique 5 minutos de silêncio contemplativo antes de tomar decisões importantes']"
     },
     {
+      "id": "personalidades_referencia",
+      "title": "Pessoas que Pensam Como ${youWord === 'Tu' ? 'Tu' : 'Você'}",
+      "source": "Temperamento + Arquétipos + DISC",
+      "intro": "[1 frase introdutória sobre como conhecer pessoas com padrões similares ajuda a entender o próprio perfil]",
+      "personalities": [
+        {
+          "name": "[Nome da personalidade 1 - ex: Steve Jobs, Winston Churchill, Madre Teresa]",
+          "field": "[Campo de atuação - ex: Tecnologia e Design, Liderança Política, Serviço e Compaixão]",
+          "profile_match": "[Combinação que justifica - ex: Colérico + Arquétipo Criador + DISC D]",
+          "connection": "[1-2 frases sobre a conexão específica com o perfil do usuário]",
+          "lesson": "[1 frase sobre o que essa pessoa ensina sobre usar bem as mesmas forças]"
+        },
+        {
+          "name": "[Nome da personalidade 2]",
+          "field": "[Campo]",
+          "profile_match": "[Combinação]",
+          "connection": "[Conexão]",
+          "lesson": "[Lição]"
+        },
+        {
+          "name": "[Nome da personalidade 3]",
+          "field": "[Campo]",
+          "profile_match": "[Combinação]",
+          "connection": "[Conexão]",
+          "lesson": "[Lição]"
+        }
+      ],
+      "reflection": "[1-2 frases de reflexão sobre o que essas pessoas têm em comum com o usuário - foco em COMO pensam e sentem, não no que fizeram]"
+    },
+    {
       "id": "conversa_final",
       "title": "Uma Conversa Honesta",
       "who_you_are": "[1 frase reafirmando identidade]",
@@ -1834,6 +1864,62 @@ EXEMPLOS POR COMBINAÇÃO:
 - Sanguíneo + Criador → São João Bosco (alegria a serviço dos jovens)
 - Fleumático + Cuidador → São José (silêncio protetor e fidelidade)
 
+═══════════════════════════════════════════
+👥 REGRA DAS PERSONALIDADES DE REFERÊNCIA (OBRIGATÓRIA)
+═══════════════════════════════════════════
+
+A seção personalidades_referencia apresenta 3-5 figuras conhecidas que compartilham 
+características similares ao perfil do usuário, criando identificação e aspiração.
+
+📋 BIBLIOTECA DE PERSONALIDADES POR PERFIL:
+
+COLÉRICO + HERÓI/GOVERNANTE:
+- Steve Jobs (Tecnologia) - intensidade + visão + exigência
+- Winston Churchill (Liderança Política) - firmeza em crises
+- Margaret Thatcher (Política) - convicção inabalável
+- Jeff Bezos (Empreendedorismo) - foco obsessivo em resultados
+- São João Paulo II (Fé e Liderança) - força pastoral e decisão
+
+COLÉRICO + CRIADOR:
+- Elon Musk (Tecnologia e Inovação) - visão disruptiva
+- Walt Disney (Entretenimento) - perfeccionismo criativo
+- Leonardo da Vinci (Artes e Ciência) - excelência multifacetada
+
+SANGUÍNEO + EXPLORADOR/BOBO DA CORTE:
+- Richard Branson (Empreendedorismo) - ousadia e carisma
+- Robin Williams (Entretenimento) - energia contagiante
+- São João Bosco (Educação e Fé) - alegria a serviço
+
+MELANCÓLICO + SÁBIO:
+- Albert Einstein (Ciência) - profundidade intelectual
+- C.S. Lewis (Literatura e Fé) - razão e imaginação
+- Jordan Peterson (Psicologia) - análise e confronto
+- Santo Agostinho (Filosofia e Fé) - busca inquieta pela verdade
+
+MELANCÓLICO + CRIADOR:
+- Beethoven (Música) - genialidade através da dor
+- Michelangelo (Artes) - perfeição como obsessão
+- Dostoiévski (Literatura) - profundidade humana
+
+FLEUMÁTICO + CUIDADOR:
+- Madre Teresa de Calcutá (Serviço) - presença silenciosa
+- Nelson Mandela (Liderança) - paciência estratégica
+- Papa Francisco (Fé) - simplicidade e acolhimento
+- São José (Fé) - fidelidade invisível
+
+SANGUÍNEO + CUIDADOR:
+- Oprah Winfrey (Comunicação) - conexão emocional
+- Padre Marcelo Rossi (Fé) - carisma pastoral
+
+REGRAS DE SELEÇÃO (PERSONALIDADES):
+1. MÍNIMO 3, MÁXIMO 5 personalidades
+2. DIVERSIDADE de campos - não repetir área de atuação
+3. MIX de seculares + religiosos (1-2 santos, 2-3 seculares)
+4. NENHUMA figura polêmica ou controversa
+5. CONEXÃO REAL - cite qual combinação de testes justifica
+6. LIÇÃO que mostra como usou bem (ou pagou preço) pelas mesmas forças
+7. DIVERSIDADE de gênero e época - misture homens/mulheres, históricos/contemporâneos
+
 REGRAS CRÍTICAS - LAPIDAÇÃO V6:
 - impact_blocks DEVE ser preenchido com conteúdo específico e personalizado
 - visual_data DEVE extrair valores reais dos resultados dos testes
@@ -1843,6 +1929,7 @@ REGRAS CRÍTICAS - LAPIDAÇÃO V6:
 - raridade_perfil é OBRIGATÓRIO - estime a raridade entre 1-25%
 - plano_90_dias DEVE ter ritual_name para cada mês (Método Nello)
 - rotina_diaria DEVE ter ritual_name para manhã, tarde e noite (Método Nello)
+- personalidades_referencia é OBRIGATÓRIO - selecione 3-5 personalidades diversas
 - conversa_final DEVE ter who_you_are, risk_of_not_living, invitation (fechamento que exige decisão)
 - next_step DEVE ter ritual_name (Método Nello)
 - Frases curtas e impactantes apenas

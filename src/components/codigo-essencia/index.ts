@@ -31,3 +31,4 @@ export { SectionSummary } from "./SectionSummary";
 export { ProvocativeClosing } from "./ProvocativeClosing";
 export { RelatorioConjuge } from "./RelatorioConjuge";
 export { SaintPatronSection } from "./SaintPatronSection";
+export { PersonalitiesReferenceSection } from "./PersonalitiesReferenceSection";
