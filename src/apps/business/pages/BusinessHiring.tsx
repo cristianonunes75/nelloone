@@ -153,7 +153,13 @@ export default function BusinessHiring() {
   };
 
   const getInviteLink = (token: string) => {
-    return `${window.location.origin}/business/assessment/${token}`;
+    // Em produção: business.nello.one/assessment/TOKEN
+    // Em preview: adiciona ?app=business para routing correto
+    const isPreview = window.location.hostname.includes('lovable');
+    if (isPreview) {
+      return `${window.location.origin}/assessment/${token}?app=business`;
+    }
+    return `${window.location.origin}/assessment/${token}`;
   };
 
   const copyInviteLink = async (token: string) => {
