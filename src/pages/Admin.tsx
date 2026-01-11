@@ -32,6 +32,7 @@ const CommunicationManagement = lazy(() => import("@/components/admin/Communicat
 const AdminNotificationsHistory = lazy(() => import("@/components/admin/AdminNotificationsHistory").then(m => ({ default: m.AdminNotificationsHistory })));
 const AdminSendReports = lazy(() => import("@/components/admin/AdminSendReports").then(m => ({ default: m.AdminSendReports })));
 const AdminEngagementCenter = lazy(() => import("@/components/admin/AdminEngagementCenter").then(m => ({ default: m.default })));
+const AdminTools = lazy(() => import("@/components/admin/AdminTools").then(m => ({ default: m.AdminTools })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -96,6 +97,7 @@ const Admin = () => {
                 <Route path="limpeza" element={<DataCleanupTool />} />
                 <Route path="notificacoes" element={<NotificationAutomation />} />
                 <Route path="logs" element={<AdminLogs />} />
+                <Route path="tools" element={<AdminTools />} />
                 <Route path="configuracoes" element={<AdminSettings />} />
                 <Route path="*" element={<AdminDashboard />} />
               </Routes>
