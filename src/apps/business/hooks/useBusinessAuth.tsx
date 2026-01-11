@@ -37,6 +37,7 @@ interface BusinessAuthContextType {
   isCompanyAdmin: boolean;
   isCollaborator: boolean;
   isSuperAdmin: boolean;
+  isNelloOneSuperAdmin: boolean; // Super admin from Nello One (user_roles)
   isLoading: boolean;
   hasCompany: boolean;
   needsOnboarding: boolean;
@@ -51,10 +52,13 @@ interface BusinessAuthProviderProps {
 }
 
 export function BusinessAuthProvider({ children }: BusinessAuthProviderProps) {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, userRoles, isLoading: authLoading } = useAuth();
   const [companyUser, setCompanyUser] = useState<CompanyUser | null>(null);
   const [company, setCompany] = useState<Company | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Check if user is a Nello One super admin (has 'admin' role in user_roles)
+  const isNelloOneSuperAdmin = userRoles.includes('admin');
 
   const fetchBusinessData = async () => {
     if (!user) {
@@ -113,13 +117,18 @@ export function BusinessAuthProvider({ children }: BusinessAuthProviderProps) {
     }
   }, [user, authLoading]);
 
+  // Business role from company_users table
   const businessRole = companyUser?.role || null;
-  const isCompanyAdmin = businessRole === 'company_admin' || businessRole === 'super_admin';
+  
+  // isCompanyAdmin: either from company_users role OR if they're a Nello One super admin
+  const isCompanyAdmin = businessRole === 'company_admin' || businessRole === 'super_admin' || isNelloOneSuperAdmin;
   const isCollaborator = businessRole === 'collaborator';
-  const isSuperAdmin = businessRole === 'super_admin';
+  const isSuperAdmin = businessRole === 'super_admin' || isNelloOneSuperAdmin;
   const hasCompany = !!company;
-  const needsOnboarding = isCompanyAdmin && hasCompany && !companyUser?.onboarding_completed;
-  const needsConsent = isCollaborator && !companyUser?.consent_given;
+  
+  // Nello One super admins don't need onboarding or consent
+  const needsOnboarding = !isNelloOneSuperAdmin && isCompanyAdmin && hasCompany && !companyUser?.onboarding_completed;
+  const needsConsent = !isNelloOneSuperAdmin && isCollaborator && !companyUser?.consent_given;
 
   const value: BusinessAuthContextType = {
     companyUser,
@@ -128,6 +137,7 @@ export function BusinessAuthProvider({ children }: BusinessAuthProviderProps) {
     isCompanyAdmin,
     isCollaborator,
     isSuperAdmin,
+    isNelloOneSuperAdmin,
     isLoading: authLoading || isLoading,
     hasCompany,
     needsOnboarding,
