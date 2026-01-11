@@ -24,8 +24,10 @@ import {
   Users,
   Briefcase,
   UserCog,
+  FileDown,
 } from "lucide-react";
 import { toast } from "sonner";
+import { downloadRelatorioContextualPDF } from "@/lib/pdfRelatorioContextual";
 
 // ===========================================
 // TYPES
@@ -370,6 +372,24 @@ export const RelatorioContextual = ({ reportType, language, hasSavedCodigo }: Re
     setTimeout(() => setLinkCopied(false), 3000);
   };
 
+  const handleDownloadPDF = () => {
+    if (!report?.content) return;
+    
+    try {
+      downloadRelatorioContextualPDF({
+        userName,
+        recipientName: report.recipient_name || undefined,
+        reportType,
+        language,
+        content: report.content
+      });
+      toast.success(language === 'en' ? 'PDF downloaded!' : 'PDF baixado!');
+    } catch (err) {
+      console.error('Error generating PDF:', err);
+      toast.error(language === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+    }
+  };
+
   const renderContent = (content: any) => {
     if (!content) return null;
     
@@ -582,6 +602,15 @@ export const RelatorioContextual = ({ reportType, language, hasSavedCodigo }: Re
               >
                 {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 {linkCopied ? t.linkCopied : t.copyLink}
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleDownloadPDF}
+                className="gap-1"
+              >
+                <FileDown className="w-4 h-4" />
+                {t.downloadPdf}
               </Button>
               <span className="text-xs text-muted-foreground">{t.linkExpires}</span>
             </div>
