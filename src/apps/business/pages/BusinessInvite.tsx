@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { UserPlus, Send, Loader2, X, CheckCircle } from 'lucide-react';
+import { UserPlus, Send, Loader2, X, CheckCircle, Crown, Users } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
 import { useBusinessEnforcement } from '../hooks/useBusinessEnforcement';
@@ -16,6 +17,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 
+type InviteRole = 'collaborator' | 'company_admin';
+
 export default function BusinessInvite() {
   const { company } = useBusinessAuth();
   const { user } = useAuth();
@@ -25,6 +28,7 @@ export default function BusinessInvite() {
   const [customMessage, setCustomMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [sentEmails, setSentEmails] = useState<string[]>([]);
+  const [selectedRole, setSelectedRole] = useState<InviteRole>('collaborator');
 
   const addEmail = () => {
     const email = currentEmail.trim().toLowerCase();
@@ -91,13 +95,13 @@ export default function BusinessInvite() {
         // Generate unique token
         const token = crypto.randomUUID();
         
-        // Create invite record
+        // Create invite record with selected role
         const { error } = await supabase
           .from('company_invites')
           .insert({
             company_id: company.id,
             email,
-            role: 'collaborator',
+            role: selectedRole,
             invite_token: token,
             invited_by: user.id,
             sent_at: new Date().toISOString(),
@@ -144,8 +148,10 @@ export default function BusinessInvite() {
           </p>
         </div>
 
-        {/* Limit Warning */}
-        <CollaboratorLimitWarning action="invite" />
+        {/* Limit Warning - only for collaborators */}
+        {selectedRole === 'collaborator' && (
+          <CollaboratorLimitWarning action="invite" />
+        )}
 
         <Card>
           <CardHeader>
@@ -154,12 +160,83 @@ export default function BusinessInvite() {
               Novos convites
             </CardTitle>
             <CardDescription>
-              Adicione os emails dos colaboradores que deseja convidar
-              {enforcement.remainingSlots > 0 && (
-                <span className="ml-1">
-                  ({enforcement.remainingSlots} vagas disponíveis)
-                </span>
+              Convide colaboradores ou sócios/administradores para sua empresa
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Role Selection */}
+            <div className="space-y-3">
+              <Label>Tipo de acesso</Label>
+              <RadioGroup
+                value={selectedRole}
+                onValueChange={(value) => setSelectedRole(value as InviteRole)}
+                className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+              >
+                <div className={`relative flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                  selectedRole === 'collaborator' 
+                    ? 'border-primary bg-primary/5' 
+                    : 'border-border hover:border-primary/50'
+                }`}>
+                  <RadioGroupItem value="collaborator" id="collaborator" className="mt-0.5" />
+                  <label htmlFor="collaborator" className="cursor-pointer flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Users className="w-4 h-4 text-muted-foreground" />
+                      <span className="font-medium">Colaborador</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Faz os testes e vê apenas seus próprios resultados
+                    </p>
+                  </label>
+                </div>
+                
+                <div className={`relative flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                  selectedRole === 'company_admin' 
+                    ? 'border-primary bg-primary/5' 
+                    : 'border-border hover:border-primary/50'
+                }`}>
+                  <RadioGroupItem value="company_admin" id="company_admin" className="mt-0.5" />
+                  <label htmlFor="company_admin" className="cursor-pointer flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Crown className="w-4 h-4 text-amber-500" />
+                      <span className="font-medium">Sócio / Admin</span>
+                      <Badge variant="outline" className="text-xs">Acesso total</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Gerencia equipe, vê relatórios e convida membros
+                    </p>
+                  </label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {selectedRole === 'collaborator' && enforcement.remainingSlots > 0 && (
+              <p className="text-sm text-muted-foreground">
+                {enforcement.remainingSlots} vagas de colaborador disponíveis
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {selectedRole === 'company_admin' ? (
+                <>
+                  <Crown className="w-5 h-5 text-amber-500" />
+                  Convidar Sócio/Admin
+                </>
+              ) : (
+                <>
+                  <Users className="w-5 h-5" />
+                  Convidar Colaboradores
+                </>
               )}
+            </CardTitle>
+            <CardDescription>
+              {selectedRole === 'company_admin' 
+                ? 'Adicione sócios ou administradores com acesso total à gestão'
+                : 'Adicione colaboradores para a jornada de autoconhecimento'
+              }
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
