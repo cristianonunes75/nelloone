@@ -28,7 +28,7 @@ const adminApps: AdminApp[] = [
     name: 'Nello One',
     label: 'Core',
     icon: <Sparkles className="w-4 h-4" />,
-    url: 'https://one.nello.one',
+    url: 'https://nello.one',
     adminPath: '/admin',
   },
   {
