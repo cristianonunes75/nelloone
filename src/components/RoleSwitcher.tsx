@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,8 +29,9 @@ const roleRoutes: Record<string, string> = {
 };
 
 export const RoleSwitcher = () => {
-  const { userRoles, userRole, setActiveRole } = useAuth();
+  const { userRoles, setActiveRole } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Only show admin and cliente roles
   const availableRoles = userRoles?.filter((role): role is UserRole => role === "admin" || role === "cliente") || [];
@@ -40,19 +41,28 @@ export const RoleSwitcher = () => {
     return null;
   }
 
+  // Determine current role based on the current route, not the auth state
+  const getCurrentRoleFromRoute = (): UserRole => {
+    const path = location.pathname;
+    if (path.startsWith("/admin")) return "admin";
+    if (path.startsWith("/cliente")) return "cliente";
+    // Default based on path patterns
+    return "cliente";
+  };
+
+  const currentRouteRole = getCurrentRoleFromRoute();
+
   const handleRoleSwitch = (role: UserRole) => {
     setActiveRole(role);
     navigate(roleRoutes[role]);
   };
 
-  const displayRole = userRole as UserRole;
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
-          {displayRole && roleIcons[displayRole]}
-          {displayRole && roleNames[displayRole]}
+          {roleIcons[currentRouteRole]}
+          {roleNames[currentRouteRole]}
           <ChevronDown className="w-4 h-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -64,11 +74,11 @@ export const RoleSwitcher = () => {
             key={role}
             onClick={() => handleRoleSwitch(role as UserRole)}
             className="gap-2 cursor-pointer"
-            disabled={displayRole === role}
+            disabled={currentRouteRole === role}
           >
             {roleIcons[role]}
             <span>{roleNames[role]}</span>
-            {displayRole === role && (
+            {currentRouteRole === role && (
               <span className="ml-auto text-xs text-muted-foreground">Atual</span>
             )}
           </DropdownMenuItem>
