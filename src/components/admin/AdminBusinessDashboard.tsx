@@ -4,6 +4,17 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { 
   Building2, 
   Users, 
@@ -20,7 +31,8 @@ import {
   Share2,
   History,
   XCircle,
-  AlertOctagon
+  AlertOctagon,
+  Plus
 } from "lucide-react";
 import { format, parseISO, differenceInDays, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -106,6 +118,14 @@ export const AdminBusinessDashboard = () => {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [statusHistory, setStatusHistory] = useState<StatusHistoryEntry[]>([]);
   const [activeTab, setActiveTab] = useState("all");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newCompany, setNewCompany] = useState({
+    name: "",
+    billingEmail: "",
+    industry: "",
+    adminEmail: "",
+  });
 
   useEffect(() => {
     fetchData();
@@ -279,6 +299,77 @@ export const AdminBusinessDashboard = () => {
     }
   };
 
+  const handleCreateCompany = async () => {
+    if (!newCompany.name.trim()) {
+      toast.error("Nome da empresa é obrigatório");
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      // Generate slug from name
+      const slug = newCompany.name
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+
+      // Check if slug already exists
+      const { data: existing } = await supabase
+        .from("companies")
+        .select("id")
+        .eq("slug", slug)
+        .maybeSingle();
+
+      if (existing) {
+        toast.error("Já existe uma empresa com esse nome");
+        return;
+      }
+
+      // Create company
+      const { data: company, error: companyError } = await supabase
+        .from("companies")
+        .insert({
+          name: newCompany.name.trim(),
+          slug,
+          billing_email: newCompany.billingEmail.trim() || null,
+          industry: newCompany.industry.trim() || null,
+        })
+        .select()
+        .single();
+
+      if (companyError) throw companyError;
+
+      // Create trial subscription
+      const trialEndsAt = new Date();
+      trialEndsAt.setDate(trialEndsAt.getDate() + 14);
+
+      const { error: subError } = await supabase
+        .from("company_subscriptions")
+        .insert({
+          company_id: company.id,
+          status: 'trialing',
+          plan_tier: 'starter',
+          trial_ends_at: trialEndsAt.toISOString(),
+          max_collaborators: 5,
+          current_collaborators: 0,
+        });
+
+      if (subError) throw subError;
+
+      toast.success(`Empresa "${company.name}" criada com sucesso!`);
+      setIsCreateDialogOpen(false);
+      setNewCompany({ name: "", billingEmail: "", industry: "", adminEmail: "" });
+      fetchData();
+    } catch (error) {
+      console.error("Error creating company:", error);
+      toast.error("Erro ao criar empresa");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   const getStatusBadge = (subscription: CompanySubscription | null) => {
     if (!subscription) {
       return <Badge variant="outline" className="text-muted-foreground">Sem plano</Badge>;
@@ -351,13 +442,90 @@ export const AdminBusinessDashboard = () => {
   return (
     <div className="space-y-6 md:space-y-8 max-w-7xl">
       {/* Header */}
-      <div className="space-y-1">
-        <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-ink">
-          Nello One Business
-        </h1>
-        <p className="text-muted-foreground text-xs md:text-sm">
-          Visão global de todas as empresas e colaboradores
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-ink">
+            Nello One Business
+          </h1>
+          <p className="text-muted-foreground text-xs md:text-sm">
+            Visão global de todas as empresas e colaboradores
+          </p>
+        </div>
+
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="gap-2">
+              <Plus className="w-4 h-4" />
+              Nova Empresa
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Criar Nova Empresa</DialogTitle>
+              <DialogDescription>
+                Adicione uma nova empresa à plataforma. Ela iniciará com 14 dias de trial.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="company-name">Nome da Empresa *</Label>
+                <Input
+                  id="company-name"
+                  placeholder="Ex: Empresa XYZ"
+                  value={newCompany.name}
+                  onChange={(e) => setNewCompany(prev => ({ ...prev, name: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="billing-email">Email de Cobrança</Label>
+                <Input
+                  id="billing-email"
+                  type="email"
+                  placeholder="financeiro@empresa.com"
+                  value={newCompany.billingEmail}
+                  onChange={(e) => setNewCompany(prev => ({ ...prev, billingEmail: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="industry">Segmento/Indústria</Label>
+                <Input
+                  id="industry"
+                  placeholder="Ex: Tecnologia, Saúde, Varejo"
+                  value={newCompany.industry}
+                  onChange={(e) => setNewCompany(prev => ({ ...prev, industry: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="admin-email">Email do Administrador</Label>
+                <Input
+                  id="admin-email"
+                  type="email"
+                  placeholder="admin@empresa.com"
+                  value={newCompany.adminEmail}
+                  onChange={(e) => setNewCompany(prev => ({ ...prev, adminEmail: e.target.value }))}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Opcional - o administrador receberá um convite por email
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleCreateCompany} disabled={isCreating}>
+                {isCreating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Criando...
+                  </>
+                ) : (
+                  "Criar Empresa"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Global Stats Grid */}
