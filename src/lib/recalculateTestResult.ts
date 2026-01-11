@@ -108,7 +108,29 @@ export async function recalculateTestResult(
 
       case "linguagens_amor": {
         const estilosResults = calculateEstilosConexaoAfetiva(answers as any, "pt");
-        resultData = estilosResults;
+        // Format result to be compatible with both the new Estilos system 
+        // and the legacy code that reads primary/secondary as objects
+        resultData = {
+          testType: "linguagens_amor",
+          completed_at: new Date().toISOString(),
+          // New format fields
+          ...estilosResults,
+          // Legacy compatible fields  
+          primary: {
+            style: estilosResults.primary.style,
+            score: estilosResults.primary.score,
+            name: estilosResults.primary.name.pt,
+            symbol: estilosResults.primary.symbol,
+            essence: estilosResults.primary.essence.pt,
+          },
+          secondary: {
+            style: estilosResults.secondary.style,
+            score: estilosResults.secondary.score,
+            name: estilosResults.secondary.name.pt,
+            symbol: estilosResults.secondary.symbol,
+            essence: estilosResults.secondary.essence.pt,
+          },
+        };
         break;
       }
 
