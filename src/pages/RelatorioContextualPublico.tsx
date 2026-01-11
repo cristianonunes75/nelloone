@@ -144,8 +144,25 @@ const RelatorioContextualPublico = () => {
     fetchReport();
   }, [token, reportType, config, lang]);
 
-  const renderContent = (content: string | string[] | undefined) => {
+  const renderContent = (content: string | string[] | { titulo?: string; conteudo?: string | string[] } | undefined) => {
     if (!content) return null;
+    
+    // Handle object format with titulo/conteudo structure
+    if (typeof content === 'object' && !Array.isArray(content)) {
+      const obj = content as { titulo?: string; conteudo?: string | string[] };
+      const textContent = obj.conteudo || obj.titulo;
+      if (!textContent) return null;
+      
+      if (Array.isArray(textContent)) {
+        return (
+          <ul className="list-disc list-inside space-y-1">
+            {textContent.map((item, i) => <li key={i}>{item}</li>)}
+          </ul>
+        );
+      }
+      return <p className="whitespace-pre-wrap">{textContent}</p>;
+    }
+    
     if (Array.isArray(content)) {
       return (
         <ul className="list-disc list-inside space-y-1">
@@ -217,17 +234,28 @@ const RelatorioContextualPublico = () => {
 
         {/* Report Sections */}
         {report && Object.entries(report).map(([key, value]) => {
-          if (!value || (typeof value === 'string' && !value.trim())) return null;
+          if (!value) return null;
           
-          const label = SECTION_LABELS[key]?.[lang] || key;
+          // Check for empty content in different formats
+          if (typeof value === 'string' && !value.trim()) return null;
+          if (typeof value === 'object' && !Array.isArray(value)) {
+            const obj = value as { titulo?: string; conteudo?: string | string[] };
+            if (!obj.conteudo && !obj.titulo) return null;
+          }
+          
+          // Get section title - use object's titulo if available, otherwise use label
+          const objValue = value as { titulo?: string; conteudo?: string | string[] };
+          const sectionTitle = (typeof value === 'object' && !Array.isArray(value) && objValue.titulo) 
+            ? objValue.titulo 
+            : (SECTION_LABELS[key]?.[lang] || key);
           
           return (
             <Card key={key}>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{label}</CardTitle>
+                <CardTitle className="text-base">{sectionTitle}</CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
-                {renderContent(value as string | string[])}
+                {renderContent(value as string | string[] | { titulo?: string; conteudo?: string | string[] })}
               </CardContent>
             </Card>
           );
