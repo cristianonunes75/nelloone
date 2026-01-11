@@ -13,7 +13,7 @@ export function BusinessProtectedRoute({
   children, 
   requiredRole = 'any' 
 }: BusinessProtectedRouteProps) {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, userRoles, isLoading: authLoading } = useAuth();
   const { 
     companyUser, 
     businessRole, 
@@ -23,6 +23,9 @@ export function BusinessProtectedRoute({
     hasCompany
   } = useBusinessAuth();
   const location = useLocation();
+
+  // Check if user is Nello One super admin (has admin role in user_roles)
+  const isNelloOneSuperAdmin = userRoles.includes('admin');
 
   // Show loading while checking auth
   if (authLoading || businessLoading) {
@@ -39,6 +42,11 @@ export function BusinessProtectedRoute({
   // Not logged in - redirect to auth
   if (!user) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  // Nello One super admins have full access to Business without needing a company
+  if (isNelloOneSuperAdmin) {
+    return <>{children}</>;
   }
 
   // No company association
