@@ -18,7 +18,8 @@ type EmailType =
   | "new_commission"
   | "new_testimonial"
   | "testimonial_response"
-  | "support_reply";
+  | "support_reply"
+  | "results_updated";
 
 interface EmailRequest {
   type: EmailType;
@@ -39,6 +40,8 @@ interface EmailRequest {
     userEmail?: string;
     subject?: string;
     message?: string;
+    oldResult?: string;
+    newResult?: string;
   };
 }
 
@@ -455,6 +458,44 @@ ${data.message || "Obrigado pelo seu feedback!"}
           </div>
         `,
       },
+      results_updated: {
+        subject: "🔄 Seus resultados foram atualizados - NELLO ONE",
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">O caminho começa dentro.</p>
+            </div>
+            
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Olá, ${name}! 🔄</h2>
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Temos uma boa notícia! Fizemos uma correção em nosso sistema de cálculo e seus resultados do teste <strong>Estilos de Conexão Afetiva</strong> foram atualizados.
+              </p>
+              
+              <div style="background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                <p style="color: #166534; font-size: 14px; margin: 0 0 8px;">Seu novo resultado:</p>
+                <p style="color: #166534; font-size: 20px; font-weight: 600; margin: 0;">
+                  ${data.newResult || "Resultado atualizado"}
+                </p>
+              </div>
+              
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Se você já havia visto seu Código da Essência, acesse novamente para ver a análise atualizada com base neste resultado corrigido.
+              </p>
+              
+              <a href="https://nello.one/cliente" 
+                 style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
+                Ver Meus Resultados
+              </a>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. Todos os direitos reservados.
+            </p>
+          </div>
+        `,
+      },
     },
     en: {
       purchase_confirmation: {
@@ -856,6 +897,44 @@ ${data.message || "Thank you for your feedback!"}
                   Access My Account
                 </a>
               </div>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. All rights reserved.
+            </p>
+          </div>
+        `,
+      },
+      results_updated: {
+        subject: "🔄 Your results have been updated - NELLO ONE",
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">The path begins within.</p>
+            </div>
+            
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Hello, ${name}! 🔄</h2>
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Great news! We've made a correction to our calculation system and your <strong>Affective Connection Styles</strong> test results have been updated.
+              </p>
+              
+              <div style="background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                <p style="color: #166534; font-size: 14px; margin: 0 0 8px;">Your new result:</p>
+                <p style="color: #166534; font-size: 20px; font-weight: 600; margin: 0;">
+                  ${data.newResult || "Updated result"}
+                </p>
+              </div>
+              
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                If you've already seen your Essence Code, access it again to see the updated analysis based on this corrected result.
+              </p>
+              
+              <a href="https://nello.one/cliente" 
+                 style="display: inline-block; background: #1F2E4B; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; margin-top: 16px;">
+                View My Results
+              </a>
             </div>
             
             <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">

@@ -5,11 +5,13 @@ interface RecalculationResult {
   userId: string;
   userTestId: string;
   userName: string;
+  userEmail?: string;
   success: boolean;
   oldPrimary?: string;
   newPrimary?: string;
   newScores?: Record<string, number>;
   error?: string;
+  emailSent?: boolean;
 }
 
 /**
@@ -17,13 +19,15 @@ interface RecalculationResult {
  * This fixes the bug where scores weren't being calculated correctly
  * because the calculation function was looking for old answer values.
  */
-export async function recalculateLinguagensAmorResults(): Promise<{
+export async function recalculateLinguagensAmorResults(sendEmailNotifications: boolean = false): Promise<{
   total: number;
   successful: number;
   failed: number;
+  emailsSent: number;
   results: RecalculationResult[];
 }> {
   const results: RecalculationResult[] = [];
+  let emailsSent = 0;
   
   // Get all completed linguagens_amor tests
   const { data: userTests, error: fetchError } = await supabase
@@ -46,11 +50,11 @@ export async function recalculateLinguagensAmorResults(): Promise<{
 
   if (fetchError) {
     console.error("Error fetching user tests:", fetchError);
-    return { total: 0, successful: 0, failed: 0, results: [] };
+    return { total: 0, successful: 0, failed: 0, emailsSent: 0, results: [] };
   }
 
   if (!userTests || userTests.length === 0) {
-    return { total: 0, successful: 0, failed: 0, results: [] };
+    return { total: 0, successful: 0, failed: 0, emailsSent: 0, results: [] };
   }
 
   // Filter tests that need recalculation (scores are all zero or missing)
@@ -67,8 +71,25 @@ export async function recalculateLinguagensAmorResults(): Promise<{
     return !hasNonZeroScore;
   });
 
+  // Fetch user emails if we need to send notifications
+  let userEmails: Record<string, string> = {};
+  if (sendEmailNotifications && testsToRecalculate.length > 0) {
+    const userIds = testsToRecalculate.map(ut => ut.user_id);
+    try {
+      const { data: emailsData } = await supabase.functions.invoke('get-user-emails', {
+        body: { userIds }
+      });
+      if (emailsData?.emails) {
+        userEmails = emailsData.emails;
+      }
+    } catch (error) {
+      console.error("Error fetching user emails:", error);
+    }
+  }
+
   for (const userTest of testsToRecalculate) {
     const userName = (userTest.profiles as any)?.full_name || "Unknown";
+    const userEmail = userEmails[userTest.user_id];
     const oldResultData = userTest.result_data as any;
     const oldPrimary = oldResultData?.primary?.name || oldResultData?.primary?.style || "Unknown";
     
@@ -84,6 +105,7 @@ export async function recalculateLinguagensAmorResults(): Promise<{
           userId: userTest.user_id,
           userTestId: userTest.id,
           userName,
+          userEmail,
           success: false,
           oldPrimary,
           error: answersError?.message || "No answers found",
@@ -129,19 +151,47 @@ export async function recalculateLinguagensAmorResults(): Promise<{
           userId: userTest.user_id,
           userTestId: userTest.id,
           userName,
+          userEmail,
           success: false,
           oldPrimary,
           error: updateError.message,
         });
       } else {
+        let emailSentSuccess = false;
+        
+        // Send email notification if enabled and email available
+        if (sendEmailNotifications && userEmail) {
+          try {
+            const { error: emailError } = await supabase.functions.invoke('send-email', {
+              body: {
+                type: 'results_updated',
+                to: userEmail,
+                data: {
+                  name: userName,
+                  newResult: estilosResults.primary.name.pt,
+                  language: 'pt'
+                }
+              }
+            });
+            if (!emailError) {
+              emailSentSuccess = true;
+              emailsSent++;
+            }
+          } catch (error) {
+            console.error("Error sending email to", userEmail, error);
+          }
+        }
+        
         results.push({
           userId: userTest.user_id,
           userTestId: userTest.id,
           userName,
+          userEmail,
           success: true,
           oldPrimary,
           newPrimary: estilosResults.primary.name.pt,
           newScores: estilosResults.scores,
+          emailSent: emailSentSuccess,
         });
       }
     } catch (error: any) {
@@ -149,6 +199,7 @@ export async function recalculateLinguagensAmorResults(): Promise<{
         userId: userTest.user_id,
         userTestId: userTest.id,
         userName,
+        userEmail,
         success: false,
         oldPrimary,
         error: error.message || "Unknown error",
@@ -163,6 +214,7 @@ export async function recalculateLinguagensAmorResults(): Promise<{
     total: testsToRecalculate.length,
     successful,
     failed,
+    emailsSent,
     results,
   };
 }

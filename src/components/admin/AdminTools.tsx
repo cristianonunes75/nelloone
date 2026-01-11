@@ -24,7 +24,8 @@ import {
   User,
   RefreshCw,
   FileText,
-  Heart
+  Heart,
+  Mail
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -64,10 +65,12 @@ export const AdminTools = () => {
   const [myTestsLoading, setMyTestsLoading] = useState(false);
   const [resettingTestId, setResettingTestId] = useState<string | null>(null);
   const [recalculatingLinguagens, setRecalculatingLinguagens] = useState(false);
+  const [sendEmailsOnRecalculate, setSendEmailsOnRecalculate] = useState(true);
   const [recalculationResults, setRecalculationResults] = useState<{
     total: number;
     successful: number;
     failed: number;
+    emailsSent: number;
     results: any[];
   } | null>(null);
   const navigate = useNavigate();
@@ -528,15 +531,35 @@ export const AdminTools = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Notificar usuários por email</p>
+                    <p className="text-xs text-muted-foreground">
+                      Enviar email automático avisando sobre a atualização
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={sendEmailsOnRecalculate}
+                  onCheckedChange={setSendEmailsOnRecalculate}
+                />
+              </div>
+
               <Button 
                 variant="outline" 
                 onClick={async () => {
                   setRecalculatingLinguagens(true);
                   try {
-                    const results = await recalculateLinguagensAmorResults();
+                    const results = await recalculateLinguagensAmorResults(sendEmailsOnRecalculate);
                     setRecalculationResults(results);
                     if (results.successful > 0) {
-                      toast.success(`${results.successful} resultados recalculados com sucesso!`);
+                      let message = `${results.successful} resultados recalculados com sucesso!`;
+                      if (results.emailsSent > 0) {
+                        message += ` ${results.emailsSent} emails enviados.`;
+                      }
+                      toast.success(message);
                     } else if (results.total === 0) {
                       toast.info("Nenhum resultado precisava ser recalculado");
                     }
@@ -563,13 +586,19 @@ export const AdminTools = () => {
 
               {recalculationResults && (
                 <div className="space-y-2 mt-4">
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-2 text-sm flex-wrap">
                     <Badge variant={recalculationResults.successful > 0 ? "default" : "secondary"}>
                       {recalculationResults.total} testes analisados
                     </Badge>
                     <Badge variant="default" className="bg-emerald-500">
                       {recalculationResults.successful} corrigidos
                     </Badge>
+                    {recalculationResults.emailsSent > 0 && (
+                      <Badge variant="outline" className="border-blue-500 text-blue-600">
+                        <Mail className="w-3 h-3 mr-1" />
+                        {recalculationResults.emailsSent} emails enviados
+                      </Badge>
+                    )}
                     {recalculationResults.failed > 0 && (
                       <Badge variant="destructive">
                         {recalculationResults.failed} falhas
@@ -584,6 +613,11 @@ export const AdminTools = () => {
                           <CheckCircle2 className="w-3 h-3 text-emerald-600 flex-shrink-0" />
                           <span className="font-medium">{r.userName}:</span>
                           <span className="text-muted-foreground">{r.oldPrimary} → {r.newPrimary}</span>
+                          {r.emailSent && (
+                            <span className="ml-auto" aria-label="Email enviado">
+                              <Mail className="w-3 h-3 text-blue-500" />
+                            </span>
+                          )}
                         </div>
                       ))}
                     </div>
