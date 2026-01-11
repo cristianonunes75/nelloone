@@ -13,6 +13,7 @@ interface InviteRequest {
   email: string;
   role: "company_admin" | "collaborator";
   company_id: string;
+  import_requested?: boolean;
 }
 
 const logStep = (step: string, details?: Record<string, unknown>) => {
@@ -44,11 +45,13 @@ serve(async (req: Request): Promise<Response> => {
 
     logStep("User authenticated", { userId: user.id });
 
-    const { email, role, company_id }: InviteRequest = await req.json();
+    const { email, role, company_id, import_requested }: InviteRequest = await req.json();
 
     if (!email || !role || !company_id) {
       throw new Error("Missing required fields: email, role, company_id");
     }
+
+    logStep("Processing invite request", { email, role, company_id, import_requested });
 
     logStep("Processing invite request", { email, role, company_id });
 
@@ -111,6 +114,7 @@ serve(async (req: Request): Promise<Response> => {
         invited_by: user.id,
         expires_at: expiresAt.toISOString(),
         status: "pending",
+        import_requested: import_requested || false,
       })
       .select()
       .single();

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { UserPlus, Send, Loader2, X, CheckCircle, Crown, Users } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { UserPlus, Send, Loader2, X, CheckCircle, Crown, Users, Sparkles, AlertCircle, UserCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,9 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
 import { useBusinessEnforcement } from '../hooks/useBusinessEnforcement';
+import { useExistingUserCheck } from '../hooks/useExistingUserCheck';
 import { SubscriptionStatusBanner } from '../components/SubscriptionStatusBanner';
 import { CollaboratorLimitWarning } from '../components/CollaboratorLimitWarning';
 import { BlockedAccessOverlay } from '../components/BlockedAccessOverlay';
@@ -19,16 +21,64 @@ import { useAuth } from '@/hooks/useAuth';
 
 type InviteRole = 'collaborator' | 'company_admin';
 
+interface EmailWithInfo {
+  email: string;
+  requestImport: boolean;
+}
+
 export default function BusinessInvite() {
   const { company } = useBusinessAuth();
   const { user } = useAuth();
   const enforcement = useBusinessEnforcement();
-  const [emails, setEmails] = useState<string[]>([]);
+  const { checkEmail, getResultForEmail, isChecking } = useExistingUserCheck(company?.id);
+  
+  const [emails, setEmails] = useState<EmailWithInfo[]>([]);
   const [currentEmail, setCurrentEmail] = useState('');
   const [customMessage, setCustomMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [sentEmails, setSentEmails] = useState<string[]>([]);
   const [selectedRole, setSelectedRole] = useState<InviteRole>('collaborator');
+  const [emailPreview, setEmailPreview] = useState<{
+    email: string;
+    exists: boolean;
+    firstName: string | null;
+    testsCount: number;
+    hasEssenceCode: boolean;
+    alreadyInCompany: boolean;
+    alreadyInvited: boolean;
+  } | null>(null);
+  const [isCheckingPreview, setIsCheckingPreview] = useState(false);
+
+  // Debounce email check
+  useEffect(() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!currentEmail.trim() || !emailRegex.test(currentEmail.trim())) {
+      setEmailPreview(null);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsCheckingPreview(true);
+      const result = await checkEmail(currentEmail.trim());
+      
+      if (result) {
+        setEmailPreview({
+          email: currentEmail.trim().toLowerCase(),
+          exists: result.exists,
+          firstName: result.first_name,
+          testsCount: result.completed_tests_count,
+          hasEssenceCode: result.has_essence_code,
+          alreadyInCompany: result.already_in_company,
+          alreadyInvited: result.already_invited,
+        });
+      } else {
+        setEmailPreview(null);
+      }
+      setIsCheckingPreview(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [currentEmail, checkEmail]);
 
   const addEmail = () => {
     const email = currentEmail.trim().toLowerCase();
@@ -55,17 +105,42 @@ export default function BusinessInvite() {
       return;
     }
     
-    if (emails.includes(email)) {
+    if (emails.some(e => e.email === email)) {
       toast.error('Email já adicionado');
       return;
     }
+
+    // Check if already in company
+    if (emailPreview?.alreadyInCompany) {
+      toast.error('Este usuário já faz parte da empresa');
+      return;
+    }
+
+    // Check if already invited
+    if (emailPreview?.alreadyInvited) {
+      toast.error('Já existe um convite pendente para este email');
+      return;
+    }
     
-    setEmails([...emails, email]);
+    // Add email with import preference based on preview
+    const shouldRequestImport = emailPreview?.exists && emailPreview.testsCount > 0;
+    
+    setEmails([...emails, { 
+      email, 
+      requestImport: shouldRequestImport || false 
+    }]);
     setCurrentEmail('');
+    setEmailPreview(null);
   };
 
   const removeEmail = (emailToRemove: string) => {
-    setEmails(emails.filter(e => e !== emailToRemove));
+    setEmails(emails.filter(e => e.email !== emailToRemove));
+  };
+
+  const toggleImportRequest = (email: string) => {
+    setEmails(emails.map(e => 
+      e.email === email ? { ...e, requestImport: !e.requestImport } : e
+    ));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -91,25 +166,26 @@ export default function BusinessInvite() {
     
     setIsSending(true);
     const successfulEmails: string[] = [];
-    const failedEmails: string[] = [];
+    const failedEmails: EmailWithInfo[] = [];
     
     try {
-      for (const email of emails) {
+      for (const emailInfo of emails) {
         // Call edge function to create invite and send email
         const { data, error } = await supabase.functions.invoke('business-invite', {
           body: {
-            email,
+            email: emailInfo.email,
             role: selectedRole,
             company_id: company.id,
+            import_requested: emailInfo.requestImport,
           },
         });
         
         if (error || data?.error) {
-          console.error(`Error inviting ${email}:`, error || data?.error);
-          failedEmails.push(email);
-          toast.error(`Erro ao convidar ${email}: ${data?.error || error?.message}`);
+          console.error(`Error inviting ${emailInfo.email}:`, error || data?.error);
+          failedEmails.push(emailInfo);
+          toast.error(`Erro ao convidar ${emailInfo.email}: ${data?.error || error?.message}`);
         } else {
-          successfulEmails.push(email);
+          successfulEmails.push(emailInfo.email);
         }
       }
       
@@ -130,6 +206,11 @@ export default function BusinessInvite() {
       setIsSending(false);
     }
   };
+
+  const existingUsersCount = emails.filter(e => {
+    const result = getResultForEmail(e.email);
+    return result?.info?.exists;
+  }).length;
 
   return (
     <BusinessLayout>
@@ -244,24 +325,90 @@ export default function BusinessInvite() {
                 {selectedRole === 'company_admin' ? 'Email do sócio/admin' : 'Email do colaborador'}
               </Label>
               <div className="flex gap-2">
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder={selectedRole === 'company_admin' ? 'socio@empresa.com' : 'colaborador@empresa.com'}
-                  value={currentEmail}
-                  onChange={(e) => setCurrentEmail(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={selectedRole === 'collaborator' && !enforcement.canInviteCollaborators}
-                />
+                <div className="relative flex-1">
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder={selectedRole === 'company_admin' ? 'socio@empresa.com' : 'colaborador@empresa.com'}
+                    value={currentEmail}
+                    onChange={(e) => setCurrentEmail(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    disabled={selectedRole === 'collaborator' && !enforcement.canInviteCollaborators}
+                    className={emailPreview?.exists ? 'pr-10 border-emerald-500' : ''}
+                  />
+                  {isCheckingPreview && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                    </div>
+                  )}
+                  {emailPreview?.exists && !isCheckingPreview && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <UserCheck className="w-4 h-4 text-emerald-500" />
+                    </div>
+                  )}
+                </div>
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={addEmail}
-                  disabled={selectedRole === 'collaborator' && !enforcement.canInviteCollaborators}
+                  disabled={(selectedRole === 'collaborator' && !enforcement.canInviteCollaborators) || emailPreview?.alreadyInCompany || emailPreview?.alreadyInvited}
                 >
                   Adicionar
                 </Button>
               </div>
+              
+              {/* Email Preview Card */}
+              {emailPreview && (
+                <div className={`mt-2 p-3 rounded-lg border ${
+                  emailPreview.alreadyInCompany || emailPreview.alreadyInvited 
+                    ? 'bg-destructive/10 border-destructive/30' 
+                    : emailPreview.exists 
+                      ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800' 
+                      : 'bg-muted/50'
+                }`}>
+                  {emailPreview.alreadyInCompany ? (
+                    <div className="flex items-center gap-2 text-destructive">
+                      <AlertCircle className="w-4 h-4" />
+                      <span className="text-sm font-medium">Este usuário já faz parte da empresa</span>
+                    </div>
+                  ) : emailPreview.alreadyInvited ? (
+                    <div className="flex items-center gap-2 text-destructive">
+                      <AlertCircle className="w-4 h-4" />
+                      <span className="text-sm font-medium">Já existe um convite pendente para este email</span>
+                    </div>
+                  ) : emailPreview.exists ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-emerald-600" />
+                        <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                          {emailPreview.firstName ? `${emailPreview.firstName} já` : 'Usuário já'} usa o Nello One!
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="secondary" className="text-xs bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300">
+                          {emailPreview.testsCount} teste{emailPreview.testsCount !== 1 ? 's' : ''} completo{emailPreview.testsCount !== 1 ? 's' : ''}
+                        </Badge>
+                        {emailPreview.hasEssenceCode && (
+                          <Badge variant="secondary" className="text-xs bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300">
+                            ✨ Código da Essência
+                          </Badge>
+                        )}
+                      </div>
+                      {emailPreview.testsCount > 0 && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Ao aceitar o convite, {emailPreview.firstName || 'o colaborador'} pode optar por compartilhar seus resultados existentes com a empresa.
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <UserPlus className="w-4 h-4" />
+                      <span className="text-sm">Novo usuário - será criada uma conta</span>
+                    </div>
+                  )}
+                </div>
+              )}
+              
               <p className="text-xs text-muted-foreground">
                 Pressione Enter ou vírgula para adicionar múltiplos emails
               </p>
@@ -270,20 +417,58 @@ export default function BusinessInvite() {
             {emails.length > 0 && (
               <div className="space-y-2">
                 <Label>Emails para convidar ({emails.length})</Label>
-                <div className="flex flex-wrap gap-2 p-3 bg-muted rounded-lg">
-                  {emails.map((email) => (
-                    <Badge key={email} variant="secondary" className="gap-1 pr-1">
-                      {email}
-                      <button
-                        type="button"
-                        onClick={() => removeEmail(email)}
-                        className="ml-1 hover:bg-muted-foreground/20 rounded p-0.5"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </Badge>
-                  ))}
+                <div className="space-y-2 p-3 bg-muted rounded-lg">
+                  {emails.map(({ email, requestImport }) => {
+                    const result = getResultForEmail(email);
+                    const isExisting = result?.info?.exists;
+                    const testsCount = result?.info?.completed_tests_count || 0;
+                    
+                    return (
+                      <div key={email} className="flex items-center justify-between gap-2 p-2 bg-background rounded border">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          {isExisting ? (
+                            <UserCheck className="w-4 h-4 text-emerald-500 shrink-0" />
+                          ) : (
+                            <UserPlus className="w-4 h-4 text-muted-foreground shrink-0" />
+                          )}
+                          <span className="text-sm truncate">{email}</span>
+                          {isExisting && testsCount > 0 && (
+                            <Badge variant="outline" className="text-xs shrink-0">
+                              {testsCount} teste{testsCount !== 1 ? 's' : ''}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {isExisting && testsCount > 0 && (
+                            <div className="flex items-center gap-1.5">
+                              <Checkbox 
+                                id={`import-${email}`}
+                                checked={requestImport}
+                                onCheckedChange={() => toggleImportRequest(email)}
+                                className="h-4 w-4"
+                              />
+                              <label htmlFor={`import-${email}`} className="text-xs text-muted-foreground cursor-pointer">
+                                Solicitar dados
+                              </label>
+                            </div>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => removeEmail(email)}
+                            className="hover:bg-muted-foreground/20 rounded p-1"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
+                {existingUsersCount > 0 && (
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                    ✓ {existingUsersCount} usuário{existingUsersCount !== 1 ? 's' : ''} já possui{existingUsersCount === 1 ? '' : 'em'} conta no Nello One
+                  </p>
+                )}
               </div>
             )}
 
@@ -346,7 +531,8 @@ export default function BusinessInvite() {
             <h4 className="font-medium mb-2">O que acontece depois?</h4>
             <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
               <li>O colaborador recebe um email com o link de convite</li>
-              <li>Ele cria sua conta e lê os termos de consentimento</li>
+              <li>Ele cria sua conta (ou acessa com conta existente) e lê os termos de consentimento</li>
+              <li>Se já tiver resultados no Nello One, pode optar por compartilhá-los com a empresa</li>
               <li>Após aceitar, tem acesso à sua jornada de autoconhecimento</li>
               <li>Você pode acompanhar o progresso no dashboard</li>
             </ol>

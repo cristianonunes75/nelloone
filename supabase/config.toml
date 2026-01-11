@@ -99,5 +99,8 @@ verify_jwt = true
 [functions.business-check-subscription]
 verify_jwt = true
 
+[functions.business-check-existing-user]
+verify_jwt = true
+
 [functions.business-customer-portal]
 verify_jwt = true
