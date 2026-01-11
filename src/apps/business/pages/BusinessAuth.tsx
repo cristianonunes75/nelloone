@@ -1,19 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { Building2, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Building2, Loader2, Eye, EyeOff, User, ArrowRight, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 export default function BusinessAuth() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user, profile, isLoading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [existingUserMode, setExistingUserMode] = useState(false);
   
   const defaultTab = searchParams.get('mode') === 'register' ? 'register' : 'login';
   const [activeTab, setActiveTab] = useState(defaultTab);
@@ -22,22 +25,22 @@ export default function BusinessAuth() {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   
-  // Register form
+  // Register form (new user)
   const [registerName, setRegisterName] = useState('');
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [companyName, setCompanyName] = useState('');
 
-  // Check if already logged in
+  // Check if already logged in and has company
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        // Check if user has a company
+    if (authLoading) return;
+    
+    const checkCompanyAssociation = async () => {
+      if (user) {
         const { data: companyUser } = await supabase
           .from('company_users')
           .select('company_id, role')
-          .eq('user_id', session.user.id)
+          .eq('user_id', user.id)
           .maybeSingle();
         
         if (companyUser) {
@@ -46,11 +49,14 @@ export default function BusinessAuth() {
           } else {
             navigate('/dashboard');
           }
+        } else {
+          // User is logged in but has no company - show create company flow
+          setExistingUserMode(true);
         }
       }
     };
-    checkSession();
-  }, [navigate]);
+    checkCompanyAssociation();
+  }, [user, authLoading, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,10 +85,79 @@ export default function BusinessAuth() {
           navigate('/dashboard');
         }
       } else {
-        toast.error('Você não está associado a nenhuma empresa. Entre em contato com o administrador.');
+        // User exists but no company - switch to create company mode
+        setExistingUserMode(true);
+        toast.info('Você já tem uma conta Nello! Crie sua empresa para continuar.');
       }
     } catch (error: any) {
       toast.error(error.message || 'Erro ao fazer login');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Create company for existing Nello One user
+  const handleCreateCompanyForExistingUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    
+    setIsLoading(true);
+    
+    try {
+      // Create company
+      const slug = companyName
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+      
+      const { data: company, error: companyError } = await supabase
+        .from('companies')
+        .insert({
+          name: companyName,
+          slug: `${slug}-${Date.now().toString(36)}`,
+          created_by: user.id,
+          billing_email: user.email,
+        })
+        .select()
+        .single();
+      
+      if (companyError) throw companyError;
+      
+      // Link user to company as admin
+      const { error: linkError } = await supabase
+        .from('company_users')
+        .insert({
+          company_id: company.id,
+          user_id: user.id,
+          role: 'company_admin',
+          is_active: true,
+          consent_given: true,
+          consent_given_at: new Date().toISOString(),
+          joined_at: new Date().toISOString(),
+        });
+      
+      if (linkError) throw linkError;
+      
+      // Create subscription record
+      const { error: subError } = await supabase
+        .from('company_subscriptions')
+        .insert({
+          company_id: company.id,
+          status: 'trialing',
+          plan_tier: 'starter',
+          max_collaborators: 10,
+          trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+        });
+      
+      if (subError) throw subError;
+      
+      toast.success('Empresa criada com sucesso! Bem-vindo ao Nello Business.');
+      navigate('/onboarding');
+    } catch (error: any) {
+      console.error('Company creation error:', error);
+      toast.error(error.message || 'Erro ao criar empresa');
     } finally {
       setIsLoading(false);
     }
@@ -166,6 +241,83 @@ export default function BusinessAuth() {
     }
   };
 
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Existing Nello One user - simplified company creation
+  if (existingUserMode && user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="w-full max-w-md">
+          {/* Logo */}
+          <Link to="/" className="flex items-center justify-center gap-3 mb-8">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Building2 className="w-6 h-6 text-primary" />
+            </div>
+            <span className="text-2xl font-bold">Nello Business</span>
+          </Link>
+          
+          <Card>
+            <CardHeader className="text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <User className="w-8 h-8 text-primary" />
+              </div>
+              <CardTitle>Olá, {profile?.full_name || 'Usuário'}!</CardTitle>
+              <CardDescription>
+                Você já tem uma conta Nello One. Crie sua empresa para começar a usar o Nello Business.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-muted/50 rounded-lg p-4 mb-6">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <div>
+                    <p className="text-sm font-medium">Conta conectada</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <form onSubmit={handleCreateCompanyForExistingUser} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="company-name">Nome da sua empresa</Label>
+                  <Input
+                    id="company-name"
+                    type="text"
+                    placeholder="Sua Empresa Ltda"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full gap-2" disabled={isLoading}>
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      Criar empresa
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </Button>
+              </form>
+              
+              <p className="text-xs text-center text-muted-foreground mt-4">
+                Seus dados do Nello One serão aproveitados automaticamente
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
@@ -188,7 +340,7 @@ export default function BusinessAuth() {
               <CardHeader>
                 <CardTitle>Bem-vindo de volta</CardTitle>
                 <CardDescription>
-                  Entre com sua conta para acessar o painel
+                  Use sua conta Nello para acessar o painel empresarial
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -229,6 +381,9 @@ export default function BusinessAuth() {
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Entrar'}
                   </Button>
+                  <p className="text-xs text-center text-muted-foreground">
+                    Já tem conta no Nello One? Use a mesma senha!
+                  </p>
                 </form>
               </CardContent>
             </TabsContent>
@@ -254,9 +409,9 @@ export default function BusinessAuth() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="company-name">Nome da empresa</Label>
+                    <Label htmlFor="company-name-new">Nome da empresa</Label>
                     <Input
-                      id="company-name"
+                      id="company-name-new"
                       type="text"
                       placeholder="Sua Empresa Ltda"
                       value={companyName}
