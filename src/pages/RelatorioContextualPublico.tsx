@@ -3,8 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft, Heart, Baby, Users, Briefcase, AlertCircle } from "lucide-react";
+import { Loader2, ArrowLeft, Heart, Baby, Users, Briefcase, AlertCircle, FileDown } from "lucide-react";
 import { LogoText } from "@/components/LogoText";
+import { downloadRelatorioContextualPDF, type ReportType as PDFReportType } from "@/lib/pdfRelatorioContextual";
+import { toast } from "sonner";
 
 type ReportType = 'parceiro' | 'pai_para_filho' | 'filho_para_pai' | 'para_gestor' | 'para_equipe';
 
@@ -229,6 +231,28 @@ const RelatorioContextualPublico = () => {
                 {lang === 'en' ? `Written by ${authorName}` : `Escrito por ${authorName}`}
               </p>
             )}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-4 gap-2"
+              onClick={() => {
+                try {
+                  downloadRelatorioContextualPDF({
+                    userName: authorName || 'Usuário',
+                    reportType: reportType as PDFReportType,
+                    language: lang as 'pt' | 'pt-pt' | 'en',
+                    content: report
+                  });
+                  toast.success(lang === 'en' ? 'PDF downloaded!' : 'PDF baixado!');
+                } catch (err) {
+                  console.error('Error generating PDF:', err);
+                  toast.error(lang === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+                }
+              }}
+            >
+              <FileDown className="w-4 h-4" />
+              {lang === 'en' ? 'Download PDF' : 'Baixar PDF'}
+            </Button>
           </CardHeader>
         </Card>
 
