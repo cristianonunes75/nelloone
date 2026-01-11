@@ -1348,6 +1348,144 @@ export type Database = {
           },
         ]
       }
+      hiring_answers: {
+        Row: {
+          answer: Json
+          assessment_id: string
+          created_at: string
+          id: string
+          question_id: string | null
+          question_number: number
+        }
+        Insert: {
+          answer: Json
+          assessment_id: string
+          created_at?: string
+          id?: string
+          question_id?: string | null
+          question_number: number
+        }
+        Update: {
+          answer?: Json
+          assessment_id?: string
+          created_at?: string
+          id?: string
+          question_id?: string | null
+          question_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hiring_answers_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "hiring_assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hiring_assessments: {
+        Row: {
+          algorithm_version: string | null
+          candidate_id: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          result_data: Json | null
+          started_at: string | null
+          status: string
+          test_type: string
+        }
+        Insert: {
+          algorithm_version?: string | null
+          candidate_id: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          result_data?: Json | null
+          started_at?: string | null
+          status?: string
+          test_type: string
+        }
+        Update: {
+          algorithm_version?: string | null
+          candidate_id?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          result_data?: Json | null
+          started_at?: string | null
+          status?: string
+          test_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hiring_assessments_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "hiring_candidates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hiring_candidates: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          email: string
+          full_name: string
+          id: string
+          invite_expires_at: string | null
+          invite_sent_at: string | null
+          invite_token: string
+          notes: string | null
+          phone: string | null
+          position_applied: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          email: string
+          full_name: string
+          id?: string
+          invite_expires_at?: string | null
+          invite_sent_at?: string | null
+          invite_token?: string
+          notes?: string | null
+          phone?: string | null
+          position_applied?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          invite_expires_at?: string | null
+          invite_sent_at?: string | null
+          invite_token?: string
+          notes?: string | null
+          phone?: string | null
+          position_applied?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hiring_candidates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       home_content: {
         Row: {
           content: Json
