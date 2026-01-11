@@ -53,12 +53,40 @@ export default function BusinessOnboarding() {
   };
 
   const handleComplete = async () => {
-    if (!company || !companyUser) return;
-    
     setIsLoading(true);
+    
     try {
+      // If company or companyUser is null, try to refetch first
+      if (!company || !companyUser) {
+        console.log('Company or companyUser not loaded, refetching...');
+        await refetch();
+        
+        // Small delay to let state update
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      // Get current user to query directly
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Você precisa estar logado');
+        return;
+      }
+      
+      // Get company user directly from DB
+      const { data: cuData, error: cuError } = await supabase
+        .from('company_users')
+        .select('id, company_id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (cuError || !cuData) {
+        console.error('Error getting company user:', cuError);
+        toast.error('Erro ao buscar dados da empresa. Tente novamente.');
+        return;
+      }
+      
       // Update company info
-      await supabase
+      const { error: companyUpdateError } = await supabase
         .from('companies')
         .update({
           industry,
@@ -66,22 +94,35 @@ export default function BusinessOnboarding() {
           employee_count_range: employeeRange,
           settings: { onboarding_goals: goals },
         })
-        .eq('id', company.id);
+        .eq('id', cuData.company_id);
+      
+      if (companyUpdateError) {
+        console.error('Error updating company:', companyUpdateError);
+        toast.error('Erro ao atualizar dados da empresa');
+        return;
+      }
       
       // Mark onboarding as complete
-      await supabase
+      const { error: userUpdateError } = await supabase
         .from('company_users')
         .update({
           onboarding_completed: true,
           onboarding_completed_at: new Date().toISOString(),
         })
-        .eq('id', companyUser.id);
+        .eq('id', cuData.id);
+      
+      if (userUpdateError) {
+        console.error('Error updating company user:', userUpdateError);
+        toast.error('Erro ao finalizar onboarding');
+        return;
+      }
       
       await refetch();
       toast.success('Onboarding concluído! Bem-vindo ao Nello Business.');
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error('Erro ao salvar informações');
+      console.error('Onboarding completion error:', error);
+      toast.error('Erro ao salvar informações. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
