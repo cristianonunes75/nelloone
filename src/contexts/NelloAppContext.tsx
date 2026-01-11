@@ -1,4 +1,5 @@
 import React, { createContext, useContext, ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useSubdomain, NelloApp, getNelloAppUrl } from '@/hooks/useSubdomain';
 
 interface NelloAppContextType {
@@ -21,8 +22,9 @@ interface NelloAppProviderProps {
 }
 
 export function NelloAppProvider({ children }: NelloAppProviderProps) {
-  const subdomainConfig = useSubdomain();
-  
+  const location = useLocation();
+  const subdomainConfig = useSubdomain(location.search);
+
   const value: NelloAppContextType = {
     currentApp: subdomainConfig.app,
     subdomain: subdomainConfig.subdomain,
@@ -34,12 +36,8 @@ export function NelloAppProvider({ children }: NelloAppProviderProps) {
     domain: subdomainConfig.domain,
     getAppUrl: getNelloAppUrl,
   };
-  
-  return (
-    <NelloAppContext.Provider value={value}>
-      {children}
-    </NelloAppContext.Provider>
-  );
+
+  return <NelloAppContext.Provider value={value}>{children}</NelloAppContext.Provider>;
 }
 
 export function useNelloApp() {
