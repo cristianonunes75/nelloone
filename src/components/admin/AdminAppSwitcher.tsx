@@ -114,7 +114,7 @@ export function AdminAppSwitcher() {
   const handleAppSwitch = (app: AdminApp) => {
     if (app.id === currentAppId) return;
 
-    // In preview/local, we must NOT do a hard reload (it can 404 on deep links).
+    // In preview/local, always use React Router navigation
     if (isPreview) {
       const params = new URLSearchParams(location.search);
       params.set('app', app.id);
@@ -122,8 +122,18 @@ export function AdminAppSwitcher() {
       return;
     }
 
-    // Production: navigate to the actual subdomain
-    window.location.href = `${app.url}${app.adminPath}`;
+    // Production: check if target app is on the same domain (nello.one)
+    const currentHost = window.location.host;
+    const targetUrl = new URL(app.url);
+    const isSameDomain = targetUrl.host === currentHost;
+
+    if (isSameDomain) {
+      // Same domain - use React Router to avoid re-authentication
+      navigate(app.adminPath);
+    } else {
+      // Different subdomain - need to redirect
+      window.location.href = `${app.url}${app.adminPath}`;
+    }
   };
 
   return (
