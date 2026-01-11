@@ -116,12 +116,13 @@ export default function BusinessHiringAssessment() {
     setSaving(true);
     
     try {
-      // Fetch questions for this test type
+      // Fetch questions for this test type - order by created_at to get the original test
       const { data: testsData, error: testsError } = await supabase
         .from("tests")
         .select("id")
         .eq("type", testType)
         .eq("active", true)
+        .order("created_at", { ascending: true })
         .limit(1)
         .single();
 
