@@ -515,6 +515,47 @@ export type Database = {
         }
         Relationships: []
       }
+      company_ai_consultations: {
+        Row: {
+          ai_response: string
+          company_id: string
+          consultation_type: string
+          context: Json
+          created_at: string
+          id: string
+          rating: number | null
+          requested_by: string
+        }
+        Insert: {
+          ai_response: string
+          company_id: string
+          consultation_type: string
+          context?: Json
+          created_at?: string
+          id?: string
+          rating?: number | null
+          requested_by: string
+        }
+        Update: {
+          ai_response?: string
+          company_id?: string
+          consultation_type?: string
+          context?: Json
+          created_at?: string
+          id?: string
+          rating?: number | null
+          requested_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_ai_consultations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_audit_logs: {
         Row: {
           action: string
@@ -568,6 +609,7 @@ export type Database = {
           email: string
           expires_at: string
           id: string
+          import_requested: boolean | null
           invite_token: string
           invited_by: string
           role: Database["public"]["Enums"]["business_role"]
@@ -583,6 +625,7 @@ export type Database = {
           email: string
           expires_at?: string
           id?: string
+          import_requested?: boolean | null
           invite_token: string
           invited_by: string
           role?: Database["public"]["Enums"]["business_role"]
@@ -598,6 +641,7 @@ export type Database = {
           email?: string
           expires_at?: string
           id?: string
+          import_requested?: boolean | null
           invite_token?: string
           invited_by?: string
           role?: Database["public"]["Enums"]["business_role"]
@@ -791,6 +835,50 @@ export type Database = {
             foreignKeyName: "company_team_insights_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_user_imports: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          import_consented_at: string | null
+          imported_by: string | null
+          source_type: string
+          tests_imported: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          import_consented_at?: string | null
+          imported_by?: string | null
+          source_type?: string
+          tests_imported?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          import_consented_at?: string | null
+          imported_by?: string | null
+          source_type?: string
+          tests_imported?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_user_imports_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
