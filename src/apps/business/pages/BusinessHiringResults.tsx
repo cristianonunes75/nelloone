@@ -91,7 +91,7 @@ export default function BusinessHiringResults() {
     return { completed, total: assessments.length };
   };
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <BusinessLayout>
         <div className="flex items-center justify-center min-h-[60vh]">

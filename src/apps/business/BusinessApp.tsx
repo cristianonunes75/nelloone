@@ -9,6 +9,9 @@ import BusinessReports from './pages/BusinessReports';
 import BusinessSettings from './pages/BusinessSettings';
 import BusinessAcceptInvite from './pages/BusinessAcceptInvite';
 import BusinessCollaboratorRedirect from './pages/BusinessCollaboratorRedirect';
+import BusinessHiring from './pages/BusinessHiring';
+import BusinessHiringResults from './pages/BusinessHiringResults';
+import BusinessHiringAssessment from './pages/BusinessHiringAssessment';
 import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
 
 /**
@@ -62,6 +65,19 @@ export default function BusinessApp() {
           <BusinessSettings />
         </BusinessProtectedRoute>
       } />
+      <Route path="/hiring" element={
+        <BusinessProtectedRoute requiredRole="company_admin">
+          <BusinessHiring />
+        </BusinessProtectedRoute>
+      } />
+      <Route path="/hiring/:candidateId" element={
+        <BusinessProtectedRoute requiredRole="company_admin">
+          <BusinessHiringResults />
+        </BusinessProtectedRoute>
+      } />
+      
+      {/* Public hiring assessment route - candidates access via token */}
+      <Route path="/assessment/:token" element={<BusinessHiringAssessment />} />
       
       {/* Collaborator routes - redirect to Core with company context */}
       <Route path="/my-journey" element={
