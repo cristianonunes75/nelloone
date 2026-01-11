@@ -6,10 +6,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Loader2, CheckCircle2, ArrowLeft, ArrowRight, Clock, AlertCircle } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2, CheckCircle2, ArrowLeft, ArrowRight, Clock, AlertCircle, Building2, Shield, Eye, FileText, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { calculateTemperamentos } from "@/lib/temperamentos";
+
+interface Company {
+  id: string;
+  name: string;
+  logo_url: string | null;
+}
 
 interface Candidate {
   id: string;
@@ -17,6 +24,9 @@ interface Candidate {
   company_id: string;
   status: string;
   invite_expires_at: string | null;
+  position_applied: string | null;
+  consent_given_at: string | null;
+  company?: Company;
 }
 
 interface Assessment {
@@ -33,7 +43,7 @@ interface Question {
   options: any;
 }
 
-type TestPhase = "intro" | "disc" | "temperamentos" | "completed";
+type TestPhase = "consent" | "intro" | "disc" | "temperamentos" | "completed";
 
 const LIKERT_OPTIONS = [
   { value: 1, label: "Discordo totalmente" },
@@ -50,7 +60,9 @@ export default function BusinessHiringAssessment() {
   const [loading, setLoading] = useState(true);
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [assessments, setAssessments] = useState<Assessment[]>([]);
-  const [phase, setPhase] = useState<TestPhase>("intro");
+  const [phase, setPhase] = useState<TestPhase>("consent");
+  const [consentChecked, setConsentChecked] = useState(false);
+  const [savingConsent, setSavingConsent] = useState(false);
   
   // Test execution state
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -69,10 +81,13 @@ export default function BusinessHiringAssessment() {
     if (!token) return;
     setLoading(true);
     try {
-      // Fetch candidate by token
+      // Fetch candidate by token with company data
       const { data: candidateData, error: candidateError } = await supabase
         .from("hiring_candidates")
-        .select("*")
+        .select(`
+          *,
+          company:companies(id, name, logo_url)
+        `)
         .eq("invite_token", token)
         .single();
 
@@ -98,16 +113,48 @@ export default function BusinessHiringAssessment() {
       if (assessmentsError) throw assessmentsError;
       setAssessments(assessmentsData || []);
 
-      // Check if already completed
+      // Determine initial phase
       const allCompleted = assessmentsData?.every(a => a.status === "completed");
       if (allCompleted) {
         setPhase("completed");
+      } else if (candidateData.consent_given_at) {
+        // Consent already given, go to intro
+        setPhase("intro");
+      } else {
+        // Need consent first
+        setPhase("consent");
       }
     } catch (error) {
       console.error("Error validating token:", error);
       toast.error("Erro ao carregar avaliação");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleConsentSubmit = async () => {
+    if (!candidate || !consentChecked) return;
+    setSavingConsent(true);
+    
+    try {
+      const { error } = await supabase
+        .from("hiring_candidates")
+        .update({
+          consent_given_at: new Date().toISOString()
+        })
+        .eq("id", candidate.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setCandidate(prev => prev ? { ...prev, consent_given_at: new Date().toISOString() } : null);
+      setPhase("intro");
+      toast.success("Consentimento registrado!");
+    } catch (error) {
+      console.error("Error saving consent:", error);
+      toast.error("Erro ao salvar consentimento");
+    } finally {
+      setSavingConsent(false);
     }
   };
 
@@ -337,6 +384,159 @@ export default function BusinessHiringAssessment() {
             </p>
           </CardContent>
         </Card>
+      </div>
+    );
+  }
+
+  // Consent phase
+  if (phase === "consent") {
+    const companyName = candidate.company?.name || "a empresa";
+    const positionName = candidate.position_applied || "a vaga";
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background p-4 md:p-8">
+        <div className="max-w-2xl mx-auto space-y-6">
+          {/* Company Header */}
+          <Card className="border-primary/20">
+            <CardContent className="flex items-center gap-4 py-6">
+              {candidate.company?.logo_url ? (
+                <img 
+                  src={candidate.company.logo_url} 
+                  alt={companyName} 
+                  className="h-16 w-16 rounded-lg object-contain bg-white p-2 border"
+                />
+              ) : (
+                <div className="h-16 w-16 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Building2 className="h-8 w-8 text-primary" />
+                </div>
+              )}
+              <div>
+                <p className="text-sm text-muted-foreground">Avaliação enviada por</p>
+                <h1 className="text-2xl font-bold">{companyName}</h1>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Position Card */}
+          <Card className="bg-primary/5 border-primary/20">
+            <CardContent className="flex items-center gap-3 py-4">
+              <Briefcase className="h-5 w-5 text-primary" />
+              <div>
+                <p className="text-sm text-muted-foreground">Processo seletivo para</p>
+                <p className="font-semibold">{positionName}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Welcome Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Olá, {candidate.full_name}!</CardTitle>
+              <CardDescription>
+                Você foi convidado(a) para participar de uma avaliação de perfil comportamental.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          {/* About the Assessment */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Sobre a Avaliação</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-start gap-3">
+                <span className="text-xl">📋</span>
+                <div>
+                  <p className="font-medium">Dois testes comportamentais</p>
+                  <p className="text-sm text-muted-foreground">
+                    DISC (perfil de comportamento) e Temperamentos (tendências naturais)
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-xl">⏱️</span>
+                <div>
+                  <p className="font-medium">Duração estimada: ~10 minutos</p>
+                  <p className="text-sm text-muted-foreground">
+                    Responda com calma e sinceridade
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-xl">✅</span>
+                <div>
+                  <p className="font-medium">Não há respostas certas ou erradas</p>
+                  <p className="text-sm text-muted-foreground">
+                    O objetivo é conhecer seu perfil natural de comportamento
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* What Company Will See */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Eye className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">O que {companyName} verá</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              <p>• Seu perfil comportamental (DISC e Temperamentos)</p>
+              <p>• Suas tendências naturais de comunicação e trabalho</p>
+              <p>• Compatibilidade com o perfil da vaga</p>
+            </CardContent>
+          </Card>
+
+          {/* Privacy & LGPD */}
+          <Card className="border-blue-200 bg-blue-50/50">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-blue-600" />
+                <CardTitle className="text-lg text-blue-900">Privacidade e Uso dos Dados</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-blue-800">
+              <p>• Seus dados serão utilizados <strong>exclusivamente</strong> para este processo seletivo</p>
+              <p>• Esta não é uma avaliação psicológica ou diagnóstico clínico</p>
+              <p>• Você pode solicitar a exclusão dos seus dados a qualquer momento entrando em contato com {companyName}</p>
+              <p>• Os resultados são confidenciais e acessíveis apenas pela equipe de recrutamento</p>
+            </CardContent>
+          </Card>
+
+          {/* Consent Checkbox */}
+          <Card className="border-2 border-primary/30">
+            <CardContent className="py-6">
+              <div className="flex items-start gap-3">
+                <Checkbox 
+                  id="consent" 
+                  checked={consentChecked}
+                  onCheckedChange={(checked) => setConsentChecked(checked === true)}
+                  className="mt-1"
+                />
+                <Label htmlFor="consent" className="text-sm leading-relaxed cursor-pointer">
+                  Li e compreendo as informações acima. <strong>Autorizo {companyName}</strong> a utilizar 
+                  os resultados desta avaliação para o processo seletivo{candidate.position_applied ? ` da vaga de ${candidate.position_applied}` : ""}.
+                </Label>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Submit Button */}
+          <Button 
+            onClick={handleConsentSubmit}
+            disabled={!consentChecked || savingConsent}
+            className="w-full"
+            size="lg"
+          >
+            {savingConsent && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+            Concordar e Iniciar Avaliação
+          </Button>
+        </div>
       </div>
     );
   }
