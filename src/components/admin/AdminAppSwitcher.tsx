@@ -32,9 +32,17 @@ const adminApps: AdminApp[] = [
     adminPath: '/admin',
   },
   {
+    id: 'business-admin',
+    name: 'Business Admin',
+    label: 'Gestão B2B',
+    icon: <Building2 className="w-4 h-4" />,
+    url: 'https://nello.one',
+    adminPath: '/admin/business',
+  },
+  {
     id: 'business',
     name: 'Nello Business',
-    label: 'B2B',
+    label: 'Portal Empresa',
     icon: <Building2 className="w-4 h-4" />,
     url: 'https://business.nello.one',
     adminPath: '/dashboard',
