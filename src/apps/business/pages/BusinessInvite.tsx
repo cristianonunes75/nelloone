@@ -34,16 +34,18 @@ export default function BusinessInvite() {
     const email = currentEmail.trim().toLowerCase();
     if (!email) return;
     
-    // Check if can add more collaborators
-    if (!enforcement.canInviteCollaborators) {
-      toast.error(`Limite de ${enforcement.maxCollaborators} colaboradores atingido`);
-      return;
-    }
-    
-    // Check remaining slots vs emails to be invited
-    if (emails.length >= enforcement.remainingSlots) {
-      toast.error(`Você só pode convidar mais ${enforcement.remainingSlots} colaborador(es)`);
-      return;
+    // Only check collaborator limits for collaborator invites
+    if (selectedRole === 'collaborator') {
+      if (!enforcement.canInviteCollaborators) {
+        toast.error(`Limite de ${enforcement.maxCollaborators} colaboradores atingido`);
+        return;
+      }
+      
+      // Check remaining slots vs emails to be invited
+      if (emails.length >= enforcement.remainingSlots) {
+        toast.error(`Você só pode convidar mais ${enforcement.remainingSlots} colaborador(es)`);
+        return;
+      }
     }
     
     // Basic email validation
@@ -76,46 +78,38 @@ export default function BusinessInvite() {
   const handleSendInvites = async () => {
     if (!company || !user || emails.length === 0) return;
     
-    // Final enforcement check
-    if (!enforcement.canInviteCollaborators) {
+    // Final enforcement check - only for collaborators, admins don't count towards limit
+    if (selectedRole === 'collaborator' && !enforcement.canInviteCollaborators) {
       toast.error('Não é possível enviar convites no momento');
       return;
     }
     
-    if (emails.length > enforcement.remainingSlots) {
+    if (selectedRole === 'collaborator' && emails.length > enforcement.remainingSlots) {
       toast.error(`Você só pode convidar mais ${enforcement.remainingSlots} colaborador(es)`);
       return;
     }
     
     setIsSending(true);
     const successfulEmails: string[] = [];
+    const failedEmails: string[] = [];
     
     try {
       for (const email of emails) {
-        // Generate unique token
-        const token = crypto.randomUUID();
-        
-        // Create invite record with selected role
-        const { error } = await supabase
-          .from('company_invites')
-          .insert({
-            company_id: company.id,
+        // Call edge function to create invite and send email
+        const { data, error } = await supabase.functions.invoke('business-invite', {
+          body: {
             email,
             role: selectedRole,
-            invite_token: token,
-            invited_by: user.id,
-            sent_at: new Date().toISOString(),
-          });
+            company_id: company.id,
+          },
+        });
         
-        if (error) {
-          console.error(`Error inviting ${email}:`, error);
-          toast.error(`Erro ao convidar ${email}`);
+        if (error || data?.error) {
+          console.error(`Error inviting ${email}:`, error || data?.error);
+          failedEmails.push(email);
+          toast.error(`Erro ao convidar ${email}: ${data?.error || error?.message}`);
         } else {
           successfulEmails.push(email);
-          
-          // TODO: Send email via edge function
-          // For now, just log the invite link
-          console.log(`Invite link for ${email}: ${window.location.origin}/invite/${token}`);
         }
       }
       
@@ -123,6 +117,11 @@ export default function BusinessInvite() {
         setSentEmails([...sentEmails, ...successfulEmails]);
         setEmails([]);
         toast.success(`${successfulEmails.length} convite(s) enviado(s) com sucesso!`);
+      }
+      
+      // Keep failed emails in the list so user can retry
+      if (failedEmails.length > 0) {
+        setEmails(failedEmails);
       }
     } catch (error) {
       console.error('Error sending invites:', error);
@@ -241,22 +240,24 @@ export default function BusinessInvite() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email do colaborador</Label>
+              <Label htmlFor="email">
+                {selectedRole === 'company_admin' ? 'Email do sócio/admin' : 'Email do colaborador'}
+              </Label>
               <div className="flex gap-2">
                 <Input
                   id="email"
                   type="email"
-                  placeholder="colaborador@empresa.com"
+                  placeholder={selectedRole === 'company_admin' ? 'socio@empresa.com' : 'colaborador@empresa.com'}
                   value={currentEmail}
                   onChange={(e) => setCurrentEmail(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  disabled={!enforcement.canInviteCollaborators}
+                  disabled={selectedRole === 'collaborator' && !enforcement.canInviteCollaborators}
                 />
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={addEmail}
-                  disabled={!enforcement.canInviteCollaborators}
+                  disabled={selectedRole === 'collaborator' && !enforcement.canInviteCollaborators}
                 >
                   Adicionar
                 </Button>
@@ -294,13 +295,13 @@ export default function BusinessInvite() {
                 value={customMessage}
                 onChange={(e) => setCustomMessage(e.target.value)}
                 rows={3}
-                disabled={!enforcement.canInviteCollaborators}
+                disabled={selectedRole === 'collaborator' && !enforcement.canInviteCollaborators}
               />
             </div>
 
             <Button
               onClick={handleSendInvites}
-              disabled={emails.length === 0 || isSending || !enforcement.canInviteCollaborators}
+              disabled={emails.length === 0 || isSending || (selectedRole === 'collaborator' && !enforcement.canInviteCollaborators)}
               className="w-full gap-2"
             >
               {isSending ? (
