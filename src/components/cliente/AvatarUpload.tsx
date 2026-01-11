@@ -90,7 +90,7 @@ export const AvatarUpload = ({
 
       if (updateError) throw updateError;
 
-      onAvatarChange(publicUrl);
+      onAvatarChange(`${publicUrl}?t=${Date.now()}`);
       
       toast({
         title: isEn ? "Avatar updated!" : "Avatar atualizado!",
