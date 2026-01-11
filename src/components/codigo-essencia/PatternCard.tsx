@@ -60,10 +60,7 @@ export const PatternCard = ({
             )} />
           </div>
           {detail && (
-            <p className={cn(
-              "text-xs text-muted-foreground mt-1 leading-snug transition-all duration-200",
-              !isExpanded && "line-clamp-2"
-            )}>
+            <p className="text-xs text-muted-foreground mt-1 leading-snug">
               {detail}
             </p>
           )}

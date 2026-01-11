@@ -89,21 +89,20 @@ export const ArchetypesMissionSection = ({
                     showPrimaryDetails && "rotate-180"
                   )} />
                 </div>
-                <div className={cn(
-                  "overflow-hidden transition-all duration-200",
-                  showPrimaryDetails ? "max-h-40 mt-2" : "max-h-0"
-                )}>
-                  {primary?.role && (
-                    <p className="text-xs text-muted-foreground">
-                      <span className="font-medium text-foreground">{labels.role[lang]}</span> {primary.role}
-                    </p>
-                  )}
-                  {primary?.contribution && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      <span className="font-medium text-foreground">{labels.contribution[lang]}</span> {primary.contribution}
-                    </p>
-                  )}
-                </div>
+                {showPrimaryDetails && (
+                  <div className="mt-2 space-y-1">
+                    {primary?.role && (
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium text-foreground">{labels.role[lang]}</span> {primary.role}
+                      </p>
+                    )}
+                    {primary?.contribution && (
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium text-foreground">{labels.contribution[lang]}</span> {primary.contribution}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -128,21 +127,20 @@ export const ArchetypesMissionSection = ({
                     showSecondaryDetails && "rotate-180"
                   )} />
                 </div>
-                <div className={cn(
-                  "overflow-hidden transition-all duration-200",
-                  showSecondaryDetails ? "max-h-40 mt-2" : "max-h-0"
-                )}>
-                  {secondary?.role && (
-                    <p className="text-xs text-muted-foreground">
-                      <span className="font-medium text-foreground">{labels.role[lang]}</span> {secondary.role}
-                    </p>
-                  )}
-                  {secondary?.contribution && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      <span className="font-medium text-foreground">{labels.contribution[lang]}</span> {secondary.contribution}
-                    </p>
-                  )}
-                </div>
+                {showSecondaryDetails && (
+                  <div className="mt-2 space-y-1">
+                    {secondary?.role && (
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium text-foreground">{labels.role[lang]}</span> {secondary.role}
+                      </p>
+                    )}
+                    {secondary?.contribution && (
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium text-foreground">{labels.contribution[lang]}</span> {secondary.contribution}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -184,17 +182,16 @@ export const ArchetypesMissionSection = ({
                       isExpanded && "rotate-180"
                     )} />
                   </div>
-                  <div className={cn(
-                    "overflow-hidden transition-all duration-200",
-                    isExpanded ? "max-h-40 mt-2" : "max-h-0"
-                  )}>
-                    <p className="text-xs text-muted-foreground">
-                      <span className="font-medium text-foreground">{labels.trigger[lang]}</span> {item.trigger}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      <span className="font-medium text-foreground">{labels.consequence[lang]}</span> {item.consequence}
-                    </p>
-                  </div>
+                  {isExpanded && (
+                    <div className="mt-2 space-y-1">
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium text-foreground">{labels.trigger[lang]}</span> {item.trigger}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium text-foreground">{labels.consequence[lang]}</span> {item.consequence}
+                      </p>
+                    </div>
+                  )}
                 </div>
               );
             })}

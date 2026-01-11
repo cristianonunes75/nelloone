@@ -62,17 +62,16 @@ export const TalentsGiftsSection = ({
                       isExpanded && "rotate-180"
                     )} />
                   </div>
-                  <div className={cn(
-                    "overflow-hidden transition-all duration-200",
-                    isExpanded ? "max-h-40 mt-2" : "max-h-0"
-                  )}>
-                    <p className="text-xs text-muted-foreground">
-                      <span className="font-medium text-foreground">{labels.origin[lang]}</span> {item.origin}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      <span className="font-medium text-foreground">{labels.application[lang]}</span> {item.application}
-                    </p>
-                  </div>
+                  {isExpanded && (
+                    <div className="mt-2 space-y-1">
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium text-foreground">{labels.origin[lang]}</span> {item.origin}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium text-foreground">{labels.application[lang]}</span> {item.application}
+                      </p>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -105,14 +104,13 @@ export const TalentsGiftsSection = ({
                       isExpanded && "rotate-180"
                     )} />
                   </div>
-                  <div className={cn(
-                    "overflow-hidden transition-all duration-200",
-                    isExpanded ? "max-h-24 mt-2" : "max-h-0"
-                  )}>
-                    <p className="text-xs text-muted-foreground">
-                      <span className="font-medium text-foreground">{labels.manifests[lang]}</span> {item.manifestation}
-                    </p>
-                  </div>
+                  {isExpanded && (
+                    <div className="mt-2">
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium text-foreground">{labels.manifests[lang]}</span> {item.manifestation}
+                      </p>
+                    </div>
+                  )}
                 </div>
               );
             })}

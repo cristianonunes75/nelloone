@@ -71,19 +71,18 @@ export const VocationSection = ({
                     isExpanded && "rotate-180"
                   )} />
                 </div>
-                <div className={cn(
-                  "overflow-hidden transition-all duration-200",
-                  isExpanded ? "max-h-40 mt-2 pl-7" : "max-h-0"
-                )}>
-                  <p className="text-xs text-muted-foreground">
-                    <span className="font-medium text-foreground">{labels.why[lang]}</span> {item.reason}
-                  </p>
-                  {item.example && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      <span className="font-medium text-foreground">{labels.example[lang]}</span> {item.example}
+                {isExpanded && (
+                  <div className="mt-2 pl-7 space-y-1">
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-medium text-foreground">{labels.why[lang]}</span> {item.reason}
                     </p>
-                  )}
-                </div>
+                    {item.example && (
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium text-foreground">{labels.example[lang]}</span> {item.example}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
