@@ -29,7 +29,7 @@ interface DashboardStats {
 }
 
 export default function BusinessDashboard() {
-  const { company } = useBusinessAuth();
+  const { company, isNelloOneSuperAdmin } = useBusinessAuth();
   const enforcement = useBusinessEnforcement();
   const [stats, setStats] = useState<DashboardStats>({
     totalMembers: 0,
@@ -37,13 +37,36 @@ export default function BusinessDashboard() {
     completedAssessments: 0,
     inProgressAssessments: 0,
   });
+  const [allCompanies, setAllCompanies] = useState<Array<{ id: string; name: string; slug: string }>>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (company) {
       fetchStats();
+    } else if (isNelloOneSuperAdmin) {
+      // Super admin without company - fetch all companies overview
+      fetchAllCompanies();
+    } else {
+      setIsLoading(false);
     }
-  }, [company]);
+  }, [company, isNelloOneSuperAdmin]);
+
+  const fetchAllCompanies = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('companies')
+        .select('id, name, slug')
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      setAllCompanies(data || []);
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fetchStats = async () => {
     if (!company) return;
@@ -86,6 +109,50 @@ export default function BusinessDashboard() {
   const completionRate = stats.totalMembers > 0 
     ? Math.round((stats.completedAssessments / stats.totalMembers) * 100) 
     : 0;
+
+  // Super admin without company sees all companies overview
+  if (isNelloOneSuperAdmin && !company) {
+    return (
+      <BusinessLayout>
+        <div className="space-y-8">
+          <div>
+            <h1 className="text-2xl font-bold">Admin Overview - Nello Business</h1>
+            <p className="text-muted-foreground">
+              Visão geral de todas as empresas no Nello Business
+            </p>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Empresas cadastradas</CardTitle>
+              <CardDescription>
+                {allCompanies.length} empresas encontradas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {allCompanies.length === 0 ? (
+                <p className="text-muted-foreground">Nenhuma empresa cadastrada ainda.</p>
+              ) : (
+                <div className="space-y-2">
+                  {allCompanies.map((c) => (
+                    <div key={c.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
+                      <div>
+                        <p className="font-medium">{c.name}</p>
+                        <p className="text-sm text-muted-foreground">/{c.slug}</p>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        Ver detalhes
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </BusinessLayout>
+    );
+  }
 
   return (
     <BusinessLayout>
