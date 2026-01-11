@@ -64,11 +64,28 @@ const adminApps: AdminApp[] = [
 export function AdminAppSwitcher() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { userRoles } = useAuth();
+  const { userRoles, isLoading, user } = useAuth();
   const { currentApp, domain } = useNelloApp();
 
   // Only show for super admins (users with admin role in Nello One)
   const isSuperAdmin = userRoles.includes('admin');
+
+  // Don't hide while loading if user is authenticated - prevents flash
+  // Show the switcher if user is logged in and we're still loading roles
+  // or if user explicitly has admin role
+  if (!user) {
+    return null;
+  }
+
+  // While loading, show a placeholder to avoid layout shift
+  if (isLoading) {
+    return (
+      <Button variant="outline" size="sm" className="gap-2 border-primary/20 bg-primary/5 opacity-50" disabled>
+        <Sparkles className="w-4 h-4" />
+        <span className="hidden sm:inline">Carregando...</span>
+      </Button>
+    );
+  }
 
   if (!isSuperAdmin) {
     return null;
