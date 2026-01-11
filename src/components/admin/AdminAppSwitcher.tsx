@@ -1,0 +1,123 @@
+import { useAuth } from "@/hooks/useAuth";
+import { useNelloApp } from "@/contexts/NelloAppContext";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Building2, Sparkles, ChevronDown, ExternalLink } from "lucide-react";
+
+interface AdminApp {
+  id: string;
+  name: string;
+  label: string;
+  icon: React.ReactNode;
+  url: string;
+  adminPath: string;
+}
+
+const adminApps: AdminApp[] = [
+  {
+    id: 'one',
+    name: 'Nello One',
+    label: 'Core',
+    icon: <Sparkles className="w-4 h-4" />,
+    url: 'https://one.nello.one',
+    adminPath: '/admin',
+  },
+  {
+    id: 'business',
+    name: 'Nello Business',
+    label: 'B2B',
+    icon: <Building2 className="w-4 h-4" />,
+    url: 'https://business.nello.one',
+    adminPath: '/dashboard',
+  },
+];
+
+/**
+ * AdminAppSwitcher - Allows super admins to switch between different Nello admin areas
+ * Only visible to users with 'admin' role in user_roles table
+ */
+export function AdminAppSwitcher() {
+  const { userRoles } = useAuth();
+  const { currentApp, domain } = useNelloApp();
+  
+  // Only show for super admins (users with admin role in Nello One)
+  const isSuperAdmin = userRoles.includes('admin');
+  
+  if (!isSuperAdmin) {
+    return null;
+  }
+
+  // Determine which app is currently active
+  const isLocalhost = domain.includes('localhost') || domain.includes('lovable');
+  
+  const getCurrentAppId = () => {
+    if (currentApp === 'business') return 'business';
+    return 'one'; // Default to One for main/one/flow/life
+  };
+  
+  const currentAppId = getCurrentAppId();
+  const currentAdminApp = adminApps.find(app => app.id === currentAppId) || adminApps[0];
+
+  const handleAppSwitch = (app: AdminApp) => {
+    if (app.id === currentAppId) return;
+    
+    // For localhost/preview, use query param; for production, navigate to subdomain
+    if (isLocalhost) {
+      // Use query param for testing
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('app', app.id);
+      newUrl.pathname = app.adminPath;
+      window.location.href = newUrl.toString();
+    } else {
+      // Navigate to the actual subdomain
+      window.location.href = `${app.url}${app.adminPath}`;
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10">
+          {currentAdminApp.icon}
+          <span className="hidden sm:inline">{currentAdminApp.name}</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+            {currentAdminApp.label}
+          </span>
+          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel className="text-xs text-muted-foreground uppercase tracking-wider">
+          Áreas Admin
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {adminApps.map((app) => (
+          <DropdownMenuItem
+            key={app.id}
+            onClick={() => handleAppSwitch(app)}
+            className="gap-3 cursor-pointer"
+            disabled={app.id === currentAppId}
+          >
+            {app.icon}
+            <div className="flex flex-col flex-1">
+              <span className="font-medium">{app.name}</span>
+              <span className="text-xs text-muted-foreground">{app.label}</span>
+            </div>
+            {app.id === currentAppId ? (
+              <span className="text-xs text-primary font-medium">Atual</span>
+            ) : (
+              <ExternalLink className="w-3 h-3 text-muted-foreground" />
+            )}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}

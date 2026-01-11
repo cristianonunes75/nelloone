@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminAppSwitcher } from "@/components/admin/AdminAppSwitcher";
 import { Loader2 } from "lucide-react";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 
@@ -61,6 +62,7 @@ const Admin = () => {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <AdminAppSwitcher />
               <RoleSwitcher />
               <div className="h-5 w-px bg-border/60" />
               <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground hover:text-ink transition-colors">

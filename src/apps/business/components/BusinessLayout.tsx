@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Building2, 
@@ -9,13 +9,14 @@ import {
   Settings, 
   LogOut,
   Menu,
-  X
+  X,
+  Briefcase
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
+import { AdminAppSwitcher } from '@/components/admin/AdminAppSwitcher';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
 
 interface BusinessLayoutProps {
   children: ReactNode;
@@ -25,6 +26,7 @@ const adminNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/team', label: 'Equipe', icon: Users },
   { href: '/invite', label: 'Convidar', icon: UserPlus },
+  { href: '/hiring', label: 'Recrutamento', icon: Briefcase },
   { href: '/reports', label: 'Relatórios', icon: BarChart3 },
   { href: '/settings', label: 'Configurações', icon: Settings },
 ];
@@ -90,6 +92,7 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
 
             {/* Actions */}
             <div className="flex items-center gap-2">
+              <AdminAppSwitcher />
               <Button
                 variant="ghost"
                 size="sm"
