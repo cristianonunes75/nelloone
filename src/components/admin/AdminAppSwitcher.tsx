@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Building2, Sparkles, ChevronDown, ExternalLink } from "lucide-react";
+import { Building2, Sparkles, ChevronDown, ExternalLink, Zap, Heart } from "lucide-react";
 
 interface AdminApp {
   id: string;
@@ -39,6 +39,22 @@ const adminApps: AdminApp[] = [
     url: 'https://business.nello.one',
     adminPath: '/dashboard',
   },
+  {
+    id: 'flow',
+    name: 'Nello Flow',
+    label: 'Produtividade',
+    icon: <Zap className="w-4 h-4" />,
+    url: 'https://flow.nello.one',
+    adminPath: '/dashboard',
+  },
+  {
+    id: 'life',
+    name: 'Nello Life',
+    label: 'Bem-estar',
+    icon: <Heart className="w-4 h-4" />,
+    url: 'https://life.nello.one',
+    adminPath: '/dashboard',
+  },
 ];
 
 /**
@@ -63,7 +79,9 @@ export function AdminAppSwitcher() {
 
   const currentAppId = useMemo(() => {
     if (currentApp === 'business') return 'business';
-    return 'one'; // Default to One for main/one/flow/life
+    if (currentApp === 'flow') return 'flow';
+    if (currentApp === 'life') return 'life';
+    return 'one'; // Default to One for main/one
   }, [currentApp]);
 
   const currentAdminApp = adminApps.find(app => app.id === currentAppId) || adminApps[0];
