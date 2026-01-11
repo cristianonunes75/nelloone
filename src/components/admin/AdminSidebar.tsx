@@ -20,6 +20,7 @@ import {
   Send,
   Target,
   Building2,
+  Wrench,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -84,6 +85,7 @@ const menuSections = [
       { title: "Permissões", url: "/admin/permissoes", icon: Shield },
       { title: "Notificações", url: "/admin/notificacoes", icon: Bell },
       { title: "Limpeza de Dados", url: "/admin/limpeza", icon: Trash2 },
+      { title: "Tools", url: "/admin/tools", icon: Wrench },
       { title: "Logs", url: "/admin/logs", icon: Activity },
       { title: "Configurações", url: "/admin/configuracoes", icon: Settings },
     ]
