@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useNelloApp } from "@/contexts/NelloAppContext";
 import { Button } from "@/components/ui/button";
@@ -44,41 +46,41 @@ const adminApps: AdminApp[] = [
  * Only visible to users with 'admin' role in user_roles table
  */
 export function AdminAppSwitcher() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { userRoles } = useAuth();
   const { currentApp, domain } = useNelloApp();
-  
+
   // Only show for super admins (users with admin role in Nello One)
   const isSuperAdmin = userRoles.includes('admin');
-  
+
   if (!isSuperAdmin) {
     return null;
   }
 
   // Determine which app is currently active
-  const isLocalhost = domain.includes('localhost') || domain.includes('lovable');
-  
-  const getCurrentAppId = () => {
+  const isPreview = domain.includes('localhost') || domain.includes('lovable');
+
+  const currentAppId = useMemo(() => {
     if (currentApp === 'business') return 'business';
     return 'one'; // Default to One for main/one/flow/life
-  };
-  
-  const currentAppId = getCurrentAppId();
+  }, [currentApp]);
+
   const currentAdminApp = adminApps.find(app => app.id === currentAppId) || adminApps[0];
 
   const handleAppSwitch = (app: AdminApp) => {
     if (app.id === currentAppId) return;
-    
-    // For localhost/preview, use query param; for production, navigate to subdomain
-    if (isLocalhost) {
-      // Use query param for testing
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.set('app', app.id);
-      newUrl.pathname = app.adminPath;
-      window.location.href = newUrl.toString();
-    } else {
-      // Navigate to the actual subdomain
-      window.location.href = `${app.url}${app.adminPath}`;
+
+    // In preview/local, we must NOT do a hard reload (it can 404 on deep links).
+    if (isPreview) {
+      const params = new URLSearchParams(location.search);
+      params.set('app', app.id);
+      navigate({ pathname: app.adminPath, search: params.toString() }, { replace: true });
+      return;
     }
+
+    // Production: navigate to the actual subdomain
+    window.location.href = `${app.url}${app.adminPath}`;
   };
 
   return (

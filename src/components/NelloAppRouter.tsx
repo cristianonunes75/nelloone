@@ -3,6 +3,7 @@ import { useNelloApp } from '@/contexts/NelloAppContext';
 import FlowApp from '@/apps/flow/FlowApp';
 import LifeApp from '@/apps/life/LifeApp';
 import BusinessApp from '@/apps/business/BusinessApp';
+import { BusinessAuthProvider } from '@/apps/business/hooks/useBusinessAuth';
 
 interface NelloAppRouterProps {
   children: ReactNode; // Nello One routes (default)
@@ -10,22 +11,26 @@ interface NelloAppRouterProps {
 
 /**
  * Routes to the correct Nello app based on subdomain
- * 
+ *
  * - flow.nello.one → Nello Flow
- * - life.nello.one → Nello Life  
+ * - life.nello.one → Nello Life
  * - business.nello.one → Nello One Business
  * - one.nello.one or nello.one → Nello One (default)
  */
 export function NelloAppRouter({ children }: NelloAppRouterProps) {
   const { currentApp } = useNelloApp();
-  
+
   switch (currentApp) {
     case 'flow':
       return <FlowApp />;
     case 'life':
       return <LifeApp />;
     case 'business':
-      return <BusinessApp />;
+      return (
+        <BusinessAuthProvider>
+          <BusinessApp />
+        </BusinessAuthProvider>
+      );
     case 'one':
     case 'main':
     default:

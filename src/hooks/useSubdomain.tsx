@@ -33,11 +33,14 @@ const DEV_FORCE_SUBDOMAIN = import.meta.env.VITE_FORCE_SUBDOMAIN as string | und
  * - nello.one → Main/redirect
  * - localhost:8080 → Main (or forced via env)
  */
-export function useSubdomain(): SubdomainConfig {
+export function useSubdomain(searchOverride?: string): SubdomainConfig {
+  // NOTE: We accept an optional `searchOverride` so the app can react to
+  // in-app query param changes (e.g. ?app=business) without a full reload.
   return useMemo(() => {
     const hostname = window.location.hostname;
     const fullDomain = window.location.host;
-    
+    const search = searchOverride ?? window.location.search;
+
     // For development: allow forcing subdomain via env variable
     if (DEV_FORCE_SUBDOMAIN && (hostname === 'localhost' || hostname === '127.0.0.1')) {
       const app = SUBDOMAIN_MAP[DEV_FORCE_SUBDOMAIN] || 'main';
@@ -51,16 +54,16 @@ export function useSubdomain(): SubdomainConfig {
         domain: fullDomain,
       };
     }
-    
+
     // Extract subdomain from hostname
     // Expected format: subdomain.nello.one or subdomain.domain.com
     const parts = hostname.split('.');
-    
+
     // Check if it's a subdomain of nello.one (e.g., flow.nello.one)
     if (parts.length >= 3) {
       const subdomain = parts[0].toLowerCase();
       const app = SUBDOMAIN_MAP[subdomain] || 'main';
-      
+
       return {
         app,
         subdomain,
@@ -71,12 +74,11 @@ export function useSubdomain(): SubdomainConfig {
         domain: fullDomain,
       };
     }
-    
-    // Check for lovable preview domains (e.g., id.lovable.app)
-    // In this case, we use query params or default to 'one' (current app)
-    if (hostname.includes('lovable.app') || hostname.includes('lovable.dev')) {
-      // Check URL for app param: ?app=flow
-      const urlParams = new URLSearchParams(window.location.search);
+
+    // Preview / local domains: lovable.* (lovable.app, lovable.dev, lovableproject.com, etc.)
+    // In this case, we use query params (?app=flow|business|one) or default to 'one'.
+    if (hostname.includes('lovable')) {
+      const urlParams = new URLSearchParams(search);
       const appParam = urlParams.get('app');
       if (appParam && SUBDOMAIN_MAP[appParam]) {
         const app = SUBDOMAIN_MAP[appParam];
@@ -90,8 +92,7 @@ export function useSubdomain(): SubdomainConfig {
           domain: fullDomain,
         };
       }
-      
-      // Default to 'one' for preview/development
+
       return {
         app: 'one',
         subdomain: null,
@@ -102,7 +103,7 @@ export function useSubdomain(): SubdomainConfig {
         domain: fullDomain,
       };
     }
-    
+
     // Default: main domain (nello.one without subdomain)
     return {
       app: 'main',
@@ -113,7 +114,7 @@ export function useSubdomain(): SubdomainConfig {
       isMain: true,
       domain: fullDomain,
     };
-  }, []);
+  }, [searchOverride]);
 }
 
 /**
