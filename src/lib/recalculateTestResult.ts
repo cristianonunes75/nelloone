@@ -4,6 +4,7 @@ import { getDISCResults } from "@/lib/disc";
 import { getInteligenciasResults } from "@/lib/inteligenciasMultiplas";
 import { calculateEstilosConexaoAfetiva } from "@/lib/estilosConexaoAfetiva";
 import { calculateTemperamentos } from "@/lib/temperamentos";
+import { getEnneagramResults } from "@/lib/eneagrama";
 
 type TestType = 
   | "arquetipos_proposito"
@@ -86,23 +87,21 @@ export async function recalculateTestResult(
       }
 
       case "eneagrama": {
-        // Eneagrama calculation from answers
-        const typeScores: Record<string, number> = {};
-        
-        answers.forEach(answer => {
-          const value = answer.answer?.value || answer.answer;
-          if (typeof value === "string" || typeof value === "number") {
-            const type = String(value);
-            typeScores[type] = (typeScores[type] || 0) + 1;
-          }
-        });
-        
-        const sortedTypes = Object.entries(typeScores)
-          .sort(([, a], [, b]) => b - a);
-        
+        // Use the proper Enneagram calculation function
+        const enneagramResults = getEnneagramResults(answers as any);
         resultData = {
-          primaryType: sortedTypes[0]?.[0],
-          scores: typeScores,
+          primaryType: enneagramResults.primaryType,
+          secondaryType: enneagramResults.secondaryType,
+          wing: enneagramResults.wing,
+          scores: enneagramResults.scores,
+          percentages: enneagramResults.percentages,
+          hasCloseSecondary: enneagramResults.hasCloseSecondary,
+          instinct: enneagramResults.instinct,
+          instinctScores: enneagramResults.instinctScores,
+          consistencyScore: enneagramResults.consistencyScore,
+          isConsistent: enneagramResults.isConsistent,
+          completed_at: enneagramResults.completed_at,
+          testType: "eneagrama",
         };
         break;
       }

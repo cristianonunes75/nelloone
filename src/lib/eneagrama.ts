@@ -130,14 +130,22 @@ export const getEnneagramResults = (answers: EnneagramAnswer[]): EnneagramResult
   let consistencyTotal = 0;
   let consistencyCount = 0;
 
-  // Calculate scores for each type and instinct
+// Calculate scores for each type and instinct
   answers.forEach((answer) => {
-    const type = answer.test_questions.options.type;
-    const value = answer.answer;
+    const type = answer.test_questions?.options?.type;
+// Handle both formats: { value: number } or just number
+    const rawAnswer = answer.answer as { value?: number } | number | null | undefined;
+    const value = rawAnswer && typeof rawAnswer === 'object' && 'value' in rawAnswer
+      ? Number(rawAnswer.value)
+      : Number(rawAnswer ?? 0);
     
-    if (type && scores.hasOwnProperty(type)) {
+    // Skip if value is not a valid number
+    if (isNaN(value)) return;
+    
+    const typeStr = String(type);
+    if (typeStr && scores.hasOwnProperty(typeStr)) {
       // Type 1-9 question
-      scores[type] += value;
+      scores[typeStr] += value;
     } else if (type === 'SP' || type === 'SO' || type === 'SX') {
       // Instinctive subtype question
       instinctScores[type] += value;
