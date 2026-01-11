@@ -23,11 +23,13 @@ import {
   CheckCircle2,
   User,
   RefreshCw,
-  FileText
+  FileText,
+  Heart
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { recalculateLinguagensAmorResults } from "@/lib/recalculateBatchResults";
 
 interface UserTest {
   id: string;
@@ -61,6 +63,13 @@ export const AdminTools = () => {
   const [myTests, setMyTests] = useState<UserTest[]>([]);
   const [myTestsLoading, setMyTestsLoading] = useState(false);
   const [resettingTestId, setResettingTestId] = useState<string | null>(null);
+  const [recalculatingLinguagens, setRecalculatingLinguagens] = useState(false);
+  const [recalculationResults, setRecalculationResults] = useState<{
+    total: number;
+    successful: number;
+    failed: number;
+    results: any[];
+  } | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -504,6 +513,83 @@ export const AdminTools = () => {
                 )}
                 Resetar Progresso
               </Button>
+            </CardContent>
+          </Card>
+
+          {/* Recalculate Linguagens Amor Card */}
+          <Card className="border-border/50">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Heart className="w-5 h-5" />
+                Recalcular Estilos de Conexão Afetiva
+              </CardTitle>
+              <CardDescription>
+                Corrigir resultados de testes que foram calculados incorretamente (scores zerados)
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button 
+                variant="outline" 
+                onClick={async () => {
+                  setRecalculatingLinguagens(true);
+                  try {
+                    const results = await recalculateLinguagensAmorResults();
+                    setRecalculationResults(results);
+                    if (results.successful > 0) {
+                      toast.success(`${results.successful} resultados recalculados com sucesso!`);
+                    } else if (results.total === 0) {
+                      toast.info("Nenhum resultado precisava ser recalculado");
+                    }
+                    if (results.failed > 0) {
+                      toast.error(`${results.failed} recálculos falharam`);
+                    }
+                  } catch (error) {
+                    console.error("Error recalculating:", error);
+                    toast.error("Erro ao recalcular resultados");
+                  } finally {
+                    setRecalculatingLinguagens(false);
+                  }
+                }}
+                disabled={recalculatingLinguagens}
+                className="w-full"
+              >
+                {recalculatingLinguagens ? (
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                ) : (
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                )}
+                Recalcular Testes com Scores Zerados
+              </Button>
+
+              {recalculationResults && (
+                <div className="space-y-2 mt-4">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Badge variant={recalculationResults.successful > 0 ? "default" : "secondary"}>
+                      {recalculationResults.total} testes analisados
+                    </Badge>
+                    <Badge variant="default" className="bg-emerald-500">
+                      {recalculationResults.successful} corrigidos
+                    </Badge>
+                    {recalculationResults.failed > 0 && (
+                      <Badge variant="destructive">
+                        {recalculationResults.failed} falhas
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  {recalculationResults.results.filter(r => r.success).length > 0 && (
+                    <div className="max-h-48 overflow-y-auto space-y-1 text-xs">
+                      {recalculationResults.results.filter(r => r.success).map((r, i) => (
+                        <div key={i} className="flex items-center gap-2 p-2 bg-emerald-500/10 rounded">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600 flex-shrink-0" />
+                          <span className="font-medium">{r.userName}:</span>
+                          <span className="text-muted-foreground">{r.oldPrimary} → {r.newPrimary}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 

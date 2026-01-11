@@ -1,3 +1,7 @@
+// Re-export from the new file for backwards compatibility
+// This file now delegates to the new Estilos de Conexão Afetiva system
+import { calculateEstilosConexaoAfetiva, EstilosConexaoAfetiva } from './estilosConexaoAfetiva';
+
 export interface LinguagensAmorResult {
   primary: {
     language: string;
@@ -5,6 +9,7 @@ export interface LinguagensAmorResult {
     name: string;
     symbol: string;
     essence: string;
+    description?: string;
   };
   secondary: {
     language: string;
@@ -12,89 +17,64 @@ export interface LinguagensAmorResult {
     name: string;
     symbol: string;
     essence: string;
+    description?: string;
   };
   scores: {
-    palavras_afirmacao: number;
-    tempo_qualidade: number;
-    presentes: number;
-    atos_servico: number;
-    toque_fisico: number;
+    // Support both old and new keys for compatibility
+    palavras_afirmacao?: number;
+    tempo_qualidade?: number;
+    presentes?: number;
+    atos_servico?: number;
+    toque_fisico?: number;
+    presenca_ativa?: number;
+    expressao_verbal?: number;
+    cuidado_pratico?: number;
+    gestos_simbolicos?: number;
+    conexao_fisica?: number;
   };
   interpretation: string;
 }
 
-const styleData = {
-  palavras_afirmacao: {
-    name: "Expressão Verbal",
-    symbol: "🕊️ Voz da Criação",
-    essence: "Você cria mundos com suas palavras. Quando fala com amor, tudo floresce.",
-    description: "Seu estilo de conexão é expresso através de palavras. Elogios, palavras de encorajamento, reconhecimento verbal e mensagens de carinho são fundamentais para você se sentir amado(a) e para demonstrar afeto aos outros."
-  },
-  tempo_qualidade: {
-    name: "Presença Ativa",
-    symbol: "🌅 Presença Plena",
-    essence: "O tempo é sua forma de amar. Você transforma simples momentos em eternidade.",
-    description: "Para você, conexão é presença. Conversas profundas, atenção total e momentos compartilhados sem distrações são a forma mais verdadeira de conexão. O tempo dedicado é seu maior presente."
-  },
-  presentes: {
-    name: "Gestos Simbólicos",
-    symbol: "🎁 Rituais de Afeto",
-    essence: "Para você, o amor é um gesto visível, uma lembrança do que é invisível.",
-    description: "Os gestos simbólicos carregam significado profundo para você. Não é o valor material, mas o pensamento, a lembrança e o simbolismo que tocam seu coração."
-  },
-  atos_servico: {
-    name: "Cuidado Prático",
-    symbol: "💧 Amor em Ação",
-    essence: "O amor, pra você, é verbo. Está em cuidar, servir e aliviar o peso do outro.",
-    description: "Para você, conexão é ação. Quando alguém faz algo prático para ajudar, resolver problemas ou facilitar sua vida, você sente o amor verdadeiro. E é assim que você demonstra cuidado aos outros."
-  },
-  toque_fisico: {
-    name: "Conexão Física",
-    symbol: "🔥 Fogo Sagrado",
-    essence: "Você se comunica pelo contato. O toque é oração, presença e entrega.",
-    description: "O contato físico é seu estilo de conexão. Abraços, carinhos, proximidade física e gestos afetuosos são essenciais para você se sentir amado(a) e expressar afeto aos outros."
-  }
+// Map new style keys to old style keys for backwards compatibility
+const NEW_TO_OLD_STYLE_MAP: Record<string, string> = {
+  'expressao_verbal': 'palavras_afirmacao',
+  'presenca_ativa': 'tempo_qualidade', 
+  'cuidado_pratico': 'atos_servico',
+  'gestos_simbolicos': 'presentes',
+  'conexao_fisica': 'toque_fisico',
 };
 
-export const calculateLinguagensAmor = (answers: any[]): LinguagensAmorResult => {
-  const scores = {
-    palavras_afirmacao: 0,
-    tempo_qualidade: 0,
-    presentes: 0,
-    atos_servico: 0,
-    toque_fisico: 0
-  };
-
-  // Count each language occurrence in the answers
-  answers.forEach((answer) => {
-    const value = answer.answer?.value || answer.answer;
-    if (value && scores.hasOwnProperty(value)) {
-      scores[value as keyof typeof scores]++;
-    }
+export const calculateLinguagensAmor = (answers: any[], language: 'pt' | 'en' | 'pt-pt' = 'pt'): LinguagensAmorResult => {
+  // Use the new calculation function
+  const estilosResult = calculateEstilosConexaoAfetiva(answers, language);
+  
+  // Convert to the old format for backwards compatibility
+  const oldScores: Record<string, number> = {};
+  
+  // Map new scores to old keys
+  Object.entries(estilosResult.scores).forEach(([key, value]) => {
+    const oldKey = NEW_TO_OLD_STYLE_MAP[key] || key;
+    oldScores[oldKey] = value;
+    // Also include new keys
+    oldScores[key] = value;
   });
-
-  // Sort by score to find primary and secondary
-  const sortedStyles = Object.entries(scores)
-    .sort(([, a], [, b]) => b - a)
-    .map(([language, score]) => ({
-      language,
-      score,
-      ...styleData[language as keyof typeof styleData]
-    }));
-
-  const primary = sortedStyles[0];
-  const secondary = sortedStyles[1];
-
-  const interpretation = `Seu estilo primário de conexão afetiva é ${primary.name}. ${primary.description}
-
-Seu estilo secundário é ${secondary.name}, mostrando que você também valoriza esse estilo em seus relacionamentos.
-
-Essa combinação revela uma pessoa que se conecta de forma ${primary.score > secondary.score + 5 ? 'profundamente focada' : 'equilibrada'}, sabendo expressar e receber afeto de maneiras diversas e complementares.`;
-
+  
   return {
-    primary,
-    secondary,
-    scores,
-    interpretation
+    primary: {
+      language: NEW_TO_OLD_STYLE_MAP[estilosResult.primary.style] || estilosResult.primary.style,
+      score: estilosResult.primary.score,
+      name: estilosResult.primary.name[language] || estilosResult.primary.name.pt,
+      symbol: estilosResult.primary.symbol,
+      essence: estilosResult.primary.essence[language] || estilosResult.primary.essence.pt,
+    },
+    secondary: {
+      language: NEW_TO_OLD_STYLE_MAP[estilosResult.secondary.style] || estilosResult.secondary.style,
+      score: estilosResult.secondary.score,
+      name: estilosResult.secondary.name[language] || estilosResult.secondary.name.pt,
+      symbol: estilosResult.secondary.symbol,
+      essence: estilosResult.secondary.essence[language] || estilosResult.secondary.essence.pt,
+    },
+    scores: oldScores as LinguagensAmorResult['scores'],
+    interpretation: estilosResult.interpretation[language] || estilosResult.interpretation.pt,
   };
 };
