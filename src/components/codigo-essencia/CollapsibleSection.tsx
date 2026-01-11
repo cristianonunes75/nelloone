@@ -62,14 +62,13 @@ export const CollapsibleSection = ({
             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
 
-          <div className={cn(
-            "overflow-hidden transition-all duration-300",
-            isExpanded ? "max-h-96 opacity-100 mt-4" : "max-h-0 opacity-0"
-          )}>
-            <div className="bg-background/30 rounded-lg p-4">
-              <p className="text-sm leading-relaxed">{deepContent}</p>
+          {isExpanded && (
+            <div className="mt-4 animate-in fade-in duration-300">
+              <div className="bg-background/30 rounded-lg p-4">
+                <p className="text-sm leading-relaxed">{deepContent}</p>
+              </div>
             </div>
-          </div>
+          )}
         </>
       )}
     </div>
