@@ -16,7 +16,7 @@ import ArchetypeResults from "@/components/cliente/ArchetypeResults";
 import { calculateArchetypeScores, getDominantArchetypes } from "@/lib/archetypes";
 import { getDISCResults, DISC_PROFILES } from "@/lib/disc";
 import { NELLO_16_PROFILES, getNello16DisplayCode } from "@/lib/nello16Personality";
-import { ENNEAGRAM_PROFILES } from "@/lib/eneagrama";
+import { ENNEAGRAM_PROFILES, getEnneagramResults, EnneagramResult } from "@/lib/eneagrama";
 import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
 import { getInteligenciasResults, INTELLIGENCES, InteligenciasResult } from "@/lib/inteligenciasMultiplas";
@@ -680,9 +680,38 @@ function TestResultsInner() {
   
   // Cast result_data for MBTI and Enneagram
   const mbtiResultData = isMBTITest ? (userTest.result_data as any) : null;
-  const enneagramResultData = isEnneagramTest ? (userTest.result_data as any) : null;
   const linguagensAmorResultData = isLinguagensAmorTest ? (userTest.result_data as any) : null;
   const temperamentosResultData = isTemperamentosTest ? (userTest.result_data as any) : null;
+
+  // Calculate Enneagram results - detect corrupted data and recalculate if needed
+  let enneagramResultData: EnneagramResult | null = null;
+  let enneagramNeedsRecalculation = false;
+  if (isEnneagramTest) {
+    const savedData = userTest.result_data as any;
+    
+    // Check if data is corrupted (scores contain "[object Object]" strings)
+    const isCorrupted = savedData?.scores && Object.values(savedData.scores).some(
+      (score: any) => typeof score === 'string' && score.includes('[object Object]')
+    );
+    
+    if (isCorrupted || !savedData?.primaryType) {
+      // Try to recalculate from answers
+      if (answers && answers.length > 0) {
+        enneagramResultData = getEnneagramResults(answers as any);
+      }
+      enneagramNeedsRecalculation = !enneagramResultData;
+    } else {
+      // Validate that scores are actual numbers
+      const hasValidScores = savedData?.scores && Object.values(savedData.scores).every(
+        (score: any) => typeof score === 'number'
+      );
+      if (hasValidScores) {
+        enneagramResultData = savedData as EnneagramResult;
+      } else if (answers && answers.length > 0) {
+        enneagramResultData = getEnneagramResults(answers as any);
+      }
+    }
+  }
 
   // Calculate archetype scores
   let archetypeScoresArray;
@@ -861,6 +890,40 @@ function TestResultsInner() {
             lang={lang as 'pt' | 'pt-pt' | 'en'}
             userName={userFirstName}
           />
+        )}
+
+        {/* Fallback for Enneagram when results need recalculation */}
+        {isEnneagramTest && enneagramNeedsRecalculation && answers && answers.length > 0 && (
+          <Card className="border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20">
+            <CardContent className="pt-6 text-center space-y-4">
+              <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto" />
+              <h2 className="text-xl font-semibold">
+                {lang === 'en' ? 'Results need recalculation' : 'Resultados precisam ser recalculados'}
+              </h2>
+              <p className="text-muted-foreground text-sm max-w-md mx-auto">
+                {lang === 'en' 
+                  ? 'There was an issue loading your Enneagram results. Click below to recalculate from your answers.'
+                  : 'Houve um problema ao carregar seus resultados do Eneagrama. Clique abaixo para recalcular a partir das suas respostas.'}
+              </p>
+              <Button 
+                onClick={handleRecalculate} 
+                disabled={isRecalculating}
+                className="gap-2"
+              >
+                {isRecalculating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {lang === 'en' ? 'Recalculating...' : 'Recalculando...'}
+                  </>
+                ) : (
+                  <>
+                    <Calculator className="h-4 w-4" />
+                    {lang === 'en' ? 'Recalculate Results' : 'Recalcular Resultados'}
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
         )}
 
         {/* Nello 16 Personality Map Results - Rich Component */}
