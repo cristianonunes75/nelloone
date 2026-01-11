@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Building2, Loader2, CheckCircle, AlertCircle, Shield } from 'lucide-react';
+import { Building2, Loader2, CheckCircle, AlertCircle, Shield, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +14,7 @@ import { useAuth } from '@/hooks/useAuth';
 interface InviteData {
   id: string;
   email: string;
+  role: 'collaborator' | 'company_admin';
   company: {
     id: string;
     name: string;
@@ -50,6 +52,7 @@ export default function BusinessAcceptInvite() {
         .select(`
           id,
           email,
+          role,
           status,
           expires_at,
           companies:company_id (
@@ -80,6 +83,7 @@ export default function BusinessAcceptInvite() {
       setInvite({
         id: data.id,
         email: data.email,
+        role: data.role as 'collaborator' | 'company_admin',
         status: data.status,
         expires_at: data.expires_at,
         company: companyData as { id: string; name: string; logo_url: string | null }
@@ -116,18 +120,20 @@ export default function BusinessAcceptInvite() {
         userId = authData.user.id;
       }
       
-      // Create company_user link
+      // Create company_user link with the invited role
+      const isAdmin = invite.role === 'company_admin';
       const { error: linkError } = await supabase
         .from('company_users')
         .insert({
           company_id: invite.company.id,
           user_id: userId,
-          role: 'collaborator',
+          role: invite.role,
           is_active: true,
           consent_given: true,
           consent_given_at: new Date().toISOString(),
           consent_text_version: '1.0',
           joined_at: new Date().toISOString(),
+          onboarding_completed: isAdmin, // Admins skip onboarding as they share company config
         });
       
       if (linkError) throw linkError;
@@ -143,7 +149,13 @@ export default function BusinessAcceptInvite() {
         .eq('id', invite.id);
       
       toast.success('Convite aceito! Bem-vindo à equipe.');
-      navigate('/my-journey');
+      
+      // Redirect based on role
+      if (invite.role === 'company_admin') {
+        navigate('/dashboard');
+      } else {
+        navigate('/my-journey');
+      }
     } catch (err: any) {
       console.error('Error accepting invite:', err);
       toast.error(err.message || 'Erro ao aceitar convite');
@@ -193,9 +205,38 @@ export default function BusinessAcceptInvite() {
           </div>
           <h1 className="text-2xl font-bold">{invite.company.name}</h1>
           <p className="text-muted-foreground">
-            Você foi convidado para fazer parte da equipe
+            {invite.role === 'company_admin' 
+              ? 'Você foi convidado como Sócio/Administrador'
+              : 'Você foi convidado para fazer parte da equipe'
+            }
           </p>
+          {invite.role === 'company_admin' && (
+            <Badge className="mt-2 bg-amber-100 text-amber-700 border-amber-200">
+              <Crown className="w-3 h-3 mr-1" />
+              Acesso Administrativo
+            </Badge>
+          )}
         </div>
+
+        {/* Admin Info Card */}
+        {invite.role === 'company_admin' && (
+          <Card className="border-amber-200 bg-amber-50/50">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-3">
+                <Crown className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-amber-700">Como Sócio/Admin você poderá:</p>
+                  <ul className="mt-2 space-y-1 text-sm text-amber-600">
+                    <li>• Gerenciar toda a equipe e convites</li>
+                    <li>• Ver relatórios agregados da empresa</li>
+                    <li>• Convidar novos colaboradores e admins</li>
+                    <li>• Gerenciar configurações da empresa</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Consent Card */}
         <Card>
