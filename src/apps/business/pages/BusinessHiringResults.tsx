@@ -238,6 +238,8 @@ export default function BusinessHiringResults() {
         {/* Attachments Section */}
         <CandidateAttachments
           candidateId={candidate.id}
+          candidateEmail={candidate.email}
+          companyId={company?.id || ""}
           attachments={candidate.attachments || []}
           onUpdate={fetchCandidateData}
         />
