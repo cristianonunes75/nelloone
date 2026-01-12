@@ -547,6 +547,84 @@ export type Database = {
         }
         Relationships: []
       }
+      codigo_cruzamentos: {
+        Row: {
+          content: Json | null
+          created_at: string | null
+          id: string
+          invite_accepted_at: string | null
+          invite_email: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          is_public_active: boolean | null
+          public_expires_at: string | null
+          public_token: string | null
+          raw_content: string | null
+          relationship_type: string
+          status: string | null
+          updated_at: string | null
+          user_a_consent_at: string | null
+          user_a_id: string
+          user_b_consent_at: string | null
+          user_b_id: string | null
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string | null
+          id?: string
+          invite_accepted_at?: string | null
+          invite_email?: string | null
+          invite_sent_at?: string | null
+          invite_token?: string | null
+          is_public_active?: boolean | null
+          public_expires_at?: string | null
+          public_token?: string | null
+          raw_content?: string | null
+          relationship_type: string
+          status?: string | null
+          updated_at?: string | null
+          user_a_consent_at?: string | null
+          user_a_id: string
+          user_b_consent_at?: string | null
+          user_b_id?: string | null
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string | null
+          id?: string
+          invite_accepted_at?: string | null
+          invite_email?: string | null
+          invite_sent_at?: string | null
+          invite_token?: string | null
+          is_public_active?: boolean | null
+          public_expires_at?: string | null
+          public_token?: string | null
+          raw_content?: string | null
+          relationship_type?: string
+          status?: string | null
+          updated_at?: string | null
+          user_a_consent_at?: string | null
+          user_a_id?: string
+          user_b_consent_at?: string | null
+          user_b_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "codigo_cruzamentos_user_a_id_fkey"
+            columns: ["user_a_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "codigo_cruzamentos_user_b_id_fkey"
+            columns: ["user_b_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           billing_email: string | null
