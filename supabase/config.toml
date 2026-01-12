@@ -117,3 +117,9 @@ verify_jwt = true
 [functions.business-import-user-data]
 verify_jwt = true
 
+[functions.business-scan-attachment]
+verify_jwt = true
+
+[functions.business-resend-assessment]
+verify_jwt = true
+
