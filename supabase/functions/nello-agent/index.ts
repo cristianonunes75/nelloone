@@ -1,9 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Rate limiting configuration
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 30; // 30 requests per minute
 
 // Array de saudações iniciais variadas para o Nello (PT)
 const NELLO_INITIAL_GREETINGS_PT = [
@@ -491,61 +496,45 @@ IMPORTANTE:
 - Use os marcadores de seção EXATAMENTE como mostrado`;
 };
 
-// Simulation analysis prompt
+// Simulation analysis prompt for admins
 const getSimulationPrompt = (language: string, basePrompt: string, simulationResult: any) => {
   if (language === 'en') {
     return `${basePrompt}
 
-CONTEXT: You are analyzing a TEST SIMULATION performed by a system administrator.
+SPECIAL CONTEXT: You are analyzing a SIMULATED test result for an administrator.
+This is an internal tool for the admin to explore how the tests work and what insights can be generated.
 
-This is the simulated test result:
+SIMULATED RESULT DATA:
 ${JSON.stringify(simulationResult, null, 2)}
 
-Your task is to analyze this result as if it were from a real user and provide:
+Analyze this simulated result and provide:
+1. A clear interpretation of what these scores would indicate about someone
+2. Main strengths and areas for development
+3. How this profile tends to behave in different contexts
+4. Practical suggestions for growth
 
-1. **General Interpretation**: A welcoming and human view of what this result reveals about the person
-2. **Identified Strengths**: 2-3 positive characteristics that stand out
-3. **Areas of Attention**: 1-2 aspects that deserve reflection or development
-4. **Deep Insight**: A deeper observation about what these patterns might mean in real life
-5. **Suggested Next Step**: What this person could do to deepen self-knowledge
-
-IMPORTANT:
-- Speak directly to the person (use "you")
-- Be welcoming and encouraging
-- Don't mention it's a simulation
-- Don't show technical data or JSON
-- Maintain your human, deep, and inspiring tone
-- Be specific based on the presented results
-- WRAP ALL YOUR TEXT IN DOUBLE QUOTES`;
+Remember: This is a simulation for the administrator, not a real user. Maintain a professional and analytical tone while still being warm and human.`;
   }
   
   return `${basePrompt}
 
-CONTEXTO: Você está analisando uma SIMULAÇÃO de teste realizada por um administrador do sistema.
+CONTEXTO ESPECIAL: Você está analisando um resultado de teste SIMULADO para um administrador.
+Esta é uma ferramenta interna para o admin explorar como os testes funcionam e quais insights podem ser gerados.
 
-Este é o resultado simulado do teste:
+DADOS DO RESULTADO SIMULADO:
 ${JSON.stringify(simulationResult, null, 2)}
 
-Sua tarefa é analisar este resultado como se fosse de um usuário real e fornecer:
+Analise este resultado simulado e forneça:
+1. Uma interpretação clara do que essas pontuações indicariam sobre alguém
+2. Principais forças e áreas de desenvolvimento
+3. Como esse perfil tende a se comportar em diferentes contextos
+4. Sugestões práticas para crescimento
 
-1. **Interpretação Geral**: Uma visão acolhedora e humana do que este resultado revela sobre a pessoa
-2. **Pontos Fortes Identificados**: 2-3 características positivas que se destacam
-3. **Áreas de Atenção**: 1-2 aspectos que merecem reflexão ou desenvolvimento
-4. **Insight Profundo**: Uma observação mais profunda sobre o que esses padrões podem significar na vida real
-5. **Próximo Passo Sugerido**: O que essa pessoa poderia fazer para aprofundar o autoconhecimento
-
-IMPORTANTE:
-- Fale diretamente para a pessoa (use "você")
-- Seja acolhedor e encorajador
-- Não mencione que é uma simulação
-- Não mostre dados técnicos ou JSON
-- Mantenha seu tom humano, profundo e inspirador
-- Seja específico baseado nos resultados apresentados
-- COLOQUE TODO SEU TEXTO ENTRE ASPAS DUPLAS`;
+Lembre-se: Esta é uma simulação para o administrador, não um usuário real. Mantenha um tom profissional e analítico, mas ainda assim acolhedor e humano.`;
 };
 
-// Function to get random initial greeting
-const getRandomGreeting = (language: string, userName?: string): string => {
+// Helper to get random greeting
+const getRandomGreeting = (language: string, userName?: string) => {
   let greetings: string[];
   
   if (language === 'en') {
@@ -556,109 +545,130 @@ const getRandomGreeting = (language: string, userName?: string): string => {
     greetings = NELLO_INITIAL_GREETINGS_PT;
   }
   
-  const randomIndex = Math.floor(Math.random() * greetings.length);
-  let greeting = greetings[randomIndex];
+  const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
   
-  // Personalizar com nome se disponível
   if (userName) {
-    // Inserir nome no início da fala
-    greeting = greeting.replace('"', `"${userName}, `).replace(`"${userName}, B`, `"Bom`).replace(`"${userName}, R`, `"${userName}, r`);
+    // Insert name after the first quote
+    return randomGreeting.replace(/^"/, `"${userName}, `);
   }
   
-  return greeting;
+  return randomGreeting;
 };
 
-// Context additions based on language
+// Context additions for different locations
 const getContextAdditions = (language: string, context: any, userName: string) => {
-  const langKey = language === 'pt-pt' ? 'pt-pt' : language === 'en' ? 'en' : 'pt';
-  
-  if (langKey === 'en') {
-    let additions = `\n\nUser context:`;
-    
-    if (userName) {
-      additions += `\n- Name: ${userName}`;
-    }
-    
-    if (context.completedTests && context.completedTests.length > 0) {
-      additions += `\n- Completed tests: ${context.completedTests.join(", ")}`;
-    }
-    
-    if (context.currentStep) {
-      additions += `\n- Current journey step: ${context.currentStep}`;
-    }
-    
-    if (context.results) {
-      additions += `\n- Previous results: ${JSON.stringify(context.results)}`;
-    }
-    
-    if (context.isNewUser) {
-      const greeting = getRandomGreeting('en', userName);
-      additions += `\n\nThis is a new user. Start the conversation with this greeting:
-${greeting}`;
-    }
-    
-    if (context.location === 'landing') {
-      additions += `\n\nThe user is on the landing page. Your role is:
-- Welcome visitors warmly
-- Explain what NELLO ONE is
-- Present available tests
-- Guide to signup or login
-- Answer questions about prices and how it works`;
-    } else if (context.location === 'cliente') {
-      additions += `\n\nThe user is in the logged-in area. Your role is:
-- Accompany the test journey
-- Explain each test before starting
-- Interpret results after completion
-- Motivate to continue the journey
-- Help understand insights`;
-    }
-    
-    return additions;
-  }
-  
-  // Portuguese version
-  let additions = `\n\nContexto do usuário:`;
+  let additions = '';
   
   if (userName) {
-    additions += `\n- Nome: ${userName}`;
+    additions += language === 'en' 
+      ? `\n\nThe user's name is ${userName}. Use their name warmly when appropriate.`
+      : `\n\nO nome do usuário é ${userName}. Use o nome dele/dela com carinho quando apropriado.`;
   }
   
   if (context.completedTests && context.completedTests.length > 0) {
-    additions += `\n- Testes concluídos: ${context.completedTests.join(", ")}`;
+    const testsText = context.completedTests.join(', ');
+    additions += language === 'en'
+      ? `\n\nTests already completed: ${testsText}. Use this to personalize your responses.`
+      : `\n\nTestes já completados: ${testsText}. Use isso para personalizar suas respostas.`;
   }
   
   if (context.currentStep) {
-    additions += `\n- Etapa atual na jornada: ${context.currentStep}`;
+    additions += language === 'en'
+      ? `\n\nThe user is currently at step: ${context.currentStep} in the journey.`
+      : `\n\nO usuário está atualmente na etapa: ${context.currentStep} da jornada.`;
   }
   
-  if (context.results) {
-    additions += `\n- Resultados anteriores: ${JSON.stringify(context.results)}`;
+  if (context.testResults) {
+    additions += language === 'en'
+      ? `\n\nTest Results available:\n${JSON.stringify(context.testResults, null, 2)}\n\nUse these results to provide personalized insights.`
+      : `\n\nResultados de Testes disponíveis:\n${JSON.stringify(context.testResults, null, 2)}\n\nUse estes resultados para fornecer insights personalizados.`;
   }
   
-  if (context.isNewUser) {
-    const greeting = getRandomGreeting(langKey, userName);
-    additions += `\n\nEste é um novo usuário. Inicie a conversa com esta saudação:
-${greeting}`;
-  }
-  
+  // Location-specific context
   if (context.location === 'landing') {
-    additions += `\n\nO usuário está na página inicial (landing page). Seu papel é:
-- Acolher visitantes com calor humano
-- Explicar o que é o NELLO ONE
-- Apresentar os testes disponíveis
-- Guiar para o cadastro ou login
-- Responder dúvidas sobre preços e funcionamento`;
+    additions += language === 'en'
+      ? `\n\nThe user is on the landing page. Your role is:\n- Present NELLO ONE with enthusiasm\n- Explain the tests\n- Answer questions about pricing and how it works`
+      : `\n\nO usuário está na landing page. Seu papel é:\n- Apresentar o NELLO ONE com entusiasmo\n- Explicar os testes\n- Responder dúvidas sobre preços e funcionamento`;
   } else if (context.location === 'cliente') {
-    additions += `\n\nO usuário está na área logada. Seu papel é:
-- Acompanhar a jornada de testes
-- Explicar cada teste antes de começar
-- Interpretar resultados após conclusão
-- Motivar a continuar a jornada
-- Ajudar a entender os insights`;
+    additions += language === 'en'
+      ? `\n\nThe user is in the logged-in area. Your role is:\n- Accompany the test journey\n- Explain each test before starting\n- Interpret results after completion\n- Motivate to continue the journey\n- Help understand insights`
+      : `\n\nO usuário está na área logada. Seu papel é:\n- Acompanhar a jornada de testes\n- Explicar cada teste antes de começar\n- Interpretar resultados após conclusão\n- Motivar a continuar a jornada\n- Ajudar a entender os insights`;
   }
   
   return additions;
 };
+
+// Helper to verify JWT and get user
+async function authenticateRequest(req: Request, supabaseClient: any): Promise<{ user: any; error: string | null }> {
+  const authHeader = req.headers.get('Authorization');
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return { user: null, error: 'Authentication required' };
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+  
+  const { data: { user }, error } = await supabaseClient.auth.getUser(token);
+  
+  if (error || !user) {
+    console.error('[NELLO] Auth error:', error?.message);
+    return { user: null, error: 'Invalid or expired token' };
+  }
+
+  return { user, error: null };
+}
+
+// Rate limiting check
+async function checkRateLimit(userId: string, endpoint: string, supabaseClient: any): Promise<{ allowed: boolean; remaining: number }> {
+  const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString();
+  
+  // Get current request count in window
+  const { data: limits, error } = await supabaseClient
+    .from('ai_rate_limits')
+    .select('request_count, window_start')
+    .eq('user_id', userId)
+    .eq('endpoint', endpoint)
+    .gte('window_start', windowStart)
+    .order('window_start', { ascending: false })
+    .limit(1);
+
+  if (error) {
+    console.error('[NELLO] Rate limit check error:', error);
+    // Allow request if we can't check rate limit
+    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS };
+  }
+
+  let currentCount = 0;
+  
+  if (limits && limits.length > 0) {
+    currentCount = limits[0].request_count;
+  }
+
+  if (currentCount >= RATE_LIMIT_MAX_REQUESTS) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  // Update or insert rate limit record
+  if (limits && limits.length > 0) {
+    await supabaseClient
+      .from('ai_rate_limits')
+      .update({ request_count: currentCount + 1 })
+      .eq('user_id', userId)
+      .eq('endpoint', endpoint)
+      .gte('window_start', windowStart);
+  } else {
+    await supabaseClient
+      .from('ai_rate_limits')
+      .insert({
+        user_id: userId,
+        endpoint: endpoint,
+        request_count: 1,
+        window_start: new Date().toISOString()
+      });
+  }
+
+  return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - currentCount - 1 };
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -666,6 +676,41 @@ serve(async (req) => {
   }
 
   try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Authenticate request
+    const { user, error: authError } = await authenticateRequest(req, supabaseClient);
+    
+    if (authError || !user) {
+      console.error('[NELLO] Authentication failed:', authError);
+      return new Response(
+        JSON.stringify({ error: authError || 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check rate limit
+    const { allowed, remaining } = await checkRateLimit(user.id, 'nello-agent', supabaseClient);
+    
+    if (!allowed) {
+      console.warn(`[NELLO] Rate limit exceeded for user: ${user.id}`);
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded. Please wait a moment.' }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': String(Math.ceil(RATE_LIMIT_WINDOW_MS / 1000))
+          } 
+        }
+      );
+    }
+
     const { messages, context, userName, simulationResult, language = 'pt' } = await req.json();
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -688,7 +733,7 @@ serve(async (req) => {
     // Handle simulation analysis for admin
     if (context === "analise_simulacao_admin" && simulationResult) {
       contextualPrompt = getSimulationPrompt(language, basePrompt, simulationResult);
-      console.log(`[NELLO] Processing simulation analysis for admin (${language})`);
+      console.log(`[NELLO] Processing simulation analysis for admin (${language}), user: ${user.id}`);
     } else if (context && typeof context === 'object') {
       // Special prompt for Essence Map generation
       if (context.isMapGeneration && context.results) {
@@ -699,7 +744,7 @@ serve(async (req) => {
     }
 
     const contextLocation = typeof context === 'string' ? context : context?.location || 'unknown';
-    console.log(`[NELLO] Processing request with context: ${contextLocation}, language: ${language}`);
+    console.log(`[NELLO] Processing request with context: ${contextLocation}, language: ${language}, user: ${user.id}, remaining: ${remaining}`);
 
     // Build messages array safely
     const chatMessages = [
@@ -768,10 +813,14 @@ serve(async (req) => {
       });
     }
 
-    console.log(`[NELLO] Streaming response started (${language})`);
+    console.log(`[NELLO] Streaming response started (${language}), user: ${user.id}`);
 
     return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      headers: { 
+        ...corsHeaders, 
+        "Content-Type": "text/event-stream",
+        'X-RateLimit-Remaining': String(remaining)
+      },
     });
 
   } catch (error) {
