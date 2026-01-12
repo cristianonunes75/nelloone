@@ -34,3 +34,5 @@ export { SaintPatronSection } from "./SaintPatronSection";
 export { PersonalitiesReferenceSection } from "./PersonalitiesReferenceSection";
 export { RelatorioContextual } from "./RelatorioContextual";
 export { RelatorioSelector } from "./RelatorioSelector";
+export { CruzamentoCodigos } from "./CruzamentoCodigos";
+export { CruzamentoViewer } from "./CruzamentoViewer";
