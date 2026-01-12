@@ -6,12 +6,17 @@ import { BusinessLayout } from "../components/BusinessLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Loader2, Mail, Phone, Briefcase, Calendar, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { ArrowLeft, Loader2, Mail, Phone, Briefcase, Calendar, CheckCircle2, Clock, AlertCircle, Target, AlertTriangle, Users, Compass } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DISC_PROFILES, type DISCScores } from "@/lib/disc";
+import { 
+  DISC_HIRING_INSIGHTS, 
+  TEMPERAMENT_HIRING_INSIGHTS, 
+  getDISCLevelLabel,
+  getCombinedProfileInsights 
+} from "@/lib/discHiringInsights";
 
 interface Candidate {
   id: string;
@@ -39,6 +44,13 @@ const temperamentData: Record<string, { name: string; emoji: string; color: stri
   fleumatico: { name: "Fleumático", emoji: "🌍", color: "text-green-600" },
 };
 
+const DISC_LABELS: Record<string, string> = {
+  D: "Dominância",
+  I: "Influência",
+  S: "Estabilidade",
+  C: "Conformidade",
+};
+
 export default function BusinessHiringResults() {
   const { candidateId } = useParams<{ candidateId: string }>();
   const navigate = useNavigate();
@@ -58,7 +70,6 @@ export default function BusinessHiringResults() {
     if (!candidateId) return;
     setLoading(true);
     try {
-      // Fetch candidate
       const { data: candidateData, error: candidateError } = await supabase
         .from("hiring_candidates")
         .select("*")
@@ -68,7 +79,6 @@ export default function BusinessHiringResults() {
       if (candidateError) throw candidateError;
       setCandidate(candidateData);
 
-      // Fetch assessments
       const { data: assessmentsData, error: assessmentsError } = await supabase
         .from("hiring_assessments")
         .select("*")
@@ -116,10 +126,11 @@ export default function BusinessHiringResults() {
   }
 
   const status = getCompletionStatus();
+  const bothCompleted = discAssessment?.status === "completed" && temperamentAssessment?.status === "completed";
 
   return (
     <BusinessLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/business/hiring")}>
@@ -127,7 +138,7 @@ export default function BusinessHiringResults() {
           </Button>
           <div className="flex-1">
             <h1 className="text-2xl font-bold tracking-tight">{candidate.full_name}</h1>
-            <p className="text-muted-foreground">Resultados da avaliação</p>
+            <p className="text-muted-foreground">Relatório de Avaliação Comportamental</p>
           </div>
           <Badge variant={status.completed === status.total ? "default" : "secondary"}>
             {status.completed === status.total ? (
@@ -144,9 +155,9 @@ export default function BusinessHiringResults() {
           </Badge>
         </div>
 
-        {/* Candidate Info */}
+        {/* 1. Informações do Candidato */}
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-3">
             <CardTitle className="text-lg">Informações do Candidato</CardTitle>
           </CardHeader>
           <CardContent>
@@ -177,178 +188,149 @@ export default function BusinessHiringResults() {
           </CardContent>
         </Card>
 
-        {/* Quick Summary - Only show if both tests are complete */}
-        {discAssessment?.status === "completed" && temperamentAssessment?.status === "completed" && (
-          <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-background">
-            <CardHeader>
-              <CardTitle className="text-lg">Resumo Executivo</CardTitle>
-              <CardDescription>Visão rápida do perfil do candidato</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* DISC Summary */}
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm uppercase text-muted-foreground">Perfil DISC</h4>
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">{DISC_PROFILES[discAssessment.result_data?.primary as keyof typeof DISC_PROFILES]?.emoji}</span>
-                    <div>
-                      <p className="font-semibold text-lg">
-                        {DISC_PROFILES[discAssessment.result_data?.primary as keyof typeof DISC_PROFILES]?.name?.pt}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Secundário: {DISC_PROFILES[discAssessment.result_data?.secondary as keyof typeof DISC_PROFILES]?.name?.pt}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+        {/* Show full report only when both tests are complete */}
+        {bothCompleted ? (
+          <>
+            {/* 2. Resumo Executivo */}
+            <ExecutiveSummaryCard 
+              discResult={discAssessment.result_data}
+              temperamentResult={temperamentAssessment.result_data}
+            />
 
-                {/* Temperament Summary */}
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm uppercase text-muted-foreground">Temperamento</h4>
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">
-                      {temperamentData[temperamentAssessment.result_data?.primary?.temperament]?.emoji}
-                    </span>
-                    <div>
-                      <p className="font-semibold text-lg">
-                        {temperamentData[temperamentAssessment.result_data?.primary?.temperament]?.name}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Secundário: {temperamentData[temperamentAssessment.result_data?.secondary?.temperament]?.name}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            {/* 3. Perfil DISC Predominante */}
+            <DISCProfileCard result={discAssessment.result_data} />
 
-              {/* Key insights */}
-              <div className="mt-6 p-4 rounded-lg bg-muted/50">
-                <h4 className="font-medium mb-2">Pontos-chave para a entrevista</h4>
-                <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>• Estilo de comunicação: {discAssessment.result_data?.primary === 'D' ? 'Direto e objetivo' : discAssessment.result_data?.primary === 'I' ? 'Entusiasta e sociável' : discAssessment.result_data?.primary === 'S' ? 'Calmo e acolhedor' : 'Detalhista e preciso'}</li>
-                  <li>• Motivação principal: {discAssessment.result_data?.primary === 'D' ? 'Resultados e desafios' : discAssessment.result_data?.primary === 'I' ? 'Reconhecimento e conexões' : discAssessment.result_data?.primary === 'S' ? 'Estabilidade e harmonia' : 'Qualidade e precisão'}</li>
-                  <li>• Ritmo natural: {temperamentAssessment.result_data?.primary?.temperament === 'colerico' ? 'Rápido e decisivo' : temperamentAssessment.result_data?.primary?.temperament === 'sanguineo' ? 'Dinâmico e variável' : temperamentAssessment.result_data?.primary?.temperament === 'melancolico' ? 'Analítico e cuidadoso' : 'Constante e metodológico'}</li>
-                </ul>
+            {/* 4. Temperamento */}
+            <TemperamentProfileCard result={temperamentAssessment.result_data} />
+
+            {/* 5. Pontos Fortes */}
+            <StrengthsCard 
+              discPrimary={discAssessment.result_data?.primary}
+              temperamentPrimary={temperamentAssessment.result_data?.primary?.temperament}
+            />
+
+            {/* 6. Riscos no Ambiente de Trabalho */}
+            <WorkplaceRisksCard 
+              discPrimary={discAssessment.result_data?.primary}
+              temperamentPrimary={temperamentAssessment.result_data?.primary?.temperament}
+            />
+
+            {/* 7. Como Liderar este Perfil */}
+            <LeadershipGuideCard 
+              discPrimary={discAssessment.result_data?.primary}
+            />
+
+            {/* 8. Indicação de Contexto */}
+            <ContextIndicationCard 
+              discPrimary={discAssessment.result_data?.primary}
+              temperamentPrimary={temperamentAssessment.result_data?.primary?.temperament}
+            />
+          </>
+        ) : (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <Clock className="h-12 w-12 text-muted-foreground/50 mb-4" />
+              <h3 className="text-lg font-medium mb-1">Aguardando avaliações</h3>
+              <p className="text-muted-foreground text-sm text-center max-w-md">
+                O relatório completo será exibido quando o candidato completar os testes de DISC e Temperamentos.
+              </p>
+              <div className="mt-4 flex gap-3">
+                <Badge variant={discAssessment?.status === "completed" ? "default" : "secondary"}>
+                  DISC: {discAssessment?.status === "completed" ? "Completo" : "Pendente"}
+                </Badge>
+                <Badge variant={temperamentAssessment?.status === "completed" ? "default" : "secondary"}>
+                  Temperamentos: {temperamentAssessment?.status === "completed" ? "Completo" : "Pendente"}
+                </Badge>
               </div>
             </CardContent>
           </Card>
         )}
-
-        {/* Detailed Results */}
-        <Tabs defaultValue="disc" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="disc" className="gap-2">
-              🎯 DISC
-              {discAssessment?.status === "completed" && <CheckCircle2 className="h-3 w-3 text-green-500" />}
-            </TabsTrigger>
-            <TabsTrigger value="temperamentos" className="gap-2">
-              🔥 Temperamentos
-              {temperamentAssessment?.status === "completed" && <CheckCircle2 className="h-3 w-3 text-green-500" />}
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="disc">
-            {discAssessment?.status === "completed" && discAssessment.result_data ? (
-              <DISCResultCard result={discAssessment.result_data} />
-            ) : (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <Clock className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                  <h3 className="text-lg font-medium mb-1">Aguardando resultado</h3>
-                  <p className="text-muted-foreground text-sm">
-                    O candidato ainda não completou o teste DISC
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="temperamentos">
-            {temperamentAssessment?.status === "completed" && temperamentAssessment.result_data ? (
-              <TemperamentResultCard result={temperamentAssessment.result_data} />
-            ) : (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <Clock className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                  <h3 className="text-lg font-medium mb-1">Aguardando resultado</h3>
-                  <p className="text-muted-foreground text-sm">
-                    O candidato ainda não completou o teste de Temperamentos
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-        </Tabs>
       </div>
     </BusinessLayout>
   );
 }
 
-// DISC Result Card Component
-function DISCResultCard({ result }: { result: any }) {
-  const percentages = result.percentages as DISCScores;
-  const primary = result.primary as keyof typeof DISC_PROFILES;
-  const secondary = result.secondary as keyof typeof DISC_PROFILES;
+// 2. Resumo Executivo
+function ExecutiveSummaryCard({ discResult, temperamentResult }: { discResult: any; temperamentResult: any }) {
+  const discPrimary = discResult?.primary as keyof typeof DISC_PROFILES;
+  const tempPrimary = temperamentResult?.primary?.temperament;
+  
+  const { highlights, watchPoints } = getCombinedProfileInsights(
+    discPrimary,
+    tempPrimary
+  );
 
   return (
-    <Card>
+    <Card className="border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <span className="text-2xl">{DISC_PROFILES[primary]?.emoji}</span>
-          Perfil DISC: {DISC_PROFILES[primary]?.name?.pt}
-        </CardTitle>
-        <CardDescription>
-          {DISC_PROFILES[primary]?.shortDescription?.pt}
-        </CardDescription>
+        <CardTitle className="text-lg">Resumo Executivo</CardTitle>
+        <CardDescription>Visão rápida para decisão</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Score bars */}
-        <div className="space-y-4">
-          {(['D', 'I', 'S', 'C'] as const).map((key) => {
-            const profile = DISC_PROFILES[key];
-            const percentage = percentages[key] || 0;
-            const isPrimary = key === primary;
-            const isSecondary = key === secondary;
-            
-            return (
-              <div key={key} className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span>{profile.emoji}</span>
-                    <span className={`font-medium ${isPrimary ? 'text-primary' : isSecondary ? 'text-primary/70' : ''}`}>
-                      {profile.name.pt}
-                    </span>
-                    {isPrimary && <Badge variant="default" className="text-xs">Principal</Badge>}
-                    {isSecondary && <Badge variant="secondary" className="text-xs">Secundário</Badge>}
-                  </div>
-                  <span className="text-sm font-medium">{percentage}%</span>
-                </div>
-                <Progress value={percentage} className="h-2" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* DISC Summary */}
+          <div className="space-y-2">
+            <p className="text-xs font-medium uppercase text-muted-foreground tracking-wide">Perfil DISC</p>
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">{DISC_PROFILES[discPrimary]?.emoji}</span>
+              <div>
+                <p className="font-semibold text-lg">
+                  {DISC_PROFILES[discPrimary]?.name?.pt}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Secundário: {DISC_PROFILES[discResult?.secondary as keyof typeof DISC_PROFILES]?.name?.pt}
+                </p>
               </div>
-            );
-          })}
+            </div>
+          </div>
+
+          {/* Temperament Summary */}
+          <div className="space-y-2">
+            <p className="text-xs font-medium uppercase text-muted-foreground tracking-wide">Temperamento</p>
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">
+                {temperamentData[tempPrimary]?.emoji}
+              </span>
+              <div>
+                <p className="font-semibold text-lg">
+                  {temperamentData[tempPrimary]?.name}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Secundário: {temperamentData[temperamentResult?.secondary?.temperament]?.name}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Traits */}
+        <Separator />
+
+        {/* Quick Insights */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h4 className="font-medium mb-2 text-green-700">Pontos Fortes</h4>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-green-700 flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Destaques
+            </p>
             <ul className="text-sm space-y-1">
-              {DISC_PROFILES[primary]?.strengths?.pt?.slice(0, 3).map((s, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  {s}
+              {highlights.map((h, i) => (
+                <li key={i} className="flex items-start gap-2 text-muted-foreground">
+                  <span className="text-green-500 mt-0.5">✓</span>
+                  {h}
                 </li>
               ))}
             </ul>
           </div>
-          <div>
-            <h4 className="font-medium mb-2 text-amber-700">Áreas de Atenção</h4>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-amber-700 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" />
+              Atenção
+            </p>
             <ul className="text-sm space-y-1">
-              {DISC_PROFILES[primary]?.vulnerabilities?.pt?.slice(0, 3).map((v, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <span className="text-amber-500 mt-1">!</span>
-                  {v}
+              {watchPoints.map((w, i) => (
+                <li key={i} className="flex items-start gap-2 text-muted-foreground">
+                  <span className="text-amber-500 mt-0.5">!</span>
+                  {w}
                 </li>
               ))}
             </ul>
@@ -359,10 +341,60 @@ function DISCResultCard({ result }: { result: any }) {
   );
 }
 
-// Temperament Result Card Component
-function TemperamentResultCard({ result }: { result: any }) {
+// 3. Perfil DISC
+function DISCProfileCard({ result }: { result: any }) {
+  const percentages = result.percentages as DISCScores;
+  const primary = result.primary as keyof typeof DISC_PROFILES;
+
+  // Sort by percentage to show hierarchy
+  const sortedProfiles = (['D', 'I', 'S', 'C'] as const)
+    .map(key => ({ key, percentage: percentages[key] || 0 }))
+    .sort((a, b) => b.percentage - a.percentage);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <span className="text-2xl">{DISC_PROFILES[primary]?.emoji}</span>
+          Perfil DISC Predominante
+        </CardTitle>
+        <CardDescription>
+          {DISC_PROFILES[primary]?.shortDescription?.pt}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {sortedProfiles.map(({ key, percentage }, index) => {
+            const profile = DISC_PROFILES[key];
+            const isPrimary = index === 0;
+            
+            return (
+              <div 
+                key={key} 
+                className={`p-4 rounded-lg border ${isPrimary ? 'border-primary bg-primary/5' : 'border-border'}`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">{profile.emoji}</span>
+                  <span className="font-medium text-sm">{DISC_LABELS[key]}</span>
+                </div>
+                <p className={`text-lg font-bold ${isPrimary ? 'text-primary' : 'text-muted-foreground'}`}>
+                  {getDISCLevelLabel(percentage)}
+                </p>
+                {isPrimary && (
+                  <Badge variant="default" className="mt-2 text-xs">Principal</Badge>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// 4. Temperamento
+function TemperamentProfileCard({ result }: { result: any }) {
   const primary = result.primary;
-  const secondary = result.secondary;
   const ranking = result.ranking || [];
 
   return (
@@ -370,62 +402,175 @@ function TemperamentResultCard({ result }: { result: any }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <span className="text-2xl">{temperamentData[primary?.temperament]?.emoji}</span>
-          Temperamento: {primary?.name}
+          Temperamento
         </CardTitle>
         <CardDescription>
           {primary?.description}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Score bars */}
-        <div className="space-y-4">
-          {ranking.map((item: any, index: number) => {
+      <CardContent>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {ranking.slice(0, 4).map((item: any, index: number) => {
             const tempData = temperamentData[item.temperament];
             const isPrimary = index === 0;
-            const isSecondary = index === 1;
+            const level = item.percentage >= 35 ? "Alta" : item.percentage >= 20 ? "Média" : "Baixa";
             
             return (
-              <div key={item.temperament} className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span>{tempData?.emoji}</span>
-                    <span className={`font-medium ${tempData?.color}`}>
-                      {tempData?.name}
-                    </span>
-                    {isPrimary && <Badge variant="default" className="text-xs">Principal</Badge>}
-                    {isSecondary && <Badge variant="secondary" className="text-xs">Secundário</Badge>}
-                  </div>
-                  <span className="text-sm font-medium">{item.percentage}%</span>
+              <div 
+                key={item.temperament} 
+                className={`p-4 rounded-lg border ${isPrimary ? 'border-primary bg-primary/5' : 'border-border'}`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">{tempData?.emoji}</span>
+                  <span className="font-medium text-sm">{tempData?.name}</span>
                 </div>
-                <Progress value={item.percentage} className="h-2" />
+                <p className={`text-lg font-bold ${isPrimary ? 'text-primary' : 'text-muted-foreground'}`}>
+                  {level}
+                </p>
+                {isPrimary && (
+                  <Badge variant="default" className="mt-2 text-xs">Principal</Badge>
+                )}
               </div>
             );
           })}
         </div>
+      </CardContent>
+    </Card>
+  );
+}
 
-        {/* Traits */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h4 className="font-medium mb-2 text-green-700">Características</h4>
-            <ul className="text-sm space-y-1">
-              {primary?.traits?.slice(0, 4).map((t: string, i: number) => (
-                <li key={i} className="flex items-start gap-2">
-                  <span className="text-primary mt-1">•</span>
-                  {t}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-medium mb-2">Forças e Desafios</h4>
-            <p className="text-sm text-muted-foreground mb-2">
-              <strong className="text-foreground">Forças:</strong> {primary?.strengths}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              <strong className="text-foreground">Desafios:</strong> {primary?.challenges}
-            </p>
-          </div>
+// 5. Pontos Fortes
+function StrengthsCard({ discPrimary, temperamentPrimary }: { discPrimary: string; temperamentPrimary: string }) {
+  const discInsights = DISC_HIRING_INSIGHTS[discPrimary];
+  const tempInsights = TEMPERAMENT_HIRING_INSIGHTS[temperamentPrimary];
+
+  if (!discInsights) return null;
+
+  // Combine unique strengths
+  const allStrengths = [
+    ...discInsights.strengths.slice(0, 3),
+    ...(tempInsights?.strengths?.slice(0, 2) || [])
+  ];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-green-700">
+          <Target className="h-5 w-5" />
+          Pontos Fortes
+        </CardTitle>
+        <CardDescription>Comportamentos observáveis no ambiente de trabalho</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {allStrengths.map((strength, i) => (
+            <li key={i} className="flex items-start gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-950/20">
+              <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+              <span className="text-sm">{strength}</span>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  );
+}
+
+// 6. Riscos no Ambiente de Trabalho
+function WorkplaceRisksCard({ discPrimary, temperamentPrimary }: { discPrimary: string; temperamentPrimary: string }) {
+  const discInsights = DISC_HIRING_INSIGHTS[discPrimary];
+  const tempInsights = TEMPERAMENT_HIRING_INSIGHTS[temperamentPrimary];
+
+  if (!discInsights) return null;
+
+  // Combine risks, max 4
+  const allRisks = [
+    ...discInsights.workplaceRisks.slice(0, 2),
+    ...(tempInsights?.workplaceRisks?.slice(0, 2) || [])
+  ].slice(0, 4);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-amber-700">
+          <AlertTriangle className="h-5 w-5" />
+          Riscos no Ambiente de Trabalho
+        </CardTitle>
+        <CardDescription>Contextos que podem gerar atrito ou dificuldade</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-3">
+          {allRisks.map((risk, i) => (
+            <li key={i} className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20">
+              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <span className="text-sm">{risk}</span>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  );
+}
+
+// 7. Como Liderar este Perfil
+function LeadershipGuideCard({ discPrimary }: { discPrimary: string }) {
+  const insights = DISC_HIRING_INSIGHTS[discPrimary];
+
+  if (!insights) return null;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-blue-700">
+          <Users className="h-5 w-5" />
+          Como Liderar este Perfil
+        </CardTitle>
+        <CardDescription>Orientações para os primeiros 30 dias</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {insights.leadershipGuide.map((guide, i) => (
+            <li key={i} className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20">
+              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-medium">
+                {i + 1}
+              </span>
+              <span className="text-sm">{guide}</span>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  );
+}
+
+// 8. Indicação de Contexto
+function ContextIndicationCard({ discPrimary, temperamentPrimary }: { discPrimary: string; temperamentPrimary: string }) {
+  const discInsights = DISC_HIRING_INSIGHTS[discPrimary];
+  const tempInsights = TEMPERAMENT_HIRING_INSIGHTS[temperamentPrimary];
+
+  if (!discInsights) return null;
+
+  return (
+    <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-background">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Compass className="h-5 w-5 text-primary" />
+          Indicação de Contexto
+        </CardTitle>
+        <CardDescription>Síntese decisória para recrutamento</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="p-4 rounded-lg bg-background border">
+          <p className="text-sm leading-relaxed">
+            {discInsights.contextIndication}
+          </p>
         </div>
+        {tempInsights && (
+          <div className="p-4 rounded-lg bg-muted/50">
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              <strong className="text-foreground">Temperamento:</strong> {tempInsights.contextIndication}
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
