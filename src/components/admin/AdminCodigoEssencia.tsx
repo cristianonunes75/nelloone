@@ -370,11 +370,16 @@ export const AdminCodigoEssencia = () => {
                       <div className="flex items-center gap-1.5">
                         <Badge className="bg-primary/10 text-primary border-primary/20 text-xs gap-1">
                           <FileText className="w-3 h-3" />
-                          Gerado
+                          v{user.mapa_version || 1}
                         </Badge>
                         {user.mapa_version === 0 && (
                           <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs">
                             Regen liberada
+                          </Badge>
+                        )}
+                        {(user.mapa_version || 1) >= 2 && (
+                          <Badge variant="outline" className="text-xs text-muted-foreground">
+                            Limite
                           </Badge>
                         )}
                       </div>
@@ -486,11 +491,13 @@ export const AdminCodigoEssencia = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Liberar Regeneração</AlertDialogTitle>
             <AlertDialogDescription>
-              Deseja liberar uma nova geração do Código da Essência para <strong>{confirmUnlock?.full_name}</strong>?
+              Deseja liberar novas gerações do Código da Essência para <strong>{confirmUnlock?.full_name}</strong>?
               <br /><br />
-              O usuário poderá acessar a página e clicar em "Gerar Código" novamente. Isso consumirá créditos de IA.
+              Isso irá resetar a versão para 0, permitindo que o usuário gere o código mais 2 vezes.
               <br /><br />
-              <span className="text-amber-600">Use apenas em casos de erro ou quando o cliente pagar por uma nova geração.</span>
+              <span className="text-muted-foreground">Versão atual: {confirmUnlock?.mapa_version || 0}</span>
+              <br /><br />
+              <span className="text-amber-600">Use apenas em casos de erro ou quando o cliente pagar por novas gerações.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -181,10 +181,13 @@ export const useCodigoEssencia = (targetUserId?: string) => {
     }
   }, [effectiveUserId]);
 
-  // Users can only generate ONCE (version 0 = not generated, version 1 = generated)
+  // Users can generate up to 2 times (version 0 = not generated, 1 = first gen, 2 = second gen)
   // Admins can always regenerate
-  // If version is explicitly set to 0 by admin, user can regenerate once more
-  const canRegenerate = isAdmin || !savedCodigo || (savedCodigo.version || 1) === 0;
+  // If version is set to 0 by admin, user gets 2 more generations
+  const currentVersion = savedCodigo?.version || 0;
+  const maxGenerations = 2;
+  const canRegenerate = isAdmin || !savedCodigo || currentVersion < maxGenerations;
+  const regenerationsRemaining = Math.max(0, maxGenerations - currentVersion);
 
   // Admin function to reset version to 0, allowing user to regenerate
   const unlockRegeneration = useCallback(async (unlockTargetUserId?: string) => {
@@ -221,7 +224,9 @@ export const useCodigoEssencia = (targetUserId?: string) => {
     resetCodigo,
     hasSavedCodigo: !!savedCodigo,
     canRegenerate,
-    currentVersion: savedCodigo?.version || 0,
+    currentVersion,
+    maxGenerations,
+    regenerationsRemaining,
     isAdmin,
     unlockRegeneration,
     targetProfile,

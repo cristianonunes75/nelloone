@@ -103,6 +103,10 @@ const TRANSLATIONS = {
     pdfDownloaded: "PDF baixado!",
     pdfError: "Erro no PDF.",
     generateCode: "Gerar Código",
+    regenerateCode: "Regenerar Código",
+    generationOf: "de",
+    generationLimit: "Limite de gerações atingido",
+    lastChance: "última chance",
     detailedCharts: "Gráficos",
     allComplete: "7 testes completos",
     strengths: "Forças",
@@ -135,6 +139,10 @@ const TRANSLATIONS = {
     pdfDownloaded: "PDF transferido!",
     pdfError: "Erro no PDF.",
     generateCode: "Gerar Código",
+    regenerateCode: "Regenerar Código",
+    generationOf: "de",
+    generationLimit: "Limite de gerações atingido",
+    lastChance: "última chance",
     detailedCharts: "Gráficos",
     allComplete: "7 testes completos",
     strengths: "Forças",
@@ -167,6 +175,10 @@ const TRANSLATIONS = {
     pdfDownloaded: "PDF downloaded!",
     pdfError: "PDF error.",
     generateCode: "Generate Code",
+    regenerateCode: "Regenerate Code",
+    generationOf: "of",
+    generationLimit: "Generation limit reached",
+    lastChance: "last chance",
     detailedCharts: "Charts",
     allComplete: "7 tests complete",
     strengths: "Strengths",
@@ -188,7 +200,7 @@ const CodigoEssenciaInner = () => {
   const codigoData = useCodigoEssencia(targetUserId);
   
   const { isJourneyComplete = false, testResults = {}, completedCount = 0, totalSteps = 7, isLoading: journeyLoading = true } = journeyData || {};
-  const { hasSavedCodigo = false, savedCodigo = null, saveCodigo, resetCodigo, isLoading: codigoLoading = true, canRegenerate = false, isAdmin = false, targetProfile, isViewingOtherUser = false } = codigoData || {};
+  const { hasSavedCodigo = false, savedCodigo = null, saveCodigo, resetCodigo, isLoading: codigoLoading = true, canRegenerate = false, currentVersion = 0, maxGenerations = 2, regenerationsRemaining = 2, isAdmin = false, targetProfile, isViewingOtherUser = false } = codigoData || {};
   
   const isLoading = journeyLoading || codigoLoading;
   const navigate = useNavigate();
@@ -562,9 +574,9 @@ const CodigoEssenciaInner = () => {
           <LogoText className="text-xl" variant="solid" />
           <div className="flex items-center gap-1.5">
             <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => navigate(`${basePath}/cliente`)}><ArrowLeft className="w-4 h-4" /></Button>
-            {/* Only show regenerate button for admins */}
-            {isAdmin && (
-              <Button variant="outline" size="sm" className="h-8 px-2" onClick={() => setShowRegenerateConfirm(true)} disabled={isGenerating} title={lang === 'en' ? 'Regenerate (Admin only)' : 'Regenerar (Somente admin)'}><RefreshCw className="w-4 h-4" /></Button>
+            {/* Show regenerate button for admins OR users with remaining generations */}
+            {hasGenerated && (isAdmin || (canRegenerate && regenerationsRemaining > 0)) && (
+              <Button variant="outline" size="sm" className="h-8 px-2" onClick={() => setShowRegenerateConfirm(true)} disabled={isGenerating} title={isAdmin ? (lang === 'en' ? 'Regenerate (Admin)' : 'Regenerar (Admin)') : `${regenerationsRemaining} ${lang === 'en' ? 'remaining' : 'restantes'}`}><RefreshCw className="w-4 h-4" /></Button>
             )}
             <Button variant="outline" size="sm" className="h-8 px-2" onClick={handleDownloadPDF} disabled={!canDownloadPdf}><Download className="w-4 h-4" /></Button>
             <Button variant="outline" size="sm" className="h-8 px-2" onClick={handleSendEmail} disabled={isSendingEmail || !canDownloadPdf}>{isSendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}</Button>
@@ -590,10 +602,13 @@ const CodigoEssenciaInner = () => {
 
         {/* Main content - no more tabs, just the code content */}
         <div className="w-full">
-            {/* Generate button */}
+            {/* Generate button - show for first generation or regeneration */}
             {!hasGenerated && canGenerateReport && (
               <div className="bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 rounded-xl p-6 text-center mb-6">
                 <Sparkles className="w-10 h-10 text-primary mx-auto mb-3" />
+                <p className="text-xs text-muted-foreground mb-3">
+                  {lang === 'en' ? `Generation ${currentVersion + 1} ${t.generationOf} ${maxGenerations}` : `Geração ${currentVersion + 1} ${t.generationOf} ${maxGenerations}`}
+                </p>
                 <Button onClick={handleGenerateCodigo} disabled={isGenerating} className="gap-2">
                   {isGenerating ? <><Loader2 className="w-4 h-4 animate-spin" />{t.generating}</> : <><Sparkles className="w-4 h-4" />{t.generateCode}</>}
                 </Button>
@@ -994,10 +1009,26 @@ const CodigoEssenciaInner = () => {
             <AlertDialogTitle>
               {lang === 'en' ? 'Regenerate Essence Code?' : 'Regenerar Código da Essência?'}
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              {lang === 'en' 
-                ? 'This action will consume AI credits to generate a new report. Your current report will be replaced. Are you sure you want to continue?'
-                : 'Esta ação vai consumir créditos de IA para gerar um novo relatório. Seu relatório atual será substituído. Tem certeza que deseja continuar?'}
+            <AlertDialogDescription className="space-y-2">
+              <p>
+                {lang === 'en' 
+                  ? 'This action will consume AI credits to generate a new report. Your current report will be replaced.'
+                  : 'Esta ação vai consumir créditos de IA para gerar um novo relatório. Seu relatório atual será substituído.'}
+              </p>
+              {!isAdmin && regenerationsRemaining === 1 && (
+                <p className="font-semibold text-amber-600">
+                  {lang === 'en' 
+                    ? '⚠️ This is your LAST regeneration! After this, you will not be able to regenerate again.'
+                    : '⚠️ Esta é sua ÚLTIMA regeneração! Após isso, você não poderá regenerar novamente.'}
+                </p>
+              )}
+              {!isAdmin && (
+                <p className="text-sm">
+                  {lang === 'en' 
+                    ? `Regenerations remaining: ${regenerationsRemaining} of ${maxGenerations}`
+                    : `Regenerações restantes: ${regenerationsRemaining} de ${maxGenerations}`}
+                </p>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
