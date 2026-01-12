@@ -1558,6 +1558,8 @@ export type Database = {
           completed_at: string | null
           created_at: string
           id: string
+          imported_from_user_id: string | null
+          original_completed_at: string | null
           result_data: Json | null
           started_at: string | null
           status: string
@@ -1569,6 +1571,8 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          imported_from_user_id?: string | null
+          original_completed_at?: string | null
           result_data?: Json | null
           started_at?: string | null
           status?: string
@@ -1580,6 +1584,8 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          imported_from_user_id?: string | null
+          original_completed_at?: string | null
           result_data?: Json | null
           started_at?: string | null
           status?: string
