@@ -53,6 +53,11 @@ const LIKERT_OPTIONS = [
   { value: 5, label: "Concordo totalmente" },
 ];
 
+interface QuestionOption {
+  text: string;
+  value: string | number;
+}
+
 export default function BusinessHiringAssessment() {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
@@ -215,7 +220,7 @@ export default function BusinessHiringAssessment() {
     }
   };
 
-  const handleAnswer = (questionId: string, value: number) => {
+  const handleAnswer = (questionId: string, value: string | number) => {
     setAnswers(prev => ({
       ...prev,
       [questionId]: value
@@ -290,12 +295,13 @@ export default function BusinessHiringAssessment() {
       });
 
       if (phase === "disc") {
-        // Simple DISC calculation for hiring
+        // DISC calculation - each answer is a letter (D, I, S, C)
         const scores = { D: 0, I: 0, S: 0, C: 0 };
         answersWithMetadata.forEach(a => {
-          const discType = a.test_questions?.options?.disc_type;
-          if (discType && scores.hasOwnProperty(discType)) {
-            scores[discType as keyof typeof scores] += Number(a.answer) || 0;
+          // The answer value is now the letter directly (D, I, S, or C)
+          const discType = String(a.answer);
+          if (scores.hasOwnProperty(discType)) {
+            scores[discType as keyof typeof scores] += 1;
           }
         });
         const total = Object.values(scores).reduce((a, b) => a + b, 0) || 1;
@@ -311,7 +317,7 @@ export default function BusinessHiringAssessment() {
           percentages,
           primary: sorted[0][0],
           secondary: sorted[1][0],
-          algorithm_version: 'hiring_disc_v1'
+          algorithm_version: 'hiring_disc_v2'
         };
       } else if (phase === "temperamentos") {
         resultData = calculateTemperamentos(answersWithMetadata);
@@ -693,28 +699,57 @@ export default function BusinessHiringAssessment() {
               <CardContent className="space-y-4">
                 <RadioGroup
                   value={currentAnswer?.toString()}
-                  onValueChange={(value) => handleAnswer(currentQuestion.id, parseInt(value))}
+                  onValueChange={(value) => {
+                    // For DISC (has D/I/S/C options), store the letter value
+                    // For Temperamentos (Likert), store the number
+                    const questionOptions = currentQuestion?.options as QuestionOption[] | undefined;
+                    const isDISCQuestion = Array.isArray(questionOptions) && questionOptions.length > 0 && 
+                      questionOptions.some(opt => typeof opt.value === 'string' && ['D', 'I', 'S', 'C'].includes(opt.value));
+                    
+                    if (isDISCQuestion) {
+                      handleAnswer(currentQuestion.id, value);
+                    } else {
+                      handleAnswer(currentQuestion.id, parseInt(value));
+                    }
+                  }}
                   className="space-y-3"
                 >
-                  {LIKERT_OPTIONS.map((option) => (
-                    <div
-                      key={option.value}
-                      className={`flex items-center space-x-3 p-3 rounded-lg border transition-all cursor-pointer
-                        ${currentAnswer === option.value 
-                          ? 'border-primary bg-primary/5' 
-                          : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                        }`}
-                      onClick={() => handleAnswer(currentQuestion.id, option.value)}
-                    >
-                      <RadioGroupItem value={option.value.toString()} id={`option-${option.value}`} />
-                      <Label 
-                        htmlFor={`option-${option.value}`} 
-                        className="flex-1 cursor-pointer font-normal"
+                  {/* Use dynamic options from the question if available (DISC), otherwise use Likert */}
+                  {(() => {
+                    const questionOptions = currentQuestion?.options as QuestionOption[] | undefined;
+                    const isDISCQuestion = Array.isArray(questionOptions) && questionOptions.length > 0 && 
+                      questionOptions.some(opt => typeof opt.value === 'string' && ['D', 'I', 'S', 'C'].includes(opt.value));
+                    
+                    const optionsToShow = isDISCQuestion 
+                      ? questionOptions.map(opt => ({ value: opt.value, label: opt.text }))
+                      : LIKERT_OPTIONS;
+                    
+                    return optionsToShow.map((option, index) => (
+                      <div
+                        key={`${option.value}-${index}`}
+                        className={`flex items-center space-x-3 p-3 rounded-lg border transition-all cursor-pointer
+                          ${currentAnswer == option.value 
+                            ? 'border-primary bg-primary/5' 
+                            : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                          }`}
+                        onClick={() => {
+                          if (isDISCQuestion) {
+                            handleAnswer(currentQuestion.id, option.value);
+                          } else {
+                            handleAnswer(currentQuestion.id, option.value as number);
+                          }
+                        }}
                       >
-                        {option.label}
-                      </Label>
-                    </div>
-                  ))}
+                        <RadioGroupItem value={option.value.toString()} id={`option-${option.value}-${index}`} />
+                        <Label 
+                          htmlFor={`option-${option.value}-${index}`} 
+                          className="flex-1 cursor-pointer font-normal"
+                        >
+                          {option.label}
+                        </Label>
+                      </div>
+                    ));
+                  })()}
                 </RadioGroup>
               </CardContent>
             </Card>
