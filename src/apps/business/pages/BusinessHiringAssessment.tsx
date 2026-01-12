@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -309,22 +309,24 @@ export default function BusinessHiringAssessment() {
     }
   };
 
-  const nextQuestion = useCallback(async () => {
+  // IMPORTANT: do not memoize these handlers with incomplete deps,
+  // otherwise they can capture stale state and fail to persist answers.
+  const nextQuestion = async () => {
     await saveCurrentAnswer();
-    
+
     if (currentIndex < questions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex((prev) => prev + 1);
     } else {
       // Complete test
       await completeCurrentTest();
     }
-  }, [currentIndex, questions.length]);
+  };
 
-  const previousQuestion = useCallback(() => {
+  const previousQuestion = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
+      setCurrentIndex((prev) => prev - 1);
     }
-  }, [currentIndex]);
+  };
 
   const completeCurrentTest = async () => {
     if (!currentAssessment || !candidate) return;
