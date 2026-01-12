@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,10 +7,12 @@ import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, CheckCircle2, ArrowLeft, ArrowRight, Clock, AlertCircle, Building2, Shield, Eye, FileText, Briefcase } from "lucide-react";
+import { Loader2, CheckCircle2, ArrowLeft, ArrowRight, Clock, AlertCircle, Building2, Shield, Eye, FileText, Briefcase, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { calculateTemperamentos } from "@/lib/temperamentos";
+import { HiringResultsSummary } from "../components/HiringResultsSummary";
+import { NelloOneUpsell } from "../components/NelloOneUpsell";
 
 interface Company {
   id: string;
@@ -21,6 +23,7 @@ interface Company {
 interface Candidate {
   id: string;
   full_name: string;
+  email: string;
   company_id: string;
   status: string;
   invite_expires_at: string | null;
@@ -660,25 +663,102 @@ export default function BusinessHiringAssessment() {
     );
   }
 
+  // Parse results for completed phase
+  const completedResults = useMemo(() => {
+    if (phase !== "completed") return null;
+    
+    const discAssessment = assessments.find(a => a.test_type === "disc" && a.status === "completed");
+    const tempAssessment = assessments.find(a => a.test_type === "temperamentos" && a.status === "completed");
+    
+    let discResults = null;
+    let temperamentResults = null;
+    
+    if (discAssessment?.result_data) {
+      const data = discAssessment.result_data;
+      discResults = {
+        primary: data.primary || data.primaryProfile || 'D',
+        secondary: data.secondary || data.secondaryProfile || 'I',
+        percentages: data.percentages || data.scores || { D: 25, I: 25, S: 25, C: 25 },
+      };
+    }
+    
+    if (tempAssessment?.result_data) {
+      const data = tempAssessment.result_data;
+      const primary = data.primary?.type || data.primaryTemperament || 'sanguineo';
+      const secondary = data.secondary?.type || data.secondaryTemperament || 'colerico';
+      
+      // Build percentages from scores or use existing
+      let percentages = { sanguineo: 25, colerico: 25, melancolico: 25, fleumatico: 25 };
+      if (data.percentages) {
+        percentages = data.percentages;
+      } else if (data.scores) {
+        const total = Object.values(data.scores as Record<string, number>).reduce((a, b) => a + b, 0);
+        if (total > 0) {
+          percentages = {
+            sanguineo: ((data.scores.sanguineo || 0) / total) * 100,
+            colerico: ((data.scores.colerico || 0) / total) * 100,
+            melancolico: ((data.scores.melancolico || 0) / total) * 100,
+            fleumatico: ((data.scores.fleumatico || 0) / total) * 100,
+          };
+        }
+      }
+      
+      temperamentResults = { primary, secondary, percentages };
+    }
+    
+    return { discResults, temperamentResults };
+  }, [phase, assessments]);
+
   // Completed phase
   if (phase === "completed") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-background flex items-center justify-center p-4">
-        <Card className="max-w-md w-full">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-6">
-              <CheckCircle2 className="h-8 w-8 text-green-600" />
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-background p-4 md:p-8">
+        <div className="max-w-3xl mx-auto space-y-6">
+          {/* Success Header */}
+          <Card className="border-green-200 bg-green-50/50">
+            <CardContent className="flex flex-col items-center justify-center py-8 text-center">
+              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
+                <CheckCircle2 className="h-8 w-8 text-green-600" />
+              </div>
+              <h2 className="text-2xl font-semibold mb-2">Avaliação Concluída!</h2>
+              <p className="text-muted-foreground">
+                Obrigado por completar todos os testes, {candidate.full_name}. 
+                Seus resultados foram enviados para análise.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Results Summary */}
+          {completedResults && (completedResults.discResults || completedResults.temperamentResults) && (
+            <HiringResultsSummary
+              candidateName={candidate.full_name}
+              discResults={completedResults.discResults || undefined}
+              temperamentResults={completedResults.temperamentResults || undefined}
+            />
+          )}
+
+          {/* Upsell */}
+          <div className="pt-4">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                <Sparkles className="h-3 w-3" />
+                Aproveite esta oportunidade
+              </span>
+              <div className="h-px flex-1 bg-border" />
             </div>
-            <h2 className="text-2xl font-semibold mb-2">Avaliação Concluída!</h2>
-            <p className="text-muted-foreground mb-6">
-              Obrigado por completar todos os testes, {candidate.full_name}. 
-              Seus resultados foram enviados para análise.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Você pode fechar esta página. Boa sorte no processo seletivo!
-            </p>
-          </CardContent>
-        </Card>
+            
+            <NelloOneUpsell 
+              candidateEmail={candidate.email} 
+              candidateName={candidate.full_name}
+            />
+          </div>
+
+          {/* Footer note */}
+          <p className="text-sm text-center text-muted-foreground pt-4">
+            Você pode fechar esta página. Boa sorte no processo seletivo!
+          </p>
+        </div>
       </div>
     );
   }
