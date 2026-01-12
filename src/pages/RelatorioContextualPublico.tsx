@@ -146,23 +146,107 @@ const RelatorioContextualPublico = () => {
     fetchReport();
   }, [token, reportType, config, lang]);
 
-  const renderContent = (content: string | string[] | { titulo?: string; conteudo?: string | string[] } | undefined) => {
+  interface SectionContent {
+    titulo?: string;
+    conteudo?: string | string[];
+    compromissos?: string[];
+    perguntas?: string[];
+    nota_final?: string;
+    feedback_positivo?: string;
+    feedback_corretivo?: string;
+  }
+
+  const renderContent = (content: string | string[] | SectionContent | undefined) => {
     if (!content) return null;
     
     // Handle object format with titulo/conteudo structure
     if (typeof content === 'object' && !Array.isArray(content)) {
-      const obj = content as { titulo?: string; conteudo?: string | string[] };
-      const textContent = obj.conteudo || obj.titulo;
-      if (!textContent) return null;
+      const obj = content as SectionContent;
+      const elements: React.ReactNode[] = [];
       
-      if (Array.isArray(textContent)) {
-        return (
-          <ul className="list-disc list-inside space-y-1">
-            {textContent.map((item, i) => <li key={i}>{item}</li>)}
-          </ul>
+      // Render main content
+      const textContent = obj.conteudo;
+      if (textContent) {
+        if (Array.isArray(textContent)) {
+          elements.push(
+            <ul key="content" className="list-disc list-inside space-y-1 mb-3">
+              {textContent.map((item, i) => <li key={i}>{item}</li>)}
+            </ul>
+          );
+        } else {
+          elements.push(<p key="content" className="whitespace-pre-wrap mb-3">{textContent}</p>);
+        }
+      }
+      
+      // Render feedback positivo
+      if (obj.feedback_positivo) {
+        elements.push(
+          <div key="feedback-pos" className="mb-3">
+            <p className="font-medium text-emerald-600 mb-1">
+              {lang === 'en' ? 'Positive feedback:' : 'Feedback positivo:'}
+            </p>
+            <p className="whitespace-pre-wrap">{obj.feedback_positivo}</p>
+          </div>
         );
       }
-      return <p className="whitespace-pre-wrap">{textContent}</p>;
+      
+      // Render feedback corretivo
+      if (obj.feedback_corretivo) {
+        elements.push(
+          <div key="feedback-cor" className="mb-3">
+            <p className="font-medium text-amber-600 mb-1">
+              {lang === 'en' ? 'Corrective feedback:' : 'Feedback corretivo:'}
+            </p>
+            <p className="whitespace-pre-wrap">{obj.feedback_corretivo}</p>
+          </div>
+        );
+      }
+      
+      // Render compromissos
+      if (obj.compromissos && obj.compromissos.length > 0) {
+        elements.push(
+          <div key="compromissos" className="mb-3">
+            <p className="font-medium text-primary mb-1">
+              {lang === 'en' ? 'Commitments:' : 'Compromissos:'}
+            </p>
+            <ul className="space-y-1">
+              {obj.compromissos.map((item, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-primary">✓</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
+      
+      // Render perguntas
+      if (obj.perguntas && obj.perguntas.length > 0) {
+        elements.push(
+          <div key="perguntas" className="mb-3">
+            <p className="font-medium text-primary mb-1">
+              {lang === 'en' ? 'Questions for reflection:' : 'Perguntas para reflexão:'}
+            </p>
+            <ol className="list-decimal list-inside space-y-1">
+              {obj.perguntas.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ol>
+          </div>
+        );
+      }
+      
+      // Render nota final
+      if (obj.nota_final) {
+        elements.push(
+          <div key="nota" className="bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-3 border border-emerald-200 dark:border-emerald-800">
+            <p className="text-emerald-700 dark:text-emerald-300 italic text-sm">{obj.nota_final}</p>
+          </div>
+        );
+      }
+      
+      return elements.length > 0 ? <>{elements}</> : null;
     }
     
     if (Array.isArray(content)) {
@@ -263,12 +347,15 @@ const RelatorioContextualPublico = () => {
           // Check for empty content in different formats
           if (typeof value === 'string' && !value.trim()) return null;
           if (typeof value === 'object' && !Array.isArray(value)) {
-            const obj = value as { titulo?: string; conteudo?: string | string[] };
-            if (!obj.conteudo && !obj.titulo) return null;
+            const obj = value as SectionContent;
+            // Section is valid if it has any content
+            const hasContent = obj.conteudo || obj.compromissos?.length || obj.perguntas?.length || 
+                             obj.feedback_positivo || obj.feedback_corretivo || obj.nota_final;
+            if (!hasContent) return null;
           }
           
           // Get section title - use object's titulo if available, otherwise use label
-          const objValue = value as { titulo?: string; conteudo?: string | string[] };
+          const objValue = value as SectionContent;
           const sectionTitle = (typeof value === 'object' && !Array.isArray(value) && objValue.titulo) 
             ? objValue.titulo 
             : (SECTION_LABELS[key]?.[lang] || key);
@@ -279,7 +366,7 @@ const RelatorioContextualPublico = () => {
                 <CardTitle className="text-base">{sectionTitle}</CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
-                {renderContent(value as string | string[] | { titulo?: string; conteudo?: string | string[] })}
+                {renderContent(value as string | string[] | SectionContent)}
               </CardContent>
             </Card>
           );
