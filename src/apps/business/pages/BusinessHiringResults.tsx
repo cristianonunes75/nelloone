@@ -128,7 +128,7 @@ export default function BusinessHiringResults() {
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
           <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
           <h2 className="text-xl font-semibold mb-2">Candidato não encontrado</h2>
-          <Button onClick={() => navigate("/business/hiring")}>
+          <Button onClick={() => navigate("/hiring")}>
             Voltar para lista
           </Button>
         </div>
@@ -144,7 +144,7 @@ export default function BusinessHiringResults() {
       <div className="space-y-6 max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/business/hiring")}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/hiring")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
