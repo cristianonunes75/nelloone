@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Paperclip, Upload, Loader2, X, Trash2, Image, ZoomIn } from "lucide-react";
+import { Paperclip, Upload, Loader2, X, Trash2, Image, ZoomIn, Sparkles, ScanSearch, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -17,6 +18,7 @@ interface Attachment {
   description?: string;
   uploaded_at: string;
   uploaded_by: string;
+  scanned?: boolean;
 }
 
 interface CandidateAttachmentsProps {
@@ -27,6 +29,7 @@ interface CandidateAttachmentsProps {
 
 export function CandidateAttachments({ candidateId, attachments, onUpdate }: CandidateAttachmentsProps) {
   const [uploading, setUploading] = useState(false);
+  const [scanning, setScanning] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -42,6 +45,7 @@ export function CandidateAttachments({ candidateId, attachments, onUpdate }: Can
       if (!user) throw new Error("Usuário não autenticado");
 
       const newAttachments: Attachment[] = [...attachments];
+      const uploadedUrls: { id: string; url: string }[] = [];
 
       for (const file of Array.from(files)) {
         // Validate file type
@@ -61,7 +65,7 @@ export function CandidateAttachments({ candidateId, attachments, onUpdate }: Can
         const fileName = `${candidateId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
         // Upload to storage
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from("candidate-attachments")
           .upload(fileName, file);
 
@@ -76,14 +80,19 @@ export function CandidateAttachments({ candidateId, attachments, onUpdate }: Can
           .from("candidate-attachments")
           .getPublicUrl(fileName);
 
+        const attachmentId = crypto.randomUUID();
+        
         // Add to attachments array
         newAttachments.push({
-          id: crypto.randomUUID(),
+          id: attachmentId,
           url: publicUrl,
           name: file.name,
           uploaded_at: new Date().toISOString(),
           uploaded_by: user.id,
+          scanned: false,
         });
+
+        uploadedUrls.push({ id: attachmentId, url: publicUrl });
       }
 
       // Update candidate with new attachments
@@ -94,8 +103,14 @@ export function CandidateAttachments({ candidateId, attachments, onUpdate }: Can
 
       if (updateError) throw updateError;
 
-      toast.success("Anexos salvos com sucesso!");
+      toast.success("Anexos salvos! Escaneando para extrair dados...");
       onUpdate();
+
+      // Auto-scan uploaded images
+      for (const { id, url } of uploadedUrls) {
+        await handleScanAttachment(id, url, newAttachments);
+      }
+
     } catch (error) {
       console.error("Error uploading:", error);
       toast.error("Erro ao fazer upload dos anexos");
@@ -104,6 +119,50 @@ export function CandidateAttachments({ candidateId, attachments, onUpdate }: Can
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+    }
+  };
+
+  const handleScanAttachment = async (attachmentId: string, imageUrl: string, currentAttachments?: Attachment[]) => {
+    setScanning(attachmentId);
+    try {
+      const response = await supabase.functions.invoke("business-scan-attachment", {
+        body: {
+          image_url: imageUrl,
+          candidate_id: candidateId,
+        },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || "Erro ao escanear");
+      }
+
+      const result = response.data;
+      
+      if (result.updates?.disc || result.updates?.temperament) {
+        toast.success(result.message || "Dados extraídos com sucesso!");
+        
+        // Mark attachment as scanned
+        const attachmentsToUpdate = currentAttachments || attachments;
+        const updatedAttachments = attachmentsToUpdate.map(a => 
+          a.id === attachmentId ? { ...a, scanned: true } : a
+        );
+        
+        await supabase
+          .from("hiring_candidates")
+          .update({ attachments: JSON.parse(JSON.stringify(updatedAttachments)) as Json })
+          .eq("id", candidateId);
+        
+        onUpdate();
+      } else {
+        toast.info("Nenhum dado de DISC ou Temperamentos encontrado na imagem.");
+      }
+
+    } catch (error: unknown) {
+      console.error("Error scanning:", error);
+      const errorMessage = error instanceof Error ? error.message : "Erro ao escanear imagem";
+      toast.error(errorMessage);
+    } finally {
+      setScanning(null);
     }
   };
 
@@ -145,19 +204,25 @@ export function CandidateAttachments({ candidateId, attachments, onUpdate }: Can
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Paperclip className="h-5 w-5" />
-          Anexos e Documentos
-          {attachments.length > 0 && (
-            <span className="text-sm font-normal text-muted-foreground">
-              ({attachments.length})
-            </span>
-          )}
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Paperclip className="h-5 w-5" />
+            Anexos e Documentos
+            {attachments.length > 0 && (
+              <span className="text-sm font-normal text-muted-foreground">
+                ({attachments.length})
+              </span>
+            )}
+          </CardTitle>
+          <Badge variant="secondary" className="gap-1">
+            <Sparkles className="h-3 w-3" />
+            IA extrai dados automaticamente
+          </Badge>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Upload Button */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <Input
             ref={fileInputRef}
             type="file"
@@ -186,7 +251,7 @@ export function CandidateAttachments({ candidateId, attachments, onUpdate }: Can
             )}
           </Button>
           <span className="text-xs text-muted-foreground">
-            PNG, JPG até 5MB
+            PNG, JPG até 5MB • Prints de resultados serão escaneados automaticamente
           </span>
         </div>
 
@@ -204,20 +269,51 @@ export function CandidateAttachments({ candidateId, attachments, onUpdate }: Can
                   className="w-full h-full object-cover cursor-pointer"
                   onClick={() => setSelectedImage(attachment.url)}
                 />
+                
+                {/* Scanning indicator */}
+                {scanning === attachment.id && (
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center flex-col gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-white" />
+                    <span className="text-white text-xs">Escaneando...</span>
+                  </div>
+                )}
+                
+                {/* Scanned badge */}
+                {attachment.scanned && (
+                  <div className="absolute top-2 left-2">
+                    <Badge className="gap-1 bg-green-500/90 hover:bg-green-500/90">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Escaneado
+                    </Badge>
+                  </div>
+                )}
+                
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                   <Button
                     size="icon"
                     variant="secondary"
                     className="h-8 w-8"
                     onClick={() => setSelectedImage(attachment.url)}
+                    title="Ver imagem"
                   >
                     <ZoomIn className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="secondary"
+                    className="h-8 w-8"
+                    onClick={() => handleScanAttachment(attachment.id, attachment.url)}
+                    disabled={scanning === attachment.id}
+                    title="Escanear novamente"
+                  >
+                    <ScanSearch className="h-4 w-4" />
                   </Button>
                   <Button
                     size="icon"
                     variant="destructive"
                     className="h-8 w-8"
                     onClick={() => setDeleteConfirm(attachment.id)}
+                    title="Remover"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -238,7 +334,7 @@ export function CandidateAttachments({ candidateId, attachments, onUpdate }: Can
               Nenhum anexo adicionado
             </p>
             <p className="text-xs text-muted-foreground/70 mt-1">
-              Adicione prints ou documentos do candidato
+              Adicione prints de resultados para extrair dados automaticamente com IA
             </p>
           </div>
         )}
