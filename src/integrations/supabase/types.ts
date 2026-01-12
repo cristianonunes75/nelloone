@@ -1603,6 +1603,7 @@ export type Database = {
       }
       hiring_candidates: {
         Row: {
+          attachments: Json | null
           company_id: string
           consent_given_at: string | null
           consent_ip: string | null
@@ -1621,6 +1622,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          attachments?: Json | null
           company_id: string
           consent_given_at?: string | null
           consent_ip?: string | null
@@ -1639,6 +1641,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          attachments?: Json | null
           company_id?: string
           consent_given_at?: string | null
           consent_ip?: string | null

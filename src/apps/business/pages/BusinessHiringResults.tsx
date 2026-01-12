@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Loader2, Mail, Phone, Briefcase, Calendar, CheckCircle2, Clock, AlertCircle, Target, AlertTriangle, Users, Compass, Eye, UserCircle } from "lucide-react";
+import { CandidateAttachments } from "../components/CandidateAttachments";
 import { CandidateResultsFeedback } from "../components/CandidateResultsFeedback";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -21,6 +22,15 @@ import {
 } from "@/lib/discHiringInsights";
 import { getUnifiedDiscRanking, getDiscDisplayData, type DiscRankingItem } from "@/lib/discRanking";
 
+interface Attachment {
+  id: string;
+  url: string;
+  name: string;
+  description?: string;
+  uploaded_at: string;
+  uploaded_by: string;
+}
+
 interface Candidate {
   id: string;
   full_name: string;
@@ -30,6 +40,7 @@ interface Candidate {
   notes: string | null;
   status: string;
   created_at: string;
+  attachments?: Attachment[];
 }
 
 interface Assessment {
@@ -88,7 +99,16 @@ export default function BusinessHiringResults() {
         .single();
 
       if (candidateError) throw candidateError;
-      setCandidate(candidateData);
+      // Parse attachments from Json to Attachment[]
+      const rawAttachments = candidateData.attachments;
+      const parsedAttachments: Attachment[] = Array.isArray(rawAttachments) 
+        ? (rawAttachments as unknown as Attachment[]) 
+        : [];
+      const parsedCandidate = {
+        ...candidateData,
+        attachments: parsedAttachments,
+      };
+      setCandidate(parsedCandidate);
 
       const { data: assessmentsData, error: assessmentsError } = await supabase
         .from("hiring_assessments")
@@ -214,6 +234,13 @@ export default function BusinessHiringResults() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Attachments Section */}
+        <CandidateAttachments
+          candidateId={candidate.id}
+          attachments={candidate.attachments || []}
+          onUpdate={fetchCandidateData}
+        />
 
         {/* Show full report only when both tests are complete */}
         {bothCompleted ? (
