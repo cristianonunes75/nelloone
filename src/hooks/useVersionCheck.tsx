@@ -1,13 +1,20 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 
-const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
+const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // Check every 30 minutes (less aggressive)
+const INITIAL_CHECK_DELAY = 60 * 1000; // Wait 1 minute after page load
 
 export const useVersionCheck = () => {
+  const hasShownToast = useRef(false);
+  const lastHash = useRef<string | null>(null);
+  
   const checkForUpdates = useCallback(async () => {
+    // Don't check again if we already showed a toast
+    if (hasShownToast.current) return;
+    
     try {
       // Fetch the current index.html to check for new version
-      const response = await fetch('/', {
+      const response = await fetch('/?_v=' + Date.now(), {
         cache: 'no-store',
         headers: {
           'Cache-Control': 'no-cache',
@@ -19,12 +26,24 @@ export const useVersionCheck = () => {
       
       const html = await response.text();
       
-      // Extract script/css hashes from the HTML
-      const currentScripts = html.match(/src="[^"]+\.js"/g)?.join('') || '';
-      const storedScripts = sessionStorage.getItem('app-scripts-hash');
+      // Extract ONLY the main bundle hash (more stable than all scripts)
+      const mainScript = html.match(/src="\/assets\/index-[a-zA-Z0-9]+\.js"/)?.[0] || '';
       
-      if (storedScripts && storedScripts !== currentScripts) {
+      if (!mainScript) return;
+      
+      // On first check, just store the hash
+      if (lastHash.current === null) {
+        lastHash.current = mainScript;
+        sessionStorage.setItem('app-main-hash', mainScript);
+        return;
+      }
+      
+      // Compare with stored hash
+      const storedHash = sessionStorage.getItem('app-main-hash');
+      
+      if (storedHash && storedHash !== mainScript && lastHash.current !== mainScript) {
         // New version detected!
+        hasShownToast.current = true;
         toast.info('Nova versão disponível!', {
           description: 'Clique para atualizar',
           duration: Infinity,
@@ -37,13 +56,11 @@ export const useVersionCheck = () => {
                   names.forEach(name => caches.delete(name));
                 });
               }
+              sessionStorage.removeItem('app-main-hash');
               window.location.reload();
             }
           }
         });
-      } else if (!storedScripts) {
-        // First visit, store the hash
-        sessionStorage.setItem('app-scripts-hash', currentScripts);
       }
     } catch (error) {
       // Silently fail - don't disrupt user experience
@@ -52,15 +69,24 @@ export const useVersionCheck = () => {
   }, []);
 
   useEffect(() => {
-    // Check on mount (after a small delay to not slow initial load)
-    const initialCheck = setTimeout(checkForUpdates, 5000);
+    // Initialize hash from session storage
+    const stored = sessionStorage.getItem('app-main-hash');
+    if (stored) {
+      lastHash.current = stored;
+    }
     
-    // Then check periodically
+    // Check after a longer delay to not slow initial load
+    const initialCheck = setTimeout(checkForUpdates, INITIAL_CHECK_DELAY);
+    
+    // Then check less frequently
     const interval = setInterval(checkForUpdates, VERSION_CHECK_INTERVAL);
     
-    // Also check when tab becomes visible again
+    // Also check when tab becomes visible again (but with debounce)
+    let lastVisibilityCheck = 0;
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
+      const now = Date.now();
+      if (document.visibilityState === 'visible' && now - lastVisibilityCheck > 5 * 60 * 1000) {
+        lastVisibilityCheck = now;
         checkForUpdates();
       }
     };
