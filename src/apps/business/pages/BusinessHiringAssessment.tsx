@@ -739,21 +739,36 @@ export default function BusinessHiringAssessment() {
                   }}
                   className="space-y-3"
                 >
-                  {/* Use dynamic options from the question if available (DISC), otherwise use Likert */}
+                  {/* Use dynamic options from the question if available */}
                   {(() => {
-                    const questionOptions = currentQuestion?.options as QuestionOption[] | undefined;
+                    const questionOptions = currentQuestion?.options as any;
+                    
+                    // Check if it's a DISC question (array format with D/I/S/C values)
                     const isDISCQuestion = Array.isArray(questionOptions) && questionOptions.length > 0 && 
-                      questionOptions.some(opt => typeof opt.value === 'string' && ['D', 'I', 'S', 'C'].includes(opt.value));
+                      questionOptions.some((opt: any) => typeof opt.value === 'string' && ['D', 'I', 'S', 'C'].includes(opt.value));
                     
-                    // Map options and shuffle DISC options to avoid predictability
-                    const mappedOptions = isDISCQuestion 
-                      ? questionOptions.map(opt => ({ value: opt.value, label: opt.text }))
-                      : LIKERT_OPTIONS;
+                    // Check if it's a Likert question with labels from DB (Temperamentos format)
+                    const isLikertWithLabels = questionOptions && 
+                      questionOptions.type === 'likert' && 
+                      questionOptions.labels && 
+                      typeof questionOptions.labels === 'object';
                     
-                    // Shuffle DISC options using question id as seed for consistency
-                    const optionsToShow = isDISCQuestion 
-                      ? seededShuffle(mappedOptions, currentQuestion.id) 
-                      : mappedOptions;
+                    let optionsToShow: { value: string | number; label: string }[];
+                    
+                    if (isDISCQuestion) {
+                      // DISC: Map and shuffle options
+                      const mappedOptions = questionOptions.map((opt: any) => ({ value: opt.value, label: opt.text }));
+                      optionsToShow = seededShuffle(mappedOptions, currentQuestion.id);
+                    } else if (isLikertWithLabels) {
+                      // Temperamentos: Use labels from database
+                      const labels = questionOptions.labels as Record<string, string>;
+                      optionsToShow = Object.entries(labels)
+                        .map(([key, label]) => ({ value: parseInt(key), label }))
+                        .sort((a, b) => (a.value as number) - (b.value as number));
+                    } else {
+                      // Fallback to static LIKERT_OPTIONS
+                      optionsToShow = LIKERT_OPTIONS;
+                    }
                     
                     return optionsToShow.map((option, index) => (
                       <div
