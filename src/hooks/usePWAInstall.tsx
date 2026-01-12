@@ -17,13 +17,14 @@ export const usePWAInstall = () => {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
   } = useRegisterSW({
+    immediate: true,
     onRegisteredSW(swUrl, r) {
       console.log('SW registered:', swUrl);
-      // Check for updates every hour
+      // Check for updates every 5 minutes (was 1 hour)
       if (r) {
         setInterval(() => {
           r.update();
-        }, 60 * 60 * 1000);
+        }, 5 * 60 * 1000);
       }
     },
     onRegisterError(error) {
