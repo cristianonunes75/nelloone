@@ -104,6 +104,20 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
       };
     }
 
+    // Handle alternative domain: nelloone.com (single word without dot)
+    // This should be treated as Nello One (same as one.nello.one)
+    if (hostname.includes('nelloone.com') || hostname === 'nelloone.com') {
+      return {
+        app: 'one',
+        subdomain: null,
+        isFlow: false,
+        isLife: false,
+        isOne: true,
+        isMain: false,
+        domain: fullDomain,
+      };
+    }
+
     // Default: main domain (nello.one without subdomain)
     return {
       app: 'main',
