@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, CheckCircle2, ArrowRight, Brain, Heart, Compass, Target, Lightbulb, Building2, Users } from "lucide-react";
+import { Sparkles, CheckCircle2, ArrowRight, Brain, Heart, Compass, Target, Lightbulb } from "lucide-react";
 import { bundlePrices } from "@/lib/priceConfig";
 
 interface NelloOneUpsellProps {
@@ -32,22 +32,8 @@ export function NelloOneUpsell({ candidateEmail, candidateName }: NelloOneUpsell
     window.open(`https://nelloone.com/auth?${utmParams.toString()}`, '_blank');
   };
 
-  const handleIndicateBusiness = () => {
-    // Create UTM params for tracking
-    const utmParams = new URLSearchParams({
-      utm_source: 'hiring',
-      utm_medium: 'candidate_recommendation',
-      utm_campaign: 'assessment_business_indication',
-    });
-    
-    // Redirect to Business landing
-    window.open(`https://business.nello.one/?${utmParams.toString()}`, '_blank');
-  };
-
   return (
-    <div className="space-y-4">
-      {/* Main Upsell - Personal Journey */}
-      <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-background overflow-hidden relative">
+    <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-background overflow-hidden relative">
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         
         <CardHeader className="text-center pb-2 relative">
@@ -128,46 +114,12 @@ export function NelloOneUpsell({ candidateEmail, candidateName }: NelloOneUpsell
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
 
-          <p className="text-xs text-center text-muted-foreground">
-            Ao continuar, você será redirecionado para criar sua conta no Nello One.
-            <br />
-            Seus resultados de hoje serão sincronizados automaticamente.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Secondary Upsell - Business Indication */}
-      <Card className="border border-amber-200 bg-gradient-to-br from-amber-50/50 to-background overflow-hidden relative">
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-              <Building2 className="h-6 w-6 text-amber-600" />
-            </div>
-            
-            <div className="flex-1 text-center sm:text-left">
-              <h4 className="font-semibold text-amber-900 mb-1">
-                Conhece uma empresa que precisa disso?
-              </h4>
-              <p className="text-sm text-muted-foreground">
-                O Nello Business ajuda empresas a entender seus colaboradores através de avaliações científicas.
-              </p>
-              <div className="flex items-center gap-2 justify-center sm:justify-start mt-2 text-xs text-amber-700">
-                <Users className="h-3.5 w-3.5" />
-                <span>14 dias grátis • Sem cartão de crédito</span>
-              </div>
-            </div>
-            
-            <Button 
-              variant="outline"
-              onClick={handleIndicateBusiness}
-              className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800 whitespace-nowrap"
-            >
-              Indicar para empresa
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        <p className="text-xs text-center text-muted-foreground">
+          Ao continuar, você será redirecionado para criar sua conta no Nello One.
+          <br />
+          Seus resultados de hoje serão sincronizados automaticamente.
+        </p>
+      </CardContent>
+    </Card>
   );
 }
