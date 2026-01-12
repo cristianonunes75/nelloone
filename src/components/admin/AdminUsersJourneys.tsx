@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { 
-  Search, Eye, UserCog, Loader2, Map, Download, Ban, CheckCircle, X, RefreshCw, Trash2
+  Search, Eye, UserCog, Loader2, Map, Download, Ban, CheckCircle, X, RefreshCw, Trash2, Building2, Users
 } from "lucide-react";
 import { DeleteUserDialog } from "./DeleteUserDialog";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,6 +29,8 @@ import {
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { JOURNEY_TEST_SLUGS, JourneyTestSlug, updateJourneyProgress } from "@/utils/journey";
+
+type UserAccountType = 'nello_one' | 'business_admin' | 'business_collaborator';
 
 interface UserWithDetails {
   id: string;
@@ -42,6 +44,10 @@ interface UserWithDetails {
   codigo_essencia_unlocked: boolean;
   is_blocked: boolean;
   roles: string[];
+  // New fields for distinguishing Nello One vs Business
+  account_type: UserAccountType;
+  company_name?: string;
+  company_role?: string;
 }
 
 const TEST_DISPLAY_NAMES: Record<JourneyTestSlug, string> = {
@@ -67,6 +73,7 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
   const [showDetails, setShowDetails] = useState(false);
   const [impersonating, setImpersonating] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all_types");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<{type: string; user: UserWithDetails} | null>(null);
   const [userToDelete, setUserToDelete] = useState<UserWithDetails | null>(null);
@@ -88,10 +95,26 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
       if (profilesError) throw profilesError;
 
       const { data: rolesData } = await supabase.from("user_roles").select("user_id, role");
-      const { data: authUsers } = await supabase.rpc('get_user_roles', { _user_id: profiles?.[0]?.id || '' });
+      
+      // Fetch company_users data to distinguish Nello One vs Business
+      const { data: companyUsersData } = await supabase
+        .from("company_users")
+        .select("user_id, role, companies(name)");
 
       const usersWithDetails: UserWithDetails[] = (profiles || []).map((profile) => {
         const userRoles = rolesData?.filter((r) => r.user_id === profile.id).map((r) => r.role) || [];
+        
+        // Check if user belongs to a company
+        const companyUser = companyUsersData?.find((cu) => cu.user_id === profile.id);
+        let accountType: UserAccountType = 'nello_one';
+        let companyName: string | undefined;
+        let companyRole: string | undefined;
+        
+        if (companyUser) {
+          companyName = (companyUser.companies as any)?.name;
+          companyRole = companyUser.role;
+          accountType = companyUser.role === 'company_admin' ? 'business_admin' : 'business_collaborator';
+        }
         
         return {
           id: profile.id,
@@ -105,6 +128,9 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
           codigo_essencia_unlocked: profile.journey_status === 'completed',
           is_blocked: (profile as any).is_blocked || false,
           roles: userRoles,
+          account_type: accountType,
+          company_name: companyName,
+          company_role: companyRole,
         };
       });
 
@@ -266,10 +292,20 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
   };
 
   const exportCSV = () => {
-    const headers = ["Nome", "Email", "Status Jornada", "Testes Concluídos", "Código da Essência", "Data de Criação"];
+    const getAccountTypeLabel = (type: UserAccountType) => {
+      switch (type) {
+        case 'nello_one': return 'Nello One';
+        case 'business_admin': return 'Business Admin';
+        case 'business_collaborator': return 'Colaborador';
+      }
+    };
+
+    const headers = ["Nome", "Email", "Tipo de Conta", "Empresa", "Status Jornada", "Testes Concluídos", "Código da Essência", "Data de Criação"];
     const rows = filteredUsers.map(u => [
       u.full_name,
       u.email,
+      getAccountTypeLabel(u.account_type),
+      u.company_name || "",
       u.journey_status,
       `${u.journey_completed_tests}/7`,
       u.codigo_essencia_unlocked ? "Sim" : "Não",
@@ -280,27 +316,38 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `usuarios_nelloone_${format(new Date(), "yyyy-MM-dd")}.csv`;
+    link.download = `usuarios_nello_${format(new Date(), "yyyy-MM-dd")}.csv`;
     link.click();
     toast.success("CSV exportado com sucesso");
   };
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch = user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.company_name && user.company_name.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    if (filter === "all") return matchesSearch;
-    if (filter === "in_progress") return matchesSearch && user.journey_status === "in_progress";
-    if (filter === "completed") return matchesSearch && user.journey_status === "completed";
-    if (filter === "not_started") return matchesSearch && user.journey_status === "not_started";
-    if (filter === "with_codigo") return matchesSearch && user.codigo_essencia_unlocked;
-    if (filter === "blocked") return matchesSearch && user.is_blocked;
+    // Status filter
+    let matchesStatusFilter = true;
+    if (filter === "in_progress") matchesStatusFilter = user.journey_status === "in_progress";
+    else if (filter === "completed") matchesStatusFilter = user.journey_status === "completed";
+    else if (filter === "not_started") matchesStatusFilter = user.journey_status === "not_started";
+    else if (filter === "with_codigo") matchesStatusFilter = user.codigo_essencia_unlocked;
+    else if (filter === "blocked") matchesStatusFilter = user.is_blocked;
     
-    return matchesSearch;
+    // Type filter
+    let matchesTypeFilter = true;
+    if (typeFilter === "nello_one") matchesTypeFilter = user.account_type === "nello_one";
+    else if (typeFilter === "business_admin") matchesTypeFilter = user.account_type === "business_admin";
+    else if (typeFilter === "business_collaborator") matchesTypeFilter = user.account_type === "business_collaborator";
+    
+    return matchesSearch && matchesStatusFilter && matchesTypeFilter;
   });
 
   const stats = {
     total: users.length,
+    nelloOne: users.filter(u => u.account_type === "nello_one").length,
+    businessAdmin: users.filter(u => u.account_type === "business_admin").length,
+    businessCollaborator: users.filter(u => u.account_type === "business_collaborator").length,
     inProgress: users.filter(u => u.journey_status === "in_progress").length,
     completed: users.filter(u => u.journey_status === "completed").length,
     withCodigo: users.filter(u => u.codigo_essencia_unlocked).length,
@@ -314,6 +361,43 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
         return <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20">Em andamento</Badge>;
       default:
         return <Badge variant="outline" className="text-muted-foreground">Não iniciada</Badge>;
+    }
+  };
+
+  const getAccountTypeBadge = (user: UserWithDetails) => {
+    switch (user.account_type) {
+      case "nello_one":
+        return (
+          <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
+            Nello One
+          </Badge>
+        );
+      case "business_admin":
+        return (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 gap-1">
+                <Building2 className="w-3 h-3" />
+                Business Admin
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>{user.company_name}</TooltipContent>
+          </Tooltip>
+        );
+      case "business_collaborator":
+        return (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge className="bg-violet-500/10 text-violet-600 border-violet-500/20 gap-1">
+                <Users className="w-3 h-3" />
+                Colaborador
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>{user.company_name}</TooltipContent>
+          </Tooltip>
+        );
+      default:
+        return null;
     }
   };
 
@@ -351,15 +435,31 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
         </div>
       )}
 
-      {/* Stats */}
+      {/* Stats - User Types */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
         <Card className="p-3 md:p-4 border-border/50">
           <p className="text-lg md:text-2xl font-semibold">{stats.total}</p>
           <p className="text-[10px] md:text-xs text-muted-foreground">Total</p>
         </Card>
         <Card className="p-3 md:p-4 border-border/50">
+          <p className="text-lg md:text-2xl font-semibold text-emerald-600">{stats.nelloOne}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Nello One</p>
+        </Card>
+        <Card className="p-3 md:p-4 border-border/50">
+          <p className="text-lg md:text-2xl font-semibold text-blue-600">{stats.businessAdmin}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Business Admin</p>
+        </Card>
+        <Card className="p-3 md:p-4 border-border/50">
+          <p className="text-lg md:text-2xl font-semibold text-violet-600">{stats.businessCollaborator}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Colaboradores</p>
+        </Card>
+      </div>
+
+      {/* Stats - Journey */}
+      <div className="grid grid-cols-3 gap-2 md:gap-4">
+        <Card className="p-3 md:p-4 border-border/50">
           <p className="text-lg md:text-2xl font-semibold text-blue-600">{stats.inProgress}</p>
-          <p className="text-[10px] md:text-xs text-muted-foreground">Em andamento</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Jornada em andamento</p>
         </Card>
         <Card className="p-3 md:p-4 border-border/50">
           <p className="text-lg md:text-2xl font-semibold text-emerald-600">{stats.completed}</p>
@@ -384,12 +484,23 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
                 className="pl-10 text-sm"
               />
             </div>
-            <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-full md:w-[200px]">
-                <SelectValue placeholder="Filtrar por" />
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Tipo de conta" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="all_types">Todos os tipos</SelectItem>
+                <SelectItem value="nello_one">Nello One</SelectItem>
+                <SelectItem value="business_admin">Business Admin</SelectItem>
+                <SelectItem value="business_collaborator">Colaboradores</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={filter} onValueChange={setFilter}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Status jornada" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos status</SelectItem>
                 <SelectItem value="in_progress">Em andamento</SelectItem>
                 <SelectItem value="completed">Jornada completa</SelectItem>
                 <SelectItem value="not_started">Não iniciada</SelectItem>
@@ -406,6 +517,7 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
                   <TableHead>Usuário</TableHead>
+                  <TableHead>Tipo</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-center">Jornada</TableHead>
                   <TableHead className="text-center">Código</TableHead>
@@ -422,9 +534,13 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
                         <div>
                           <p className="font-medium">{user.full_name}</p>
                           <p className="text-xs text-muted-foreground">{user.phone || "—"}</p>
+                          {user.company_name && (
+                            <p className="text-[10px] text-muted-foreground/70">{user.company_name}</p>
+                          )}
                         </div>
                       </div>
                     </TableCell>
+                    <TableCell>{getAccountTypeBadge(user)}</TableCell>
                     <TableCell>{getStatusBadge(user.journey_status)}</TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-1">
@@ -516,6 +632,9 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
                   </div>
                   {getStatusBadge(user.journey_status)}
                 </div>
+                <div className="mb-2">
+                  {getAccountTypeBadge(user)}
+                </div>
                 <div className="flex items-center gap-4 mb-3 text-xs">
                   <div className="flex items-center gap-1">
                     <span className="text-muted-foreground">Jornada:</span>
@@ -582,6 +701,19 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
                   <p className="text-xs text-muted-foreground mb-1">Telefone</p>
                   <p className="font-medium">{selectedUser.phone || "Não informado"}</p>
                 </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Tipo de Conta</p>
+                  {getAccountTypeBadge(selectedUser)}
+                </div>
+                {selectedUser.company_name && (
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Empresa</p>
+                    <p className="font-medium flex items-center gap-1">
+                      <Building2 className="w-3 h-3" />
+                      {selectedUser.company_name}
+                    </p>
+                  </div>
+                )}
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Membro desde</p>
                   <p className="font-medium">
