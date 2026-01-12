@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useImpersonate } from "@/contexts/ImpersonateContext";
 import type { Json } from "@/integrations/supabase/types";
 
 // Check if user has admin role
@@ -33,13 +34,14 @@ interface SavedCodigo {
 
 export const useCodigoEssencia = (targetUserId?: string) => {
   const { user } = useAuth();
+  const { impersonatedUserId, isImpersonating } = useImpersonate();
   const [savedCodigo, setSavedCodigo] = useState<SavedCodigo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [targetProfile, setTargetProfile] = useState<{ full_name: string } | null>(null);
 
-  // The userId to use - either the target (for admin viewing another user) or current user
-  const effectiveUserId = targetUserId || user?.id;
+  // The userId to use - prioritize: targetUserId > impersonatedUserId > current user
+  const effectiveUserId = targetUserId || (isImpersonating ? impersonatedUserId : user?.id);
 
   // Check admin status
   useEffect(() => {
@@ -106,10 +108,10 @@ export const useCodigoEssencia = (targetUserId?: string) => {
     loadCodigo();
   }, [effectiveUserId]);
 
-  // Save codigo to database
+  // Save codigo to database - uses effectiveUserId for impersonation support
   const saveCodigo = useCallback(
     async (sections: CodigoSection[], rawContent: string) => {
-      if (!user?.id) return;
+      if (!effectiveUserId) return;
 
       const sectionsJson = sections as unknown as Json;
 
@@ -118,7 +120,7 @@ export const useCodigoEssencia = (targetUserId?: string) => {
         const { data: existing } = await supabase
           .from("mapa_essencia")
           .select("id")
-          .eq("user_id", user.id)
+          .eq("user_id", effectiveUserId)
           .maybeSingle();
 
         let result;
@@ -131,14 +133,14 @@ export const useCodigoEssencia = (targetUserId?: string) => {
               raw_content: rawContent,
               version: (savedCodigo?.version || 1) + 1,
             })
-            .eq("user_id", user.id)
+            .eq("user_id", effectiveUserId)
             .select()
             .single();
         } else {
           result = await supabase
             .from("mapa_essencia")
             .insert({
-              user_id: user.id,
+              user_id: effectiveUserId,
               sections: sectionsJson,
               raw_content: rawContent,
               version: 1,
@@ -164,20 +166,20 @@ export const useCodigoEssencia = (targetUserId?: string) => {
         console.error("Error saving codigo:", error);
       }
     },
-    [user?.id, savedCodigo?.version]
+    [effectiveUserId, savedCodigo?.version]
   );
 
-  // Delete and regenerate codigo
+  // Delete and regenerate codigo - uses effectiveUserId for impersonation support
   const resetCodigo = useCallback(async () => {
-    if (!user?.id) return;
+    if (!effectiveUserId) return;
 
     try {
-      await supabase.from("mapa_essencia").delete().eq("user_id", user.id);
+      await supabase.from("mapa_essencia").delete().eq("user_id", effectiveUserId);
       setSavedCodigo(null);
     } catch (error) {
       console.error("Error resetting codigo:", error);
     }
-  }, [user?.id]);
+  }, [effectiveUserId]);
 
   // Users can only generate ONCE (version 0 = not generated, version 1 = generated)
   // Admins can always regenerate
@@ -185,8 +187,8 @@ export const useCodigoEssencia = (targetUserId?: string) => {
   const canRegenerate = isAdmin || !savedCodigo || (savedCodigo.version || 1) === 0;
 
   // Admin function to reset version to 0, allowing user to regenerate
-  const unlockRegeneration = useCallback(async (targetUserId?: string) => {
-    const userId = targetUserId || user?.id;
+  const unlockRegeneration = useCallback(async (unlockTargetUserId?: string) => {
+    const userId = unlockTargetUserId || effectiveUserId;
     if (!userId) return false;
 
     try {
@@ -200,8 +202,8 @@ export const useCodigoEssencia = (targetUserId?: string) => {
         return false;
       }
 
-      // If it's the current user, update local state
-      if (userId === user?.id && savedCodigo) {
+      // If it's the effective user, update local state
+      if (userId === effectiveUserId && savedCodigo) {
         setSavedCodigo({ ...savedCodigo, version: 0 });
       }
 
@@ -210,7 +212,7 @@ export const useCodigoEssencia = (targetUserId?: string) => {
       console.error("Error unlocking regeneration:", error);
       return false;
     }
-  }, [user?.id, savedCodigo]);
+  }, [effectiveUserId, savedCodigo]);
 
   return {
     savedCodigo,
@@ -223,6 +225,6 @@ export const useCodigoEssencia = (targetUserId?: string) => {
     isAdmin,
     unlockRegeneration,
     targetProfile,
-    isViewingOtherUser: !!targetUserId && targetUserId !== user?.id,
+    isViewingOtherUser: (!!targetUserId && targetUserId !== user?.id) || isImpersonating,
   };
 };
