@@ -111,5 +111,6 @@ verify_jwt = false
 [functions.business-health-check]
 verify_jwt = false
 
-[functions.business-calculate-insights]
-verify_jwt = false
+[functions.business-create-company]
+verify_jwt = true
+
