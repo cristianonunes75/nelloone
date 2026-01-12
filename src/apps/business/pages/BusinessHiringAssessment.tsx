@@ -45,11 +45,12 @@ interface Question {
 
 type TestPhase = "consent" | "intro" | "disc" | "temperamentos" | "completed";
 
+// Fallback options - should match database labels
 const LIKERT_OPTIONS = [
   { value: 1, label: "Discordo totalmente" },
-  { value: 2, label: "Discordo" },
+  { value: 2, label: "Discordo parcialmente" },
   { value: 3, label: "Neutro" },
-  { value: 4, label: "Concordo" },
+  { value: 4, label: "Concordo parcialmente" },
   { value: 5, label: "Concordo totalmente" },
 ];
 
@@ -760,14 +761,15 @@ export default function BusinessHiringAssessment() {
                       const mappedOptions = questionOptions.map((opt: any) => ({ value: opt.value, label: opt.text }));
                       optionsToShow = seededShuffle(mappedOptions, currentQuestion.id);
                     } else if (isLikertWithLabels) {
-                      // Temperamentos: Use labels from database
+                      // Temperamentos: Use labels from database and shuffle for randomness
                       const labels = questionOptions.labels as Record<string, string>;
-                      optionsToShow = Object.entries(labels)
-                        .map(([key, label]) => ({ value: parseInt(key), label }))
-                        .sort((a, b) => (a.value as number) - (b.value as number));
+                      const mappedOptions = Object.entries(labels)
+                        .map(([key, label]) => ({ value: parseInt(key), label }));
+                      // Shuffle the order to prevent predictable patterns
+                      optionsToShow = seededShuffle(mappedOptions, currentQuestion.id);
                     } else {
-                      // Fallback to static LIKERT_OPTIONS
-                      optionsToShow = LIKERT_OPTIONS;
+                      // Fallback to static LIKERT_OPTIONS (also shuffled)
+                      optionsToShow = seededShuffle([...LIKERT_OPTIONS], currentQuestion.id);
                     }
                     
                     return optionsToShow.map((option, index) => (
