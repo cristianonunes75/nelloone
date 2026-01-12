@@ -423,7 +423,7 @@ export default function BusinessHiring() {
                         <Button
                           variant="default"
                           size="sm"
-                          onClick={() => navigate(`/business/hiring/${candidate.id}`)}
+                          onClick={() => navigate(`/hiring/${candidate.id}`)}
                           className="gap-1"
                         >
                           <Eye className="h-3.5 w-3.5" />
