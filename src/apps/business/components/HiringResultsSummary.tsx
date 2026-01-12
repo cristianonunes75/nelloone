@@ -1,6 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { DISC_PROFILES } from "@/lib/disc";
+import { 
+  getDISCRankedProfiles, 
+  getTemperamentRankedProfiles 
+} from "@/lib/discHiringInsights";
 
 interface DISCScores {
   D: number;
@@ -30,25 +34,11 @@ interface HiringResultsSummaryProps {
   };
 }
 
-const DISC_COLORS: Record<string, string> = {
-  D: "bg-red-500",
-  I: "bg-yellow-500",
-  S: "bg-green-500",
-  C: "bg-blue-500",
-};
-
 const DISC_LABELS: Record<string, string> = {
   D: "Dominância",
   I: "Influência",
   S: "Estabilidade",
   C: "Conformidade",
-};
-
-const TEMPERAMENT_COLORS: Record<string, string> = {
-  sanguineo: "bg-yellow-500",
-  colerico: "bg-red-500",
-  melancolico: "bg-blue-500",
-  fleumatico: "bg-green-500",
 };
 
 const TEMPERAMENT_LABELS: Record<string, string> = {
@@ -77,6 +67,26 @@ export function HiringResultsSummary({
   discResults, 
   temperamentResults 
 }: HiringResultsSummaryProps) {
+  // Get ranked DISC profiles
+  const discRanked = discResults 
+    ? getDISCRankedProfiles({
+        D: discResults.percentages?.D || 0,
+        I: discResults.percentages?.I || 0,
+        S: discResults.percentages?.S || 0,
+        C: discResults.percentages?.C || 0,
+      })
+    : [];
+
+  // Get ranked Temperament profiles
+  const tempRanked = temperamentResults
+    ? getTemperamentRankedProfiles({
+        sanguineo: temperamentResults.percentages?.sanguineo || 0,
+        colerico: temperamentResults.percentages?.colerico || 0,
+        melancolico: temperamentResults.percentages?.melancolico || 0,
+        fleumatico: temperamentResults.percentages?.fleumatico || 0,
+      })
+    : [];
+
   return (
     <div className="space-y-4">
       <p className="text-center text-muted-foreground">
@@ -95,7 +105,7 @@ export function HiringResultsSummary({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-center p-3 rounded-lg bg-primary/5">
-                <p className="text-sm text-muted-foreground">Seu perfil dominante</p>
+                <p className="text-sm text-muted-foreground">Seu perfil predominante</p>
                 <p className="text-2xl font-bold text-primary">
                   {discResults.primary} - {DISC_LABELS[discResults.primary]}
                 </p>
@@ -105,22 +115,19 @@ export function HiringResultsSummary({
               </div>
 
               <div className="space-y-2">
-                {Object.entries(discResults.percentages)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([key, value]) => (
-                    <div key={key} className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span className="font-medium">
-                          {key} - {DISC_LABELS[key]}
-                        </span>
-                        <span className="text-muted-foreground">{Math.round(value)}%</span>
-                      </div>
-                      <Progress 
-                        value={value} 
-                        className={`h-2 [&>div]:${DISC_COLORS[key]}`}
-                      />
-                    </div>
-                  ))}
+                {discRanked.map(({ key, label, isTop }) => (
+                  <div key={key} className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                    <span className="font-medium flex items-center gap-2 text-sm">
+                      <span>{DISC_EMOJIS[key]}</span>
+                      {key} - {DISC_LABELS[key]}
+                    </span>
+                    {label && (
+                      <Badge variant={isTop ? "default" : "secondary"} className="text-xs">
+                        {label}
+                      </Badge>
+                    )}
+                  </div>
+                ))}
               </div>
 
               <p className="text-xs text-muted-foreground text-center italic">
@@ -141,7 +148,7 @@ export function HiringResultsSummary({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-center p-3 rounded-lg bg-primary/5">
-                <p className="text-sm text-muted-foreground">Seu temperamento dominante</p>
+                <p className="text-sm text-muted-foreground">Seu temperamento predominante</p>
                 <p className="text-2xl font-bold text-primary">
                   {TEMPERAMENT_LABELS[temperamentResults.primary.toLowerCase()] || temperamentResults.primary}
                 </p>
@@ -151,23 +158,19 @@ export function HiringResultsSummary({
               </div>
 
               <div className="space-y-2">
-                {Object.entries(temperamentResults.percentages)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([key, value]) => (
-                    <div key={key} className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span className="font-medium flex items-center gap-1">
-                          <span>{TEMPERAMENT_EMOJIS[key]}</span>
-                          {TEMPERAMENT_LABELS[key]}
-                        </span>
-                        <span className="text-muted-foreground">{Math.round(value)}%</span>
-                      </div>
-                      <Progress 
-                        value={value} 
-                        className={`h-2 [&>div]:${TEMPERAMENT_COLORS[key]}`}
-                      />
-                    </div>
-                  ))}
+                {tempRanked.map(({ key, label, isTop }) => (
+                  <div key={key} className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                    <span className="font-medium flex items-center gap-2 text-sm">
+                      <span>{TEMPERAMENT_EMOJIS[key]}</span>
+                      {TEMPERAMENT_LABELS[key]}
+                    </span>
+                    {label && (
+                      <Badge variant={isTop ? "default" : "secondary"} className="text-xs">
+                        {label}
+                      </Badge>
+                    )}
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
