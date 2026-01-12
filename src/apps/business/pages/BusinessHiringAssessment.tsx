@@ -264,18 +264,47 @@ export default function BusinessHiringAssessment() {
     
     if (answer !== undefined) {
       try {
-        await supabase
+        // First check if answer exists
+        const { data: existing } = await supabase
           .from("hiring_answers")
-          .upsert({
-            assessment_id: currentAssessment.id,
-            question_id: question.id,
-            question_number: question.question_number,
-            answer: { value: answer, options: question.options }
-          }, {
-            onConflict: "assessment_id,question_number"
-          });
+          .select("id")
+          .eq("assessment_id", currentAssessment.id)
+          .eq("question_number", question.question_number)
+          .maybeSingle();
+        
+        if (existing) {
+          // Update existing answer
+          const { error } = await supabase
+            .from("hiring_answers")
+            .update({
+              question_id: question.id,
+              answer: { value: answer, options: question.options }
+            })
+            .eq("id", existing.id);
+          
+          if (error) {
+            console.error("Error updating answer:", error);
+            toast.error("Erro ao salvar resposta");
+          }
+        } else {
+          // Insert new answer
+          const { error } = await supabase
+            .from("hiring_answers")
+            .insert({
+              assessment_id: currentAssessment.id,
+              question_id: question.id,
+              question_number: question.question_number,
+              answer: { value: answer, options: question.options }
+            });
+          
+          if (error) {
+            console.error("Error inserting answer:", error);
+            toast.error("Erro ao salvar resposta");
+          }
+        }
       } catch (error) {
         console.error("Error saving answer:", error);
+        toast.error("Erro ao salvar resposta");
       }
     }
   };
