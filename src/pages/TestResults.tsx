@@ -777,7 +777,7 @@ function TestResultsInner() {
       // Start or continue the next test directly
       if (nextTestInfo.userTestId) {
         // User already started this test, continue it
-        navigate(`${basePath}/test/${nextTestInfo.test.id}/${nextTestInfo.userTestId}`);
+        navigate(`${basePath}/test-execution/${nextTestInfo.test.id}/${nextTestInfo.userTestId}`);
       } else {
         // Create new user_test and start the test
         if (!user?.id) {
@@ -800,7 +800,7 @@ function TestResultsInner() {
           if (error) throw error;
           
           if (newUserTest) {
-            navigate(`${basePath}/test/${nextTestInfo.test.id}/${newUserTest.id}`);
+            navigate(`${basePath}/test-execution/${nextTestInfo.test.id}/${newUserTest.id}`);
           }
         } catch (err) {
           console.error("Error creating user test:", err);
