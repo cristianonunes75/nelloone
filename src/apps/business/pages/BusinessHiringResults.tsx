@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useBusinessAuth } from "../hooks/useBusinessAuth";
 import { BusinessLayout } from "../components/BusinessLayout";
@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Loader2, Mail, Phone, Briefcase, Calendar, CheckCircle2, Clock, AlertCircle, Target, AlertTriangle, Users, Compass } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Loader2, Mail, Phone, Briefcase, Calendar, CheckCircle2, Clock, AlertCircle, Target, AlertTriangle, Users, Compass, Eye, UserCircle } from "lucide-react";
+import { CandidateResultsFeedback } from "../components/CandidateResultsFeedback";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DISC_PROFILES, type DISCScores } from "@/lib/disc";
@@ -55,11 +57,19 @@ const DISC_LABELS: Record<string, string> = {
 export default function BusinessHiringResults() {
   const { candidateId } = useParams<{ candidateId: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { company } = useBusinessAuth();
   
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // View mode: 'hr' (default) or 'candidate'
+  const viewMode = searchParams.get('view') || 'hr';
+  
+  const setViewMode = (mode: string) => {
+    setSearchParams({ view: mode });
+  };
 
   useEffect(() => {
     if (candidateId && company?.id) {
@@ -156,6 +166,22 @@ export default function BusinessHiringResults() {
           </Badge>
         </div>
 
+        {/* View Mode Toggle - Only show when both tests complete */}
+        {bothCompleted && (
+          <Tabs value={viewMode} onValueChange={setViewMode} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+              <TabsTrigger value="hr" className="flex items-center gap-2">
+                <Eye className="h-4 w-4" />
+                Visão RH
+              </TabsTrigger>
+              <TabsTrigger value="candidate" className="flex items-center gap-2">
+                <UserCircle className="h-4 w-4" />
+                Visão Candidato
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
+
         {/* 1. Informações do Candidato */}
         <Card>
           <CardHeader className="pb-3">
@@ -191,42 +217,73 @@ export default function BusinessHiringResults() {
 
         {/* Show full report only when both tests are complete */}
         {bothCompleted ? (
-          <>
-            {/* 2. Resumo Executivo */}
-            <ExecutiveSummaryCard 
-              discResult={discAssessment.result_data}
-              temperamentResult={temperamentAssessment.result_data}
-            />
+          viewMode === 'candidate' ? (
+            /* Candidate View - Preview of what the candidate sees */
+            <div className="space-y-4">
+              <div className="bg-muted/50 border rounded-lg p-3 flex items-center gap-2">
+                <Eye className="h-4 w-4 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  <strong>Preview:</strong> Esta é a visão que o candidato receberá após completar os testes.
+                </p>
+              </div>
+              <CandidateResultsFeedback
+                candidateName={candidate.full_name}
+                discResults={{
+                  primary: discAssessment.result_data?.primary,
+                  secondary: discAssessment.result_data?.secondary,
+                  percentages: discAssessment.result_data?.percentages
+                }}
+                temperamentResults={{
+                  primary: temperamentAssessment.result_data?.primary?.temperament,
+                  secondary: temperamentAssessment.result_data?.secondary?.temperament,
+                  percentages: {
+                    sanguineo: 0,
+                    colerico: 0,
+                    melancolico: 0,
+                    fleumatico: 0
+                  }
+                }}
+              />
+            </div>
+          ) : (
+            /* HR View - Full detailed report */
+            <>
+              {/* 2. Resumo Executivo */}
+              <ExecutiveSummaryCard 
+                discResult={discAssessment.result_data}
+                temperamentResult={temperamentAssessment.result_data}
+              />
 
-            {/* 3. Perfil DISC Predominante */}
-            <DISCProfileCard result={discAssessment.result_data} />
+              {/* 3. Perfil DISC Predominante */}
+              <DISCProfileCard result={discAssessment.result_data} />
 
-            {/* 4. Temperamento */}
-            <TemperamentProfileCard result={temperamentAssessment.result_data} />
+              {/* 4. Temperamento */}
+              <TemperamentProfileCard result={temperamentAssessment.result_data} />
 
-            {/* 5. Pontos Fortes */}
-            <StrengthsCard 
-              discPrimary={discAssessment.result_data?.primary}
-              temperamentPrimary={temperamentAssessment.result_data?.primary?.temperament}
-            />
+              {/* 5. Pontos Fortes */}
+              <StrengthsCard 
+                discPrimary={discAssessment.result_data?.primary}
+                temperamentPrimary={temperamentAssessment.result_data?.primary?.temperament}
+              />
 
-            {/* 6. Riscos no Ambiente de Trabalho */}
-            <WorkplaceRisksCard 
-              discPrimary={discAssessment.result_data?.primary}
-              temperamentPrimary={temperamentAssessment.result_data?.primary?.temperament}
-            />
+              {/* 6. Riscos no Ambiente de Trabalho */}
+              <WorkplaceRisksCard 
+                discPrimary={discAssessment.result_data?.primary}
+                temperamentPrimary={temperamentAssessment.result_data?.primary?.temperament}
+              />
 
-            {/* 7. Como Liderar este Perfil */}
-            <LeadershipGuideCard 
-              discPrimary={discAssessment.result_data?.primary}
-            />
+              {/* 7. Como Liderar este Perfil */}
+              <LeadershipGuideCard 
+                discPrimary={discAssessment.result_data?.primary}
+              />
 
-            {/* 8. Indicação de Contexto */}
-            <ContextIndicationCard 
-              discPrimary={discAssessment.result_data?.primary}
-              temperamentPrimary={temperamentAssessment.result_data?.primary?.temperament}
-            />
-          </>
+              {/* 8. Indicação de Contexto */}
+              <ContextIndicationCard 
+                discPrimary={discAssessment.result_data?.primary}
+                temperamentPrimary={temperamentAssessment.result_data?.primary?.temperament}
+              />
+            </>
+          )
         ) : (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
