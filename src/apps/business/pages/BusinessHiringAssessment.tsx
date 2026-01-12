@@ -11,7 +11,7 @@ import { Loader2, CheckCircle2, ArrowLeft, ArrowRight, Clock, AlertCircle, Build
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { calculateTemperamentos } from "@/lib/temperamentos";
-import { HiringResultsSummary } from "../components/HiringResultsSummary";
+import { CandidateResultsFeedback } from "../components/CandidateResultsFeedback";
 import { NelloOneUpsell } from "../components/NelloOneUpsell";
 
 interface Company {
@@ -735,9 +735,9 @@ export default function BusinessHiringAssessment() {
             </CardContent>
           </Card>
 
-          {/* Results Summary */}
+          {/* Candidate Feedback - Development-focused, ethical */}
           {completedResults && (completedResults.discResults || completedResults.temperamentResults) && (
-            <HiringResultsSummary
+            <CandidateResultsFeedback
               candidateName={candidate.full_name}
               discResults={completedResults.discResults || undefined}
               temperamentResults={completedResults.temperamentResults || undefined}
