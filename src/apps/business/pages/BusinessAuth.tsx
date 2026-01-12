@@ -104,55 +104,25 @@ export default function BusinessAuth() {
     setIsLoading(true);
     
     try {
-      // Create company
-      const slug = companyName
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '');
-      
-      const { data: company, error: companyError } = await supabase
-        .from('companies')
-        .insert({
-          name: companyName,
-          slug: `${slug}-${Date.now().toString(36)}`,
-          created_by: user.id,
-          billing_email: user.email,
-        })
-        .select()
-        .single();
-      
-      if (companyError) throw companyError;
-      
-      // Link user to company as admin
-      const { error: linkError } = await supabase
-        .from('company_users')
-        .insert({
-          company_id: company.id,
-          user_id: user.id,
-          role: 'company_admin',
-          is_active: true,
-          consent_given: true,
-          consent_given_at: new Date().toISOString(),
-          joined_at: new Date().toISOString(),
-        });
-      
-      if (linkError) throw linkError;
-      
-      // Create subscription record
-      const { error: subError } = await supabase
-        .from('company_subscriptions')
-        .insert({
-          company_id: company.id,
-          status: 'trialing',
-          plan_tier: 'starter',
-          max_collaborators: 10,
-          trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-        });
-      
-      if (subError) throw subError;
-      
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+      if (!accessToken) {
+        throw new Error('Sessão inválida. Faça login novamente.');
+      }
+
+      const { data, error } = await supabase.functions.invoke('business-create-company', {
+        body: {
+          companyName,
+          billingEmail: user.email,
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Erro ao criar empresa');
+
       toast.success('Empresa criada com sucesso! Bem-vindo ao Nello Business.');
       navigate('/onboarding');
     } catch (error: any) {
@@ -178,59 +148,30 @@ export default function BusinessAuth() {
           }
         }
       });
-      
+
       if (authError) throw authError;
       if (!authData.user) throw new Error('Erro ao criar conta');
-      
-      // 2. Create company
-      const slug = companyName
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '');
-      
-      const { data: company, error: companyError } = await supabase
-        .from('companies')
-        .insert({
-          name: companyName,
-          slug: `${slug}-${Date.now().toString(36)}`,
-          created_by: authData.user.id,
-          billing_email: registerEmail,
-        })
-        .select()
-        .single();
-      
-      if (companyError) throw companyError;
-      
-      // 3. Link user to company as admin
-      const { error: linkError } = await supabase
-        .from('company_users')
-        .insert({
-          company_id: company.id,
-          user_id: authData.user.id,
-          role: 'company_admin',
-          is_active: true,
-          consent_given: true,
-          consent_given_at: new Date().toISOString(),
-          joined_at: new Date().toISOString(),
-        });
-      
-      if (linkError) throw linkError;
-      
-      // 4. Create subscription record
-      const { error: subError } = await supabase
-        .from('company_subscriptions')
-        .insert({
-          company_id: company.id,
-          status: 'trialing',
-          plan_tier: 'starter',
-          max_collaborators: 10,
-          trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-        });
-      
-      if (subError) throw subError;
-      
+
+      // Ensure we have an access token (auto-confirm is enabled in backend)
+      const accessToken = authData.session?.access_token;
+      if (!accessToken) {
+        throw new Error('Não foi possível iniciar sessão após cadastro. Tente entrar com seu email e senha.');
+      }
+
+      // 2. Create company via backend function (avoids RLS issues)
+      const { data, error } = await supabase.functions.invoke('business-create-company', {
+        body: {
+          companyName,
+          billingEmail: registerEmail,
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Erro ao criar empresa');
+
       toast.success('Conta criada com sucesso! Bem-vindo ao Nello Business.');
       navigate('/onboarding');
     } catch (error: any) {
