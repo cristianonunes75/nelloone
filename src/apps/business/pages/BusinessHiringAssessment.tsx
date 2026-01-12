@@ -375,11 +375,18 @@ export default function BusinessHiringAssessment() {
       const allCompleted = updatedAssessments?.every(a => a.status === "completed");
       
       if (allCompleted) {
-        // Update candidate status
-        await supabase
+        // Update candidate status with error handling
+        const { error: statusError } = await supabase
           .from("hiring_candidates")
-          .update({ status: "completed" })
+          .update({ status: "completed", updated_at: new Date().toISOString() })
           .eq("id", candidate.id);
+        
+        if (statusError) {
+          console.error("Error updating candidate status:", statusError);
+          toast.error("Erro ao atualizar status, mas seus resultados foram salvos.");
+        } else {
+          console.log("Candidate status updated to completed:", candidate.id);
+        }
         
         setPhase("completed");
       } else {
