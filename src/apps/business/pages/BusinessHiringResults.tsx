@@ -16,10 +16,10 @@ import { DISC_PROFILES, type DISCScores } from "@/lib/disc";
 import { 
   DISC_HIRING_INSIGHTS, 
   TEMPERAMENT_HIRING_INSIGHTS, 
-  getDISCRankedProfiles,
   getTemperamentRankedProfiles,
   getCombinedProfileInsights 
 } from "@/lib/discHiringInsights";
+import { getUnifiedDiscRanking, getDiscDisplayData, type DiscRankingItem } from "@/lib/discRanking";
 
 interface Candidate {
   id: string;
@@ -219,70 +219,86 @@ export default function BusinessHiringResults() {
         {bothCompleted ? (
           viewMode === 'candidate' ? (
             /* Candidate View - Preview of what the candidate sees */
-            <div className="space-y-4">
-              <div className="bg-muted/50 border rounded-lg p-3 flex items-center gap-2">
-                <Eye className="h-4 w-4 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">
-                  <strong>Preview:</strong> Esta é a visão que o candidato receberá após completar os testes.
-                </p>
-              </div>
-              <CandidateResultsFeedback
-                candidateName={candidate.full_name}
-                discResults={{
-                  primary: discAssessment.result_data?.primary,
-                  secondary: discAssessment.result_data?.secondary,
-                  percentages: discAssessment.result_data?.percentages
-                }}
-                temperamentResults={{
-                  primary: temperamentAssessment.result_data?.primary?.temperament,
-                  secondary: temperamentAssessment.result_data?.secondary?.temperament,
-                  percentages: {
-                    sanguineo: 0,
-                    colerico: 0,
-                    melancolico: 0,
-                    fleumatico: 0
-                  }
-                }}
-              />
-            </div>
+            (() => {
+              // SINGLE SOURCE OF TRUTH: Calculate DISC ranking for candidate view too
+              const discDisplay = getDiscDisplayData(discAssessment.result_data);
+              
+              return (
+                <div className="space-y-4">
+                  <div className="bg-muted/50 border rounded-lg p-3 flex items-center gap-2">
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Preview:</strong> Esta é a visão que o candidato receberá após completar os testes.
+                    </p>
+                  </div>
+                  <CandidateResultsFeedback
+                    candidateName={candidate.full_name}
+                    discResults={{
+                      primary: discDisplay.primaryKey || '',
+                      secondary: discDisplay.secondaryKey || '',
+                      percentages: discAssessment.result_data?.percentages
+                    }}
+                    temperamentResults={{
+                      primary: temperamentAssessment.result_data?.primary?.temperament,
+                      secondary: temperamentAssessment.result_data?.secondary?.temperament,
+                      percentages: {
+                        sanguineo: 0,
+                        colerico: 0,
+                        melancolico: 0,
+                        fleumatico: 0
+                      }
+                    }}
+                  />
+                </div>
+              );
+            })()
           ) : (
             /* HR View - Full detailed report */
-            <>
-              {/* 2. Resumo Executivo */}
-              <ExecutiveSummaryCard 
-                discResult={discAssessment.result_data}
-                temperamentResult={temperamentAssessment.result_data}
-              />
+            (() => {
+              // SINGLE SOURCE OF TRUTH: Calculate DISC ranking ONCE for all cards
+              const discDisplay = getDiscDisplayData(discAssessment.result_data);
+              const calculatedDiscPrimary = discDisplay.primaryKey || '';
+              const tempPrimary = temperamentAssessment.result_data?.primary?.temperament || '';
+              
+              return (
+                <>
+                  {/* 2. Resumo Executivo */}
+                  <ExecutiveSummaryCard 
+                    discResult={discAssessment.result_data}
+                    temperamentResult={temperamentAssessment.result_data}
+                  />
 
-              {/* 3. Perfil DISC Predominante */}
-              <DISCProfileCard result={discAssessment.result_data} />
+                  {/* 3. Perfil DISC Predominante */}
+                  <DISCProfileCard result={discAssessment.result_data} />
 
-              {/* 4. Temperamento */}
-              <TemperamentProfileCard result={temperamentAssessment.result_data} />
+                  {/* 4. Temperamento */}
+                  <TemperamentProfileCard result={temperamentAssessment.result_data} />
 
-              {/* 5. Pontos Fortes */}
-              <StrengthsCard 
-                discPrimary={discAssessment.result_data?.primary}
-                temperamentPrimary={temperamentAssessment.result_data?.primary?.temperament}
-              />
+                  {/* 5. Pontos Fortes - Uses calculated primary */}
+                  <StrengthsCard 
+                    discPrimary={calculatedDiscPrimary}
+                    temperamentPrimary={tempPrimary}
+                  />
 
-              {/* 6. Riscos no Ambiente de Trabalho */}
-              <WorkplaceRisksCard 
-                discPrimary={discAssessment.result_data?.primary}
-                temperamentPrimary={temperamentAssessment.result_data?.primary?.temperament}
-              />
+                  {/* 6. Riscos no Ambiente de Trabalho - Uses calculated primary */}
+                  <WorkplaceRisksCard 
+                    discPrimary={calculatedDiscPrimary}
+                    temperamentPrimary={tempPrimary}
+                  />
 
-              {/* 7. Como Liderar este Perfil */}
-              <LeadershipGuideCard 
-                discPrimary={discAssessment.result_data?.primary}
-              />
+                  {/* 7. Como Liderar este Perfil - Uses calculated primary */}
+                  <LeadershipGuideCard 
+                    discPrimary={calculatedDiscPrimary}
+                  />
 
-              {/* 8. Indicação de Contexto */}
-              <ContextIndicationCard 
-                discPrimary={discAssessment.result_data?.primary}
-                temperamentPrimary={temperamentAssessment.result_data?.primary?.temperament}
-              />
-            </>
+                  {/* 8. Indicação de Contexto - Uses calculated primary */}
+                  <ContextIndicationCard 
+                    discPrimary={calculatedDiscPrimary}
+                    temperamentPrimary={tempPrimary}
+                  />
+                </>
+              );
+            })()
           )
         ) : (
           <Card>
@@ -308,15 +324,38 @@ export default function BusinessHiringResults() {
   );
 }
 
-// 2. Resumo Executivo
+// 2. Resumo Executivo - USES SINGLE SOURCE OF TRUTH
 function ExecutiveSummaryCard({ discResult, temperamentResult }: { discResult: any; temperamentResult: any }) {
-  const discPrimary = discResult?.primary as keyof typeof DISC_PROFILES;
+  // SINGLE SOURCE OF TRUTH: Calculate DISC ranking from percentages
+  const discDisplay = getDiscDisplayData(discResult);
+  const discPrimary = discDisplay.primaryKey as keyof typeof DISC_PROFILES;
+  const discSecondary = discDisplay.secondaryKey as keyof typeof DISC_PROFILES;
+  
   const tempPrimary = temperamentResult?.primary?.temperament;
   
   const { highlights, watchPoints } = getCombinedProfileInsights(
-    discPrimary,
-    tempPrimary
+    discPrimary || '',
+    tempPrimary || ''
   );
+
+  // Fallback UI for invalid DISC data
+  if (!discDisplay.isValid) {
+    return (
+      <Card className="border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
+        <CardHeader>
+          <CardTitle className="text-lg">Resumo Executivo</CardTitle>
+          <CardDescription>Visão rápida para decisão</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 bg-muted rounded-lg text-center">
+            <p className="text-muted-foreground">
+              {discDisplay.fallbackText || 'Dados DISC insuficientes para classificação'}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
@@ -326,7 +365,7 @@ function ExecutiveSummaryCard({ discResult, temperamentResult }: { discResult: a
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* DISC Summary */}
+          {/* DISC Summary - Uses calculated ranking */}
           <div className="space-y-2">
             <p className="text-xs font-medium uppercase text-muted-foreground tracking-wide">Perfil DISC</p>
             <div className="flex items-center gap-3">
@@ -335,9 +374,11 @@ function ExecutiveSummaryCard({ discResult, temperamentResult }: { discResult: a
                 <p className="font-semibold text-lg">
                   {DISC_PROFILES[discPrimary]?.name?.pt}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Secundário: {DISC_PROFILES[discResult?.secondary as keyof typeof DISC_PROFILES]?.name?.pt}
-                </p>
+                {discSecondary && (
+                  <p className="text-sm text-muted-foreground">
+                    Secundário: {DISC_PROFILES[discSecondary]?.name?.pt}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -399,29 +440,38 @@ function ExecutiveSummaryCard({ discResult, temperamentResult }: { discResult: a
   );
 }
 
-// 3. Perfil DISC
+// 3. Perfil DISC - USES SINGLE SOURCE OF TRUTH
 function DISCProfileCard({ result }: { result: any }) {
-  const percentages = result.percentages as DISCScores;
-  const primary = result.primary as keyof typeof DISC_PROFILES;
+  // SINGLE SOURCE OF TRUTH: Use the unified ranking function
+  const discDisplay = getDiscDisplayData(result);
+  const primaryKey = discDisplay.primaryKey as keyof typeof DISC_PROFILES;
 
-  // Get ranked profiles with predominance labels - convert to Record<string, number>
-  const percentagesRecord: Record<string, number> = {
-    D: percentages?.D || 0,
-    I: percentages?.I || 0,
-    S: percentages?.S || 0,
-    C: percentages?.C || 0,
-  };
-  const rankedProfiles = getDISCRankedProfiles(percentagesRecord);
+  // Fallback UI for invalid data
+  if (!discDisplay.isValid) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <span className="text-2xl">📊</span>
+            Perfil DISC Predominante
+          </CardTitle>
+          <CardDescription>
+            {discDisplay.fallbackText || 'Dados insuficientes para classificação'}
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <span className="text-2xl">{DISC_PROFILES[primary]?.emoji}</span>
+          <span className="text-2xl">{DISC_PROFILES[primaryKey]?.emoji}</span>
           Perfil DISC Predominante
         </CardTitle>
         <CardDescription>
-          {DISC_PROFILES[primary]?.shortDescription?.pt}
+          {DISC_PROFILES[primaryKey]?.shortDescription?.pt}
           <span className="block mt-1 text-xs opacity-70">
             Os rótulos indicam predominância relativa entre os fatores, não nível absoluto.
           </span>
@@ -429,7 +479,7 @@ function DISCProfileCard({ result }: { result: any }) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {rankedProfiles.map(({ key, label, isTop, orderIndex }) => {
+          {discDisplay.ranking.map(({ key, label, isTop, orderIndex }) => {
             const profile = DISC_PROFILES[key as keyof typeof DISC_PROFILES];
             
             return (
