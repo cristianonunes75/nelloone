@@ -58,6 +58,31 @@ interface QuestionOption {
   value: string | number;
 }
 
+// Shuffle array using a seeded random based on question id for consistency
+function seededShuffle<T>(array: T[], seed: string): T[] {
+  const result = [...array];
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    const char = seed.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  
+  // Simple seeded random
+  const seededRandom = () => {
+    hash = (hash * 1103515245 + 12345) & 0x7fffffff;
+    return (hash % 1000) / 1000;
+  };
+  
+  // Fisher-Yates shuffle with seeded random
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(seededRandom() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  
+  return result;
+}
+
 export default function BusinessHiringAssessment() {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
@@ -720,9 +745,15 @@ export default function BusinessHiringAssessment() {
                     const isDISCQuestion = Array.isArray(questionOptions) && questionOptions.length > 0 && 
                       questionOptions.some(opt => typeof opt.value === 'string' && ['D', 'I', 'S', 'C'].includes(opt.value));
                     
-                    const optionsToShow = isDISCQuestion 
+                    // Map options and shuffle DISC options to avoid predictability
+                    const mappedOptions = isDISCQuestion 
                       ? questionOptions.map(opt => ({ value: opt.value, label: opt.text }))
                       : LIKERT_OPTIONS;
+                    
+                    // Shuffle DISC options using question id as seed for consistency
+                    const optionsToShow = isDISCQuestion 
+                      ? seededShuffle(mappedOptions, currentQuestion.id) 
+                      : mappedOptions;
                     
                     return optionsToShow.map((option, index) => (
                       <div
