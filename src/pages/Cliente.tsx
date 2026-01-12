@@ -42,23 +42,7 @@ import { supabase } from "@/integrations/supabase/client";
 const Cliente = () => {
   const { user, profile, signOut, userRole } = useAuth();
   const { startTestAsync, userTests, resetTest } = useTests();
-  const {
-    journeySteps, 
-    completedTests, 
-    completedCount, 
-    totalSteps, 
-    isJourneyComplete,
-    currentStep,
-    testResults,
-    isLoading 
-  } = useJourneyProgress();
-  const { 
-    canSeeMenuItem: canSeeCodigoMenu,
-    canGenerateCode,
-    canPurchase: canPurchaseCodigo,
-    hasUnlocked: hasCodigoUnlocked
-  } = useCodigoEssenciaAccess();
-  const { isImpersonating, impersonatedUserName, setImpersonation } = useImpersonate();
+  const { isImpersonating, impersonatedUserName, impersonatedUserId, setImpersonation } = useImpersonate();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
@@ -67,13 +51,21 @@ const Cliente = () => {
   
   // State for reset confirmation dialog
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
-  const [stepToReset, setStepToReset] = useState<typeof journeySteps[0] | null>(null);
+  const [stepToReset, setStepToReset] = useState<any>(null);
+  
+  // State to track if we're validating impersonation token
+  const [isValidatingImpersonation, setIsValidatingImpersonation] = useState(() => {
+    // Check if there's an impersonate token in the URL on initial load
+    const urlParams = new URLSearchParams(window.location.search);
+    return !!urlParams.get("impersonate");
+  });
 
   // Handle impersonation token from URL (when admin opens this page in new tab)
   useEffect(() => {
     const impersonateToken = searchParams.get("impersonate");
     
     if (impersonateToken && !isImpersonating) {
+      setIsValidatingImpersonation(true);
       // Validate the impersonation token with the edge function
       const validateAndSetImpersonation = async () => {
         try {
@@ -93,36 +85,32 @@ const Cliente = () => {
             // Remove the invalid token from URL
             searchParams.delete("impersonate");
             setSearchParams(searchParams);
+            setIsValidatingImpersonation(false);
             return;
           }
 
-          // Get target user info from session
-          const { data: sessionData, error: sessionError } = await supabase
-            .from("impersonation_sessions")
-            .select("target_user_id, profiles:target_user_id(full_name)")
-            .eq("session_token", impersonateToken)
-            .eq("is_active", true)
+          // The edge function already validated and returns the target user ID
+          const targetUserId = data.targetUserId;
+          
+          // Get user name for display
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", targetUserId)
             .single();
 
-          if (sessionError || !sessionData) {
-            toast({
-              title: "Erro ao carregar sessão",
-              description: "Não foi possível identificar o usuário.",
-              variant: "destructive",
-            });
-            searchParams.delete("impersonate");
-            setSearchParams(searchParams);
-            return;
-          }
-
-          const targetUserName = (sessionData.profiles as any)?.full_name || "Usuário";
+          const targetUserName = profileData?.full_name || "Usuário";
           
           // Set the impersonation context (this also stores in sessionStorage)
-          setImpersonation(sessionData.target_user_id, targetUserName, impersonateToken);
+          setImpersonation(targetUserId, targetUserName, impersonateToken);
           
           // Remove the token from URL for security
           searchParams.delete("impersonate");
           setSearchParams(searchParams);
+          
+          // Invalidate queries to refetch with new user ID
+          queryClient.invalidateQueries({ queryKey: ["target-user-tests"] });
+          queryClient.invalidateQueries({ queryKey: ["user-tests"] });
           
           toast({
             title: `Modo Simulação Ativado`,
@@ -132,12 +120,36 @@ const Cliente = () => {
           console.error("Error validating impersonation:", err);
           searchParams.delete("impersonate");
           setSearchParams(searchParams);
+        } finally {
+          setIsValidatingImpersonation(false);
         }
       };
 
       validateAndSetImpersonation();
+    } else if (!searchParams.get("impersonate")) {
+      // No token in URL, not validating
+      setIsValidatingImpersonation(false);
     }
-  }, [searchParams, isImpersonating, setImpersonation, setSearchParams, toast]);
+  }, [searchParams, isImpersonating, setImpersonation, setSearchParams, toast, queryClient]);
+
+  // These hooks depend on the impersonation state being set, so they'll refetch when it changes
+  const {
+    journeySteps, 
+    completedTests, 
+    completedCount, 
+    totalSteps, 
+    isJourneyComplete,
+    currentStep,
+    testResults,
+    isLoading 
+  } = useJourneyProgress();
+  
+  const { 
+    canSeeMenuItem: canSeeCodigoMenu,
+    canGenerateCode,
+    canPurchase: canPurchaseCodigo,
+    hasUnlocked: hasCodigoUnlocked
+  } = useCodigoEssenciaAccess();
 
   // Handle payment success callback
   useEffect(() => {
@@ -429,12 +441,14 @@ const Cliente = () => {
     navigate(`${basePath}/cliente/codigo-essencia`);
   };
 
-  if (isLoading) {
+  if (isLoading || isValidatingImpersonation) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground text-sm">Carregando sua jornada...</p>
+          <p className="text-muted-foreground text-sm">
+            {isValidatingImpersonation ? "Validando sessão de simulação..." : "Carregando sua jornada..."}
+          </p>
         </div>
       </div>
     );
