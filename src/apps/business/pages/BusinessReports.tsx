@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   BarChart3, 
   Users, 
@@ -8,7 +8,10 @@ import {
   MessageSquare,
   Shield,
   Target,
-  Lock
+  Lock,
+  RefreshCw,
+  Clock,
+  CheckCircle2
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +24,7 @@ import { useBusinessEnforcement } from '../hooks/useBusinessEnforcement';
 import { SubscriptionStatusBanner } from '../components/SubscriptionStatusBanner';
 import { BlockedAccessOverlay } from '../components/BlockedAccessOverlay';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface TeamInsights {
   total_members: number;
@@ -31,21 +35,23 @@ interface TeamInsights {
   team_growth_areas: string[];
   conflict_risk_areas: string[];
   management_recommendations: string[];
+  last_calculated_at?: string;
+  calculation_member_count?: number;
 }
+
+type InsightsState = 'loading' | 'calculating' | 'insufficient' | 'ready' | 'error';
+
+const MINIMUM_THRESHOLD = 3;
 
 export default function BusinessReports() {
   const { company } = useBusinessAuth();
   const enforcement = useBusinessEnforcement();
   const [insights, setInsights] = useState<TeamInsights | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [insightsState, setInsightsState] = useState<InsightsState>('loading');
 
-  useEffect(() => {
-    if (company) {
-      fetchInsights();
-    }
-  }, [company]);
-
-  const fetchInsights = async () => {
+  const fetchInsights = useCallback(async () => {
     if (!company) return;
     
     try {
@@ -59,21 +65,95 @@ export default function BusinessReports() {
       
       if (data) {
         setInsights(data as unknown as TeamInsights);
+        
+        // Determine state based on data
+        if ((data.completed_assessments || 0) >= MINIMUM_THRESHOLD && 
+            Object.keys(data.temperament_distribution || {}).length > 0) {
+          setInsightsState('ready');
+        } else {
+          setInsightsState('insufficient');
+        }
+      } else {
+        setInsightsState('insufficient');
       }
     } catch (error) {
       console.error('Error fetching insights:', error);
+      setInsightsState('error');
     } finally {
       setIsLoading(false);
     }
+  }, [company]);
+
+  useEffect(() => {
+    if (company) {
+      fetchInsights();
+    }
+  }, [company, fetchInsights]);
+
+  const handleRecalculate = async () => {
+    if (!company || isCalculating) return;
+    
+    setIsCalculating(true);
+    setInsightsState('calculating');
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('Não autenticado');
+      }
+
+      const response = await supabase.functions.invoke('business-calculate-insights', {
+        body: { 
+          company_id: company.id,
+          triggered_by: 'manual'
+        }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      const result = response.data;
+      
+      if (result.success) {
+        if (result.completed_count !== undefined && result.completed_count < MINIMUM_THRESHOLD) {
+          toast.info(`Dados insuficientes: ${result.completed_count}/${MINIMUM_THRESHOLD} jornadas completas`);
+          setInsightsState('insufficient');
+        } else {
+          toast.success('Insights atualizados com sucesso!');
+          setInsightsState('ready');
+        }
+        
+        // Refresh data
+        await fetchInsights();
+      } else {
+        throw new Error(result.error || 'Falha ao calcular insights');
+      }
+    } catch (error) {
+      console.error('Error calculating insights:', error);
+      toast.error('Erro ao atualizar insights. Tente novamente.');
+      setInsightsState('error');
+    } finally {
+      setIsCalculating(false);
+    }
   };
 
-  const hasEnoughData = insights && insights.completed_assessments >= 3;
+  const hasEnoughData = insightsState === 'ready';
+
+  // Format last calculated time
+  const getLastCalculatedText = () => {
+    if (!insights?.last_calculated_at) return null;
+    const date = new Date(insights.last_calculated_at);
+    return `Última atualização: ${date.toLocaleDateString('pt-BR')} às ${date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+  };
 
   if (isLoading) {
     return (
       <BusinessLayout>
         <div className="flex items-center justify-center py-20">
           <div className="text-center text-muted-foreground">
+            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-2" />
             Carregando relatórios...
           </div>
         </div>
@@ -114,11 +194,32 @@ export default function BusinessReports() {
         {/* Subscription Status Banner */}
         <SubscriptionStatusBanner />
         
-        <div>
-          <h1 className="text-2xl font-bold">Relatórios da Equipe</h1>
-          <p className="text-muted-foreground">
-            Insights consolidados sobre os perfis e tendências do seu time
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Relatórios da Equipe</h1>
+            <p className="text-muted-foreground">
+              Insights consolidados sobre os perfis e tendências do seu time
+            </p>
+          </div>
+          
+          {/* Recalculate Button */}
+          <div className="flex flex-col items-end gap-1">
+            <Button 
+              onClick={handleRecalculate} 
+              disabled={isCalculating}
+              variant="outline"
+              className="gap-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${isCalculating ? 'animate-spin' : ''}`} />
+              {isCalculating ? 'Calculando...' : 'Atualizar insights'}
+            </Button>
+            {getLastCalculatedText() && (
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                {getLastCalculatedText()}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Privacy Notice */}
@@ -129,30 +230,83 @@ export default function BusinessReports() {
               <h4 className="font-medium text-primary">Dados anônimos e agregados</h4>
               <p className="text-sm text-muted-foreground">
                 Estes relatórios mostram tendências da equipe como um todo. 
-                Nenhuma informação individual é identificável.
+                Nenhuma informação individual é identificável. Mínimo de {MINIMUM_THRESHOLD} jornadas completas.
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {!hasEnoughData ? (
+        {/* State: Calculating */}
+        {insightsState === 'calculating' && (
+          <Card>
+            <CardContent className="text-center py-12">
+              <RefreshCw className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+              <h3 className="text-lg font-medium mb-2">Calculando insights...</h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Processando dados agregados da equipe. Isso pode levar alguns segundos.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* State: Insufficient Data */}
+        {insightsState === 'insufficient' && !isCalculating && (
           <Card>
             <CardContent className="text-center py-12">
               <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">Dados insuficientes</h3>
-              <p className="text-muted-foreground max-w-md mx-auto">
-                São necessários pelo menos 3 colaboradores com a jornada completa 
-                para gerar relatórios consolidados e garantir o anonimato.
+              <p className="text-muted-foreground max-w-md mx-auto mb-4">
+                São necessários pelo menos <strong>{MINIMUM_THRESHOLD} colaboradores</strong> com a jornada completa 
+                e compartilhamento ativado para gerar relatórios consolidados e garantir o anonimato.
               </p>
-              <div className="mt-4">
-                <Badge variant="outline">
-                  {insights?.completed_assessments || 0}/3 jornadas completas
+              <div className="flex flex-col items-center gap-3">
+                <Badge variant="outline" className="text-base px-4 py-2">
+                  {insights?.completed_assessments || 0}/{MINIMUM_THRESHOLD} jornadas completas
                 </Badge>
+                <p className="text-sm text-muted-foreground">
+                  Convide mais colaboradores ou aguarde que completem suas jornadas.
+                </p>
               </div>
             </CardContent>
           </Card>
-        ) : (
+        )}
+
+        {/* State: Error */}
+        {insightsState === 'error' && !isCalculating && (
+          <Card>
+            <CardContent className="text-center py-12">
+              <AlertTriangle className="w-12 h-12 text-destructive mx-auto mb-4" />
+              <h3 className="text-lg font-medium mb-2">Erro ao carregar dados</h3>
+              <p className="text-muted-foreground max-w-md mx-auto mb-4">
+                Não foi possível carregar os insights da equipe. Tente novamente.
+              </p>
+              <Button onClick={handleRecalculate} disabled={isCalculating}>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Tentar novamente
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* State: Ready - Show full insights */}
+        {hasEnoughData && !isCalculating && (
           <div className="space-y-6">
+            {/* Summary Card */}
+            <Card className="bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
+              <CardContent className="flex items-center gap-4 py-4">
+                <CheckCircle2 className="w-8 h-8 text-green-600 flex-shrink-0" />
+                <div>
+                  <h4 className="font-medium text-green-700 dark:text-green-400">
+                    Insights disponíveis
+                  </h4>
+                  <p className="text-sm text-green-600/80 dark:text-green-500/80">
+                    Baseado em {insights?.calculation_member_count || insights?.completed_assessments || 0} colaboradores 
+                    com jornada completa e compartilhamento ativo
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Distribution Charts */}
             <div className="grid gap-6 md:grid-cols-2">
               {/* Temperament Distribution */}
