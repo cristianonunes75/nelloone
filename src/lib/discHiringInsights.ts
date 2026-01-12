@@ -1,27 +1,95 @@
 // DISC Hiring Insights - B2B Decision-Focused Data
 // Provides actionable insights for HR and managers
+// Uses PREDOMINANCE labels (Principal, Secundário) instead of absolute levels (Alta, Média, Baixa)
 
 export interface HiringInsights {
-  levelLabels: Record<string, string>;
   strengths: string[];
   workplaceRisks: string[];
   leadershipGuide: string[];
   contextIndication: string;
 }
 
+// Predominance labels for recruitment context
+export const PREDOMINANCE_LABELS: Record<number, string> = {
+  0: "Principal",
+  1: "Secundário",
+  2: "Terciário",
+  3: "Quaternário",
+};
+
+// Ranking item structure
+export interface RankedProfile {
+  key: string;
+  value: number;
+  label: string;
+  isTop: boolean;
+  orderIndex: number;
+}
+
+/**
+ * Creates a ranked list of profiles based on scores
+ * Returns profiles sorted by score with predominance labels
+ * Handles ties by using alphabetical order of keys
+ */
+export function getRankedProfiles<T extends Record<string, number>>(
+  scores: T,
+  validKeys: string[]
+): RankedProfile[] {
+  if (!scores) return [];
+  
+  // Filter only valid keys and create ranked items
+  const items = validKeys
+    .filter(key => key in scores && scores[key] !== undefined && scores[key] !== null)
+    .map(key => ({
+      key,
+      value: scores[key] || 0,
+    }));
+  
+  // Sort by value (descending), then by key (alphabetical) for ties
+  items.sort((a, b) => {
+    if (b.value !== a.value) return b.value - a.value;
+    return a.key.localeCompare(b.key);
+  });
+  
+  // Add labels and order info
+  return items.map((item, index) => ({
+    key: item.key,
+    value: item.value,
+    label: index <= 1 ? PREDOMINANCE_LABELS[index] : "", // Only show Principal and Secundário
+    isTop: index === 0,
+    orderIndex: index,
+  }));
+}
+
+/**
+ * Get DISC profiles ranked by predominance
+ */
+export function getDISCRankedProfiles(percentages: Record<string, number>): RankedProfile[] {
+  return getRankedProfiles(percentages, ['D', 'I', 'S', 'C']);
+}
+
+/**
+ * Get Temperament profiles ranked by predominance
+ */
+export function getTemperamentRankedProfiles(percentages: Record<string, number>): RankedProfile[] {
+  return getRankedProfiles(percentages, ['sanguineo', 'colerico', 'melancolico', 'fleumatico']);
+}
+
+// DEPRECATED - kept for backwards compatibility but should not be used in recruitment
 export const DISC_LEVEL_LABELS: Record<string, string> = {
   high: "Alta",
   medium: "Média", 
   low: "Baixa",
 };
 
-// Get level label based on percentage
+// DEPRECATED
 export function getDISCLevel(percentage: number): string {
   if (percentage >= 35) return "high";
   if (percentage >= 20) return "medium";
   return "low";
 }
 
+// DEPRECATED
 export function getDISCLevelLabel(percentage: number): string {
   const level = getDISCLevel(percentage);
   return DISC_LEVEL_LABELS[level];
@@ -30,7 +98,6 @@ export function getDISCLevelLabel(percentage: number): string {
 // DISC Hiring Insights - Focused on workplace decision
 export const DISC_HIRING_INSIGHTS: Record<string, HiringInsights> = {
   D: {
-    levelLabels: DISC_LEVEL_LABELS,
     strengths: [
       "Liderança natural em ambientes de meta",
       "Tomada de decisão rápida sob pressão",
@@ -54,7 +121,6 @@ export const DISC_HIRING_INSIGHTS: Record<string, HiringInsights> = {
     contextIndication: "Perfil indicado para ambientes dinâmicos, orientados a metas e com espaço para autonomia. Pode não performar bem em estruturas excessivamente hierarquizadas ou com baixa flexibilidade."
   },
   I: {
-    levelLabels: DISC_LEVEL_LABELS,
     strengths: [
       "Excelente comunicação e articulação",
       "Capacidade de engajar e motivar equipes",
@@ -78,7 +144,6 @@ export const DISC_HIRING_INSIGHTS: Record<string, HiringInsights> = {
     contextIndication: "Perfil indicado para posições com alta interação humana, vendas, atendimento ou liderança motivacional. Pode ter dificuldades em funções isoladas ou altamente técnicas sem interação."
   },
   S: {
-    levelLabels: DISC_LEVEL_LABELS,
     strengths: [
       "Consistência e confiabilidade nas entregas",
       "Excelente trabalho em equipe",
@@ -102,7 +167,6 @@ export const DISC_HIRING_INSIGHTS: Record<string, HiringInsights> = {
     contextIndication: "Perfil indicado para ambientes estáveis, funções que exigem consistência e trabalho em equipe. Pode ter dificuldades em startups caóticas ou posições com mudanças frequentes."
   },
   C: {
-    levelLabels: DISC_LEVEL_LABELS,
     strengths: [
       "Atenção excepcional a detalhes",
       "Análise crítica e precisão",
@@ -130,7 +194,6 @@ export const DISC_HIRING_INSIGHTS: Record<string, HiringInsights> = {
 // Temperament Hiring Insights
 export const TEMPERAMENT_HIRING_INSIGHTS: Record<string, HiringInsights> = {
   colerico: {
-    levelLabels: DISC_LEVEL_LABELS,
     strengths: [
       "Energia e iniciativa para novos projetos",
       "Liderança natural e visão estratégica",
@@ -154,7 +217,6 @@ export const TEMPERAMENT_HIRING_INSIGHTS: Record<string, HiringInsights> = {
     contextIndication: "Indicado para liderança de projetos, vendas competitivas ou turnaround. Requer gestor que equilibre sua energia com limites claros."
   },
   sanguineo: {
-    levelLabels: DISC_LEVEL_LABELS,
     strengths: [
       "Criatividade e pensamento inovador",
       "Habilidade social excepcional",
@@ -178,7 +240,6 @@ export const TEMPERAMENT_HIRING_INSIGHTS: Record<string, HiringInsights> = {
     contextIndication: "Indicado para funções criativas, comerciais ou de relacionamento. Precisa de estrutura externa para manter consistência."
   },
   melancolico: {
-    levelLabels: DISC_LEVEL_LABELS,
     strengths: [
       "Profundidade de análise",
       "Comprometimento com qualidade",
@@ -202,7 +263,6 @@ export const TEMPERAMENT_HIRING_INSIGHTS: Record<string, HiringInsights> = {
     contextIndication: "Indicado para funções analíticas, criativas ou de suporte. Precisa de ambiente psicologicamente seguro para florescer."
   },
   fleumatico: {
-    levelLabels: DISC_LEVEL_LABELS,
     strengths: [
       "Estabilidade emocional admirável",
       "Capacidade de mediar conflitos",

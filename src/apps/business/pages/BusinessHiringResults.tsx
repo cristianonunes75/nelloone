@@ -14,7 +14,8 @@ import { DISC_PROFILES, type DISCScores } from "@/lib/disc";
 import { 
   DISC_HIRING_INSIGHTS, 
   TEMPERAMENT_HIRING_INSIGHTS, 
-  getDISCLevelLabel,
+  getDISCRankedProfiles,
+  getTemperamentRankedProfiles,
   getCombinedProfileInsights 
 } from "@/lib/discHiringInsights";
 
@@ -346,10 +347,14 @@ function DISCProfileCard({ result }: { result: any }) {
   const percentages = result.percentages as DISCScores;
   const primary = result.primary as keyof typeof DISC_PROFILES;
 
-  // Sort by percentage to show hierarchy
-  const sortedProfiles = (['D', 'I', 'S', 'C'] as const)
-    .map(key => ({ key, percentage: percentages[key] || 0 }))
-    .sort((a, b) => b.percentage - a.percentage);
+  // Get ranked profiles with predominance labels - convert to Record<string, number>
+  const percentagesRecord: Record<string, number> = {
+    D: percentages?.D || 0,
+    I: percentages?.I || 0,
+    S: percentages?.S || 0,
+    C: percentages?.C || 0,
+  };
+  const rankedProfiles = getDISCRankedProfiles(percentagesRecord);
 
   return (
     <Card>
@@ -360,28 +365,32 @@ function DISCProfileCard({ result }: { result: any }) {
         </CardTitle>
         <CardDescription>
           {DISC_PROFILES[primary]?.shortDescription?.pt}
+          <span className="block mt-1 text-xs opacity-70">
+            Os rótulos indicam predominância relativa entre os fatores, não nível absoluto.
+          </span>
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {sortedProfiles.map(({ key, percentage }, index) => {
-            const profile = DISC_PROFILES[key];
-            const isPrimary = index === 0;
+          {rankedProfiles.map(({ key, label, isTop, orderIndex }) => {
+            const profile = DISC_PROFILES[key as keyof typeof DISC_PROFILES];
             
             return (
               <div 
                 key={key} 
-                className={`p-4 rounded-lg border ${isPrimary ? 'border-primary bg-primary/5' : 'border-border'}`}
+                className={`p-4 rounded-lg border ${isTop ? 'border-primary bg-primary/5' : 'border-border'}`}
               >
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xl">{profile.emoji}</span>
+                  <span className="text-xl">{profile?.emoji}</span>
                   <span className="font-medium text-sm">{DISC_LABELS[key]}</span>
                 </div>
-                <p className={`text-lg font-bold ${isPrimary ? 'text-primary' : 'text-muted-foreground'}`}>
-                  {getDISCLevelLabel(percentage)}
-                </p>
-                {isPrimary && (
-                  <Badge variant="default" className="mt-2 text-xs">Principal</Badge>
+                {label && (
+                  <Badge 
+                    variant={isTop ? "default" : "secondary"} 
+                    className="text-xs"
+                  >
+                    {label}
+                  </Badge>
                 )}
               </div>
             );
@@ -397,6 +406,17 @@ function TemperamentProfileCard({ result }: { result: any }) {
   const primary = result.primary;
   const ranking = result.ranking || [];
 
+  // Build percentages from ranking for the ranking function
+  const percentages: Record<string, number> = {};
+  ranking.forEach((item: any) => {
+    if (item.temperament) {
+      percentages[item.temperament] = item.percentage || 0;
+    }
+  });
+
+  // Get ranked profiles with predominance labels
+  const rankedProfiles = getTemperamentRankedProfiles(percentages);
+
   return (
     <Card>
       <CardHeader>
@@ -406,29 +426,32 @@ function TemperamentProfileCard({ result }: { result: any }) {
         </CardTitle>
         <CardDescription>
           {primary?.description}
+          <span className="block mt-1 text-xs opacity-70">
+            Predominância relativa entre temperamentos.
+          </span>
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {ranking.slice(0, 4).map((item: any, index: number) => {
-            const tempData = temperamentData[item.temperament];
-            const isPrimary = index === 0;
-            const level = item.percentage >= 35 ? "Alta" : item.percentage >= 20 ? "Média" : "Baixa";
+          {rankedProfiles.map(({ key, label, isTop }) => {
+            const tempData = temperamentData[key];
             
             return (
               <div 
-                key={item.temperament} 
-                className={`p-4 rounded-lg border ${isPrimary ? 'border-primary bg-primary/5' : 'border-border'}`}
+                key={key} 
+                className={`p-4 rounded-lg border ${isTop ? 'border-primary bg-primary/5' : 'border-border'}`}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xl">{tempData?.emoji}</span>
                   <span className="font-medium text-sm">{tempData?.name}</span>
                 </div>
-                <p className={`text-lg font-bold ${isPrimary ? 'text-primary' : 'text-muted-foreground'}`}>
-                  {level}
-                </p>
-                {isPrimary && (
-                  <Badge variant="default" className="mt-2 text-xs">Principal</Badge>
+                {label && (
+                  <Badge 
+                    variant={isTop ? "default" : "secondary"} 
+                    className="text-xs"
+                  >
+                    {label}
+                  </Badge>
                 )}
               </div>
             );
