@@ -14,6 +14,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { GeoRedirect } from "@/components/GeoRedirect";
 import { CurrencyProtection } from "@/components/CurrencyProtection";
 import { AffiliateTracker } from "@/hooks/useAffiliateTracking";
+import { useVersionCheck } from "@/hooks/useVersionCheck";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Cliente from "./pages/Cliente";
@@ -35,7 +36,14 @@ import CheckoutSuccess from "./pages/CheckoutSuccess";
 import RelatorioConjugePublico from "./pages/RelatorioConjugePublico";
 import RelatorioContextualPublico from "./pages/RelatorioContextualPublico";
 import ResetPassword from "./pages/ResetPassword";
+
 const queryClient = new QueryClient();
+
+// Component to run version check hook
+const VersionChecker = ({ children }: { children: React.ReactNode }) => {
+  useVersionCheck();
+  return <>{children}</>;
+};
 
 // Reusable route definitions
 const AppRoutes = () => (
@@ -420,29 +428,31 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <NelloAppProvider>
-          <LanguageProvider>
-            <SimulationProvider>
-              <AuthProvider>
-                <ImpersonateProvider>
-                  {/* GEO-routing: Automatically redirects based on IP location */}
-                  <GeoRedirect />
-                  {/* Affiliate tracking: Captures referral codes from URL */}
-                  <AffiliateTracker />
-                  {/* Currency Protection: Prevents cross-trade between BRL and USD */}
-                  <CurrencyProtection>
-                    <LanguageRoute>
-                      {/* Nello App Router: Routes to Flow, Life, or One based on subdomain */}
-                      <NelloAppRouter>
-                        <AppRoutes />
-                      </NelloAppRouter>
-                    </LanguageRoute>
-                  </CurrencyProtection>
-                </ImpersonateProvider>
-              </AuthProvider>
-            </SimulationProvider>
-          </LanguageProvider>
-        </NelloAppProvider>
+        <VersionChecker>
+          <NelloAppProvider>
+            <LanguageProvider>
+              <SimulationProvider>
+                <AuthProvider>
+                  <ImpersonateProvider>
+                    {/* GEO-routing: Automatically redirects based on IP location */}
+                    <GeoRedirect />
+                    {/* Affiliate tracking: Captures referral codes from URL */}
+                    <AffiliateTracker />
+                    {/* Currency Protection: Prevents cross-trade between BRL and USD */}
+                    <CurrencyProtection>
+                      <LanguageRoute>
+                        {/* Nello App Router: Routes to Flow, Life, or One based on subdomain */}
+                        <NelloAppRouter>
+                          <AppRoutes />
+                        </NelloAppRouter>
+                      </LanguageRoute>
+                    </CurrencyProtection>
+                  </ImpersonateProvider>
+                </AuthProvider>
+              </SimulationProvider>
+            </LanguageProvider>
+          </NelloAppProvider>
+        </VersionChecker>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
