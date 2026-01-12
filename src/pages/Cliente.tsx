@@ -40,7 +40,7 @@ import { ENNEAGRAM_PROFILES } from "@/lib/eneagrama";
 import { supabase } from "@/integrations/supabase/client";
 
 const Cliente = () => {
-  const { user, profile, signOut, userRole } = useAuth();
+  const { user, profile, signOut, userRole, isLoading: isAuthLoading } = useAuth();
   const { startTestAsync, userTests, resetTest } = useTests();
   const { isImpersonating, impersonatedUserName, impersonatedUserId, setImpersonation } = useImpersonate();
   const navigate = useNavigate();
@@ -48,11 +48,11 @@ const Cliente = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { language } = useLanguage();
-  
+
   // State for reset confirmation dialog
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [stepToReset, setStepToReset] = useState<any>(null);
-  
+
   // State to track if we're validating impersonation token
   const [isValidatingImpersonation, setIsValidatingImpersonation] = useState(() => {
     // Check if there's an impersonate token in the URL on initial load
@@ -61,77 +61,114 @@ const Cliente = () => {
   });
 
   // Handle impersonation token from URL (when admin opens this page in new tab)
+  // IMPORTANT: wait for auth to finish restoring session, otherwise the function call can go unauthenticated.
   useEffect(() => {
     const impersonateToken = searchParams.get("impersonate");
-    
-    if (impersonateToken && !isImpersonating) {
-      setIsValidatingImpersonation(true);
-      // Validate the impersonation token with the edge function
-      const validateAndSetImpersonation = async () => {
-        try {
-          const { data, error } = await supabase.functions.invoke('impersonate-user', {
-            body: { 
-              action: 'validate', 
-              sessionToken: impersonateToken 
-            }
-          });
 
-          if (error || !data?.valid) {
-            toast({
-              title: "Sessão de simulação inválida",
-              description: "O token expirou ou não é válido.",
-              variant: "destructive",
-            });
-            // Remove the invalid token from URL
-            searchParams.delete("impersonate");
-            setSearchParams(searchParams);
-            setIsValidatingImpersonation(false);
-            return;
-          }
-
-          // The edge function already validated and returns the target user ID
-          const targetUserId = data.targetUserId;
-          
-          // Get user name for display
-          const { data: profileData } = await supabase
-            .from("profiles")
-            .select("full_name")
-            .eq("id", targetUserId)
-            .single();
-
-          const targetUserName = profileData?.full_name || "Usuário";
-          
-          // Set the impersonation context (this also stores in sessionStorage)
-          setImpersonation(targetUserId, targetUserName, impersonateToken);
-          
-          // Remove the token from URL for security
-          searchParams.delete("impersonate");
-          setSearchParams(searchParams);
-          
-          // Invalidate queries to refetch with new user ID
-          queryClient.invalidateQueries({ queryKey: ["target-user-tests"] });
-          queryClient.invalidateQueries({ queryKey: ["user-tests"] });
-          
-          toast({
-            title: `Modo Simulação Ativado`,
-            description: `Você está visualizando a conta de ${targetUserName}`,
-          });
-        } catch (err) {
-          console.error("Error validating impersonation:", err);
-          searchParams.delete("impersonate");
-          setSearchParams(searchParams);
-        } finally {
-          setIsValidatingImpersonation(false);
-        }
-      };
-
-      validateAndSetImpersonation();
-    } else if (!searchParams.get("impersonate")) {
-      // No token in URL, not validating
+    if (!impersonateToken) {
       setIsValidatingImpersonation(false);
+      return;
     }
-  }, [searchParams, isImpersonating, setImpersonation, setSearchParams, toast, queryClient]);
 
+    // Keep the loading screen up while auth is still hydrating
+    if (isAuthLoading) {
+      setIsValidatingImpersonation(true);
+      return;
+    }
+
+    // If there's a token but the user isn't logged in, we can't validate (requires admin auth)
+    if (!user) {
+      toast({
+        title: "Sessão de simulação inválida",
+        description: "Faça login como administrador para validar esta sessão.",
+        variant: "destructive",
+      });
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("impersonate");
+        return next;
+      });
+      setIsValidatingImpersonation(false);
+      return;
+    }
+
+    if (isImpersonating) {
+      // Already impersonating via sessionStorage; strip token from URL for safety.
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("impersonate");
+        return next;
+      });
+      setIsValidatingImpersonation(false);
+      return;
+    }
+
+    setIsValidatingImpersonation(true);
+
+    const validateAndSetImpersonation = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("impersonate-user", {
+          body: {
+            action: "validate",
+            sessionToken: impersonateToken,
+          },
+        });
+
+        if (error || !data?.valid) {
+          toast({
+            title: "Sessão de simulação inválida",
+            description: "O token expirou ou não é válido.",
+            variant: "destructive",
+          });
+          setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.delete("impersonate");
+            return next;
+          });
+          return;
+        }
+
+        const targetUserId = data.targetUserId as string;
+
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", targetUserId)
+          .single();
+
+        const targetUserName = profileData?.full_name || "Usuário";
+
+        setImpersonation(targetUserId, targetUserName, impersonateToken);
+
+        // Remove the token from URL for security
+        setSearchParams((prev) => {
+          const next = new URLSearchParams(prev);
+          next.delete("impersonate");
+          return next;
+        });
+
+        // Invalidate queries to refetch with new user ID
+        queryClient.invalidateQueries({ queryKey: ["target-user-tests"] });
+        queryClient.invalidateQueries({ queryKey: ["user-tests"] });
+
+        toast({
+          title: `Modo Simulação Ativado`,
+          description: `Você está visualizando a conta de ${targetUserName}`,
+        });
+      } catch (err) {
+        console.error("Error validating impersonation:", err);
+        setSearchParams((prev) => {
+          const next = new URLSearchParams(prev);
+          next.delete("impersonate");
+          return next;
+        });
+      } finally {
+        setIsValidatingImpersonation(false);
+      }
+    };
+
+    validateAndSetImpersonation();
+  }, [searchParams, isImpersonating, isAuthLoading, user, setImpersonation, setSearchParams, toast, queryClient]);
   // These hooks depend on the impersonation state being set, so they'll refetch when it changes
   const {
     journeySteps, 
