@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useBusinessAuth } from "../hooks/useBusinessAuth";
 import { useBusinessEnforcement } from "../hooks/useBusinessEnforcement";
+import { useExistingUserCheck } from "../hooks/useExistingUserCheck";
 import { BusinessLayout } from "../components/BusinessLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,11 +12,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Plus, Users, Search, Mail, Eye, Clock, CheckCircle2, AlertCircle, Trash2, Send, Loader2, UserPlus, ClipboardList, RotateCcw, MoreHorizontal } from "lucide-react";
+import { Plus, Users, Search, Mail, Eye, Clock, CheckCircle2, AlertCircle, Trash2, Send, Loader2, UserPlus, ClipboardList, RotateCcw, MoreHorizontal, Download, Sparkles } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { format, formatDistanceToNow, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import debounce from "lodash/debounce";
 
 interface Candidate {
   id: string;
@@ -53,6 +56,7 @@ export default function BusinessHiring() {
   const navigate = useNavigate();
   const { companyUser, company } = useBusinessAuth();
   const enforcement = useBusinessEnforcement();
+  const { checkEmail, getResultForEmail, isChecking } = useExistingUserCheck(company?.id);
   
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [assessments, setAssessments] = useState<Assessment[]>([]);
@@ -71,6 +75,24 @@ export default function BusinessHiring() {
   });
   const [saving, setSaving] = useState(false);
   const [resendingId, setResendingId] = useState<string | null>(null);
+  const [importExisting, setImportExisting] = useState(true);
+  const [emailCheckResult, setEmailCheckResult] = useState<any>(null);
+  const [checkingEmail, setCheckingEmail] = useState(false);
+
+  // Debounced email check
+  const debouncedCheckEmail = useCallback(
+    debounce(async (email: string) => {
+      if (email && email.includes("@") && company?.id) {
+        setCheckingEmail(true);
+        const result = await checkEmail(email);
+        setEmailCheckResult(result);
+        setCheckingEmail(false);
+      } else {
+        setEmailCheckResult(null);
+      }
+    }, 500),
+    [checkEmail, company?.id]
+  );
 
   useEffect(() => {
     if (company?.id) {
@@ -132,9 +154,38 @@ export default function BusinessHiring() {
 
       if (error) throw error;
 
-      toast.success("Candidato adicionado com sucesso!");
+      // Check if we should import existing user data
+      if (importExisting && emailCheckResult?.exists && emailCheckResult?.has_completed_tests) {
+        try {
+          const importResponse = await supabase.functions.invoke("business-import-user-data", {
+            body: {
+              candidate_id: data.id,
+              email: newCandidate.email,
+              company_id: company.id,
+            },
+          });
+
+          if (importResponse.data?.success) {
+            toast.success(`Candidato adicionado! ${importResponse.data.message}`);
+          } else {
+            toast.success("Candidato adicionado com sucesso!");
+            if (importResponse.data?.message) {
+              toast.info(importResponse.data.message);
+            }
+          }
+        } catch (importError) {
+          console.error("Error importing user data:", importError);
+          toast.success("Candidato adicionado com sucesso!");
+          toast.info("Não foi possível importar dados existentes");
+        }
+      } else {
+        toast.success("Candidato adicionado com sucesso!");
+      }
+
       setDialogOpen(false);
       setNewCandidate({ full_name: "", email: "", phone: "", position_applied: "", notes: "" });
+      setEmailCheckResult(null);
+      setImportExisting(true);
       fetchCandidates();
     } catch (error: any) {
       console.error("Error creating candidate:", error);
@@ -142,6 +193,11 @@ export default function BusinessHiring() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleEmailChange = (email: string) => {
+    setNewCandidate(prev => ({ ...prev, email }));
+    debouncedCheckEmail(email);
   };
 
   const handleResendAssessment = async (candidateId: string, candidateName: string) => {
@@ -264,13 +320,70 @@ export default function BusinessHiring() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="email@exemplo.com"
-                    value={newCandidate.email}
-                    onChange={(e) => setNewCandidate(prev => ({ ...prev, email: e.target.value }))}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="email@exemplo.com"
+                      value={newCandidate.email}
+                      onChange={(e) => handleEmailChange(e.target.value)}
+                    />
+                    {checkingEmail && (
+                      <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+                    )}
+                  </div>
+                  
+                  {/* Existing user info */}
+                  {emailCheckResult && (
+                    <div className={`p-3 rounded-lg text-sm ${
+                      emailCheckResult.exists 
+                        ? "bg-primary/10 border border-primary/20" 
+                        : "bg-muted"
+                    }`}>
+                      {emailCheckResult.exists ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-primary font-medium">
+                            <Sparkles className="h-4 w-4" />
+                            <span>
+                              {emailCheckResult.first_name ? `${emailCheckResult.first_name} encontrado(a)` : "Usuário encontrado"} no Nello One!
+                            </span>
+                          </div>
+                          {emailCheckResult.has_completed_tests && (
+                            <p className="text-muted-foreground">
+                              {emailCheckResult.completed_tests_count} teste(s) completo(s) disponível(is) para importação
+                              {emailCheckResult.has_essence_code && " + Código da Essência"}
+                            </p>
+                          )}
+                          {!emailCheckResult.has_completed_tests && (
+                            <p className="text-muted-foreground">
+                              Sem testes DISC/Temperamentos completos
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground">
+                          Novo usuário - precisará realizar os testes
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Import checkbox */}
+                  {emailCheckResult?.exists && emailCheckResult?.has_completed_tests && (
+                    <div className="flex items-center space-x-2 pt-2">
+                      <Checkbox
+                        id="importExisting"
+                        checked={importExisting}
+                        onCheckedChange={(checked) => setImportExisting(checked === true)}
+                      />
+                      <label
+                        htmlFor="importExisting"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        Importar dados existentes (DISC, Temperamentos)
+                      </label>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">Telefone</Label>
