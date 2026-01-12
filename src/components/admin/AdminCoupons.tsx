@@ -22,7 +22,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Loader2, Plus, Ticket, RefreshCw, Copy, ExternalLink, Trash2 } from "lucide-react";
+import { Loader2, Plus, Ticket, RefreshCw, Copy, ExternalLink, Trash2, Building2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -51,6 +51,7 @@ const PRODUCT_OPTIONS = [
   { value: "eneagrama", label: "Eneagrama" },
   { value: "nello16", label: "Nello 16 Personality" },
   { value: "estilos_conexao", label: "Estilos de Conexão" },
+  { value: "nello_business", label: "🏢 Nello Business (Empresas)" },
 ];
 
 export const AdminCoupons = () => {
@@ -164,11 +165,20 @@ export const AdminCoupons = () => {
     }
   };
 
-  const copyCheckoutLink = (couponId: string) => {
+  const copyCheckoutLink = (couponId: string, isBusinessCoupon?: boolean) => {
     const baseUrl = window.location.origin;
-    const ptLink = `${baseUrl}/pt/pricing?promo=${couponId}`;
-    navigator.clipboard.writeText(ptLink);
+    // Se for cupom Business, gerar link para a landing do Business
+    const link = isBusinessCoupon 
+      ? `https://business.nello.one/?promo=${couponId}`
+      : `${baseUrl}/pt/pricing?promo=${couponId}`;
+    navigator.clipboard.writeText(link);
     toast.success("Link copiado!");
+  };
+
+  const copyBusinessLink = (couponId: string) => {
+    const businessLink = `https://business.nello.one/?promo=${couponId}`;
+    navigator.clipboard.writeText(businessLink);
+    toast.success("Link Business copiado!");
   };
 
   const handleDeleteCoupon = async (couponId: string) => {
@@ -291,8 +301,17 @@ export const AdminCoupons = () => {
                     </div>
                   )}
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => copyCheckoutLink(coupon.id)} title="Copiar link">
+                    <Button variant="ghost" size="sm" onClick={() => copyCheckoutLink(coupon.id)} title="Copiar link Nello One">
                       <Copy className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => copyBusinessLink(coupon.id)} 
+                      title="Copiar link Nello Business"
+                      className="text-amber-600 hover:text-amber-700"
+                    >
+                      <Building2 className="w-4 h-4" />
                     </Button>
                     <Button
                       variant="ghost"
