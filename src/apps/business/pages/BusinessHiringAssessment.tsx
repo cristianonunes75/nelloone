@@ -405,6 +405,52 @@ export default function BusinessHiringAssessment() {
     }
   };
 
+  // Parse results for completed phase - MUST be before any conditional returns
+  const completedResults = useMemo(() => {
+    if (phase !== "completed") return null;
+    
+    const discAssessment = assessments.find(a => a.test_type === "disc" && a.status === "completed");
+    const tempAssessment = assessments.find(a => a.test_type === "temperamentos" && a.status === "completed");
+    
+    let discResults = null;
+    let temperamentResults = null;
+    
+    if (discAssessment?.result_data) {
+      const data = discAssessment.result_data;
+      discResults = {
+        primary: data.primary || data.primaryProfile || 'D',
+        secondary: data.secondary || data.secondaryProfile || 'I',
+        percentages: data.percentages || data.scores || { D: 25, I: 25, S: 25, C: 25 },
+      };
+    }
+    
+    if (tempAssessment?.result_data) {
+      const data = tempAssessment.result_data;
+      const primary = data.primary?.type || data.primaryTemperament || 'sanguineo';
+      const secondary = data.secondary?.type || data.secondaryTemperament || 'colerico';
+      
+      // Build percentages from scores or use existing
+      let percentages = { sanguineo: 25, colerico: 25, melancolico: 25, fleumatico: 25 };
+      if (data.percentages) {
+        percentages = data.percentages;
+      } else if (data.scores) {
+        const total = Object.values(data.scores as Record<string, number>).reduce((a, b) => a + b, 0);
+        if (total > 0) {
+          percentages = {
+            sanguineo: ((data.scores.sanguineo || 0) / total) * 100,
+            colerico: ((data.scores.colerico || 0) / total) * 100,
+            melancolico: ((data.scores.melancolico || 0) / total) * 100,
+            fleumatico: ((data.scores.fleumatico || 0) / total) * 100,
+          };
+        }
+      }
+      
+      temperamentResults = { primary, secondary, percentages };
+    }
+    
+    return { discResults, temperamentResults };
+  }, [phase, assessments]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-background">
@@ -670,51 +716,6 @@ export default function BusinessHiringAssessment() {
     );
   }
 
-  // Parse results for completed phase
-  const completedResults = useMemo(() => {
-    if (phase !== "completed") return null;
-    
-    const discAssessment = assessments.find(a => a.test_type === "disc" && a.status === "completed");
-    const tempAssessment = assessments.find(a => a.test_type === "temperamentos" && a.status === "completed");
-    
-    let discResults = null;
-    let temperamentResults = null;
-    
-    if (discAssessment?.result_data) {
-      const data = discAssessment.result_data;
-      discResults = {
-        primary: data.primary || data.primaryProfile || 'D',
-        secondary: data.secondary || data.secondaryProfile || 'I',
-        percentages: data.percentages || data.scores || { D: 25, I: 25, S: 25, C: 25 },
-      };
-    }
-    
-    if (tempAssessment?.result_data) {
-      const data = tempAssessment.result_data;
-      const primary = data.primary?.type || data.primaryTemperament || 'sanguineo';
-      const secondary = data.secondary?.type || data.secondaryTemperament || 'colerico';
-      
-      // Build percentages from scores or use existing
-      let percentages = { sanguineo: 25, colerico: 25, melancolico: 25, fleumatico: 25 };
-      if (data.percentages) {
-        percentages = data.percentages;
-      } else if (data.scores) {
-        const total = Object.values(data.scores as Record<string, number>).reduce((a, b) => a + b, 0);
-        if (total > 0) {
-          percentages = {
-            sanguineo: ((data.scores.sanguineo || 0) / total) * 100,
-            colerico: ((data.scores.colerico || 0) / total) * 100,
-            melancolico: ((data.scores.melancolico || 0) / total) * 100,
-            fleumatico: ((data.scores.fleumatico || 0) / total) * 100,
-          };
-        }
-      }
-      
-      temperamentResults = { primary, secondary, percentages };
-    }
-    
-    return { discResults, temperamentResults };
-  }, [phase, assessments]);
 
   // Completed phase
   if (phase === "completed") {
