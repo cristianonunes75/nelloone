@@ -116,7 +116,27 @@ export default function BusinessHiringResults() {
         .eq("candidate_id", candidateId);
 
       if (assessmentsError) throw assessmentsError;
-      setAssessments(assessmentsData || []);
+
+      // Normalize legacy/alternate result_data shapes (e.g. imported user_tests)
+      const normalizedAssessments = (assessmentsData || []).map((a: any) => {
+        if (a?.test_type === "disc" && a?.result_data) {
+          const rd = a.result_data;
+          // Some sources store DISC as { scores: {D,I,S,C}, dominantProfile: 'D' }
+          if (!rd.percentages && rd.scores && typeof rd.scores === 'object') {
+            return {
+              ...a,
+              result_data: {
+                ...rd,
+                percentages: rd.scores,
+                primary: rd.primary ?? rd.dominantProfile,
+              },
+            };
+          }
+        }
+        return a;
+      });
+
+      setAssessments(normalizedAssessments);
     } catch (error) {
       console.error("Error fetching candidate:", error);
     } finally {
