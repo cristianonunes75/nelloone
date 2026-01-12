@@ -12,7 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Plus, Users, Search, Mail, Eye, Clock, CheckCircle2, AlertCircle, Trash2, Send, Loader2, UserPlus, ClipboardList } from "lucide-react";
+import { Plus, Users, Search, Mail, Eye, Clock, CheckCircle2, AlertCircle, Trash2, Send, Loader2, UserPlus, ClipboardList, RotateCcw, MoreHorizontal } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { format, formatDistanceToNow, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -69,6 +70,7 @@ export default function BusinessHiring() {
     notes: ""
   });
   const [saving, setSaving] = useState(false);
+  const [resendingId, setResendingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (company?.id) {
@@ -139,6 +141,33 @@ export default function BusinessHiring() {
       toast.error(error.message || "Erro ao adicionar candidato");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleResendAssessment = async (candidateId: string, candidateName: string) => {
+    setResendingId(candidateId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Sessão expirada");
+        return;
+      }
+
+      const response = await supabase.functions.invoke("business-resend-assessment", {
+        body: { candidate_id: candidateId },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || "Erro ao reenviar avaliação");
+      }
+
+      toast.success(`Avaliação reenviada para ${candidateName}!`);
+      fetchCandidates(); // Refresh list
+    } catch (error: any) {
+      console.error("Error resending assessment:", error);
+      toast.error(error.message || "Erro ao reenviar avaliação");
+    } finally {
+      setResendingId(null);
     }
   };
 
@@ -429,6 +458,29 @@ export default function BusinessHiring() {
                           <Eye className="h-3.5 w-3.5" />
                           Ver Resultados
                         </Button>
+                        
+                        {/* More actions dropdown */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-background">
+                            <DropdownMenuItem 
+                              onClick={() => handleResendAssessment(candidate.id, candidate.full_name)}
+                              disabled={resendingId === candidate.id}
+                              className="gap-2"
+                            >
+                              {resendingId === candidate.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <RotateCcw className="h-4 w-4" />
+                              )}
+                              Reenviar Testes
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                   </CardContent>
