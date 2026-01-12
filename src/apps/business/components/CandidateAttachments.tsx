@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Paperclip, Upload, Loader2, X, Trash2, Image, ZoomIn, Sparkles, ScanSearch, CheckCircle2 } from "lucide-react";
+import { Paperclip, Upload, Loader2, X, Trash2, Image, ZoomIn, Sparkles, ScanSearch, CheckCircle2, Download } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -23,16 +24,21 @@ interface Attachment {
 
 interface CandidateAttachmentsProps {
   candidateId: string;
+  candidateEmail: string;
+  companyId: string;
   attachments: Attachment[];
   onUpdate: () => void;
 }
 
-export function CandidateAttachments({ candidateId, attachments, onUpdate }: CandidateAttachmentsProps) {
+export function CandidateAttachments({ candidateId, candidateEmail, companyId, attachments, onUpdate }: CandidateAttachmentsProps) {
   const [uploading, setUploading] = useState(false);
   const [scanning, setScanning] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importEmail, setImportEmail] = useState("");
+  const [importing, setImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,6 +172,45 @@ export function CandidateAttachments({ candidateId, attachments, onUpdate }: Can
     }
   };
 
+  const handleImportFromUser = async () => {
+    if (!importEmail.trim()) {
+      toast.error("Digite um email válido");
+      return;
+    }
+
+    setImporting(true);
+    try {
+      const response = await supabase.functions.invoke("business-import-user-data", {
+        body: {
+          candidate_id: candidateId,
+          email: importEmail.trim(),
+          company_id: companyId,
+        },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || "Erro ao importar");
+      }
+
+      const result = response.data;
+      
+      if (result.success) {
+        toast.success(result.message);
+        setImportDialogOpen(false);
+        setImportEmail("");
+        onUpdate();
+      } else {
+        toast.error(result.message || "Não foi possível importar os dados");
+      }
+    } catch (error: unknown) {
+      console.error("Error importing:", error);
+      const errorMessage = error instanceof Error ? error.message : "Erro ao importar dados";
+      toast.error(errorMessage);
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const handleDelete = async (attachmentId: string) => {
     setDeleting(true);
     try {
@@ -221,7 +266,7 @@ export function CandidateAttachments({ candidateId, attachments, onUpdate }: Can
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Upload Button */}
+        {/* Upload and Import Buttons */}
         <div className="flex items-center gap-3 flex-wrap">
           <Input
             ref={fileInputRef}
@@ -250,8 +295,19 @@ export function CandidateAttachments({ candidateId, attachments, onUpdate }: Can
               </>
             )}
           </Button>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setImportEmail(candidateEmail);
+              setImportDialogOpen(true);
+            }}
+            className="gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Importar Testes
+          </Button>
           <span className="text-xs text-muted-foreground">
-            PNG, JPG até 5MB • Prints de resultados serão escaneados automaticamente
+            Prints de resultados serão escaneados automaticamente pela IA
           </span>
         </div>
 
@@ -382,6 +438,43 @@ export function CandidateAttachments({ candidateId, attachments, onUpdate }: Can
               >
                 {deleting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
                 Remover
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Import Tests Dialog */}
+        <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Importar Testes de Usuário</DialogTitle>
+              <DialogDescription>
+                Importe os testes DISC e Temperamentos já realizados por um usuário no Nello.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="import-email">Email do usuário</Label>
+                <Input
+                  id="import-email"
+                  type="email"
+                  placeholder="email@exemplo.com"
+                  value={importEmail}
+                  onChange={(e) => setImportEmail(e.target.value)}
+                  disabled={importing}
+                />
+                <p className="text-xs text-muted-foreground">
+                  O usuário deve ter completado os testes DISC e Temperamentos no Nello.
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setImportDialogOpen(false)} disabled={importing}>
+                Cancelar
+              </Button>
+              <Button onClick={handleImportFromUser} disabled={importing || !importEmail.trim()}>
+                {importing && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                Importar Dados
               </Button>
             </DialogFooter>
           </DialogContent>
