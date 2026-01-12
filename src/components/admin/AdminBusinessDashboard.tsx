@@ -37,6 +37,7 @@ import {
 import { format, parseISO, differenceInDays, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AdminBusinessCompanyDetail } from "./AdminBusinessCompanyDetail";
+import { AdminHealthAlerts } from "./AdminHealthAlerts";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -649,6 +650,9 @@ export const AdminBusinessDashboard = () => {
           </div>
         </div>
       </Card>
+
+      {/* Health Alerts Section */}
+      <AdminHealthAlerts />
 
       {/* Companies List with Tabs */}
       <Card className="border-border/40 rounded-2xl shadow-soft overflow-hidden">

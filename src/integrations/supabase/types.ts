@@ -416,6 +416,59 @@ export type Database = {
         }
         Relationships: []
       }
+      business_health_alerts: {
+        Row: {
+          alert_type: string
+          company_id: string
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          alert_type: string
+          company_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          alert_type?: string
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_health_alerts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_pricing_tiers: {
         Row: {
           created_at: string
