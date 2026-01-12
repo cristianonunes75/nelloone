@@ -133,7 +133,7 @@ serve(async (req) => {
       .from("user_tests")
       .select(`
         id,
-        test_type,
+        test_id,
         result_data,
         completed_at,
         tests!inner (
@@ -141,20 +141,26 @@ serve(async (req) => {
         )
       `)
       .eq("user_id", existingUser.id)
-      .eq("status", "completed")
-      .in("test_type", ["disc", "temperamentos"]);
+      .eq("status", "completed");
 
     if (testsError) {
       logStep("Error fetching user tests", { error: testsError.message });
       throw testsError;
     }
 
-    if (!userTests || userTests.length === 0) {
+    // Filter for DISC and Temperamentos tests only
+    const relevantTests = userTests?.filter(test => {
+      const testsData = test.tests as unknown as { type: string };
+      const testType = testsData?.type;
+      return testType === "disc" || testType === "temperamentos";
+    }) || [];
+
+    if (relevantTests.length === 0) {
       logStep("No completed tests found for user");
       const result: ImportResult = {
         success: false,
         imported_tests: [],
-        message: "Usuário não possui testes completos para importar",
+        message: "Usuário não possui testes DISC ou Temperamentos completos para importar",
         user_id: existingUser.id,
       };
       return new Response(JSON.stringify(result), {
@@ -163,7 +169,7 @@ serve(async (req) => {
       });
     }
 
-    logStep("Found completed tests", { count: userTests.length, types: userTests.map(t => t.test_type) });
+    logStep("Found completed tests", { count: relevantTests.length, types: relevantTests.map(t => (t.tests as unknown as { type: string })?.type) });
 
     // Get the candidate's assessments
     const { data: candidateAssessments, error: assessmentsError } = await supabaseAdmin
@@ -179,8 +185,9 @@ serve(async (req) => {
     const importedTests: string[] = [];
 
     // Import each test
-    for (const userTest of userTests) {
-      const testType = userTest.test_type;
+    for (const userTest of relevantTests) {
+      const testsData = userTest.tests as unknown as { type: string };
+      const testType = testsData?.type;
       const assessment = candidateAssessments?.find(a => a.test_type === testType);
 
       if (assessment) {
