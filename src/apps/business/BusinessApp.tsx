@@ -12,6 +12,10 @@ import BusinessCollaboratorRedirect from './pages/BusinessCollaboratorRedirect';
 import BusinessHiring from './pages/BusinessHiring';
 import BusinessHiringResults from './pages/BusinessHiringResults';
 import BusinessHiringAssessment from './pages/BusinessHiringAssessment';
+import BusinessJobs from './pages/BusinessJobs';
+import BusinessJobDetail from './pages/BusinessJobDetail';
+import BusinessJobPublic from './pages/BusinessJobPublic';
+import BusinessApplicationConfirm from './pages/BusinessApplicationConfirm';
 import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
 
 /**
@@ -33,6 +37,10 @@ export default function BusinessApp() {
       <Route path="/" element={<BusinessLanding />} />
       <Route path="/auth" element={<BusinessAuth />} />
       <Route path="/invite/:token" element={<BusinessAcceptInvite />} />
+      
+      {/* Public job routes */}
+      <Route path="/vaga/:slug" element={<BusinessJobPublic />} />
+      <Route path="/confirmar/:token" element={<BusinessApplicationConfirm />} />
       
       {/* Company Admin routes */}
       <Route path="/onboarding" element={
@@ -73,6 +81,18 @@ export default function BusinessApp() {
       <Route path="/hiring/:candidateId" element={
         <BusinessProtectedRoute requiredRole="company_admin">
           <BusinessHiringResults />
+        </BusinessProtectedRoute>
+      } />
+      
+      {/* Jobs module routes */}
+      <Route path="/jobs" element={
+        <BusinessProtectedRoute requiredRole="company_admin">
+          <BusinessJobs />
+        </BusinessProtectedRoute>
+      } />
+      <Route path="/jobs/:jobId" element={
+        <BusinessProtectedRoute requiredRole="company_admin">
+          <BusinessJobDetail />
         </BusinessProtectedRoute>
       } />
       
