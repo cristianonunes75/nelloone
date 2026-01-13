@@ -428,13 +428,13 @@ export default function BusinessHiringResults() {
                   {/* 4. Temperamento */}
                   <TemperamentProfileCard result={temperamentAssessment.result_data} />
 
-                  {/* 5. Pontos Fortes - Uses calculated primary */}
+                  {/* 5. Tendências Observáveis - Uses calculated primary */}
                   <StrengthsCard 
                     discPrimary={calculatedDiscPrimary}
                     temperamentPrimary={tempPrimary}
                   />
 
-                  {/* 6. Riscos no Ambiente de Trabalho - Uses calculated primary */}
+                  {/* 6. Pontos de Atenção - Uses calculated primary */}
                   <WorkplaceRisksCard 
                     discPrimary={calculatedDiscPrimary}
                     temperamentPrimary={tempPrimary}
@@ -741,9 +741,9 @@ function StrengthsCard({ discPrimary, temperamentPrimary }: { discPrimary: strin
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-green-700">
           <Target className="h-5 w-5" />
-          Pontos Fortes
+          Tendências Observáveis
         </CardTitle>
-        <CardDescription>Comportamentos observáveis no ambiente de trabalho</CardDescription>
+        <CardDescription>Padrões comportamentais identificados no contexto avaliado</CardDescription>
       </CardHeader>
       <CardContent>
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -777,9 +777,9 @@ function WorkplaceRisksCard({ discPrimary, temperamentPrimary }: { discPrimary: 
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-amber-700">
           <AlertTriangle className="h-5 w-5" />
-          Riscos no Ambiente de Trabalho
+          Pontos de Atenção
         </CardTitle>
-        <CardDescription>Contextos que podem gerar atrito ou dificuldade</CardDescription>
+        <CardDescription>Contextos que podem requerer adaptação ou suporte</CardDescription>
       </CardHeader>
       <CardContent>
         <ul className="space-y-3">
@@ -840,7 +840,9 @@ function ContextIndicationCard({ discPrimary, temperamentPrimary }: { discPrimar
           <Compass className="h-5 w-5 text-primary" />
           Indicação de Contexto
         </CardTitle>
-        <CardDescription>Síntese decisória para recrutamento</CardDescription>
+        <CardDescription>
+          Síntese observacional para apoio à decisão (não determinante)
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="p-4 rounded-lg bg-background border">

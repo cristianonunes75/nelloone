@@ -621,7 +621,8 @@ export default function BusinessHiringAssessment() {
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-blue-800">
               <p>• Seus dados serão utilizados <strong>exclusivamente</strong> para este processo seletivo</p>
-              <p>• Esta não é uma avaliação psicológica ou diagnóstico clínico</p>
+              <p>• Este mapeamento descreve tendências comportamentais, não é diagnóstico ou avaliação psicológica</p>
+              <p>• Os resultados não determinam adequação a posições — são apenas um dos muitos critérios utilizados</p>
               <p>• Você pode solicitar a exclusão dos seus dados a qualquer momento entrando em contato com {companyName}</p>
               <p>• Os resultados são confidenciais e acessíveis apenas pela equipe de recrutamento</p>
             </CardContent>
