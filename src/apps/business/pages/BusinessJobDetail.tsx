@@ -274,10 +274,16 @@ export default function BusinessJobDetail() {
 
       if (error) throw error;
 
-      // If a PDF resume was uploaded, scan it for data extraction
+      // If a PDF or image resume was uploaded, scan it for data extraction
       if (uploadFile && data && filePath) {
-        const isPdf = uploadFile.name.toLowerCase().endsWith('.pdf');
-        if (isPdf) {
+        const fileName = uploadFile.name.toLowerCase();
+        const isScannableFile = fileName.endsWith('.pdf') || 
+                                fileName.endsWith('.jpg') || 
+                                fileName.endsWith('.jpeg') || 
+                                fileName.endsWith('.png') || 
+                                fileName.endsWith('.gif') || 
+                                fileName.endsWith('.webp');
+        if (isScannableFile) {
           toast.info("Escaneando currículo para extração de dados...");
           
           // Call the scan-resume edge function
@@ -367,9 +373,20 @@ export default function BusinessJobDetail() {
       return;
     }
 
-    const isPdf = app.resume_filename?.toLowerCase().endsWith('.pdf') || app.resume_url.toLowerCase().includes('.pdf');
-    if (!isPdf) {
-      toast.error("Apenas currículos em PDF podem ser escaneados");
+    const fileName = (app.resume_filename || app.resume_url || "").toLowerCase();
+    const isScannableFile = fileName.endsWith('.pdf') || 
+                            fileName.endsWith('.jpg') || 
+                            fileName.endsWith('.jpeg') || 
+                            fileName.endsWith('.png') || 
+                            fileName.endsWith('.gif') || 
+                            fileName.endsWith('.webp') ||
+                            fileName.includes('.pdf') ||
+                            fileName.includes('.jpg') ||
+                            fileName.includes('.jpeg') ||
+                            fileName.includes('.png');
+    
+    if (!isScannableFile) {
+      toast.error("Este arquivo não pode ser escaneado. Use PDF ou imagens (JPG, PNG)");
       return;
     }
 
@@ -568,11 +585,11 @@ export default function BusinessJobDetail() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="resume">Currículo (PDF/DOC)</Label>
+                    <Label htmlFor="resume">Currículo (PDF/DOC/Imagem)</Label>
                     <Input
                       id="resume"
                       type="file"
-                      accept=".pdf,.doc,.docx"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp,image/*"
                       onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
                     />
                   </div>

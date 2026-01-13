@@ -47,11 +47,12 @@ export function BulkResumeUpload({ open, onOpenChange, jobId, companyId, onCompl
     const droppedFiles = Array.from(e.dataTransfer.files).filter(
       file => file.type === "application/pdf" || 
               file.name.endsWith(".doc") || 
-              file.name.endsWith(".docx")
+              file.name.endsWith(".docx") ||
+              file.type.startsWith("image/")
     );
     
     if (droppedFiles.length === 0) {
-      toast.error("Por favor, selecione apenas arquivos PDF ou DOC/DOCX");
+      toast.error("Por favor, selecione arquivos PDF, DOC/DOCX ou imagens (JPG, PNG)");
       return;
     }
 
@@ -68,7 +69,8 @@ export function BulkResumeUpload({ open, onOpenChange, jobId, companyId, onCompl
     const validFiles = newFiles.filter(
       file => file.type === "application/pdf" || 
               file.name.endsWith(".doc") || 
-              file.name.endsWith(".docx")
+              file.name.endsWith(".docx") ||
+              file.type.startsWith("image/")
     );
 
     // Avoid duplicates
@@ -107,8 +109,8 @@ export function BulkResumeUpload({ open, onOpenChange, jobId, companyId, onCompl
 
         // Upload file to storage
         const fileExt = fileStatus.file.name.split('.').pop();
-        const fileName = `${crypto.randomUUID()}.${fileExt}`;
-        const filePath = `${companyId}/${jobId}/${fileName}`;
+        const storageName = `${crypto.randomUUID()}.${fileExt}`;
+        const filePath = `${companyId}/${jobId}/${storageName}`;
 
         const { error: uploadError } = await supabase.storage
           .from("resumes")
@@ -144,9 +146,15 @@ export function BulkResumeUpload({ open, onOpenChange, jobId, companyId, onCompl
           idx === i ? { ...f, status: "scanning", applicationId: appData.id } : f
         ));
 
-        // Trigger resume scanning for PDFs
-        const isPdf = fileStatus.file.name.toLowerCase().endsWith('.pdf');
-        if (isPdf) {
+        // Trigger resume scanning for PDFs and images
+        const fileName = fileStatus.file.name.toLowerCase();
+        const isScannableFile = fileName.endsWith('.pdf') || 
+                                fileName.endsWith('.jpg') || 
+                                fileName.endsWith('.jpeg') || 
+                                fileName.endsWith('.png') || 
+                                fileName.endsWith('.gif') || 
+                                fileName.endsWith('.webp');
+        if (isScannableFile) {
           supabase.functions.invoke("scan-resume", {
             body: {
               application_id: appData.id,
@@ -237,7 +245,7 @@ export function BulkResumeUpload({ open, onOpenChange, jobId, companyId, onCompl
             <input
               type="file"
               multiple
-              accept=".pdf,.doc,.docx"
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp,image/*"
               onChange={handleFileSelect}
               disabled={isProcessing}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -247,7 +255,7 @@ export function BulkResumeUpload({ open, onOpenChange, jobId, companyId, onCompl
               Arraste arquivos aqui ou clique para selecionar
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              PDF, DOC, DOCX • Múltiplos arquivos
+              PDF, DOC, DOCX, JPG, PNG • Múltiplos arquivos
             </p>
           </div>
 
