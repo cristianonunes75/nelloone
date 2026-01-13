@@ -127,16 +127,17 @@ export default function BusinessJobPublic() {
       if (resumeFile) {
         const fileExt = resumeFile.name.split('.').pop();
         const fileName = `${crypto.randomUUID()}.${fileExt}`;
-        const filePath = `resumes/${job.company.id}/${job.id}/${fileName}`;
+        // Store inside the "resumes" bucket
+        const filePath = `${job.company.id}/${job.id}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
-          .from("attachments")
+          .from("resumes")
           .upload(filePath, resumeFile);
 
         if (uploadError) throw uploadError;
 
         const { data: urlData } = supabase.storage
-          .from("attachments")
+          .from("resumes")
           .getPublicUrl(filePath);
 
         resumeUrl = urlData.publicUrl;
