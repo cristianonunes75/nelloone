@@ -59,7 +59,7 @@ serve(async (req) => {
       .eq("id", application_id);
 
     // Get signed URL if we have file_path (for private bucket)
-    let pdfUrl = resume_url;
+    let fileUrl = resume_url;
     if (file_path) {
       const { data: signedData, error: signedError } = await supabase.storage
         .from("resumes")
@@ -69,22 +69,41 @@ serve(async (req) => {
         console.error("Error creating signed URL:", signedError);
         throw signedError;
       }
-      pdfUrl = signedData.signedUrl;
+      fileUrl = signedData.signedUrl;
     }
 
-    console.log("PDF URL for AI analysis:", pdfUrl);
+    console.log("File URL for AI analysis:", fileUrl);
 
-    // Fetch the PDF content
-    const pdfResponse = await fetch(pdfUrl);
-    if (!pdfResponse.ok) {
-      throw new Error(`Failed to fetch PDF: ${pdfResponse.status}`);
+    // Fetch the file content
+    const fileResponse = await fetch(fileUrl);
+    if (!fileResponse.ok) {
+      throw new Error(`Failed to fetch file: ${fileResponse.status}`);
     }
     
+    // Determine file type from URL or content-type
+    const contentType = fileResponse.headers.get("content-type") || "";
+    const urlLower = (file_path || resume_url || "").toLowerCase();
+    
+    let mimeType = "application/pdf";
+    if (urlLower.endsWith(".jpg") || urlLower.endsWith(".jpeg") || contentType.includes("image/jpeg")) {
+      mimeType = "image/jpeg";
+    } else if (urlLower.endsWith(".png") || contentType.includes("image/png")) {
+      mimeType = "image/png";
+    } else if (urlLower.endsWith(".gif") || contentType.includes("image/gif")) {
+      mimeType = "image/gif";
+    } else if (urlLower.endsWith(".webp") || contentType.includes("image/webp")) {
+      mimeType = "image/webp";
+    } else if (urlLower.endsWith(".pdf") || contentType.includes("application/pdf")) {
+      mimeType = "application/pdf";
+    }
+    
+    console.log("Detected MIME type:", mimeType);
+    
     // Use proper base64 encoding that handles large files without stack overflow
-    const pdfBuffer = await pdfResponse.arrayBuffer();
-    const pdfBase64 = arrayBufferToBase64(pdfBuffer);
+    const fileBuffer = await fileResponse.arrayBuffer();
+    const fileBase64 = arrayBufferToBase64(fileBuffer);
 
-    console.log("PDF size (bytes):", pdfBuffer.byteLength, "Base64 length:", pdfBase64.length);
+    console.log("File size (bytes):", fileBuffer.byteLength, "Base64 length:", fileBase64.length);
 
     // Call AI to analyze the PDF using the most powerful model for document analysis
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -128,12 +147,12 @@ IMPORTANTE: SEMPRE responda usando a função extract_resume_data com os dados e
             content: [
               {
                 type: "text",
-                text: "Analise este currículo em PDF e extraia TODAS as informações estruturadas disponíveis. Seja minucioso e capture todos os detalhes, incluindo experiências profissionais, formação, habilidades e informações de contato."
+                text: "Analise este currículo e extraia TODAS as informações estruturadas disponíveis. Seja minucioso e capture todos os detalhes, incluindo experiências profissionais, formação, habilidades e informações de contato. O arquivo pode ser um PDF ou uma imagem de um currículo."
               },
               {
                 type: "image_url",
                 image_url: { 
-                  url: `data:application/pdf;base64,${pdfBase64}`
+                  url: `data:${mimeType};base64,${fileBase64}`
                 }
               }
             ]
