@@ -43,7 +43,7 @@ export const useScreenPDF = () => {
       fileName = 'relatorio-nello',
       scale = 2,
       backgroundColor = '#ffffff',
-      quality = 0.95,
+      quality = 0.92,
       language = 'pt'
     } = options;
 
@@ -79,7 +79,7 @@ export const useScreenPDF = () => {
       );
 
       // Small delay to ensure all styles are applied
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200));
 
       // Capture the element with html2canvas
       const canvas = await html2canvas(element, {
@@ -114,46 +114,73 @@ export const useScreenPDF = () => {
       // Restore original styles
       element.style.cssText = originalStyle;
 
-      // Calculate PDF dimensions - A4 in mm
-      const imgWidth = 210; // A4 width
-      const pageHeight = 297; // A4 height
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // A4 dimensions in mm
+      const pageWidthMM = 210;
+      const pageHeightMM = 297;
+      const marginMM = 10; // Margin for footer
+      const usableHeightMM = pageHeightMM - marginMM;
 
       // Create PDF
       const pdf = new jsPDF({
-        orientation: imgHeight > imgWidth ? 'portrait' : 'portrait',
+        orientation: 'portrait',
         unit: 'mm',
         format: 'a4'
       });
 
-      let heightLeft = imgHeight;
-      let position = 0;
-      let pageNumber = 1;
+      // Calculate how much of the canvas fits per page
+      const imgWidthMM = pageWidthMM;
+      const imgHeightMM = (canvas.height * imgWidthMM) / canvas.width;
+      
+      // Calculate page height in canvas pixels
+      const pageHeightPx = (usableHeightMM / imgHeightMM) * canvas.height;
+      
+      // Number of pages needed
+      const totalPages = Math.ceil(canvas.height / pageHeightPx);
 
-      // Add image to PDF, handling multiple pages if needed
-      const imgData = canvas.toDataURL('image/jpeg', quality);
+      for (let pageNum = 0; pageNum < totalPages; pageNum++) {
+        if (pageNum > 0) {
+          pdf.addPage();
+        }
 
-      // First page
-      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+        // Calculate the portion of the canvas for this page
+        const sourceY = pageNum * pageHeightPx;
+        const sourceHeight = Math.min(pageHeightPx, canvas.height - sourceY);
+        
+        // Create a temporary canvas for this page slice
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sourceHeight;
+        
+        const ctx = pageCanvas.getContext('2d');
+        if (ctx) {
+          // Fill with background color
+          ctx.fillStyle = backgroundColor;
+          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+          
+          // Draw the portion of the main canvas
+          ctx.drawImage(
+            canvas,
+            0, sourceY, canvas.width, sourceHeight,  // Source rectangle
+            0, 0, canvas.width, sourceHeight          // Destination rectangle
+          );
+        }
 
-      // Add additional pages if content is taller than one page
-      while (heightLeft > 0) {
-        position = -pageHeight * pageNumber;
-        pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-        pageNumber++;
+        // Calculate the height of this slice in mm
+        const sliceHeightMM = (sourceHeight / canvas.height) * imgHeightMM;
+
+        // Add this page slice to PDF
+        const pageImgData = pageCanvas.toDataURL('image/jpeg', quality);
+        pdf.addImage(pageImgData, 'JPEG', 0, 0, imgWidthMM, sliceHeightMM);
       }
 
       // Add footer with page numbers
-      const totalPages = pdf.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
+      const pagesCount = pdf.getNumberOfPages();
+      for (let i = 1; i <= pagesCount; i++) {
         pdf.setPage(i);
         pdf.setFontSize(8);
         pdf.setTextColor(150);
         pdf.text(
-          `NELLO ONE • Página ${i} de ${totalPages}`,
+          `NELLO ONE • Página ${i} de ${pagesCount}`,
           105,
           292,
           { align: 'center' }
