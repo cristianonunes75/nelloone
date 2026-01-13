@@ -117,7 +117,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `Você é um especialista em análise de currículos profissionais. Sua tarefa é extrair TODAS as informações estruturadas de currículos em PDF, mesmo que o texto seja difícil de ler ou esteja em formatos diversos.
+            content: `Você é um especialista em análise de currículos profissionais. Sua tarefa é extrair TODAS as informações estruturadas de currículos em PDF ou imagem, mesmo que o texto seja difícil de ler ou esteja em formatos diversos.
 
 REGRAS DE EXTRAÇÃO:
 1. Analise TODO o documento cuidadosamente, página por página
@@ -129,6 +129,7 @@ REGRAS DE EXTRAÇÃO:
    - Formação acadêmica e cursos
    - Habilidades técnicas e comportamentais
    - Idiomas e certificações
+   - FOTO DO CANDIDATO (se houver uma foto/imagem do rosto no currículo)
 
 5. Para experiências profissionais, capture:
    - Nome da empresa/empregador
@@ -139,6 +140,7 @@ REGRAS DE EXTRAÇÃO:
 6. Normalize telefones brasileiros no formato (XX) XXXXX-XXXX
 7. Extraia emails mesmo que estejam parcialmente visíveis
 8. Identifique a cidade/estado do candidato
+9. FOTO: Se o currículo contiver uma foto do candidato, SEMPRE indique has_photo como true e descreva a localização da foto no documento (ex: "canto superior esquerdo", "lado direito do cabeçalho")
 
 IMPORTANTE: SEMPRE responda usando a função extract_resume_data com os dados encontrados. Se algum campo não estiver disponível, simplesmente não o inclua.`
           },
@@ -289,6 +291,15 @@ IMPORTANTE: SEMPRE responda usando a função extract_resume_data com os dados e
                         contact: { type: "string", description: "Contato (telefone ou email)" }
                       }
                     }
+                  },
+                  photo_info: {
+                    type: "object",
+                    description: "Informações sobre a foto do candidato no currículo",
+                    properties: {
+                      has_photo: { type: "boolean", description: "Se o currículo contém uma foto do candidato" },
+                      photo_location: { type: "string", description: "Localização da foto no documento (ex: canto superior esquerdo, lado direito do cabeçalho)" },
+                      photo_description: { type: "string", description: "Breve descrição da foto (ex: foto 3x4, foto profissional, foto casual)" }
+                    }
                   }
                 },
                 required: ["personal_info"]
@@ -366,11 +377,138 @@ IMPORTANTE: SEMPRE responda usando a função extract_resume_data com os dados e
 
     console.log("Extracted resume data:", JSON.stringify(extractedData, null, 2));
 
+    // If photo detected, extract it using AI image generation/crop
+    let candidatePhotoUrl: string | null = null;
+    
+    if (extractedData.photo_info?.has_photo) {
+      console.log("Photo detected in resume, attempting to extract...");
+      console.log("Photo location:", extractedData.photo_info.photo_location);
+      
+      try {
+        // Use AI to extract/crop just the photo from the resume
+        const photoExtractionResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-pro",
+            messages: [
+              {
+                role: "system",
+                content: `Você é um especialista em extração de imagens. Sua tarefa é identificar e descrever EXATAMENTE onde está a foto do candidato no currículo para que possamos recortá-la.
+
+Retorne as coordenadas aproximadas da foto como porcentagem do documento:
+- top: distância do topo (0-100%)
+- left: distância da esquerda (0-100%)  
+- width: largura da foto (0-100%)
+- height: altura da foto (0-100%)
+
+Exemplo: uma foto 3x4 no canto superior esquerdo típico seria aproximadamente:
+{ "top": 5, "left": 5, "width": 15, "height": 20 }`
+              },
+              {
+                role: "user",
+                content: [
+                  {
+                    type: "text",
+                    text: `Localize a foto do candidato neste currículo. A foto está localizada em: ${extractedData.photo_info.photo_location}. Retorne as coordenadas como JSON.`
+                  },
+                  {
+                    type: "image_url",
+                    image_url: { 
+                      url: `data:${mimeType};base64,${fileBase64}`
+                    }
+                  }
+                ]
+              }
+            ],
+            tools: [
+              {
+                type: "function",
+                function: {
+                  name: "extract_photo_coordinates",
+                  description: "Extrai as coordenadas da foto do candidato",
+                  parameters: {
+                    type: "object",
+                    properties: {
+                      top: { type: "number", description: "Distância do topo em porcentagem (0-100)" },
+                      left: { type: "number", description: "Distância da esquerda em porcentagem (0-100)" },
+                      width: { type: "number", description: "Largura da foto em porcentagem (0-100)" },
+                      height: { type: "number", description: "Altura da foto em porcentagem (0-100)" },
+                      confidence: { type: "string", description: "Nível de confiança: high, medium, low" }
+                    },
+                    required: ["top", "left", "width", "height"]
+                  }
+                }
+              }
+            ],
+            tool_choice: { type: "function", function: { name: "extract_photo_coordinates" } }
+          }),
+        });
+
+        if (photoExtractionResponse.ok) {
+          const photoResult = await photoExtractionResponse.json();
+          const photoToolCall = photoResult.choices?.[0]?.message?.tool_calls?.[0];
+          
+          if (photoToolCall) {
+            const photoCoords = JSON.parse(photoToolCall.function.arguments);
+            console.log("Photo coordinates extracted:", photoCoords);
+            
+            // Store the original resume as the photo source for now
+            // In a more advanced implementation, we could use canvas to crop
+            // For now, we save the photo info in extracted_data and use the resume as reference
+            
+            // Store photo metadata in extracted data
+            extractedData.photo_info.coordinates = photoCoords;
+            
+            // If this is already an image (not PDF), we can use it directly as the photo
+            if (mimeType.startsWith("image/")) {
+              // For images, save a copy as the candidate photo
+              const photoFileName = `candidate-photos/${application_id}-photo.${mimeType.split("/")[1]}`;
+              
+              const photoBytes = new Uint8Array(fileBuffer);
+              const { error: uploadError } = await supabase.storage
+                .from("resumes")
+                .upload(photoFileName, photoBytes, {
+                  contentType: mimeType,
+                  upsert: true
+                });
+              
+              if (!uploadError) {
+                const { data: publicUrlData } = supabase.storage
+                  .from("resumes")
+                  .getPublicUrl(photoFileName);
+                
+                candidatePhotoUrl = publicUrlData.publicUrl;
+                console.log("Candidate photo saved:", candidatePhotoUrl);
+              } else {
+                console.error("Error uploading candidate photo:", uploadError);
+              }
+            } else {
+              // For PDFs, we note that there's a photo but can't easily extract it
+              // The photo coordinates are stored for potential future use
+              console.log("Photo detected in PDF - coordinates stored for reference");
+            }
+          }
+        }
+      } catch (photoError) {
+        console.error("Error extracting photo:", photoError);
+        // Don't fail the whole extraction just because photo extraction failed
+      }
+    }
+
     // Update job application with extracted data
     const updateData: Record<string, unknown> = {
       extracted_data: extractedData,
       extraction_status: "completed",
     };
+
+    // Add photo URL if extracted
+    if (candidatePhotoUrl) {
+      updateData.candidate_photo_url = candidatePhotoUrl;
+    }
 
     // Also update direct fields if available and not already set
     const { data: existingApp } = await supabase
@@ -415,6 +553,7 @@ IMPORTANTE: SEMPRE responda usando a função extract_resume_data com os dados e
       JSON.stringify({
         success: true,
         extracted: extractedData,
+        candidate_photo_url: candidatePhotoUrl,
         message: "Currículo analisado e dados extraídos com sucesso!"
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

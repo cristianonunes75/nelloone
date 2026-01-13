@@ -1853,6 +1853,7 @@ export type Database = {
       }
       job_applications: {
         Row: {
+          candidate_photo_url: string | null
           city: string | null
           commute_time: string | null
           company_id: string
@@ -1886,6 +1887,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          candidate_photo_url?: string | null
           city?: string | null
           commute_time?: string | null
           company_id: string
@@ -1919,6 +1921,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          candidate_photo_url?: string | null
           city?: string | null
           commute_time?: string | null
           company_id?: string
