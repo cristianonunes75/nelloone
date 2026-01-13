@@ -308,6 +308,34 @@ export default function BusinessJobDetail() {
     setActiveStatus(status);
   };
 
+  const handleOpenResume = async (resumeUrl: string) => {
+    try {
+      // Extract file path from the public URL
+      const urlParts = resumeUrl.split("/resumes/");
+      if (urlParts.length < 2) {
+        // If not a storage URL, just open directly
+        window.open(resumeUrl, "_blank");
+        return;
+      }
+      
+      const filePath = decodeURIComponent(urlParts[1]);
+      
+      // Create a signed URL for the private bucket
+      const { data, error } = await supabase.storage
+        .from("resumes")
+        .createSignedUrl(filePath, 3600); // 1 hour expiry
+      
+      if (error) throw error;
+      
+      if (data?.signedUrl) {
+        window.open(data.signedUrl, "_blank");
+      }
+    } catch (error) {
+      console.error("Error opening resume:", error);
+      toast.error("Erro ao abrir currículo");
+    }
+  };
+
   if (loading) {
     return (
       <BusinessLayout>
@@ -623,15 +651,13 @@ export default function BusinessJobDetail() {
 
                         {/* Resume link */}
                         {app.resume_url && (
-                          <a 
-                            href={app.resume_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                          <button 
+                            onClick={() => handleOpenResume(app.resume_url!)}
+                            className="inline-flex items-center gap-1 text-sm text-primary hover:underline cursor-pointer"
                           >
                             <FileText className="h-3 w-3" />
                             {app.resume_filename || "Ver currículo"}
-                          </a>
+                          </button>
                         )}
                       </div>
 
