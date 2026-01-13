@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useBusinessAuth, BusinessRole } from '../hooks/useBusinessAuth';
+import { useCrossAppAuth } from '@/hooks/useCrossAppAuth';
 import { Loader2 } from 'lucide-react';
 
 interface BusinessProtectedRouteProps {
@@ -23,12 +24,15 @@ export function BusinessProtectedRoute({
     hasCompany
   } = useBusinessAuth();
   const location = useLocation();
+  
+  // Handle cross-app authentication tokens (from AdminAppSwitcher)
+  const { isPending: crossAppPending } = useCrossAppAuth();
 
   // Check if user is Nello One super admin (has admin role in user_roles)
   const isNelloOneSuperAdmin = userRoles.includes('admin');
 
-  // Show loading while checking auth
-  if (authLoading || businessLoading) {
+  // Show loading while checking auth or processing cross-app token
+  if (authLoading || businessLoading || crossAppPending) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
