@@ -104,6 +104,16 @@ export default function BusinessAcceptInvite() {
     try {
       let userId = user?.id;
       
+      // If logged in, verify that the logged-in user's email matches the invite email
+      if (user) {
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        if (currentUser?.email?.toLowerCase() !== invite.email.toLowerCase()) {
+          toast.error(`Este convite é para ${invite.email}. Faça logout e acesse com a conta correta, ou crie uma nova conta.`);
+          setIsAccepting(false);
+          return;
+        }
+      }
+      
       // If not logged in, create account
       if (!user) {
         const { data: authData, error: authError } = await supabase.auth.signUp({
