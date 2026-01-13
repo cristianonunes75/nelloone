@@ -33,6 +33,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import type { Json } from "@/integrations/supabase/types";
 
 interface JobPosting {
   id: string;
@@ -43,13 +44,11 @@ interface JobPosting {
   description: string | null;
   internal_notes: string | null;
   cultural_affinity_question: string | null;
-  cultural_affinity_options: any;
+  cultural_affinity_options: Json | null;
   public_slug: string;
   created_at: string;
   updated_at: string;
   closed_at: string | null;
-  cultural_affinity_question: string | null;
-  cultural_affinity_options: string[] | null;
   application_count?: number;
 }
 
