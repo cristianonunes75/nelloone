@@ -10,7 +10,8 @@ import {
   LogOut,
   Menu,
   X,
-  Briefcase
+  Briefcase,
+  ClipboardList
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -26,6 +27,7 @@ const adminNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/team', label: 'Equipe', icon: Users },
   { href: '/invite', label: 'Convidar', icon: UserPlus },
+  { href: '/jobs', label: 'Vagas', icon: ClipboardList },
   { href: '/hiring', label: 'Recrutamento', icon: Briefcase },
   { href: '/reports', label: 'Relatórios', icon: BarChart3 },
   { href: '/settings', label: 'Configurações', icon: Settings },
