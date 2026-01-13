@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
 import { AdminAppSwitcher } from '@/components/admin/AdminAppSwitcher';
+import { CompanySwitcher } from './CompanySwitcher';
 import { cn } from '@/lib/utils';
 
 interface BusinessLayoutProps {
@@ -39,7 +40,7 @@ const collaboratorNavItems = [
 
 export function BusinessLayout({ children }: BusinessLayoutProps) {
   const { signOut } = useAuth();
-  const { company, isCompanyAdmin, isCollaborator } = useBusinessAuth();
+  const { company, isCompanyAdmin, switchCompany } = useBusinessAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -94,6 +95,10 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
 
             {/* Actions */}
             <div className="flex items-center gap-2">
+              <CompanySwitcher 
+                currentCompanyId={company?.id || null} 
+                onCompanyChange={switchCompany} 
+              />
               <AdminAppSwitcher />
               <Button
                 variant="ghost"

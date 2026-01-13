@@ -30,6 +30,19 @@ interface Company {
   settings: Record<string, unknown>;
 }
 
+interface UserCompanyRecord {
+  id: string;
+  company_id: string;
+  role: BusinessRole;
+  is_active: boolean;
+  consent_given: boolean;
+  consent_given_at: string | null;
+  onboarding_completed: boolean;
+  share_report_with_company: boolean;
+  joined_at: string | null;
+  user_id: string;
+}
+
 interface BusinessAuthContextType {
   companyUser: CompanyUser | null;
   company: Company | null;
@@ -37,15 +50,21 @@ interface BusinessAuthContextType {
   isCompanyAdmin: boolean;
   isCollaborator: boolean;
   isSuperAdmin: boolean;
-  isNelloOneSuperAdmin: boolean; // Super admin from Nello One (user_roles)
+  isNelloOneSuperAdmin: boolean;
   isLoading: boolean;
   hasCompany: boolean;
   needsOnboarding: boolean;
   needsConsent: boolean;
+  // Multi-company support
+  userCompanies: UserCompanyRecord[];
+  hasMultipleCompanies: boolean;
+  switchCompany: (companyId: string) => Promise<void>;
   refetch: () => Promise<void>;
 }
 
 const BusinessAuthContext = createContext<BusinessAuthContextType | undefined>(undefined);
+
+const SELECTED_COMPANY_KEY = 'nello_selected_company';
 
 interface BusinessAuthProviderProps {
   children: ReactNode;
@@ -55,48 +74,76 @@ export function BusinessAuthProvider({ children }: BusinessAuthProviderProps) {
   const { user, userRoles, isLoading: authLoading } = useAuth();
   const [companyUser, setCompanyUser] = useState<CompanyUser | null>(null);
   const [company, setCompany] = useState<Company | null>(null);
+  const [userCompanies, setUserCompanies] = useState<UserCompanyRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check if user is a Nello One super admin (has 'admin' role in user_roles)
   const isNelloOneSuperAdmin = userRoles.includes('admin');
 
-  const fetchBusinessData = async () => {
+  const fetchBusinessData = async (selectedCompanyId?: string) => {
     if (!user) {
       setCompanyUser(null);
       setCompany(null);
+      setUserCompanies([]);
       setIsLoading(false);
       return;
     }
 
     try {
-      // First get the company_user record
-      const { data: cuData, error: cuError } = await supabase
+      // First get ALL company_user records for this user
+      const { data: allCompanyUsers, error: cuError } = await supabase
         .from('company_users')
         .select('*')
         .eq('user_id', user.id)
-        .eq('is_active', true)
-        .maybeSingle();
+        .eq('is_active', true);
 
       if (cuError) {
-        console.error('Error fetching company user:', cuError);
+        console.error('Error fetching company users:', cuError);
         setIsLoading(false);
         return;
       }
 
-      if (!cuData) {
+      if (!allCompanyUsers || allCompanyUsers.length === 0) {
+        setCompanyUser(null);
+        setCompany(null);
+        setUserCompanies([]);
+        setIsLoading(false);
+        return;
+      }
+
+      setUserCompanies(allCompanyUsers as UserCompanyRecord[]);
+
+      // Determine which company to use
+      let targetCompanyId = selectedCompanyId;
+      
+      if (!targetCompanyId) {
+        // Check localStorage for previously selected company
+        const savedCompanyId = localStorage.getItem(SELECTED_COMPANY_KEY);
+        if (savedCompanyId && allCompanyUsers.some(cu => cu.company_id === savedCompanyId)) {
+          targetCompanyId = savedCompanyId;
+        } else {
+          // Default to first company
+          targetCompanyId = allCompanyUsers[0].company_id;
+        }
+      }
+
+      // Find the company_user record for the target company
+      const targetCompanyUser = allCompanyUsers.find(cu => cu.company_id === targetCompanyId);
+      
+      if (!targetCompanyUser) {
         setCompanyUser(null);
         setCompany(null);
         setIsLoading(false);
         return;
       }
 
-      setCompanyUser(cuData as unknown as CompanyUser);
+      setCompanyUser(targetCompanyUser as unknown as CompanyUser);
+      localStorage.setItem(SELECTED_COMPANY_KEY, targetCompanyId);
 
-      // Then get the company
+      // Get the company details
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .select('*')
-        .eq('id', cuData.company_id)
+        .eq('id', targetCompanyId)
         .single();
 
       if (companyError) {
@@ -111,22 +158,24 @@ export function BusinessAuthProvider({ children }: BusinessAuthProviderProps) {
     }
   };
 
+  const switchCompany = async (companyId: string) => {
+    setIsLoading(true);
+    await fetchBusinessData(companyId);
+  };
+
   useEffect(() => {
     if (!authLoading) {
       fetchBusinessData();
     }
   }, [user, authLoading]);
 
-  // Business role from company_users table
   const businessRole = companyUser?.role || null;
-  
-  // isCompanyAdmin: either from company_users role OR if they're a Nello One super admin
   const isCompanyAdmin = businessRole === 'company_admin' || businessRole === 'super_admin' || isNelloOneSuperAdmin;
   const isCollaborator = businessRole === 'collaborator';
   const isSuperAdmin = businessRole === 'super_admin' || isNelloOneSuperAdmin;
   const hasCompany = !!company;
+  const hasMultipleCompanies = userCompanies.length > 1;
   
-  // Nello One super admins don't need onboarding or consent
   const needsOnboarding = !isNelloOneSuperAdmin && isCompanyAdmin && hasCompany && !companyUser?.onboarding_completed;
   const needsConsent = !isNelloOneSuperAdmin && isCollaborator && !companyUser?.consent_given;
 
@@ -142,6 +191,9 @@ export function BusinessAuthProvider({ children }: BusinessAuthProviderProps) {
     hasCompany,
     needsOnboarding,
     needsConsent,
+    userCompanies,
+    hasMultipleCompanies,
+    switchCompany,
     refetch: fetchBusinessData,
   };
 
