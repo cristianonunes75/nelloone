@@ -586,6 +586,217 @@ export type Database = {
         }
         Relationships: []
       }
+      client_milestones: {
+        Row: {
+          client_id: string
+          created_at: string
+          description: string | null
+          id: string
+          milestone_date: string
+          milestone_type: string | null
+          professional_id: string
+          related_session_id: string | null
+          title: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          milestone_date?: string
+          milestone_type?: string | null
+          professional_id: string
+          related_session_id?: string | null
+          title: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          milestone_date?: string
+          milestone_type?: string | null
+          professional_id?: string
+          related_session_id?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_milestones_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "professional_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_milestones_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professional_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_milestones_related_session_id_fkey"
+            columns: ["related_session_id"]
+            isOneToOne: false
+            referencedRelation: "client_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_session_packages: {
+        Row: {
+          client_id: string
+          created_at: string
+          currency: string | null
+          expires_at: string | null
+          id: string
+          package_name: string
+          payment_status: string | null
+          price_total: number
+          professional_id: string
+          sessions_used: number | null
+          starts_at: string | null
+          total_sessions: number
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          currency?: string | null
+          expires_at?: string | null
+          id?: string
+          package_name: string
+          payment_status?: string | null
+          price_total: number
+          professional_id: string
+          sessions_used?: number | null
+          starts_at?: string | null
+          total_sessions: number
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          currency?: string | null
+          expires_at?: string | null
+          id?: string
+          package_name?: string
+          payment_status?: string | null
+          price_total?: number
+          professional_id?: string
+          sessions_used?: number | null
+          starts_at?: string | null
+          total_sessions?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_session_packages_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "professional_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_session_packages_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professional_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_sessions: {
+        Row: {
+          ai_generated_at: string | null
+          ai_suggestions: Json | null
+          attention_points: string | null
+          client_id: string
+          created_at: string
+          currency: string | null
+          duration_minutes: number | null
+          id: string
+          insights: string | null
+          notes: string | null
+          objectives: string | null
+          paid_at: string | null
+          payment_status: string | null
+          professional_id: string
+          session_date: string
+          session_rate: number | null
+          session_type: string | null
+          status: string | null
+          tags: string[] | null
+          tasks_for_client: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          ai_generated_at?: string | null
+          ai_suggestions?: Json | null
+          attention_points?: string | null
+          client_id: string
+          created_at?: string
+          currency?: string | null
+          duration_minutes?: number | null
+          id?: string
+          insights?: string | null
+          notes?: string | null
+          objectives?: string | null
+          paid_at?: string | null
+          payment_status?: string | null
+          professional_id: string
+          session_date?: string
+          session_rate?: number | null
+          session_type?: string | null
+          status?: string | null
+          tags?: string[] | null
+          tasks_for_client?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          ai_generated_at?: string | null
+          ai_suggestions?: Json | null
+          attention_points?: string | null
+          client_id?: string
+          created_at?: string
+          currency?: string | null
+          duration_minutes?: number | null
+          id?: string
+          insights?: string | null
+          notes?: string | null
+          objectives?: string | null
+          paid_at?: string | null
+          payment_status?: string | null
+          professional_id?: string
+          session_date?: string
+          session_rate?: number | null
+          session_type?: string | null
+          status?: string | null
+          tags?: string[] | null
+          tasks_for_client?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_sessions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "professional_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_sessions_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professional_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       codigo_cruzamentos: {
         Row: {
           content: Json | null
@@ -2273,6 +2484,225 @@ export type Database = {
           promo_text?: string | null
           remaining_spots?: number | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      professional_clients: {
+        Row: {
+          client_user_id: string | null
+          consent_given: boolean | null
+          consent_given_at: string | null
+          consent_text_version: string | null
+          created_at: string
+          currency: string | null
+          email: string | null
+          id: string
+          last_session_at: string | null
+          metadata: Json | null
+          name: string
+          notes: string | null
+          phone: string | null
+          photo_url: string | null
+          professional_id: string
+          session_rate: number | null
+          share_reports_with_professional: boolean | null
+          status: string | null
+          tags: string[] | null
+          total_sessions: number | null
+          updated_at: string
+        }
+        Insert: {
+          client_user_id?: string | null
+          consent_given?: boolean | null
+          consent_given_at?: string | null
+          consent_text_version?: string | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          id?: string
+          last_session_at?: string | null
+          metadata?: Json | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          professional_id: string
+          session_rate?: number | null
+          share_reports_with_professional?: boolean | null
+          status?: string | null
+          tags?: string[] | null
+          total_sessions?: number | null
+          updated_at?: string
+        }
+        Update: {
+          client_user_id?: string | null
+          consent_given?: boolean | null
+          consent_given_at?: string | null
+          consent_text_version?: string | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          id?: string
+          last_session_at?: string | null
+          metadata?: Json | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          professional_id?: string
+          session_rate?: number | null
+          share_reports_with_professional?: boolean | null
+          status?: string | null
+          tags?: string[] | null
+          total_sessions?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_clients_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professional_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      professional_financial_records: {
+        Row: {
+          amount: number
+          client_id: string | null
+          created_at: string
+          currency: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          invoice_number: string | null
+          paid_at: string | null
+          professional_id: string
+          record_type: string
+          session_id: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          client_id?: string | null
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_number?: string | null
+          paid_at?: string | null
+          professional_id: string
+          record_type: string
+          session_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          client_id?: string | null
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_number?: string | null
+          paid_at?: string | null
+          professional_id?: string
+          record_type?: string
+          session_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_financial_records_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "professional_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "professional_financial_records_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professional_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "professional_financial_records_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "client_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      professional_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          business_name: string | null
+          created_at: string
+          current_clients: number | null
+          id: string
+          max_clients: number | null
+          mode: string
+          phone: string | null
+          settings: Json | null
+          specialty: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string | null
+          subscription_tier: string | null
+          trial_ends_at: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          business_name?: string | null
+          created_at?: string
+          current_clients?: number | null
+          id?: string
+          max_clients?: number | null
+          mode?: string
+          phone?: string | null
+          settings?: Json | null
+          specialty?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          business_name?: string | null
+          created_at?: string
+          current_clients?: number | null
+          id?: string
+          max_clients?: number | null
+          mode?: string
+          phone?: string | null
+          settings?: Json | null
+          specialty?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
         }
         Relationships: []
       }

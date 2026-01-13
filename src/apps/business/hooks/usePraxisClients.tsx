@@ -1,0 +1,310 @@
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { usePraxisAuth } from './usePraxisAuth';
+import { toast } from 'sonner';
+import { Json } from '@/integrations/supabase/types';
+
+export interface PraxisClient {
+  id: string;
+  professional_id: string;
+  client_user_id: string | null;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  photo_url: string | null;
+  notes: string | null;
+  status: string;
+  session_rate: number | null;
+  currency: string;
+  total_sessions: number;
+  last_session_at: string | null;
+  consent_given: boolean;
+  consent_given_at: string | null;
+  tags: string[];
+  metadata: Json;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ClientSession {
+  id: string;
+  client_id: string;
+  professional_id: string;
+  title: string;
+  session_date: string;
+  duration_minutes: number;
+  session_type: string;
+  status: string;
+  objectives: string | null;
+  notes: string | null;
+  insights: string | null;
+  tasks_for_client: string | null;
+  attention_points: string | null;
+  tags: string[];
+  ai_suggestions: Json | null;
+  ai_generated_at: string | null;
+  session_rate: number | null;
+  currency: string;
+  payment_status: string;
+  paid_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export function usePraxisClients() {
+  const { professionalProfile } = usePraxisAuth();
+  const [clients, setClients] = useState<PraxisClient[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchClients = useCallback(async () => {
+    if (!professionalProfile?.id) {
+      setClients([]);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('professional_clients')
+        .select('*')
+        .eq('professional_id', professionalProfile.id)
+        .order('name');
+
+      if (error) throw error;
+      setClients((data || []) as PraxisClient[]);
+    } catch (err) {
+      console.error('Error fetching clients:', err);
+      toast.error('Erro ao carregar clientes');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [professionalProfile?.id]);
+
+  useEffect(() => {
+    fetchClients();
+  }, [fetchClients]);
+
+  const createClient = async (data: Partial<PraxisClient>): Promise<PraxisClient | null> => {
+    if (!professionalProfile?.id) return null;
+
+    try {
+      const { data: newClient, error } = await supabase
+        .from('professional_clients')
+        .insert({
+          professional_id: professionalProfile.id,
+          name: data.name || '',
+          email: data.email,
+          phone: data.phone,
+          notes: data.notes,
+          session_rate: data.session_rate,
+          tags: data.tags || [],
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      const client = newClient as PraxisClient;
+      setClients(prev => [...prev, client]);
+      toast.success('Cliente adicionado com sucesso');
+      return client;
+    } catch (err) {
+      console.error('Error creating client:', err);
+      toast.error('Erro ao criar cliente');
+      return null;
+    }
+  };
+
+  const updateClient = async (id: string, data: Partial<PraxisClient>): Promise<boolean> => {
+    try {
+      const updateData: Record<string, unknown> = {};
+      if (data.name !== undefined) updateData.name = data.name;
+      if (data.email !== undefined) updateData.email = data.email;
+      if (data.phone !== undefined) updateData.phone = data.phone;
+      if (data.notes !== undefined) updateData.notes = data.notes;
+      if (data.session_rate !== undefined) updateData.session_rate = data.session_rate;
+      if (data.status !== undefined) updateData.status = data.status;
+
+      const { error } = await supabase
+        .from('professional_clients')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      setClients(prev => prev.map(c => c.id === id ? { ...c, ...data } as PraxisClient : c));
+      toast.success('Cliente atualizado');
+      return true;
+    } catch (err) {
+      console.error('Error updating client:', err);
+      toast.error('Erro ao atualizar cliente');
+      return false;
+    }
+  };
+
+  const deleteClient = async (id: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('professional_clients')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      setClients(prev => prev.filter(c => c.id !== id));
+      toast.success('Cliente removido');
+      return true;
+    } catch (err) {
+      console.error('Error deleting client:', err);
+      toast.error('Erro ao remover cliente');
+      return false;
+    }
+  };
+
+  const activeClients = clients.filter(c => c.status === 'active');
+  const archivedClients = clients.filter(c => c.status === 'archived');
+
+  return {
+    clients,
+    activeClients,
+    archivedClients,
+    isLoading,
+    refetch: fetchClients,
+    createClient,
+    updateClient,
+    deleteClient,
+  };
+}
+
+export function usePraxisSessions(clientId: string | null) {
+  const { professionalProfile } = usePraxisAuth();
+  const [sessions, setSessions] = useState<ClientSession[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchSessions = useCallback(async () => {
+    if (!professionalProfile?.id || !clientId) {
+      setSessions([]);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('client_sessions')
+        .select('*')
+        .eq('professional_id', professionalProfile.id)
+        .eq('client_id', clientId)
+        .order('session_date', { ascending: false });
+
+      if (error) throw error;
+      setSessions((data || []) as ClientSession[]);
+    } catch (err) {
+      console.error('Error fetching sessions:', err);
+      toast.error('Erro ao carregar sessões');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [professionalProfile?.id, clientId]);
+
+  useEffect(() => {
+    fetchSessions();
+  }, [fetchSessions]);
+
+  const createSession = async (data: Partial<ClientSession>): Promise<ClientSession | null> => {
+    if (!professionalProfile?.id || !clientId) return null;
+
+    try {
+      const { data: newSession, error } = await supabase
+        .from('client_sessions')
+        .insert({
+          professional_id: professionalProfile.id,
+          client_id: clientId,
+          title: data.title || 'Nova Sessão',
+          session_date: data.session_date || new Date().toISOString(),
+          duration_minutes: data.duration_minutes || 60,
+          session_type: data.session_type || 'coaching',
+          status: data.status || 'scheduled',
+          objectives: data.objectives,
+          notes: data.notes,
+          insights: data.insights,
+          tasks_for_client: data.tasks_for_client,
+          attention_points: data.attention_points,
+          tags: data.tags || [],
+          session_rate: data.session_rate,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      const session = newSession as ClientSession;
+      setSessions(prev => [session, ...prev]);
+      toast.success('Sessão criada');
+      return session;
+    } catch (err) {
+      console.error('Error creating session:', err);
+      toast.error('Erro ao criar sessão');
+      return null;
+    }
+  };
+
+  const updateSession = async (id: string, data: Partial<ClientSession>): Promise<boolean> => {
+    try {
+      const updateData: Record<string, unknown> = {};
+      if (data.title !== undefined) updateData.title = data.title;
+      if (data.session_date !== undefined) updateData.session_date = data.session_date;
+      if (data.duration_minutes !== undefined) updateData.duration_minutes = data.duration_minutes;
+      if (data.session_type !== undefined) updateData.session_type = data.session_type;
+      if (data.status !== undefined) updateData.status = data.status;
+      if (data.objectives !== undefined) updateData.objectives = data.objectives;
+      if (data.notes !== undefined) updateData.notes = data.notes;
+      if (data.insights !== undefined) updateData.insights = data.insights;
+      if (data.tasks_for_client !== undefined) updateData.tasks_for_client = data.tasks_for_client;
+      if (data.attention_points !== undefined) updateData.attention_points = data.attention_points;
+      if (data.tags !== undefined) updateData.tags = data.tags;
+
+      const { error } = await supabase
+        .from('client_sessions')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      setSessions(prev => prev.map(s => s.id === id ? { ...s, ...data } as ClientSession : s));
+      toast.success('Sessão atualizada');
+      return true;
+    } catch (err) {
+      console.error('Error updating session:', err);
+      toast.error('Erro ao atualizar sessão');
+      return false;
+    }
+  };
+
+  const deleteSession = async (id: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('client_sessions')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      setSessions(prev => prev.filter(s => s.id !== id));
+      toast.success('Sessão removida');
+      return true;
+    } catch (err) {
+      console.error('Error deleting session:', err);
+      toast.error('Erro ao remover sessão');
+      return false;
+    }
+  };
+
+  return {
+    sessions,
+    isLoading,
+    refetch: fetchSessions,
+    createSession,
+    updateSession,
+    deleteSession,
+  };
+}
