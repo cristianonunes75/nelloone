@@ -120,6 +120,7 @@ export default function BusinessJobDetail() {
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeStage, setActiveStage] = useState("all");
+  const [activeStatus, setActiveStatus] = useState<"all" | "pre_candidate" | "active_candidate" | "evaluated">("all");
   const [searchQuery, setSearchQuery] = useState("");
   
   // Upload dialog
@@ -278,21 +279,33 @@ export default function BusinessJobDetail() {
     }
   };
 
-  const filteredApplications = applications.filter(app => {
-    const matchesSearch = 
-      (app.full_name?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (app.email?.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredApplications = applications.filter((app) => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+
+    const matchesSearch =
+      normalizedQuery.length === 0 ||
+      (app.full_name?.toLowerCase().includes(normalizedQuery) ?? false) ||
+      (app.email?.toLowerCase().includes(normalizedQuery) ?? false);
 
     const matchesStage = activeStage === "all" || app.pipeline_stage === activeStage;
 
-    return matchesSearch && matchesStage;
+    const matchesStatus =
+      activeStatus === "all" || app.status === activeStatus;
+
+    return matchesSearch && matchesStage && matchesStatus;
   });
 
   const stats = {
     total: applications.length,
-    preCandidates: applications.filter(a => a.status === "pre_candidate").length,
-    active: applications.filter(a => a.status === "active_candidate").length,
-    evaluated: applications.filter(a => a.status === "evaluated").length,
+    preCandidates: applications.filter((a) => a.status === "pre_candidate").length,
+    active: applications.filter((a) => a.status === "active_candidate").length,
+    evaluated: applications.filter((a) => a.status === "evaluated").length,
+  };
+
+  const handleStatusFilter = (
+    status: "all" | "pre_candidate" | "active_candidate" | "evaluated"
+  ) => {
+    setActiveStatus(status);
   };
 
   if (loading) {
@@ -407,7 +420,17 @@ export default function BusinessJobDetail() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card>
+          <Card
+            role="button"
+            tabIndex={0}
+            onClick={() => handleStatusFilter("all")}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") handleStatusFilter("all");
+            }}
+            className={`cursor-pointer transition-shadow ${
+              activeStatus === "all" ? "ring-2 ring-primary" : "hover:shadow-md"
+            }`}
+          >
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-primary/10">
@@ -420,7 +443,21 @@ export default function BusinessJobDetail() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+
+          <Card
+            role="button"
+            tabIndex={0}
+            onClick={() => handleStatusFilter("pre_candidate")}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ")
+                handleStatusFilter("pre_candidate");
+            }}
+            className={`cursor-pointer transition-shadow ${
+              activeStatus === "pre_candidate"
+                ? "ring-2 ring-primary"
+                : "hover:shadow-md"
+            }`}
+          >
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-gray-100">
@@ -433,7 +470,21 @@ export default function BusinessJobDetail() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+
+          <Card
+            role="button"
+            tabIndex={0}
+            onClick={() => handleStatusFilter("active_candidate")}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ")
+                handleStatusFilter("active_candidate");
+            }}
+            className={`cursor-pointer transition-shadow ${
+              activeStatus === "active_candidate"
+                ? "ring-2 ring-primary"
+                : "hover:shadow-md"
+            }`}
+          >
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-blue-100">
@@ -446,7 +497,21 @@ export default function BusinessJobDetail() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+
+          <Card
+            role="button"
+            tabIndex={0}
+            onClick={() => handleStatusFilter("evaluated")}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ")
+                handleStatusFilter("evaluated");
+            }}
+            className={`cursor-pointer transition-shadow ${
+              activeStatus === "evaluated"
+                ? "ring-2 ring-primary"
+                : "hover:shadow-md"
+            }`}
+          >
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-green-100">
