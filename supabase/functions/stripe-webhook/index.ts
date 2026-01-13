@@ -244,11 +244,29 @@ serve(async (req) => {
     const body = await req.text();
     const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
 
-    const event = webhookSecret
-      ? stripe.webhooks.constructEvent(body, signature, webhookSecret)
-      : JSON.parse(body);
+    // CRITICAL: Always require webhook secret verification - no fallback to unverified parsing
+    if (!webhookSecret) {
+      logStep("CRITICAL ERROR: STRIPE_WEBHOOK_SECRET not configured");
+      return new Response(
+        JSON.stringify({ error: "Webhook not properly configured" }),
+        { status: 500, headers: corsHeaders }
+      );
+    }
 
-    logStep("Webhook event received", { type: event.type });
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    } catch (err) {
+      logStep("ERROR: Webhook signature verification failed", { 
+        error: err instanceof Error ? err.message : String(err) 
+      });
+      return new Response(
+        JSON.stringify({ error: "Invalid signature" }),
+        { status: 400, headers: corsHeaders }
+      );
+    }
+
+    logStep("Webhook event verified and received", { type: event.type });
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;

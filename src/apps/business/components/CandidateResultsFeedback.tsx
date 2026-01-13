@@ -221,10 +221,15 @@ export function CandidateResultsFeedback({
       )}
 
       {/* Nota de fechamento */}
-      <div className="text-center pt-2">
+      <div className="text-center pt-2 space-y-2">
         <p className="text-xs text-muted-foreground italic">
-          Este resultado é uma ferramenta de autoconhecimento. 
+          Este resultado descreve tendências comportamentais observadas no contexto avaliado. 
+          Não é um diagnóstico, não define limites e não indica adequação a posições específicas.
           As decisões do processo seletivo são tomadas pela empresa com base em múltiplos critérios.
+        </p>
+        <p className="text-xs text-muted-foreground/70">
+          Algumas informações podem ter sido fornecidas anteriormente pelo candidato na plataforma 
+          Nello One, sempre com seu consentimento.
         </p>
       </div>
     </div>

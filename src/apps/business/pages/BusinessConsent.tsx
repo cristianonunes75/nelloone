@@ -139,25 +139,46 @@ export default function BusinessConsent() {
               </div>
             </div>
 
-            {/* Optional sharing */}
-            <div className="p-4 bg-muted/50 rounded-lg border">
+            {/* Sharing consent for aggregated insights - LGPD compliant language */}
+            <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
               <div className="flex items-start gap-3">
                 <Checkbox
                   id="share-report"
                   checked={shareWithCompany}
                   onCheckedChange={(checked) => setShareWithCompany(checked === true)}
+                  className="mt-1"
                 />
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <label 
                     htmlFor="share-report" 
                     className="font-medium text-sm cursor-pointer"
                   >
-                    Compartilhar meu tipo com a empresa (opcional)
+                    Autorizo o compartilhamento de insights agregados e anônimos
                   </label>
-                  <p className="text-xs text-muted-foreground">
-                    Se marcado, seu tipo de personalidade (ex: "Eneagrama Tipo 3") será visível para a empresa 
-                    nos relatórios de equipe. Seu relatório detalhado permanece privado.
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Ao marcar esta opção, você autoriza que <strong>apenas dados agregados e anônimos</strong> sejam 
+                    utilizados para compor relatórios de equipe. Isso significa:
                   </p>
+                  <ul className="text-xs text-muted-foreground space-y-1 ml-3">
+                    <li className="flex items-start gap-1">
+                      <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>Seu perfil individual <strong>nunca</strong> será exposto</span>
+                    </li>
+                    <li className="flex items-start gap-1">
+                      <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>Insights são gerados apenas quando há mínimo de 3 participantes</span>
+                    </li>
+                    <li className="flex items-start gap-1">
+                      <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>Resultados aparecem como tendências da equipe, sem identificação</span>
+                    </li>
+                  </ul>
+                  <div className="pt-2 border-t border-primary/10 mt-2">
+                    <p className="text-xs text-muted-foreground italic">
+                      Se preferir não compartilhar, sua jornada continua normalmente — apenas não contribuirá 
+                      para os insights agregados da empresa.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
