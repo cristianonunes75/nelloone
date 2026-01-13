@@ -19,6 +19,14 @@ import BusinessJobPublic from './pages/BusinessJobPublic';
 import BusinessApplicationConfirm from './pages/BusinessApplicationConfirm';
 import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
 
+// Praxis imports
+import PraxisLanding from './pages/PraxisLanding';
+import PraxisAuth from './pages/PraxisAuth';
+import PraxisOnboarding from './pages/PraxisOnboarding';
+import PraxisDashboard from './pages/PraxisDashboard';
+import PraxisClientDetail from './pages/PraxisClientDetail';
+import { PraxisAuthProvider } from './hooks/usePraxisAuth';
+
 /**
  * Nello One Business - B2B Platform for Team Self-Knowledge
  * Subdomain: business.nello.one
@@ -26,14 +34,14 @@ import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
  * Enterprise solution for companies to apply self-knowledge tests
  * to their teams with consolidated reports and privacy-first approach.
  * 
- * ARCHITECTURE:
- * - Collaborators execute tests in the CORE (/cliente) - single source of truth
- * - Business only handles: company association, invites, aggregated insights
- * - No duplicate journey logic - Business READS from Core
+ * MODES:
+ * - Enterprise: Team/company management (existing)
+ * - Professional (Praxis): 1:1 client management for coaches/therapists
  */
 export default function BusinessApp() {
   return (
     <Routes>
+      {/* ========== ENTERPRISE MODE (existing) ========== */}
       {/* Public routes */}
       <Route path="/" element={<BusinessLanding />} />
       <Route path="/auth" element={<BusinessAuth />} />
@@ -112,6 +120,19 @@ export default function BusinessApp() {
         <BusinessProtectedRoute requiredRole="collaborator">
           <BusinessCollaboratorRedirect />
         </BusinessProtectedRoute>
+      } />
+
+      {/* ========== PRAXIS MODE (new) ========== */}
+      <Route path="/praxis" element={<PraxisLanding />} />
+      <Route path="/praxis/auth" element={<PraxisAuth />} />
+      <Route path="/praxis/*" element={
+        <PraxisAuthProvider>
+          <Routes>
+            <Route path="/onboarding" element={<PraxisOnboarding />} />
+            <Route path="/dashboard" element={<PraxisDashboard />} />
+            <Route path="/clients/:clientId" element={<PraxisClientDetail />} />
+          </Routes>
+        </PraxisAuthProvider>
       } />
       
       {/* Fallback */}
