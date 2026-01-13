@@ -26,10 +26,11 @@ export function NelloOneUpsell({ candidateEmail, candidateName }: NelloOneUpsell
       utm_medium: 'candidate_upsell',
       utm_campaign: 'assessment_completion',
       email: candidateEmail,
+      tab: 'register', // Pre-select register tab
     });
     
-    // Redirect to Nello One landing with pre-filled email
-    window.open(`https://nello.one/lander?${utmParams.toString()}`, '_blank');
+    // Redirect to Nello One auth page with pre-filled email
+    window.open(`https://nello.one/auth?${utmParams.toString()}`, '_blank');
   };
 
   return (
