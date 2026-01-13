@@ -131,3 +131,6 @@ verify_jwt = false
 
 [functions.nello-relatorio-contextual]
 verify_jwt = true
+
+[functions.scan-resume]
+verify_jwt = true

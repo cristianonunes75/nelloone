@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useBusinessAuth } from "../hooks/useBusinessAuth";
 import { BusinessLayout } from "../components/BusinessLayout";
+import { ExtractedResumeDetails } from "../components/ExtractedResumeDetails";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +31,8 @@ import {
   Heart,
   MoreHorizontal,
   Trash2,
-  RefreshCw
+  RefreshCw,
+  Scan
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { format, formatDistanceToNow } from "date-fns";
@@ -44,6 +46,52 @@ interface JobPosting {
   status: string;
   public_slug: string;
   cultural_affinity_question: string | null;
+}
+
+interface ExtractedResumeData {
+  personal_info?: {
+    full_name?: string;
+    email?: string;
+    phone?: string;
+    city?: string;
+    state?: string;
+    neighborhood?: string;
+    linkedin?: string;
+    portfolio?: string;
+  };
+  professional_objective?: string;
+  professional_summary?: string;
+  work_experience?: Array<{
+    company?: string;
+    position?: string;
+    start_date?: string;
+    end_date?: string;
+    description?: string;
+    achievements?: string[];
+  }>;
+  education?: Array<{
+    institution?: string;
+    course?: string;
+    degree?: string;
+    start_date?: string;
+    end_date?: string;
+    status?: string;
+  }>;
+  courses_certifications?: Array<{
+    name?: string;
+    institution?: string;
+    date?: string;
+    hours?: string;
+  }>;
+  skills?: {
+    technical?: string[];
+    soft?: string[];
+  };
+  languages?: Array<{
+    language?: string;
+    level?: string;
+  }>;
+  additional_info?: string;
 }
 
 interface JobApplication {
@@ -68,6 +116,9 @@ interface JobApplication {
   internal_notes: string | null;
   created_at: string;
   hiring_candidate_id: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  extracted_data: ExtractedResumeData | any;
+  extraction_status: string | null;
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
@@ -179,13 +230,14 @@ export default function BusinessJobDetail() {
     try {
       let resumeUrl = null;
       let resumeFilename = null;
+      let filePath = null;
 
       // Upload resume if provided
       if (uploadFile) {
         const fileExt = uploadFile.name.split('.').pop();
         const fileName = `${crypto.randomUUID()}.${fileExt}`;
         // Store inside the "resumes" bucket
-        const filePath = `${company.id}/${job.id}/${fileName}`;
+        filePath = `${company.id}/${job.id}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from("resumes")
@@ -213,11 +265,39 @@ export default function BusinessJobDetail() {
           email: uploadData.email || null,
           resume_url: resumeUrl,
           resume_filename: resumeFilename,
+          extraction_status: uploadFile ? "pending" : null,
         })
         .select()
         .single();
 
       if (error) throw error;
+
+      // If a PDF resume was uploaded, scan it for data extraction
+      if (uploadFile && data && filePath) {
+        const isPdf = uploadFile.name.toLowerCase().endsWith('.pdf');
+        if (isPdf) {
+          toast.info("Escaneando currículo para extração de dados...");
+          
+          // Call the scan-resume edge function
+          supabase.functions.invoke("scan-resume", {
+            body: {
+              application_id: data.id,
+              file_path: filePath,
+              resume_url: resumeUrl,
+            },
+          }).then(({ data: scanData, error: scanError }) => {
+            if (scanError) {
+              console.error("Error scanning resume:", scanError);
+              toast.error("Erro ao escanear currículo. Os dados precisam ser preenchidos manualmente.");
+            } else if (scanData?.success) {
+              toast.success("Dados do currículo extraídos com sucesso!");
+              fetchJobAndApplications();
+            }
+          }).catch(err => {
+            console.error("Resume scan failed:", err);
+          });
+        }
+      }
 
       toast.success("Currículo adicionado! Aguardando confirmação do candidato.");
       setUploadDialogOpen(false);
@@ -651,13 +731,38 @@ export default function BusinessJobDetail() {
 
                         {/* Resume link */}
                         {app.resume_url && (
-                          <button 
-                            onClick={() => handleOpenResume(app.resume_url!)}
-                            className="inline-flex items-center gap-1 text-sm text-primary hover:underline cursor-pointer"
-                          >
-                            <FileText className="h-3 w-3" />
-                            {app.resume_filename || "Ver currículo"}
-                          </button>
+                          <div className="flex items-center gap-3">
+                            <button 
+                              onClick={() => handleOpenResume(app.resume_url!)}
+                              className="inline-flex items-center gap-1 text-sm text-primary hover:underline cursor-pointer"
+                            >
+                              <FileText className="h-3 w-3" />
+                              {app.resume_filename || "Ver currículo"}
+                            </button>
+                            {app.extraction_status === "processing" && (
+                              <Badge variant="outline" className="text-blue-600 border-blue-200">
+                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                Escaneando...
+                              </Badge>
+                            )}
+                            {app.extraction_status === "completed" && (
+                              <Badge variant="outline" className="text-green-600 border-green-200">
+                                <CheckCircle2 className="h-3 w-3 mr-1" />
+                                Dados extraídos
+                              </Badge>
+                            )}
+                            {app.extraction_status === "failed" && (
+                              <Badge variant="outline" className="text-red-600 border-red-200">
+                                <AlertCircle className="h-3 w-3 mr-1" />
+                                Falha na extração
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Extracted Resume Data */}
+                        {app.extracted_data && app.extraction_status === "completed" && (
+                          <ExtractedResumeDetails data={app.extracted_data} />
                         )}
                       </div>
 
