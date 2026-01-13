@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useBusinessAuth } from "../hooks/useBusinessAuth";
 import { BusinessLayout } from "../components/BusinessLayout";
 import { ExtractedResumeDetails } from "../components/ExtractedResumeDetails";
+import { BulkResumeUpload } from "../components/BulkResumeUpload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -176,6 +177,7 @@ export default function BusinessJobDetail() {
   
   // Upload dialog
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [bulkUploadDialogOpen, setBulkUploadDialogOpen] = useState(false);
   const [uploadData, setUploadData] = useState({
     full_name: "",
     email: "",
@@ -508,81 +510,97 @@ export default function BusinessJobDetail() {
             <h1 className="text-2xl font-bold tracking-tight">{job.title}</h1>
             <p className="text-muted-foreground">{job.department}</p>
           </div>
-          <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <Upload className="h-4 w-4" />
-                Adicionar Currículo
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Adicionar Currículo</DialogTitle>
-                <DialogDescription>
-                  Adicione um currículo recebido externamente. O candidato será notificado para confirmar interesse.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="upload-name">Nome (opcional)</Label>
-                  <Input
-                    id="upload-name"
-                    placeholder="Nome do candidato"
-                    value={uploadData.full_name}
-                    onChange={(e) => setUploadData(prev => ({ ...prev, full_name: e.target.value }))}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="upload-email">Email (opcional)</Label>
-                  <Input
-                    id="upload-email"
-                    type="email"
-                    placeholder="email@exemplo.com"
-                    value={uploadData.email}
-                    onChange={(e) => setUploadData(prev => ({ ...prev, email: e.target.value }))}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="source">Origem</Label>
-                  <Select
-                    value={uploadData.source}
-                    onValueChange={(value) => setUploadData(prev => ({ ...prev, source: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="internal_upload">Upload interno</SelectItem>
-                      <SelectItem value="email">Recebido por email</SelectItem>
-                      <SelectItem value="referral">Indicação</SelectItem>
-                      <SelectItem value="job_fair">Feira de emprego</SelectItem>
-                      <SelectItem value="other">Outro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="resume">Currículo (PDF/DOC)</Label>
-                  <Input
-                    id="resume"
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setUploadDialogOpen(false)}>
-                  Cancelar
+          <div className="flex gap-2">
+            <Button variant="outline" className="gap-2" onClick={() => setBulkUploadDialogOpen(true)}>
+              <Upload className="h-4 w-4" />
+              Upload em Massa
+            </Button>
+            <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2">
+                  <Upload className="h-4 w-4" />
+                  Adicionar Currículo
                 </Button>
-                <Button onClick={handleUploadCandidate} disabled={uploading}>
-                  {uploading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                  Adicionar
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Adicionar Currículo</DialogTitle>
+                  <DialogDescription>
+                    Adicione um currículo recebido externamente. O candidato será notificado para confirmar interesse.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="upload-name">Nome (opcional)</Label>
+                    <Input
+                      id="upload-name"
+                      placeholder="Nome do candidato"
+                      value={uploadData.full_name}
+                      onChange={(e) => setUploadData(prev => ({ ...prev, full_name: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="upload-email">Email (opcional)</Label>
+                    <Input
+                      id="upload-email"
+                      type="email"
+                      placeholder="email@exemplo.com"
+                      value={uploadData.email}
+                      onChange={(e) => setUploadData(prev => ({ ...prev, email: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="source">Origem</Label>
+                    <Select
+                      value={uploadData.source}
+                      onValueChange={(value) => setUploadData(prev => ({ ...prev, source: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="internal_upload">Upload interno</SelectItem>
+                        <SelectItem value="email">Recebido por email</SelectItem>
+                        <SelectItem value="referral">Indicação</SelectItem>
+                        <SelectItem value="job_fair">Feira de emprego</SelectItem>
+                        <SelectItem value="other">Outro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="resume">Currículo (PDF/DOC)</Label>
+                    <Input
+                      id="resume"
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setUploadDialogOpen(false)}>
+                    Cancelar
+                  </Button>
+                  <Button onClick={handleUploadCandidate} disabled={uploading}>
+                    {uploading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                    Adicionar
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+          
+          {/* Bulk Upload Dialog */}
+          {job && company && (
+            <BulkResumeUpload
+              open={bulkUploadDialogOpen}
+              onOpenChange={setBulkUploadDialogOpen}
+              jobId={job.id}
+              companyId={company.id}
+              onComplete={fetchJobAndApplications}
+            />
+          )}
         </div>
-
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card
