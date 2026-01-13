@@ -120,23 +120,51 @@ export default function BusinessAcceptInvite() {
         userId = authData.user.id;
       }
       
-      // Create company_user link with the invited role
+      // Create or update company_user link with the invited role
       const isAdmin = invite.role === 'company_admin';
-      const { error: linkError } = await supabase
-        .from('company_users')
-        .insert({
-          company_id: invite.company.id,
-          user_id: userId,
-          role: invite.role,
-          is_active: true,
-          consent_given: true,
-          consent_given_at: new Date().toISOString(),
-          consent_text_version: '1.0',
-          joined_at: new Date().toISOString(),
-          onboarding_completed: isAdmin, // Admins skip onboarding as they share company config
-        });
       
-      if (linkError) throw linkError;
+      // Check if user is already linked to this company
+      const { data: existingLink } = await supabase
+        .from('company_users')
+        .select('id')
+        .eq('company_id', invite.company.id)
+        .eq('user_id', userId)
+        .maybeSingle();
+      
+      if (existingLink) {
+        // Update existing link
+        const { error: updateError } = await supabase
+          .from('company_users')
+          .update({
+            role: invite.role,
+            is_active: true,
+            consent_given: true,
+            consent_given_at: new Date().toISOString(),
+            consent_text_version: '1.0',
+            joined_at: new Date().toISOString(),
+            onboarding_completed: isAdmin,
+          })
+          .eq('id', existingLink.id);
+        
+        if (updateError) throw updateError;
+      } else {
+        // Create new link
+        const { error: linkError } = await supabase
+          .from('company_users')
+          .insert({
+            company_id: invite.company.id,
+            user_id: userId,
+            role: invite.role,
+            is_active: true,
+            consent_given: true,
+            consent_given_at: new Date().toISOString(),
+            consent_text_version: '1.0',
+            joined_at: new Date().toISOString(),
+            onboarding_completed: isAdmin,
+          });
+        
+        if (linkError) throw linkError;
+      }
       
       // Update invite status
       await supabase
