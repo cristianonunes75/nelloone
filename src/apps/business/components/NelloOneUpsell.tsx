@@ -28,8 +28,8 @@ export function NelloOneUpsell({ candidateEmail, candidateName }: NelloOneUpsell
       email: candidateEmail,
     });
     
-    // Redirect to Nello One auth with pre-filled email
-    window.open(`https://nelloone.com/auth?${utmParams.toString()}`, '_blank');
+    // Redirect to Nello One landing with pre-filled email
+    window.open(`https://nello.one/lander?${utmParams.toString()}`, '_blank');
   };
 
   return (
