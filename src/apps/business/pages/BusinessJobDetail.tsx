@@ -359,6 +359,63 @@ export default function BusinessJobDetail() {
     }
   };
 
+  const handleScanResume = async (app: JobApplication) => {
+    if (!app.resume_url) {
+      toast.error("Este candidato não possui currículo anexado");
+      return;
+    }
+
+    const isPdf = app.resume_filename?.toLowerCase().endsWith('.pdf') || app.resume_url.toLowerCase().includes('.pdf');
+    if (!isPdf) {
+      toast.error("Apenas currículos em PDF podem ser escaneados");
+      return;
+    }
+
+    try {
+      // Extract file path from resume URL
+      const urlParts = app.resume_url.split("/resumes/");
+      if (urlParts.length < 2) {
+        toast.error("Não foi possível localizar o arquivo do currículo");
+        return;
+      }
+      const filePath = decodeURIComponent(urlParts[1]);
+
+      // Update status to pending
+      await supabase
+        .from("job_applications")
+        .update({ extraction_status: "processing" })
+        .eq("id", app.id);
+
+      toast.info("Escaneando currículo...");
+      fetchJobAndApplications();
+
+      // Call the scan-resume edge function
+      const { data: scanData, error: scanError } = await supabase.functions.invoke("scan-resume", {
+        body: {
+          application_id: app.id,
+          file_path: filePath,
+          resume_url: app.resume_url,
+        },
+      });
+
+      if (scanError) {
+        console.error("Error scanning resume:", scanError);
+        toast.error("Erro ao escanear currículo");
+        await supabase
+          .from("job_applications")
+          .update({ extraction_status: "failed" })
+          .eq("id", app.id);
+      } else if (scanData?.success) {
+        toast.success("Dados do currículo extraídos com sucesso!");
+      }
+      
+      fetchJobAndApplications();
+    } catch (error) {
+      console.error("Resume scan failed:", error);
+      toast.error("Erro ao escanear currículo");
+    }
+  };
+
   const filteredApplications = applications.filter((app) => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
 
@@ -814,6 +871,18 @@ export default function BusinessJobDetail() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            {app.resume_url && app.extraction_status !== "completed" && app.extraction_status !== "processing" && (
+                              <DropdownMenuItem onClick={() => handleScanResume(app)}>
+                                <Scan className="h-4 w-4 mr-2" />
+                                Escanear currículo
+                              </DropdownMenuItem>
+                            )}
+                            {app.resume_url && app.extraction_status === "completed" && (
+                              <DropdownMenuItem onClick={() => handleScanResume(app)}>
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Re-escanear currículo
+                              </DropdownMenuItem>
+                            )}
                             {app.status === "active_candidate" && !app.hiring_candidate_id && (
                               <DropdownMenuItem>
                                 <UserPlus className="h-4 w-4 mr-2" />
