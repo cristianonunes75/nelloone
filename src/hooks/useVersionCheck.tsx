@@ -1,16 +1,15 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { toast } from 'sonner';
 
-const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // Check every 30 minutes (less aggressive)
+const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // Check every 30 minutes
 const INITIAL_CHECK_DELAY = 60 * 1000; // Wait 1 minute after page load
 
 export const useVersionCheck = () => {
-  const hasShownToast = useRef(false);
+  const hasUpdated = useRef(false);
   const lastHash = useRef<string | null>(null);
   
   const checkForUpdates = useCallback(async () => {
-    // Don't check again if we already showed a toast
-    if (hasShownToast.current) return;
+    // Don't check again if we already triggered an update
+    if (hasUpdated.current) return;
     
     try {
       // Fetch the current index.html to check for new version
@@ -42,25 +41,21 @@ export const useVersionCheck = () => {
       const storedHash = sessionStorage.getItem('app-main-hash');
       
       if (storedHash && storedHash !== mainScript && lastHash.current !== mainScript) {
-        // New version detected!
-        hasShownToast.current = true;
-        toast.info('Nova versão disponível!', {
-          description: 'Clique para atualizar',
-          duration: Infinity,
-          action: {
-            label: 'Atualizar',
-            onClick: () => {
-              // Clear all caches and reload
-              if ('caches' in window) {
-                caches.keys().then(names => {
-                  names.forEach(name => caches.delete(name));
-                });
-              }
-              sessionStorage.removeItem('app-main-hash');
-              window.location.reload();
-            }
-          }
-        });
+        // New version detected - update silently
+        hasUpdated.current = true;
+        
+        // Clear all caches and reload silently
+        if ('caches' in window) {
+          caches.keys().then(names => {
+            names.forEach(name => caches.delete(name));
+          });
+        }
+        sessionStorage.removeItem('app-main-hash');
+        
+        // Small delay to ensure caches are cleared
+        setTimeout(() => {
+          window.location.reload();
+        }, 100);
       }
     } catch (error) {
       // Silently fail - don't disrupt user experience
