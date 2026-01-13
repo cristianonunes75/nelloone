@@ -1,5 +1,6 @@
 import { ReactNode, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useCrossAppAuth } from "@/hooks/useCrossAppAuth";
 import { useNavigate, useLocation } from "react-router-dom";
 
 type UserRole = "admin" | "cliente";
@@ -14,6 +15,9 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
   const navigate = useNavigate();
   const location = useLocation();
   
+  // Handle cross-app authentication tokens (from AdminAppSwitcher)
+  const { isPending: crossAppPending } = useCrossAppAuth();
+  
   // Detect language from current path
   const getBasePath = () => {
     if (location.pathname.startsWith('/en/')) return '/en';
@@ -22,6 +26,9 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
   };
 
   useEffect(() => {
+    // Wait for cross-app auth to complete before redirecting
+    if (crossAppPending) return;
+    
     const basePath = getBasePath();
     
     if (!isLoading && !user) {
@@ -47,9 +54,10 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
           navigate(basePath || "/");
       }
     }
-  }, [user, userRole, isLoading, allowedRoles, navigate, location.pathname]);
+  }, [user, userRole, isLoading, allowedRoles, navigate, location.pathname, crossAppPending]);
 
-  if (isLoading) {
+  // Show loading while auth is loading or cross-app token is being validated
+  if (isLoading || crossAppPending) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>

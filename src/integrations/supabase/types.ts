@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_cross_app_tokens: {
+        Row: {
+          admin_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          ip_address: string | null
+          target_app: string
+          target_path: string
+          token: string
+          used_at: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          ip_address?: string | null
+          target_app: string
+          target_path: string
+          token: string
+          used_at?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          ip_address?: string | null
+          target_app?: string
+          target_path?: string
+          token?: string
+          used_at?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       admin_permissions: {
         Row: {
           can_delete_data: boolean | null
@@ -3004,6 +3043,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      cleanup_expired_cross_app_tokens: { Args: never; Returns: undefined }
       get_admin_permission_level: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["admin_permission_level"]

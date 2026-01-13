@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useNelloApp } from "@/contexts/NelloAppContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,7 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Building2, Sparkles, ChevronDown, ExternalLink, Zap, Heart } from "lucide-react";
+import { Building2, Sparkles, ChevronDown, ExternalLink, Zap, Heart, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface AdminApp {
   id: string;
@@ -68,19 +70,20 @@ const adminApps: AdminApp[] = [
 /**
  * AdminAppSwitcher - Allows super admins to switch between different Nello admin areas
  * Only visible to users with 'admin' role in user_roles table
+ * Uses cross-app tokens for seamless authentication between different subdomains
  */
 export function AdminAppSwitcher() {
   const navigate = useNavigate();
   const location = useLocation();
   const { userRoles, isLoading, user } = useAuth();
   const { currentApp, domain } = useNelloApp();
+  const { toast } = useToast();
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Only show for super admins (users with admin role in Nello One)
   const isSuperAdmin = userRoles.includes('admin');
 
   // Don't hide while loading if user is authenticated - prevents flash
-  // Show the switcher if user is logged in and we're still loading roles
-  // or if user explicitly has admin role
   if (!user) {
     return null;
   }
@@ -111,10 +114,10 @@ export function AdminAppSwitcher() {
 
   const currentAdminApp = adminApps.find(app => app.id === currentAppId) || adminApps[0];
 
-  const handleAppSwitch = (app: AdminApp) => {
-    if (app.id === currentAppId) return;
+  const handleAppSwitch = async (app: AdminApp) => {
+    if (app.id === currentAppId || isTransitioning) return;
 
-    // In preview/local, always use React Router navigation
+    // In preview/local, always use React Router navigation (shared session)
     if (isPreview) {
       const params = new URLSearchParams(location.search);
       params.set('app', app.id);
@@ -131,16 +134,61 @@ export function AdminAppSwitcher() {
       // Same domain - use React Router to avoid re-authentication
       navigate(app.adminPath);
     } else {
-      // Different subdomain - need to redirect
-      window.location.href = `${app.url}${app.adminPath}`;
+      // Different subdomain - need to use cross-app token for seamless auth
+      setIsTransitioning(true);
+      
+      try {
+        // Create a cross-app token
+        const { data, error } = await supabase.functions.invoke('admin-cross-app-auth', {
+          body: { 
+            action: 'create',
+            targetApp: app.id,
+            targetPath: app.adminPath,
+          }
+        });
+
+        if (error) {
+          throw new Error(error.message || "Failed to create cross-app token");
+        }
+
+        if (!data?.token) {
+          throw new Error("No token received");
+        }
+
+        // Redirect to target app with the cross-app token
+        const targetAppUrl = `${app.url}${app.adminPath}?crossAppToken=${data.token}`;
+        window.location.href = targetAppUrl;
+        
+      } catch (error) {
+        console.error("Cross-app transition error:", error);
+        toast({
+          title: "Erro na transição",
+          description: "Não foi possível fazer a transição. Você será redirecionado para fazer login.",
+          variant: "destructive",
+        });
+        
+        // Fallback: redirect without token (will need to login)
+        window.location.href = `${app.url}${app.adminPath}`;
+      } finally {
+        setIsTransitioning(false);
+      }
     }
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10">
-          {currentAdminApp.icon}
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10"
+          disabled={isTransitioning}
+        >
+          {isTransitioning ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            currentAdminApp.icon
+          )}
           <span className="hidden sm:inline">{currentAdminApp.name}</span>
           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
             {currentAdminApp.label}
@@ -158,7 +206,7 @@ export function AdminAppSwitcher() {
             key={app.id}
             onClick={() => handleAppSwitch(app)}
             className="gap-3 cursor-pointer"
-            disabled={app.id === currentAppId}
+            disabled={app.id === currentAppId || isTransitioning}
           >
             {app.icon}
             <div className="flex flex-col flex-1">

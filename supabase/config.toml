@@ -137,3 +137,9 @@ verify_jwt = true
 
 [functions.business-send-job-assessment]
 verify_jwt = true
+
+[functions.business-trial-reminder]
+verify_jwt = false
+
+[functions.admin-cross-app-auth]
+verify_jwt = false
