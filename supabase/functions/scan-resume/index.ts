@@ -1,6 +1,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// Helper function to encode ArrayBuffer to base64 without stack overflow
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const chunkSize = 0x8000; // 32KB chunks to avoid call stack issues
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode.apply(null, Array.from(chunk));
+  }
+  return btoa(binary);
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -68,10 +80,13 @@ serve(async (req) => {
       throw new Error(`Failed to fetch PDF: ${pdfResponse.status}`);
     }
     
+    // Use proper base64 encoding that handles large files without stack overflow
     const pdfBuffer = await pdfResponse.arrayBuffer();
-    const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
+    const pdfBase64 = arrayBufferToBase64(pdfBuffer);
 
-    // Call AI to analyze the PDF
+    console.log("PDF size (bytes):", pdfBuffer.byteLength, "Base64 length:", pdfBase64.length);
+
+    // Call AI to analyze the PDF using the most powerful model for document analysis
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -79,37 +94,41 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [
           {
             role: "system",
-            content: `Você é um especialista em análise de currículos. Sua tarefa é extrair informações estruturadas de currículos em PDF.
+            content: `Você é um especialista em análise de currículos profissionais. Sua tarefa é extrair TODAS as informações estruturadas de currículos em PDF, mesmo que o texto seja difícil de ler ou esteja em formatos diversos.
 
-Extraia as seguintes informações quando disponíveis:
-- Nome completo
-- Email
-- Telefone
-- Cidade/Estado
-- Bairro
-- LinkedIn ou outras redes sociais
-- Objetivo profissional ou cargo desejado
-- Resumo profissional
-- Experiências profissionais (empresa, cargo, período, descrição)
-- Formação acadêmica (instituição, curso, período)
-- Cursos e certificações
-- Habilidades técnicas
-- Idiomas
-- Informações adicionais relevantes
+REGRAS DE EXTRAÇÃO:
+1. Analise TODO o documento cuidadosamente, página por página
+2. Extraia informações mesmo que estejam em formatos não convencionais
+3. Se encontrar informações parciais, ainda assim extraia o que conseguir
+4. Preste atenção especial a:
+   - Cabeçalhos e informações de contato no topo
+   - Seções de experiência profissional
+   - Formação acadêmica e cursos
+   - Habilidades técnicas e comportamentais
+   - Idiomas e certificações
 
-Seja preciso e extraia apenas informações que estão claramente presentes no documento.
-IMPORTANTE: Sempre responda usando a função extract_resume_data.`
+5. Para experiências profissionais, capture:
+   - Nome da empresa/empregador
+   - Cargo/função exercida
+   - Período (datas de início e fim)
+   - Atividades e responsabilidades
+
+6. Normalize telefones brasileiros no formato (XX) XXXXX-XXXX
+7. Extraia emails mesmo que estejam parcialmente visíveis
+8. Identifique a cidade/estado do candidato
+
+IMPORTANTE: SEMPRE responda usando a função extract_resume_data com os dados encontrados. Se algum campo não estiver disponível, simplesmente não o inclua.`
           },
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Analise este currículo em PDF e extraia todas as informações estruturadas disponíveis."
+                text: "Analise este currículo em PDF e extraia TODAS as informações estruturadas disponíveis. Seja minucioso e capture todos os detalhes, incluindo experiências profissionais, formação, habilidades e informações de contato."
               },
               {
                 type: "image_url",
@@ -125,7 +144,7 @@ IMPORTANTE: Sempre responda usando a função extract_resume_data.`
             type: "function",
             function: {
               name: "extract_resume_data",
-              description: "Extrai dados estruturados de um currículo",
+              description: "Extrai dados estruturados de um currículo profissional",
               parameters: {
                 type: "object",
                 properties: {
@@ -133,40 +152,48 @@ IMPORTANTE: Sempre responda usando a função extract_resume_data.`
                     type: "object",
                     description: "Informações pessoais do candidato",
                     properties: {
-                      full_name: { type: "string", description: "Nome completo" },
+                      full_name: { type: "string", description: "Nome completo do candidato" },
                       email: { type: "string", description: "Email de contato" },
                       phone: { type: "string", description: "Telefone de contato" },
-                      city: { type: "string", description: "Cidade" },
-                      state: { type: "string", description: "Estado" },
+                      city: { type: "string", description: "Cidade onde reside" },
+                      state: { type: "string", description: "Estado (UF)" },
                       neighborhood: { type: "string", description: "Bairro" },
-                      linkedin: { type: "string", description: "URL do LinkedIn" },
-                      portfolio: { type: "string", description: "URL do portfólio ou site pessoal" }
+                      address: { type: "string", description: "Endereço completo se disponível" },
+                      linkedin: { type: "string", description: "URL do perfil LinkedIn" },
+                      portfolio: { type: "string", description: "URL do portfólio ou site pessoal" },
+                      github: { type: "string", description: "URL do perfil GitHub" },
+                      birth_date: { type: "string", description: "Data de nascimento" },
+                      age: { type: "string", description: "Idade" },
+                      marital_status: { type: "string", description: "Estado civil" },
+                      nationality: { type: "string", description: "Nacionalidade" }
                     }
                   },
                   professional_objective: {
                     type: "string",
-                    description: "Objetivo profissional ou cargo desejado"
+                    description: "Objetivo profissional ou cargo desejado pelo candidato"
                   },
                   professional_summary: {
                     type: "string",
-                    description: "Resumo profissional ou sobre o candidato"
+                    description: "Resumo profissional, perfil ou apresentação do candidato"
                   },
                   work_experience: {
                     type: "array",
-                    description: "Experiências profissionais",
+                    description: "Histórico de experiências profissionais",
                     items: {
                       type: "object",
                       properties: {
-                        company: { type: "string", description: "Nome da empresa" },
-                        position: { type: "string", description: "Cargo ocupado" },
-                        start_date: { type: "string", description: "Data de início (formato: MM/AAAA ou AAAA)" },
-                        end_date: { type: "string", description: "Data de término ou 'Atual'" },
-                        description: { type: "string", description: "Descrição das atividades" },
+                        company: { type: "string", description: "Nome da empresa ou empregador" },
+                        position: { type: "string", description: "Cargo ou função exercida" },
+                        start_date: { type: "string", description: "Data de início (MM/AAAA ou AAAA)" },
+                        end_date: { type: "string", description: "Data de término ou 'Atual' se ainda empregado" },
+                        is_current: { type: "boolean", description: "Se é o emprego atual" },
+                        description: { type: "string", description: "Descrição das atividades e responsabilidades" },
                         achievements: { 
                           type: "array", 
                           items: { type: "string" },
-                          description: "Principais conquistas ou realizações"
-                        }
+                          description: "Principais conquistas, resultados ou realizações"
+                        },
+                        location: { type: "string", description: "Localização do trabalho (cidade/remoto)" }
                       }
                     }
                   },
@@ -176,58 +203,73 @@ IMPORTANTE: Sempre responda usando a função extract_resume_data.`
                     items: {
                       type: "object",
                       properties: {
-                        institution: { type: "string", description: "Nome da instituição" },
+                        institution: { type: "string", description: "Nome da instituição de ensino" },
                         course: { type: "string", description: "Nome do curso" },
-                        degree: { type: "string", description: "Tipo de formação (Graduação, Pós, MBA, etc.)" },
+                        degree: { type: "string", description: "Tipo de formação (Ensino Médio, Técnico, Graduação, Pós-graduação, MBA, Mestrado, Doutorado)" },
+                        field_of_study: { type: "string", description: "Área de estudo" },
                         start_date: { type: "string", description: "Data de início" },
                         end_date: { type: "string", description: "Data de conclusão ou previsão" },
-                        status: { type: "string", description: "Status (Completo, Em andamento, Trancado)" }
+                        status: { type: "string", description: "Status: Completo, Em andamento, Trancado, Incompleto" }
                       }
                     }
                   },
                   courses_certifications: {
                     type: "array",
-                    description: "Cursos e certificações",
+                    description: "Cursos livres, treinamentos e certificações",
                     items: {
                       type: "object",
                       properties: {
                         name: { type: "string", description: "Nome do curso ou certificação" },
-                        institution: { type: "string", description: "Instituição" },
+                        institution: { type: "string", description: "Instituição que ofereceu" },
                         date: { type: "string", description: "Data de conclusão" },
-                        hours: { type: "string", description: "Carga horária" }
+                        hours: { type: "string", description: "Carga horária" },
+                        credential_id: { type: "string", description: "ID ou código da credencial/certificado" }
                       }
                     }
                   },
                   skills: {
                     type: "object",
-                    description: "Habilidades do candidato",
+                    description: "Habilidades e competências do candidato",
                     properties: {
                       technical: { 
                         type: "array", 
                         items: { type: "string" },
-                        description: "Habilidades técnicas (ferramentas, tecnologias, softwares)"
+                        description: "Habilidades técnicas: ferramentas, softwares, tecnologias, metodologias"
                       },
                       soft: { 
                         type: "array", 
                         items: { type: "string" },
-                        description: "Habilidades comportamentais"
+                        description: "Habilidades comportamentais e interpessoais"
                       }
                     }
                   },
                   languages: {
                     type: "array",
-                    description: "Idiomas",
+                    description: "Idiomas que o candidato domina",
                     items: {
                       type: "object",
                       properties: {
                         language: { type: "string", description: "Nome do idioma" },
-                        level: { type: "string", description: "Nível de proficiência" }
+                        level: { type: "string", description: "Nível: Básico, Intermediário, Avançado, Fluente, Nativo" }
                       }
                     }
                   },
                   additional_info: {
                     type: "string",
-                    description: "Informações adicionais relevantes"
+                    description: "Informações adicionais como disponibilidade, pretensão salarial, CNH, etc"
+                  },
+                  references: {
+                    type: "array",
+                    description: "Referências profissionais",
+                    items: {
+                      type: "object",
+                      properties: {
+                        name: { type: "string", description: "Nome da referência" },
+                        position: { type: "string", description: "Cargo" },
+                        company: { type: "string", description: "Empresa" },
+                        contact: { type: "string", description: "Contato (telefone ou email)" }
+                      }
+                    }
                   }
                 },
                 required: ["personal_info"]
@@ -262,16 +304,16 @@ IMPORTANTE: Sempre responda usando a função extract_resume_data.`
         );
       }
       
-      throw new Error(`AI analysis failed: ${aiResponse.status}`);
+      throw new Error(`AI analysis failed: ${aiResponse.status} - ${errorText}`);
     }
 
     const aiResult = await aiResponse.json();
-    console.log("AI response received");
+    console.log("AI response received successfully");
 
     // Extract the function call result
     const toolCall = aiResult.choices?.[0]?.message?.tool_calls?.[0];
     if (!toolCall || toolCall.function.name !== "extract_resume_data") {
-      console.error("No valid tool call in response");
+      console.error("No valid tool call in response:", JSON.stringify(aiResult, null, 2));
       
       await supabase
         .from("job_applications")
@@ -279,16 +321,34 @@ IMPORTANTE: Sempre responda usando a função extract_resume_data.`
         .eq("id", application_id);
       
       return new Response(
-        JSON.stringify({ error: "Could not extract data from resume", details: "AI did not return structured data" }),
+        JSON.stringify({ 
+          error: "Could not extract data from resume", 
+          details: "AI did not return structured data. The PDF may be image-based or have an unusual format." 
+        }),
         { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const extractedData = JSON.parse(toolCall.function.arguments);
+    let extractedData;
+    try {
+      extractedData = JSON.parse(toolCall.function.arguments);
+    } catch (parseError) {
+      console.error("Failed to parse AI response:", parseError);
+      await supabase
+        .from("job_applications")
+        .update({ extraction_status: "failed" })
+        .eq("id", application_id);
+      
+      return new Response(
+        JSON.stringify({ error: "Failed to parse extracted data" }),
+        { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     console.log("Extracted resume data:", JSON.stringify(extractedData, null, 2));
 
     // Update job application with extracted data
-    const updateData: Record<string, any> = {
+    const updateData: Record<string, unknown> = {
       extracted_data: extractedData,
       extraction_status: "completed",
     };
