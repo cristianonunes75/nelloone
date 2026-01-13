@@ -2005,7 +2005,7 @@ export type Database = {
           description?: string | null
           id?: string
           internal_notes?: string | null
-          public_slug: string
+          public_slug?: string
           status?: string
           title: string
           updated_at?: string
