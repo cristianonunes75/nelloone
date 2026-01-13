@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import JSZip from "https://esm.sh/jszip@3.10.1";
 
 // Helper function to encode ArrayBuffer to base64 without stack overflow
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
@@ -11,6 +12,90 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
     binary += String.fromCharCode.apply(null, Array.from(chunk));
   }
   return btoa(binary);
+}
+
+// Helper function to extract text from Word documents (.docx)
+async function extractTextFromWord(buffer: ArrayBuffer, mimeType: string): Promise<string> {
+  try {
+    if (mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+      // .docx files are ZIP archives containing XML
+      const zip = new JSZip();
+      const contents = await zip.loadAsync(buffer);
+      
+      // Get the main document content
+      const documentXml = await contents.file("word/document.xml")?.async("string");
+      
+      if (!documentXml) {
+        console.log("No document.xml found in docx");
+        return "";
+      }
+      
+      // Extract text from XML, removing tags
+      // This regex extracts text between <w:t> tags (Word text elements)
+      const textMatches = documentXml.match(/<w:t[^>]*>([^<]*)<\/w:t>/g) || [];
+      const texts: string[] = [];
+      
+      for (const match of textMatches) {
+        const textContent = match.replace(/<w:t[^>]*>/, "").replace(/<\/w:t>/, "");
+        if (textContent) {
+          texts.push(textContent);
+        }
+      }
+      
+      // Also handle paragraph breaks
+      let result = documentXml;
+      result = result.replace(/<\/w:p>/g, "\n");
+      result = result.replace(/<[^>]+>/g, "");
+      result = result.replace(/\s+/g, " ").trim();
+      
+      // Decode XML entities
+      result = result.replace(/&amp;/g, "&");
+      result = result.replace(/&lt;/g, "<");
+      result = result.replace(/&gt;/g, ">");
+      result = result.replace(/&quot;/g, '"');
+      result = result.replace(/&apos;/g, "'");
+      
+      return result;
+    } else if (mimeType === "application/msword") {
+      // .doc files are binary format - harder to parse
+      // We'll try to extract ASCII text from the binary
+      const bytes = new Uint8Array(buffer);
+      let text = "";
+      let currentWord = "";
+      
+      for (let i = 0; i < bytes.length; i++) {
+        const char = bytes[i];
+        // Check if it's a printable ASCII character
+        if (char >= 32 && char <= 126) {
+          currentWord += String.fromCharCode(char);
+        } else if (char === 10 || char === 13) {
+          if (currentWord.length > 2) {
+            text += currentWord + "\n";
+          }
+          currentWord = "";
+        } else {
+          if (currentWord.length > 2) {
+            text += currentWord + " ";
+          }
+          currentWord = "";
+        }
+      }
+      
+      if (currentWord.length > 2) {
+        text += currentWord;
+      }
+      
+      // Clean up the extracted text
+      text = text.replace(/\s+/g, " ").trim();
+      
+      return text;
+    }
+    
+    return "";
+  } catch (error) {
+    console.error("Error extracting text from Word document:", error);
+    return "";
+  }
 }
 
 const corsHeaders = {
@@ -85,6 +170,8 @@ serve(async (req) => {
     const urlLower = (file_path || resume_url || "").toLowerCase();
     
     let mimeType = "application/pdf";
+    let isWordDocument = false;
+    
     if (urlLower.endsWith(".jpg") || urlLower.endsWith(".jpeg") || contentType.includes("image/jpeg")) {
       mimeType = "image/jpeg";
     } else if (urlLower.endsWith(".png") || contentType.includes("image/png")) {
@@ -95,17 +182,60 @@ serve(async (req) => {
       mimeType = "image/webp";
     } else if (urlLower.endsWith(".pdf") || contentType.includes("application/pdf")) {
       mimeType = "application/pdf";
+    } else if (urlLower.endsWith(".docx") || contentType.includes("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+      mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+      isWordDocument = true;
+    } else if (urlLower.endsWith(".doc") || contentType.includes("application/msword")) {
+      mimeType = "application/msword";
+      isWordDocument = true;
     }
     
-    console.log("Detected MIME type:", mimeType);
+    console.log("Detected MIME type:", mimeType, "Is Word document:", isWordDocument);
     
     // Use proper base64 encoding that handles large files without stack overflow
     const fileBuffer = await fileResponse.arrayBuffer();
+    
+    // For Word documents, extract text content
+    let extractedTextContent = "";
+    if (isWordDocument) {
+      console.log("Processing Word document, extracting text...");
+      extractedTextContent = await extractTextFromWord(fileBuffer, mimeType);
+      console.log("Extracted text length:", extractedTextContent.length);
+    }
+    
     const fileBase64 = arrayBufferToBase64(fileBuffer);
 
     console.log("File size (bytes):", fileBuffer.byteLength, "Base64 length:", fileBase64.length);
 
-    // Call AI to analyze the PDF using the most powerful model for document analysis
+    // Call AI to analyze the resume using the most powerful model for document analysis
+    // For Word documents, send extracted text; for images/PDFs, send as base64
+    const userContent = isWordDocument
+      ? [
+          {
+            type: "text",
+            text: `Analise este currículo e extraia TODAS as informações estruturadas disponíveis. Seja minucioso e capture todos os detalhes, incluindo experiências profissionais, formação, habilidades e informações de contato.
+
+CONTEÚDO DO CURRÍCULO (extraído de arquivo Word):
+---
+${extractedTextContent}
+---
+
+Por favor, extraia todos os dados estruturados deste currículo.`
+          }
+        ]
+      : [
+          {
+            type: "text",
+            text: "Analise este currículo e extraia TODAS as informações estruturadas disponíveis. Seja minucioso e capture todos os detalhes, incluindo experiências profissionais, formação, habilidades e informações de contato. O arquivo pode ser um PDF ou uma imagem de um currículo."
+          },
+          {
+            type: "image_url",
+            image_url: { 
+              url: `data:${mimeType};base64,${fileBase64}`
+            }
+          }
+        ];
+    
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -117,10 +247,10 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `Você é um especialista em análise de currículos profissionais. Sua tarefa é extrair TODAS as informações estruturadas de currículos em PDF ou imagem, mesmo que o texto seja difícil de ler ou esteja em formatos diversos.
+            content: `Você é um especialista em análise de currículos profissionais. Sua tarefa é extrair TODAS as informações estruturadas de currículos em PDF, imagem ou texto extraído de documento Word, mesmo que o texto seja difícil de ler ou esteja em formatos diversos.
 
 REGRAS DE EXTRAÇÃO:
-1. Analise TODO o documento cuidadosamente, página por página
+1. Analise TODO o documento/texto cuidadosamente
 2. Extraia informações mesmo que estejam em formatos não convencionais
 3. Se encontrar informações parciais, ainda assim extraia o que conseguir
 4. Preste atenção especial a:
@@ -129,7 +259,7 @@ REGRAS DE EXTRAÇÃO:
    - Formação acadêmica e cursos
    - Habilidades técnicas e comportamentais
    - Idiomas e certificações
-   - FOTO DO CANDIDATO (se houver uma foto/imagem do rosto no currículo)
+   - FOTO DO CANDIDATO (se houver uma foto/imagem do rosto no currículo - apenas para PDFs/imagens)
 
 5. Para experiências profissionais, capture:
    - Nome da empresa/empregador
@@ -140,24 +270,13 @@ REGRAS DE EXTRAÇÃO:
 6. Normalize telefones brasileiros no formato (XX) XXXXX-XXXX
 7. Extraia emails mesmo que estejam parcialmente visíveis
 8. Identifique a cidade/estado do candidato
-9. FOTO: Se o currículo contiver uma foto do candidato, SEMPRE indique has_photo como true e descreva a localização da foto no documento (ex: "canto superior esquerdo", "lado direito do cabeçalho")
+9. FOTO: Se o currículo contiver uma foto do candidato (apenas para PDFs/imagens), SEMPRE indique has_photo como true e descreva a localização da foto no documento
 
 IMPORTANTE: SEMPRE responda usando a função extract_resume_data com os dados encontrados. Se algum campo não estiver disponível, simplesmente não o inclua.`
           },
           {
             role: "user",
-            content: [
-              {
-                type: "text",
-                text: "Analise este currículo e extraia TODAS as informações estruturadas disponíveis. Seja minucioso e capture todos os detalhes, incluindo experiências profissionais, formação, habilidades e informações de contato. O arquivo pode ser um PDF ou uma imagem de um currículo."
-              },
-              {
-                type: "image_url",
-                image_url: { 
-                  url: `data:${mimeType};base64,${fileBase64}`
-                }
-              }
-            ]
+            content: userContent
           }
         ],
         tools: [
