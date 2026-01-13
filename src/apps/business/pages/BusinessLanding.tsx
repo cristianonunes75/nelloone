@@ -21,10 +21,19 @@ export default function BusinessLanding() {
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-primary" />
+              <a 
+                href="https://nello.one" 
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                ← Voltar para Nello One
+              </a>
+              <span className="text-muted-foreground/50">|</span>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Building2 className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-lg font-semibold">Nello Business</span>
               </div>
-              <span className="text-lg font-semibold">Nello Business</span>
             </div>
             <div className="flex items-center gap-3">
               <Link to="/auth">

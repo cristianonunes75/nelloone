@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import BusinessLanding from './pages/BusinessLanding';
 import BusinessAuth from './pages/BusinessAuth';
 import BusinessOnboarding from './pages/BusinessOnboarding';
+import BusinessConsent from './pages/BusinessConsent';
 import BusinessDashboard from './pages/BusinessDashboard';
 import BusinessTeam from './pages/BusinessTeam';
 import BusinessInvite from './pages/BusinessInvite';
@@ -41,6 +42,13 @@ export default function BusinessApp() {
       {/* Public job routes */}
       <Route path="/vaga/:slug" element={<BusinessJobPublic />} />
       <Route path="/confirmar/:token" element={<BusinessApplicationConfirm />} />
+      
+      {/* Collaborator consent route */}
+      <Route path="/consent" element={
+        <BusinessProtectedRoute requiredRole="collaborator">
+          <BusinessConsent />
+        </BusinessProtectedRoute>
+      } />
       
       {/* Company Admin routes */}
       <Route path="/onboarding" element={
