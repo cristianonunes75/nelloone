@@ -1,13 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, ArrowRight, Share2 } from "lucide-react";
+import { Home, ArrowRight, Share2, FileText, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ResultsFloatingMenuProps {
   basePath: string;
   onShare?: () => void;
   onContinue?: () => void;
+  onDownloadPDF?: () => void;
   showContinue?: boolean;
+  isDownloading?: boolean;
   className?: string;
 }
 
@@ -15,7 +17,9 @@ export function ResultsFloatingMenu({
   basePath,
   onShare,
   onContinue,
+  onDownloadPDF,
   showContinue = true,
+  isDownloading = false,
   className,
 }: ResultsFloatingMenuProps) {
   const navigate = useNavigate();
@@ -27,6 +31,24 @@ export function ResultsFloatingMenu({
         className
       )}
     >
+      {/* Download PDF button */}
+      {onDownloadPDF && (
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={onDownloadPDF}
+          disabled={isDownloading}
+          className="h-12 w-12 rounded-full shadow-lg bg-background/95 backdrop-blur-sm border-border hover:bg-accent"
+          title="Baixar PDF"
+        >
+          {isDownloading ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <FileText className="h-5 w-5" />
+          )}
+        </Button>
+      )}
+
       {/* Share button */}
       {onShare && (
         <Button
