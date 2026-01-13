@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Building2, Loader2, CheckCircle, AlertCircle, Shield, Crown } from 'lucide-react';
+import { Building2, Loader2, CheckCircle, AlertCircle, Shield, Crown, LogOut, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -38,6 +38,21 @@ export default function BusinessAcceptInvite() {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [consentGiven, setConsentGiven] = useState(false);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+  
+  // Check if logged-in user email differs from invite email
+  const isWrongAccount = user && currentUserEmail && invite && 
+    currentUserEmail.toLowerCase() !== invite.email.toLowerCase();
+
+  useEffect(() => {
+    const fetchCurrentUserEmail = async () => {
+      if (user) {
+        const { data } = await supabase.auth.getUser();
+        setCurrentUserEmail(data.user?.email || null);
+      }
+    };
+    fetchCurrentUserEmail();
+  }, [user]);
 
   useEffect(() => {
     if (token) {
@@ -256,6 +271,39 @@ export default function BusinessAcceptInvite() {
           )}
         </div>
 
+        {/* Wrong Account Warning Card */}
+        {isWrongAccount && (
+          <Card className="border-orange-300 bg-orange-50">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-6 h-6 text-orange-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-semibold text-orange-800">Conta diferente detectada</p>
+                  <p className="text-sm text-orange-700 mt-1">
+                    Você está logado como <strong>{currentUserEmail}</strong>, mas este convite é para <strong>{invite.email}</strong>.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2 mt-4">
+                    <Button 
+                      variant="outline" 
+                      className="border-orange-300 text-orange-700 hover:bg-orange-100"
+                      onClick={async () => {
+                        await supabase.auth.signOut();
+                        window.location.reload();
+                      }}
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sair e criar conta para {invite.email.split('@')[0]}...
+                    </Button>
+                  </div>
+                  <p className="text-xs text-orange-600 mt-3">
+                    💡 Após sair, você poderá criar uma conta com o email do convite ou fazer login se já tiver uma.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Admin Info Card */}
         {invite.role === 'company_admin' && (
           <Card className="border-amber-200 bg-amber-50/50">
@@ -276,127 +324,134 @@ export default function BusinessAcceptInvite() {
           </Card>
         )}
 
-        {/* Consent Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-primary" />
-              Sua privacidade é prioridade
-            </CardTitle>
-            <CardDescription>
-              Antes de continuar, entenda como seus dados serão utilizados
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3 text-sm">
-              <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-green-700">Você terá acesso completo</p>
-                  <p className="text-green-600">
-                    Seu relatório pessoal com forças, padrões e orientações de desenvolvimento
-                  </p>
+        {/* Only show consent and registration if correct account or not logged in */}
+        {!isWrongAccount && (
+          <>
+            {/* Consent Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-primary" />
+                  Sua privacidade é prioridade
+                </CardTitle>
+                <CardDescription>
+                  Antes de continuar, entenda como seus dados serão utilizados
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-green-700">Você terá acesso completo</p>
+                      <p className="text-green-600">
+                        Seu relatório pessoal com forças, padrões e orientações de desenvolvimento
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <Shield className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-blue-700">A empresa verá apenas dados agregados</p>
+                      <p className="text-blue-600">
+                        Tendências gerais da equipe, sem identificação individual
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+                    <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Importante</p>
+                      <p className="text-muted-foreground">
+                        Este não é um teste psicológico ou diagnóstico clínico. 
+                        É uma ferramenta de autoconhecimento para desenvolvimento pessoal e profissional.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <Shield className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-blue-700">A empresa verá apenas dados agregados</p>
-                  <p className="text-blue-600">
-                    Tendências gerais da equipe, sem identificação individual
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
-                <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium">Importante</p>
-                  <p className="text-muted-foreground">
-                    Este não é um teste psicológico ou diagnóstico clínico. 
-                    É uma ferramenta de autoconhecimento para desenvolvimento pessoal e profissional.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
 
-        {/* Registration Form (if not logged in) */}
-        {!user && (
+            {/* Registration Form (if not logged in) */}
+            {!user && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Criar sua conta</CardTitle>
+                  <CardDescription>
+                    Complete seus dados para aceitar o convite
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Seu nome</Label>
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Seu nome completo"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={invite.email}
+                      disabled
+                      className="bg-muted"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Senha</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Mínimo 8 caracteres"
+                      minLength={8}
+                      required
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </>
+        )}
+
+        {/* Consent Checkbox and Action - Only show if correct account */}
+        {!isWrongAccount && (
           <Card>
-            <CardHeader>
-              <CardTitle>Criar sua conta</CardTitle>
-              <CardDescription>
-                Complete seus dados para aceitar o convite
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Seu nome</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Seu nome completo"
-                  required
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="consent"
+                  checked={consentGiven}
+                  onCheckedChange={(checked) => setConsentGiven(checked === true)}
                 />
+                <label htmlFor="consent" className="text-sm leading-relaxed cursor-pointer">
+                  Li e compreendi as informações acima. Aceito participar da jornada de autoconhecimento 
+                  e autorizo o uso dos meus dados de forma agregada e anônima para relatórios da equipe.
+                </label>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={invite.email}
-                  disabled
-                  className="bg-muted"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Mínimo 8 caracteres"
-                  minLength={8}
-                  required
-                />
-              </div>
+              
+              <Button
+                onClick={handleAcceptInvite}
+                disabled={!consentGiven || isAccepting || (!user && (!name || !password))}
+                className="w-full"
+              >
+                {isAccepting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  'Aceitar convite e começar'
+                )}
+              </Button>
             </CardContent>
           </Card>
         )}
-
-        {/* Consent Checkbox and Action */}
-        <Card>
-          <CardContent className="pt-6 space-y-4">
-            <div className="flex items-start gap-3">
-              <Checkbox
-                id="consent"
-                checked={consentGiven}
-                onCheckedChange={(checked) => setConsentGiven(checked === true)}
-              />
-              <label htmlFor="consent" className="text-sm leading-relaxed cursor-pointer">
-                Li e compreendi as informações acima. Aceito participar da jornada de autoconhecimento 
-                e autorizo o uso dos meus dados de forma agregada e anônima para relatórios da equipe.
-              </label>
-            </div>
-            
-            <Button
-              onClick={handleAcceptInvite}
-              disabled={!consentGiven || isAccepting || (!user && (!name || !password))}
-              className="w-full"
-            >
-              {isAccepting ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                'Aceitar convite e começar'
-              )}
-            </Button>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
