@@ -38,10 +38,27 @@ interface StripeCoupon {
   times_redeemed: number;
   valid: boolean;
   redeem_by: number | null;
+  metadata?: {
+    product_type?: string;
+    applies_to?: string;
+  };
 }
 
-const PRODUCT_OPTIONS = [
-  { value: "all", label: "Todos os produtos" },
+interface LocalCoupon {
+  id: string;
+  code: string;
+  allowed_product_type: string | null;
+}
+
+// Tipos principais de produto para cupons
+const PRODUCT_TYPE_OPTIONS = [
+  { value: "nello_one", label: "🎯 Nello One (Consumidor)", color: "bg-primary/10 text-primary" },
+  { value: "nello_business", label: "🏢 Nello Business (Empresas)", color: "bg-amber-500/10 text-amber-600" },
+];
+
+// Opções específicas dentro do Nello One
+const NELLO_ONE_SUB_OPTIONS = [
+  { value: "all", label: "Todos os produtos One" },
   { value: "jornada_completa", label: "Jornada Completa" },
   { value: "codigo_essencia", label: "Código da Essência" },
   { value: "test_avulso", label: "Apenas Testes Avulsos" },
@@ -51,11 +68,11 @@ const PRODUCT_OPTIONS = [
   { value: "eneagrama", label: "Eneagrama" },
   { value: "nello16", label: "Nello 16 Personality" },
   { value: "estilos_conexao", label: "Estilos de Conexão" },
-  { value: "nello_business", label: "🏢 Nello Business (Empresas)" },
 ];
 
 export const AdminCoupons = () => {
   const [coupons, setCoupons] = useState<StripeCoupon[]>([]);
+  const [localCoupons, setLocalCoupons] = useState<LocalCoupon[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -70,7 +87,8 @@ export const AdminCoupons = () => {
     duration_in_months: 1,
     max_redemptions: 10,
     redeem_by_months: 1,
-    appliesTo: "all",
+    productType: "nello_one", // nello_one ou nello_business
+    appliesTo: "all", // sub-opção dentro do nello_one
     testesAvulsosOnly: false,
     isFreeAccess: false,
   });
@@ -82,16 +100,29 @@ export const AdminCoupons = () => {
   const fetchCoupons = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.functions.invoke('list-stripe-coupons');
       
+      // Fetch from Stripe
+      const { data, error } = await supabase.functions.invoke('list-stripe-coupons');
       if (error) throw error;
       setCoupons(data?.coupons || []);
+
+      // Fetch local coupons to get product_type
+      const { data: localData } = await supabase
+        .from('coupons')
+        .select('id, code, allowed_product_type');
+      setLocalCoupons(localData || []);
     } catch (error) {
       console.error("Error fetching coupons:", error);
       toast.error("Erro ao carregar cupons");
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper para determinar tipo do cupom
+  const getCouponProductType = (couponId: string): string | null => {
+    const local = localCoupons.find(c => c.code === couponId);
+    return local?.allowed_product_type || null;
   };
 
   const handleCreateCoupon = async () => {
@@ -102,12 +133,19 @@ export const AdminCoupons = () => {
 
     setCreating(true);
     try {
+      // Determinar o allowed_product_type baseado na seleção
+      const allowedProductType = newCoupon.productType === "nello_business" 
+        ? "nello_business" 
+        : newCoupon.appliesTo; // Para Nello One, usa a sub-opção
+
       const payload: any = {
         name: newCoupon.name.toUpperCase(),
         duration: newCoupon.duration,
         max_redemptions: newCoupon.max_redemptions,
         redeem_by_months: newCoupon.redeem_by_months,
+        allowed_product_type: allowedProductType,
         metadata: {
+          product_type: newCoupon.productType, // nello_one ou nello_business
           applies_to: newCoupon.appliesTo,
           testes_avulsos_only: newCoupon.testesAvulsosOnly,
           is_free_access: newCoupon.isFreeAccess,
@@ -152,6 +190,7 @@ export const AdminCoupons = () => {
         duration_in_months: 1,
         max_redemptions: 10,
         redeem_by_months: 1,
+        productType: "nello_one",
         appliesTo: "all",
         testesAvulsosOnly: false,
         isFreeAccess: false,
@@ -165,20 +204,28 @@ export const AdminCoupons = () => {
     }
   };
 
-  const copyCheckoutLink = (couponId: string, isBusinessCoupon?: boolean) => {
+  const copyCheckoutLink = (couponId: string) => {
+    const productType = getCouponProductType(couponId);
     const baseUrl = window.location.origin;
     // Se for cupom Business, gerar link para a landing do Business
-    const link = isBusinessCoupon 
+    const link = productType === "nello_business" 
       ? `https://business.nello.one/?promo=${couponId}`
       : `${baseUrl}/pt/pricing?promo=${couponId}`;
     navigator.clipboard.writeText(link);
-    toast.success("Link copiado!");
+    toast.success(productType === "nello_business" ? "Link Business copiado!" : "Link Nello One copiado!");
   };
 
   const copyBusinessLink = (couponId: string) => {
     const businessLink = `https://business.nello.one/?promo=${couponId}`;
     navigator.clipboard.writeText(businessLink);
     toast.success("Link Business copiado!");
+  };
+
+  const copyOneLink = (couponId: string) => {
+    const baseUrl = window.location.origin;
+    const link = `${baseUrl}/pt/pricing?promo=${couponId}`;
+    navigator.clipboard.writeText(link);
+    toast.success("Link Nello One copiado!");
   };
 
   const handleDeleteCoupon = async (couponId: string) => {
@@ -254,17 +301,31 @@ export const AdminCoupons = () => {
 
       {/* Coupons List */}
       <div className="space-y-3">
-        {coupons.map((coupon) => (
+        {coupons.map((coupon) => {
+          const productType = getCouponProductType(coupon.id);
+          const isBusiness = productType === "nello_business";
+          
+          return (
           <Card key={coupon.id} className={`border-border/50 ${!coupon.valid ? "opacity-50" : ""}`}>
             <CardContent className="p-4">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Ticket className="w-4 h-4 text-primary" />
+                  <div className={`p-2 rounded-lg ${isBusiness ? "bg-amber-500/10" : "bg-primary/10"}`}>
+                    {isBusiness ? (
+                      <Building2 className="w-4 h-4 text-amber-600" />
+                    ) : (
+                      <Ticket className="w-4 h-4 text-primary" />
+                    )}
                   </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <code className="font-mono font-semibold">{coupon.id}</code>
+                      {/* Badge de tipo de produto */}
+                      {isBusiness ? (
+                        <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs">🏢 Business</Badge>
+                      ) : (
+                        <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">🎯 One</Badge>
+                      )}
                       {coupon.valid ? (
                         <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs">Ativo</Badge>
                       ) : (
@@ -301,17 +362,15 @@ export const AdminCoupons = () => {
                     </div>
                   )}
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => copyCheckoutLink(coupon.id)} title="Copiar link Nello One">
-                      <Copy className="w-4 h-4" />
-                    </Button>
+                    {/* Botão principal de copiar link - usa o tipo do cupom */}
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      onClick={() => copyBusinessLink(coupon.id)} 
-                      title="Copiar link Nello Business"
-                      className="text-amber-600 hover:text-amber-700"
+                      onClick={() => isBusiness ? copyBusinessLink(coupon.id) : copyOneLink(coupon.id)} 
+                      title={isBusiness ? "Copiar link Nello Business" : "Copiar link Nello One"}
+                      className={isBusiness ? "text-amber-600 hover:text-amber-700" : ""}
                     >
-                      <Building2 className="w-4 h-4" />
+                      <Copy className="w-4 h-4" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -357,7 +416,8 @@ export const AdminCoupons = () => {
               </div>
             </CardContent>
           </Card>
-        ))}
+          );
+        })}
 
         {coupons.length === 0 && (
           <Card className="p-8 text-center border-dashed">
@@ -444,33 +504,56 @@ export const AdminCoupons = () => {
               </div>
             )}
 
+            {/* Seleção do tipo de produto principal */}
             <div className="space-y-2">
-              <Label>Aplicar a</Label>
+              <Label className="font-semibold">Tipo de Produto</Label>
               <Select 
-                value={newCoupon.appliesTo}
-                onValueChange={(v) => setNewCoupon({ ...newCoupon, appliesTo: v })}
+                value={newCoupon.productType}
+                onValueChange={(v) => setNewCoupon({ ...newCoupon, productType: v })}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {PRODUCT_OPTIONS.map(opt => (
+                  {PRODUCT_TYPE_OPTIONS.map(opt => (
                     <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Checkbox 
-                id="testesOnly"
-                checked={newCoupon.testesAvulsosOnly}
-                onCheckedChange={(checked) => setNewCoupon({ ...newCoupon, testesAvulsosOnly: !!checked })}
-              />
-              <Label htmlFor="testesOnly" className="text-sm">
-                Apenas para testes avulsos
-              </Label>
-            </div>
+            {/* Sub-opções apenas para Nello One */}
+            {newCoupon.productType === "nello_one" && (
+              <>
+                <div className="space-y-2">
+                  <Label>Aplicar a (Nello One)</Label>
+                  <Select 
+                    value={newCoupon.appliesTo}
+                    onValueChange={(v) => setNewCoupon({ ...newCoupon, appliesTo: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {NELLO_ONE_SUB_OPTIONS.map(opt => (
+                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Checkbox 
+                    id="testesOnly"
+                    checked={newCoupon.testesAvulsosOnly}
+                    onCheckedChange={(checked) => setNewCoupon({ ...newCoupon, testesAvulsosOnly: !!checked })}
+                  />
+                  <Label htmlFor="testesOnly" className="text-sm">
+                    Apenas para testes avulsos
+                  </Label>
+                </div>
+              </>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
