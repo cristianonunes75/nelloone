@@ -33,7 +33,9 @@ import {
   MoreHorizontal,
   Trash2,
   RefreshCw,
-  Scan
+  Scan,
+  Brain,
+  ClipboardCheck
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { format, formatDistanceToNow } from "date-fns";
@@ -95,6 +97,11 @@ interface ExtractedResumeData {
   additional_info?: string;
 }
 
+interface AssessmentStatus {
+  disc_status: string | null;
+  temperament_status: string | null;
+}
+
 interface JobApplication {
   id: string;
   job_id: string;
@@ -120,6 +127,7 @@ interface JobApplication {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   extracted_data: ExtractedResumeData | any;
   extraction_status: string | null;
+  assessment_status?: AssessmentStatus;
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
@@ -174,6 +182,7 @@ export default function BusinessJobDetail() {
   const [activeStage, setActiveStage] = useState("all");
   const [activeStatus, setActiveStatus] = useState<"all" | "pre_candidate" | "active_candidate" | "evaluated">("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sendingAssessment, setSendingAssessment] = useState<string | null>(null);
   
   // Upload dialog
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -215,7 +224,44 @@ export default function BusinessJobDetail() {
         .order("created_at", { ascending: false });
 
       if (appError) throw appError;
-      setApplications(appData || []);
+      
+      // Fetch assessment status for applications with hiring_candidate_id
+      const appsWithCandidates = (appData || []).filter(app => app.hiring_candidate_id);
+      const candidateIds = appsWithCandidates.map(app => app.hiring_candidate_id);
+      
+      let assessmentMap: Record<string, AssessmentStatus> = {};
+      
+      if (candidateIds.length > 0) {
+        const { data: assessmentsData } = await supabase
+          .from("hiring_assessments")
+          .select("candidate_id, test_type, status")
+          .in("candidate_id", candidateIds);
+        
+        if (assessmentsData) {
+          // Group assessments by candidate
+          assessmentsData.forEach(assessment => {
+            if (!assessmentMap[assessment.candidate_id]) {
+              assessmentMap[assessment.candidate_id] = {
+                disc_status: null,
+                temperament_status: null
+              };
+            }
+            if (assessment.test_type === "disc") {
+              assessmentMap[assessment.candidate_id].disc_status = assessment.status;
+            } else if (assessment.test_type === "temperamentos") {
+              assessmentMap[assessment.candidate_id].temperament_status = assessment.status;
+            }
+          });
+        }
+      }
+      
+      // Merge assessment status into applications
+      const enrichedApps = (appData || []).map(app => ({
+        ...app,
+        assessment_status: app.hiring_candidate_id ? assessmentMap[app.hiring_candidate_id] : undefined
+      }));
+      
+      setApplications(enrichedApps);
     } catch (error) {
       console.error("Error fetching job:", error);
       toast.error("Erro ao carregar vaga");
@@ -433,6 +479,77 @@ export default function BusinessJobDetail() {
       console.error("Resume scan failed:", error);
       toast.error("Erro ao escanear currículo");
     }
+  };
+
+  const handleSendToAssessment = async (app: JobApplication) => {
+    if (!app.email) {
+      toast.error("O candidato precisa ter um email cadastrado para receber a avaliação");
+      return;
+    }
+
+    if (app.hiring_candidate_id) {
+      toast.error("Este candidato já possui uma avaliação comportamental");
+      return;
+    }
+
+    setSendingAssessment(app.id);
+    try {
+      const { data, error } = await supabase.functions.invoke("business-send-job-assessment", {
+        body: { application_id: app.id },
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        toast.success("Avaliação comportamental enviada com sucesso!");
+        fetchJobAndApplications();
+      } else {
+        throw new Error(data?.error || "Erro ao enviar avaliação");
+      }
+    } catch (error: any) {
+      console.error("Error sending assessment:", error);
+      toast.error(error.message || "Erro ao enviar avaliação comportamental");
+    } finally {
+      setSendingAssessment(null);
+    }
+  };
+
+  const getAssessmentStatusBadge = (app: JobApplication) => {
+    if (!app.hiring_candidate_id || !app.assessment_status) return null;
+
+    const { disc_status, temperament_status } = app.assessment_status;
+    
+    const discComplete = disc_status === "completed";
+    const tempComplete = temperament_status === "completed";
+    
+    if (discComplete && tempComplete) {
+      return (
+        <Badge className="bg-green-100 text-green-700 border-green-200">
+          <CheckCircle2 className="h-3 w-3 mr-1" />
+          Avaliação Completa
+        </Badge>
+      );
+    }
+    
+    const discStarted = disc_status === "in_progress";
+    const tempStarted = temperament_status === "in_progress";
+    
+    if (discStarted || tempStarted || discComplete || tempComplete) {
+      const completedCount = (discComplete ? 1 : 0) + (tempComplete ? 1 : 0);
+      return (
+        <Badge className="bg-blue-100 text-blue-700 border-blue-200">
+          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+          Em Progresso ({completedCount}/2)
+        </Badge>
+      );
+    }
+    
+    return (
+      <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
+        <Clock className="h-3 w-3 mr-1" />
+        Avaliação Pendente
+      </Badge>
+    );
   };
 
   const filteredApplications = applications.filter((app) => {
@@ -783,6 +900,8 @@ export default function BusinessJobDetail() {
                               Dados pendentes
                             </Badge>
                           )}
+                          {/* Assessment Status Badge */}
+                          {getAssessmentStatusBadge(app)}
                         </div>
 
                         {/* Contact & Source */}
@@ -899,6 +1018,29 @@ export default function BusinessJobDetail() {
                           </Button>
                         )}
 
+                        {/* Send behavioral assessment button */}
+                        {app.email && !app.hiring_candidate_id && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => handleSendToAssessment(app)}
+                            disabled={sendingAssessment === app.id}
+                            className="gap-2"
+                          >
+                            {sendingAssessment === app.id ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Enviando...
+                              </>
+                            ) : (
+                              <>
+                                <Brain className="h-4 w-4" />
+                                Avaliação Comportamental
+                              </>
+                            )}
+                          </Button>
+                        )}
+
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
@@ -918,9 +1060,9 @@ export default function BusinessJobDetail() {
                                 Re-escanear currículo
                               </DropdownMenuItem>
                             )}
-                            {app.status === "active_candidate" && !app.hiring_candidate_id && (
-                              <DropdownMenuItem>
-                                <UserPlus className="h-4 w-4 mr-2" />
+                            {app.email && !app.hiring_candidate_id && (
+                              <DropdownMenuItem onClick={() => handleSendToAssessment(app)}>
+                                <Brain className="h-4 w-4 mr-2" />
                                 Enviar avaliação comportamental
                               </DropdownMenuItem>
                             )}

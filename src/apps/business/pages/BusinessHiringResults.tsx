@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Loader2, Mail, Phone, Briefcase, Calendar, CheckCircle2, Clock, AlertCircle, Target, AlertTriangle, Users, Compass, Eye, UserCircle } from "lucide-react";
+import { ArrowLeft, Loader2, Mail, Phone, Briefcase, Calendar, CheckCircle2, Clock, AlertCircle, Target, AlertTriangle, Users, Compass, Eye, UserCircle, FileText, ExternalLink } from "lucide-react";
 import { CandidateAttachments } from "../components/CandidateAttachments";
 import { CandidateResultsFeedback } from "../components/CandidateResultsFeedback";
 import { format } from "date-fns";
@@ -43,6 +43,17 @@ interface Candidate {
   attachments?: Attachment[];
 }
 
+interface JobApplicationOrigin {
+  id: string;
+  job_id: string;
+  full_name: string | null;
+  resume_url: string | null;
+  resume_filename: string | null;
+  created_at: string;
+  job_title: string | null;
+  job_department: string | null;
+}
+
 interface Assessment {
   id: string;
   test_type: string;
@@ -73,6 +84,7 @@ export default function BusinessHiringResults() {
   
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [assessments, setAssessments] = useState<Assessment[]>([]);
+  const [jobOrigin, setJobOrigin] = useState<JobApplicationOrigin | null>(null);
   const [loading, setLoading] = useState(true);
   
   // View mode: 'hr' (default) or 'candidate'
@@ -137,10 +149,53 @@ export default function BusinessHiringResults() {
       });
 
       setAssessments(normalizedAssessments);
+
+      // Fetch job application origin if exists
+      const { data: jobAppData } = await supabase
+        .from("job_applications")
+        .select(`
+          id,
+          job_id,
+          full_name,
+          resume_url,
+          resume_filename,
+          created_at,
+          job_postings(title, department)
+        `)
+        .eq("hiring_candidate_id", candidateId)
+        .maybeSingle();
+
+      if (jobAppData) {
+        setJobOrigin({
+          ...jobAppData,
+          job_title: (jobAppData.job_postings as any)?.title || null,
+          job_department: (jobAppData.job_postings as any)?.department || null,
+        });
+      }
     } catch (error) {
       console.error("Error fetching candidate:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenResume = async (resumeUrl: string) => {
+    try {
+      const urlParts = resumeUrl.split("/resumes/");
+      if (urlParts.length < 2) {
+        window.open(resumeUrl, "_blank");
+        return;
+      }
+      const filePath = decodeURIComponent(urlParts[1]);
+      const { data, error } = await supabase.storage
+        .from("resumes")
+        .createSignedUrl(filePath, 3600);
+      if (error) throw error;
+      if (data?.signedUrl) {
+        window.open(data.signedUrl, "_blank");
+      }
+    } catch (error) {
+      console.error("Error opening resume:", error);
     }
   };
 
@@ -263,6 +318,56 @@ export default function BusinessHiringResults() {
           attachments={candidate.attachments || []}
           onUpdate={fetchCandidateData}
         />
+
+        {/* Job Origin Card - if candidate came from a job application */}
+        {jobOrigin && (
+          <Card className="border-blue-200 bg-blue-50/30">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Briefcase className="h-5 w-5 text-blue-600" />
+                Origem da Candidatura
+              </CardTitle>
+              <CardDescription>Este candidato veio de uma vaga publicada</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Vaga</p>
+                  <p className="font-medium">{jobOrigin.job_title || "Não especificada"}</p>
+                  {jobOrigin.job_department && (
+                    <p className="text-sm text-muted-foreground">{jobOrigin.job_department}</p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Data de Candidatura</p>
+                  <p className="font-medium">
+                    {format(new Date(jobOrigin.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-4">
+                {jobOrigin.resume_url && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleOpenResume(jobOrigin.resume_url!)}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    {jobOrigin.resume_filename || "Ver Currículo"}
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate(`/jobs/${jobOrigin.job_id}`)}
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Ver Vaga
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Show full report only when both tests are complete */}
         {bothCompleted ? (
