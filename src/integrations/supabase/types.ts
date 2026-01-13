@@ -1813,6 +1813,230 @@ export type Database = {
         }
         Relationships: []
       }
+      job_application_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_type: string | null
+          application_id: string
+          created_at: string
+          details: Json | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_type?: string | null
+          application_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_type?: string | null
+          application_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_application_logs_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "job_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_applications: {
+        Row: {
+          city: string | null
+          commute_time: string | null
+          company_id: string
+          confirmation_sent_at: string | null
+          confirmation_token: string | null
+          confirmed_at: string | null
+          created_at: string
+          created_by: string | null
+          cultural_affinity_level: string | null
+          cultural_affinity_response: string | null
+          email: string | null
+          extracted_data: Json | null
+          extraction_status: string | null
+          full_name: string | null
+          hiring_candidate_id: string | null
+          id: string
+          internal_notes: string | null
+          job_id: string
+          lgpd_consent: boolean | null
+          lgpd_consent_at: string | null
+          lgpd_consent_text_version: string | null
+          neighborhood: string | null
+          pending_fields: string[] | null
+          phone: string | null
+          pipeline_stage: string | null
+          resume_filename: string | null
+          resume_url: string | null
+          source: string
+          source_details: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          commute_time?: string | null
+          company_id: string
+          confirmation_sent_at?: string | null
+          confirmation_token?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          cultural_affinity_level?: string | null
+          cultural_affinity_response?: string | null
+          email?: string | null
+          extracted_data?: Json | null
+          extraction_status?: string | null
+          full_name?: string | null
+          hiring_candidate_id?: string | null
+          id?: string
+          internal_notes?: string | null
+          job_id: string
+          lgpd_consent?: boolean | null
+          lgpd_consent_at?: string | null
+          lgpd_consent_text_version?: string | null
+          neighborhood?: string | null
+          pending_fields?: string[] | null
+          phone?: string | null
+          pipeline_stage?: string | null
+          resume_filename?: string | null
+          resume_url?: string | null
+          source?: string
+          source_details?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          commute_time?: string | null
+          company_id?: string
+          confirmation_sent_at?: string | null
+          confirmation_token?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          cultural_affinity_level?: string | null
+          cultural_affinity_response?: string | null
+          email?: string | null
+          extracted_data?: Json | null
+          extraction_status?: string | null
+          full_name?: string | null
+          hiring_candidate_id?: string | null
+          id?: string
+          internal_notes?: string | null
+          job_id?: string
+          lgpd_consent?: boolean | null
+          lgpd_consent_at?: string | null
+          lgpd_consent_text_version?: string | null
+          neighborhood?: string | null
+          pending_fields?: string[] | null
+          phone?: string | null
+          pipeline_stage?: string | null
+          resume_filename?: string | null
+          resume_url?: string | null
+          source?: string
+          source_details?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_applications_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_applications_hiring_candidate_id_fkey"
+            columns: ["hiring_candidate_id"]
+            isOneToOne: false
+            referencedRelation: "hiring_candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_postings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_postings: {
+        Row: {
+          closed_at: string | null
+          company_id: string
+          contract_type: string
+          created_at: string
+          created_by: string | null
+          cultural_affinity_options: Json | null
+          cultural_affinity_question: string | null
+          department: string
+          description: string | null
+          id: string
+          internal_notes: string | null
+          public_slug: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          closed_at?: string | null
+          company_id: string
+          contract_type: string
+          created_at?: string
+          created_by?: string | null
+          cultural_affinity_options?: Json | null
+          cultural_affinity_question?: string | null
+          department: string
+          description?: string | null
+          id?: string
+          internal_notes?: string | null
+          public_slug: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          closed_at?: string | null
+          company_id?: string
+          contract_type?: string
+          created_at?: string
+          created_by?: string | null
+          cultural_affinity_options?: Json | null
+          cultural_affinity_question?: string | null
+          department?: string
+          description?: string | null
+          id?: string
+          internal_notes?: string | null
+          public_slug?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_postings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mapa_essencia: {
         Row: {
           created_at: string
