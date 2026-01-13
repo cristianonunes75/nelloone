@@ -10,6 +10,7 @@ import { ARCHETYPES } from "@/lib/archetypes";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef, useState, useMemo, Component, type ReactNode } from "react";
+import { useScreenPDF } from "@/hooks/useScreenPDF";
 import { toast } from "sonner";
 
 import ArchetypeResults from "@/components/cliente/ArchetypeResults";
@@ -189,7 +190,7 @@ function TestResultsInner() {
   const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   const [isRecalculating, setIsRecalculating] = useState(false);
-  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+  const { generatePDFFromRef, isGenerating: isDownloadingPDF } = useScreenPDF();
 
   // Define handleRetry early to avoid hoisting issues
   const handleRetry = () => {
@@ -643,30 +644,15 @@ function TestResultsInner() {
     }
   };
 
-  // Unified PDF download handler for floating menu
+  // Unified PDF download handler for floating menu - captures screen layout exactly
   const handleUnifiedPDFDownload = async () => {
-    setIsDownloadingPDF(true);
-    try {
-      if (isInteligenciasTest && inteligenciasResults && inteligenciasResults.ranking?.length > 0) {
-        handleDownloadInteligenciasPDF();
-      } else if (isArchetyposTest && dominantArchetypes) {
-        handleDownloadArquetiposPDF();
-      } else if (isDISCTest && discResults) {
-        handleDownloadDISCPDF();
-      } else if (isEnneagramTest && enneagramResultData?.primaryType) {
-        handleDownloadEneagramaPDF();
-      } else if (isTemperamentosTest && temperamentosResultData) {
-        handleDownloadTemperamentosPDF();
-      } else if (isMBTITest && mbtiResultData?.type) {
-        handleDownloadNello16PDF();
-      } else if (isLinguagensAmorTest && (estilosConexaoResults || linguagensAmorResultData)) {
-        handleDownloadEstilosConexaoPDF();
-      } else {
-        await handleDownloadPDF();
-      }
-    } finally {
-      setIsDownloadingPDF(false);
-    }
+    const testName = userTest?.tests?.name?.replace(/\s+/g, '-').toLowerCase() || 'resultado';
+    await generatePDFFromRef(resultsRef as React.RefObject<HTMLElement>, {
+      fileName: `nello-one-${testName}`,
+      language: lang as 'pt' | 'pt-pt' | 'en',
+      scale: 2,
+      quality: 0.95
+    });
   };
 
   // Send PDF by email handler
