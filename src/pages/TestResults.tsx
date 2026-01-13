@@ -189,6 +189,7 @@ function TestResultsInner() {
   const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   const [isRecalculating, setIsRecalculating] = useState(false);
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
 
   // Define handleRetry early to avoid hoisting issues
   const handleRetry = () => {
@@ -639,6 +640,32 @@ function TestResultsInner() {
       }
     } else {
       toast.error(lang === 'en' ? 'Results not available' : 'Resultados não disponíveis');
+    }
+  };
+
+  // Unified PDF download handler for floating menu
+  const handleUnifiedPDFDownload = async () => {
+    setIsDownloadingPDF(true);
+    try {
+      if (isInteligenciasTest && inteligenciasResults && inteligenciasResults.ranking?.length > 0) {
+        handleDownloadInteligenciasPDF();
+      } else if (isArchetyposTest && dominantArchetypes) {
+        handleDownloadArquetiposPDF();
+      } else if (isDISCTest && discResults) {
+        handleDownloadDISCPDF();
+      } else if (isEnneagramTest && enneagramResultData?.primaryType) {
+        handleDownloadEneagramaPDF();
+      } else if (isTemperamentosTest && temperamentosResultData) {
+        handleDownloadTemperamentosPDF();
+      } else if (isMBTITest && mbtiResultData?.type) {
+        handleDownloadNello16PDF();
+      } else if (isLinguagensAmorTest && (estilosConexaoResults || linguagensAmorResultData)) {
+        handleDownloadEstilosConexaoPDF();
+      } else {
+        await handleDownloadPDF();
+      }
+    } finally {
+      setIsDownloadingPDF(false);
     }
   };
 
@@ -1159,6 +1186,8 @@ function TestResultsInner() {
       {/* Floating Navigation Menu */}
       <ResultsFloatingMenu
         basePath={basePath}
+        onDownloadPDF={handleUnifiedPDFDownload}
+        isDownloading={isDownloadingPDF}
         onShare={() => {
           const testName = userTest.tests?.name || "teste";
           const shareText = `🌟 Concluí o teste "${testName}" no NELLO ONE!\n\nDescubra sua essência em nello.one`;
