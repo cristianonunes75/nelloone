@@ -22,7 +22,7 @@ import { LogoText } from "@/components/LogoText";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { ImpersonateBanner } from "@/components/ImpersonateBanner";
 import { OnboardingModal } from "@/components/cliente/OnboardingModal";
-import { LogOut, User, Sparkles, Map, Lock, ShoppingCart } from "lucide-react";
+import { LogOut, User, Sparkles, Map, Lock, ShoppingCart, Target } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -38,6 +38,10 @@ import { NELLO_16_PROFILES, getNello16DisplayCode } from "@/lib/nello16Personali
 import { DISC_PROFILES } from "@/lib/disc";
 import { ENNEAGRAM_PROFILES } from "@/lib/eneagrama";
 import { supabase } from "@/integrations/supabase/client";
+import { useCodigoEssencia } from "@/hooks/useCodigoEssencia";
+import { useAtivacaoCodigo } from "@/hooks/useAtivacaoCodigo";
+import { useAtivacaoCodigoFlag } from "@/hooks/useFeatureFlag";
+import { Badge } from "@/components/ui/badge";
 
 const Cliente = () => {
   const { user, profile, signOut, userRole, isLoading: isAuthLoading } = useAuth();
@@ -187,6 +191,13 @@ const Cliente = () => {
     canPurchase: canPurchaseCodigo,
     hasUnlocked: hasCodigoUnlocked
   } = useCodigoEssenciaAccess();
+
+  // Check if user has generated the Código da Essência
+  const { hasSavedCodigo } = useCodigoEssencia();
+  
+  // Check if user has generated the Ativação and if feature is enabled
+  const { hasAtivacao, isLoading: isAtivacaoLoading } = useAtivacaoCodigo();
+  const { isEnabled: isAtivacaoEnabled } = useAtivacaoCodigoFlag();
 
   // Handle payment success callback
   useEffect(() => {
@@ -704,6 +715,41 @@ const Cliente = () => {
                   {language === 'en' ? 'Generate My Essence Code' : 'Gerar Meu Código da Essência'}
                 </Button>
               )}
+            </div>
+          )}
+
+          {/* Ativação do Código - Shows only when Código da Essência has been generated */}
+          {hasSavedCodigo && (isAtivacaoEnabled || userRole === 'admin') && (
+            <div className="bg-gradient-to-br from-accent/20 via-accent/10 to-primary/20 border-accent/30 border rounded-xl md:rounded-2xl p-6 md:p-8 text-center mt-4 relative">
+              {!isAtivacaoEnabled && userRole === 'admin' && (
+                <Badge variant="outline" className="absolute top-3 right-3 text-xs bg-amber-500/20 text-amber-600 border-amber-500/50">
+                  Admin Preview
+                </Badge>
+              )}
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                <Target className="w-6 h-6 md:w-8 md:h-8 text-accent-foreground" />
+              </div>
+              <h2 className="text-xl md:text-2xl font-bold mb-2">
+                {language === 'en' ? 'Essence Code Activation' : 'Ativação do Código da Essência'}
+              </h2>
+              <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6">
+                {language === 'en' 
+                  ? 'Transform self-knowledge into actionable clarity. Receive a personalized plan based on your story and your Essence Code.'
+                  : 'Transforme autoconhecimento em clareza acionável. Receba um plano personalizado baseado na sua história e no seu Código da Essência.'
+                }
+              </p>
+              <Button 
+                size="lg" 
+                onClick={() => navigate(`${getBasePath()}/cliente/ativacao`)} 
+                className="gap-2 w-full sm:w-auto"
+                variant={hasAtivacao ? "outline" : "default"}
+              >
+                <Target className="w-4 h-4 md:w-5 md:h-5" />
+                {hasAtivacao 
+                  ? (language === 'en' ? 'View My Report' : 'Ver Meu Relatório')
+                  : (language === 'en' ? 'Start Activation' : 'Iniciar Ativação')
+                }
+              </Button>
             </div>
           )}
 
