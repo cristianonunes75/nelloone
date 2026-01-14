@@ -10,7 +10,8 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Loader2, Settings, Shield, Users, AlertTriangle, Server } from "lucide-react";
+import { Loader2, Settings, Shield, Users, AlertTriangle, Server, Sparkles } from "lucide-react";
+import { useAtivacaoCodigoFlag } from "@/hooks/useFeatureFlag";
 
 interface AdminUser {
   id: string;
@@ -24,6 +25,14 @@ export const AdminSettings = () => {
   const [admins, setAdmins] = useState<AdminUser[]>([]);
   const [confirmMaintenance, setConfirmMaintenance] = useState(false);
   const [saving, setSaving] = useState(false);
+  
+  // Feature flags
+  const { 
+    isEnabled: ativacaoCodigoEnabled, 
+    isLoading: ativacaoLoading, 
+    toggle: toggleAtivacaoCodigo 
+  } = useAtivacaoCodigoFlag();
+  const [savingAtivacao, setSavingAtivacao] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -101,6 +110,23 @@ export const AdminSettings = () => {
     }
   };
 
+  const handleToggleAtivacaoCodigo = async () => {
+    setSavingAtivacao(true);
+    try {
+      await toggleAtivacaoCodigo();
+      toast.success(
+        !ativacaoCodigoEnabled 
+          ? "Ativação do Código habilitada" 
+          : "Ativação do Código desabilitada"
+      );
+    } catch (error) {
+      console.error("Error toggling Ativação do Código:", error);
+      toast.error("Erro ao alterar configuração");
+    } finally {
+      setSavingAtivacao(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -119,6 +145,47 @@ export const AdminSettings = () => {
         </h1>
         <p className="text-muted-foreground text-xs md:text-sm">Configurações do sistema administrativo</p>
       </div>
+
+      {/* Feature Flags */}
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Sparkles className="w-4 h-4 text-amber-500" />
+            Funcionalidades
+          </CardTitle>
+          <CardDescription>
+            Habilite ou desabilite módulos do sistema
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Ativação do Código */}
+          <div className="flex items-center justify-between py-3 border-b border-border/50">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium">Ativação do Código da Essência</Label>
+                {ativacaoCodigoEnabled && (
+                  <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs">
+                    Ativo
+                  </Badge>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Módulo de personalização profunda baseado no Código da Essência
+              </p>
+              {ativacaoCodigoEnabled && (
+                <p className="text-xs text-amber-600 mt-1">
+                  Rota: /cliente/ativacao
+                </p>
+              )}
+            </div>
+            <Switch 
+              checked={ativacaoCodigoEnabled} 
+              onCheckedChange={handleToggleAtivacaoCodigo}
+              disabled={ativacaoLoading || savingAtivacao}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Maintenance Mode */}
       <Card className="border-border/50">
