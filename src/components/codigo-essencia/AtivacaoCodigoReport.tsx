@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { 
   Sparkles, 
   Eye, 
@@ -11,10 +12,17 @@ import {
   Calendar,
   Quote,
   Heart,
-  Share2
+  Share2,
+  User,
+  Info
 } from "lucide-react";
 
 export interface AtivacaoReport {
+  nivel_usuario?: {
+    nivel: 1 | 2 | 3;
+    justificativa: string;
+    tom_aplicado: "descoberta" | "consciencia" | "ativacao";
+  };
   leitura_conexao: {
     titulo: string;
     coerencia: string;
@@ -43,6 +51,10 @@ export interface AtivacaoReport {
   };
   declaracao_ativacao: string;
   fechamento: string;
+  mensagem_seguranca?: {
+    disclaimer_1: string;
+    disclaimer_2: string;
+  };
 }
 
 interface AtivacaoCodigoReportProps {
@@ -59,6 +71,7 @@ const labels = {
     coerencia: "Onde há coerência",
     conflito: "Onde há conflito",
     section2: "Padrão Central de Sabotagem",
+    section2Level1: "Padrão Central de Tensão",
     comoForma: "Como se forma",
     comoManifesta: "Como se manifesta hoje",
     porqueRepete: "Por que se repete",
@@ -74,7 +87,14 @@ const labels = {
     porque: "Por quê",
     section5: "Sua Declaração de Ativação",
     section6: "Fechamento",
-    share: "Compartilhar"
+    share: "Compartilhar",
+    levelLabel: "Nível de Leitura",
+    levelDiscovery: "Descoberta",
+    levelAwareness: "Consciência",
+    levelActivation: "Ativação",
+    safetyTitle: "Mensagem Importante",
+    defaultDisclaimer1: "O Código da Essência não define quem você é. Ele revela padrões que podem ser transformados.",
+    defaultDisclaimer2: "Este relatório é um ponto de partida, não uma solução final."
   },
   "pt-pt": {
     title: "Relatório de Ativação",
@@ -83,6 +103,7 @@ const labels = {
     coerencia: "Onde há coerência",
     conflito: "Onde há conflito",
     section2: "Padrão Central de Sabotagem",
+    section2Level1: "Padrão Central de Tensão",
     comoForma: "Como se forma",
     comoManifesta: "Como se manifesta hoje",
     porqueRepete: "Por que se repete",
@@ -98,7 +119,14 @@ const labels = {
     porque: "Porquê",
     section5: "A Sua Declaração de Ativação",
     section6: "Fechamento",
-    share: "Partilhar"
+    share: "Partilhar",
+    levelLabel: "Nível de Leitura",
+    levelDiscovery: "Descoberta",
+    levelAwareness: "Consciência",
+    levelActivation: "Ativação",
+    safetyTitle: "Mensagem Importante",
+    defaultDisclaimer1: "O Código da Essência não define quem tu és. Ele revela padrões que podem ser transformados.",
+    defaultDisclaimer2: "Este relatório é um ponto de partida, não uma solução final."
   },
   en: {
     title: "Activation Report",
@@ -107,6 +135,7 @@ const labels = {
     coerencia: "Where there is coherence",
     conflito: "Where there is conflict",
     section2: "Central Self-Sabotage Pattern",
+    section2Level1: "Central Tension Pattern",
     comoForma: "How it forms",
     comoManifesta: "How it manifests today",
     porqueRepete: "Why it repeats",
@@ -122,12 +151,49 @@ const labels = {
     porque: "Why",
     section5: "Your Activation Statement",
     section6: "Closing",
-    share: "Share"
+    share: "Share",
+    levelLabel: "Reading Level",
+    levelDiscovery: "Discovery",
+    levelAwareness: "Awareness",
+    levelActivation: "Activation",
+    safetyTitle: "Important Message",
+    defaultDisclaimer1: "The Essence Code does not define who you are. It reveals patterns that can be transformed.",
+    defaultDisclaimer2: "This report is a starting point, not a final solution."
+  }
+};
+
+const getLevelConfig = (nivel: 1 | 2 | 3, language: string) => {
+  const t = labels[language as keyof typeof labels] || labels.pt;
+  
+  switch (nivel) {
+    case 1:
+      return {
+        label: t.levelDiscovery,
+        color: "bg-blue-500/20 text-blue-600 border-blue-500/30",
+        bgGradient: "from-blue-500/10 to-cyan-500/5",
+        iconColor: "text-blue-500"
+      };
+    case 2:
+      return {
+        label: t.levelAwareness,
+        color: "bg-amber-500/20 text-amber-600 border-amber-500/30",
+        bgGradient: "from-amber-500/10 to-orange-500/5",
+        iconColor: "text-amber-500"
+      };
+    case 3:
+      return {
+        label: t.levelActivation,
+        color: "bg-emerald-500/20 text-emerald-600 border-emerald-500/30",
+        bgGradient: "from-emerald-500/10 to-teal-500/5",
+        iconColor: "text-emerald-500"
+      };
   }
 };
 
 export function AtivacaoCodigoReport({ report, userName, language = "pt" }: AtivacaoCodigoReportProps) {
   const t = labels[language as keyof typeof labels] || labels.pt;
+  const userLevel = report.nivel_usuario?.nivel || 2;
+  const levelConfig = getLevelConfig(userLevel, language);
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -142,6 +208,9 @@ export function AtivacaoCodigoReport({ report, userName, language = "pt" }: Ativ
     }
   };
 
+  // Use level-appropriate section title for sabotage pattern
+  const section2Title = userLevel === 1 ? t.section2Level1 : t.section2;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -155,6 +224,19 @@ export function AtivacaoCodigoReport({ report, userName, language = "pt" }: Ativ
             <h1 className="text-3xl font-bold mb-1">{t.title}</h1>
             <p className="text-lg text-muted-foreground">{t.subtitle}</p>
             {userName && <p className="text-amber-600 font-medium mt-2">{userName}</p>}
+            
+            {/* User Level Badge */}
+            {report.nivel_usuario && (
+              <div className="mt-4 flex justify-center">
+                <Badge 
+                  variant="outline" 
+                  className={`${levelConfig.color} px-3 py-1 text-sm font-medium gap-2`}
+                >
+                  <User className="w-3.5 h-3.5" />
+                  {t.levelLabel}: {levelConfig.label}
+                </Badge>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -189,7 +271,7 @@ export function AtivacaoCodigoReport({ report, userName, language = "pt" }: Ativ
             <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
               <AlertTriangle className="w-5 h-5 text-red-500" />
             </div>
-            {t.section2}
+            {section2Title}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -327,6 +409,26 @@ export function AtivacaoCodigoReport({ report, userName, language = "pt" }: Ativ
         </CardHeader>
         <CardContent>
           <p className="leading-relaxed text-muted-foreground">{report.fechamento}</p>
+        </CardContent>
+      </Card>
+
+      {/* Safety Messages */}
+      <Card className="border-slate-500/30 bg-slate-500/5">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-3 text-base">
+            <div className="w-8 h-8 rounded-full bg-slate-500/20 flex items-center justify-center">
+              <Info className="w-4 h-4 text-slate-500" />
+            </div>
+            {t.safetyTitle}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 pt-0">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {report.mensagem_seguranca?.disclaimer_1 || t.defaultDisclaimer1}
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {report.mensagem_seguranca?.disclaimer_2 || t.defaultDisclaimer2}
+          </p>
         </CardContent>
       </Card>
 
