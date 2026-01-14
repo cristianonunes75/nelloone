@@ -23,6 +23,12 @@ interface SavedAtivacao {
   updated_at: string;
 }
 
+interface UserTest {
+  type: string;
+  result: any;
+  status: string;
+}
+
 export function useAtivacaoCodigo() {
   const { user } = useAuth();
   const [savedAtivacao, setSavedAtivacao] = useState<SavedAtivacao | null>(null);
@@ -44,7 +50,8 @@ export function useAtivacaoCodigo() {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // Use any to bypass type check since table was just created
+      const { data, error } = await (supabase as any)
         .from("ativacao_codigo")
         .select("*")
         .eq("user_id", user.id)
@@ -85,20 +92,22 @@ export function useAtivacaoCodigo() {
       // Get user tests for more data
       const { data: tests } = await supabase
         .from("user_tests")
-        .select("test_type, result_data")
+        .select("type, result, status")
         .eq("user_id", user.id)
         .eq("status", "completed");
 
-      const arquetiposTest = tests?.find(t => t.test_type === "arquetipos");
-      const discTest = tests?.find(t => t.test_type === "disc");
-      const temperamentoTest = tests?.find(t => t.test_type === "temperamento");
-      const eneagramaTest = tests?.find(t => t.test_type === "eneagrama");
+      const testsArray = (tests || []) as unknown as UserTest[];
+      
+      const arquetiposTest = testsArray.find(t => t.type === "arquetipos");
+      const discTest = testsArray.find(t => t.type === "disc");
+      const temperamentoTest = testsArray.find(t => t.type === "temperamento");
+      const eneagramaTest = testsArray.find(t => t.type === "eneagrama");
 
       // Build the Código data
-      const arquetiposData = arquetiposTest?.result_data as any;
-      const discData = discTest?.result_data as any;
-      const tempData = temperamentoTest?.result_data as any;
-      const eneaData = eneagramaTest?.result_data as any;
+      const arquetiposData = arquetiposTest?.result as any;
+      const discData = discTest?.result as any;
+      const tempData = temperamentoTest?.result as any;
+      const eneaData = eneagramaTest?.result as any;
 
       return {
         arquetipos: arquetiposData 
@@ -178,7 +187,8 @@ export function useAtivacaoCodigo() {
     if (!user || !savedAtivacao) return;
 
     try {
-      const { error } = await supabase
+      // Use any to bypass type check since table was just created
+      const { error } = await (supabase as any)
         .from("ativacao_codigo")
         .delete()
         .eq("user_id", user.id);

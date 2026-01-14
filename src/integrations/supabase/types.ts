@@ -395,6 +395,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ativacao_codigo: {
+        Row: {
+          created_at: string
+          historia_usuario: Json
+          id: string
+          language: string | null
+          relatorio: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          historia_usuario?: Json
+          id?: string
+          language?: string | null
+          relatorio?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          historia_usuario?: Json
+          id?: string
+          language?: string | null
+          relatorio?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
