@@ -13,7 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 export default function PraxisAuth() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, loading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
