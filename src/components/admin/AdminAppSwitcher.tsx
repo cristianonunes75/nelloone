@@ -65,6 +65,14 @@ const adminApps: AdminApp[] = [
     url: 'https://life.nello.one',
     adminPath: '/dashboard',
   },
+  {
+    id: 'praxis',
+    name: 'Nello Praxis',
+    label: 'Profissional',
+    icon: <Sparkles className="w-4 h-4 text-amber-500" />,
+    url: 'https://business.nello.one',
+    adminPath: '/praxis/dashboard',
+  },
 ];
 
 /**
