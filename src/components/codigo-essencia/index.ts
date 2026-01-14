@@ -36,3 +36,5 @@ export { RelatorioContextual } from "./RelatorioContextual";
 export { RelatorioSelector } from "./RelatorioSelector";
 export { CruzamentoCodigos } from "./CruzamentoCodigos";
 export { CruzamentoViewer } from "./CruzamentoViewer";
+export { AtivacaoCodigoForm } from "./AtivacaoCodigoForm";
+export { AtivacaoCodigoReport } from "./AtivacaoCodigoReport";

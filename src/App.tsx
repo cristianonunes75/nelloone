@@ -29,6 +29,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
 import { TestDetailPage } from "./components/tests/TestDetailPage";
 import CodigoEssencia from "./pages/CodigoEssencia";
+import AtivacaoCodigoPage from "./pages/cliente/AtivacaoCodigoPage";
 // CodigoEssencia sales pages removed - now included in journey
 import ComprarTeste from "./pages/ComprarTeste";
 import DiagnosticoPDF from "./pages/DiagnosticoPDF";
@@ -366,6 +367,30 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute allowedRoles={["cliente", "admin"]}>
           <CodigoEssencia />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/cliente/ativacao"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <AtivacaoCodigoPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/ativacao-codigo"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <AtivacaoCodigoPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/activation"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <AtivacaoCodigoPage />
         </ProtectedRoute>
       }
     />
