@@ -144,5 +144,8 @@ verify_jwt = false
 [functions.admin-cross-app-auth]
 verify_jwt = false
 
+[functions.cross-app-auth]
+verify_jwt = false
+
 [functions.nello-ativacao-codigo]
 verify_jwt = true
