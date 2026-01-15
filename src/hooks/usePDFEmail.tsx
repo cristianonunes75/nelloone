@@ -19,6 +19,7 @@ interface PDFEmailOptions {
   userEmail: string;
   language: 'pt' | 'pt-pt' | 'en';
   resultData: any;
+  pdfBase64?: string; // Optional: pre-generated PDF base64 (for screen capture PDFs)
 }
 
 export const usePDFEmail = () => {
@@ -28,76 +29,83 @@ export const usePDFEmail = () => {
     setIsSending(true);
     
     try {
-      const { testType, testName, userName, userEmail, language, resultData } = options;
+      const { testType, testName, userName, userEmail, language, resultData, pdfBase64: preGeneratedPdf } = options;
       
-      // Generate PDF based on test type and get base64
-      let pdfBase64 = "";
+      // If pre-generated PDF is provided, use it directly
+      let pdfBase64 = preGeneratedPdf || "";
       let doc: jsPDF | null = null;
       
-      switch (testType) {
-        case "disc":
-          doc = generateDISCPremiumPDF({
-            userName,
-            scores: resultData.scores,
-            dominantProfile: resultData.dominantProfile,
-            language
-          });
-          break;
-          
-        case "mbti":
-          doc = generateNello16PremiumPDF({
-            userName,
-            personalityType: resultData.type,
-            dimensionScores: resultData.scores || { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 },
-            language
-          });
-          break;
-          
-        case "eneagrama":
-          doc = createEneagramaPDF({
-            dominantType: parseInt(resultData.primaryType),
-            wing: parseInt(resultData.primaryType) === 9 ? 1 : parseInt(resultData.primaryType) + 1,
-            scores: resultData.scores || {}
-          }, { userName, language });
-          break;
-          
-        case "temperamentos":
-          doc = createTemperamentosPDF({
-            primary: resultData.primary,
-            secondary: resultData.secondary,
-            scores: resultData.scores || { sanguineo: 0, colerico: 0, melancolico: 0, fleumatico: 0 },
-            interpretation: resultData.interpretation || ''
-          }, { userName, language });
-          break;
-          
-        case "linguagens_amor":
-          doc = createEstilosConexaoPDF(resultData, userName, { language });
-          break;
-          
-        case "inteligencias_multiplas":
-          // pdfInteligenciasMultiplas only accepts 'pt' | 'en', map pt-pt → pt
-          doc = createInteligenciasPremiumPDF(resultData, userName, { language: language === 'pt-pt' ? 'pt' : language });
-          break;
-          
-        case "arquetipos_proposito":
-          doc = createArquetiposPremiumPDF({
-            dominant: resultData.primary?.archetype || resultData.dominant || '',
-            secondary: resultData.secondary?.archetype || resultData.secondary || '',
-            tertiary: resultData.tertiary?.archetype || resultData.tertiary || '',
-            allScores: resultData.allScores || {},
-            ranking: resultData.ranking || []
-          }, { userName, language });
-          break;
-          
-        default:
-          throw new Error(`Unsupported test type: ${testType}`);
+      // Only generate PDF if not pre-generated
+      if (!pdfBase64) {
+        switch (testType) {
+          case "disc":
+            doc = generateDISCPremiumPDF({
+              userName,
+              scores: resultData.scores,
+              dominantProfile: resultData.dominantProfile,
+              language
+            });
+            break;
+            
+          case "mbti":
+            doc = generateNello16PremiumPDF({
+              userName,
+              personalityType: resultData.type,
+              dimensionScores: resultData.scores || { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 },
+              language
+            });
+            break;
+            
+          case "eneagrama":
+            doc = createEneagramaPDF({
+              dominantType: parseInt(resultData.primaryType),
+              wing: parseInt(resultData.primaryType) === 9 ? 1 : parseInt(resultData.primaryType) + 1,
+              scores: resultData.scores || {}
+            }, { userName, language });
+            break;
+            
+          case "temperamentos":
+            doc = createTemperamentosPDF({
+              primary: resultData.primary,
+              secondary: resultData.secondary,
+              scores: resultData.scores || { sanguineo: 0, colerico: 0, melancolico: 0, fleumatico: 0 },
+              interpretation: resultData.interpretation || ''
+            }, { userName, language });
+            break;
+            
+          case "linguagens_amor":
+            doc = createEstilosConexaoPDF(resultData, userName, { language });
+            break;
+            
+          case "inteligencias_multiplas":
+            // pdfInteligenciasMultiplas only accepts 'pt' | 'en', map pt-pt → pt
+            doc = createInteligenciasPremiumPDF(resultData, userName, { language: language === 'pt-pt' ? 'pt' : language });
+            break;
+            
+          case "arquetipos_proposito":
+            doc = createArquetiposPremiumPDF({
+              dominant: resultData.primary?.archetype || resultData.dominant || '',
+              secondary: resultData.secondary?.archetype || resultData.secondary || '',
+              tertiary: resultData.tertiary?.archetype || resultData.tertiary || '',
+              allScores: resultData.allScores || {},
+              ranking: resultData.ranking || []
+            }, { userName, language });
+            break;
+            
+          case "ativacao_codigo":
+            // ativacao_codigo requires pre-generated PDF base64
+            throw new Error('ativacao_codigo requires pre-generated pdfBase64 option');
+            
+          default:
+            throw new Error(`Unsupported test type: ${testType}`);
+        }
+        
+        if (!doc) {
+          throw new Error('Failed to generate PDF');
+        }
+        
+        pdfBase64 = doc.output('datauristring').split(',')[1];
       }
-      
-      if (!doc) {
-        throw new Error('Failed to generate PDF');
-      }
-      
-      pdfBase64 = doc.output('datauristring').split(',')[1];
       
       // Send email with PDF attachment
       const { data, error } = await supabase.functions.invoke('send-pdf-email', {

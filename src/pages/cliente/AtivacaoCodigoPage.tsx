@@ -1,13 +1,18 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RefreshCw, Lock } from "lucide-react";
+import { ArrowLeft, RefreshCw, Lock, Download, Mail, Loader2 } from "lucide-react";
 import { AtivacaoCodigoForm, type HistoriaUsuario } from "@/components/codigo-essencia/AtivacaoCodigoForm";
 import { AtivacaoCodigoReport } from "@/components/codigo-essencia/AtivacaoCodigoReport";
 import { useAtivacaoCodigo } from "@/hooks/useAtivacaoCodigo";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAtivacaoCodigoFlag } from "@/hooks/useFeatureFlag";
+import { useScreenPDF } from "@/hooks/useScreenPDF";
+import { usePDFEmail } from "@/hooks/usePDFEmail";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { toast } from "sonner";
 
 export default function AtivacaoCodigoPage() {
   const navigate = useNavigate();
@@ -24,10 +29,157 @@ export default function AtivacaoCodigoPage() {
   
   const { isEnabled: featureEnabled, isLoading: featureLoading } = useAtivacaoCodigoFlag();
   const [generatedReport, setGeneratedReport] = useState<any>(null);
+  
+  // PDF hooks
+  const { generatePDFFromRef, isGenerating: isPDFGenerating } = useScreenPDF();
+  const { sendPDFByEmail, isSending: isEmailSending } = usePDFEmail();
+  const reportRef = useRef<HTMLDivElement>(null);
 
   // Admins can always access, even if feature is disabled
   const isAdmin = userRole === 'admin';
   const canAccess = isAdmin || featureEnabled;
+  
+  const handleDownloadPDF = async () => {
+    const testName = language === 'en' ? 'essence-activation' : 'ativacao-codigo';
+    await generatePDFFromRef(reportRef as React.RefObject<HTMLElement>, {
+      fileName: `nello-one-${testName}`,
+      language: language as 'pt' | 'pt-pt' | 'en',
+      scale: 2,
+      quality: 0.95
+    });
+  };
+
+  // Generate PDF base64 from screen capture for email
+  const generatePDFBase64 = useCallback(async (): Promise<string | null> => {
+    const element = reportRef.current;
+    if (!element) return null;
+    
+    try {
+      // Store original styles
+      const originalStyle = element.style.cssText;
+      
+      // Prepare element for capture
+      element.style.overflow = 'visible';
+      element.style.maxHeight = 'none';
+      element.style.height = 'auto';
+
+      // Wait for images to load
+      const images = element.querySelectorAll('img');
+      await Promise.all(
+        Array.from(images).map(img => {
+          if (img.complete) return Promise.resolve();
+          return new Promise(resolve => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        })
+      );
+
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Capture with html2canvas
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+      });
+
+      // Restore original styles
+      element.style.cssText = originalStyle;
+
+      // A4 dimensions
+      const pageWidthMM = 210;
+      const pageHeightMM = 297;
+      const marginMM = 10;
+      const usableHeightMM = pageHeightMM - marginMM;
+
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgWidthMM = pageWidthMM;
+      const imgHeightMM = (canvas.height * imgWidthMM) / canvas.width;
+      const pageHeightPx = (usableHeightMM / imgHeightMM) * canvas.height;
+      const totalPages = Math.ceil(canvas.height / pageHeightPx);
+
+      for (let pageNum = 0; pageNum < totalPages; pageNum++) {
+        if (pageNum > 0) {
+          pdf.addPage();
+        }
+
+        const sourceY = pageNum * pageHeightPx;
+        const sourceHeight = Math.min(pageHeightPx, canvas.height - sourceY);
+        
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sourceHeight;
+        
+        const ctx = pageCanvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+          ctx.drawImage(canvas, 0, sourceY, canvas.width, sourceHeight, 0, 0, canvas.width, sourceHeight);
+        }
+
+        const sliceHeightMM = (sourceHeight / canvas.height) * imgHeightMM;
+        const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.92);
+        pdf.addImage(pageImgData, 'JPEG', 0, 0, imgWidthMM, sliceHeightMM);
+      }
+
+      // Add footer
+      const pagesCount = pdf.getNumberOfPages();
+      for (let i = 1; i <= pagesCount; i++) {
+        pdf.setPage(i);
+        pdf.setFontSize(8);
+        pdf.setTextColor(150);
+        pdf.text(`NELLO ONE • Página ${i} de ${pagesCount}`, 105, 292, { align: 'center' });
+      }
+
+      // Return base64 without data URI prefix
+      return pdf.output('datauristring').split(',')[1];
+    } catch (error) {
+      console.error('Error generating PDF base64:', error);
+      return null;
+    }
+  }, []);
+
+  const handleSendEmail = async () => {
+    const reportToSend = generatedReport || savedAtivacao?.relatorio;
+    if (!user?.email || !reportToSend) return;
+    
+    const loadingToast = toast.loading(
+      language === 'en' ? 'Preparing report...' : 'Preparando relatório...'
+    );
+    
+    // Generate PDF base64 first
+    const pdfBase64 = await generatePDFBase64();
+    
+    toast.dismiss(loadingToast);
+    
+    if (!pdfBase64) {
+      toast.error(
+        language === 'en' ? 'Failed to generate PDF' : 'Erro ao gerar PDF'
+      );
+      return;
+    }
+    
+    await sendPDFByEmail({
+      testType: 'ativacao_codigo',
+      testName: language === 'en' ? 'Essence Code Activation' : 'Ativação do Código da Essência',
+      userName: profile?.full_name || '',
+      userEmail: user.email,
+      language: language as 'pt' | 'pt-pt' | 'en',
+      resultData: reportToSend,
+      pdfBase64
+    });
+  };
 
   const handleSubmit = async (historia: HistoriaUsuario) => {
     const report = await generateAtivacao(historia, language);
@@ -116,6 +268,38 @@ export default function AtivacaoCodigoPage() {
                 Admin Preview
               </span>
             )}
+            {reportToShow && (
+              <>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleDownloadPDF}
+                  disabled={isPDFGenerating}
+                  className="gap-2"
+                >
+                  {isPDFGenerating ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4" />
+                  )}
+                  PDF
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleSendEmail}
+                  disabled={isEmailSending}
+                  className="gap-2"
+                >
+                  {isEmailSending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Mail className="w-4 h-4" />
+                  )}
+                  Email
+                </Button>
+              </>
+            )}
             {hasAtivacao && (
               <Button 
                 variant="outline" 
@@ -132,11 +316,13 @@ export default function AtivacaoCodigoPage() {
 
         {/* Content */}
         {reportToShow ? (
-          <AtivacaoCodigoReport 
-            report={reportToShow} 
-            userName={profile?.full_name}
-            language={language}
-          />
+          <div ref={reportRef}>
+            <AtivacaoCodigoReport 
+              report={reportToShow} 
+              userName={profile?.full_name}
+              language={language}
+            />
+          </div>
         ) : (
           <AtivacaoCodigoForm 
             onSubmit={handleSubmit}
