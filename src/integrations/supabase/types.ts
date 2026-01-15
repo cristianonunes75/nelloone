@@ -1444,6 +1444,45 @@ export type Database = {
           },
         ]
       }
+      cross_app_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          ip_address: string | null
+          target_app: string
+          target_path: string | null
+          token: string
+          used_at: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          ip_address?: string | null
+          target_app: string
+          target_path?: string | null
+          token: string
+          used_at?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          ip_address?: string | null
+          target_app?: string
+          target_path?: string | null
+          token?: string
+          used_at?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       engagement_campaigns: {
         Row: {
           body: string
@@ -3423,6 +3462,30 @@ export type Database = {
           questions_count?: number
           stripe_price_id?: string | null
           type?: Database["public"]["Enums"]["test_type"]
+        }
+        Relationships: []
+      }
+      user_app_registrations: {
+        Row: {
+          app_name: string
+          id: string
+          last_accessed_at: string | null
+          registered_at: string
+          user_id: string
+        }
+        Insert: {
+          app_name: string
+          id?: string
+          last_accessed_at?: string | null
+          registered_at?: string
+          user_id: string
+        }
+        Update: {
+          app_name?: string
+          id?: string
+          last_accessed_at?: string | null
+          registered_at?: string
+          user_id?: string
         }
         Relationships: []
       }

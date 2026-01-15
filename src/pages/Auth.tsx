@@ -202,7 +202,7 @@ const Auth = () => {
           }
         }, 500);
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -219,6 +219,16 @@ const Auth = () => {
             throw new Error(texts.alreadyRegistered);
           }
           throw error;
+        }
+
+        // Register user for Nello One app
+        if (data.user) {
+          await supabase
+            .from('user_app_registrations')
+            .insert({
+              user_id: data.user.id,
+              app_name: 'one',
+            });
         }
 
         toast({

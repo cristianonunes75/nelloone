@@ -35,7 +35,7 @@ export default function FlowAuth() {
           return;
         }
         
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -47,15 +47,37 @@ export default function FlowAuth() {
         });
         
         if (error) throw error;
+        
+        // Register user for Flow app
+        if (data.user) {
+          await supabase
+            .from('user_app_registrations')
+            .insert({
+              user_id: data.user.id,
+              app_name: 'flow',
+            });
+        }
+        
         toast.success('Conta criada! Verifique seu email.');
         navigate('/dashboard');
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         
         if (error) throw error;
+        
+        // Register user for Flow app if not already registered
+        if (data.user) {
+          await supabase
+            .from('user_app_registrations')
+            .upsert({
+              user_id: data.user.id,
+              app_name: 'flow',
+            }, { onConflict: 'user_id,app_name' });
+        }
+        
         toast.success('Login realizado!');
         navigate('/dashboard');
       }
