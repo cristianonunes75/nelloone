@@ -407,55 +407,41 @@ serve(async (req) => {
                 properties: {
                   nivel_usuario: {
                     type: "object",
-                    description: "User's awareness level classification (MANDATORY)",
+                    description: "User's awareness level classification. nivel: 1=Discovery, 2=Awareness, 3=Activation. tom_aplicado: 'descoberta', 'consciencia', or 'ativacao'",
                     properties: {
-                      nivel: { 
-                        type: "number", 
-                        enum: [1, 2, 3],
-                        description: "1 = Discovery, 2 = Awareness, 3 = Activation" 
-                      },
-                      justificativa: { 
-                        type: "string", 
-                        description: "Brief justification for the level classification" 
-                      },
-                      tom_aplicado: {
-                        type: "string",
-                        description: "The tone being applied: 'descoberta', 'consciencia', or 'ativacao'"
-                      }
-                    },
-                    required: ["nivel", "justificativa", "tom_aplicado"]
+                      nivel: { type: "number", description: "1 = Discovery, 2 = Awareness, 3 = Activation" },
+                      justificativa: { type: "string", description: "Brief justification for the level classification" },
+                      tom_aplicado: { type: "string", description: "The tone being applied: descoberta, consciencia, or ativacao" }
+                    }
                   },
                   leitura_conexao: {
                     type: "object",
-                    description: "Connection reading section",
+                    description: "Connection reading section with titulo, coerencia, conflito, conclusao",
                     properties: {
-                      titulo: { type: "string" },
+                      titulo: { type: "string", description: "Section title" },
                       coerencia: { type: "string", description: "Where the code appears coherently in their story" },
                       conflito: { type: "string", description: "Where there is internal conflict/tension" },
-                      conclusao: { type: "string" }
-                    },
-                    required: ["titulo", "coerencia", "conflito", "conclusao"]
+                      conclusao: { type: "string", description: "Conclusion of this section" }
+                    }
                   },
                   padrao_sabotagem: {
                     type: "object",
-                    description: "Central self-sabotage pattern (or 'tension pattern' for Level 1)",
+                    description: "Central self-sabotage pattern (or tension pattern for Level 1)",
                     properties: {
-                      nome_padrao: { type: "string", description: "Name of the pattern (adapted to user level)" },
-                      como_se_forma: { type: "string" },
-                      como_manifesta_hoje: { type: "string" },
-                      porque_repete: { type: "string" }
-                    },
-                    required: ["nome_padrao", "como_se_forma", "como_manifesta_hoje", "porque_repete"]
+                      nome_padrao: { type: "string", description: "Name of the pattern adapted to user level" },
+                      como_se_forma: { type: "string", description: "How the pattern forms" },
+                      como_manifesta_hoje: { type: "string", description: "How it manifests today" },
+                      porque_repete: { type: "string", description: "Why it repeats" }
+                    }
                   },
                   posicionamento_contra_si: {
                     type: "object",
                     description: "How user positions against themselves",
                     properties: {
-                      como_tenta_se_vender: { type: "string" },
-                      conflito_com_essencia: { type: "string" },
+                      como_tenta_se_vender: { type: "string", description: "How they try to sell themselves" },
+                      conflito_com_essencia: { type: "string", description: "Conflict with their essence" },
                       custo: { type: "string", description: "The cost in energy, money, wear" }
-                    },
-                    required: ["como_tenta_se_vender", "conflito_com_essencia", "custo"]
+                    }
                   },
                   ativacao_pratica: {
                     type: "object",
@@ -464,26 +450,23 @@ serve(async (req) => {
                       ajustes_atitude: {
                         type: "array",
                         items: { type: "string" },
-                        minItems: 3,
-                        maxItems: 3,
                         description: "Exactly 3 attitude adjustments"
                       },
                       ajuste_linguagem: { type: "string", description: "1 language adjustment" },
                       limite_necessario: { type: "string", description: "1 necessary limit" },
                       decisao_7_dias: {
                         type: "object",
+                        description: "Decision for next 7 days with acao and porque fields",
                         properties: {
                           acao: { type: "string", description: "The concrete action" },
                           porque: { type: "string", description: "Why this action matters" }
-                        },
-                        required: ["acao", "porque"]
+                        }
                       }
-                    },
-                    required: ["ajustes_atitude", "ajuste_linguagem", "limite_necessario", "decisao_7_dias"]
+                    }
                   },
                   declaracao_ativacao: {
                     type: "string",
-                    description: "Personalized activation statement in format: 'When I act from who I am, I ______'"
+                    description: "Personalized activation statement in format: When I act from who I am, I ______"
                   },
                   fechamento: {
                     type: "string",
@@ -491,18 +474,11 @@ serve(async (req) => {
                   },
                   mensagem_seguranca: {
                     type: "object",
-                    description: "Mandatory safety messages",
+                    description: "Mandatory safety messages with disclaimer_1 and disclaimer_2",
                     properties: {
-                      disclaimer_1: { 
-                        type: "string", 
-                        description: "Must include: The Essence Code does not define who you are..." 
-                      },
-                      disclaimer_2: { 
-                        type: "string", 
-                        description: "Must include: This report is a starting point..." 
-                      }
-                    },
-                    required: ["disclaimer_1", "disclaimer_2"]
+                      disclaimer_1: { type: "string", description: "The Essence Code does not define who you are. It reveals patterns that can be transformed." },
+                      disclaimer_2: { type: "string", description: "This report is a starting point, not a final solution." }
+                    }
                   }
                 },
                 required: ["nivel_usuario", "leitura_conexao", "padrao_sabotagem", "posicionamento_contra_si", "ativacao_pratica", "declaracao_ativacao", "fechamento", "mensagem_seguranca"]
