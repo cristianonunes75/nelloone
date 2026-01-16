@@ -42,7 +42,7 @@ const ecosystemModules = [
     tagline: 'O Fundamento',
     description: 'Clareza sobre quem você é, seus padrões, talentos e propósito através de ciência e autoconhecimento profundo.',
     cta: 'Explorar Módulo',
-    url: 'https://one.nello.one',
+    url: 'https://identity.nello.one',
     icon: Brain,
     accentColor: 'from-amber-500/10 via-orange-400/5 to-transparent',
     borderGlow: 'group-hover:shadow-[0_0_60px_-15px_hsl(38_70%_50%/0.3)]',
@@ -136,7 +136,7 @@ export function InstitutionalLanding() {
               </nav>
               
               <a 
-                href="https://one.nello.one"
+                href="https://identity.nello.one"
                 className="text-sm font-medium text-[#1A1A1A] hover:text-nello-gold transition-colors flex items-center gap-1.5"
               >
                 Entrar

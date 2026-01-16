@@ -1,8 +1,9 @@
 import { ReactNode } from 'react';
 
 /**
- * Nello One - App Principal
- * Subdomínio: one.nello.one (ou nello.one principal)
+ * Nello One | Identity - App Principal de Autoconhecimento
+ * Subdomínio: identity.nello.one
+ * Legacy: one.nello.one (redireciona automaticamente)
  * 
  * Descrição: Plataforma de autoconhecimento e identidade, 
  * com testes e perfis de essência.

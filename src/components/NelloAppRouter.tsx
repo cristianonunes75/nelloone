@@ -37,9 +37,9 @@ export function NelloAppRouter({ children }: NelloAppRouterProps) {
           <BusinessApp />
         </BusinessAuthProvider>
       );
-    case 'one':
+    case 'identity':
     default:
-      // Nello One uses the existing routes passed as children
+      // Nello One Identity uses the existing routes passed as children
       return <>{children}</>;
   }
 }

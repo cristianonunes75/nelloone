@@ -26,16 +26,16 @@ interface AppConfig {
 
 const appConfigs: AppConfig[] = [
   {
-    id: "one",
-    name: "Nello One",
+    id: "identity",
+    name: "Nello One | Identity",
     label: "Autoconhecimento",
     icon: Sparkles,
     color: "text-violet-400",
-    url: "https://one.nello.one",
+    url: "https://identity.nello.one",
   },
   {
     id: "life",
-    name: "Nello Life",
+    name: "Nello One | Life",
     label: "Vida & Hábitos",
     icon: Heart,
     color: "text-emerald-400",
@@ -43,7 +43,7 @@ const appConfigs: AppConfig[] = [
   },
   {
     id: "flow",
-    name: "Nello Flow",
+    name: "Nello One | Flow",
     label: "Mentor IA",
     icon: Zap,
     color: "text-amber-400",
@@ -51,7 +51,7 @@ const appConfigs: AppConfig[] = [
   },
   {
     id: "business",
-    name: "Nello Business",
+    name: "Nello One | Business",
     label: "Empresas",
     icon: Briefcase,
     color: "text-blue-400",
@@ -94,7 +94,7 @@ export function NelloAppSwitcher({ variant = "icon", className }: NelloAppSwitch
 
       if (isLocalOrPreview) {
         // In local/preview, use query param to switch apps
-        const targetPath = app.id === "one" ? "/cliente/dashboard" :
+        const targetPath = app.id === "identity" ? "/cliente/dashboard" :
                           app.id === "life" ? "/dashboard" :
                           app.id === "flow" ? "/dashboard" :
                           app.id === "business" ? "/dashboard" : "/";
@@ -115,7 +115,7 @@ export function NelloAppSwitcher({ variant = "icon", className }: NelloAppSwitch
         return;
       }
 
-      const targetPath = app.id === "one" ? "/cliente/dashboard" :
+      const targetPath = app.id === "identity" ? "/cliente/dashboard" :
                         app.id === "life" ? "/dashboard" :
                         app.id === "flow" ? "/dashboard" :
                         app.id === "business" ? "/dashboard" : "/";

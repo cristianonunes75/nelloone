@@ -26,11 +26,11 @@ interface AdminApp {
 
 const adminApps: AdminApp[] = [
   {
-    id: 'one',
-    name: 'Nello One',
+    id: 'identity',
+    name: 'Nello One | Identity',
     label: 'Core',
     icon: <Sparkles className="w-4 h-4" />,
-    url: 'https://nello.one',
+    url: 'https://identity.nello.one',
     adminPath: '/admin',
   },
   {
@@ -117,7 +117,7 @@ export function AdminAppSwitcher() {
     if (currentApp === 'business') return 'business';
     if (currentApp === 'flow') return 'flow';
     if (currentApp === 'life') return 'life';
-    return 'one'; // Default to One for main/one
+    return 'identity'; // Default to Identity for main/identity
   }, [currentApp]);
 
   const currentAdminApp = adminApps.find(app => app.id === currentAppId) || adminApps[0];

@@ -221,13 +221,13 @@ const Auth = () => {
           throw error;
         }
 
-        // Register user for Nello One app
+        // Register user for Nello One Identity app
         if (data.user) {
           await supabase
             .from('user_app_registrations')
             .insert({
               user_id: data.user.id,
-              app_name: 'one',
+              app_name: 'identity',
             });
         }
 
