@@ -81,7 +81,10 @@ export default function FlowOffer() {
         status: newStatus || status,
       });
       if (newStatus) setStatus(newStatus);
-      toast.success(newStatus === 'active' ? 'Oferta ativada!' : 'Oferta salva!');
+      const successMessage = newStatus === 'active' 
+        ? 'Oferta ativada! Agora é hora de colocar em prática. — Nello'
+        : 'Oferta salva! Continue refinando até ficar do seu jeito. — Nello';
+      toast.success(successMessage, { duration: 5000 });
     } catch (error) {
       toast.error('Erro ao salvar oferta');
     } finally {
@@ -246,11 +249,11 @@ export default function FlowOffer() {
       {aiLoading === field ? (
         <Loader2 className="w-3.5 h-3.5 animate-spin" />
       ) : (
-        <Sparkles className="w-3.5 h-3.5" />
-      )}
-      <span className="text-xs">Pedir ajuda à IA</span>
-    </Button>
-  );
+      <Sparkles className="w-3.5 h-3.5" />
+    )}
+    <span className="text-xs">Analisar com Nello</span>
+  </Button>
+);
 
   const AISuggestionBox = ({ field }: { field: FieldType }) => {
     if (!aiSuggestion || aiSuggestion.field !== field) return null;

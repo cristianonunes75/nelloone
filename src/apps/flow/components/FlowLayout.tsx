@@ -15,11 +15,11 @@ interface FlowLayoutProps {
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-  { icon: Lightbulb, label: 'Ideias', path: '/ideias' },
-  { icon: Target, label: 'Minha Oferta', path: '/oferta' },
-  { icon: ListTodo, label: 'Plano de Ação', path: '/plano' },
-  { icon: CheckCircle, label: 'Check-in', path: '/checkin' },
-  { icon: MessageSquare, label: 'Mentor IA', path: '/mentor' },
+  { icon: Lightbulb, label: 'Ideias', path: '/ideias', subtitle: 'Onde o caos vira ordem' },
+  { icon: Target, label: 'Minha Oferta', path: '/oferta', subtitle: 'Onde a ideia vira valor' },
+  { icon: ListTodo, label: 'Plano de Ação', path: '/plano', subtitle: 'Onde o valor vira execução' },
+  { icon: CheckCircle, label: 'Check-in', path: '/checkin', subtitle: 'Onde a execução vira aprendizado' },
+  { icon: MessageSquare, label: 'Conversar com Nello', path: '/mentor' },
   { icon: User, label: 'Conta', path: '/conta' },
 ];
 
@@ -94,7 +94,7 @@ export function FlowLayout({ children }: FlowLayoutProps) {
             </div>
             <div>
               <span className="text-xl font-semibold text-white block">Nello Flow</span>
-              <span className="text-xs text-slate-500">Da essência à ação</span>
+              <span className="text-xs text-slate-500">Foco • Ação • Resultado</span>
             </div>
           </Link>
         </div>
