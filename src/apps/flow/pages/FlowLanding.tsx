@@ -13,9 +13,9 @@ export default function FlowLanding() {
   return (
     <>
       <SEOHead
-        title="Nello Flow | Mentor Digital para Multipotenciais"
-        description="Transforme ideias em ação e renda. Mentor digital com IA para multipotenciais usando o Método FLOW."
-        keywords="multipotencial, produtividade, foco, método flow, mentor digital, IA"
+        title="Nello Flow | Transforme Ideias em Ação"
+        description="Transforme seu excesso de ideias em foco, ação e renda. Mentor digital com IA para mentes inquietas que precisam de clareza."
+        keywords="produtividade, foco, execução, mentor digital, IA, resultados, plano de ação"
       />
       
       <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
@@ -61,17 +61,15 @@ export default function FlowLanding() {
               
               {/* Headline */}
               <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                Transforme ideias em{' '}
+                Transforme seu excesso de ideias em{' '}
                 <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                  ação e renda
+                  foco, ação e renda
                 </span>
               </h1>
               
               {/* Subheadline */}
               <p className="text-xl md:text-2xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
-                Você é multipotencial, cheio de ideias, mas se sente disperso?
-                <br />
-                O Nello Flow é um mentor digital com IA que te ajuda a focar no que importa e executar, com leveza, verdade e propósito.
+                O Nello Flow é o mentor digital com IA para mentes inquietas que precisam de clareza para executar seus projetos com propósito e leveza.
               </p>
               
               {/* CTA */}
@@ -265,19 +263,24 @@ export default function FlowLanding() {
                 </h2>
               </div>
               
-              <div className="grid md:grid-cols-2 gap-4 mb-12">
+              <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
                 {[
-                  "é multipotencial, criativo ou visionário",
-                  "se sente disperso e sobrecarregado",
-                  "começa projetos e não termina",
-                  "empreende sozinho",
-                  "quer ganhar dinheiro com algo próprio",
-                  "tem TDAH ou apenas precisa de mais clareza",
-                  "sente que nasceu para mais, mas falta direção"
+                  {
+                    title: "Tem grandes ideias, mas...",
+                    desc: "sente dificuldade em escolher por onde começar."
+                  },
+                  {
+                    title: "Começa muitos projetos, mas...",
+                    desc: "termina poucos. Quer finalmente executar."
+                  },
+                  {
+                    title: "Sente potencial disperso e...",
+                    desc: "quer resultados concretos no seu ritmo."
+                  }
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 p-4 rounded-xl bg-slate-800/30 border border-slate-700/30">
-                    <Users className="w-5 h-5 text-violet-400 flex-shrink-0" />
-                    <span className="text-slate-300">Para quem {item}</span>
+                  <div key={i} className="p-6 rounded-xl bg-slate-800/30 border border-slate-700/30 text-center">
+                    <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
+                    <p className="text-slate-400">{item.desc}</p>
                   </div>
                 ))}
               </div>
@@ -285,7 +288,7 @@ export default function FlowLanding() {
               {/* Quote */}
               <div className="max-w-2xl mx-auto text-center p-8 rounded-2xl bg-gradient-to-br from-violet-900/20 to-fuchsia-900/20 border border-violet-500/10">
                 <p className="text-xl text-slate-300 italic mb-4">
-                  "Sou alguém com muitas potencialidades, que precisa de estrutura para florescer."
+                  "Meu potencial está pronto. Só preciso de um caminho claro para agir."
                 </p>
                 <p className="text-violet-400 font-medium">
                   Se isso é você, o Nello Flow é para você.

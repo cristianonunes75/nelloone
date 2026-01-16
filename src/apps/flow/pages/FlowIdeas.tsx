@@ -256,7 +256,7 @@ Seja direto e prático.`;
                         ) : (
                           <Sparkles className="w-3.5 h-3.5" />
                         )}
-                        <span className="text-xs">Sugerir título</span>
+                        <span className="text-xs">Analisar com Nello</span>
                       </Button>
                     </div>
                     <Input
@@ -299,7 +299,7 @@ Seja direto e prático.`;
                         ) : (
                           <Sparkles className="w-3.5 h-3.5" />
                         )}
-                        <span className="text-xs">Desenvolver com IA</span>
+                        <span className="text-xs">Analisar com Nello</span>
                       </Button>
                     </div>
                     <Textarea
@@ -371,7 +371,7 @@ Seja direto e prático.`;
               <div className="flex items-start gap-2">
                 <Sparkles className="w-5 h-5 text-violet-400 mt-0.5 shrink-0" />
                 <div>
-                  <div className="text-sm font-medium text-violet-400 mb-1">Sugestão do Mentor IA</div>
+                  <div className="text-sm font-medium text-violet-400 mb-1">Sugestão do Nello</div>
                   <p className="text-sm text-slate-300 whitespace-pre-wrap">{aiSuggestion.content}</p>
                 </div>
               </div>

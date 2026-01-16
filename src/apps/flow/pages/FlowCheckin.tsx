@@ -35,7 +35,9 @@ export default function FlowCheckin() {
       setWhatWorked('');
       setWhatNot('');
       setAdjustments('');
-      toast.success('Check-in salvo!');
+      toast.success('Excelente! Um passo de cada vez é o que constrói o caminho. — Nello', {
+        duration: 5000,
+      });
     } catch (error) {
       toast.error('Erro ao salvar check-in');
     } finally {

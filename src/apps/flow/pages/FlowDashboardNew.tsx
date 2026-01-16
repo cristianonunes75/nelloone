@@ -53,7 +53,7 @@ export default function FlowDashboardNew() {
 
   return (
     <>
-      <SEOHead title="Dashboard | Nello Flow" description="Seu painel de controle no Nello Flow" />
+      <SEOHead title="Dashboard | Nello Flow" description="Seu painel de controle de foco e ação" />
       
       <FlowLayout>
         <div className="max-w-6xl mx-auto space-y-8">
@@ -68,6 +68,38 @@ export default function FlowDashboardNew() {
                 : 'Vamos transformar suas ideias em ação.'
               }
             </p>
+          </div>
+
+          {/* Foco da Semana - Hero Widget */}
+          <div className="p-6 rounded-2xl bg-gradient-to-br from-violet-600/30 to-fuchsia-600/30 border border-violet-500/40">
+            <div className="flex items-center gap-2 text-violet-300 text-sm font-medium mb-3">
+              <Target className="w-4 h-4" />
+              Foco da Semana
+            </div>
+            {chosenIdea ? (
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-2">{chosenIdea.title}</h2>
+                {chosenIdea.description && (
+                  <p className="text-slate-300">{chosenIdea.description}</p>
+                )}
+                <Link to="/plano" className="inline-block mt-4">
+                  <Button variant="outline" size="sm" className="border-violet-500/50 text-violet-300 hover:bg-violet-500/20">
+                    Ver Plano de Ação
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div>
+                <p className="text-slate-400 mb-4">Nenhum foco definido ainda. Escolha uma ideia para começar.</p>
+                <Link to="/ideias">
+                  <Button size="sm" className="bg-violet-500 hover:bg-violet-600">
+                    Escolher Meu Foco
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* FLOW Method Progress */}
@@ -206,14 +238,14 @@ export default function FlowDashboardNew() {
                 <div className="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center">
                   <MessageSquare className="w-5 h-5 text-violet-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-white">Mentor Flow IA</h3>
+                <h3 className="text-lg font-semibold text-white">Conversar com Nello</h3>
               </div>
               <p className="text-slate-300 mb-4">
-                Converse com seu mentor digital para clarear ideias, estruturar sua oferta ou planejar sua semana.
+                Seu mentor digital para clarear ideias, estruturar sua oferta ou planejar sua semana. Pé no chão, focado em resultados.
               </p>
               <Link to="/mentor">
                 <Button className="bg-violet-500 hover:bg-violet-600">
-                  Falar com meu Mentor
+                  Falar com Nello
                   <MessageSquare className="w-4 h-4 ml-2" />
                 </Button>
               </Link>

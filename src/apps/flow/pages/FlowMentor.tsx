@@ -107,7 +107,7 @@ export default function FlowMentor() {
 
   return (
     <>
-      <SEOHead title="Mentor IA | Nello Flow" description="Converse com seu mentor digital" />
+      <SEOHead title="Conversar com Nello | Nello Flow" description="Seu mentor digital pé no chão, focado em viabilidade e execução" />
       
       <FlowLayout>
         <div className="max-w-3xl mx-auto h-[calc(100vh-8rem)] flex flex-col">
@@ -115,9 +115,9 @@ export default function FlowMentor() {
           <div className="mb-4">
             <h1 className="text-2xl font-bold text-white flex items-center gap-3">
               <MessageSquare className="w-7 h-7 text-violet-400" />
-              Mentor Flow
+              Conversar com Nello
             </h1>
-            <p className="text-slate-400 mt-1">Seu mentor digital para transformar ideias em ação</p>
+            <p className="text-slate-400 mt-1">Seu mentor pé no chão, focado em viabilidade e execução</p>
           </div>
 
           {/* Messages */}
@@ -129,9 +129,9 @@ export default function FlowMentor() {
             ) : messages.length === 0 ? (
               <div className="text-center py-12">
                 <Bot className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-white mb-2">Olá! Sou seu Mentor Flow</h3>
+                <h3 className="text-lg font-medium text-white mb-2">Olá! Sou o Nello</h3>
                 <p className="text-slate-400 max-w-md mx-auto">
-                  Estou aqui para te ajudar a clarear ideias, estruturar sua oferta e criar planos de ação. Como posso te ajudar hoje?
+                  Estou aqui para te ajudar a clarear ideias, estruturar sua oferta e criar planos de ação possíveis. Sem enrolação, focado em resultados. Como posso te ajudar hoje?
                 </p>
               </div>
             ) : (
