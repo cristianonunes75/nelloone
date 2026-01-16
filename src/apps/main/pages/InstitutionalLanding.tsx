@@ -549,7 +549,7 @@ export function InstitutionalLanding() {
                 <ul className="space-y-3">
                   <li><a href="#ecossistema" className="text-sm text-[#1A1A1A]/60 hover:text-[#1A1A1A] transition-colors">Sobre</a></li>
                   <li><a href="#investidor" className="text-sm text-[#1A1A1A]/60 hover:text-[#1A1A1A] transition-colors">Investidores</a></li>
-                  <li><a href="https://wa.me/5561992430090" target="_blank" rel="noopener noreferrer" className="text-sm text-[#1A1A1A]/60 hover:text-[#1A1A1A] transition-colors">Contato</a></li>
+                  <li><a href="https://wa.me/5561992430090" target="_blank" rel="noopener noreferrer" className="text-sm text-[#1A1A1A]/60 hover:text-[#1A1A1A] transition-colors">WhatsApp</a></li>
                 </ul>
               </div>
               
