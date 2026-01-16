@@ -76,6 +76,7 @@ import {
   SaintPatronSection,
   PersonalitiesReferenceSection,
   RelatorioSelector,
+  AtivacaoEssenciaCTA,
 } from "@/components/codigo-essencia";
 
 // LangKey now imported from codigoEssenciaFallbacks
@@ -987,6 +988,12 @@ const CodigoEssenciaInner = () => {
                 language={lang} 
               />
             )}
+
+            {/* CTA - Ativação da Essência */}
+            <AtivacaoEssenciaCTA 
+              language={lang} 
+              hasUnlocked={profile?.ativacao_codigo_unlocked || false}
+            />
 
             {/* Disclaimer */}
             <div className="text-center py-3">
