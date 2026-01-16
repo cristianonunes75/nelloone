@@ -2777,6 +2777,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ativacao_codigo_unlocked: boolean | null
           avatar_url: string | null
           created_at: string
           deleted_at: string | null
@@ -2798,6 +2799,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ativacao_codigo_unlocked?: boolean | null
           avatar_url?: string | null
           created_at?: string
           deleted_at?: string | null
@@ -2819,6 +2821,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ativacao_codigo_unlocked?: boolean | null
           avatar_url?: string | null
           created_at?: string
           deleted_at?: string | null
