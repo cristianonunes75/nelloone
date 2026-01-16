@@ -51,10 +51,10 @@ export const FooterSection = () => {
             <div className="col-span-2 md:col-span-1">
               <LogoText className="text-lg md:text-xl mb-3 md:mb-4" variant="solid" />
               <p className="text-xs md:text-sm text-ink-blue/60 leading-relaxed">
-                {t.landing.footer.tagline}
+                NELLO ONE | Identity
               </p>
               <p className="text-[10px] md:text-xs text-ink-blue/40 mt-2">
-                {language === 'en' ? 'Part of the Nello ecosystem' : 'Parte do ecossistema Nello'}
+                {language === 'en' ? 'Part of the Nello One ecosystem' : 'Parte do ecossistema Nello One'}
               </p>
               <div className="mt-4">
                 <LanguageToggle />
