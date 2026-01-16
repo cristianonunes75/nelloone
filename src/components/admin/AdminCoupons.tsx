@@ -61,6 +61,7 @@ const NELLO_ONE_SUB_OPTIONS = [
   { value: "all", label: "Todos os produtos One" },
   { value: "jornada_completa", label: "Jornada Completa" },
   { value: "codigo_essencia", label: "Código da Essência" },
+  { value: "ativacao_codigo", label: "🔥 Ativação do Código (R$97)" },
   { value: "test_avulso", label: "Apenas Testes Avulsos" },
   { value: "disc", label: "DISC" },
   { value: "temperamentos", label: "Temperamentos" },

@@ -19,6 +19,7 @@ interface Profile {
   journey_started_at?: string | null;
   journey_completed_at?: string | null;
   codigo_essencia_unlocked?: boolean | null;
+  ativacao_codigo_unlocked?: boolean | null;
   // Founder flag
   is_founder?: boolean | null;
   is_blocked?: boolean | null;
