@@ -288,6 +288,95 @@ serve(async (req) => {
         // Fall through to jornada_completa handling below
       }
 
+      // ====== ATIVAÇÃO DO CÓDIGO PURCHASE ======
+      if (productType === "ativacao_codigo") {
+        logStep("Processing Ativação do Código purchase", { userId });
+        
+        if (!userId || userId === "guest") {
+          logStep("ERROR: Ativação do Código requires authenticated user");
+          return new Response(JSON.stringify({ error: "User authentication required" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        // Update profile to unlock ativacao
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ ativacao_codigo_unlocked: true })
+          .eq("id", userId);
+
+        if (updateError) {
+          logStep("ERROR: Failed to unlock Ativação do Código", { error: updateError });
+          throw updateError;
+        }
+
+        // Record purchase
+        const { error: purchaseError } = await supabase
+          .from("test_purchases")
+          .insert({
+            user_id: userId,
+            test_id: null,
+            payment_status: "completed",
+            amount_paid: (session.amount_total || 0) / 100,
+            currency: session.metadata?.currency?.toUpperCase() || "BRL",
+            stripe_session_id: session.id,
+            purchase_category: "ativacao_codigo",
+          });
+
+        if (purchaseError) {
+          logStep("ERROR: Failed to record purchase", { error: purchaseError });
+        }
+
+        logStep("Ativação do Código unlocked successfully", { userId });
+
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", userId)
+            .single();
+
+          const { data: userAuth } = await supabase.auth.admin.getUserById(userId);
+          const userEmail = userAuth?.user?.email;
+
+          if (userEmail) {
+            const language = session.metadata?.language || "pt";
+            const currencySymbol = session.metadata?.currency === "usd" ? "$" : 
+                            session.metadata?.currency === "eur" ? "€" : "R$";
+            const amountPaid = (session.amount_total || 0) / 100;
+
+            await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${supabaseServiceKey}`,
+              },
+              body: JSON.stringify({
+                type: "purchase_confirmation",
+                to: userEmail,
+                data: {
+                  name: profile?.full_name || userEmail.split("@")[0],
+                  testNames: [language === "en" ? "Essence Code Activation" : "Ativação do Código da Essência"],
+                  amount: amountPaid,
+                  currency: currencySymbol,
+                  language,
+                },
+              }),
+            });
+
+            logStep("Confirmation email sent for Ativação do Código", { userEmail });
+          }
+        } catch (emailError) {
+          logStep("WARN: Failed to send email", { error: emailError });
+        }
+
+        return new Response(JSON.stringify({ received: true, product: "ativacao_codigo" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
       // ====== CÓDIGO DA ESSÊNCIA PURCHASE ======
       if (productType === "codigo_da_essencia") {
         logStep("Processing Código da Essência purchase", { userId });

@@ -114,6 +114,7 @@ const USD_PRICES: Record<string, string> = {
   inteligencias_multiplas: "price_1SZNXnDjhZZxZELMuGMkDImQ",
   bundle: "price_1SZNYXDjhZZxZELMoGVJUZRP",
   codigo_da_essencia: "price_1Sc2RfDjhZZxZELMbZP1CvLO", // $97 USD
+  ativacao_codigo: "price_placeholder_usd", // $27 USD - To be created in Stripe
   fundadores: "price_1ScWglDjhZZxZELM3tQocxgu", // R$197 (BRL only)
 };
 
@@ -129,6 +130,7 @@ const BRL_PRICES: Record<string, string> = {
   inteligencias_multiplas: "price_1SZUpxDjhZZxZELMAkQlFX11",
   bundle: "price_1SeL7gDjhZZxZELMKuDFTI5t", // R$297 - NELLO ONE Jornada Completa (VALIDATION PHASE)
   codigo_da_essencia: "price_1Sc2RRDjhZZxZELMPxAnu0I5", // R$397 BRL
+  ativacao_codigo: "price_placeholder_brl", // R$97 BRL - To be created in Stripe
   fundadores: "price_1ScWglDjhZZxZELM3tQocxgu", // R$197 (BRL only)
 };
 
@@ -144,6 +146,7 @@ const EUR_PRICES: Record<string, string> = {
   inteligencias_multiplas: "price_1SZz0nDjhZZxZELMVagCtoXs",
   bundle: "price_1SZz6vDjhZZxZELMQsZuLKah",
   codigo_da_essencia: "price_1Sc2TRDjhZZxZELMr66uJZZm", // €97 EUR
+  ativacao_codigo: "price_placeholder_eur", // €27 EUR - To be created in Stripe
   fundadores: "price_1ScWglDjhZZxZELM3tQocxgu", // R$197 (BRL only - not available in EUR)
 };
 
@@ -353,6 +356,9 @@ serve(async (req) => {
     // Check for Fundadores purchase
     let isFundadores = body.isFundadores === true;
     
+    // Check for Ativação do Código purchase
+    const isAtivacaoCodigo = body.productType === "ativacao_codigo";
+    
     // Check for coupon code
     const couponCode = body.couponCode || null;
     
@@ -390,11 +396,11 @@ serve(async (req) => {
       }
     }
     
-    if (testIds.length === 0 && !isBundle && !isFundadores) {
-      throw new Error("At least one test ID is required, or isBundle/isFundadores must be true");
+    if (testIds.length === 0 && !isBundle && !isFundadores && !isAtivacaoCodigo) {
+      throw new Error("At least one test ID is required, or isBundle/isFundadores/isAtivacaoCodigo must be true");
     }
     
-    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, language, currency, couponCode });
+    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, isAtivacaoCodigo, language, currency, couponCode });
 
     // Get user (optional - supports guest checkout)
     let user = null;
@@ -429,7 +435,39 @@ serve(async (req) => {
     let lineItems: any[] = [];
     const priceMap = getPriceMap(currency);
     
-    if (isFundadores) {
+    if (isAtivacaoCodigo) {
+      // Ativação do Código purchase - Dynamic pricing based on currency
+      const ativacaoAmounts: Record<string, number> = {
+        brl: 9700,  // R$ 97
+        usd: 2700,  // $27
+        eur: 2700,  // €27
+      };
+      
+      const ativacaoNames: Record<string, { name: string; description: string }> = {
+        brl: {
+          name: "Ativação do Código da Essência – NELLO ONE",
+          description: "Relatório de ativação personalizado baseado no seu Código da Essência",
+        },
+        usd: {
+          name: "Essence Code Activation – NELLO ONE",
+          description: "Personalized activation report based on your Essence Code",
+        },
+        eur: {
+          name: "Ativação do Código da Essência – NELLO ONE",
+          description: "Relatório de ativação personalizado baseado no seu Código da Essência",
+        },
+      };
+      
+      lineItems = [{
+        price_data: {
+          currency: currency,
+          product_data: ativacaoNames[currency] || ativacaoNames.brl,
+          unit_amount: ativacaoAmounts[currency] || ativacaoAmounts.brl,
+        },
+        quantity: 1,
+      }];
+      logStep("Ativação do Código line item created", { currency, amount: ativacaoAmounts[currency] });
+    } else if (isFundadores) {
       // Fundadores purchase - R$197 BRL only (or free with 100% coupon)
       const fundadoresPriceId = "price_1ScWglDjhZZxZELM3tQocxgu";
       
@@ -578,7 +616,8 @@ serve(async (req) => {
         currency: currency,
         is_bundle: isBundle ? "true" : "false",
         is_fundadores: isFundadores ? "true" : "false",
-        product_type: isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
+        is_ativacao_codigo: isAtivacaoCodigo ? "true" : "false",
+        product_type: isAtivacaoCodigo ? "ativacao_codigo" : isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
         affiliate_code: affiliateCode || "",
       },
       customer_creation: customerId ? undefined : "always",

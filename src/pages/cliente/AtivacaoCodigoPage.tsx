@@ -1,15 +1,17 @@
 import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RefreshCw, Lock, Download, Mail, Loader2 } from "lucide-react";
+import { ArrowLeft, RefreshCw, Lock, Download, Mail, Loader2, Sparkles } from "lucide-react";
 import { AtivacaoCodigoForm, type HistoriaUsuario } from "@/components/codigo-essencia/AtivacaoCodigoForm";
 import { AtivacaoCodigoReport } from "@/components/codigo-essencia/AtivacaoCodigoReport";
 import { useAtivacaoCodigo } from "@/hooks/useAtivacaoCodigo";
+import { useAtivacaoCodigoAccess } from "@/hooks/useAtivacaoCodigoAccess";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAtivacaoCodigoFlag } from "@/hooks/useFeatureFlag";
 import { useScreenPDF } from "@/hooks/useScreenPDF";
 import { usePDFEmail } from "@/hooks/usePDFEmail";
+import { PurchaseAtivacaoDialog } from "@/components/cliente/PurchaseAtivacaoDialog";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
@@ -27,17 +29,27 @@ export default function AtivacaoCodigoPage() {
     hasAtivacao 
   } = useAtivacaoCodigo();
   
+  const { 
+    hasPurchased, 
+    hasCodigoEssencia, 
+    canGenerateActivation, 
+    needsPurchase,
+    isLoading: accessLoading 
+  } = useAtivacaoCodigoAccess();
+  
   const { isEnabled: featureEnabled, isLoading: featureLoading } = useAtivacaoCodigoFlag();
   const [generatedReport, setGeneratedReport] = useState<any>(null);
+  const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   
   // PDF hooks
   const { generatePDFFromRef, isGenerating: isPDFGenerating } = useScreenPDF();
   const { sendPDFByEmail, isSending: isEmailSending } = usePDFEmail();
   const reportRef = useRef<HTMLDivElement>(null);
 
-  // Admins can always access, even if feature is disabled
+  // Admins can always access, even if feature is disabled or not purchased
   const isAdmin = userRole === 'admin';
   const canAccess = isAdmin || featureEnabled;
+  const canGenerate = isAdmin || canGenerateActivation;
   
   const handleDownloadPDF = async () => {
     const testName = language === 'en' ? 'essence-activation' : 'ativacao-codigo';
@@ -203,7 +215,7 @@ export default function AtivacaoCodigoPage() {
     );
   }
 
-  if (isLoading || featureLoading) {
+  if (isLoading || featureLoading || accessLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
@@ -323,6 +335,30 @@ export default function AtivacaoCodigoPage() {
               language={language}
             />
           </div>
+        ) : !canGenerate && needsPurchase ? (
+          // Show purchase prompt if user hasn't purchased
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent/30 to-primary/30 flex items-center justify-center mb-6">
+              <Lock className="w-10 h-10 text-accent-foreground" />
+            </div>
+            <h1 className="text-2xl font-semibold mb-3">
+              {language === "en" ? "Unlock Your Activation" : "Desbloqueie Sua Ativação"}
+            </h1>
+            <p className="text-muted-foreground max-w-md mb-6">
+              {language === "en" 
+                ? "Transform your Essence Code into a personalized action plan. Get your unique activation report now."
+                : "Transforme seu Código da Essência em um plano de ação personalizado. Obtenha seu relatório de ativação único agora."
+              }
+            </p>
+            <Button 
+              size="lg" 
+              onClick={() => setPurchaseDialogOpen(true)}
+              className="gap-2"
+            >
+              <Sparkles className="w-5 h-5" />
+              {language === "en" ? "Unlock Activation" : "Desbloquear Ativação"}
+            </Button>
+          </div>
         ) : (
           <AtivacaoCodigoForm 
             onSubmit={handleSubmit}
@@ -331,6 +367,11 @@ export default function AtivacaoCodigoPage() {
           />
         )}
       </div>
+
+      <PurchaseAtivacaoDialog 
+        open={purchaseDialogOpen} 
+        onOpenChange={setPurchaseDialogOpen} 
+      />
     </div>
   );
 }
