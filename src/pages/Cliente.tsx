@@ -41,6 +41,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCodigoEssencia } from "@/hooks/useCodigoEssencia";
 import { useAtivacaoCodigo } from "@/hooks/useAtivacaoCodigo";
 import { useAtivacaoCodigoFlag } from "@/hooks/useFeatureFlag";
+import { useAtivacaoCodigoAccess } from "@/hooks/useAtivacaoCodigoAccess";
+import { PurchaseAtivacaoDialog } from "@/components/cliente/PurchaseAtivacaoDialog";
 import { Badge } from "@/components/ui/badge";
 
 const Cliente = () => {
@@ -56,6 +58,7 @@ const Cliente = () => {
   // State for reset confirmation dialog
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [stepToReset, setStepToReset] = useState<any>(null);
+  const [ativacaoPurchaseOpen, setAtivacaoPurchaseOpen] = useState(false);
 
   // State to track if we're validating impersonation token
   const [isValidatingImpersonation, setIsValidatingImpersonation] = useState(() => {
@@ -198,6 +201,7 @@ const Cliente = () => {
   // Check if user has generated the Ativação and if feature is enabled
   const { hasAtivacao, isLoading: isAtivacaoLoading } = useAtivacaoCodigo();
   const { isEnabled: isAtivacaoEnabled } = useAtivacaoCodigoFlag();
+  const { hasPurchased: hasAtivacaoPurchased, needsPurchase: needsAtivacaoPurchase } = useAtivacaoCodigoAccess();
 
   // Handle payment success callback
   useEffect(() => {
@@ -726,6 +730,11 @@ const Cliente = () => {
                   Admin Preview
                 </Badge>
               )}
+              {hasAtivacaoPurchased && (
+                <Badge variant="outline" className="absolute top-3 left-3 text-xs bg-green-500/20 text-green-600 border-green-500/50">
+                  {language === 'en' ? 'Unlocked' : 'Liberado'} ✓
+                </Badge>
+              )}
               <div className="w-12 h-12 md:w-16 md:h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
                 <Target className="w-6 h-6 md:w-8 md:h-8 text-accent-foreground" />
               </div>
@@ -738,16 +747,34 @@ const Cliente = () => {
                   : 'Transforme autoconhecimento em clareza acionável. Receba um plano personalizado baseado na sua história e no seu Código da Essência.'
                 }
               </p>
+              
+              {/* Show price if not purchased */}
+              {needsAtivacaoPurchase && !userRole?.includes('admin') && (
+                <div className="mb-4">
+                  <span className="text-2xl font-bold text-primary">
+                    {language === 'en' ? '$27' : language === 'pt-pt' ? '€27' : 'R$ 97'}
+                  </span>
+                </div>
+              )}
+              
               <Button 
                 size="lg" 
-                onClick={() => navigate(`${getBasePath()}/cliente/ativacao`)} 
+                onClick={() => {
+                  if (needsAtivacaoPurchase && !userRole?.includes('admin')) {
+                    setAtivacaoPurchaseOpen(true);
+                  } else {
+                    navigate(`${getBasePath()}/cliente/ativacao`);
+                  }
+                }} 
                 className="gap-2 w-full sm:w-auto"
                 variant={hasAtivacao ? "outline" : "default"}
               >
                 <Target className="w-4 h-4 md:w-5 md:h-5" />
                 {hasAtivacao 
                   ? (language === 'en' ? 'View My Report' : 'Ver Meu Relatório')
-                  : (language === 'en' ? 'Start Activation' : 'Iniciar Ativação')
+                  : needsAtivacaoPurchase && !userRole?.includes('admin')
+                    ? (language === 'en' ? 'Unlock Activation' : 'Desbloquear Ativação')
+                    : (language === 'en' ? 'Start Activation' : 'Iniciar Ativação')
                 }
               </Button>
             </div>
@@ -798,6 +825,12 @@ const Cliente = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Purchase Ativação dialog */}
+      <PurchaseAtivacaoDialog 
+        open={ativacaoPurchaseOpen} 
+        onOpenChange={setAtivacaoPurchaseOpen} 
+      />
 
       <NelloAgent 
         location="cliente" 
