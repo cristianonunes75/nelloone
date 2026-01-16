@@ -112,6 +112,13 @@ export const testPrices: Record<string, TestPrice> = {
     usd: { price: 97, priceId: "price_1Sc2RfDjhZZxZELMbZP1CvLO" },
     eur: { price: 97, priceId: "price_1Sc2TRDjhZZxZELMr66uJZZm" },
   },
+  // Ativação do Código da Essência - Premium activation report
+  ativacao_codigo: {
+    testType: "ativacao_codigo",
+    brl: { price: 97, priceId: null }, // Will be created in Stripe
+    usd: { price: 27, priceId: null },
+    eur: { price: 27, priceId: null },
+  },
 };
 
 // Fundadores - Special launch tier with complete access
