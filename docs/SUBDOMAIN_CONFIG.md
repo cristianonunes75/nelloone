@@ -6,27 +6,42 @@ O projeto está estruturado como um ecossistema de apps com subdomínios:
 
 | App | Subdomínio | Descrição |
 |-----|------------|-----------|
-| **Nello Flow** | flow.nello.one | Mentor digital com IA para multipotenciais - Método FLOW |
-| **Nello Life** | life.nello.one | Organização de vida, hábitos e espiritualidade |
-| **Nello One** | one.nello.one | Autoconhecimento e identidade com testes |
+| **Landing Institucional** | www.nello.one / nello.one | Apresentação do ecossistema completo |
+| **Nello One** | one.nello.one | Autoconhecimento humano e identidade |
+| **Nello Life** | life.nello.one | Organização de vida, corpo, rotina e espiritualidade |
+| **Nello Flow** | flow.nello.one | Organização da vida e produtividade consciente |
+| **Nello Business** | business.nello.one | Aplicação de valores no trabalho e liderança |
 
-## Arquitetura
+## Arquitetura Atualizada (Janeiro 2026)
 
 ```
 src/
 ├── apps/
-│   ├── flow/           # Nello Flow
+│   ├── main/              # Landing Institucional (www.nello.one)
+│   │   ├── MainApp.tsx
+│   │   └── pages/
+│   │       └── InstitutionalLanding.tsx
+│   ├── flow/              # Nello Flow
 │   │   ├── FlowApp.tsx
 │   │   └── pages/
 │   │       ├── FlowLanding.tsx
 │   │       ├── FlowAuth.tsx
 │   │       └── FlowDashboard.tsx
-│   ├── life/           # Nello Life (placeholder)
-│   │   └── LifeApp.tsx
-│   └── one/            # Nello One (wrapper)
-│       └── OneApp.tsx
+│   ├── life/              # Nello Life
+│   │   ├── LifeApp.tsx
+│   │   └── pages/
+│   │       └── LifeLanding.tsx
+│   ├── business/          # Nello Business
+│   │   ├── BusinessApp.tsx
+│   │   └── pages/
+│   │       └── BusinessLanding.tsx
+│   └── one/               # Não usado (Nello One usa routes do App.tsx)
+├── pages/                 # Páginas do Nello One (autoconhecimento)
+│   ├── Landing.tsx        # Landing do Nello One
+│   ├── Auth.tsx
+│   └── ...
 ├── hooks/
-│   └── useSubdomain.tsx    # Detecção de subdomínio
+│   └── useSubdomain.tsx   # Detecção de subdomínio
 ├── contexts/
 │   └── NelloAppContext.tsx # Contexto do app atual
 └── components/
@@ -37,26 +52,26 @@ src/
 
 1. O `useSubdomain` hook detecta o subdomínio atual
 2. O `NelloAppContext` disponibiliza essa info para toda a app
-3. O `NelloAppRouter` renderiza o app correto baseado no subdomínio
+3. O `NelloAppRouter` renderiza o app correto baseado no subdomínio:
+   - `main` ou `www` → Landing institucional (MainApp)
+   - `one` → Nello One (routes do App.tsx)
+   - `flow` → Nello Flow (FlowApp)
+   - `life` → Nello Life (LifeApp)
+   - `business` → Nello Business (BusinessApp)
 
-## Configuração de Domínio Customizado
+## Configuração de Domínio
 
-### Para flow.nello.one
+### Para www.nello.one / nello.one (Landing Institucional)
+O domínio principal agora serve a landing institucional do ecossistema.
 
+### Para one.nello.one (Nello One - Autoconhecimento)
 1. No Lovable, vá em **Project > Settings > Domains**
 2. Clique em **Connect Domain**
-3. Digite `flow.nello.one`
-4. Adicione os registros DNS no seu provedor:
-   - **A Record**: `flow` → `185.158.133.1`
-   - **TXT Record**: `_lovable` → valor fornecido pelo Lovable
+3. Digite `one.nello.one`
+4. Configure os registros DNS
 
-### Para life.nello.one e one.nello.one
-
+### Para outros subdomínios
 Mesmo processo acima, substituindo o subdomínio.
-
-### Consideração Importante
-
-Como todos os apps estão no mesmo projeto Lovable, o mesmo deploy serve todos os subdomínios. A diferenciação é feita no frontend via JavaScript.
 
 ## Desenvolvimento Local
 
@@ -64,26 +79,27 @@ Para testar um app específico localmente, use:
 
 ```bash
 # No .env (não commitar)
-VITE_FORCE_SUBDOMAIN=flow
+VITE_FORCE_SUBDOMAIN=one   # ou flow, life, business, main
 ```
 
-Ou adicione `?app=flow` na URL: `http://localhost:8080/?app=flow`
+Ou adicione `?app=` na URL: 
+- `http://localhost:8080/?app=main` (landing institucional)
+- `http://localhost:8080/?app=one` (Nello One)
+- `http://localhost:8080/?app=flow` (Nello Flow)
 
-## Compartilhamento de Dados (Futuro)
+## Compartilhamento de Dados
 
-Os apps compartilham o mesmo Supabase, então:
+Os apps compartilham o mesmo Supabase:
 - Usuários são os mesmos entre apps
 - Dados de perfil do Nello One podem ser acessados no Flow
-- Sessões de autenticação são compartilhadas
+- Sessões de autenticação são compartilhadas via cross-app tokens
 
-## SSL
+## Status dos Apps
 
-O SSL é automático via Lovable quando você configura domínios customizados.
-
-## Próximos Passos
-
-1. ✅ Nello Flow - Estrutura base criada
-2. ⏳ Nello Life - Placeholder pronto, aguardando implementação
-3. ✅ Nello One - App atual, totalmente funcional
-4. 🔜 Implementar funcionalidades específicas do Flow (ideias, timer, mentor IA)
-5. 🔜 Implementar Nello Life quando ativado
+| App | Status | Descrição |
+|-----|--------|-----------|
+| Landing Institucional | ✅ Completo | Apresentação do ecossistema |
+| Nello One | ✅ Completo | Autoconhecimento e identidade |
+| Nello Flow | ✅ Completo | Produtividade consciente |
+| Nello Life | ⏳ Placeholder | Corpo, rotina, espiritualidade |
+| Nello Business | ✅ Completo | Valores no trabalho |

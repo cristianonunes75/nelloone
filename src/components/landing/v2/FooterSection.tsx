@@ -48,14 +48,13 @@ export const FooterSection = () => {
       <div className="container px-4 md:px-6">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-8 md:mb-12">
-            {/* Brand - Full width on mobile */}
             <div className="col-span-2 md:col-span-1">
               <LogoText className="text-lg md:text-xl mb-3 md:mb-4" variant="solid" />
               <p className="text-xs md:text-sm text-ink-blue/60 leading-relaxed">
                 {t.landing.footer.tagline}
               </p>
               <p className="text-[10px] md:text-xs text-ink-blue/40 mt-2">
-                {language === 'en' ? 'Clarity. Identity. Direction.' : 'Clareza. Identidade. Propósito.'}
+                {language === 'en' ? 'Part of the Nello ecosystem' : 'Parte do ecossistema Nello'}
               </p>
               <div className="mt-4">
                 <LanguageToggle />
@@ -121,7 +120,7 @@ export const FooterSection = () => {
           {/* Bottom */}
           <div className="pt-6 md:pt-8 border-t border-bruma-deep/20 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4">
             <p className="text-[10px] md:text-xs text-ink-blue/50 text-center md:text-left">
-              © {new Date().getFullYear()} NELLO ONE — {language === 'en' ? 'Intelligent Self-Discovery Platform' : 'Plataforma de Autoconhecimento Inteligente'}
+              © {new Date().getFullYear()} Nello One — {language === 'en' ? 'Part of the Nello ecosystem' : 'Parte do ecossistema Nello'}
             </p>
             <div className="flex items-center gap-3 md:gap-4 text-[10px] md:text-xs text-ink-blue/50">
               <Link to="/termos-de-servico" className="hover:text-ink-blue transition-colors">
