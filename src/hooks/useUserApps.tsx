@@ -6,7 +6,7 @@ import { useNelloApp, NelloApp } from "@/contexts/NelloAppContext";
 interface UserAppsState {
   registeredApps: string[];
   isLoading: boolean;
-  hasOneAccess: boolean;
+  hasIdentityAccess: boolean;
   hasLifeAccess: boolean;
   hasFlowAccess: boolean;
   hasBusinessAccess: boolean;
@@ -23,7 +23,7 @@ export function useUserApps() {
   const [state, setState] = useState<UserAppsState>({
     registeredApps: [],
     isLoading: true,
-    hasOneAccess: false,
+    hasIdentityAccess: false,
     hasLifeAccess: false,
     hasFlowAccess: false,
     hasBusinessAccess: false,
@@ -35,7 +35,7 @@ export function useUserApps() {
       setState({
         registeredApps: [],
         isLoading: false,
-        hasOneAccess: false,
+        hasIdentityAccess: false,
         hasLifeAccess: false,
         hasFlowAccess: false,
         hasBusinessAccess: false,
@@ -56,12 +56,13 @@ export function useUserApps() {
         return;
       }
 
-      const apps = data?.map(r => r.app_name) || [];
+      // Map 'one' to 'identity' for backwards compatibility
+      const apps = data?.map(r => r.app_name === 'one' ? 'identity' : r.app_name) || [];
       
       setState({
         registeredApps: apps,
         isLoading: false,
-        hasOneAccess: apps.includes("one"),
+        hasIdentityAccess: apps.includes("identity") || apps.includes("one"),
         hasLifeAccess: apps.includes("life"),
         hasFlowAccess: apps.includes("flow"),
         hasBusinessAccess: apps.includes("business"),

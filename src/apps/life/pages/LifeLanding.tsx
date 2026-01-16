@@ -54,9 +54,9 @@ export default function LifeLanding() {
               </Link>
             )}
             
-            <a href="https://one.nello.one">
+            <a href="https://identity.nello.one">
               <Button variant="outline" className="border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/10">
-                Conhecer Nello One
+                Conhecer Nello One | Identity
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </a>

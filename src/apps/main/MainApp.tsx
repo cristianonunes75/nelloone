@@ -13,7 +13,7 @@ export default function MainApp() {
     <Routes>
       <Route path="/" element={<InstitutionalLanding />} />
       {/* Redirect old routes to appropriate apps */}
-      <Route path="/auth" element={<Navigate to="https://one.nello.one/auth" replace />} />
+      <Route path="/auth" element={<Navigate to="https://identity.nello.one/auth" replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
