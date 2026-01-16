@@ -9,6 +9,7 @@ interface SubdomainConfig {
   isLife: boolean;
   isOne: boolean;
   isMain: boolean;
+  isBusiness: boolean;
   domain: string;
 }
 
@@ -26,16 +27,16 @@ const DEV_FORCE_SUBDOMAIN = import.meta.env.VITE_FORCE_SUBDOMAIN as string | und
 /**
  * Detects which Nello app should be rendered based on subdomain
  * 
- * Examples:
+ * NEW ARCHITECTURE:
+ * - www.nello.one / nello.one → Main institutional landing (ecosystem presentation)
+ * - one.nello.one → Nello One (self-knowledge product)
  * - flow.nello.one → Nello Flow
  * - life.nello.one → Nello Life
- * - one.nello.one → Nello One
- * - nello.one → Main/redirect
- * - localhost:8080 → Main (or forced via env)
+ * - business.nello.one → Nello Business
+ * 
+ * For Lovable preview: use ?app=one|flow|life|business|main
  */
 export function useSubdomain(searchOverride?: string): SubdomainConfig {
-  // NOTE: We accept an optional `searchOverride` so the app can react to
-  // in-app query param changes (e.g. ?app=business) without a full reload.
   return useMemo(() => {
     const hostname = window.location.hostname;
     const fullDomain = window.location.host;
@@ -43,13 +44,14 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
 
     // For development: allow forcing subdomain via env variable
     if (DEV_FORCE_SUBDOMAIN && (hostname === 'localhost' || hostname === '127.0.0.1')) {
-      const app = SUBDOMAIN_MAP[DEV_FORCE_SUBDOMAIN] || 'main';
+      const app = DEV_FORCE_SUBDOMAIN === 'main' ? 'main' : (SUBDOMAIN_MAP[DEV_FORCE_SUBDOMAIN] || 'one');
       return {
         app,
         subdomain: DEV_FORCE_SUBDOMAIN,
         isFlow: app === 'flow',
         isLife: app === 'life',
         isOne: app === 'one',
+        isBusiness: app === 'business',
         isMain: app === 'main',
         domain: fullDomain,
       };
@@ -59,9 +61,24 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
     // Expected format: subdomain.nello.one or subdomain.domain.com
     const parts = hostname.split('.');
 
-    // Check if it's a subdomain of nello.one (e.g., flow.nello.one)
+    // Check if it's a subdomain of nello.one (e.g., flow.nello.one, one.nello.one)
     if (parts.length >= 3) {
       const subdomain = parts[0].toLowerCase();
+      
+      // www.nello.one should show the main institutional landing
+      if (subdomain === 'www') {
+        return {
+          app: 'main',
+          subdomain: 'www',
+          isFlow: false,
+          isLife: false,
+          isOne: false,
+          isBusiness: false,
+          isMain: true,
+          domain: fullDomain,
+        };
+      }
+      
       const app = SUBDOMAIN_MAP[subdomain] || 'main';
 
       return {
@@ -70,16 +87,32 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
         isFlow: app === 'flow',
         isLife: app === 'life',
         isOne: app === 'one',
+        isBusiness: app === 'business',
         isMain: app === 'main',
         domain: fullDomain,
       };
     }
 
     // Preview / local domains: lovable.* (lovable.app, lovable.dev, lovableproject.com, etc.)
-    // In this case, we use query params (?app=flow|business|one) or default to 'one'.
+    // Use query params (?app=flow|business|one|life|main) or default to 'one' for compatibility
     if (hostname.includes('lovable')) {
       const urlParams = new URLSearchParams(search);
       const appParam = urlParams.get('app');
+      
+      // If ?app=main, show institutional landing
+      if (appParam === 'main') {
+        return {
+          app: 'main',
+          subdomain: 'main',
+          isFlow: false,
+          isLife: false,
+          isOne: false,
+          isBusiness: false,
+          isMain: true,
+          domain: fullDomain,
+        };
+      }
+      
       if (appParam && SUBDOMAIN_MAP[appParam]) {
         const app = SUBDOMAIN_MAP[appParam];
         return {
@@ -88,17 +121,20 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
           isFlow: app === 'flow',
           isLife: app === 'life',
           isOne: app === 'one',
+          isBusiness: app === 'business',
           isMain: false,
           domain: fullDomain,
         };
       }
 
+      // Default to Nello One for Lovable preview (backward compatibility)
       return {
         app: 'one',
         subdomain: null,
         isFlow: false,
         isLife: false,
         isOne: true,
+        isBusiness: false,
         isMain: false,
         domain: fullDomain,
       };
@@ -113,18 +149,20 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
         isFlow: false,
         isLife: false,
         isOne: true,
+        isBusiness: false,
         isMain: false,
         domain: fullDomain,
       };
     }
 
-    // Default: main domain (nello.one without subdomain)
+    // Main domain without subdomain (nello.one) → Show institutional landing
     return {
       app: 'main',
       subdomain: null,
       isFlow: false,
       isLife: false,
       isOne: false,
+      isBusiness: false,
       isMain: true,
       domain: fullDomain,
     };
