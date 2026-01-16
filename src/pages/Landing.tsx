@@ -1,39 +1,37 @@
 import { SEOHead } from "@/components/SEOHead";
-import { NavSection } from "@/components/landing/v2/NavSection";
-import { NelloOneLanding } from "@/components/landing/v2/NelloOneLanding";
-import { FooterSection } from "@/components/landing/v2/FooterSection";
+import { InstitutionalPortal } from "@/components/landing/institutional";
 import { NelloAgent } from "@/components/NelloAgent";
 import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 
 /**
- * Nello One Landing Page
+ * Nello One Portal Institucional
  * 
- * Served at: one.nello.one (production) or lovable preview
+ * Served at: identity.nello.one (production) or lovable preview
  * 
- * This is the self-knowledge product landing page.
- * Part of the larger Nello ecosystem (Life, One, Flow, Business).
+ * This is the institutional portal for the Nello One ecosystem,
+ * presenting the complete vision for users and investors.
+ * 
+ * Modules:
+ * - Identity (Autoconhecimento) 
+ * - Life (Fé e Rotina)
+ * - Flow (Foco e Execução)
+ * - Business (Gestão e Empresas)
+ * - Praxis (Ferramenta para Profissionais)
  */
 const Landing = () => {
   // Track visitors for real-time analytics
   useVisitorTracking();
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <SEOHead 
         page="landing"
-        title="Nello One | Autoconhecimento humano a serviço de uma vida com sentido"
-        description="Descubra seus padrões, talentos e propósitos com uma jornada guiada de autoconhecimento. Parte do ecossistema Nello."
+        title="Nello One | Uma Vida. Um Ecossistema."
+        description="A inteligência que integra sua essência, sua fé e seu impacto no mundo em uma única jornada unificada."
       />
-      <NavSection />
-      
-      {/* Spacer for fixed nav */}
-      <div className="h-16" />
-      
-      <NelloOneLanding />
-      
-      <FooterSection />
+      <InstitutionalPortal />
       <NelloAgent location="landing" />
-    </div>
+    </>
   );
 };
 
