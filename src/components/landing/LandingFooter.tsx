@@ -24,11 +24,11 @@ export const LandingFooter = () => {
               />
               <p className="text-primary-foreground/80 leading-relaxed mb-6">
                 {isEn ? (
-                  <>The path begins within.<br />Clarity. Identity. Purpose.</>
+                  <>NELLO ONE | Identity<br />The path begins within.</>
                 ) : isPtPt ? (
-                  <>O caminho começa dentro.<br />Clareza. Identidade. Propósito.</>
+                  <>NELLO ONE | Identity<br />O caminho começa dentro.</>
                 ) : (
-                  <>O caminho começa dentro.<br />Clareza. Identidade. Propósito.</>
+                  <>NELLO ONE | Identity<br />O caminho começa dentro.</>
                 )}
               </p>
               <div className="flex gap-4">
