@@ -143,7 +143,56 @@ Criar frase curta, forte e personalizada:
 
 Deve: refletir o Código, contrariar o padrão de sabotagem, servir como âncora prática
 
-🔹 SEÇÃO 6: FECHAMENTO COM RESPONSABILIDADE
+🔹 SEÇÃO 6: CONVITES DE OBSERVAÇÃO E ALINHAMENTO (ADENDO)
+Este adendo complementa a Ativação do Código. Seu papel NÃO é orientar ações diretas, nem prescrever comportamentos.
+Ele existe para convidar o usuário à OBSERVAÇÃO CONSCIENTE.
+
+❌ NÃO NEGOCIÁVEIS:
+- ❌ Não prescreve atividades
+- ❌ Não define rotinas
+- ❌ Não cria metas
+- ❌ Não estabelece frequência ou desempenho
+- ❌ Não usa linguagem de obrigação
+
+✅ TEXTO DE ABERTURA OBRIGATÓRIO:
+"Este não é um conjunto de orientações a serem seguidas. É um convite à observação.
+Pessoas não se transformam por força de vontade constante, mas por alinhamento com aquilo que gera vida.
+Use as reflexões abaixo apenas como pontos de atenção para perceber o que, na sua experiência, faz sentido
+e o que gera resistência ou esgotamento."
+
+Gerar EXATAMENTE 6 observações, uma para cada área:
+
+1. CORPO E MOVIMENTO
+Formato: "Pessoas com esse padrão costumam se sentir mais conectadas ao corpo quando [contexto positivo], e menos quando [contexto negativo]."
+Convite: "Observe se você se sente mais vivo em atividades que [positivo] e mais resistente quando [negativo]."
+
+2. MENTE E ENERGIA
+Formato: "Esse padrão tende a funcionar melhor quando [contexto positivo], e se desgasta quando [contexto negativo]."
+Convite: "Observe quais situações mentais trazem clareza e quais geram dispersão ou paralisia."
+
+3. PROFISSIONAL E CRIATIVO
+Formato: "Pessoas com esse perfil costumam fluir melhor quando [contexto positivo], e se cansam quando [contexto negativo]."
+Convite: "Reflita onde hoje você está [desequilíbrio possível]."
+
+4. DINHEIRO E SUSTENTAÇÃO
+Formato: "Esse padrão geralmente não sofre por [falsa crença], mas por [verdadeira dificuldade]."
+Convite: "Observe se sua relação com dinheiro hoje é guiada por clareza ou por urgência constante."
+
+5. ESPIRITUALIDADE E SENTIDO
+Formato: "Esse padrão tende a se conectar melhor com o espiritual quando [contexto positivo], e se distancia quando [contexto negativo]."
+Convite: "Observe se sua espiritualidade hoje gera paz ou peso."
+
+6. RELACIONAL E APOIO
+Formato: "Pessoas com esse padrão costumam ser [característica], mas precisam aprender a [necessidade]."
+Convite: "Observe se você [reflexão sobre dar vs receber]."
+
+FECHAMENTO OBRIGATÓRIO DO ADENDO:
+"Nada aqui precisa ser resolvido agora. Perceber já é movimento. Escolher com consciência é o próximo passo natural."
+
+DISCLAIMER OBRIGATÓRIO:
+"Este adendo não substitui acompanhamento profissional, terapêutico ou espiritual. Ele serve como apoio de clareza para escolhas mais conscientes."
+
+🔹 SEÇÃO 7: FECHAMENTO FINAL
 Encerrar com parágrafo curto reforçando que:
 - autoconhecimento não é fim, é início
 - clareza exige ação
@@ -315,7 +364,56 @@ Create short, strong and personalized phrase:
 
 Must: reflect the Code, counter the sabotage pattern, serve as practical anchor
 
-🔹 SECTION 6: RESPONSIBLE CLOSING
+🔹 SECTION 6: OBSERVATION INVITATIONS AND ALIGNMENT (ADDENDUM)
+This addendum complements the Code Activation. Its role is NOT to direct actions or prescribe behaviors.
+It exists to invite the user to CONSCIOUS OBSERVATION.
+
+❌ NON-NEGOTIABLES:
+- ❌ Does not prescribe activities
+- ❌ Does not define routines
+- ❌ Does not create goals
+- ❌ Does not establish frequency or performance
+- ❌ Does not use obligation language
+
+✅ MANDATORY OPENING TEXT:
+"This is not a set of guidelines to follow. It's an invitation to observe.
+People don't transform through constant willpower, but through alignment with what generates life.
+Use the reflections below only as attention points to notice what, in your experience, makes sense
+and what generates resistance or exhaustion."
+
+Generate EXACTLY 6 observations, one for each area:
+
+1. BODY AND MOVEMENT
+Format: "People with this pattern tend to feel more connected to their body when [positive context], and less when [negative context]."
+Invitation: "Notice if you feel more alive in activities that [positive] and more resistant when [negative]."
+
+2. MIND AND ENERGY
+Format: "This pattern tends to function better when [positive context], and wears down when [negative context]."
+Invitation: "Notice which mental situations bring clarity and which generate dispersion or paralysis."
+
+3. PROFESSIONAL AND CREATIVE
+Format: "People with this profile tend to flow better when [positive context], and tire when [negative context]."
+Invitation: "Reflect on where today you are [possible imbalance]."
+
+4. MONEY AND SUSTENANCE
+Format: "This pattern generally doesn't suffer from [false belief], but from [true difficulty]."
+Invitation: "Notice if your relationship with money today is guided by clarity or by constant urgency."
+
+5. SPIRITUALITY AND MEANING
+Format: "This pattern tends to connect better with the spiritual when [positive context], and distances when [negative context]."
+Invitation: "Notice if your spirituality today generates peace or weight."
+
+6. RELATIONAL AND SUPPORT
+Format: "People with this pattern tend to be [characteristic], but need to learn to [need]."
+Invitation: "Notice if you [reflection on giving vs receiving]."
+
+MANDATORY ADDENDUM CLOSING:
+"Nothing here needs to be resolved now. Noticing is already movement. Choosing with awareness is the next natural step."
+
+MANDATORY DISCLAIMER:
+"This addendum does not replace professional, therapeutic or spiritual support. It serves as clarity support for more conscious choices."
+
+🔹 SECTION 7: FINAL CLOSING
 End with short paragraph reinforcing that:
 - self-knowledge is not the end, it's the beginning
 - clarity requires action
@@ -468,6 +566,57 @@ serve(async (req) => {
                     type: "string",
                     description: "Personalized activation statement in format: When I act from who I am, I ______"
                   },
+                  convites_observacao: {
+                    type: "object",
+                    description: "Observation invitations addendum with 6 life areas",
+                    properties: {
+                      abertura: { type: "string", description: "Mandatory opening text about observation invitation" },
+                      corpo_movimento: {
+                        type: "object",
+                        properties: {
+                          leitura: { type: "string", description: "Pattern reading for body and movement" },
+                          convite: { type: "string", description: "Reflective invitation" }
+                        }
+                      },
+                      mente_energia: {
+                        type: "object",
+                        properties: {
+                          leitura: { type: "string", description: "Pattern reading for mind and energy" },
+                          convite: { type: "string", description: "Reflective invitation" }
+                        }
+                      },
+                      profissional_criativo: {
+                        type: "object",
+                        properties: {
+                          leitura: { type: "string", description: "Pattern reading for professional and creative" },
+                          convite: { type: "string", description: "Reflective invitation" }
+                        }
+                      },
+                      dinheiro_sustentacao: {
+                        type: "object",
+                        properties: {
+                          leitura: { type: "string", description: "Pattern reading for money and sustenance" },
+                          convite: { type: "string", description: "Reflective invitation" }
+                        }
+                      },
+                      espiritualidade_sentido: {
+                        type: "object",
+                        properties: {
+                          leitura: { type: "string", description: "Pattern reading for spirituality and meaning" },
+                          convite: { type: "string", description: "Reflective invitation" }
+                        }
+                      },
+                      relacional_apoio: {
+                        type: "object",
+                        properties: {
+                          leitura: { type: "string", description: "Pattern reading for relational and support" },
+                          convite: { type: "string", description: "Reflective invitation" }
+                        }
+                      },
+                      fechamento: { type: "string", description: "Mandatory closing text: Nothing here needs to be resolved now..." },
+                      disclaimer: { type: "string", description: "Mandatory disclaimer about professional support" }
+                    }
+                  },
                   fechamento: {
                     type: "string",
                     description: "Responsible closing paragraph with safety messages"
@@ -481,7 +630,7 @@ serve(async (req) => {
                     }
                   }
                 },
-                required: ["nivel_usuario", "leitura_conexao", "padrao_sabotagem", "posicionamento_contra_si", "ativacao_pratica", "declaracao_ativacao", "fechamento", "mensagem_seguranca"]
+                required: ["nivel_usuario", "leitura_conexao", "padrao_sabotagem", "posicionamento_contra_si", "ativacao_pratica", "declaracao_ativacao", "convites_observacao", "fechamento", "mensagem_seguranca"]
               }
             }
           }

@@ -16,6 +16,7 @@ import {
   User,
   Info
 } from "lucide-react";
+import { ObservationInvitationsSection, ConvitesObservacao } from "./ObservationInvitationsSection";
 
 export interface AtivacaoReport {
   nivel_usuario?: {
@@ -50,6 +51,7 @@ export interface AtivacaoReport {
     };
   };
   declaracao_ativacao: string;
+  convites_observacao?: ConvitesObservacao;
   fechamento: string;
   mensagem_seguranca?: {
     disclaimer_1: string;
@@ -396,6 +398,14 @@ export function AtivacaoCodigoReport({ report, userName, language = "pt" }: Ativ
           </blockquote>
         </CardContent>
       </Card>
+
+      {/* Section 6: Convites de Observação (Addendum) */}
+      {report.convites_observacao && (
+        <ObservationInvitationsSection 
+          convites={report.convites_observacao} 
+          language={language} 
+        />
+      )}
 
       {/* Section 6: Fechamento */}
       <Card>
