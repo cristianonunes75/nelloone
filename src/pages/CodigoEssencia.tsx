@@ -72,11 +72,13 @@ import {
   ProvocativeClosing,
   ExecutiveSummary,
   ProductHeader,
-  RelatorioConjuge,
   SaintPatronSection,
   PersonalitiesReferenceSection,
   SymbolicReferencesSection,
   RelatorioSelector,
+  CodigoTabs,
+  PremiumProgressBars,
+  AtivacaoTabContent,
   AtivacaoEssenciaCTA,
 } from "@/components/codigo-essencia";
 
@@ -665,7 +667,6 @@ const CodigoEssenciaInner = () => {
                   maiorForca={resumoExecutivoSection.maior_forca || ""}
                   maiorRisco={resumoExecutivoSection.maior_risco || ""}
                   tensaoCentral={resumoExecutivoSection.tensao_central || ""}
-                  direcao90Dias={resumoExecutivoSection.direcao_90_dias || ""}
                   fraseSintese={resumoExecutivoSection.frase_sintese || ""}
                   language={lang}
                 />
@@ -923,37 +924,8 @@ const CodigoEssenciaInner = () => {
               </>
             )}
 
-            <SectionDivider variant="gradient" />
 
-            {/* === SECTION 7: 90-Day Plan (Horizontal timeline) === */}
-            {plano90Section?.months && (
-              <div>
-                <h3 className="font-bold text-sm mb-3 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-teal-500" />{t.plan90}
-                </h3>
-                <TimelinePath months={plano90Section.months} language={lang} />
-              </div>
-            )}
-
-            {/* === SECTION 8: Daily Routine (3-column) === */}
-            {rotinaSection && (
-              <>
-                <SectionDivider variant="line" />
-                <div>
-                  <h3 className="font-bold text-sm mb-3 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-cyan-500" />{t.routine}
-                  </h3>
-                  <DailyRoutineChecklist 
-                    morning={rotinaSection.morning} 
-                    afternoon={rotinaSection.afternoon} 
-                    night={rotinaSection.night} 
-                    language={lang} 
-                  />
-                </div>
-              </>
-            )}
-
-            <SectionDivider variant="wave" />
+            {/* NOTE: 90-Day Plan and Daily Routine removed - now exclusive to Ativação module */}
 
             {/* === SECTION 9: Symbolic References (new unified block) === */}
             {symbolicReferencesSection && (
