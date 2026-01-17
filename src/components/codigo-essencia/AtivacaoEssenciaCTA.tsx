@@ -85,7 +85,9 @@ export const AtivacaoEssenciaCTA = ({ language, hasUnlocked = false }: AtivacaoE
 
   const handleClick = () => {
     if (hasUnlocked) {
-      window.location.href = `/${language}/ativacao-codigo`;
+      // Use correct route path - /cliente/ativacao with language prefix
+      const basePath = language === 'pt' ? '' : language === 'en' ? '/en' : `/${language}`;
+      window.location.href = `${basePath}/cliente/ativacao`;
     } else {
       setPurchaseOpen(true);
     }
