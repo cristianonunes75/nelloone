@@ -4,7 +4,6 @@ import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { useCodigoEssenciaAccess } from "@/hooks/useCodigoEssenciaAccess";
 import { useImpersonate } from "@/contexts/ImpersonateContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,25 +14,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { JourneyStepCard } from "@/components/cliente/JourneyStepCard";
-import { JourneyResultsSummary } from "@/components/cliente/JourneyResultsSummary";
-import { JourneyTimeline } from "@/components/cliente/JourneyTimeline";
 import { LogoText } from "@/components/LogoText";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { ImpersonateBanner } from "@/components/ImpersonateBanner";
 import { OnboardingModal } from "@/components/cliente/OnboardingModal";
-import { LogOut, User, Sparkles, Map, Lock, ShoppingCart, Target } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { NelloAgent } from "@/components/NelloAgent";
-import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { testSlugs } from "@/lib/testContent";
-import { JornadaNelloCard } from "@/components/cliente/JornadaNelloCard";
-import { TEST_TYPE_TO_SLUG } from "@/utils/journey";
-import { AffiliatePanel } from "@/components/cliente/AffiliatePanel";
 import { NELLO_16_PROFILES, getNello16DisplayCode } from "@/lib/nello16Personality";
 import { DISC_PROFILES } from "@/lib/disc";
 import { ENNEAGRAM_PROFILES } from "@/lib/eneagrama";
@@ -43,7 +35,11 @@ import { useAtivacaoCodigo } from "@/hooks/useAtivacaoCodigo";
 import { useAtivacaoCodigoFlag } from "@/hooks/useFeatureFlag";
 import { useAtivacaoCodigoAccess } from "@/hooks/useAtivacaoCodigoAccess";
 import { PurchaseAtivacaoDialog } from "@/components/cliente/PurchaseAtivacaoDialog";
-import { Badge } from "@/components/ui/badge";
+import { 
+  DashboardStageJourney,
+  DashboardStageRevelation,
+  DashboardStagePotency
+} from "@/components/cliente/dashboard";
 
 const Cliente = () => {
   const { user, profile, signOut, userRole, isLoading: isAuthLoading } = useAuth();
@@ -566,222 +562,61 @@ const Cliente = () => {
 
       <main className="container px-4 py-6 md:py-12">
         <div className="max-w-3xl mx-auto">
-          {/* Header Section */}
-          <div className="text-center mb-6 md:mb-10">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 md:px-4 py-1.5 md:py-2 rounded-full mb-3 md:mb-4">
-              <Map className="w-3.5 h-3.5 md:w-4 md:h-4" />
-              <span className="text-xs md:text-sm font-medium">Jornada de Autoconhecimento</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-3">
-              Seu Código da Essência
-            </h1>
-            <p className="text-sm md:text-lg text-muted-foreground max-w-xl mx-auto px-2">
-              Olá, {displayName}! Nello AI vai te acompanhar em cada etapa. Basta seguir o caminho no seu ritmo.
-            </p>
-          </div>
-
-          {/* Progress Section */}
-          <div className="bg-card border border-border rounded-xl md:rounded-2xl p-4 md:p-6 mb-6 md:mb-8">
-            <div className="flex items-center justify-between mb-2 md:mb-3">
-              <span className="text-xs md:text-sm font-medium">Progresso da Jornada</span>
-              <span className="text-xs md:text-sm text-muted-foreground">
-                {completedCount} de {totalSteps} etapas
-              </span>
-            </div>
-            <Progress value={progressPercentage} className="h-1.5 md:h-2 mb-2" />
-            {isJourneyComplete ? (
-              <p className="text-[10px] md:text-xs text-primary font-medium">
-                🎉 Parabéns! Sua essência está pronta para ser revelada.
-              </p>
-            ) : completedCount > 0 ? (
-              <p className="text-[10px] md:text-xs text-muted-foreground">
-                Continue sua jornada - próxima etapa: {currentStep} de {totalSteps}
-              </p>
-            ) : (
-              <p className="text-[10px] md:text-xs text-muted-foreground">
-                Comece sua jornada de autoconhecimento
-              </p>
-            )}
-          </div>
-
-          {/* Journey Timeline - Visual Progress */}
-          <Card className="mb-6 md:mb-8">
-            <CardContent className="p-4 md:p-6">
-              <JourneyTimeline
-                steps={journeySteps.map(step => ({
-                  id: step.testId,
-                  name: step.name,
-                  status: step.status === "completed" ? "completed" 
-                    : step.status === "in_progress" ? "in_progress"
-                    : "not_started",
-                  completedAt: userTests?.find(ut => ut.test_id === step.testId && ut.status === "completed")?.completed_at,
-                }))}
-                currentStep={currentStep - 1}
-                onStepClick={(stepId) => {
-                  const step = journeySteps.find(s => s.testId === stepId);
-                  if (step?.status === "completed") {
-                    handleViewResult(step);
-                  } else if (step?.status === "in_progress") {
-                    handleContinueTest(step);
-                  } else if (step) {
-                    handleStartTest(step);
-                  }
-                }}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Jornada Nello Card - Progress Overview */}
-          {/* Use profile journey_status as source of truth when available */}
-          <JornadaNelloCard
-            status={
-              profile?.journey_status === 'completed' ? 'completed' :
-              profile?.journey_status === 'in_progress' ? 'in_progress' :
-              (isJourneyComplete ? 'completed' : completedCount > 0 ? 'in_progress' : 'not_started')
+          {/* Evolutionary Dashboard - 3 Stages */}
+          {(() => {
+            // Stage C: Potency (Post-purchase Ativação)
+            if (hasSavedCodigo && hasAtivacaoPurchased && !needsAtivacaoPurchase) {
+              return (
+                <DashboardStagePotency
+                  displayName={displayName}
+                  testResults={completedResultsForSummary}
+                  journeySteps={journeySteps}
+                  hasAtivacao={hasAtivacao}
+                  onViewAtivacao={() => navigate(`${getBasePath()}/cliente/ativacao`)}
+                  onViewCodigo={handleGenerateCode}
+                  onViewResult={handleViewResult}
+                />
+              );
             }
-            totalTests={profile?.journey_total_tests ?? totalSteps}
-            completedTests={profile?.journey_completed_tests ?? completedCount}
-            testsStatus={journeySteps.reduce((acc, step) => {
-              // Map testType to official journey slug for consistency
-              const slug = TEST_TYPE_TO_SLUG[step.testType] ?? step.testType;
-              acc[slug] = step.status;
-              return acc;
-            }, {} as Record<string, string>)}
-            hasCodigoEssencia={hasCodigoUnlocked}
-            onContinueJourney={() => {
-              const currentStepData = journeySteps.find(s => s.isCurrentStep);
-              if (currentStepData) handleStartTest(currentStepData);
-            }}
-            onViewCodigo={handleGenerateCode}
-            onPurchaseCodigo={handleGenerateCode}
-          />
-
-
-          {/* Consolidated Results Summary - Shows completed tests */}
-          {completedResultsForSummary.length > 0 && (
-            <JourneyResultsSummary
-              results={completedResultsForSummary}
-              onViewResult={(userTestId) => {
-                const basePath = getBasePath();
-                navigate(`${basePath}/cliente/test-results/${userTestId}`);
-              }}
-              onShareResult={(result) => handleShareResult(result.testName, result.summary)}
-            />
-          )}
-
-          {/* Journey Steps */}
-          <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
-            {journeySteps.map((step) => (
-              <JourneyStepCard
-                key={step.testId}
-                step={step}
-                onStart={() => handleStartTest(step)}
-                onContinue={() => handleContinueTest(step)}
-                onPurchase={() => navigate(`${getBasePath()}/cliente/comprar/${step.testId}`)}
-                onViewResult={() => handleViewResult(step)}
-                onReset={() => handleResetTestClick(step)}
-                onShare={() => {
-                  const summary = getResultSummary(step);
-                  if (summary) handleShareResult(step.name, summary);
-                }}
-                resultSummary={getResultSummary(step)}
-                completedAt={getCompletedAt(step)}
+            
+            // Stage B: Revelation (7/7 completed, pre/post Código)
+            if (isJourneyComplete) {
+              return (
+                <DashboardStageRevelation
+                  displayName={displayName}
+                  hasCodigoUnlocked={hasCodigoUnlocked}
+                  hasSavedCodigo={hasSavedCodigo}
+                  testResults={completedResultsForSummary}
+                  journeySteps={journeySteps}
+                  isAtivacaoEnabled={isAtivacaoEnabled || userRole === 'admin'}
+                  hasAtivacaoPurchased={hasAtivacaoPurchased}
+                  needsAtivacaoPurchase={needsAtivacaoPurchase}
+                  onGenerateCode={handleGenerateCode}
+                  onViewResult={handleViewResult}
+                  onPurchaseAtivacao={() => setAtivacaoPurchaseOpen(true)}
+                  onStartAtivacao={() => navigate(`${getBasePath()}/cliente/ativacao`)}
+                />
+              );
+            }
+            
+            // Stage A: Journey (0-6 tests completed)
+            return (
+              <DashboardStageJourney
+                displayName={displayName}
+                journeySteps={journeySteps}
+                completedCount={completedCount}
+                totalSteps={totalSteps}
+                currentStep={currentStep}
+                onStartTest={handleStartTest}
+                onContinueTest={handleContinueTest}
+                onViewResult={handleViewResult}
+                onPurchase={(step) => navigate(`${getBasePath()}/cliente/comprar/${step.testId}`)}
               />
-            ))}
-          </div>
-
-          {/* Final Code Generation - Shows only when journey is complete */}
-          {canSeeCodigoMenu && (
-            <div className={`bg-gradient-to-br ${hasCodigoUnlocked ? 'from-primary/20 via-primary/10 to-accent/20 border-primary/30' : 'from-amber-500/20 via-amber-400/10 to-orange-400/20 border-amber-500/30'} border rounded-xl md:rounded-2xl p-6 md:p-8 text-center`}>
-              <div className={`w-12 h-12 md:w-16 md:h-16 ${hasCodigoUnlocked ? 'bg-primary/20' : 'bg-amber-500/20'} rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4`}>
-                {hasCodigoUnlocked ? (
-                  <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-primary" />
-                ) : (
-                  <Lock className="w-6 h-6 md:w-8 md:h-8 text-amber-600" />
-                )}
-              </div>
-              <h2 className="text-xl md:text-2xl font-bold mb-2">
-                {language === 'en' ? 'Essence Code' : 'Código da Essência'}
-              </h2>
-              <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6">
-                {hasCodigoUnlocked 
-                  ? (language === 'en' 
-                    ? `Congratulations, ${displayName}! Your inner code is ready to be revealed.`
-                    : `Parabéns, ${displayName}! Seu código interior está pronto para ser revelado.`)
-                  : (language === 'en'
-                    ? `${displayName}, you've completed all 7 tests! Unlock your Essence Code.`
-                    : `${displayName}, você completou todos os 7 testes! Desbloqueie seu Código da Essência.`)
-                }
-              </p>
-              {hasCodigoUnlocked && (
-                <Button size="lg" onClick={handleGenerateCode} className="gap-2 w-full sm:w-auto">
-                  <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
-                  {language === 'en' ? 'Generate My Essence Code' : 'Gerar Meu Código da Essência'}
-                </Button>
-              )}
-            </div>
-          )}
-
-          {/* Ativação do Código - Shows only when Código da Essência has been generated */}
-          {hasSavedCodigo && (isAtivacaoEnabled || userRole === 'admin') && (
-            <div className="bg-gradient-to-br from-accent/20 via-accent/10 to-primary/20 border-accent/30 border rounded-xl md:rounded-2xl p-6 md:p-8 text-center mt-4 relative">
-              {!isAtivacaoEnabled && userRole === 'admin' && (
-                <Badge variant="outline" className="absolute top-3 right-3 text-xs bg-amber-500/20 text-amber-600 border-amber-500/50">
-                  Admin Preview
-                </Badge>
-              )}
-              {hasAtivacaoPurchased && (
-                <Badge variant="outline" className="absolute top-3 left-3 text-xs bg-green-500/20 text-green-600 border-green-500/50">
-                  {language === 'en' ? 'Unlocked' : 'Liberado'} ✓
-                </Badge>
-              )}
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                <Target className="w-6 h-6 md:w-8 md:h-8 text-accent-foreground" />
-              </div>
-              <h2 className="text-xl md:text-2xl font-bold mb-2">
-                {language === 'en' ? 'Essence Code Activation' : 'Ativação do Código da Essência'}
-              </h2>
-              <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6">
-                {language === 'en' 
-                  ? 'Transform self-knowledge into actionable clarity. Receive a personalized plan based on your story and your Essence Code.'
-                  : 'Transforme autoconhecimento em clareza acionável. Receba um plano personalizado baseado na sua história e no seu Código da Essência.'
-                }
-              </p>
-              
-              {/* Show price if not purchased */}
-              {needsAtivacaoPurchase && !userRole?.includes('admin') && (
-                <div className="mb-4">
-                  <span className="text-2xl font-bold text-primary">
-                    {language === 'en' ? '$27' : language === 'pt-pt' ? '€27' : 'R$ 97'}
-                  </span>
-                </div>
-              )}
-              
-              <Button 
-                size="lg" 
-                onClick={() => {
-                  if (needsAtivacaoPurchase && !userRole?.includes('admin')) {
-                    setAtivacaoPurchaseOpen(true);
-                  } else {
-                    navigate(`${getBasePath()}/cliente/ativacao`);
-                  }
-                }} 
-                className="gap-2 w-full sm:w-auto"
-                variant={hasAtivacao ? "outline" : "default"}
-              >
-                <Target className="w-4 h-4 md:w-5 md:h-5" />
-                {hasAtivacao 
-                  ? (language === 'en' ? 'View My Report' : 'Ver Meu Relatório')
-                  : needsAtivacaoPurchase && !userRole?.includes('admin')
-                    ? (language === 'en' ? 'Unlock Activation' : 'Desbloquear Ativação')
-                    : (language === 'en' ? 'Start Activation' : 'Iniciar Ativação')
-                }
-              </Button>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Disclaimer */}
-          <div className="bg-accent/10 border border-border rounded-xl md:rounded-2xl p-4 md:p-6 text-center mt-6 md:mt-8">
+          <div className="bg-accent/10 border border-border rounded-xl md:rounded-2xl p-4 md:p-6 text-center mt-8">
             <p className="text-xs md:text-sm text-muted-foreground">
               ⚠️ Os resultados destes testes são simbólicos e servem como ferramentas de autoconhecimento. 
               Eles não representam verdade absoluta, nem substituem oração, discernimento espiritual ou aconselhamento pessoal.
