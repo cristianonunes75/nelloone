@@ -41,6 +41,7 @@ export const AdminCodigoEssencia = () => {
   const [confirmRegenerate, setConfirmRegenerate] = useState<CodigoEssenciaUser | null>(null);
   const [confirmUnlock, setConfirmUnlock] = useState<CodigoEssenciaUser | null>(null);
   const [unlocking, setUnlocking] = useState<string | null>(null);
+  const [unlockAmount, setUnlockAmount] = useState<number>(2);
   const [mockTesting, setMockTesting] = useState(false);
   const [mockResult, setMockResult] = useState<any>(null);
 
@@ -132,13 +133,20 @@ export const AdminCodigoEssencia = () => {
     }
   };
 
-  // Unlock regeneration for a user (set version to 0)
-  const handleUnlockRegeneration = async (user: CodigoEssenciaUser) => {
+  // Unlock regeneration for a user with custom amount
+  const handleUnlockRegeneration = async (user: CodigoEssenciaUser, amount: number) => {
     setUnlocking(user.id);
     try {
+      // Calculate new version: current version - amount (but minimum 0)
+      const currentVersion = user.mapa_version || 0;
+      // To give N more regenerations, we need version = maxGenerations - N
+      // Since maxGenerations = 2, and user can regenerate while version < 2
+      // If we want to give them "amount" more regenerations, set version = 2 - amount (capped at 0)
+      const newVersion = Math.max(0, 2 - amount);
+      
       const { error } = await supabase
         .from("mapa_essencia")
-        .update({ version: 0 })
+        .update({ version: newVersion })
         .eq("user_id", user.id);
 
       if (error) throw error;
@@ -147,11 +155,18 @@ export const AdminCodigoEssencia = () => {
         p_action: 'unlock_regeneration',
         p_table_name: 'mapa_essencia',
         p_record_id: user.mapa_id || user.id,
-        p_new_data: { unlocked_by: 'admin', user_id: user.id }
+        p_new_data: { 
+          unlocked_by: 'admin', 
+          user_id: user.id,
+          amount_unlocked: amount,
+          previous_version: currentVersion,
+          new_version: newVersion
+        }
       });
 
-      toast.success(`Regeneração liberada para ${user.full_name}`);
+      toast.success(`${amount} regeneração(ões) liberada(s) para ${user.full_name}`);
       setConfirmUnlock(null);
+      setUnlockAmount(2); // Reset to default
       fetchUsers();
     } catch (error) {
       console.error("Error unlocking regeneration:", error);
@@ -486,28 +501,60 @@ export const AdminCodigoEssencia = () => {
       </AlertDialog>
 
       {/* Confirm Unlock Regeneration Dialog */}
-      <AlertDialog open={!!confirmUnlock} onOpenChange={() => setConfirmUnlock(null)}>
+      <AlertDialog open={!!confirmUnlock} onOpenChange={() => { setConfirmUnlock(null); setUnlockAmount(2); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Liberar Regeneração</AlertDialogTitle>
-            <AlertDialogDescription>
-              Deseja liberar novas gerações do Código da Essência para <strong>{confirmUnlock?.full_name}</strong>?
-              <br /><br />
-              Isso irá resetar a versão para 0, permitindo que o usuário gere o código mais 2 vezes.
-              <br /><br />
-              <span className="text-muted-foreground">Versão atual: {confirmUnlock?.mapa_version || 0}</span>
-              <br /><br />
-              <span className="text-amber-600">Use apenas em casos de erro ou quando o cliente pagar por novas gerações.</span>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4">
+                <p>
+                  Libere novas gerações do Código da Essência para <strong>{confirmUnlock?.full_name}</strong>.
+                </p>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Quantas regenerações liberar?</label>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 5].map((num) => (
+                      <Button
+                        key={num}
+                        type="button"
+                        variant={unlockAmount === num ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setUnlockAmount(num)}
+                        className={unlockAmount === num ? "bg-amber-600 hover:bg-amber-700" : ""}
+                      >
+                        {num}
+                      </Button>
+                    ))}
+                    <Input
+                      type="number"
+                      min={1}
+                      max={10}
+                      value={unlockAmount}
+                      onChange={(e) => setUnlockAmount(Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))}
+                      className="w-20"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Versão atual: <strong>{confirmUnlock?.mapa_version || 0}</strong> • 
+                    O usuário terá <strong>{unlockAmount}</strong> regeneração(ões) disponível(is)
+                  </p>
+                </div>
+
+                <p className="text-amber-600 text-sm">
+                  ⚠️ Use apenas em casos de erro ou quando o cliente pagar por novas gerações.
+                </p>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction 
-              onClick={() => confirmUnlock && handleUnlockRegeneration(confirmUnlock)}
+              onClick={() => confirmUnlock && handleUnlockRegeneration(confirmUnlock, unlockAmount)}
               disabled={!!unlocking}
               className="bg-amber-600 hover:bg-amber-700"
             >
-              {unlocking ? <Loader2 className="w-4 h-4 animate-spin" /> : "Liberar"}
+              {unlocking ? <Loader2 className="w-4 h-4 animate-spin" /> : `Liberar ${unlockAmount} Regeneração(ões)`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
