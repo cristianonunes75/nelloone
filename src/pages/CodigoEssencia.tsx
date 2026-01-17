@@ -75,6 +75,7 @@ import {
   RelatorioConjuge,
   SaintPatronSection,
   PersonalitiesReferenceSection,
+  SymbolicReferencesSection,
   RelatorioSelector,
   AtivacaoEssenciaCTA,
 } from "@/components/codigo-essencia";
@@ -479,6 +480,7 @@ const CodigoEssenciaInner = () => {
   const resumoExecutivoSection = generatedSections.find(s => s.id === 'resumo_executivo');
   const santoPadreiroSection = generatedSections.find(s => s.id === 'santo_padroeiro');
   const personalidadesSection = generatedSections.find(s => s.id === 'personalidades_referencia');
+  const symbolicReferencesSection = generatedSections.find(s => s.id === 'referencias_simbolicas');
 
   // Fallback: extract archetypes from testResults if AI section doesn't have them
   const arquetiposChamadoSection = useMemo(() => {
@@ -953,16 +955,24 @@ const CodigoEssenciaInner = () => {
 
             <SectionDivider variant="wave" />
 
-            {/* === SECTION 9: Saint Patron === */}
-            {santoPadreiroSection && (
+            {/* === SECTION 9: Symbolic References (new unified block) === */}
+            {symbolicReferencesSection && (
+              <>
+                <SymbolicReferencesSection data={symbolicReferencesSection} language={lang} />
+                <SectionDivider variant="gradient" />
+              </>
+            )}
+
+            {/* === SECTION 9 (Legacy): Saint Patron === */}
+            {!symbolicReferencesSection && santoPadreiroSection && (
               <>
                 <SaintPatronSection data={santoPadreiroSection} language={lang} />
                 <SectionDivider variant="dots" />
               </>
             )}
 
-            {/* === SECTION 10: Personalities Reference === */}
-            {personalidadesSection && (
+            {/* === SECTION 10 (Legacy): Personalities Reference === */}
+            {!symbolicReferencesSection && personalidadesSection && (
               <>
                 <PersonalitiesReferenceSection data={personalidadesSection} language={lang} />
                 <SectionDivider variant="gradient" />
