@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useEffect } from "react";
+import { useAdminPermissions } from "./useAdminPermissions";
 
 export interface AtivacaoCodigoAccessState {
   // User has purchased the activation module
@@ -31,8 +32,12 @@ export interface AtivacaoCodigoAccessState {
  * And auto-corrects inconsistencies for redundancy.
  */
 export function useAtivacaoCodigoAccess(): AtivacaoCodigoAccessState {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const queryClient = useQueryClient();
+  const { isSuperAdmin, isLoading: adminLoading } = useAdminPermissions();
+  
+  // Admin bypass
+  const isAdmin = userRole === 'admin';
 
   // Check if user has purchased ativacao_codigo in test_purchases
   const { data: purchaseData, isLoading: purchaseLoading } = useQuery({
@@ -120,33 +125,33 @@ export function useAtivacaoCodigoAccess(): AtivacaoCodigoAccessState {
     },
   });
 
-  const isLoading = purchaseLoading || profileLoading || codigoLoading;
-  const hasCodigoEssencia = !!codigoData?.id;
+  const isLoading = purchaseLoading || profileLoading || codigoLoading || adminLoading;
+  const hasCodigoEssencia = !!codigoData?.id || isAdmin; // Admins always have "Código"
   
   // Check both sources for purchase validation
   const hasPurchaseRecord = !!purchaseData?.id;
   const hasProfileFlag = !!(profileData as any)?.ativacao_codigo_unlocked;
   
-  // User has purchased if EITHER condition is true (redundancy)
-  const hasPurchased = hasPurchaseRecord || hasProfileFlag;
+  // User has purchased if EITHER condition is true (redundancy) OR is admin
+  const hasPurchased = hasPurchaseRecord || hasProfileFlag || isAdmin;
 
   // Auto-correct: if purchase exists but profile flag is missing, update it
   useEffect(() => {
-    if (!isLoading && user?.id && hasPurchaseRecord && !hasProfileFlag) {
+    if (!isLoading && user?.id && hasPurchaseRecord && !hasProfileFlag && !isAdmin) {
       console.log("Detected inconsistency: purchase exists but profile flag is false. Auto-correcting...");
       autoCorrectMutation.mutate(user.id);
     }
-  }, [isLoading, user?.id, hasPurchaseRecord, hasProfileFlag]);
+  }, [isLoading, user?.id, hasPurchaseRecord, hasProfileFlag, isAdmin]);
 
   return {
     hasPurchased,
     hasCodigoEssencia,
-    // Show menu item only if user has Código da Essência
-    canSeeMenuItem: hasCodigoEssencia,
-    // Can generate if purchased AND has Código
-    canGenerateActivation: hasPurchased && hasCodigoEssencia,
-    // Needs purchase if has Código but hasn't purchased
-    needsPurchase: hasCodigoEssencia && !hasPurchased,
+    // Admins can always see menu item; others need Código da Essência
+    canSeeMenuItem: hasCodigoEssencia || isAdmin,
+    // Admins can always generate; others need purchase AND Código
+    canGenerateActivation: isAdmin || (hasPurchased && hasCodigoEssencia),
+    // Admins never need to purchase
+    needsPurchase: !isAdmin && hasCodigoEssencia && !hasPurchased,
     isLoading,
   };
 }
