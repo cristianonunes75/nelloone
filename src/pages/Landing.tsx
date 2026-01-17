@@ -1,22 +1,15 @@
 import { SEOHead } from "@/components/SEOHead";
-import { InstitutionalPortal } from "@/components/landing/institutional";
+import { NelloOneLanding } from "@/components/landing/v2/NelloOneLanding";
 import { NelloAgent } from "@/components/NelloAgent";
 import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 
 /**
- * Nello One Portal Institucional
+ * Nello Identity Landing Page
  * 
  * Served at: identity.nello.one (production) or lovable preview
  * 
- * This is the institutional portal for the Nello One ecosystem,
- * presenting the complete vision for users and investors.
- * 
- * Modules:
- * - Identity (Autoconhecimento) 
- * - Life (Fé e Rotina)
- * - Flow (Foco e Execução)
- * - Business (Gestão e Empresas)
- * - Praxis (Ferramenta para Profissionais)
+ * This is the landing page for the Identity product (Autoconhecimento),
+ * presenting the 7-step self-discovery journey.
  */
 const Landing = () => {
   // Track visitors for real-time analytics
@@ -26,10 +19,10 @@ const Landing = () => {
     <>
       <SEOHead 
         page="landing"
-        title="Nello One | Uma Vida. Um Ecossistema."
-        description="A inteligência que integra sua essência, sua fé e seu impacto no mundo em uma única jornada unificada."
+        title="Nello Identity | Descubra Quem Você É"
+        description="Uma jornada de autoconhecimento em 7 etapas para descobrir sua essência e viver com propósito."
       />
-      <InstitutionalPortal />
+      <NelloOneLanding />
       <NelloAgent location="landing" />
     </>
   );
