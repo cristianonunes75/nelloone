@@ -203,12 +203,20 @@ export function useAtivacaoCodigo() {
     }
   };
 
+  // Determine activation status
+  const getAtivacaoStatus = (): "pending" | "in_progress" | "completed" => {
+    if (savedAtivacao?.relatorio) return "completed";
+    if (savedAtivacao?.historia_usuario) return "in_progress";
+    return "pending";
+  };
+
   return {
     savedAtivacao,
     isLoading,
     isGenerating,
     generateAtivacao,
     resetAtivacao,
-    hasAtivacao: !!savedAtivacao?.relatorio
+    hasAtivacao: !!savedAtivacao?.relatorio,
+    ativacaoStatus: getAtivacaoStatus()
   };
 }

@@ -195,7 +195,7 @@ const Cliente = () => {
   const { hasSavedCodigo } = useCodigoEssencia();
   
   // Check if user has generated the Ativação and if feature is enabled
-  const { hasAtivacao, isLoading: isAtivacaoLoading } = useAtivacaoCodigo();
+  const { hasAtivacao, isLoading: isAtivacaoLoading, isGenerating: isGeneratingAtivacao, ativacaoStatus } = useAtivacaoCodigo();
   const { isEnabled: isAtivacaoEnabled } = useAtivacaoCodigoFlag();
   const { hasPurchased: hasAtivacaoPurchased, needsPurchase: needsAtivacaoPurchase } = useAtivacaoCodigoAccess();
 
@@ -572,7 +572,11 @@ const Cliente = () => {
                   testResults={completedResultsForSummary}
                   journeySteps={journeySteps}
                   hasAtivacao={hasAtivacao}
+                  ativacaoStatus={ativacaoStatus}
+                  isGeneratingAtivacao={isGeneratingAtivacao}
                   onViewAtivacao={() => navigate(`${getBasePath()}/cliente/ativacao`)}
+                  onStartAtivacao={() => navigate(`${getBasePath()}/cliente/ativacao`)}
+                  onContinueAtivacao={() => navigate(`${getBasePath()}/cliente/ativacao`)}
                   onViewCodigo={handleGenerateCode}
                   onViewResult={handleViewResult}
                 />
