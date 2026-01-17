@@ -8,7 +8,11 @@ import {
   Key,
   Eye,
   ArrowRight,
-  ChevronRight
+  ChevronRight,
+  Play,
+  FileText,
+  CheckCircle2,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { JourneyStep } from "@/hooks/useJourneyProgress";
@@ -20,12 +24,19 @@ interface TestResult {
   summary: string;
 }
 
+// Activation status types
+type AtivacaoStatus = "pending" | "in_progress" | "completed";
+
 interface DashboardStagePotencyProps {
   displayName: string;
   testResults: TestResult[];
   journeySteps: JourneyStep[];
   hasAtivacao: boolean;
+  ativacaoStatus?: AtivacaoStatus;
+  isGeneratingAtivacao?: boolean;
   onViewAtivacao: () => void;
+  onStartAtivacao?: () => void;
+  onContinueAtivacao?: () => void;
   onViewCodigo: () => void;
   onViewResult: (step: JourneyStep) => void;
 }
@@ -46,32 +57,79 @@ const ativacaoModules = [
   {
     id: "plano-90-dias",
     name: "Plano de 90 Dias",
-    description: "Ações práticas baseadas no seu Código",
+    description: "Ações práticas e metas",
     icon: Calendar,
     color: "from-amber-500 to-orange-500",
   },
   {
     id: "manual-relacionamentos",
     name: "Manual de Relacionamentos",
-    description: "Como se conectar com cada tipo",
+    description: "Como interagir com família e equipe",
     icon: Heart,
     color: "from-pink-500 to-rose-500",
   },
   {
     id: "verdades-libertam",
     name: "Verdades que Libertam",
-    description: "Insights profundos sobre sua essência",
+    description: "Confronto com padrões de autossabotagem",
     icon: Key,
     color: "from-violet-500 to-purple-500",
   },
 ];
+
+// Dynamic button configuration based on status
+function getButtonConfig(status: AtivacaoStatus, isGenerating: boolean) {
+  if (isGenerating) {
+    return {
+      text: "Gerando sua Ativação...",
+      icon: Loader2,
+      iconClassName: "animate-spin",
+      disabled: true,
+    };
+  }
+
+  switch (status) {
+    case "pending":
+      return {
+        text: "Iniciar Minha Ativação",
+        icon: Play,
+        iconClassName: "",
+        disabled: false,
+      };
+    case "in_progress":
+      return {
+        text: "Continuar Minha Ativação",
+        icon: ArrowRight,
+        iconClassName: "",
+        disabled: false,
+      };
+    case "completed":
+      return {
+        text: "Ver Minha Ativação Completa",
+        icon: Eye,
+        iconClassName: "",
+        disabled: false,
+      };
+    default:
+      return {
+        text: "Iniciar Minha Ativação",
+        icon: Play,
+        iconClassName: "",
+        disabled: false,
+      };
+  }
+}
 
 export function DashboardStagePotency({
   displayName,
   testResults,
   journeySteps,
   hasAtivacao,
+  ativacaoStatus = hasAtivacao ? "completed" : "pending",
+  isGeneratingAtivacao = false,
   onViewAtivacao,
+  onStartAtivacao,
+  onContinueAtivacao,
   onViewCodigo,
   onViewResult,
 }: DashboardStagePotencyProps) {
@@ -88,6 +146,21 @@ export function DashboardStagePotency({
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } }
   };
 
+  const buttonConfig = getButtonConfig(ativacaoStatus, isGeneratingAtivacao);
+
+  // Handle button click based on status
+  const handleMainButtonClick = () => {
+    if (ativacaoStatus === "completed") {
+      onViewAtivacao();
+    } else if (ativacaoStatus === "in_progress" && onContinueAtivacao) {
+      onContinueAtivacao();
+    } else if (onStartAtivacao) {
+      onStartAtivacao();
+    } else {
+      onViewAtivacao();
+    }
+  };
+
   return (
     <motion.div 
       className="space-y-8"
@@ -98,59 +171,111 @@ export function DashboardStagePotency({
       {/* Premium Hero - Ativação do Código */}
       <motion.div 
         variants={itemVariants}
-        className="relative overflow-hidden bg-gradient-to-br from-amber-500/20 via-orange-400/15 to-amber-500/10 border border-amber-500/40 rounded-3xl p-8 md:p-10"
+        className="relative overflow-hidden bg-gradient-to-br from-amber-500/20 via-orange-400/15 to-amber-500/10 border-2 border-amber-500/50 rounded-3xl p-8 md:p-10 shadow-xl shadow-amber-500/10"
       >
         {/* Premium glow effects */}
         <div className="absolute top-0 left-1/2 w-96 h-96 bg-amber-500/20 rounded-full -translate-y-1/2 -translate-x-1/2 blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-48 h-48 bg-orange-400/20 rounded-full translate-y-1/2 translate-x-1/2 blur-2xl" />
+        <div className="absolute bottom-0 right-0 w-64 h-64 bg-orange-400/25 rounded-full translate-y-1/2 translate-x-1/2 blur-2xl" />
+        <div className="absolute top-1/2 right-1/4 w-32 h-32 bg-amber-300/20 rounded-full blur-xl" />
         
         <div className="relative">
+          {/* Header */}
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+            <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/40">
               <Target className="w-7 h-7 text-white" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider">Premium</span>
-              <h2 className="text-2xl font-bold">Ativação do Código</h2>
+              <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3" />
+                Premium
+              </span>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-500 bg-clip-text text-transparent">
+                Ativação do Código
+              </h2>
             </div>
           </div>
           
-          <p className="text-muted-foreground mb-6 max-w-lg">
-            Olá, {displayName}! Sua clareza interior foi transformada em ação. 
-            Acesse seus conteúdos personalizados.
-          </p>
+          {/* Dynamic content based on status */}
+          {ativacaoStatus === "completed" ? (
+            <p className="text-muted-foreground mb-6 max-w-lg">
+              Olá, {displayName}! Sua clareza interior foi transformada em ação. 
+              Acesse seus conteúdos personalizados abaixo.
+            </p>
+          ) : (
+            <div className="mb-6 max-w-lg">
+              <p className="text-muted-foreground mb-4">
+                Olá, {displayName}! Complete o preenchimento para desbloquear seu conteúdo personalizado.
+              </p>
+              
+              {/* Benefits Preview */}
+              <div className="bg-background/60 backdrop-blur-sm border border-amber-500/30 rounded-xl p-4">
+                <p className="text-sm font-medium mb-3 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-amber-500" />
+                  Ao concluir, você terá acesso imediato ao seu:
+                </p>
+                <ul className="space-y-2">
+                  {ativacaoModules.map((module) => (
+                    <li key={module.id} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CheckCircle2 className="w-4 h-4 text-amber-500/70" />
+                      <span className="font-medium text-foreground">{module.name}</span>
+                      <span className="text-xs">— {module.description}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
 
-          {/* Quick Access Modules */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-            {ativacaoModules.map((module) => (
-              <button
-                key={module.id}
-                onClick={onViewAtivacao}
-                className="flex items-center gap-3 p-4 bg-background/50 backdrop-blur-sm border border-border/50 rounded-xl hover:border-amber-500/50 hover:bg-amber-500/5 transition-all group text-left"
-              >
-                <div className={cn(
-                  "w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br shadow-md",
-                  module.color
-                )}>
-                  <module.icon className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">{module.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{module.description}</p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-amber-500 group-hover:translate-x-1 transition-all flex-shrink-0" />
-              </button>
-            ))}
-          </div>
+          {/* Quick Access Modules - Only show when completed */}
+          {ativacaoStatus === "completed" && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+              {ativacaoModules.map((module) => (
+                <button
+                  key={module.id}
+                  onClick={onViewAtivacao}
+                  className="flex items-center gap-3 p-4 bg-background/50 backdrop-blur-sm border border-border/50 rounded-xl hover:border-amber-500/50 hover:bg-amber-500/5 transition-all group text-left"
+                >
+                  <div className={cn(
+                    "w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br shadow-md",
+                    module.color
+                  )}>
+                    <module.icon className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">{module.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{module.description}</p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-amber-500 group-hover:translate-x-1 transition-all flex-shrink-0" />
+                </button>
+              ))}
+            </div>
+          )}
 
+          {/* Dynamic Main Button */}
           <Button 
             size="lg" 
-            onClick={onViewAtivacao}
-            className="gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/30"
+            onClick={handleMainButtonClick}
+            disabled={buttonConfig.disabled}
+            className={cn(
+              "gap-2 text-white shadow-lg shadow-amber-500/30",
+              ativacaoStatus === "completed" 
+                ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                : "bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 animate-pulse hover:animate-none"
+            )}
           >
-            <Eye className="w-5 h-5" />
-            Ver Relatório Completo
+            <buttonConfig.icon className={cn("w-5 h-5", buttonConfig.iconClassName)} />
+            {buttonConfig.text}
           </Button>
+
+          {/* Status indicator */}
+          {ativacaoStatus !== "completed" && (
+            <p className="text-xs text-amber-600/80 mt-3 flex items-center gap-1.5">
+              <Sparkles className="w-3 h-3" />
+              {ativacaoStatus === "pending" 
+                ? "Preencha seus dados para gerar o relatório"
+                : "Continue de onde parou"}
+            </p>
+          )}
         </div>
       </motion.div>
 
