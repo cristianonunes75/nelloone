@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useImpersonate } from "@/contexts/ImpersonateContext";
 import type { Json } from "@/integrations/supabase/types";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 
 // Check if user has admin role
 const checkIsAdmin = async (userId: string): Promise<boolean> => {
@@ -72,40 +73,114 @@ export const useCodigoEssencia = (targetUserId?: string) => {
   }, [targetUserId, user?.id]);
 
   // Load existing codigo from database (using mapa_essencia table for now)
-  useEffect(() => {
-    const loadCodigo = async () => {
-      if (!effectiveUserId) {
-        setIsLoading(false);
-        return;
-      }
+  const loadCodigo = useCallback(async () => {
+    if (!effectiveUserId) {
+      setIsLoading(false);
+      return;
+    }
 
-      try {
-        const { data, error } = await supabase
-          .from("mapa_essencia")
-          .select("*")
-          .eq("user_id", effectiveUserId)
-          .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from("mapa_essencia")
+        .select("*")
+        .eq("user_id", effectiveUserId)
+        .maybeSingle();
 
-        if (error) {
-          console.error("Error loading codigo:", error);
-        } else if (data) {
-          setSavedCodigo({
-            id: data.id,
-            sections: (data.sections as unknown as CodigoSection[]) || [],
-            raw_content: data.raw_content || "",
-            created_at: data.created_at,
-            updated_at: data.updated_at,
-            version: data.version || 1,
-          });
-        }
-      } catch (error) {
+      if (error) {
         console.error("Error loading codigo:", error);
-      } finally {
-        setIsLoading(false);
+      } else if (data) {
+        setSavedCodigo({
+          id: data.id,
+          sections: (data.sections as unknown as CodigoSection[]) || [],
+          raw_content: data.raw_content || "",
+          created_at: data.created_at,
+          updated_at: data.updated_at,
+          version: data.version || 1,
+        });
+      }
+    } catch (error) {
+      console.error("Error loading codigo:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [effectiveUserId]);
+
+  // Initial load
+  useEffect(() => {
+    loadCodigo();
+  }, [loadCodigo]);
+
+  // Realtime subscription for automatic updates
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  
+  useEffect(() => {
+    if (!effectiveUserId) return;
+
+    // Cleanup previous channel
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+    }
+
+    // Subscribe to changes for this user's mapa_essencia
+    const channel = supabase
+      .channel(`mapa_essencia_${effectiveUserId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'mapa_essencia',
+          filter: `user_id=eq.${effectiveUserId}`
+        },
+        (payload) => {
+          console.log('[useCodigoEssencia] Realtime update received:', payload);
+          // Update state directly from payload for faster response
+          if (payload.new) {
+            const newData = payload.new as any;
+            setSavedCodigo({
+              id: newData.id,
+              sections: (newData.sections as unknown as CodigoSection[]) || [],
+              raw_content: newData.raw_content || "",
+              created_at: newData.created_at,
+              updated_at: newData.updated_at,
+              version: newData.version || 1,
+            });
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'mapa_essencia',
+          filter: `user_id=eq.${effectiveUserId}`
+        },
+        (payload) => {
+          console.log('[useCodigoEssencia] Realtime insert received:', payload);
+          if (payload.new) {
+            const newData = payload.new as any;
+            setSavedCodigo({
+              id: newData.id,
+              sections: (newData.sections as unknown as CodigoSection[]) || [],
+              raw_content: newData.raw_content || "",
+              created_at: newData.created_at,
+              updated_at: newData.updated_at,
+              version: newData.version || 1,
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    channelRef.current = channel;
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
       }
     };
-
-    loadCodigo();
   }, [effectiveUserId]);
 
   // Save codigo to database - uses effectiveUserId for impersonation support
