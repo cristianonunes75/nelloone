@@ -98,19 +98,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
-    // Check for existing session first
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!mounted) return;
-      
-      setSession(session);
-      setUser(session?.user ?? null);
+    const hydrateSession = async () => {
+      try {
+        // Fail-safe: never keep the app stuck in loading forever
+        const timeoutId = window.setTimeout(() => {
+          if (!mounted) return;
+          setIsLoading(false);
+        }, 8000);
 
-      if (session?.user) {
-        await fetchUserData(session.user.id);
+        const { data: { session } } = await supabase.auth.getSession();
+
+        window.clearTimeout(timeoutId);
+        if (!mounted) return;
+
+        setSession(session);
+        setUser(session?.user ?? null);
+
+        if (session?.user) {
+          await fetchUserData(session.user.id);
+        }
+      } catch (error) {
+        console.error("Error hydrating session:", error);
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
-      
-      setIsLoading(false);
-    });
+    };
+
+    // Check for existing session first
+    hydrateSession();
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
