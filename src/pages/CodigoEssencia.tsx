@@ -574,191 +574,217 @@ const CodigoEssenciaInner = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Compact Header */}
-      <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-20">
+      {/* Premium Header - Clean and Sophisticated */}
+      <header className="border-b border-border/50 sticky top-0 bg-background/95 backdrop-blur-md z-30">
         <div className="container px-4 py-3 flex items-center justify-between">
-          <LogoText className="text-xl" variant="solid" />
-          <div className="flex items-center gap-1.5">
-            <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => navigate(`${basePath}/cliente`)}><ArrowLeft className="w-4 h-4" /></Button>
-            {/* Show regenerate button for admins OR users with remaining generations */}
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" className="h-9 px-2.5" onClick={() => navigate(`${basePath}/cliente`)}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <LogoText className="text-xl" variant="solid" />
+          </div>
+          
+          <div className="flex items-center gap-2">
+            {/* Regenerate button - Admin or users with remaining */}
             {hasGenerated && (isAdmin || (canRegenerate && regenerationsRemaining > 0)) && (
-              <Button variant="outline" size="sm" className="h-8 px-2" onClick={() => setShowRegenerateConfirm(true)} disabled={isGenerating} title={isAdmin ? (lang === 'en' ? 'Regenerate (Admin)' : 'Regenerar (Admin)') : `${regenerationsRemaining} ${lang === 'en' ? 'remaining' : 'restantes'}`}><RefreshCw className="w-4 h-4" /></Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-9 px-2.5 text-muted-foreground hover:text-foreground" 
+                onClick={() => setShowRegenerateConfirm(true)} 
+                disabled={isGenerating}
+                title={isAdmin ? (lang === 'en' ? 'Regenerate (Admin)' : 'Regenerar (Admin)') : `${regenerationsRemaining} ${lang === 'en' ? 'remaining' : 'restantes'}`}
+              >
+                <RefreshCw className="w-4 h-4" />
+              </Button>
             )}
-            <Button variant="outline" size="sm" className="h-8 px-2" onClick={handleDownloadPDF} disabled={!canDownloadPdf}><Download className="w-4 h-4" /></Button>
-            <Button variant="outline" size="sm" className="h-8 px-2" onClick={handleSendEmail} disabled={isSendingEmail || !canDownloadPdf}>{isSendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}</Button>
+            
+            {/* Premium PDF Download Button */}
+            <Button 
+              onClick={handleDownloadPDF} 
+              disabled={!canDownloadPdf}
+              className="h-9 px-4 bg-gradient-to-r from-[hsl(220,50%,22%)] to-[hsl(220,50%,30%)] hover:from-[hsl(220,50%,25%)] hover:to-[hsl(220,50%,35%)] text-white border-0 shadow-md gap-2"
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">{lang === 'en' ? 'Download Official Report (PDF)' : 'Baixar Relatório Oficial (PDF)'}</span>
+              <span className="sm:hidden">PDF</span>
+            </Button>
+            
+            {/* Email button */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-9 px-2.5" 
+              onClick={handleSendEmail} 
+              disabled={isSendingEmail || !canDownloadPdf}
+            >
+              {isSendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+            </Button>
           </div>
         </div>
       </header>
 
-      <main className="container px-4 py-6 max-w-3xl mx-auto">
-        {/* Compact Header */}
-        <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Sparkles className="w-6 h-6 text-primary" />
-          </div>
-          <h1 className="text-2xl font-bold">{t.title}</h1>
-          <p className="text-sm text-muted-foreground">{firstName}, {t.subtitle.toLowerCase()}</p>
+      <main className="container px-4 py-8 max-w-3xl mx-auto">
+        {/* Clean, Sophisticated Title Section */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-[hsl(220,50%,22%)] to-[hsl(42,70%,45%)] bg-clip-text text-transparent dark:from-[hsl(220,40%,70%)] dark:to-[hsl(42,65%,60%)] mb-2">
+            {t.title}
+          </h1>
+          <p className="text-base text-muted-foreground font-medium">
+            {userName}
+          </p>
         </div>
 
-        {/* Completed badge - compact */}
-        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 mb-6 flex items-center justify-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-          <span className="text-emerald-700 dark:text-emerald-400 text-sm font-medium">{t.allComplete}</span>
-        </div>
-
-        {/* Main content - no more tabs, just the code content */}
+        {/* Main content area */}
         <div className="w-full">
-            {/* Generate button - show for first generation or regeneration */}
-            {!hasGenerated && canGenerateReport && (
-              <div className="bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 rounded-xl p-6 text-center mb-6">
-                <Sparkles className="w-10 h-10 text-primary mx-auto mb-3" />
-                <p className="text-xs text-muted-foreground mb-3">
-                  {lang === 'en' ? `Generation ${currentVersion + 1} ${t.generationOf} ${maxGenerations}` : `Geração ${currentVersion + 1} ${t.generationOf} ${maxGenerations}`}
-                </p>
-                <Button onClick={handleGenerateCodigo} disabled={isGenerating} className="gap-2">
-                  {isGenerating ? <><Loader2 className="w-4 h-4 animate-spin" />{t.generating}</> : <><Sparkles className="w-4 h-4" />{t.generateCode}</>}
-                </Button>
-                {isGenerating && <p className="text-xs text-muted-foreground mt-2">{t.generatingSubtext}</p>}
+          {/* Generate button - show for first generation */}
+          {!hasGenerated && canGenerateReport && (
+            <div className="bg-gradient-to-br from-[hsl(220,50%,18%,0.06)] to-[hsl(42,70%,50%,0.06)] border border-[hsl(220,50%,30%,0.2)] rounded-2xl p-8 text-center mb-8">
+              <div className="w-14 h-14 bg-gradient-to-br from-[hsl(42,70%,50%)] to-[hsl(220,50%,25%)] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg" style={{ boxShadow: '0 8px 24px hsla(42,70%,50%,0.25)' }}>
+                <Sparkles className="w-7 h-7 text-white" />
               </div>
-            )}
+              <p className="text-sm text-muted-foreground mb-4">
+                {lang === 'en' ? `Generation ${currentVersion + 1} of ${maxGenerations}` : `Geração ${currentVersion + 1} de ${maxGenerations}`}
+              </p>
+              <Button 
+                onClick={handleGenerateCodigo} 
+                disabled={isGenerating} 
+                className="gap-2 h-11 px-6 bg-gradient-to-r from-[hsl(42,70%,50%)] to-[hsl(40,75%,40%)] hover:from-[hsl(42,70%,55%)] hover:to-[hsl(40,75%,45%)] text-white border-0 shadow-lg"
+                style={{ boxShadow: '0 4px 16px hsla(42,70%,50%,0.3)' }}
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {t.generating}
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    {t.generateCode}
+                  </>
+                )}
+              </Button>
+              {isGenerating && <p className="text-xs text-muted-foreground mt-3">{t.generatingSubtext}</p>}
+            </div>
+          )}
 
-        {/* Generated Content - Tab-based Layout */}
-        {hasGenerated && generatedSections.length > 0 && (
-          <div className="space-y-6">
-            {/* === PRODUCT HEADER - First Impression (outside tabs) === */}
-            <ProductHeader userName={userName} language={lang} />
-            
-            {/* Version/sections info for old reports */}
-            {(() => {
-              const expectedSections = ['retrato_essencial', 'tensoes_internas', 'areas_vida', 'paz_pressao', 'raridade_perfil', 'seus_talentos', 'seus_dons', 'sua_vocacao', 'arquetipos_chamado', 'riscos_desvio', 'plano_90_dias', 'rotina_diaria'];
-              const availableIds = generatedSections.map((s: any) => s.id);
-              const missingSections = expectedSections.filter(id => !availableIds.includes(id));
-              
-              if (missingSections.length > 3) {
-                return (
-                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-center">
-                    <p className="text-xs text-amber-700 dark:text-amber-400">
-                    {lang === 'en' 
-                      ? 'This report was generated with an older version. Contact support if you need to update it.'
-                      : 'Este relatório foi gerado com uma versão anterior. Entre em contato se precisar atualizar.'}
-                  </p>
-                  {isAdmin && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="mt-2 h-7 text-xs"
-                      onClick={() => setShowRegenerateConfirm(true)}
-                    >
-                      <RefreshCw className="w-3 h-3 mr-1" />
-                      {lang === 'en' ? 'Regenerate (Admin)' : 'Regenerar (Admin)'}
-                    </Button>
-                  )}
-                  </div>
-                );
-              }
-              return null;
-            })()}
+          {/* Generated Content - Tab-based Layout */}
+          {hasGenerated && generatedSections.length > 0 && (
+            <div className="space-y-8">
+              {/* Version info for old reports */}
+              {(() => {
+                const expectedSections = ['retrato_essencial', 'tensoes_internas', 'areas_vida', 'paz_pressao', 'raridade_perfil', 'seus_talentos', 'seus_dons', 'sua_vocacao', 'arquetipos_chamado', 'riscos_desvio'];
+                const availableIds = generatedSections.map((s: any) => s.id);
+                const missingSections = expectedSections.filter(id => !availableIds.includes(id));
+                
+                if (missingSections.length > 3) {
+                  return (
+                    <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-center">
+                      <p className="text-sm text-amber-700 dark:text-amber-400">
+                        {lang === 'en' 
+                          ? 'This report was generated with an older version. Contact support if you need to update it.'
+                          : 'Este relatório foi gerado com uma versão anterior. Entre em contato se precisar atualizar.'}
+                      </p>
+                      {isAdmin && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="mt-3 h-8"
+                          onClick={() => setShowRegenerateConfirm(true)}
+                        >
+                          <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                          {lang === 'en' ? 'Regenerate (Admin)' : 'Regenerar (Admin)'}
+                        </Button>
+                      )}
+                    </div>
+                  );
+                }
+                return null;
+              })()}
 
-            {/* === TAB-BASED CONTENT === */}
-            <CodigoContentTabs
-              language={lang}
-              chartData={chartData}
-              hasUnlocked={profile?.ativacao_codigo_unlocked || false}
-              essenciaContent={
-                <>
-                  {/* Executive Summary */}
-                  {resumoExecutivoSection && (resumoExecutivoSection.quem_voce_e || resumoExecutivoSection.frase_sintese) && (
-                    <>
-                      <ExecutiveSummary 
-                        tresForcasCentrais={resumoExecutivoSection.tres_forcas_centrais}
-                        quemVoceE={resumoExecutivoSection.quem_voce_e || ""}
-                        maiorForca={resumoExecutivoSection.maior_forca || ""}
-                        maiorRisco={resumoExecutivoSection.maior_risco || ""}
-                        tensaoCentral={resumoExecutivoSection.tensao_central || ""}
-                        fraseSintese={resumoExecutivoSection.frase_sintese || ""}
+              {/* === TAB-BASED CONTENT === */}
+              <CodigoContentTabs
+                language={lang}
+                chartData={chartData}
+                rarityData={raridadeSection ? { percentage: raridadeSection.percentage, explanation: raridadeSection.explanation } : undefined}
+                hasUnlocked={profile?.ativacao_codigo_unlocked || false}
+                essenciaContent={
+                  <>
+                    {/* Executive Summary - Who You Are, Strength, Risk */}
+                    {resumoExecutivoSection && (resumoExecutivoSection.quem_voce_e || resumoExecutivoSection.frase_sintese) && (
+                      <>
+                        <ExecutiveSummary 
+                          tresForcasCentrais={resumoExecutivoSection.tres_forcas_centrais}
+                          quemVoceE={resumoExecutivoSection.quem_voce_e || ""}
+                          maiorForca={resumoExecutivoSection.maior_forca || ""}
+                          maiorRisco={resumoExecutivoSection.maior_risco || ""}
+                          tensaoCentral={resumoExecutivoSection.tensao_central || ""}
+                          fraseSintese={resumoExecutivoSection.frase_sintese || ""}
+                          language={lang}
+                        />
+                        <SectionDivider variant="wave" />
+                      </>
+                    )}
+
+                    {/* 3 Central Truths - Bold key terms */}
+                    {tresVerdadesSection?.truths?.length > 0 && (
+                      <>
+                        <CentralTruths 
+                          truths={tresVerdadesSection.truths}
+                          language={lang}
+                        />
+                        <SectionDivider variant="gradient" />
+                      </>
+                    )}
+                    
+                    {/* Quick Summary */}
+                    {quickSummaryData.strengths.length > 0 && (
+                      <QuickSummary 
+                        strengths={quickSummaryData.strengths}
+                        alerts={quickSummaryData.alerts}
+                        direction={quickSummaryData.direction}
                         language={lang}
                       />
-                      <SectionDivider variant="wave" />
-                    </>
-                  )}
-
-                  {/* 3 Central Truths */}
-                  {tresVerdadesSection?.truths?.length > 0 && (
-                    <>
-                      <CentralTruths 
-                        truths={tresVerdadesSection.truths}
+                    )}
+                    
+                    {/* Impact Blocks */}
+                    {impactBlocksData && (
+                      <ImpactBlocks 
+                        essence={impactBlocksData.essence}
+                        risk={impactBlocksData.risk}
+                        calling={impactBlocksData.calling}
+                        gift={impactBlocksData.gift}
                         language={lang}
                       />
-                      <SectionDivider variant="gradient" />
-                    </>
-                  )}
-                  
-                  {/* Quick Summary */}
-                  {quickSummaryData.strengths.length > 0 && (
-                    <QuickSummary 
-                      strengths={quickSummaryData.strengths}
-                      alerts={quickSummaryData.alerts}
-                      direction={quickSummaryData.direction}
-                      language={lang}
-                    />
-                  )}
-                  
-                  {/* Score Highlights */}
-                  {generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights && (
-                    <ScoreHighlights 
-                      highlights={generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights || []}
-                      rarityNote={generatedSections.find(s => s.id === 'retrato_essencial')?.rarity_note}
-                      language={lang}
-                    />
-                  )}
-                  
-                  {/* Impact Blocks */}
-                  {impactBlocksData && (
-                    <ImpactBlocks 
-                      essence={impactBlocksData.essence}
-                      risk={impactBlocksData.risk}
-                      calling={impactBlocksData.calling}
-                      gift={impactBlocksData.gift}
-                      language={lang}
-                    />
-                  )}
+                    )}
 
-                  <SectionDivider variant="dots" />
+                    <SectionDivider variant="dots" />
 
-                  {/* Confrontation */}
-                  {confrontationData && confrontationData.title && (
-                    <ConfrontationSection 
-                      title={confrontationData.title}
-                      crossReference={confrontationData.crossReference}
-                      strengthens={confrontationData.strengthens}
-                      sabotages={confrontationData.sabotages}
-                      question={confrontationData.question}
-                      language={lang}
-                    />
-                  )}
+                    {/* Confrontation */}
+                    {confrontationData && confrontationData.title && (
+                      <ConfrontationSection 
+                        title={confrontationData.title}
+                        crossReference={confrontationData.crossReference}
+                        strengthens={confrontationData.strengthens}
+                        sabotages={confrontationData.sabotages}
+                        question={confrontationData.question}
+                        language={lang}
+                      />
+                    )}
 
-                  <SectionDivider variant="gradient" />
+                    <SectionDivider variant="gradient" />
 
-                  {/* Purpose Manifesto */}
-                  {purposeData && purposeData.manifesto && (
-                    <PurposeManifesto 
-                      manifesto={purposeData.manifesto}
-                      expressions={purposeData.expressions}
-                      risk={purposeData.risk}
-                      language={lang}
-                    />
-                  )}
-
-                  {/* Profile Rarity */}
-                  {raridadeSection && (raridadeSection.percentage || raridadeSection.explanation) && (
-                    <ProfileRarityBadge 
-                      percentage={raridadeSection.percentage}
-                      explanation={raridadeSection.explanation}
-                      language={lang}
-                    />
-                  )}
-                </>
-              }
+                    {/* Purpose Manifesto */}
+                    {purposeData && purposeData.manifesto && (
+                      <PurposeManifesto 
+                        manifesto={purposeData.manifesto}
+                        expressions={purposeData.expressions}
+                        risk={purposeData.risk}
+                        language={lang}
+                      />
+                    )}
+                  </>
+                }
               vidaPraticaContent={
                 <>
                   {/* Peace vs Pressure */}
