@@ -134,14 +134,6 @@ export function InstitutionalLanding() {
                   Investidores
                 </a>
               </nav>
-              
-              <a 
-                href="https://identity.nello.one"
-                className="text-sm font-medium text-[#1A1A1A] hover:text-nello-gold transition-colors flex items-center gap-1.5"
-              >
-                Entrar
-                <ArrowRight className="w-3.5 h-3.5" />
-              </a>
             </div>
           </div>
         </header>
