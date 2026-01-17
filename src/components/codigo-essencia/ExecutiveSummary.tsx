@@ -1,4 +1,4 @@
-import { User, Zap, AlertTriangle, Scale, Target, Quote, Compass } from "lucide-react";
+import { User, Zap, AlertTriangle, Scale, Quote, Compass } from "lucide-react";
 
 interface ExecutiveSummaryProps {
   tresForcasCentrais?: string[];
@@ -6,7 +6,6 @@ interface ExecutiveSummaryProps {
   maiorForca: string;
   maiorRisco: string;
   tensaoCentral: string;
-  direcao90Dias: string;
   fraseSintese: string;
   language?: string;
 }
@@ -17,7 +16,6 @@ export const ExecutiveSummary = ({
   maiorForca,
   maiorRisco,
   tensaoCentral,
-  direcao90Dias,
   fraseSintese,
   language = "pt"
 }: ExecutiveSummaryProps) => {
@@ -30,7 +28,6 @@ export const ExecutiveSummary = ({
       greatestStrength: "Maior Força",
       greatestRisk: "Maior Risco",
       centralTension: "Tensão Central",
-      direction90Days: "Direção 90 Dias",
       synthesis: "Síntese do Código"
     },
     "pt-pt": {
@@ -41,7 +38,6 @@ export const ExecutiveSummary = ({
       greatestStrength: "Maior Força",
       greatestRisk: "Maior Risco",
       centralTension: "Tensão Central",
-      direction90Days: "Direção 90 Dias",
       synthesis: "Síntese do Código"
     },
     en: {
@@ -52,7 +48,6 @@ export const ExecutiveSummary = ({
       greatestStrength: "Greatest Strength",
       greatestRisk: "Greatest Risk",
       centralTension: "Central Tension",
-      direction90Days: "90-Day Direction",
       synthesis: "Code Synthesis"
     }
   };
@@ -101,7 +96,7 @@ export const ExecutiveSummary = ({
           <p className="text-sm font-medium leading-relaxed">{quemVoceE}</p>
         </div>
 
-        {/* Two Column Grid */}
+        {/* Two Column Grid - Strength & Risk */}
         <div className="grid md:grid-cols-2 gap-3">
           {/* Greatest Strength */}
           <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
@@ -122,25 +117,13 @@ export const ExecutiveSummary = ({
           </div>
         </div>
 
-        {/* Two Column Grid - Tension & Direction */}
-        <div className="grid md:grid-cols-2 gap-3">
-          {/* Central Tension */}
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Scale className="w-4 h-4 text-amber-500" />
-              <span className="font-semibold text-amber-600 dark:text-amber-400 text-xs uppercase">{t.centralTension}</span>
-            </div>
-            <p className="text-sm leading-snug font-medium">{tensaoCentral}</p>
+        {/* Central Tension - Full Width */}
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Scale className="w-4 h-4 text-amber-500" />
+            <span className="font-semibold text-amber-600 dark:text-amber-400 text-xs uppercase">{t.centralTension}</span>
           </div>
-
-          {/* 90-Day Direction */}
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Target className="w-4 h-4 text-blue-500" />
-              <span className="font-semibold text-blue-600 dark:text-blue-400 text-xs uppercase">{t.direction90Days}</span>
-            </div>
-            <p className="text-sm leading-snug">{direcao90Dias}</p>
-          </div>
+          <p className="text-sm leading-snug font-medium">{tensaoCentral}</p>
         </div>
 
         {/* Synthesis - Full Width Quote */}

@@ -41,3 +41,7 @@ export { AtivacaoCodigoForm } from "./AtivacaoCodigoForm";
 export { AtivacaoCodigoReport } from "./AtivacaoCodigoReport";
 export { AtivacaoEssenciaCTA } from "./AtivacaoEssenciaCTA";
 export { ObservationInvitationsSection } from "./ObservationInvitationsSection";
+export { CodigoTabs } from "./CodigoTabs";
+export { PremiumProgressBars } from "./PremiumProgressBars";
+export { AtivacaoTabContent } from "./AtivacaoTabContent";
+export { CodigoContentTabs } from "./CodigoContentTabs";
