@@ -28,10 +28,35 @@ export const useTestAccess = () => {
     },
   });
 
+  // Fetch user profile to check journey_completed_tests
+  const { data: userProfile } = useQuery({
+    queryKey: ["user-profile-journey", effectiveUserId],
+    enabled: !!effectiveUserId,
+    queryFn: async () => {
+      if (!effectiveUserId) return null;
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("journey_completed_tests, journey_status")
+        .eq("id", effectiveUserId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Check if user has full journey access via bundle purchase
-  const hasFullJourneyAccess = purchases?.some(p => 
+  const hasBundlePurchase = purchases?.some(p => 
     (p as any).purchase_category === 'jornada_completa'
   ) || false;
+
+  // NEW: Check if user completed Arquétipos (step 5, which is journey_completed_tests >= 5)
+  // After completing Arquétipos, all remaining tests should be unlocked
+  const hasCompletedArquetipos = (userProfile?.journey_completed_tests ?? 0) >= 5;
+
+  // Full journey access = bundle purchase OR completed Arquétipos
+  const hasFullJourneyAccess = hasBundlePurchase || hasCompletedArquetipos;
 
   // Fetch all tests to enable cross-language matching by type
   const { data: allTests } = useQuery({
@@ -62,7 +87,7 @@ export const useTestAccess = () => {
     // Admins have access to all tests
     if (userRole === "admin") return true;
     
-    // Users with full journey purchase have access to all tests
+    // Users with full journey purchase OR completed Arquétipos have access to all tests
     if (hasFullJourneyAccess) return true;
     
     // Free tests are accessible to everyone
