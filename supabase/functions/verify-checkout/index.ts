@@ -208,7 +208,35 @@ serve(async (req) => {
 
       logStep("Código da Essência unlocked successfully");
 
-    } else {
+    } else if (productType === "ativacao_codigo") {
+      logStep("Processing Ativação do Código purchase");
+      
+      // Update profile to unlock ativacao
+      await supabase
+        .from("profiles")
+        .update({ ativacao_codigo_unlocked: true })
+        .eq("id", userId);
+
+      // Also record the purchase
+      await supabase
+        .from("test_purchases")
+        .insert({
+          user_id: userId,
+          test_id: null,
+          price_paid: (session.amount_total || 0) / 100,
+          payment_status: "completed",
+          payment_method: "stripe",
+          transaction_id: session.payment_intent as string,
+          purchase_category: "ativacao_codigo",
+          metadata: {
+            session_id: session.id,
+            product_type: "ativacao_codigo",
+            verified_via: "verify-checkout",
+          },
+        });
+
+      logStep("Ativação do Código unlocked successfully");
+
       // Individual test purchase
       logStep("Processing individual test purchase", { testIdsJson });
       
