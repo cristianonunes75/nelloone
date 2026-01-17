@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useEffect } from "react";
 
 export interface AtivacaoCodigoAccessState {
   // User has purchased the activation module
@@ -23,11 +24,17 @@ export interface AtivacaoCodigoAccessState {
  * 1. Prerequisite: User must have generated their Código da Essência
  * 2. Payment: User must purchase the Ativação module (R$97)
  * 3. Access: After payment, user can generate their personalized activation report
+ * 
+ * This hook checks BOTH:
+ * - Profile flag (ativacao_codigo_unlocked)
+ * - Purchase record in test_purchases
+ * And auto-corrects inconsistencies for redundancy.
  */
 export function useAtivacaoCodigoAccess(): AtivacaoCodigoAccessState {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  // Check if user has purchased ativacao_codigo
+  // Check if user has purchased ativacao_codigo in test_purchases
   const { data: purchaseData, isLoading: purchaseLoading } = useQuery({
     queryKey: ["ativacao-codigo-purchase", user?.id],
     enabled: !!user?.id,
@@ -92,9 +99,44 @@ export function useAtivacaoCodigoAccess(): AtivacaoCodigoAccessState {
     },
   });
 
+  // Auto-correction mutation: if purchase exists but profile flag is false, fix it
+  const autoCorrectMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ ativacao_codigo_unlocked: true })
+        .eq("id", userId);
+
+      if (error) throw error;
+      return true;
+    },
+    onSuccess: () => {
+      // Invalidate profile query to reflect the correction
+      queryClient.invalidateQueries({ queryKey: ["profile-ativacao-unlocked", user?.id] });
+      console.log("Auto-corrected ativacao_codigo_unlocked flag");
+    },
+    onError: (error) => {
+      console.error("Failed to auto-correct ativacao flag:", error);
+    },
+  });
+
   const isLoading = purchaseLoading || profileLoading || codigoLoading;
   const hasCodigoEssencia = !!codigoData?.id;
-  const hasPurchased = !!purchaseData?.id || !!(profileData as any)?.ativacao_codigo_unlocked;
+  
+  // Check both sources for purchase validation
+  const hasPurchaseRecord = !!purchaseData?.id;
+  const hasProfileFlag = !!(profileData as any)?.ativacao_codigo_unlocked;
+  
+  // User has purchased if EITHER condition is true (redundancy)
+  const hasPurchased = hasPurchaseRecord || hasProfileFlag;
+
+  // Auto-correct: if purchase exists but profile flag is missing, update it
+  useEffect(() => {
+    if (!isLoading && user?.id && hasPurchaseRecord && !hasProfileFlag) {
+      console.log("Detected inconsistency: purchase exists but profile flag is false. Auto-correcting...");
+      autoCorrectMutation.mutate(user.id);
+    }
+  }, [isLoading, user?.id, hasPurchaseRecord, hasProfileFlag]);
 
   return {
     hasPurchased,
