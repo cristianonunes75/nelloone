@@ -80,6 +80,7 @@ import {
   PremiumProgressBars,
   AtivacaoTabContent,
   AtivacaoEssenciaCTA,
+  CodigoContentTabs,
 } from "@/components/codigo-essencia";
 
 // LangKey now imported from codigoEssenciaFallbacks
@@ -621,11 +622,12 @@ const CodigoEssenciaInner = () => {
               </div>
             )}
 
-        {/* Generated Content - Refined Structure */}
+        {/* Generated Content - Tab-based Layout */}
         {hasGenerated && generatedSections.length > 0 && (
           <div className="space-y-6">
-            {/* === PRODUCT HEADER - First Impression === */}
+            {/* === PRODUCT HEADER - First Impression (outside tabs) === */}
             <ProductHeader userName={userName} language={lang} />
+            
             {/* Version/sections info for old reports */}
             {(() => {
               const expectedSections = ['retrato_essencial', 'tensoes_internas', 'areas_vida', 'paz_pressao', 'raridade_perfil', 'seus_talentos', 'seus_dons', 'sua_vocacao', 'arquetipos_chamado', 'riscos_desvio', 'plano_90_dias', 'rotina_diaria'];
@@ -640,7 +642,6 @@ const CodigoEssenciaInner = () => {
                       ? 'This report was generated with an older version. Contact support if you need to update it.'
                       : 'Este relatório foi gerado com uma versão anterior. Entre em contato se precisar atualizar.'}
                   </p>
-                  {/* Only show regenerate button for admins */}
                   {isAdmin && (
                     <Button 
                       variant="outline" 
@@ -657,321 +658,255 @@ const CodigoEssenciaInner = () => {
               }
               return null;
             })()}
-            
-            {/* === NEW: Executive Summary (Your Code in 1 Page) - FIRST === */}
-            {resumoExecutivoSection && (resumoExecutivoSection.quem_voce_e || resumoExecutivoSection.frase_sintese) && (
-              <>
-                <ExecutiveSummary 
-                  tresForcasCentrais={resumoExecutivoSection.tres_forcas_centrais}
-                  quemVoceE={resumoExecutivoSection.quem_voce_e || ""}
-                  maiorForca={resumoExecutivoSection.maior_forca || ""}
-                  maiorRisco={resumoExecutivoSection.maior_risco || ""}
-                  tensaoCentral={resumoExecutivoSection.tensao_central || ""}
-                  fraseSintese={resumoExecutivoSection.frase_sintese || ""}
-                  language={lang}
-                />
-                <SectionDivider variant="wave" />
-              </>
-            )}
 
-            {/* === NEW: 3 Central Truths (Hierarchy) === */}
-            {tresVerdadesSection?.truths?.length > 0 && (
-              <>
-                <CentralTruths 
-                  truths={tresVerdadesSection.truths}
-                  language={lang}
-                />
-                <SectionDivider variant="gradient" />
-              </>
-            )}
-            
-            {/* === SECTION 1: Quick Summary + Impact === */}
-            {quickSummaryData.strengths.length > 0 && (
-              <QuickSummary 
-                strengths={quickSummaryData.strengths}
-                alerts={quickSummaryData.alerts}
-                direction={quickSummaryData.direction}
-                language={lang}
-              />
-            )}
-            
-            {/* Score Highlights */}
-            {generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights && (
-              <ScoreHighlights 
-                highlights={generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights || []}
-                rarityNote={generatedSections.find(s => s.id === 'retrato_essencial')?.rarity_note}
-                language={lang}
-              />
-            )}
-            
-            {/* Impact Blocks - 4 columns on desktop */}
-            {impactBlocksData && (
-              <ImpactBlocks 
-                essence={impactBlocksData.essence}
-                risk={impactBlocksData.risk}
-                calling={impactBlocksData.calling}
-                gift={impactBlocksData.gift}
-                language={lang}
-              />
-            )}
+            {/* === TAB-BASED CONTENT === */}
+            <CodigoContentTabs
+              language={lang}
+              chartData={chartData}
+              hasUnlocked={profile?.ativacao_codigo_unlocked || false}
+              essenciaContent={
+                <>
+                  {/* Executive Summary */}
+                  {resumoExecutivoSection && (resumoExecutivoSection.quem_voce_e || resumoExecutivoSection.frase_sintese) && (
+                    <>
+                      <ExecutiveSummary 
+                        tresForcasCentrais={resumoExecutivoSection.tres_forcas_centrais}
+                        quemVoceE={resumoExecutivoSection.quem_voce_e || ""}
+                        maiorForca={resumoExecutivoSection.maior_forca || ""}
+                        maiorRisco={resumoExecutivoSection.maior_risco || ""}
+                        tensaoCentral={resumoExecutivoSection.tensao_central || ""}
+                        fraseSintese={resumoExecutivoSection.frase_sintese || ""}
+                        language={lang}
+                      />
+                      <SectionDivider variant="wave" />
+                    </>
+                  )}
 
-            <SectionDivider variant="dots" />
+                  {/* 3 Central Truths */}
+                  {tresVerdadesSection?.truths?.length > 0 && (
+                    <>
+                      <CentralTruths 
+                        truths={tresVerdadesSection.truths}
+                        language={lang}
+                      />
+                      <SectionDivider variant="gradient" />
+                    </>
+                  )}
+                  
+                  {/* Quick Summary */}
+                  {quickSummaryData.strengths.length > 0 && (
+                    <QuickSummary 
+                      strengths={quickSummaryData.strengths}
+                      alerts={quickSummaryData.alerts}
+                      direction={quickSummaryData.direction}
+                      language={lang}
+                    />
+                  )}
+                  
+                  {/* Score Highlights */}
+                  {generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights && (
+                    <ScoreHighlights 
+                      highlights={generatedSections.find(s => s.id === 'retrato_essencial')?.score_highlights || []}
+                      rarityNote={generatedSections.find(s => s.id === 'retrato_essencial')?.rarity_note}
+                      language={lang}
+                    />
+                  )}
+                  
+                  {/* Impact Blocks */}
+                  {impactBlocksData && (
+                    <ImpactBlocks 
+                      essence={impactBlocksData.essence}
+                      risk={impactBlocksData.risk}
+                      calling={impactBlocksData.calling}
+                      gift={impactBlocksData.gift}
+                      language={lang}
+                    />
+                  )}
 
-            {/* === SECTION 2: Visual Map + Indicators (Dashboard style) === */}
-            <div className="bg-card/50 border border-border rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="w-5 h-5 text-primary" />
-                <h2 className="font-bold">{lang === 'en' ? 'Your Profile' : 'Seu Perfil'}</h2>
-              </div>
-              
-              {/* Radar Chart */}
-              <div className="mb-4">
-                <EssenceRadarChart 
-                  disc={chartData.disc}
-                  temperament={chartData.temperament?.scores}
-                  intelligences={chartData.intelligences?.scores}
-                  language={lang}
-                />
-              </div>
-              
-              {/* Indicators */}
-              <EssenceIndicators 
-                disc={chartData.disc}
-                temperament={chartData.temperament}
-                connectionStyle={chartData.connectionStyle}
-                language={lang}
-              />
-            </div>
+                  <SectionDivider variant="dots" />
 
-            <SectionDivider variant="line" />
+                  {/* Confrontation */}
+                  {confrontationData && confrontationData.title && (
+                    <ConfrontationSection 
+                      title={confrontationData.title}
+                      crossReference={confrontationData.crossReference}
+                      strengthens={confrontationData.strengthens}
+                      sabotages={confrontationData.sabotages}
+                      question={confrontationData.question}
+                      language={lang}
+                    />
+                  )}
 
-            {/* === NEW: Peace vs Pressure === */}
-            {pazPressaoSection && (pazPressaoSection.in_peace || pazPressaoSection.under_pressure) && (
-              <>
-                <PeacePressureSection 
-                  inPeace={pazPressaoSection.in_peace}
-                  underPressure={pazPressaoSection.under_pressure}
-                  language={lang}
-                />
-                <SectionDivider variant="dots" />
-              </>
-            )}
-            
-            {/* === NEW: Profile Rarity === */}
-            {raridadeSection && (raridadeSection.percentage || raridadeSection.explanation) && (
-              <ProfileRarityBadge 
-                percentage={raridadeSection.percentage}
-                explanation={raridadeSection.explanation}
-                language={lang}
-              />
-            )}
+                  <SectionDivider variant="gradient" />
 
-            {/* === SECTION 3: Confrontation (Direct, impactful) === */}
-            {confrontationData && confrontationData.title && (
-              <ConfrontationSection 
-                title={confrontationData.title}
-                crossReference={confrontationData.crossReference}
-                strengthens={confrontationData.strengthens}
-                sabotages={confrontationData.sabotages}
-                question={confrontationData.question}
-                language={lang}
-              />
-            )}
+                  {/* Purpose Manifesto */}
+                  {purposeData && purposeData.manifesto && (
+                    <PurposeManifesto 
+                      manifesto={purposeData.manifesto}
+                      expressions={purposeData.expressions}
+                      risk={purposeData.risk}
+                      language={lang}
+                    />
+                  )}
 
-            <SectionDivider variant="gradient" />
+                  {/* Profile Rarity */}
+                  {raridadeSection && (raridadeSection.percentage || raridadeSection.explanation) && (
+                    <ProfileRarityBadge 
+                      percentage={raridadeSection.percentage}
+                      explanation={raridadeSection.explanation}
+                      language={lang}
+                    />
+                  )}
+                </>
+              }
+              vidaPraticaContent={
+                <>
+                  {/* Peace vs Pressure */}
+                  {pazPressaoSection && (pazPressaoSection.in_peace || pazPressaoSection.under_pressure) && (
+                    <>
+                      <PeacePressureSection 
+                        inPeace={pazPressaoSection.in_peace}
+                        underPressure={pazPressaoSection.under_pressure}
+                        language={lang}
+                      />
+                      <SectionDivider variant="dots" />
+                    </>
+                  )}
 
-            {/* === Internal Tensions === */}
-            {tensoesSection?.items?.length > 0 && (
-              <>
-                <InternalTensionsSection 
-                  tensions={tensoesSection.items}
-                  language={lang}
-                />
-                <SectionDivider variant="wave" />
-              </>
-            )}
+                  {/* Life Areas */}
+                  {areasVidaSection?.items?.length > 0 && (
+                    <>
+                      <LifeAreasSection 
+                        areas={areasVidaSection.items}
+                        language={lang}
+                      />
+                      <SectionDivider variant="wave" />
+                    </>
+                  )}
 
-            {/* === Life Areas Reading === */}
-            {areasVidaSection?.items?.length > 0 && (
-              <>
-                <LifeAreasSection 
-                  areas={areasVidaSection.items}
-                  language={lang}
-                />
-                <SectionDivider variant="dots" />
-              </>
-            )}
+                  {/* Internal Tensions */}
+                  {tensoesSection?.items?.length > 0 && (
+                    <>
+                      <InternalTensionsSection 
+                        tensions={tensoesSection.items}
+                        language={lang}
+                      />
+                      <SectionDivider variant="dots" />
+                    </>
+                  )}
 
-            {/* === SECTION 4: Purpose (Manifesto style) === */}
-            {purposeData && purposeData.manifesto && (
-              <PurposeManifesto 
-                manifesto={purposeData.manifesto}
-                expressions={purposeData.expressions}
-                risk={purposeData.risk}
-                language={lang}
-              />
-            )}
+                  {/* Talents & Gifts */}
+                  {(talentosSection?.items?.length > 0 || donsSection?.items?.length > 0) && (
+                    <TalentsGiftsSection 
+                      talents={talentosSection?.items}
+                      gifts={donsSection?.items}
+                      language={lang}
+                    />
+                  )}
 
-            <SectionDivider variant="dots" />
+                  {/* Vocation */}
+                  {vocacaoSection && (
+                    <VocationSection 
+                      fields={vocacaoSection.fields}
+                      coreMessage={vocacaoSection.core_message}
+                      language={lang}
+                    />
+                  )}
 
-            {/* === NEW: Talents & Gifts === */}
-            {(talentosSection?.items?.length > 0 || donsSection?.items?.length > 0) && (
-              <TalentsGiftsSection 
-                talents={talentosSection?.items}
-                gifts={donsSection?.items}
-                language={lang}
-              />
-            )}
+                  {/* Archetypes Mission */}
+                  {(arquetiposChamadoSection || riscosDesvioSection?.items?.length > 0) && (
+                    <ArchetypesMissionSection 
+                      primary={arquetiposChamadoSection?.primary}
+                      secondary={arquetiposChamadoSection?.secondary}
+                      synergy={arquetiposChamadoSection?.synergy}
+                      deviationRisks={riscosDesvioSection?.items}
+                      language={lang}
+                    />
+                  )}
 
-            {/* === NEW: Vocation === */}
-            {vocacaoSection && (
-              <VocationSection 
-                fields={vocacaoSection.fields}
-                coreMessage={vocacaoSection.core_message}
-                language={lang}
-              />
-            )}
+                  <SectionDivider variant="wave" />
 
-            {/* === NEW: Archetypes Mission & Deviation Risks === */}
-            {(arquetiposChamadoSection || riscosDesvioSection?.items?.length > 0) && (
-              <ArchetypesMissionSection 
-                primary={arquetiposChamadoSection?.primary}
-                secondary={arquetiposChamadoSection?.secondary}
-                synergy={arquetiposChamadoSection?.synergy}
-                deviationRisks={riscosDesvioSection?.items}
-                language={lang}
-              />
-            )}
-
-            {/* Internal Tensions already rendered above after Purpose section */}
-
-            <SectionDivider variant="wave" />
-
-            {/* === SECTION 5: Detailed Charts (VISIBLE - moved from collapsible) === */}
-            <div className="bg-card/50 border border-border rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="w-5 h-5 text-primary" />
-                <h2 className="font-bold">{t.detailedCharts}</h2>
-              </div>
-              <div className="grid md:grid-cols-2 gap-3">
-                {chartData.disc && Object.keys(chartData.disc).length > 0 && (
-                  <div className="bg-background rounded-lg p-3 border border-border">
-                    <h3 className="font-semibold text-xs mb-2 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-red-500" />DISC
-                    </h3>
-                    <DISCChart results={chartData.disc} language={lang} />
-                  </div>
-                )}
-                {(chartData.temperament?.primary || chartData.temperament?.scores) && (
-                  <div className="bg-background rounded-lg p-3 border border-border">
-                    <h3 className="font-semibold text-xs mb-2 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-500" />{lang === 'en' ? 'Temperaments' : 'Temperamentos'}
-                    </h3>
-                    <TemperamentChart results={{ primary: chartData.temperament.primary, secondary: chartData.temperament.secondary, scores: chartData.temperament.scores }} language={lang} />
-                  </div>
-                )}
-                {(chartData.intelligences?.scores || chartData.intelligences?.top?.length > 0) && (
-                  <div className="bg-background rounded-lg p-3 border border-border">
-                    <h3 className="font-semibold text-xs mb-2 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-purple-500" />{lang === 'en' ? 'Intelligences' : 'Inteligências'}
-                    </h3>
-                    <IntelligenceRanking results={{ scores: chartData.intelligences.scores, top: chartData.intelligences.top }} language={lang} />
-                  </div>
-                )}
-                {(chartData.connectionStyle?.primary || chartData.connectionStyle?.scores) && (
-                  <div className="bg-background rounded-lg p-3 border border-border">
-                    <h3 className="font-semibold text-xs mb-2 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-rose-500" />{lang === 'en' ? 'Connection' : 'Conexão'}
-                    </h3>
-                    <ConnectionStyleChart results={{ primary: chartData.connectionStyle.primary, secondary: chartData.connectionStyle.secondary, scores: chartData.connectionStyle.scores }} language={lang} />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* === SECTION 6: Strengths & Shadows (Side by side compact cards) === */}
-            {(forcasSection?.items?.length > 0 || sombrasSection?.items?.length > 0) && (
-              <>
-                <SectionDivider variant="dots" />
-                <div className="grid md:grid-cols-2 gap-4">
-                  {/* Strengths */}
-                  {forcasSection?.items?.length > 0 && (
-                    <div>
-                      <h3 className="font-bold text-sm mb-2 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500" />{t.strengths}
-                      </h3>
-                      <div className="space-y-2">
-                        {forcasSection.items.slice(0, 3).map((item: any, i: number) => (
-                          <PatternCard key={i} pattern={item.talent} manifestation={item.example} variant="strength" language={lang} />
-                        ))}
-                      </div>
+                  {/* Strengths & Shadows */}
+                  {(forcasSection?.items?.length > 0 || sombrasSection?.items?.length > 0) && (
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {forcasSection?.items?.length > 0 && (
+                        <div>
+                          <h3 className="font-bold text-sm mb-2 flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500" />{t.strengths}
+                          </h3>
+                          <div className="space-y-2">
+                            {forcasSection.items.slice(0, 3).map((item: any, i: number) => (
+                              <PatternCard key={i} pattern={item.talent} manifestation={item.example} variant="strength" language={lang} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {sombrasSection?.items?.length > 0 && (
+                        <div>
+                          <h3 className="font-bold text-sm mb-2 flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-amber-500" />{t.shadows}
+                          </h3>
+                          <div className="space-y-2">
+                            {sombrasSection.items.slice(0, 3).map((item: any, i: number) => (
+                              <PatternCard key={i} pattern={item.pattern} situation={item.situation} exit={item.exit} variant="warning" language={lang} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
-                  {/* Shadows */}
-                  {sombrasSection?.items?.length > 0 && (
-                    <div>
-                      <h3 className="font-bold text-sm mb-2 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-amber-500" />{t.shadows}
-                      </h3>
-                      <div className="space-y-2">
-                        {sombrasSection.items.slice(0, 3).map((item: any, i: number) => (
-                          <PatternCard key={i} pattern={item.pattern} situation={item.situation} exit={item.exit} variant="warning" language={lang} />
-                        ))}
-                      </div>
-                    </div>
+
+                  {/* Symbolic References */}
+                  {symbolicReferencesSection && (
+                    <>
+                      <SectionDivider variant="gradient" />
+                      <SymbolicReferencesSection data={symbolicReferencesSection} language={lang} />
+                    </>
                   )}
-                </div>
-              </>
-            )}
 
+                  {/* Legacy: Saint Patron */}
+                  {!symbolicReferencesSection && santoPadreiroSection && (
+                    <>
+                      <SectionDivider variant="dots" />
+                      <SaintPatronSection data={santoPadreiroSection} language={lang} />
+                    </>
+                  )}
 
-            {/* NOTE: 90-Day Plan and Daily Routine removed - now exclusive to Ativação module */}
+                  {/* Legacy: Personalities Reference */}
+                  {!symbolicReferencesSection && personalidadesSection && (
+                    <>
+                      <SectionDivider variant="gradient" />
+                      <PersonalitiesReferenceSection data={personalidadesSection} language={lang} />
+                    </>
+                  )}
 
-            {/* === SECTION 9: Symbolic References (new unified block) === */}
-            {symbolicReferencesSection && (
-              <>
-                <SymbolicReferencesSection data={symbolicReferencesSection} language={lang} />
-                <SectionDivider variant="gradient" />
-              </>
-            )}
+                  {/* Closing */}
+                  {conversaSection && (
+                    <>
+                      <SectionDivider variant="wave" />
+                      <ProvocativeClosing 
+                        whoYouAre={conversaSection.who_you_are}
+                        riskOfNotLiving={conversaSection.risk_of_not_living}
+                        invitation={conversaSection.invitation}
+                        paragraphs={conversaSection.paragraphs}
+                        language={lang}
+                      />
+                    </>
+                  )}
 
-            {/* === SECTION 9 (Legacy): Saint Patron === */}
-            {!symbolicReferencesSection && santoPadreiroSection && (
-              <>
-                <SaintPatronSection data={santoPadreiroSection} language={lang} />
-                <SectionDivider variant="dots" />
-              </>
-            )}
+                  {/* Next Step */}
+                  {conversaSection?.next_step && (
+                    <NextStepCard 
+                      action={conversaSection.next_step.action} 
+                      why={conversaSection.next_step.why} 
+                      language={lang} 
+                    />
+                  )}
+                </>
+              }
+            />
 
-            {/* === SECTION 10 (Legacy): Personalities Reference === */}
-            {!symbolicReferencesSection && personalidadesSection && (
-              <>
-                <PersonalitiesReferenceSection data={personalidadesSection} language={lang} />
-                <SectionDivider variant="gradient" />
-              </>
-            )}
-
-            {/* === SECTION 10: Closing + Next Step === */}
-            {conversaSection && (
-              <ProvocativeClosing 
-                whoYouAre={conversaSection.who_you_are}
-                riskOfNotLiving={conversaSection.risk_of_not_living}
-                invitation={conversaSection.invitation}
-                paragraphs={conversaSection.paragraphs}
-                language={lang}
-              />
-            )}
-
-            {/* Next Step - Actionable */}
-            {conversaSection?.next_step && (
-              <NextStepCard 
-                action={conversaSection.next_step.action} 
-                why={conversaSection.next_step.why} 
-                language={lang} 
-              />
-            )}
-
-            {/* CTA - Ativação da Essência */}
+            {/* CTA - Ativação da Essência (outside tabs) */}
             <AtivacaoEssenciaCTA 
               language={lang} 
               hasUnlocked={profile?.ativacao_codigo_unlocked || false}
