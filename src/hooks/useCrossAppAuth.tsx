@@ -43,40 +43,46 @@ export function useCrossAppAuth() {
     // User is not authenticated but has a token - validate it
     const validateToken = async () => {
       setIsValidating(true);
-      
-      try {
-        const { data, error } = await supabase.functions.invoke('admin-cross-app-auth', {
-          body: { 
-            action: 'validate',
-            token: crossAppToken,
-          }
+
+      const withTimeout = async <T,>(promise: Promise<T>, ms: number): Promise<T> => {
+        return await new Promise<T>((resolve, reject) => {
+          const id = window.setTimeout(() => reject(new Error("cross-app auth timeout")), ms);
+          promise
+            .then((res) => {
+              window.clearTimeout(id);
+              resolve(res);
+            })
+            .catch((err) => {
+              window.clearTimeout(id);
+              reject(err);
+            });
         });
+      };
+
+      try {
+        const { data, error } = await withTimeout(
+          supabase.functions.invoke("admin-cross-app-auth", {
+            body: {
+              action: "validate",
+              token: crossAppToken,
+            },
+          }),
+          8000
+        );
 
         if (error || !data?.valid) {
           console.log("Cross-app token validation failed:", error?.message || "Invalid token");
-          // Token is invalid - redirect to auth
           navigate("/auth", { replace: true });
           return;
         }
 
-        // Token is valid! The admin ID is verified
-        // However, Supabase auth still requires a session
-        // We need to redirect to a special auth flow that can restore the session
-        
-        // For now, we'll store the validated admin info and redirect to auth
-        // The auth flow can check for this and auto-login if there's an active session
         sessionStorage.setItem("crossAppAdminId", data.adminId);
         sessionStorage.setItem("crossAppTargetPath", data.targetPath);
-        
+
         // Clean up URL
         const newParams = new URLSearchParams(searchParams);
         newParams.delete("crossAppToken");
         setSearchParams(newParams, { replace: true });
-        
-        // Note: At this point, the user needs to have a shared Supabase session
-        // across subdomains, which requires proper cookie configuration.
-        // If they don't, they'll need to re-authenticate.
-        
       } catch (err) {
         console.error("Cross-app auth error:", err);
         navigate("/auth", { replace: true });
