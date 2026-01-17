@@ -937,6 +937,23 @@ FINAL JSON STRUCTURE
       "morning": "...", "afternoon": "...", "night": "..."
     },
     {
+      "id": "referencias_simbolicas",
+      "title": "Symbolic References",
+      "source": "Temperament + Archetypes",
+      "spiritual_reference": {
+        "name": "[Saint name - e.g.: Saint John Paul II]",
+        "trait": "[human trait that connects - e.g.: the way they dealt with pressure and decision]",
+        "context": "[concrete human context - e.g.: moments of leadership under adversity]"
+      },
+      "cultural_references": [
+        {
+          "name": "[Personality name - e.g.: Steve Jobs]",
+          "pattern": "[behavior pattern - e.g.: creating, deciding, executing]",
+          "context": "[context - e.g.: projects requiring vision and determination]"
+        }
+      ]
+    },
+    {
       "id": "conversa_final",
       "title": "An Honest Conversation",
       "paragraphs": [...]
@@ -1517,66 +1534,26 @@ ESTRUTURA JSON FINAL
       "night": { "ritual_name": "...", "practice": "..." }
     },
     {
-      "id": "santo_padroeiro",
-      "title": "${youWord === 'Tu' ? 'O Teu' : 'Seu'} Santo Padroeiro",
-      "source": "Temperamento + Arquétipos + Virtudes",
-      "saint": {
-        "name": "[Nome do Santo - ex: São João Paulo II]",
-        "title": "[Título ou epíteto - ex: O Papa Peregrino]",
-        "lived": "[Período de vida - ex: 1920-2005]",
-        "feast_day": "[Dia da festa - ex: 22 de outubro]"
+      "id": "referencias_simbolicas",
+      "title": "Referências Simbólicas",
+      "source": "Temperamento + Arquétipos",
+      "spiritual_reference": {
+        "name": "[Nome do santo - ex: São João Paulo II]",
+        "trait": "[traço humano que se conecta - ex: a forma como lidava com pressão e decisão]",
+        "context": "[contexto humano concreto - ex: momentos de liderança sob adversidade]"
       },
-      "connection": {
-        "temperament_match": "[Como o temperamento do santo se conecta com o perfil - 1-2 frases]",
-        "virtue_match": "[Virtude principal que o santo desenvolveu e que o perfil precisa desenvolver]",
-        "mission_match": "[Como a missão do santo ressoa com o propósito identificado no perfil]"
-      },
-      "biography": "[Breve biografia focada nos aspectos que conectam com o perfil - 3-4 frases. Inclua desafios que o santo enfrentou similares aos do perfil]",
-      "quote": {
-        "text": "[Citação autêntica do santo - máximo 2 frases]",
-        "source": "[Fonte da citação - ex: Homilia de 1985, Carta Encíclica, etc.]"
-      },
-      "reflection": "[Reflexão de 2-3 frases aplicando a citação ao perfil específico do usuário. Conecte com as tensões e desafios identificados no Código]",
-      "virtues_in_common": [
-        { "virtue": "[Virtude 1]", "in_saint": "[Como apareceu na vida do santo]", "in_you": "[Como aparece no perfil do usuário]" },
-        { "virtue": "[Virtude 2]", "in_saint": "[Como apareceu na vida do santo]", "in_you": "[Como aparece no perfil do usuário]" },
-        { "virtue": "[Virtude 3]", "in_saint": "[Como apareceu na vida do santo]", "in_you": "[Como aparece no perfil do usuário]" }
-      ],
-      "prayer": {
-        "title": "[Título da oração/invocação - ex: Oração a São João Paulo II]",
-        "text": "[Oração breve e autêntica ao santo - 3-4 frases. Se não houver oração oficial, criar invocação respeitosa pedindo intercessão específica relacionada aos desafios do perfil]"
-      },
-      "daily_practice": "[Prática diária inspirada no santo para os próximos 30 dias - ex: 'Como São Francisco, pratique 5 minutos de silêncio contemplativo antes de tomar decisões importantes']"
-    },
-    {
-      "id": "personalidades_referencia",
-      "title": "Pessoas que Pensam Como ${youWord === 'Tu' ? 'Tu' : 'Você'}",
-      "source": "Temperamento + Arquétipos + DISC",
-      "intro": "[1 frase introdutória sobre como conhecer pessoas com padrões similares ajuda a entender o próprio perfil]",
-      "personalities": [
+      "cultural_references": [
         {
-          "name": "[Nome da personalidade 1 - ex: Steve Jobs, Winston Churchill, Madre Teresa]",
-          "field": "[Campo de atuação - ex: Tecnologia e Design, Liderança Política, Serviço e Compaixão]",
-          "profile_match": "[Combinação que justifica - ex: Colérico + Arquétipo Criador + DISC D]",
-          "connection": "[1-2 frases sobre a conexão específica com o perfil do usuário]",
-          "lesson": "[1 frase sobre o que essa pessoa ensina sobre usar bem as mesmas forças]"
+          "name": "[Nome da personalidade - ex: Steve Jobs]",
+          "pattern": "[padrão de comportamento - ex: criar, decidir, executar]",
+          "context": "[contexto - ex: projetos que exigiam visão e determinação]"
         },
         {
           "name": "[Nome da personalidade 2]",
-          "field": "[Campo]",
-          "profile_match": "[Combinação]",
-          "connection": "[Conexão]",
-          "lesson": "[Lição]"
-        },
-        {
-          "name": "[Nome da personalidade 3]",
-          "field": "[Campo]",
-          "profile_match": "[Combinação]",
-          "connection": "[Conexão]",
-          "lesson": "[Lição]"
+          "pattern": "[padrão]",
+          "context": "[contexto]"
         }
-      ],
-      "reflection": "[1-2 frases de reflexão sobre o que essas pessoas têm em comum com o usuário - foco em COMO pensam e sentem, não no que fizeram]"
+      ]
     },
     {
       "id": "conversa_final",
@@ -1591,113 +1568,72 @@ ESTRUTURA JSON FINAL
 }
 
 ═══════════════════════════════════════════
-🙏 REGRA DO SANTO PADROEIRO (OBRIGATÓRIA)
+🌟 REGRA DAS REFERÊNCIAS SIMBÓLICAS
 ═══════════════════════════════════════════
 
-A seção santo_padroeiro conecta o perfil do usuário com um santo católico 
-que compartilha características similares ou desenvolveu virtudes que o perfil precisa.
+A seção referencias_simbolicas é DIDÁTICA e SIMBÓLICA.
+Seu objetivo é facilitar a compreensão da essência através de espelhos humanos.
 
-📋 BIBLIOTECA DE SANTOS POR PERFIL:
+⚠️ PRINCÍPIOS NÃO NEGOCIÁVEIS:
+- ❌ NÃO define padroeiro espiritual
+- ❌ NÃO sugere devoção
+- ❌ NÃO impõe crença religiosa
+- ❌ NÃO compara santidade ou valor pessoal
+- ❌ NÃO cria obrigação moral
+- ✅ Existe APENAS como recurso simbólico e cultural OPCIONAL
 
-TEMPERAMENTOS:
-- COLÉRICO: São Paulo, Santa Catarina de Sena, São João Paulo II, Santa Teresa de Ávila, São Pedro
-- SANGUÍNEO: São Francisco de Assis, São Filipe Néri, Santa Teresinha, São João Bosco, Santa Clara
-- MELANCÓLICO: Santo Agostinho, São Tomás de Aquino, Santa Teresa de Lisieux, São João da Cruz, Beata Chiara Luce
-- FLEUMÁTICO: São José, São Francisco de Sales, Santa Mônica, São Bento, Santa Maria Goretti
+📋 ESTRUTURA DA SEÇÃO:
 
-ARQUÉTIPOS:
-- HERÓI: São Jorge, Santa Joana D'Arc, São Miguel Arcanjo, São Sebastião
-- SÁBIO: São Tomás de Aquino, Santo Agostinho, São João da Cruz, Santa Edith Stein
-- CRIADOR: Fra Angelico, Santa Hildegarda de Bingen, São João Paulo II
-- CUIDADOR: Madre Teresa de Calcutá, São Vicente de Paulo, São Camilo de Lellis
-- GOVERNANTE: São Luís IX, Santa Isabel da Hungria, São Henrique
-- MAGO: São Padre Pio, São João Maria Vianney, Santa Faustina
-- INOCENTE: Santa Teresinha do Menino Jesus, São Francisco de Assis, Santa Bernadette
-- EXPLORADOR: São Francisco Xavier, São Paulo, Santa Rosa de Lima
-- REBELDE: São João Batista, São Tomás More, São Maximiliano Kolbe
-- AMANTE: São João, Santa Maria Madalena, São Valentim
-- BOBO DA CORTE: São Filipe Néri, São João Bosco, Beato Pier Giorgio Frassati
-- HOMEM COMUM: São José, Santa Gianna Beretta Molla, Beatos Luigi e Maria Beltrame Quattrocchi
+1. spiritual_reference (OPCIONAL - máximo 1 santo):
+   - Linguagem NEUTRA e respeitosa
+   - Foco em TRAÇO HUMANO, não em virtude espiritual
+   - NENHUMA linguagem devocional
+   - Estrutura: "Em [Nome], é possível reconhecer um traço humano semelhante ao seu: 
+     [como lidava com X], especialmente em contextos de [situação humana concreta]."
+
+2. cultural_references (1-2 personalidades no máximo):
+   - Figuras AMPLAMENTE reconhecidas
+   - Foco em PADRÃO DE ATUAÇÃO, não em sucesso ou fama
+   - DIVERSIDADE de campos (não repetir área)
+   - Estrutura: "Em [Nome], aparece um padrão semelhante ao seu na forma de 
+     [agir, criar, decidir ou se relacionar], especialmente diante de [contexto]."
+
+📋 BIBLIOTECA DE REFERÊNCIAS:
+
+SANTOS (por temperamento - usar apenas 1):
+- COLÉRICO: São Paulo, São João Paulo II, São Pedro
+- SANGUÍNEO: São Francisco de Assis, São João Bosco
+- MELANCÓLICO: Santo Agostinho, São Tomás de Aquino
+- FLEUMÁTICO: São José, São Bento
+
+PERSONALIDADES CULTURAIS (por arquétipo - usar 1-2):
+- HERÓI: Winston Churchill, Marie Curie
+- SÁBIO: Albert Einstein, C.S. Lewis
+- CRIADOR: Leonardo da Vinci, Walt Disney
+- CUIDADOR: Nelson Mandela, Florence Nightingale
+- GOVERNANTE: Margaret Thatcher, Abraham Lincoln
+- EXPLORADOR: Amelia Earhart, Marco Polo
 
 REGRAS DE SELEÇÃO:
-1. COMBINE temperamento + arquétipo para escolher o santo mais adequado
-2. PRIORIZE santos cujas histórias de vida ressoam com os DESAFIOS do perfil
-3. ESCOLHA citações AUTÊNTICAS e VERIFICÁVEIS do santo
-4. A oração deve ser REAL (se existir) ou uma invocação RESPEITOSA
-5. A prática diária deve ser ESPECÍFICA e APLICÁVEL
+1. Máximo 1 santo + 2 personalidades culturais
+2. Linguagem neutra, sem devoção
+3. Foco no TRAÇO HUMANO, não na santidade ou sucesso
+4. Figuras NÃO polêmicas ou controversas
+5. DIVERSIDADE de gênero e época
 
-EXEMPLOS POR COMBINAÇÃO:
-- Colérico + Herói → São Paulo (converteu sua força em missão)
-- Melancólico + Sábio → Santo Agostinho (transformou inquietação em busca de Deus)
-- Sanguíneo + Criador → São João Bosco (alegria a serviço dos jovens)
-- Fleumático + Cuidador → São José (silêncio protetor e fidelidade)
+POSICIONAMENTO:
+- Após a leitura principal da essência
+- Após a tensão central
+- NUNCA no início ou como conclusão
 
-═══════════════════════════════════════════
-👥 REGRA DAS PERSONALIDADES DE REFERÊNCIA (OBRIGATÓRIA)
-═══════════════════════════════════════════
-
-A seção personalidades_referencia apresenta 3-5 figuras conhecidas que compartilham 
-características similares ao perfil do usuário, criando identificação e aspiração.
-
-📋 BIBLIOTECA DE PERSONALIDADES POR PERFIL:
-
-COLÉRICO + HERÓI/GOVERNANTE:
-- Steve Jobs (Tecnologia) - intensidade + visão + exigência
-- Winston Churchill (Liderança Política) - firmeza em crises
-- Margaret Thatcher (Política) - convicção inabalável
-- Jeff Bezos (Empreendedorismo) - foco obsessivo em resultados
-- São João Paulo II (Fé e Liderança) - força pastoral e decisão
-
-COLÉRICO + CRIADOR:
-- Elon Musk (Tecnologia e Inovação) - visão disruptiva
-- Walt Disney (Entretenimento) - perfeccionismo criativo
-- Leonardo da Vinci (Artes e Ciência) - excelência multifacetada
-
-SANGUÍNEO + EXPLORADOR/BOBO DA CORTE:
-- Richard Branson (Empreendedorismo) - ousadia e carisma
-- Robin Williams (Entretenimento) - energia contagiante
-- São João Bosco (Educação e Fé) - alegria a serviço
-
-MELANCÓLICO + SÁBIO:
-- Albert Einstein (Ciência) - profundidade intelectual
-- C.S. Lewis (Literatura e Fé) - razão e imaginação
-- Jordan Peterson (Psicologia) - análise e confronto
-- Santo Agostinho (Filosofia e Fé) - busca inquieta pela verdade
-
-MELANCÓLICO + CRIADOR:
-- Beethoven (Música) - genialidade através da dor
-- Michelangelo (Artes) - perfeição como obsessão
-- Dostoiévski (Literatura) - profundidade humana
-
-FLEUMÁTICO + CUIDADOR:
-- Madre Teresa de Calcutá (Serviço) - presença silenciosa
-- Nelson Mandela (Liderança) - paciência estratégica
-- Papa Francisco (Fé) - simplicidade e acolhimento
-- São José (Fé) - fidelidade invisível
-
-SANGUÍNEO + CUIDADOR:
-- Oprah Winfrey (Comunicação) - conexão emocional
-- Padre Marcelo Rossi (Fé) - carisma pastoral
-
-REGRAS DE SELEÇÃO (PERSONALIDADES):
-1. MÍNIMO 3, MÁXIMO 5 personalidades
-2. DIVERSIDADE de campos - não repetir área de atuação
-3. MIX de seculares + religiosos (1-2 santos, 2-3 seculares)
-4. NENHUMA figura polêmica ou controversa
-5. CONEXÃO REAL - cite qual combinação de testes justifica
-6. LIÇÃO que mostra como usou bem (ou pagou preço) pelas mesmas forças
-7. DIVERSIDADE de gênero e época - misture homens/mulheres, históricos/contemporâneos
-
-REGRAS CRÍTICAS - LAPIDAÇÃO V6:
+REGRAS CRÍTICAS - LAPIDAÇÃO V7:
 - impact_blocks DEVE ser preenchido com conteúdo específico e personalizado
 - visual_data DEVE extrair valores reais dos resultados dos testes
 - tensoes_internas é OBRIGATÓRIO - identifique MÍNIMO 2 conflitos reais entre testes
 - areas_vida é OBRIGATÓRIO - analise cada área com cruzamento de testes
 - paz_pressao é OBRIGATÓRIO - descreva comportamentos específicos com 3 itens em cada lista
 - raridade_perfil é OBRIGATÓRIO - estime a raridade entre 1-25%
-- plano_90_dias DEVE ter ritual_name para cada mês (Método Nello)
-- rotina_diaria DEVE ter ritual_name para manhã, tarde e noite (Método Nello)
-- personalidades_referencia é OBRIGATÓRIO - selecione 3-5 personalidades diversas
+- referencias_simbolicas é OBRIGATÓRIO - máximo 1 santo + 2 personalidades, linguagem neutra
 - conversa_final DEVE ter who_you_are, risk_of_not_living, invitation (fechamento que exige decisão)
 - next_step DEVE ter ritual_name (Método Nello)
 - Frases curtas e impactantes apenas

@@ -32,6 +32,7 @@ export { ProvocativeClosing } from "./ProvocativeClosing";
 export { RelatorioConjuge } from "./RelatorioConjuge";
 export { SaintPatronSection } from "./SaintPatronSection";
 export { PersonalitiesReferenceSection } from "./PersonalitiesReferenceSection";
+export { SymbolicReferencesSection } from "./SymbolicReferencesSection";
 export { RelatorioContextual } from "./RelatorioContextual";
 export { RelatorioSelector } from "./RelatorioSelector";
 export { CruzamentoCodigos } from "./CruzamentoCodigos";
