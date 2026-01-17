@@ -1,5 +1,6 @@
 import { useAuth } from "./useAuth";
 import { useJourneyProgress } from "./useJourneyProgress";
+import { useAdminPermissions } from "./useAdminPermissions";
 
 export interface CodigoEssenciaAccessState {
   // User has access (always true when journey is complete - no purchase needed)
@@ -25,21 +26,25 @@ export interface CodigoEssenciaAccessState {
  * 4. No purchase check needed - automatic when journey is complete
  */
 export function useCodigoEssenciaAccess(): CodigoEssenciaAccessState {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const { isJourneyComplete, isLoading: journeyLoading } = useJourneyProgress();
+  const { isSuperAdmin, isLoading: adminLoading } = useAdminPermissions();
 
-  const isLoading = journeyLoading;
-  const allTestsCompleted = isJourneyComplete;
+  const isLoading = journeyLoading || adminLoading;
+  const isAdmin = userRole === 'admin';
   
-  // Automatic access when journey is complete - no purchase needed
+  // Admin bypass: admins always have full access
+  const allTestsCompleted = isJourneyComplete || isAdmin;
+  
+  // Automatic access when journey is complete OR user is admin
   const hasUnlocked = allTestsCompleted;
 
   return {
     hasUnlocked,
     allTestsCompleted,
-    // Show menu item only if all tests are completed
+    // Admins can always see menu item
     canSeeMenuItem: allTestsCompleted,
-    // Can generate when all tests completed (no purchase check)
+    // Admins can always generate
     canGenerateCode: allTestsCompleted,
     // Never show purchase option - it's included in the journey
     canPurchase: false,
