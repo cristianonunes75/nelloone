@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -66,6 +67,7 @@ export default function CheckoutSuccess() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const queryClient = useQueryClient();
   const [status, setStatus] = useState<VerifyStatus>("verifying");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -142,6 +144,12 @@ export default function CheckoutSuccess() {
       }
 
       if (data.success) {
+        // Invalidate queries to ensure fresh data on redirect
+        queryClient.invalidateQueries({ queryKey: ["ativacao-codigo-purchase"] });
+        queryClient.invalidateQueries({ queryKey: ["profile-ativacao-unlocked"] });
+        queryClient.invalidateQueries({ queryKey: ["test-purchases"] });
+        queryClient.invalidateQueries({ queryKey: ["user-tests"] });
+        
         if (data.already_processed) {
           setStatus("already_processed");
         } else {
