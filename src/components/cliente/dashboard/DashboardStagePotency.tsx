@@ -55,23 +55,23 @@ const testIcons: Record<string, string> = {
 
 const ativacaoModules = [
   {
-    id: "plano-90-dias",
-    name: "Plano de 90 Dias",
-    description: "Ações práticas e metas",
+    id: "ativacao-pratica",
+    name: "Ativação Prática",
+    description: "Ajustes de atitude, linguagem e limites",
     icon: Calendar,
     color: "from-amber-500 to-orange-500",
   },
   {
-    id: "manual-relacionamentos",
-    name: "Manual de Relacionamentos",
-    description: "Como interagir com família e equipe",
+    id: "convites-observacao",
+    name: "Convites de Observação",
+    description: "Reflexões para 6 áreas da vida",
     icon: Heart,
     color: "from-pink-500 to-rose-500",
   },
   {
-    id: "verdades-libertam",
-    name: "Verdades que Libertam",
-    description: "Confronto com padrões de autossabotagem",
+    id: "declaracao-ativacao",
+    name: "Declaração de Ativação",
+    description: "Sua frase de poder personalizada",
     icon: Key,
     color: "from-violet-500 to-purple-500",
   },
