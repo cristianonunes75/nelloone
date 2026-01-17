@@ -136,7 +136,7 @@ export const TestCard = ({
           <ButtonIcon className="w-4 h-4 mr-2" />
           {config.button.label}
         </Button>
-        {isAdmin && status === "completed" && onReset && (
+        {status === "completed" && onReset && (
           <Button
             onClick={onReset}
             variant="ghost"
