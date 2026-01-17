@@ -28,6 +28,11 @@
     --nello-gold-deep: 40 75% 40%;
     --nello-gold-glow: 42 50% 92%;
     
+    /* Navy Blue - Premium Dashboard */
+    --nello-navy: 220 50% 18%; /* Deep Navy #1a2744 */
+    --nello-navy-light: 220 40% 30%;
+    --nello-navy-deep: 220 55% 12%;
+    
     /* Nello Graphite - CTA Final dark background */
     --nello-graphite: 25 12% 23%; /* #3D3630 warm graphite */
     --nello-graphite-light: 25 10% 35%;

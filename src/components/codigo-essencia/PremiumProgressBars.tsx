@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { Activity } from "lucide-react";
 
 interface Indicator {
   key: string;
@@ -106,13 +107,37 @@ export const PremiumProgressBars = ({ disc, temperament, connectionStyle, langua
 
   if (indicators.length === 0) return null;
 
+  // Alternating Gold and Navy colors
+  const getBarGradient = (index: number) => {
+    const gradients = [
+      "from-[hsl(42,70%,50%)] to-[hsl(40,75%,40%)]", // Gold
+      "from-[hsl(220,50%,35%)] to-[hsl(220,50%,22%)]", // Navy
+      "from-[hsl(42,65%,55%)] to-[hsl(38,70%,45%)]", // Light Gold
+      "from-[hsl(220,45%,40%)] to-[hsl(220,50%,28%)]", // Light Navy
+      "from-[hsl(40,70%,52%)] to-[hsl(42,70%,42%)]", // Warm Gold
+    ];
+    return gradients[index % gradients.length];
+  };
+
+  const getGlowStyle = (index: number) => {
+    const glows = [
+      "0 0 16px hsla(42,70%,50%,0.35)",
+      "0 0 16px hsla(220,50%,35%,0.35)",
+      "0 0 16px hsla(42,65%,55%,0.35)",
+      "0 0 16px hsla(220,45%,40%,0.35)",
+      "0 0 16px hsla(40,70%,52%,0.35)",
+    ];
+    return glows[index % glows.length];
+  };
+
   return (
-    <div className="bg-gradient-to-br from-amber-500/5 via-background to-blue-900/5 border border-amber-500/20 rounded-2xl p-6">
+    <div className="bg-gradient-to-br from-[hsl(220,50%,18%,0.04)] via-background to-[hsl(42,70%,50%,0.04)] border border-[hsl(220,50%,30%,0.15)] rounded-2xl p-6">
+      {/* Header with premium styling */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500/30 to-blue-900/30 flex items-center justify-center">
-          <span className="text-lg">📊</span>
+        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[hsl(42,70%,50%)] to-[hsl(220,50%,25%)] flex items-center justify-center shadow-lg" style={{ boxShadow: '0 4px 20px hsla(42,70%,50%,0.25)' }}>
+          <Activity className="w-5 h-5 text-white" />
         </div>
-        <h2 className="text-lg font-bold bg-gradient-to-r from-amber-600 to-blue-800 bg-clip-text text-transparent dark:from-amber-400 dark:to-blue-400">
+        <h2 className="text-lg font-bold bg-gradient-to-r from-[hsl(220,50%,25%)] to-[hsl(42,70%,45%)] bg-clip-text text-transparent dark:from-[hsl(220,40%,70%)] dark:to-[hsl(42,65%,60%)]">
           {t.title}
         </h2>
       </div>
@@ -123,40 +148,37 @@ export const PremiumProgressBars = ({ disc, temperament, connectionStyle, langua
             key={indicator.key}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: index * 0.1 }}
+            transition={{ duration: 0.4, delay: index * 0.08 }}
             className="space-y-2"
           >
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-foreground/90">{indicator.label}</span>
-              <span className="text-sm font-bold bg-gradient-to-r from-amber-600 to-amber-800 bg-clip-text text-transparent dark:from-amber-400 dark:to-amber-300">
+              <span className="text-sm font-semibold text-foreground">{indicator.label}</span>
+              <span className="text-sm font-bold" style={{ color: index % 2 === 0 ? 'hsl(42,70%,45%)' : 'hsl(220,50%,40%)' }}>
                 {indicator.value}%
               </span>
             </div>
             
-            {/* Premium Progress Bar */}
-            <div className="relative h-3 bg-gradient-to-r from-muted/50 to-muted/30 rounded-full overflow-hidden">
-              {/* Glow effect */}
+            {/* Premium Progress Bar with Navy/Gold theme */}
+            <div className="relative h-3 bg-muted/40 rounded-full overflow-hidden">
+              {/* Main progress fill */}
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: `${indicator.value}%` }}
-                transition={{ duration: 0.8, delay: 0.2 + index * 0.1, ease: "easeOut" }}
-                className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-blue-600 dark:from-amber-500 dark:via-amber-400 dark:to-blue-500"
-                style={{
-                  boxShadow: '0 0 12px rgba(245, 158, 11, 0.4), 0 0 4px rgba(30, 58, 138, 0.3)'
-                }}
+                transition={{ duration: 0.8, delay: 0.15 + index * 0.08, ease: "easeOut" }}
+                className={`absolute inset-y-0 left-0 rounded-full bg-gradient-to-r ${getBarGradient(index)}`}
+                style={{ boxShadow: getGlowStyle(index) }}
               />
+              
               {/* Shimmer effect */}
               <motion.div
                 initial={{ x: '-100%' }}
                 animate={{ x: '200%' }}
                 transition={{ 
-                  duration: 2, 
-                  delay: 1 + index * 0.1,
-                  repeat: Infinity,
-                  repeatDelay: 3
+                  duration: 1.8, 
+                  delay: 0.8 + index * 0.08,
+                  ease: "easeInOut"
                 }}
-                className="absolute inset-y-0 w-1/4 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-full"
-                style={{ width: `${indicator.value}%` }}
+                className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent rounded-full"
               />
             </div>
             

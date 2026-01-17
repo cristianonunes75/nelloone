@@ -1,4 +1,5 @@
-import { Diamond } from "lucide-react";
+import { Diamond, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface ProfileRarityBadgeProps {
   percentage?: number;
@@ -10,55 +11,90 @@ export const ProfileRarityBadge = ({ percentage, explanation, language = 'pt' }:
   if (!percentage && !explanation) return null;
 
   const labels = {
-    pt: { title: 'Raridade do Perfil', among: 'Entre 100 pessoas', showMore: 'Ver mais', showLess: 'Ver menos' },
-    'pt-pt': { title: 'Raridade do Perfil', among: 'Entre 100 pessoas', showMore: 'Ver mais', showLess: 'Ver menos' },
-    en: { title: 'Profile Rarity', among: 'Among 100 people', showMore: 'Show more', showLess: 'Show less' },
+    pt: { title: 'Raridade do Perfil', among: 'Entre 100 pessoas', share: 'compartilham esta combinação' },
+    'pt-pt': { title: 'Raridade do Perfil', among: 'Entre 100 pessoas', share: 'partilham esta combinação' },
+    en: { title: 'Profile Rarity', among: 'Among 100 people', share: 'share this combination' },
   };
 
   const t = labels[language as keyof typeof labels] || labels.pt;
 
-  // Determine rarity color based on percentage
-  const getRarityColor = () => {
-    if (!percentage) return "from-purple-500/20 to-violet-500/20 border-purple-500/40";
-    if (percentage <= 5) return "from-amber-500/20 to-yellow-500/20 border-amber-500/40";
-    if (percentage <= 15) return "from-purple-500/20 to-violet-500/20 border-purple-500/40";
-    return "from-blue-500/20 to-indigo-500/20 border-blue-500/40";
+  // Rarity classification
+  const getRarityData = () => {
+    if (!percentage) return { label: "", gradient: "from-[hsl(220,50%,30%)] to-[hsl(220,40%,40%)]", bg: "from-[hsl(220,50%,18%,0.08)] to-[hsl(42,70%,50%,0.08)]", border: "border-[hsl(220,50%,30%,0.3)]" };
+    
+    if (percentage <= 5) {
+      return { 
+        label: language === 'en' ? "Ultra Rare" : "Ultra Raro",
+        gradient: "from-[hsl(42,70%,50%)] to-[hsl(40,75%,40%)]",
+        bg: "from-[hsl(42,70%,50%,0.12)] to-[hsl(40,75%,40%,0.08)]",
+        border: "border-[hsl(42,70%,50%,0.4)]"
+      };
+    }
+    if (percentage <= 15) {
+      return { 
+        label: language === 'en' ? "Rare" : "Raro",
+        gradient: "from-[hsl(220,50%,35%)] to-[hsl(42,70%,50%)]",
+        bg: "from-[hsl(220,50%,18%,0.1)] to-[hsl(42,70%,50%,0.08)]",
+        border: "border-[hsl(220,50%,40%,0.3)]"
+      };
+    }
+    return { 
+      label: language === 'en' ? "Uncommon" : "Incomum",
+      gradient: "from-[hsl(220,50%,30%)] to-[hsl(220,40%,45%)]",
+      bg: "from-[hsl(220,50%,18%,0.08)] to-[hsl(220,40%,30%,0.05)]",
+      border: "border-[hsl(220,50%,30%,0.25)]"
+    };
   };
 
-  const getRarityLabel = () => {
-    if (!percentage) return "";
-    if (percentage <= 5) return language === 'en' ? "Ultra Rare" : "Ultra Raro";
-    if (percentage <= 15) return language === 'en' ? "Rare" : "Raro";
-    return language === 'en' ? "Uncommon" : "Incomum";
-  };
+  const rarityData = getRarityData();
 
   return (
-    <div className={`bg-gradient-to-r ${getRarityColor()} border rounded-xl p-3 flex items-start gap-3`}>
-      <div className="w-10 h-10 rounded-full bg-background/50 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <Diamond className="w-5 h-5 text-primary" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-bold text-sm">{t.title}</span>
-          {percentage && (
-            <span className="text-xs bg-background/50 px-2 py-0.5 rounded-full font-medium">
-              {getRarityLabel()} • {percentage}%
-            </span>
-          )}
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={`bg-gradient-to-r ${rarityData.bg} ${rarityData.border} border rounded-2xl p-5 relative overflow-hidden`}
+    >
+      {/* Decorative glow */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[hsl(42,70%,50%,0.1)] to-transparent rounded-full blur-2xl" />
+      
+      <div className="flex items-start gap-4 relative z-10">
+        {/* Icon */}
+        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${rarityData.gradient} flex items-center justify-center flex-shrink-0 shadow-lg`} style={{ boxShadow: '0 4px 16px hsla(42,70%,50%,0.25)' }}>
+          <Diamond className="w-6 h-6 text-white" />
         </div>
-        {explanation && (
-          <div className="mt-1">
-            <p className="text-xs text-muted-foreground">
+        
+        <div className="flex-1 min-w-0">
+          {/* Title and Badge */}
+          <div className="flex items-center gap-3 flex-wrap mb-2">
+            <span className="text-base font-bold text-foreground">{t.title}</span>
+            {percentage && (
+              <motion.span 
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-gradient-to-r ${rarityData.gradient} text-white shadow-sm`}
+              >
+                <Sparkles className="w-3 h-3" />
+                {rarityData.label} • {percentage}%
+              </motion.span>
+            )}
+          </div>
+          
+          {/* Explanation */}
+          {explanation && (
+            <p className="text-sm text-muted-foreground leading-relaxed mb-2">
               {explanation}
             </p>
-          </div>
-        )}
-        {percentage && (
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {t.among}, ~{percentage} {language === 'en' ? 'share this combination' : 'compartilham esta combinação'}
-          </p>
-        )}
+          )}
+          
+          {/* Stats */}
+          {percentage && (
+            <p className="text-xs text-muted-foreground">
+              {t.among}, ~{percentage} {t.share}
+            </p>
+          )}
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
