@@ -40,3 +40,4 @@ export { CruzamentoViewer } from "./CruzamentoViewer";
 export { AtivacaoCodigoForm } from "./AtivacaoCodigoForm";
 export { AtivacaoCodigoReport } from "./AtivacaoCodigoReport";
 export { AtivacaoEssenciaCTA } from "./AtivacaoEssenciaCTA";
+export { ObservationInvitationsSection } from "./ObservationInvitationsSection";
