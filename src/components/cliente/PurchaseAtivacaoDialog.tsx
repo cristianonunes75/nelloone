@@ -63,6 +63,9 @@ export const PurchaseAtivacaoDialog = ({
       const currency = getCurrencyForLanguage(language).toLowerCase();
       const affiliateCode = getAffiliateCode();
       
+      // Store redirect flag for after checkout success
+      sessionStorage.setItem("pendingAtivacaoRedirect", "true");
+
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: {
           productType: "ativacao_codigo",

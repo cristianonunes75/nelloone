@@ -17,10 +17,12 @@ const MESSAGES = {
     error: "Erro na verificação",
     successDesc: "Seu acesso foi liberado com sucesso. Você será redirecionado em instantes.",
     successDescContinue: "Seu acesso foi liberado! Vamos continuar de onde você parou.",
+    successDescAtivacao: "Sua Ativação do Código foi liberada! Você será redirecionado para começar.",
     alreadyDesc: "Esta compra já foi processada anteriormente.",
     pendingDesc: "Seu pagamento ainda está sendo processado. Tente novamente em alguns segundos.",
     errorDesc: "Não foi possível verificar seu pagamento. Entre em contato com o suporte.",
     goToDashboard: "Ir para Minha Jornada",
+    goToAtivacao: "Ir para Ativação",
     continueTest: "Continuar Teste",
     tryAgain: "Tentar novamente",
   },
@@ -32,10 +34,12 @@ const MESSAGES = {
     error: "Verification error",
     successDesc: "Your access has been granted. You will be redirected shortly.",
     successDescContinue: "Your access has been granted! Let's continue where you left off.",
+    successDescAtivacao: "Your Code Activation has been unlocked! You will be redirected to begin.",
     alreadyDesc: "This purchase was already processed.",
     pendingDesc: "Your payment is still being processed. Please try again in a few seconds.",
     errorDesc: "Could not verify your payment. Please contact support.",
     goToDashboard: "Go to My Journey",
+    goToAtivacao: "Go to Activation",
     continueTest: "Continue Test",
     tryAgain: "Try again",
   },
@@ -47,10 +51,12 @@ const MESSAGES = {
     error: "Erro na verificação",
     successDesc: "O seu acesso foi libertado com sucesso. Será redirecionado em instantes.",
     successDescContinue: "O seu acesso foi libertado! Vamos continuar de onde parou.",
+    successDescAtivacao: "A sua Ativação do Código foi libertada! Será redirecionado para começar.",
     alreadyDesc: "Esta compra já foi processada anteriormente.",
     pendingDesc: "O seu pagamento ainda está a ser processado. Tente novamente em alguns segundos.",
     errorDesc: "Não foi possível verificar o seu pagamento. Entre em contacto com o suporte.",
     goToDashboard: "Ir para A Minha Jornada",
+    goToAtivacao: "Ir para Ativação",
     continueTest: "Continuar Teste",
     tryAgain: "Tentar novamente",
   },
@@ -70,6 +76,9 @@ export default function CheckoutSuccess() {
   const pendingTestId = sessionStorage.getItem("pendingTestId");
   const pendingUserTestId = sessionStorage.getItem("pendingUserTestId");
   const hasPendingTest = pendingTestId && pendingUserTestId;
+
+  // Check for pending Ativação redirect
+  const pendingAtivacaoRedirect = sessionStorage.getItem("pendingAtivacaoRedirect");
 
   const getBasePath = () => {
     return language === "en" ? "/en" : language === "pt-pt" ? "/pt-pt" : "";
@@ -91,8 +100,19 @@ export default function CheckoutSuccess() {
     sessionStorage.removeItem("pendingUserTestId");
   };
 
+  const clearPendingAtivacao = () => {
+    sessionStorage.removeItem("pendingAtivacaoRedirect");
+  };
+
+  const getAtivacaoPath = () => {
+    return `${getBasePath()}/cliente/ativacao`;
+  };
+
   const handleRedirect = () => {
-    if (hasPendingTest) {
+    if (pendingAtivacaoRedirect) {
+      clearPendingAtivacao();
+      navigate(getAtivacaoPath());
+    } else if (hasPendingTest) {
       clearPendingTest();
       navigate(getTestPath());
     } else {
@@ -167,11 +187,19 @@ export default function CheckoutSuccess() {
               <div className="space-y-2">
                 <h1 className="text-xl font-semibold text-emerald-600">{t.success}</h1>
                 <p className="text-muted-foreground text-sm">
-                  {hasPendingTest ? t.successDescContinue : t.successDesc}
+                  {pendingAtivacaoRedirect 
+                    ? t.successDescAtivacao 
+                    : hasPendingTest 
+                      ? t.successDescContinue 
+                      : t.successDesc}
                 </p>
               </div>
               <Button onClick={handleRedirect} className="w-full">
-                {hasPendingTest ? t.continueTest : t.goToDashboard}
+                {pendingAtivacaoRedirect 
+                  ? t.goToAtivacao 
+                  : hasPendingTest 
+                    ? t.continueTest 
+                    : t.goToDashboard}
               </Button>
             </>
           )}
@@ -184,7 +212,11 @@ export default function CheckoutSuccess() {
                 <p className="text-muted-foreground text-sm">{t.alreadyDesc}</p>
               </div>
               <Button onClick={handleRedirect} className="w-full">
-                {hasPendingTest ? t.continueTest : t.goToDashboard}
+                {pendingAtivacaoRedirect 
+                  ? t.goToAtivacao 
+                  : hasPendingTest 
+                    ? t.continueTest 
+                    : t.goToDashboard}
               </Button>
             </>
           )}
