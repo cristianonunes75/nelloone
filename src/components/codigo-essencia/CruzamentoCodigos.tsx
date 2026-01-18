@@ -277,12 +277,21 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
     );
   }
 
+  const handlePurchaseCouple = () => {
+    // TODO: Integrate with Stripe checkout for couple's code
+    toast.info(language === 'en' ? 'Coming soon!' : 'Em breve!');
+  };
+
   if (selectedCrossing) {
     return (
       <CruzamentoViewer 
-        crossing={selectedCrossing} 
+        crossing={{
+          ...selectedCrossing,
+          isPurchased: true // For now, default to true - integrate with purchase status later
+        }} 
         language={language}
         onBack={() => setSelectedCrossing(null)}
+        onPurchase={handlePurchaseCouple}
       />
     );
   }

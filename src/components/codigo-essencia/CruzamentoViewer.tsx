@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -19,10 +19,14 @@ import {
   ExternalLink,
   Sparkles,
   Flame,
-  Scale
+  Scale,
+  FileDown,
+  Ship,
+  Anchor
 } from "lucide-react";
 import { toast } from "sonner";
 import { SynergyRadarChart } from "./SynergyRadarChart";
+import { CouplePaywall } from "./CouplePaywall";
 
 interface CruzamentoViewerProps {
   crossing: {
@@ -31,9 +35,11 @@ interface CruzamentoViewerProps {
     relationship_type: string;
     public_token: string;
     is_public_active: boolean;
+    isPurchased?: boolean;
   };
   language: 'pt' | 'pt-pt' | 'en';
   onBack: () => void;
+  onPurchase?: () => void;
 }
 
 const TRANSLATIONS = {
@@ -250,10 +256,13 @@ const TRANSLATIONS = {
   }
 };
 
-export const CruzamentoViewer = ({ crossing, language, onBack }: CruzamentoViewerProps) => {
+export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: CruzamentoViewerProps) => {
   const [linkCopied, setLinkCopied] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const reportRef = useRef<HTMLDivElement>(null);
   const t = TRANSLATIONS[language];
   const content = crossing.content || {};
+  const isPurchased = crossing.isPurchased !== false; // Default to true for backwards compatibility
 
   const handleCopyLink = () => {
     const link = `${window.location.origin}/cruzamento/${crossing.public_token}`;
@@ -261,6 +270,62 @@ export const CruzamentoViewer = ({ crossing, language, onBack }: CruzamentoViewe
     setLinkCopied(true);
     toast.success(t.linkCopied);
     setTimeout(() => setLinkCopied(false), 3000);
+  };
+
+  const handleDownloadPDF = async () => {
+    setIsGeneratingPdf(true);
+    try {
+      const { default: html2canvas } = await import('html2canvas');
+      const { jsPDF } = await import('jspdf');
+      
+      if (!reportRef.current) {
+        throw new Error('Report element not found');
+      }
+
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 10;
+
+      // Add pages if content is longer
+      let heightLeft = imgHeight * ratio;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      heightLeft -= pdfHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight * ratio;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', imgX, position, imgWidth * ratio, imgHeight * ratio);
+        heightLeft -= pdfHeight;
+      }
+
+      pdf.save(`codigo-do-casal-${crossing.id.slice(0, 8)}.pdf`);
+      toast.success(language === 'en' ? 'PDF downloaded!' : 'PDF baixado!');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error(language === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   // ============== TRAFFIC LIGHT SECTION ==============
@@ -786,6 +851,97 @@ export const CruzamentoViewer = ({ crossing, language, onBack }: CruzamentoViewe
     );
   };
 
+  // ============== BOAT METAPHOR INTRO ==============
+  const renderBoatMetaphor = () => {
+    const metaphorText = {
+      pt: {
+        title: "A Metáfora do Barco",
+        text: "O relacionamento não é um porto seguro — é um barco em mar aberto. Vocês são os navegadores. Este relatório é o mapa e a bússola que vão ajudá-los a ajustar as velas quando a tempestade vier."
+      },
+      'pt-pt': {
+        title: "A Metáfora do Barco",
+        text: "O relacionamento não é um porto seguro — é um barco em mar aberto. Vocês são os navegadores. Este relatório é o mapa e a bússola que vos vão ajudar a ajustar as velas quando a tempestade vier."
+      },
+      en: {
+        title: "The Boat Metaphor",
+        text: "A relationship isn't a safe harbor — it's a boat on open water. You are the navigators. This report is the map and compass that will help you adjust the sails when the storm comes."
+      }
+    };
+
+    const m = metaphorText[language];
+
+    return (
+      <Card className="bg-gradient-to-br from-blue-500/5 via-cyan-500/5 to-teal-500/5 border-blue-500/20">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <Ship className="w-6 h-6 text-blue-500" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-blue-700 dark:text-blue-400 mb-2">{m.title}</h3>
+              <p className="text-foreground/80 italic">{m.text}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // If not purchased, show paywall
+  if (!isPurchased && onPurchase) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" size="sm" onClick={onBack} className="gap-1">
+            <ArrowLeft className="w-4 h-4" />
+            {t.back}
+          </Button>
+        </div>
+
+        {/* Title Card */}
+        <Card className="bg-gradient-to-br from-primary/5 to-pink-500/5 border-primary/20">
+          <CardContent className="pt-6 text-center">
+            <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Users className="w-6 h-6 text-primary" />
+            </div>
+            <h2 className="text-xl font-bold">
+              {t.relationshipLabels[crossing.relationship_type as keyof typeof t.relationshipLabels] || t.relationshipLabels.spouse}
+            </h2>
+          </CardContent>
+        </Card>
+
+        {/* Preview content with blur */}
+        <div className="relative">
+          {/* Traffic Light Preview (visible) */}
+          {renderTrafficLight()}
+          
+          {/* Blurred premium content */}
+          <div className="relative mt-6">
+            <div className="blur-sm pointer-events-none opacity-60 space-y-4">
+              {renderSynergyRadarChart()}
+              {renderMeetingOfEssences()}
+            </div>
+            
+            {/* Paywall overlay */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <CouplePaywall 
+                language={language}
+                onPurchase={onPurchase}
+                isPurchased={false}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Disclaimer */}
+        <p className="text-xs text-muted-foreground text-center px-4">
+          {t.disclaimer}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -799,59 +955,81 @@ export const CruzamentoViewer = ({ crossing, language, onBack }: CruzamentoViewe
             {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             {linkCopied ? t.linkCopied : t.copyLink}
           </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleDownloadPDF} 
+            disabled={isGeneratingPdf}
+            className="gap-1"
+          >
+            <FileDown className="w-4 h-4" />
+            {isGeneratingPdf ? '...' : t.download}
+          </Button>
         </div>
       </div>
 
-      {/* Title Card */}
-      <Card className="bg-gradient-to-br from-primary/5 to-pink-500/5 border-primary/20">
-        <CardContent className="pt-6 text-center">
-          <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Users className="w-6 h-6 text-primary" />
-          </div>
-          <h2 className="text-xl font-bold">
-            {t.relationshipLabels[crossing.relationship_type as keyof typeof t.relationshipLabels] || t.relationshipLabels.spouse}
-          </h2>
-        </CardContent>
-      </Card>
-
-      {/* Opening (legacy) */}
-      {content.abertura && (
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-foreground/80 italic whitespace-pre-line">{content.abertura}</p>
+      {/* Report content for PDF */}
+      <div ref={reportRef}>
+        {/* Title Card */}
+        <Card className="bg-gradient-to-br from-primary/5 to-pink-500/5 border-primary/20 mb-6">
+          <CardContent className="pt-6 text-center">
+            <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Users className="w-6 h-6 text-primary" />
+            </div>
+            <h2 className="text-xl font-bold">
+              {t.relationshipLabels[crossing.relationship_type as keyof typeof t.relationshipLabels] || t.relationshipLabels.spouse}
+            </h2>
           </CardContent>
         </Card>
-      )}
 
-      {/* NEW FORMAT SECTIONS */}
-      {renderTrafficLight()}
-      {renderSynergyRadarChart()}
-      {renderMeetingOfEssences()}
-      {renderSantoBate()}
-      {renderBichoPega()}
-      {renderPotentialization()}
-      {renderTranslationTable()}
-      {renderProtocoloPaz()}
-      {renderSpouseManual(content.manual_conjuge_a, 'manual_conjuge_a')}
-      {renderSpouseManual(content.manual_conjuge_b, 'manual_conjuge_b')}
-      {renderPressureAlerts()}
-      {renderConnectionChallenge()}
-      {renderSeekHelp()}
+        {/* Boat Metaphor Introduction */}
+        {renderBoatMetaphor()}
 
-      {/* LEGACY SECTIONS (for backwards compatibility) */}
-      {Object.entries(content).map(([key, value]) => renderLegacySection(key, value))}
+        {/* Opening (legacy) */}
+        {content.abertura && (
+          <Card className="mt-6">
+            <CardContent className="pt-6">
+              <p className="text-foreground/80 italic whitespace-pre-line">{content.abertura}</p>
+            </CardContent>
+          </Card>
+        )}
 
-      {/* Closing */}
-      {content.fechamento && (
-        <Card className="bg-gradient-to-br from-primary/5 to-pink-500/5 border-primary/20">
-          <CardContent className="pt-6">
-            <p className="text-foreground/80 whitespace-pre-line text-center font-medium">{content.fechamento}</p>
-          </CardContent>
-        </Card>
-      )}
+        {/* NEW FORMAT SECTIONS */}
+        <div className="space-y-6 mt-6">
+          {renderTrafficLight()}
+          {renderSynergyRadarChart()}
+          {renderMeetingOfEssences()}
+          {renderSantoBate()}
+          {renderBichoPega()}
+          {renderPotentialization()}
+          {renderTranslationTable()}
+          {renderProtocoloPaz()}
+          {renderSpouseManual(content.manual_conjuge_a, 'manual_conjuge_a')}
+          {renderSpouseManual(content.manual_conjuge_b, 'manual_conjuge_b')}
+          {renderPressureAlerts()}
+          {renderConnectionChallenge()}
+          {renderSeekHelp()}
+        </div>
 
-      {/* CTA Activation */}
-      {renderCtaActivation()}
+        {/* LEGACY SECTIONS (for backwards compatibility) */}
+        <div className="space-y-6 mt-6">
+          {Object.entries(content).map(([key, value]) => renderLegacySection(key, value))}
+        </div>
+
+        {/* Closing */}
+        {content.fechamento && (
+          <Card className="bg-gradient-to-br from-primary/5 to-pink-500/5 border-primary/20 mt-6">
+            <CardContent className="pt-6">
+              <p className="text-foreground/80 whitespace-pre-line text-center font-medium">{content.fechamento}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* CTA Activation */}
+        <div className="mt-6">
+          {renderCtaActivation()}
+        </div>
+      </div>
 
       {/* Disclaimer */}
       <p className="text-xs text-muted-foreground text-center px-4">
