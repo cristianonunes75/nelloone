@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles, Target, Zap, Brain, Lightbulb, Rocket, Check, Users, Eye, Heart } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
+import { getNelloAppUrl } from '@/hooks/useSubdomain';
 
 /**
  * Nello Flow Landing Page
@@ -313,14 +314,14 @@ export default function FlowLanding() {
                     tagline: "descubra sua essência",
                     icon: Heart,
                     gradient: "from-amber-500 to-orange-500",
-                    link: "https://nello.one"
+                    link: getNelloAppUrl('identity')
                   },
                   {
                     name: "Nello Life",
                     tagline: "organize sua vida e hábitos",
                     icon: Eye,
                     gradient: "from-emerald-500 to-teal-500",
-                    link: "https://life.nello.one"
+                    link: getNelloAppUrl('life')
                   },
                   {
                     name: "Nello Flow",
