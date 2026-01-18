@@ -203,6 +203,13 @@ export type Database = {
             foreignKeyName: "affiliates_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "affiliates_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -893,8 +900,22 @@ export type Database = {
             foreignKeyName: "codigo_cruzamentos_user_a_id_fkey"
             columns: ["user_a_id"]
             isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "codigo_cruzamentos_user_a_id_fkey"
+            columns: ["user_a_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "codigo_cruzamentos_user_b_id_fkey"
+            columns: ["user_b_id"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "codigo_cruzamentos_user_b_id_fkey"
@@ -1088,6 +1109,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "company_invites_accepted_by_fkey"
+            columns: ["accepted_by"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "company_invites_accepted_by_fkey"
             columns: ["accepted_by"]
@@ -1386,6 +1414,13 @@ export type Database = {
             foreignKeyName: "company_users_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "company_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1435,6 +1470,13 @@ export type Database = {
           times_used?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "coupons_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "coupons_created_by_fkey"
             columns: ["created_by"]
@@ -1860,6 +1902,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "founder_feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "founder_feedback_user_id_fkey"
             columns: ["user_id"]
@@ -2419,6 +2468,39 @@ export type Database = {
           sections?: Json
           user_id?: string
           version?: number
+        }
+        Relationships: []
+      }
+      nello_user_activity: {
+        Row: {
+          activity_type: string
+          app_source: string
+          content: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          app_source: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          app_source?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          title?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -3559,7 +3641,16 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      nello_user_profile_summary: {
+        Row: {
+          essence_created_at: string | null
+          essence_sections: Json | null
+          full_name: string | null
+          last_activities: Json | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_user_role: {
