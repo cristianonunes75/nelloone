@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Target, Lightbulb, ListTodo, MessageSquare, TrendingUp, CheckCircle2, ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { Target, Lightbulb, ListTodo, MessageSquare, TrendingUp, CheckCircle2, ArrowRight, Loader2, Sparkles, Building2, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SEOHead } from '@/components/SEOHead';
 import { FlowLayout } from '../components/FlowLayout';
@@ -13,6 +13,7 @@ import { SparkProgressBar } from '../components/SparkProgressBar';
 import { EssenceSuggestions } from '../components/EssenceSuggestions';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getNelloAppUrl } from '@/hooks/useSubdomain';
 
 export default function FlowDashboardNew() {
   const navigate = useNavigate();
@@ -267,6 +268,50 @@ export default function FlowDashboardNew() {
                   <MessageSquare className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
+            </div>
+
+            {/* Business CTA */}
+            <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-800/80 to-slate-900/80 border border-slate-700/50">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white mb-1">Nello Business</h3>
+                  <p className="text-sm text-slate-400 mb-3">
+                    Leve a inteligência da essência para sua empresa e potencialize sua equipe.
+                  </p>
+                  <a 
+                    href={getNelloAppUrl('business')}
+                    className="inline-flex items-center gap-2 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors group"
+                  >
+                    Conhecer soluções corporativas
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Praxis CTA */}
+            <div className="p-6 rounded-2xl bg-gradient-to-r from-amber-900/30 to-amber-950/30 border border-amber-800/30">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white mb-1">Área do Profissional</h3>
+                  <p className="text-sm text-slate-400 mb-3">
+                    É mentor ou coach? Gerencie clientes e aplique o método em suas sessões.
+                  </p>
+                  <a 
+                    href={`${getNelloAppUrl('business')}/praxis`}
+                    className="inline-flex items-center gap-2 text-sm font-medium text-amber-400 hover:text-amber-300 transition-colors group"
+                  >
+                    Acessar Nello Praxis
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -12,11 +12,14 @@ import {
   Play,
   FileText,
   CheckCircle2,
-  Loader2
+  Loader2,
+  Building2,
+  Users
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { JourneyStep } from "@/hooks/useJourneyProgress";
 import * as Icons from "lucide-react";
+import { getNelloAppUrl } from "@/hooks/useSubdomain";
 
 interface TestResult {
   testType: string;
@@ -333,6 +336,56 @@ export function DashboardStagePotency({
               </motion.button>
             );
           })}
+        </div>
+      </motion.div>
+
+      {/* Business CTA */}
+      <motion.div 
+        variants={itemVariants}
+        className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl p-6"
+      >
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Building2 className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-white mb-1">Nello Business</h3>
+            <p className="text-sm text-slate-400 mb-4">
+              Leve a inteligência da essência para sua empresa. Descubra o perfil da sua equipe e potencialize resultados.
+            </p>
+            <a 
+              href={getNelloAppUrl('business')}
+              className="inline-flex items-center gap-2 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors group"
+            >
+              Conhecer soluções corporativas
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </a>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Praxis CTA - For professionals */}
+      <motion.div 
+        variants={itemVariants}
+        className="bg-gradient-to-r from-amber-950/50 via-amber-900/30 to-amber-950/50 border border-amber-800/30 rounded-2xl p-6"
+      >
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-amber-600 to-orange-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Users className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-white mb-1">Área do Profissional</h3>
+            <p className="text-sm text-slate-400 mb-4">
+              É mentor, coach ou terapeuta? Gerencie seus clientes e aplique o Código da Essência em suas sessões.
+            </p>
+            <a 
+              href={`${getNelloAppUrl('business')}/praxis`}
+              className="inline-flex items-center gap-2 text-sm font-medium text-amber-400 hover:text-amber-300 transition-colors group"
+            >
+              Acessar Nello Praxis
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </a>
+          </div>
         </div>
       </motion.div>
     </motion.div>
