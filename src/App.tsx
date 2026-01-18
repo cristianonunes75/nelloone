@@ -37,7 +37,7 @@ import CheckoutSuccess from "./pages/CheckoutSuccess";
 import RelatorioConjugePublico from "./pages/RelatorioConjugePublico";
 import RelatorioContextualPublico from "./pages/RelatorioContextualPublico";
 import ResetPassword from "./pages/ResetPassword";
-
+import SubscriptionManagement from "./pages/SubscriptionManagement";
 const queryClient = new QueryClient();
 
 // Component to run version check hook
@@ -69,6 +69,11 @@ const AppRoutes = () => (
     <Route path="/checkout/success" element={<CheckoutSuccess />} />
     <Route path="/en/checkout/success" element={<CheckoutSuccess />} />
     <Route path="/pt-pt/checkout/success" element={<CheckoutSuccess />} />
+    
+    {/* Subscription management */}
+    <Route path="/assinatura" element={<ProtectedRoute allowedRoles={["cliente", "admin"]}><SubscriptionManagement /></ProtectedRoute>} />
+    <Route path="/subscription" element={<ProtectedRoute allowedRoles={["cliente", "admin"]}><SubscriptionManagement /></ProtectedRoute>} />
+    <Route path="/en/subscription" element={<ProtectedRoute allowedRoles={["cliente", "admin"]}><SubscriptionManagement /></ProtectedRoute>} />
     
     {/* Legal pages - PT */}
     <Route path="/termos" element={<TermsOfService />} />
