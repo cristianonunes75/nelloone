@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { NelloGlobalFooter } from '@/components/global/NelloGlobalFooter';
 
 interface FlowLayoutProps {
   children: ReactNode;
@@ -35,7 +36,7 @@ export function FlowLayout({ children }: FlowLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-slate-950 flex flex-col">
       {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-800">
         <div className="flex items-center justify-between px-4 py-3">
@@ -129,11 +130,16 @@ export function FlowLayout({ children }: FlowLayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <main className="lg:ml-64 min-h-screen pt-16 lg:pt-0">
+      <main className="lg:ml-64 flex-1 pt-16 lg:pt-0">
         <div className="p-6 lg:p-8">
           {children}
         </div>
       </main>
+
+      {/* Global Footer */}
+      <div className="lg:ml-64">
+        <NelloGlobalFooter currentApp="flow" variant="dark" />
+      </div>
     </div>
   );
 }
