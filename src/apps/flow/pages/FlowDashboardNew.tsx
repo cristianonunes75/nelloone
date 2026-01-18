@@ -1,25 +1,50 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Target, Lightbulb, ListTodo, MessageSquare, TrendingUp, CheckCircle2, ArrowRight, Loader2 } from 'lucide-react';
+import { Target, Lightbulb, ListTodo, MessageSquare, TrendingUp, CheckCircle2, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { SEOHead } from '@/components/SEOHead';
 import { FlowLayout } from '../components/FlowLayout';
 import { useFlowProfile } from '../hooks/useFlowProfile';
 import { useFlowData } from '../hooks/useFlowData';
 import { useAuth } from '@/hooks/useAuth';
+import { useEssenceProfile } from '../hooks/useEssenceProfile';
+import { AdaptiveEmptyState } from '../components/AdaptiveEmptyState';
+import { SparkProgressBar } from '../components/SparkProgressBar';
+import { EssenceSuggestions } from '../components/EssenceSuggestions';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export default function FlowDashboardNew() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { profile, loading: profileLoading } = useFlowProfile();
-  const { ideas, chosenIdea, offer, tasks, loading: dataLoading } = useFlowData();
+  const { ideas, chosenIdea, offer, tasks, loading: dataLoading, addIdea, setIdeaAsFocus } = useFlowData();
+  const essenceProfile = useEssenceProfile();
+  const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
 
   useEffect(() => {
     if (!profileLoading && profile && !profile.onboarding_completed) {
       navigate('/onboarding');
     }
   }, [profile, profileLoading, navigate]);
+
+  const handleGenerateSuggestions = async () => {
+    setIsGeneratingSuggestions(true);
+    // This will trigger the EssenceSuggestions component to generate
+    setTimeout(() => setIsGeneratingSuggestions(false), 100);
+  };
+
+  const handleSelectSuggestion = async (title: string, description: string) => {
+    try {
+      const newIdea = await addIdea(title, description);
+      if (newIdea) {
+        await setIdeaAsFocus(newIdea.id);
+        toast.success('Ideia adicionada e definida como foco!');
+      }
+    } catch (error) {
+      toast.error('Erro ao adicionar ideia');
+    }
+  };
 
   if (profileLoading || dataLoading) {
     return (
@@ -90,15 +115,10 @@ export default function FlowDashboardNew() {
                 </Link>
               </div>
             ) : (
-              <div>
-                <p className="text-slate-400 mb-4">Nenhum foco definido ainda. Escolha uma ideia para começar.</p>
-                <Link to="/ideias">
-                  <Button size="sm" className="bg-violet-500 hover:bg-violet-600">
-                    Escolher Meu Foco
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
+              <AdaptiveEmptyState 
+                onGenerateSuggestions={handleGenerateSuggestions}
+                isGenerating={isGeneratingSuggestions}
+              />
             )}
           </div>
 
@@ -184,13 +204,11 @@ export default function FlowDashboardNew() {
                 </div>
                 <h3 className="text-lg font-semibold text-white">Plano da Semana</h3>
               </div>
-              <div className="mb-4">
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-slate-400">Progresso</span>
-                  <span className="text-white">{tasksCompleted}/{tasksTotal}</span>
-                </div>
-                <Progress value={progressPercent} className="h-2" />
-              </div>
+              <SparkProgressBar 
+                value={tasksCompleted} 
+                max={tasksTotal} 
+                showSpark={tasksTotal > 0}
+              />
               <Link to="/plano">
                 <Button variant="outline" size="sm" className="border-slate-700 text-slate-300">
                   {tasksTotal === 0 ? 'Criar tarefas' : 'Ver plano'}
