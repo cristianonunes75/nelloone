@@ -73,63 +73,11 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
     // Expected format: subdomain.nello.one or subdomain.domain.com
     const parts = hostname.split('.');
 
-    // Check if it's a subdomain of nello.one (e.g., flow.nello.one, identity.nello.one)
-    if (parts.length >= 3) {
-      const subdomain = parts[0].toLowerCase();
-      
-      // www.nello.one should show the main institutional landing
-      if (subdomain === 'www') {
-        return {
-          app: 'main' as NelloApp,
-          subdomain: 'www',
-          isFlow: false,
-          isLife: false,
-          isIdentity: false,
-          isBusiness: false,
-          isMain: true,
-          domain: fullDomain,
-          shouldRedirect: false,
-          redirectTo: null as string | null,
-        };
-      }
-      
-      // Check for legacy redirects (e.g., one → identity)
-      if (LEGACY_REDIRECTS[subdomain]) {
-        const newSubdomain = LEGACY_REDIRECTS[subdomain];
-        const newUrl = `https://${newSubdomain}.nello.one${window.location.pathname}${window.location.search}${window.location.hash}`;
-        return {
-          app: SUBDOMAIN_MAP[newSubdomain] || 'identity' as NelloApp,
-          subdomain: newSubdomain,
-          isFlow: false,
-          isLife: false,
-          isIdentity: true,
-          isBusiness: false,
-          isMain: false,
-          domain: fullDomain,
-          shouldRedirect: true,
-          redirectTo: newUrl,
-        };
-      }
-      
-      const app = SUBDOMAIN_MAP[subdomain] || 'main';
-
-      return {
-        app,
-        subdomain,
-        isFlow: app === 'flow',
-        isLife: app === 'life',
-        isIdentity: app === 'identity',
-        isBusiness: app === 'business',
-        isMain: app === 'main',
-        domain: fullDomain,
-        shouldRedirect: false,
-        redirectTo: null as string | null,
-      };
-    }
-
-    // Preview / local domains: lovable.* (lovable.app, lovable.dev, lovableproject.com, etc.)
-    // Use query params (?app=flow|business|identity|life|main) or default to 'identity' for compatibility
-    if (hostname.includes('lovable')) {
+    // FIRST: Check for Lovable preview/development domains BEFORE checking subdomain structure
+    // This is important because Lovable URLs have 3+ parts (e.g., id-preview--xxx.lovable.app)
+    const isLovableDomain = hostname.includes('lovable') || hostname.includes('lovableproject');
+    
+    if (isLovableDomain) {
       const urlParams = new URLSearchParams(search);
       let appParam = urlParams.get('app');
       
@@ -185,6 +133,59 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
       };
     }
 
+    // Check if it's a subdomain of nello.one (e.g., flow.nello.one, identity.nello.one)
+    if (parts.length >= 3) {
+      const subdomain = parts[0].toLowerCase();
+      
+      // www.nello.one should show the main institutional landing
+      if (subdomain === 'www') {
+        return {
+          app: 'main' as NelloApp,
+          subdomain: 'www',
+          isFlow: false,
+          isLife: false,
+          isIdentity: false,
+          isBusiness: false,
+          isMain: true,
+          domain: fullDomain,
+          shouldRedirect: false,
+          redirectTo: null as string | null,
+        };
+      }
+      
+      // Check for legacy redirects (e.g., one → identity)
+      if (LEGACY_REDIRECTS[subdomain]) {
+        const newSubdomain = LEGACY_REDIRECTS[subdomain];
+        const newUrl = `https://${newSubdomain}.nello.one${window.location.pathname}${window.location.search}${window.location.hash}`;
+        return {
+          app: SUBDOMAIN_MAP[newSubdomain] || 'identity' as NelloApp,
+          subdomain: newSubdomain,
+          isFlow: false,
+          isLife: false,
+          isIdentity: true,
+          isBusiness: false,
+          isMain: false,
+          domain: fullDomain,
+          shouldRedirect: true,
+          redirectTo: newUrl,
+        };
+      }
+      
+      const app = SUBDOMAIN_MAP[subdomain] || 'main';
+
+      return {
+        app,
+        subdomain,
+        isFlow: app === 'flow',
+        isLife: app === 'life',
+        isIdentity: app === 'identity',
+        isBusiness: app === 'business',
+        isMain: app === 'main',
+        domain: fullDomain,
+        shouldRedirect: false,
+        redirectTo: null as string | null,
+      };
+    }
     // Handle alternative domain: nelloone.com (single word without dot)
     // This should be treated as Nello One Identity (same as identity.nello.one)
     if (hostname.includes('nelloone.com') || hostname === 'nelloone.com') {
