@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from 'react';
 
-export type NelloApp = 'flow' | 'life' | 'identity' | 'business' | 'main';
+export type NelloApp = 'flow' | 'life' | 'identity' | 'business' | 'main' | 'praxis';
 
 interface SubdomainConfig {
   app: NelloApp;
@@ -10,6 +10,7 @@ interface SubdomainConfig {
   isIdentity: boolean;
   isMain: boolean;
   isBusiness: boolean;
+  isPraxis: boolean;
   domain: string;
 }
 
@@ -19,6 +20,7 @@ const SUBDOMAIN_MAP: Record<string, NelloApp> = {
   'life': 'life', 
   'identity': 'identity',
   'business': 'business',
+  'praxis': 'praxis',
 };
 
 // Legacy subdomain redirects
@@ -62,6 +64,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
         isLife: app === 'life',
         isIdentity: app === 'identity',
         isBusiness: app === 'business',
+        isPraxis: app === 'praxis',
         isMain: app === 'main',
         domain: fullDomain,
         shouldRedirect: false,
@@ -95,6 +98,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
           isLife: false,
           isIdentity: false,
           isBusiness: false,
+          isPraxis: false,
           isMain: true,
           domain: fullDomain,
           shouldRedirect: false,
@@ -111,6 +115,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
           isLife: app === 'life',
           isIdentity: app === 'identity',
           isBusiness: app === 'business',
+          isPraxis: app === 'praxis',
           isMain: false,
           domain: fullDomain,
           shouldRedirect: false,
@@ -126,6 +131,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
         isLife: false,
         isIdentity: true,
         isBusiness: false,
+        isPraxis: false,
         isMain: false,
         domain: fullDomain,
         shouldRedirect: false,
@@ -146,6 +152,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
           isLife: false,
           isIdentity: false,
           isBusiness: false,
+          isPraxis: false,
           isMain: true,
           domain: fullDomain,
           shouldRedirect: false,
@@ -164,6 +171,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
           isLife: false,
           isIdentity: true,
           isBusiness: false,
+          isPraxis: false,
           isMain: false,
           domain: fullDomain,
           shouldRedirect: true,
@@ -180,6 +188,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
         isLife: app === 'life',
         isIdentity: app === 'identity',
         isBusiness: app === 'business',
+        isPraxis: app === 'praxis',
         isMain: app === 'main',
         domain: fullDomain,
         shouldRedirect: false,
@@ -196,6 +205,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
         isLife: false,
         isIdentity: true,
         isBusiness: false,
+        isPraxis: false,
         isMain: false,
         domain: fullDomain,
         shouldRedirect: false,
@@ -211,6 +221,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
       isLife: false,
       isIdentity: false,
       isBusiness: false,
+      isPraxis: false,
       isMain: true,
       domain: fullDomain,
       shouldRedirect: false,
@@ -232,6 +243,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
     isLife: config.isLife,
     isIdentity: config.isIdentity,
     isBusiness: config.isBusiness,
+    isPraxis: config.isPraxis,
     isMain: config.isMain,
     domain: config.domain,
   };
@@ -250,6 +262,8 @@ export function getNelloAppUrl(app: NelloApp): string {
       return `https://life.${baseDomain}`;
     case 'business':
       return `https://business.${baseDomain}`;
+    case 'praxis':
+      return `https://business.${baseDomain}/praxis`;
     case 'identity':
       return `https://identity.${baseDomain}`;
     case 'main':
