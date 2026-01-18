@@ -11,8 +11,12 @@ import {
   MessageCircle,
   Users,
   Copy,
-  Download,
-  Share2
+  Zap,
+  Shield,
+  Lightbulb,
+  HandHeart,
+  Clock,
+  ExternalLink
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -35,12 +39,23 @@ const TRANSLATIONS = {
     linkCopied: "Link copiado!",
     download: "Baixar PDF",
     relationshipLabels: {
-      spouse: "Relatório de Casal",
-      parent_child: "Relatório Familiar",
-      siblings: "Relatório entre Irmãos",
-      friends: "Relatório de Amizade"
+      spouse: "Código do Casal",
+      parent_child: "Código Familiar",
+      siblings: "Código Fraternal",
+      friends: "Código de Amizade"
     },
     sections: {
+      semaforo_relacional: "Semáforo Relacional",
+      encontro_essencias: "O Encontro das Essências",
+      potencializacao: "Onde Vocês se Potencializam",
+      tabela_traducao: "Tabela de Tradução de Intenção",
+      manual_conjuge_a: "Manual do Cônjuge",
+      manual_conjuge_b: "Manual do Cônjuge",
+      alertas_pressao: "Alertas de Pressão",
+      desafio_conexao: "Desafio de Conexão 24h",
+      quando_buscar_ajuda: "Quando Procurar Ajuda",
+      cta_ativacao: "Próximo Passo",
+      // Legacy sections for backwards compatibility
       perfil_conjunto: "Vocês como casal",
       dinamica_familiar: "A dinâmica entre vocês",
       dinamica_fraternal: "A relação entre vocês",
@@ -59,7 +74,27 @@ const TRANSLATIONS = {
       perguntas_para_casal: "Perguntas para conversarem",
       perguntas_para_conversa: "Perguntas para conversa",
       perguntas: "Perguntas para refletir"
-    }
+    },
+    trafficLight: {
+      verde: "Sinergia Natural",
+      amarelo: "Atenção e Ajuste",
+      vermelho: "Zona de Choque"
+    },
+    translationTable: {
+      whenSays: "Quando diz/faz",
+      realIntent: "Intenção real",
+      otherHears: "O outro ouve/sente"
+    },
+    manual: {
+      orientations: "Orientações",
+      disarmWords: "Palavras que desarmam"
+    },
+    pressureAlerts: {
+      behavior: "Comportamento",
+      autoDefense: "Defesa automática",
+      riskSituation: "Situação de risco"
+    },
+    disclaimer: "Este relatório é uma ferramenta simbólica de autoconhecimento. Não substitui terapia ou aconselhamento profissional."
   },
   'pt-pt': {
     back: "Voltar",
@@ -67,12 +102,22 @@ const TRANSLATIONS = {
     linkCopied: "Link copiado!",
     download: "Transferir PDF",
     relationshipLabels: {
-      spouse: "Relatório de Casal",
-      parent_child: "Relatório Familiar",
-      siblings: "Relatório entre Irmãos",
-      friends: "Relatório de Amizade"
+      spouse: "Código do Casal",
+      parent_child: "Código Familiar",
+      siblings: "Código Fraternal",
+      friends: "Código de Amizade"
     },
     sections: {
+      semaforo_relacional: "Semáforo Relacional",
+      encontro_essencias: "O Encontro das Essências",
+      potencializacao: "Onde Vocês se Potencializam",
+      tabela_traducao: "Tabela de Tradução de Intenção",
+      manual_conjuge_a: "Manual do Cônjuge",
+      manual_conjuge_b: "Manual do Cônjuge",
+      alertas_pressao: "Alertas de Pressão",
+      desafio_conexao: "Desafio de Conexão 24h",
+      quando_buscar_ajuda: "Quando Procurar Ajuda",
+      cta_ativacao: "Próximo Passo",
       perfil_conjunto: "Vocês como casal",
       dinamica_familiar: "A dinâmica entre vocês",
       dinamica_fraternal: "A relação entre vocês",
@@ -91,7 +136,27 @@ const TRANSLATIONS = {
       perguntas_para_casal: "Perguntas para conversarem",
       perguntas_para_conversa: "Perguntas para conversa",
       perguntas: "Perguntas para refletir"
-    }
+    },
+    trafficLight: {
+      verde: "Sinergia Natural",
+      amarelo: "Atenção e Ajuste",
+      vermelho: "Zona de Choque"
+    },
+    translationTable: {
+      whenSays: "Quando diz/faz",
+      realIntent: "Intenção real",
+      otherHears: "O outro ouve/sente"
+    },
+    manual: {
+      orientations: "Orientações",
+      disarmWords: "Palavras que desarmam"
+    },
+    pressureAlerts: {
+      behavior: "Comportamento",
+      autoDefense: "Defesa automática",
+      riskSituation: "Situação de risco"
+    },
+    disclaimer: "Este relatório é uma ferramenta simbólica de autoconhecimento. Não substitui terapia ou aconselhamento profissional."
   },
   en: {
     back: "Back",
@@ -99,12 +164,22 @@ const TRANSLATIONS = {
     linkCopied: "Link copied!",
     download: "Download PDF",
     relationshipLabels: {
-      spouse: "Couple Report",
-      parent_child: "Family Report",
-      siblings: "Sibling Report",
-      friends: "Friendship Report"
+      spouse: "Couple's Code",
+      parent_child: "Family Code",
+      siblings: "Sibling Code",
+      friends: "Friendship Code"
     },
     sections: {
+      semaforo_relacional: "Relational Traffic Light",
+      encontro_essencias: "The Meeting of Essences",
+      potencializacao: "Where You Empower Each Other",
+      tabela_traducao: "Intention Translation Table",
+      manual_conjuge_a: "Spouse Manual",
+      manual_conjuge_b: "Spouse Manual",
+      alertas_pressao: "Pressure Alerts",
+      desafio_conexao: "24h Connection Challenge",
+      quando_buscar_ajuda: "When to Seek Help",
+      cta_ativacao: "Next Step",
       perfil_conjunto: "You as a couple",
       dinamica_familiar: "The dynamic between you",
       dinamica_fraternal: "Your relationship",
@@ -123,29 +198,28 @@ const TRANSLATIONS = {
       perguntas_para_casal: "Questions to discuss",
       perguntas_para_conversa: "Questions for conversation",
       perguntas: "Questions to reflect on"
-    }
+    },
+    trafficLight: {
+      verde: "Natural Synergy",
+      amarelo: "Attention & Adjustment",
+      vermelho: "Shock Zone"
+    },
+    translationTable: {
+      whenSays: "When says/does",
+      realIntent: "Real intention",
+      otherHears: "Other hears/feels"
+    },
+    manual: {
+      orientations: "Guidance",
+      disarmWords: "Words that disarm"
+    },
+    pressureAlerts: {
+      behavior: "Behavior",
+      autoDefense: "Auto defense",
+      riskSituation: "Risk situation"
+    },
+    disclaimer: "This report is a symbolic tool for self-knowledge. It does not replace therapy or professional counseling."
   }
-};
-
-const SECTION_ICONS: Record<string, React.ReactNode> = {
-  perfil_conjunto: <Users className="w-5 h-5 text-primary" />,
-  dinamica_familiar: <Users className="w-5 h-5 text-primary" />,
-  dinamica_fraternal: <Users className="w-5 h-5 text-primary" />,
-  harmonias: <Heart className="w-5 h-5 text-pink-500" />,
-  forcas_da_relacao: <Heart className="w-5 h-5 text-pink-500" />,
-  complementaridades: <Heart className="w-5 h-5 text-pink-500" />,
-  tensoes: <AlertTriangle className="w-5 h-5 text-amber-500" />,
-  pontos_de_atencao: <AlertTriangle className="w-5 h-5 text-amber-500" />,
-  atritos_tipicos: <AlertTriangle className="w-5 h-5 text-amber-500" />,
-  desafios_tipicos: <Target className="w-5 h-5 text-blue-500" />,
-  compromissos_usuario_a: <Check className="w-5 h-5 text-emerald-500" />,
-  compromissos_usuario_b: <Check className="w-5 h-5 text-emerald-500" />,
-  como_o_pai_pode_apoiar: <HelpCircle className="w-5 h-5 text-purple-500" />,
-  como_o_filho_pode_comunicar: <MessageCircle className="w-5 h-5 text-purple-500" />,
-  como_melhorar: <Target className="w-5 h-5 text-blue-500" />,
-  perguntas_para_casal: <MessageCircle className="w-5 h-5 text-primary" />,
-  perguntas_para_conversa: <MessageCircle className="w-5 h-5 text-primary" />,
-  perguntas: <MessageCircle className="w-5 h-5 text-primary" />
 };
 
 export const CruzamentoViewer = ({ crossing, language, onBack }: CruzamentoViewerProps) => {
@@ -161,51 +235,394 @@ export const CruzamentoViewer = ({ crossing, language, onBack }: CruzamentoViewe
     setTimeout(() => setLinkCopied(false), 3000);
   };
 
-  const renderContent = (data: any) => {
-    if (!data) return null;
-    
-    if (typeof data === 'string') {
-      return <p className="text-foreground/80 whitespace-pre-line">{data}</p>;
-    }
-    
-    if (Array.isArray(data)) {
-      return (
-        <ul className="space-y-2">
-          {data.map((item, i) => (
-            <li key={i} className="flex items-start gap-2">
-              <span className="text-primary mt-1">•</span>
-              <span className="text-foreground/80">{item}</span>
-            </li>
-          ))}
-        </ul>
-      );
-    }
-    
-    return null;
+  // ============== TRAFFIC LIGHT SECTION ==============
+  const renderTrafficLight = () => {
+    const semaforo = content.semaforo_relacional;
+    if (!semaforo) return null;
+
+    return (
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Zap className="w-5 h-5 text-primary" />
+            <CardTitle className="text-base">{semaforo.titulo || t.sections.semaforo_relacional}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Green */}
+          {semaforo.verde && (
+            <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xl">🟢</span>
+                <h4 className="font-semibold text-emerald-700 dark:text-emerald-400">{semaforo.verde.titulo || t.trafficLight.verde}</h4>
+              </div>
+              <p className="text-sm text-muted-foreground mb-3">{semaforo.verde.descricao}</p>
+              <ul className="space-y-1">
+                {semaforo.verde.pontos?.map((ponto: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <Check className="w-4 h-4 mt-0.5 text-emerald-500" />
+                    <span>{ponto}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Yellow */}
+          {semaforo.amarelo && (
+            <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xl">🟡</span>
+                <h4 className="font-semibold text-amber-700 dark:text-amber-400">{semaforo.amarelo.titulo || t.trafficLight.amarelo}</h4>
+              </div>
+              <p className="text-sm text-muted-foreground mb-3">{semaforo.amarelo.descricao}</p>
+              <ul className="space-y-1">
+                {semaforo.amarelo.pontos?.map((ponto: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <AlertTriangle className="w-4 h-4 mt-0.5 text-amber-500" />
+                    <span>{ponto}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Red */}
+          {semaforo.vermelho && (
+            <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xl">🔴</span>
+                <h4 className="font-semibold text-red-700 dark:text-red-400">{semaforo.vermelho.titulo || t.trafficLight.vermelho}</h4>
+              </div>
+              <p className="text-sm text-muted-foreground mb-3">{semaforo.vermelho.descricao}</p>
+              <ul className="space-y-1">
+                {semaforo.vermelho.pontos?.map((ponto: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <Shield className="w-4 h-4 mt-0.5 text-red-500" />
+                    <span>{ponto}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
   };
 
-  const renderSection = (key: string, data: any) => {
+  // ============== MEETING OF ESSENCES ==============
+  const renderMeetingOfEssences = () => {
+    const encontro = content.encontro_essencias;
+    if (!encontro) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-primary/5 via-pink-500/5 to-purple-500/5 border-primary/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Heart className="w-5 h-5 text-pink-500" />
+            <CardTitle className="text-base">{encontro.titulo || t.sections.encontro_essencias}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {encontro.metafora && (
+            <div className="text-center py-4 border-b border-primary/10">
+              <p className="text-2xl font-bold bg-gradient-to-r from-primary via-pink-500 to-purple-500 bg-clip-text text-transparent">
+                ✨ {encontro.metafora} ✨
+              </p>
+            </div>
+          )}
+          <p className="text-foreground/80 whitespace-pre-line leading-relaxed">{encontro.descricao}</p>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== POTENTIALIZATION ==============
+  const renderPotentialization = () => {
+    const pot = content.potencializacao;
+    if (!pot) return null;
+
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Lightbulb className="w-5 h-5 text-amber-500" />
+            <CardTitle className="text-base">{pot.titulo || t.sections.potencializacao}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-foreground/80 whitespace-pre-line">{pot.descricao}</p>
+          {pot.forcas && (
+            <ul className="space-y-2 mt-4">
+              {pot.forcas.map((forca: string, i: number) => (
+                <li key={i} className="flex items-start gap-2">
+                  <Heart className="w-4 h-4 mt-1 text-pink-500" />
+                  <span className="text-foreground/80">{forca}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== TRANSLATION TABLE ==============
+  const renderTranslationTable = () => {
+    const tabela = content.tabela_traducao;
+    if (!tabela) return null;
+
+    const renderTranslations = (translations: any[], title: string) => {
+      if (!translations?.length) return null;
+      
+      return (
+        <div className="space-y-3">
+          <h4 className="font-semibold text-sm text-muted-foreground">{title}</h4>
+          {translations.map((item: any, i: number) => (
+            <div key={i} className="p-4 rounded-lg bg-muted/50 space-y-2">
+              <div className="flex items-start gap-2">
+                <span className="text-xs font-medium text-muted-foreground min-w-[100px]">{t.translationTable.whenSays}:</span>
+                <span className="text-sm">{item.quando_diz}</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-xs font-medium text-primary min-w-[100px]">{t.translationTable.realIntent}:</span>
+                <span className="text-sm font-medium">{item.intencao_real}</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-xs font-medium text-amber-600 dark:text-amber-400 min-w-[100px]">{t.translationTable.otherHears}:</span>
+                <span className="text-sm">{item.outro_ouve || item.filho_ouve || item.pai_ouve}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    };
+
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <MessageCircle className="w-5 h-5 text-primary" />
+            <CardTitle className="text-base">{tabela.titulo || t.sections.tabela_traducao}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {tabela.descricao && (
+            <p className="text-sm text-muted-foreground italic">{tabela.descricao}</p>
+          )}
+          {renderTranslations(tabela.traducoes_usuario_a, tabela.traducoes_usuario_a?.[0]?.quando_diz?.split(' ')?.[2] || 'Pessoa A')}
+          {renderTranslations(tabela.traducoes_usuario_b, tabela.traducoes_usuario_b?.[0]?.quando_diz?.split(' ')?.[2] || 'Pessoa B')}
+          {renderTranslations(tabela.traducoes_pai, 'Pai/Mãe')}
+          {renderTranslations(tabela.traducoes_filho, 'Filho(a)')}
+          {renderTranslations(tabela.traducoes_a, 'Irmão(ã) A')}
+          {renderTranslations(tabela.traducoes_b, 'Irmão(ã) B')}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== SPOUSE MANUAL ==============
+  const renderSpouseManual = (manual: any, key: string) => {
+    if (!manual) return null;
+
+    return (
+      <Card key={key}>
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <HandHeart className="w-5 h-5 text-purple-500" />
+            <CardTitle className="text-base">{manual.titulo || t.sections[key as keyof typeof t.sections]}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {manual.orientacoes && (
+            <div>
+              <h4 className="text-sm font-semibold text-muted-foreground mb-2">{t.manual.orientations}</h4>
+              <ul className="space-y-2">
+                {manual.orientacoes.map((item: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <Target className="w-4 h-4 mt-0.5 text-purple-500" />
+                    <span className="text-sm">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {manual.palavras_desarmam && (
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <h4 className="text-sm font-semibold text-emerald-700 dark:text-emerald-400 mb-2">{t.manual.disarmWords}</h4>
+              <div className="flex flex-wrap gap-2">
+                {manual.palavras_desarmam.map((palavra: string, i: number) => (
+                  <span key={i} className="px-3 py-1 bg-emerald-500/20 rounded-full text-sm text-emerald-700 dark:text-emerald-300">
+                    "{palavra}"
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== PRESSURE ALERTS ==============
+  const renderPressureAlerts = () => {
+    const alertas = content.alertas_pressao;
+    if (!alertas) return null;
+
+    return (
+      <Card className="border-amber-500/30">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-amber-500" />
+            <CardTitle className="text-base">{alertas.titulo || t.sections.alertas_pressao}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {alertas.descricao && (
+            <p className="text-sm text-muted-foreground">{alertas.descricao}</p>
+          )}
+          {alertas.gatilhos?.map((gatilho: any, i: number) => (
+            <div key={i} className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-2">
+              <div className="flex items-start gap-2">
+                <span className="text-xs font-medium text-amber-600 dark:text-amber-400 min-w-[120px]">{t.pressureAlerts.behavior}:</span>
+                <span className="text-sm">{gatilho.comportamento}</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-xs font-medium text-red-600 dark:text-red-400 min-w-[120px]">{t.pressureAlerts.autoDefense}:</span>
+                <span className="text-sm">{gatilho.defesa_automatica}</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-xs font-medium text-muted-foreground min-w-[120px]">{t.pressureAlerts.riskSituation}:</span>
+                <span className="text-sm">{gatilho.situacao_risco}</span>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== CONNECTION CHALLENGE ==============
+  const renderConnectionChallenge = () => {
+    const desafio = content.desafio_conexao || content.desafio_conexao_familiar;
+    if (!desafio) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/30">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Clock className="w-5 h-5 text-emerald-500" />
+            <CardTitle className="text-base">{desafio.titulo || t.sections.desafio_conexao}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {desafio.descricao && (
+            <p className="text-sm text-muted-foreground mb-3">{desafio.descricao}</p>
+          )}
+          <div className="p-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30">
+            <p className="font-medium text-emerald-700 dark:text-emerald-300">{desafio.acao}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== WHEN TO SEEK HELP ==============
+  const renderSeekHelp = () => {
+    const ajuda = content.quando_buscar_ajuda;
+    if (!ajuda) return null;
+
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <HelpCircle className="w-5 h-5 text-blue-500" />
+            <CardTitle className="text-base">{ajuda.titulo || t.sections.quando_buscar_ajuda}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {ajuda.descricao && (
+            <p className="text-sm font-medium text-blue-600 dark:text-blue-400">{ajuda.descricao}</p>
+          )}
+          <ul className="space-y-2">
+            {ajuda.sugestoes?.map((sugestao: string, i: number) => (
+              <li key={i} className="flex items-start gap-2 text-sm">
+                <ExternalLink className="w-4 h-4 mt-0.5 text-blue-500" />
+                <span>{sugestao}</span>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== LEGACY SECTION RENDERER ==============
+  const renderLegacySection = (key: string, data: any) => {
     if (!data) return null;
     
-    const title = data.titulo || t.sections[key as keyof typeof t.sections] || key;
-    const icon = SECTION_ICONS[key] || <Target className="w-5 h-5 text-primary" />;
+    // Skip new format sections (they have dedicated renderers)
+    const newFormatKeys = [
+      'semaforo_relacional', 'encontro_essencias', 'potencializacao', 
+      'tabela_traducao', 'manual_conjuge_a', 'manual_conjuge_b',
+      'alertas_pressao', 'desafio_conexao', 'quando_buscar_ajuda',
+      'cta_ativacao', 'abertura', 'fechamento', 'desafio_conexao_familiar',
+      'tabela_traducao_familiar', 'tabela_traducao_fraternal'
+    ];
     
-    // Determine content field
+    if (newFormatKeys.includes(key)) return null;
+    
+    const title = data.titulo || t.sections[key as keyof typeof t.sections] || key;
+    
     const contentField = data.resumo || data.conteudo || data.pontos || data.compromissos || 
                         data.sugestoes || data.perguntas || data.situacoes;
     
     if (!contentField) return null;
+
+    const renderContent = (content: any) => {
+      if (typeof content === 'string') {
+        return <p className="text-foreground/80 whitespace-pre-line">{content}</p>;
+      }
+      if (Array.isArray(content)) {
+        return (
+          <ul className="space-y-2">
+            {content.map((item, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span className="text-primary mt-1">•</span>
+                <span className="text-foreground/80">{item}</span>
+              </li>
+            ))}
+          </ul>
+        );
+      }
+      return null;
+    };
     
     return (
       <Card key={key}>
         <CardHeader className="pb-2">
           <div className="flex items-center gap-2">
-            {icon}
+            <Target className="w-5 h-5 text-primary" />
             <CardTitle className="text-base">{title}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           {renderContent(contentField)}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== CTA ACTIVATION ==============
+  const renderCtaActivation = () => {
+    const cta = content.cta_ativacao;
+    if (!cta) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-primary/10 to-pink-500/10 border-primary/30">
+        <CardContent className="pt-6 text-center">
+          <h3 className="font-semibold mb-2">{cta.titulo || t.sections.cta_ativacao}</h3>
+          <p className="text-sm text-muted-foreground">{cta.descricao}</p>
         </CardContent>
       </Card>
     );
@@ -239,7 +656,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack }: CruzamentoViewe
         </CardContent>
       </Card>
 
-      {/* Opening */}
+      {/* Opening (legacy) */}
       {content.abertura && (
         <Card>
           <CardContent className="pt-6">
@@ -248,26 +665,35 @@ export const CruzamentoViewer = ({ crossing, language, onBack }: CruzamentoViewe
         </Card>
       )}
 
-      {/* Dynamic Sections */}
-      {Object.entries(content).map(([key, value]) => {
-        if (key === 'abertura' || key === 'fechamento') return null;
-        return renderSection(key, value);
-      })}
+      {/* NEW FORMAT SECTIONS */}
+      {renderTrafficLight()}
+      {renderMeetingOfEssences()}
+      {renderPotentialization()}
+      {renderTranslationTable()}
+      {renderSpouseManual(content.manual_conjuge_a, 'manual_conjuge_a')}
+      {renderSpouseManual(content.manual_conjuge_b, 'manual_conjuge_b')}
+      {renderPressureAlerts()}
+      {renderConnectionChallenge()}
+      {renderSeekHelp()}
+
+      {/* LEGACY SECTIONS (for backwards compatibility) */}
+      {Object.entries(content).map(([key, value]) => renderLegacySection(key, value))}
 
       {/* Closing */}
       {content.fechamento && (
         <Card className="bg-gradient-to-br from-primary/5 to-pink-500/5 border-primary/20">
           <CardContent className="pt-6">
-            <p className="text-foreground/80 whitespace-pre-line text-center">{content.fechamento}</p>
+            <p className="text-foreground/80 whitespace-pre-line text-center font-medium">{content.fechamento}</p>
           </CardContent>
         </Card>
       )}
 
+      {/* CTA Activation */}
+      {renderCtaActivation()}
+
       {/* Disclaimer */}
       <p className="text-xs text-muted-foreground text-center px-4">
-        {language === 'en' 
-          ? "This report is a symbolic tool for self-knowledge. It does not replace therapy or professional counseling."
-          : "Este relatório é uma ferramenta simbólica de autoconhecimento. Não substitui terapia ou aconselhamento profissional."}
+        {t.disclaimer}
       </p>
     </div>
   );
