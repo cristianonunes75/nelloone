@@ -21,6 +21,7 @@ import { CrossDivider } from "./CrossDivider";
 import { FreePlanBenefits } from "./FreePlanBenefits";
 import { ApprovedTestimonialsSection } from "./ApprovedTestimonialsSection";
 import { NavSection } from "./NavSection";
+import { NelloGlobalFooter } from "@/components/global/NelloGlobalFooter";
 import heroDawn from "@/assets/hero-dawn.jpg";
 import nelloPresence from "@/assets/nello-presence.jpg";
 
@@ -389,6 +390,9 @@ export const NelloOneLanding = () => {
           </div>
         </div>
       </section>
+
+      {/* ========== FOOTER GLOBAL ========== */}
+      <NelloGlobalFooter currentApp="identity" variant="light" />
     </div>
   );
 };
