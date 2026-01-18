@@ -6,8 +6,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Base system prompt
-const BASE_SYSTEM_PROMPT = `Você é o Mentor do Nello Flow.
+// Base system prompt with unified Nello personality
+const BASE_SYSTEM_PROMPT = `Você é o Mentor do Nello Flow - uma única inteligência que acompanha o usuário em 360º pelo ecossistema Nello.
 
 Seu papel é ajudar pessoas multipotenciais, criativas e muitas vezes dispersas a transformarem ideias em ação e renda, com foco, leveza, verdade e propósito.
 
@@ -47,7 +47,8 @@ AJUSTE DE TOM - VISIONÁRIO:
 - Confronte dispersão com firmeza amorosa
 - Use linguagem de ação e resultados
 - Corte explicações desnecessárias
-- Provoque para escolhas rápidas`,
+- Provoque para escolhas rápidas
+- Exemplo: "[Nome], você tem o dom da execução. Qual dessas 3 ideias vai gerar resultado real hoje? Não se disperse."`,
 
   seeker: `
 AJUSTE DE TOM - BUSCADOR:
@@ -56,7 +57,8 @@ AJUSTE DE TOM - BUSCADOR:
 - Use perguntas que guiam sem pressionar
 - Valide sentimentos antes de sugerir ações
 - Ofereça 2-3 opções gentis quando houver paralisia
-- Conecte ações com propósito e significado`,
+- Conecte ações com propósito e significado
+- Exemplo: "[Nome], sua sensibilidade é sua força. Vamos estruturar esse projeto passo a passo para que você se sinta segura ao agir."`,
 
   executor: `
 AJUSTE DE TOM - EXECUTOR:
@@ -93,6 +95,28 @@ REGRAS:
 - O primeiro passo DEVE ser realizável em 15 minutos ou menos
 - Use linguagem inspiradora mas prática
 - Evite projetos genéricos - personalize para a essência`;
+
+// Identity Bridge prompt for suggesting projects based on identity
+const IDENTITY_BRIDGE_PROMPT = `
+PONTE IDENTITY -> FLOW:
+O usuário ainda não tem ideias registradas no Flow, mas tem dados do seu Código da Essência no Identity.
+
+Com base no chamado ([CHAMADO]) e dom ([DOM]) do usuário, sugira como começar:
+"Vi no seu Código da Essência que seu chamado é [Chamado]. Que tal iniciarmos um projeto de [Sugestão baseada na essência]?"
+
+Seja específico e conecte com a essência real do usuário.`;
+
+// Cross-module memory prompt
+const CROSS_MODULE_MEMORY_PROMPT = `
+MEMÓRIA DO ECOSSISTEMA:
+Você tem acesso às últimas atividades do usuário em outros módulos do Nello:
+[ACTIVITIES]
+
+Use essa memória para conectar experiências:
+- Se houve insight no Life: "Vi que você teve um insight profundo no Life hoje. Como podemos transformar isso em uma ação prática aqui no Flow?"
+- Se completou algo no Identity: "Parabéns por completar seu Código da Essência! Agora podemos usar essa clareza para focar em projetos que fazem sentido para você."
+
+Não mencione a memória explicitamente como "sistema" - integre naturalmente na conversa.`;
 
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
@@ -164,7 +188,66 @@ async function checkRateLimit(userId: string, endpoint: string, supabaseClient: 
   return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - currentCount - 1 };
 }
 
-function buildSystemPrompt(essenceContext: any, isSparkGenerator: boolean): string {
+// Fetch cross-module activities for memory
+async function fetchCrossModuleMemory(userId: string, supabaseClient: any): Promise<string> {
+  try {
+    const { data: activities } = await supabaseClient
+      .from('nello_user_activity')
+      .select('app_source, activity_type, title, content, created_at')
+      .eq('user_id', userId)
+      .neq('app_source', 'flow') // Exclude Flow activities (already in chat history)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    if (!activities || activities.length === 0) {
+      return '';
+    }
+
+    const formattedActivities = activities.map((a: any) => {
+      const timeAgo = getTimeAgo(new Date(a.created_at));
+      return `- [${a.app_source.toUpperCase()}] ${a.activity_type}: "${a.title}" (${timeAgo})`;
+    }).join('\n');
+
+    return CROSS_MODULE_MEMORY_PROMPT.replace('[ACTIVITIES]', formattedActivities);
+  } catch (error) {
+    console.error('[FLOW-MENTOR] Error fetching cross-module memory:', error);
+    return '';
+  }
+}
+
+function getTimeAgo(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 60) return `${diffMins}min atrás`;
+  if (diffHours < 24) return `${diffHours}h atrás`;
+  return `${diffDays}d atrás`;
+}
+
+// Check if user has ideas in Flow
+async function checkUserHasIdeas(userId: string, supabaseClient: any): Promise<boolean> {
+  try {
+    const { data, error } = await supabaseClient
+      .from('flow_ideas')
+      .select('id')
+      .eq('user_id', userId)
+      .limit(1);
+    
+    return !error && data && data.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+function buildSystemPrompt(
+  essenceContext: any, 
+  isSparkGenerator: boolean,
+  crossModuleMemory: string,
+  isIdentityBridge: boolean
+): string {
   let prompt = BASE_SYSTEM_PROMPT;
   
   // Add door-specific tone
@@ -176,8 +259,20 @@ function buildSystemPrompt(essenceContext: any, isSparkGenerator: boolean): stri
   if (essenceContext) {
     prompt += `\n\nCONTEXTO DA ESSÊNCIA DO USUÁRIO:`;
     
+    if (essenceContext.userName) {
+      prompt += `\n- Nome: ${essenceContext.userName}`;
+    }
     if (essenceContext.doorName) {
       prompt += `\n- Perfil identificado: ${essenceContext.doorName}`;
+    }
+    if (essenceContext.temperamento) {
+      prompt += `\n- Temperamento: ${essenceContext.temperamento}`;
+    }
+    if (essenceContext.disc) {
+      prompt += `\n- Perfil DISC: ${essenceContext.disc}`;
+    }
+    if (essenceContext.arquetipo) {
+      prompt += `\n- Arquétipo: ${essenceContext.arquetipo}`;
     }
     if (essenceContext.dom) {
       prompt += `\n- Dom/Talento: ${essenceContext.dom}`;
@@ -189,6 +284,19 @@ function buildSystemPrompt(essenceContext: any, isSparkGenerator: boolean): stri
       prompt += `\n- Síntese da Essência: ${essenceContext.essencia}`;
     }
   }
+
+  // Add cross-module memory if available
+  if (crossModuleMemory) {
+    prompt += '\n\n' + crossModuleMemory;
+  }
+
+  // Add Identity Bridge for users without ideas
+  if (isIdentityBridge && essenceContext?.chamado && essenceContext?.dom) {
+    const bridgePrompt = IDENTITY_BRIDGE_PROMPT
+      .replace('[CHAMADO]', essenceContext.chamado)
+      .replace('[DOM]', essenceContext.dom);
+    prompt += '\n\n' + bridgePrompt;
+  }
   
   // Add spark generator instructions if needed
   if (isSparkGenerator) {
@@ -196,6 +304,29 @@ function buildSystemPrompt(essenceContext: any, isSparkGenerator: boolean): stri
   }
   
   return prompt;
+}
+
+// Log activity to cross-module memory
+async function logFlowActivity(
+  userId: string, 
+  activityType: string, 
+  title: string, 
+  content: string | null,
+  supabaseClient: any
+): Promise<void> {
+  try {
+    await supabaseClient
+      .from('nello_user_activity')
+      .insert({
+        user_id: userId,
+        app_source: 'flow',
+        activity_type: activityType,
+        title,
+        content,
+      });
+  } catch (error) {
+    console.error('[FLOW-MENTOR] Error logging activity:', error);
+  }
 }
 
 serve(async (req) => {
@@ -251,8 +382,20 @@ serve(async (req) => {
     // Check if this is a spark generator request
     const isSparkGenerator = message === 'GERAR_SUGESTOES_CENTELHA';
     
-    // Build personalized system prompt
-    const systemPrompt = buildSystemPrompt(essenceContext, isSparkGenerator);
+    // Fetch cross-module memory
+    const crossModuleMemory = await fetchCrossModuleMemory(user.id, supabaseClient);
+    
+    // Check if user has ideas (for Identity Bridge)
+    const hasIdeas = await checkUserHasIdeas(user.id, supabaseClient);
+    const isIdentityBridge = !hasIdeas && essenceContext?.chamado && essenceContext?.dom;
+    
+    // Build personalized system prompt with memory
+    const systemPrompt = buildSystemPrompt(
+      essenceContext, 
+      isSparkGenerator, 
+      crossModuleMemory,
+      isIdentityBridge
+    );
 
     // Get recent chat history for context
     let chatHistory: { role: string; content: string }[] = [];
@@ -279,7 +422,7 @@ serve(async (req) => {
       ? `Gere 3 sugestões de projetos baseadas na minha essência. Dom: ${essenceContext?.dom || 'não definido'}. Chamado: ${essenceContext?.chamado || 'não definido'}. Essência: ${essenceContext?.essencia || 'não definida'}.`
       : message;
 
-    console.log(`[FLOW-MENTOR] Processing request for user: ${user.id}, door: ${essenceContext?.doorType || 'unknown'}, spark: ${isSparkGenerator}`);
+    console.log(`[FLOW-MENTOR] Processing: user=${user.id}, door=${essenceContext?.doorType || 'unknown'}, spark=${isSparkGenerator}, bridge=${isIdentityBridge}, memory=${!!crossModuleMemory}`);
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -288,7 +431,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-3-flash-preview',
         messages: [
           { role: 'system', content: systemPrompt },
           ...chatHistory,
@@ -320,6 +463,17 @@ serve(async (req) => {
 
     const data = await response.json();
     const aiResponse = data.choices?.[0]?.message?.content || 'Desculpe, não consegui processar sua mensagem.';
+
+    // Log meaningful interactions to cross-module memory
+    if (!isSparkGenerator && message.length > 20) {
+      await logFlowActivity(
+        user.id,
+        'chat',
+        message.slice(0, 100),
+        aiResponse.slice(0, 200),
+        supabaseClient
+      );
+    }
 
     return new Response(JSON.stringify({ response: aiResponse }), {
       headers: { 

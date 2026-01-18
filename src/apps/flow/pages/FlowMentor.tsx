@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageSquare, Send, Loader2, User, Bot, Sparkles } from 'lucide-react';
+import { MessageSquare, Send, Loader2, User, Bot, Sparkles, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { SEOHead } from '@/components/SEOHead';
@@ -7,6 +7,7 @@ import { FlowLayout } from '../components/FlowLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
+import { useNelloUnifiedProfile } from '@/hooks/useNelloUnifiedProfile';
 import { useEssenceProfile } from '../hooks/useEssenceProfile';
 
 interface Message {
@@ -17,7 +18,7 @@ interface Message {
 }
 
 export default function FlowMentor() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { 
     doorType, 
     doorName, 
@@ -29,6 +30,13 @@ export default function FlowMentor() {
     essencia,
     hasEssenceData,
   } = useEssenceProfile();
+  
+  // Use unified profile for cross-module memory
+  const { 
+    lastActivityFromApp, 
+    logActivity,
+    essenceData,
+  } = useNelloUnifiedProfile();
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -83,7 +91,7 @@ export default function FlowMentor() {
         message: userMessage,
       });
 
-      // Call AI with essence context
+      // Call AI with enhanced essence context including cross-module data
       const { data, error } = await supabase.functions.invoke('flow-mentor', {
         body: { 
           message: userMessage, 
@@ -95,6 +103,10 @@ export default function FlowMentor() {
             dom,
             chamado,
             essencia,
+            userName: profile?.full_name?.split(' ')[0],
+            temperamento: essenceData.temperamento_principal,
+            disc: essenceData.perfil_disc,
+            arquetipo: essenceData.arquetipo_dominante,
           } : null,
         },
       });
