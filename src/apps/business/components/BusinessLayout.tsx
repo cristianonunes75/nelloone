@@ -19,6 +19,7 @@ import { useBusinessAuth } from '../hooks/useBusinessAuth';
 import { AdminAppSwitcher } from '@/components/admin/AdminAppSwitcher';
 import { CompanySwitcher } from './CompanySwitcher';
 import { cn } from '@/lib/utils';
+import { NelloGlobalFooter } from '@/components/global/NelloGlobalFooter';
 
 interface BusinessLayoutProps {
   children: ReactNode;
@@ -53,7 +54,7 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Top Navigation */}
       <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur">
         <div className="container mx-auto px-4">
@@ -159,19 +160,12 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-1">
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t py-6 mt-auto">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>Nello One Business © {new Date().getFullYear()}</p>
-          <p className="mt-1 text-xs">
-            Plataforma de autoconhecimento para equipes
-          </p>
-        </div>
-      </footer>
+      {/* Global Footer */}
+      <NelloGlobalFooter currentApp="business" variant="light" />
     </div>
   );
 }
