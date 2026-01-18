@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { CrossDivider } from "./CrossDivider";
 import { FreePlanBenefits } from "./FreePlanBenefits";
 import { ApprovedTestimonialsSection } from "./ApprovedTestimonialsSection";
+import { NavSection } from "./NavSection";
 import heroDawn from "@/assets/hero-dawn.jpg";
 import nelloPresence from "@/assets/nello-presence.jpg";
 
@@ -94,6 +95,8 @@ export const NelloOneLanding = () => {
 
   return (
     <div className="flex flex-col bg-background">
+      {/* Navigation Header */}
+      <NavSection />
       
       {/* ========== 1️⃣ HERO ========== */}
       <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
