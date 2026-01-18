@@ -792,16 +792,16 @@ export const SimulationMode = () => {
                     </div>
                   ))}
                   
-                  {/* Mapa Nello One Button - appears when journey is complete */}
+                  {/* Mapa Nello Identity Button - appears when journey is complete */}
                   {journeyResults.length === 7 && (
                     <div className="pt-4 border-t border-border/50">
                       <div className="bg-[#F8F8F4] rounded-xl p-5">
                         <div className="flex items-center gap-3 mb-3">
                           <Map className="w-5 h-5 text-accent" strokeWidth={1.5} />
                           <div>
-                            <h4 className="font-medium">Mapa Nello One Disponível</h4>
+                            <h4 className="font-medium">Mapa Nello Identity Disponível</h4>
                             <p className="text-xs text-muted-foreground">
-                              Todos os 7 testes foram concluídos. O Mapa Nello One pode ser gerado.
+                              Todos os 7 testes foram concluídos. O Mapa Nello Identity pode ser gerado.
                             </p>
                           </div>
                         </div>
@@ -810,7 +810,7 @@ export const SimulationMode = () => {
                           onClick={() => setShowMapPreview(true)}
                         >
                           <Map className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                          Ver Mapa Nello One (Simulação)
+                          Ver Mapa Nello Identity (Simulação)
                         </Button>
                       </div>
                     </div>

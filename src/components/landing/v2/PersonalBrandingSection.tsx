@@ -11,7 +11,7 @@ export const PersonalBrandingSection = () => {
     pt: {
       badge: "Direção Real",
       title: "Transforme Autoconhecimento em Direção Real",
-      description: "O Mapa NELLO ONE não apenas revela quem você é. Ele também mostra como aplicar seu autoconhecimento na vida prática. Seus resultados podem orientar sua direção pessoal, comunicação, maturidade emocional e tomada de decisões.",
+      description: "O Mapa NELLO IDENTITY não apenas revela quem você é. Ele também mostra como aplicar seu autoconhecimento na vida prática. Seus resultados podem orientar sua direção pessoal, comunicação, maturidade emocional e tomada de decisões.",
       subtitle: "Use seu Mapa para:",
       items: [
         "Construir sua jornada pessoal",
@@ -24,7 +24,7 @@ export const PersonalBrandingSection = () => {
     'pt-pt': {
       badge: "Direção Real",
       title: "Transforme Autoconhecimento em Direção Real",
-      description: "O Mapa NELLO ONE não apenas revela quem é. Ele também mostra como aplicar o seu autoconhecimento na vida prática. Os seus resultados podem orientar a sua direção pessoal, comunicação, maturidade emocional e tomada de decisões.",
+      description: "O Mapa NELLO IDENTITY não apenas revela quem é. Ele também mostra como aplicar o seu autoconhecimento na vida prática. Os seus resultados podem orientar a sua direção pessoal, comunicação, maturidade emocional e tomada de decisões.",
       subtitle: "Use o seu Mapa para:",
       items: [
         "Construir a sua jornada pessoal",
@@ -37,7 +37,7 @@ export const PersonalBrandingSection = () => {
     en: {
       badge: "Real Direction",
       title: "Transform Self-Knowledge into Real Direction",
-      description: "The NELLO ONE Map doesn't just reveal who you are. It also shows you how to apply your self-knowledge in practical life. Your results can guide your personal direction, communication, emotional maturity and decision-making.",
+      description: "The NELLO IDENTITY Map doesn't just reveal who you are. It also shows you how to apply your self-knowledge in practical life. Your results can guide your personal direction, communication, emotional maturity and decision-making.",
       subtitle: "Use your Map to:",
       items: [
         "Build your personal journey",

@@ -63,7 +63,7 @@ export const NelloGlobalFooter = ({ currentApp = 'identity', variant = 'light' }
                   NELLO
                 </span>
                 <span className={`font-serif text-lg font-light ${isDark ? 'text-white/80' : 'text-ink-deep/80'}`}>
-                  ONE
+                  IDENTITY
                 </span>
               </div>
               <p className={`text-sm leading-relaxed mb-4 ${isDark ? 'text-white/60' : 'text-muted-foreground'}`}>
@@ -153,7 +153,7 @@ export const NelloGlobalFooter = ({ currentApp = 'identity', variant = 'light' }
             isDark ? 'border-white/10' : 'border-border/40'
           }`}>
             <p className={`text-xs ${isDark ? 'text-white/40' : 'text-muted-foreground/60'}`}>
-              © {new Date().getFullYear()} Nello One. {language === 'en' ? 'All rights reserved.' : 'Todos os direitos reservados.'}
+              © {new Date().getFullYear()} Nello Identity. {language === 'en' ? 'All rights reserved.' : 'Todos os direitos reservados.'}
             </p>
             <p className={`text-xs font-serif italic ${isDark ? 'text-white/40' : 'text-muted-foreground/60'}`}>
               {language === 'en' ? 'Life from the inside out.' : 'Vida de dentro para fora.'}

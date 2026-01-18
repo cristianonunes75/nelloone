@@ -144,7 +144,7 @@ const Contact = () => {
             Estamos aqui para você.
           </h1>
           <p className="text-nello-deep/70 mt-4 max-w-xl mx-auto leading-relaxed">
-            Para dúvidas, suporte ou solicitações sobre sua experiência no NELLO ONE, 
+            Para dúvidas, suporte ou solicitações sobre sua experiência no NELLO IDENTITY, 
             preencha o formulário abaixo.
           </p>
         </div>

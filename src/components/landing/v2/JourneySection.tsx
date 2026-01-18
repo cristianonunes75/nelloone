@@ -226,10 +226,10 @@ export const JourneySection = () => {
               <Check className="w-4 h-4 md:w-5 md:h-5" strokeWidth={1.5} />
               <span className="font-medium text-sm md:text-base">
                 {language === 'en' 
-                  ? 'At the end: your complete NELLO ONE Map' 
+                  ? 'At the end: your complete NELLO IDENTITY Map' 
                   : language === 'pt-pt'
-                  ? 'No final: o seu Mapa NELLO ONE completo'
-                  : 'Ao final: seu Mapa NELLO ONE completo'}
+                  ? 'No final: o seu Mapa NELLO IDENTITY completo'
+                  : 'Ao final: seu Mapa NELLO IDENTITY completo'}
               </span>
             </div>
           </div>

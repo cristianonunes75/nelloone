@@ -33,7 +33,7 @@ export const MAPA_FINAL_TEMPLATE: MapTemplate = {
   intro: {
     title: "Introdução ao Seu Mapa",
     titleEn: "Introduction to Your Map",
-    template: `Este é o seu Mapa NELLO ONE — uma síntese profunda de quem você é, baseada em 7 dimensões da personalidade humana.
+    template: `Este é o seu Mapa NELLO IDENTITY — uma síntese profunda de quem você é, baseada em 7 dimensões da personalidade humana.
 
 Cada seção revela um aspecto diferente da sua essência:
 • Seus arquétipos mostram suas energias dominantes
@@ -45,7 +45,7 @@ Cada seção revela um aspecto diferente da sua essência:
 • Seus Estilos de Conexão mostram como você ama
 
 Este não é apenas um relatório — é um espelho da sua alma.`,
-    templateEn: `This is your NELLO ONE Map — a profound synthesis of who you are, based on 7 dimensions of human personality.
+    templateEn: `This is your NELLO IDENTITY Map — a profound synthesis of who you are, based on 7 dimensions of human personality.
 
 Each section reveals a different aspect of your essence:
 • Your archetypes show your dominant energies

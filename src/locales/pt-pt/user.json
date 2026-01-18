@@ -2,7 +2,7 @@
   "sidebar": {
     "profile": "Perfil",
     "my_tests": "Os Meus Testes",
-    "map": "Mapa Nello One",
+    "map": "Mapa Nello Identity",
     "history": "Histórico de Resultados",
     "billing": "Faturação",
     "settings": "Definições",
@@ -11,7 +11,7 @@
   "profile": {
     "title": "Perfil",
     "subtitle": "Bem-vindo ao teu painel pessoal",
-    "description": "Aqui podes acompanhar a tua jornada Nello One.",
+    "description": "Aqui podes acompanhar a tua jornada Nello Identity.",
     "details": "Detalhes do Perfil",
     "full_name": "Nome Completo",
     "email": "Email",

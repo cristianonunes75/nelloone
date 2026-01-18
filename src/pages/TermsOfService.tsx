@@ -39,16 +39,16 @@ const TermsOfService = () => {
                 1. Sobre o NELLO ONE
               </h2>
               <p className="text-miguel-deep/80 leading-relaxed mb-4">
-                O NELLO ONE é uma plataforma de autoconhecimento composta por:
+                O NELLO IDENTITY é uma plataforma de autoconhecimento composta por:
               </p>
               <ul className="list-disc pl-6 text-miguel-deep/80 space-y-2 mb-6">
                 <li>testes de avaliação de personalidade, comportamento e perfil emocional;</li>
                 <li>um agente de IA chamado Miguel, que oferece explicações, reflexões e acompanhamentos;</li>
-                <li>ferramentas de análise integradas (Mapa NELLO ONE);</li>
+                <li>ferramentas de análise integradas (Mapa NELLO IDENTITY);</li>
                 <li>conteúdos informacionais e interativos.</li>
               </ul>
               <p className="text-miguel-deep/80 leading-relaxed mb-4">
-                O NELLO ONE <strong className="text-miguel-deep">não substitui:</strong>
+                O NELLO IDENTITY <strong className="text-miguel-deep">não substitui:</strong>
               </p>
               <ul className="list-disc pl-6 text-miguel-deep/80 space-y-2">
                 <li>diagnóstico clínico,</li>

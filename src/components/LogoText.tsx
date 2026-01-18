@@ -47,7 +47,7 @@ export const LogoText = ({ className = "", variant = "default", clickable = true
       onClick={handleClick}
     >
       <span className={`font-bold ${styles.nello}`}>NELLO</span>
-      <span className={`font-normal ml-1 ${styles.one}`}>ONE</span>
+      <span className={`font-normal ml-1 ${styles.one}`}>IDENTITY</span>
     </div>
   );
 };

@@ -45,12 +45,12 @@ export const EssenceMapSection = () => {
                 {language === 'en' ? (
                   <>
                     Your
-                    <span className="text-ink-blue"> NELLO ONE</span> Map
+                    <span className="text-ink-blue"> NELLO IDENTITY</span> Map
                   </>
                 ) : (
                   <>
                     Seu Mapa
-                    <span className="text-ink-blue"> NELLO ONE</span>
+                    <span className="text-ink-blue"> NELLO IDENTITY</span>
                   </>
                 )}
               </h2>
@@ -59,8 +59,8 @@ export const EssenceMapSection = () => {
               </p>
               <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8 leading-relaxed">
                 {language === 'en' 
-                  ? 'After completing the 7 tests, Nello synthesizes all your results into a single, personalized document: the NELLO ONE Map. The panel that brings all your results together in a clear and visual map.'
-                  : 'Ao completar os 7 testes, Nello sintetiza todos os seus resultados em um documento único e personalizado: o Mapa NELLO ONE. O painel que une todos os seus resultados em um mapa claro e visual.'}
+                  ? 'After completing the 7 tests, Nello synthesizes all your results into a single, personalized document: the NELLO IDENTITY Map. The panel that brings all your results together in a clear and visual map.'
+                  : 'Ao completar os 7 testes, Nello sintetiza todos os seus resultados em um documento único e personalizado: o Mapa NELLO IDENTITY. O painel que une todos os seus resultados em um mapa claro e visual.'}
               </p>
 
               <div className="space-y-2 md:space-y-3 mb-8 md:mb-10">
@@ -107,7 +107,7 @@ export const EssenceMapSection = () => {
                 <div className="relative h-full rounded-2xl md:rounded-3xl overflow-hidden border border-border/30 shadow-large hover:shadow-glow transition-shadow duration-500">
                   <img 
                     src={essenceMapImage} 
-                    alt="NELLO ONE Map"
+                    alt="NELLO IDENTITY Map"
                     className="w-full h-full object-cover"
                   />
                   
@@ -116,7 +116,7 @@ export const EssenceMapSection = () => {
                   
                   {/* Header overlay */}
                   <div className="absolute top-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-b from-card/90 to-transparent">
-                    <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-wider">NELLO ONE</p>
+                    <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-wider">NELLO IDENTITY</p>
                     <p className="font-display text-base md:text-xl text-foreground mt-1">
                       {language === 'en' ? 'Personality Map' : 'Mapa de Personalidade'}
                     </p>
