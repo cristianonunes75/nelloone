@@ -94,16 +94,16 @@ export const NavSection = () => {
     >
       <div className="container px-4 sm:px-6">
         <nav className="flex items-center justify-between h-14 md:h-16">
-          {/* Logo - Nello Identity */}
-          <button onClick={() => navigate(getHomePath())} className="focus:outline-none flex items-center gap-1.5">
+          {/* Logo - NELLO Identity (same pattern as Life, Business, Flow) */}
+          <button onClick={() => navigate(getHomePath())} className="focus:outline-none flex items-center gap-1">
             <span className={cn(
-              "font-sans tracking-wide text-lg md:text-xl font-bold transition-colors",
+              "font-serif tracking-wide text-lg md:text-xl font-bold transition-colors",
               isScrolled ? "text-ink-deep" : "text-foreground"
             )}>NELLO</span>
             <span className={cn(
-              "font-display text-base md:text-lg font-medium italic transition-colors",
-              isScrolled ? "text-nello-gold" : "text-nello-gold/90"
-            )}>Identity</span>
+              "font-serif text-lg md:text-xl font-light tracking-wide transition-colors",
+              isScrolled ? "text-ink-deep" : "text-foreground"
+            )}>IDENTITY</span>
           </button>
 
           {/* Desktop nav */}
