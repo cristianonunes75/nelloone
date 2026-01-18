@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { getNelloAppUrl } from '@/hooks/useSubdomain';
 
 export default function BusinessLanding() {
   return (
@@ -22,7 +23,7 @@ export default function BusinessLanding() {
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-3">
               <a 
-                href="https://nello.one" 
+                href={getNelloAppUrl('identity')} 
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 ← Voltar para Nello One

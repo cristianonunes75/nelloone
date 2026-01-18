@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, ExternalLink, Brain, Heart, Zap, Users, Briefcase } from 'lucide-react';
 import { NelloWordmark, ModuleBadge } from '@/components/brand/NelloWordmark';
 import { NelloSymbolOne } from '@/components/brand/NelloSymbol';
+import { getNelloAppUrl } from '@/hooks/useSubdomain';
 
 /**
  * Portal NELLO ONE - Institutional Landing Page
@@ -42,7 +43,7 @@ const ecosystemModules = [
     tagline: 'O Fundamento',
     description: 'Clareza sobre quem você é, seus padrões, talentos e propósito através de ciência e autoconhecimento profundo.',
     cta: 'Explorar Módulo',
-    url: 'https://identity.nello.one',
+    url: getNelloAppUrl('identity'),
     icon: Brain,
     accentColor: 'from-amber-500/10 via-orange-400/5 to-transparent',
     borderGlow: 'group-hover:shadow-[0_0_60px_-15px_hsl(38_70%_50%/0.3)]',
@@ -56,7 +57,7 @@ const ecosystemModules = [
     tagline: 'O Equilíbrio',
     description: 'Movimento, espiritualidade e hábitos que sustentam a alma no dia a dia.',
     cta: 'Explorar Módulo',
-    url: 'https://life.nello.one',
+    url: getNelloAppUrl('life'),
     icon: Heart,
     accentColor: 'from-emerald-500/10 via-teal-400/5 to-transparent',
     borderGlow: 'group-hover:shadow-[0_0_60px_-15px_hsl(145_55%_42%/0.3)]',
@@ -70,7 +71,7 @@ const ecosystemModules = [
     tagline: 'A Execução',
     description: 'Produtividade consciente para mentes inquietas que querem transformar ideias em realidade.',
     cta: 'Explorar Módulo',
-    url: 'https://flow.nello.one',
+    url: getNelloAppUrl('flow'),
     icon: Zap,
     accentColor: 'from-violet-500/10 via-purple-400/5 to-transparent',
     borderGlow: 'group-hover:shadow-[0_0_60px_-15px_hsl(252_47%_40%/0.3)]',
@@ -84,7 +85,7 @@ const ecosystemModules = [
     tagline: 'A Inteligência',
     description: 'Autoconhecimento aplicado a equipes, contratações e cultura organizacional.',
     cta: 'Soluções Corporativas',
-    url: 'https://business.nello.one',
+    url: getNelloAppUrl('business'),
     icon: Users,
     accentColor: 'from-blue-500/10 via-cyan-400/5 to-transparent',
     borderGlow: 'group-hover:shadow-[0_0_60px_-15px_hsl(210_70%_50%/0.3)]',
@@ -98,7 +99,7 @@ const ecosystemModules = [
     tagline: 'A Ferramenta',
     description: 'Plataforma completa para coaches, terapeutas e mentores acompanharem seus clientes.',
     cta: 'Para Profissionais',
-    url: 'https://business.nello.one/praxis',
+    url: `${getNelloAppUrl('business')}/praxis`,
     icon: Briefcase,
     accentColor: 'from-rose-500/10 via-pink-400/5 to-transparent',
     borderGlow: 'group-hover:shadow-[0_0_60px_-15px_hsl(340_70%_50%/0.3)]',
