@@ -496,16 +496,16 @@ serve(async (req) => {
         
         const bundleNames: Record<string, { name: string; description: string }> = {
           brl: {
-            name: "NELLO ONE Completo",
-            description: "Todos os 7 testes + Mapa NELLO ONE gerado por IA",
+            name: "NELLO IDENTITY Completo",
+            description: "Todos os 7 testes + Mapa NELLO IDENTITY gerado por IA",
           },
           usd: {
-            name: "NELLO ONE Complete",
-            description: "All 7 tests + AI-generated NELLO ONE Map",
+            name: "NELLO IDENTITY Complete",
+            description: "All 7 tests + AI-generated NELLO IDENTITY Map",
           },
           eur: {
-            name: "NELLO ONE Completo",
-            description: "Todos os 7 testes + Mapa NELLO ONE gerado por IA",
+            name: "NELLO IDENTITY Completo",
+            description: "Todos os 7 testes + Mapa NELLO IDENTITY gerado por IA",
           },
         };
         

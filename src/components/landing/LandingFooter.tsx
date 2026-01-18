@@ -19,16 +19,16 @@ export const LandingFooter = () => {
             <div className="md:col-span-2">
               <img 
                 src={logo} 
-                alt="NELLO ONE" 
+                alt="NELLO IDENTITY" 
                 className="h-12 w-auto mb-6 brightness-0 invert opacity-90"
               />
               <p className="text-primary-foreground/80 leading-relaxed mb-6">
                 {isEn ? (
-                  <>NELLO ONE | Identity<br />The path begins within.</>
+                  <>NELLO IDENTITY<br />The path begins within.</>
                 ) : isPtPt ? (
-                  <>NELLO ONE | Identity<br />O caminho começa dentro.</>
+                  <>NELLO IDENTITY<br />O caminho começa dentro.</>
                 ) : (
-                  <>NELLO ONE | Identity<br />O caminho começa dentro.</>
+                  <>NELLO IDENTITY<br />O caminho começa dentro.</>
                 )}
               </p>
               <div className="flex gap-4">
@@ -37,7 +37,7 @@ export const LandingFooter = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 flex items-center justify-center transition-colors"
-                  aria-label="Instagram NELLO ONE"
+                  aria-label="Instagram NELLO IDENTITY"
                 >
                   <Instagram className="w-5 h-5" />
                 </a>
@@ -118,7 +118,7 @@ export const LandingFooter = () => {
           {/* Bottom */}
           <div className="pt-8 border-t border-primary-foreground/20">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-primary-foreground/60">
-              <p>&copy; 2025 NELLO ONE. {isEn ? 'All rights reserved.' : 'Todos os direitos reservados.'}</p>
+              <p>&copy; 2025 NELLO IDENTITY. {isEn ? 'All rights reserved.' : 'Todos os direitos reservados.'}</p>
               <div className="flex gap-6">
                 <button 
                   onClick={() => navigate(isEn ? "/en/terms" : isPtPt ? "/pt-pt/termos" : "/termos")}

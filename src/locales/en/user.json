@@ -2,7 +2,7 @@
   "sidebar": {
     "profile": "Profile",
     "my_tests": "My Tests",
-    "map": "Nello One Map",
+    "map": "Nello Identity Map",
     "history": "Results History",
     "billing": "Billing & Invoices",
     "settings": "Settings",
@@ -11,7 +11,7 @@
   "profile": {
     "title": "Profile",
     "subtitle": "Welcome to your personal dashboard",
-    "description": "Here you can track your Nello One journey.",
+    "description": "Here you can track your Nello Identity journey.",
     "details": "Profile Details",
     "full_name": "Full Name",
     "email": "Email",

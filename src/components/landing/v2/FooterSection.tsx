@@ -10,11 +10,11 @@ export const FooterSection = () => {
   const footerLinks = {
     produto: language === 'en' ? [
       { label: "Archetypes Test", href: "/auth" },
-      { label: "NELLO ONE Map", href: "/auth" },
+      { label: "NELLO IDENTITY Map", href: "/auth" },
       { label: "Pricing", href: "#precos" },
     ] : [
       { label: "Teste de Arquétipos", href: "/auth" },
-      { label: "Mapa NELLO ONE", href: "/auth" },
+      { label: "Mapa NELLO IDENTITY", href: "/auth" },
       { label: "Preços", href: "#precos" },
     ],
     empresa: language === 'en' ? [
@@ -51,10 +51,10 @@ export const FooterSection = () => {
             <div className="col-span-2 md:col-span-1">
               <LogoText className="text-lg md:text-xl mb-3 md:mb-4" variant="solid" />
               <p className="text-xs md:text-sm text-ink-blue/60 leading-relaxed">
-                NELLO ONE | Identity
+                NELLO IDENTITY
               </p>
               <p className="text-[10px] md:text-xs text-ink-blue/40 mt-2">
-                {language === 'en' ? 'Part of the Nello One ecosystem' : 'Parte do ecossistema Nello One'}
+                {language === 'en' ? 'Part of the Nello ecosystem' : 'Parte do ecossistema Nello'}
               </p>
               <div className="mt-4">
                 <LanguageToggle />
@@ -120,7 +120,7 @@ export const FooterSection = () => {
           {/* Bottom */}
           <div className="pt-6 md:pt-8 border-t border-bruma-deep/20 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4">
             <p className="text-[10px] md:text-xs text-ink-blue/50 text-center md:text-left">
-              © {new Date().getFullYear()} Nello One — {language === 'en' ? 'Part of the Nello ecosystem' : 'Parte do ecossistema Nello'}
+              © {new Date().getFullYear()} Nello Identity — {language === 'en' ? 'Part of the Nello ecosystem' : 'Parte do ecossistema Nello'}
             </p>
             <div className="flex items-center gap-3 md:gap-4 text-[10px] md:text-xs text-ink-blue/50">
               <Link to="/termos-de-servico" className="hover:text-ink-blue transition-colors">

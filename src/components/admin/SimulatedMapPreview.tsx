@@ -342,7 +342,7 @@ export const SimulatedMapPreview = ({
               </div>
               <div>
                 <DialogTitle className="text-xl font-semibold">
-                  {isEn ? 'Nello One Map Preview' : 'Pré-visualização do Mapa Nello One'}
+                  {isEn ? 'Nello Identity Map Preview' : 'Pré-visualização do Mapa Nello Identity'}
                 </DialogTitle>
                 <p className="text-sm text-muted-foreground">
                   {isEn ? 'Simulated data based on journey results' : 'Dados simulados baseados nos resultados da jornada'}

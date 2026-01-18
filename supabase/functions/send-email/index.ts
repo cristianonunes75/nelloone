@@ -121,7 +121,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
               </div>
               
               <p style="color: #444; font-size: 16px; line-height: 1.6;">
-                Ao completar todos os testes, você receberá seu <strong>Mapa Nello One</strong> personalizado.
+                Ao completar todos os testes, você receberá seu <strong>Mapa Nello Identity</strong> personalizado.
               </p>
               
               <a href="https://nello.one/cliente" 
@@ -131,7 +131,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
             </div>
             
             <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
-              © 2025 NELLO ONE. Todos os direitos reservados.
+              © 2025 NELLO IDENTITY. Todos os direitos reservados.
             </p>
           </div>
         `,
@@ -202,7 +202,7 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
               </div>
               
               <p style="color: #444; font-size: 16px; line-height: 1.6;">
-                Continue sua jornada completando os próximos testes para desbloquear seu Mapa Nello One completo.
+                Continue sua jornada completando os próximos testes para desbloquear seu Mapa Nello Identity completo.
               </p>
               
               <a href="https://nello.one/cliente" 
@@ -212,28 +212,28 @@ const getEmailContent = (type: EmailType, data: EmailRequest["data"]) => {
             </div>
             
             <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
-              © 2025 NELLO ONE. Todos os direitos reservados.
+              © 2025 NELLO IDENTITY. Todos os direitos reservados.
             </p>
           </div>
         `,
       },
       map_available: {
-        subject: "Seu Mapa Nello One está pronto! 🗺️",
+        subject: "Seu Mapa Nello Identity está pronto! 🗺️",
         html: `
           <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
             <div style="text-align: center; margin-bottom: 32px;">
-              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO IDENTITY</h1>
             </div>
             
             <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
               <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Parabéns, ${name}! 🗺️</h2>
               <p style="color: #444; font-size: 16px; line-height: 1.6;">
-                Você completou toda a jornada e seu <strong>Mapa Nello One</strong> está pronto!
+                Você completou toda a jornada e seu <strong>Mapa Nello Identity</strong> está pronto!
               </p>
               
               <div style="background: linear-gradient(135deg, #1F2E4B 0%, #2F3A57 100%); border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
                 <p style="color: #CDAE67; font-size: 14px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 1px;">Disponível agora</p>
-                <p style="color: white; font-size: 24px; font-weight: 600; margin: 0;">Seu Mapa Nello One</p>
+                <p style="color: white; font-size: 24px; font-weight: 600; margin: 0;">Seu Mapa Nello Identity</p>
               </div>
               
               <p style="color: #444; font-size: 16px; line-height: 1.6;">

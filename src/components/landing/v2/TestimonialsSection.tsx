@@ -19,7 +19,7 @@ export const TestimonialsSection = () => {
     {
       name: "Rafael M.",
       role: "Entrepreneur",
-      content: "The NELLO ONE Map gave me clarity on decisions I had been putting off for years. Now I know exactly where to focus my energy.",
+      content: "The NELLO IDENTITY Map gave me clarity on decisions I had been putting off for years. Now I know exactly where to focus my energy.",
       rating: 5,
     },
     {
@@ -38,7 +38,7 @@ export const TestimonialsSection = () => {
     {
       name: "Rafael M.",
       role: "Empreendedor",
-      content: "O Mapa NELLO ONE me deu clareza sobre decisões que eu vinha adiando há anos. Agora sei exatamente onde colocar minha energia.",
+      content: "O Mapa NELLO IDENTITY me deu clareza sobre decisões que eu vinha adiando há anos. Agora sei exatamente onde colocar minha energia.",
       rating: 5,
     },
     {
