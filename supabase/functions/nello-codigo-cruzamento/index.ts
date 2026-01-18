@@ -61,6 +61,50 @@ ESTRUTURA DO RELATÓRIO (retorne JSON exato):
       "pontos": ["Ponto 1", "Ponto 2"]
     }
   },
+  "dados_grafico": {
+    "usuario_a": {
+      "nome": "[NOME_A]",
+      "disc": { "D": 0-100, "I": 0-100, "S": 0-100, "C": 0-100 }
+    },
+    "usuario_b": {
+      "nome": "[NOME_B]",
+      "disc": { "D": 0-100, "I": 0-100, "S": 0-100, "C": 0-100 }
+    }
+  },
+  "santo_bate": {
+    "titulo": "Onde o Santo Bate ✨",
+    "descricao": "As áreas de maior compatibilidade natural entre vocês",
+    "areas": [
+      {
+        "titulo": "Área de compatibilidade 1",
+        "descricao": "Explicação de como essa área cria sinergia natural"
+      },
+      {
+        "titulo": "Área de compatibilidade 2", 
+        "descricao": "Explicação da conexão"
+      },
+      {
+        "titulo": "Área de compatibilidade 3",
+        "descricao": "Como isso os fortalece como casal"
+      }
+    ]
+  },
+  "bicho_pega": {
+    "titulo": "Onde o Bicho Pega ⚡",
+    "descricao": "Pontos de atrito baseados nos temperamentos e padrões de cada um",
+    "atritios": [
+      {
+        "titulo": "Ponto de atrito 1 (ex: A urgência do Colérico vs a cautela do Melancólico)",
+        "descricao": "Explicação de como esse atrito se manifesta no dia a dia",
+        "como_lidar": "Sugestão prática para lidar com esse atrito"
+      },
+      {
+        "titulo": "Ponto de atrito 2",
+        "descricao": "Explicação",
+        "como_lidar": "Sugestão"
+      }
+    ]
+  },
   "encontro_essencias": {
     "titulo": "O Encontro das Essências",
     "metafora": "Nome simbólico da metáfora (ex: Fogo e Água Cristalina, Visão e Lapidação)",
@@ -72,20 +116,41 @@ ESTRUTURA DO RELATÓRIO (retorne JSON exato):
     "forcas": ["Força complementar 1", "Força complementar 2", "Força complementar 3"]
   },
   "tabela_traducao": {
-    "titulo": "Tabela de Tradução de Intenção",
+    "titulo": "Tabela de Tradução do Casal",
     "descricao": "Este bloco é central no produto e deve gerar alívio imediato: 'Agora eu entendi o que estava acontecendo.'",
     "traducoes_usuario_a": [
       {
-        "quando_diz": "O que [NOME_A] costuma dizer ou fazer",
-        "intencao_real": "A intenção real por trás na essência",
-        "outro_ouve": "O que [NOME_B] costuma ouvir ou sentir"
+        "quando_faz": "O que [NOME_A] costuma fazer (comportamento específico)",
+        "voce_sente": "O que [NOME_B] costuma sentir quando isso acontece",
+        "verdade_por_tras": "A verdade por trás - o que a essência dele(a) realmente quer dizer"
       }
     ],
     "traducoes_usuario_b": [
       {
-        "quando_diz": "O que [NOME_B] costuma dizer ou fazer",
-        "intencao_real": "A intenção real por trás na essência",
-        "outro_ouve": "O que [NOME_A] costuma ouvir ou sentir"
+        "quando_faz": "O que [NOME_B] costuma fazer (comportamento específico)",
+        "voce_sente": "O que [NOME_A] costuma sentir quando isso acontece",
+        "verdade_por_tras": "A verdade por trás - o que a essência dele(a) realmente quer dizer"
+      }
+    ]
+  },
+  "protocolo_paz": {
+    "titulo": "Protocolo de Paz Unificado",
+    "descricao": "3 regras de ouro específicas para o casal baseadas no cruzamento dos seus riscos",
+    "regras": [
+      {
+        "numero": 1,
+        "regra": "Regra clara e específica (ex: Nunca discutam prazos após as 20h, pois o Colérico está exausto e o Melancólico está reflexivo)",
+        "porque": "Explicação baseada nos perfis de ambos"
+      },
+      {
+        "numero": 2,
+        "regra": "Segunda regra específica",
+        "porque": "Justificativa baseada nos perfis"
+      },
+      {
+        "numero": 3,
+        "regra": "Terceira regra específica",
+        "porque": "Justificativa baseada nos perfis"
       }
     ]
   },
@@ -296,6 +361,50 @@ REPORT STRUCTURE (return exact JSON):
       "pontos": ["Point 1", "Point 2"]
     }
   },
+  "dados_grafico": {
+    "usuario_a": {
+      "nome": "[NAME_A]",
+      "disc": { "D": 0-100, "I": 0-100, "S": 0-100, "C": 0-100 }
+    },
+    "usuario_b": {
+      "nome": "[NAME_B]",
+      "disc": { "D": 0-100, "I": 0-100, "S": 0-100, "C": 0-100 }
+    }
+  },
+  "santo_bate": {
+    "titulo": "Where You Click ✨",
+    "descricao": "Your areas of greatest natural compatibility",
+    "areas": [
+      {
+        "titulo": "Compatibility area 1",
+        "descricao": "How this area creates natural synergy"
+      },
+      {
+        "titulo": "Compatibility area 2", 
+        "descricao": "Explanation of the connection"
+      },
+      {
+        "titulo": "Compatibility area 3",
+        "descricao": "How this strengthens you as a couple"
+      }
+    ]
+  },
+  "bicho_pega": {
+    "titulo": "Where You Clash ⚡",
+    "descricao": "Friction points based on each person's temperaments and patterns",
+    "atritios": [
+      {
+        "titulo": "Friction point 1 (e.g., The Choleric's urgency vs the Melancholic's caution)",
+        "descricao": "How this friction manifests in daily life",
+        "como_lidar": "Practical suggestion for handling this friction"
+      },
+      {
+        "titulo": "Friction point 2",
+        "descricao": "Explanation",
+        "como_lidar": "Suggestion"
+      }
+    ]
+  },
   "encontro_essencias": {
     "titulo": "The Meeting of Essences",
     "metafora": "Symbolic metaphor name (e.g., Fire and Crystal Water, Vision and Refinement)",
@@ -307,20 +416,41 @@ REPORT STRUCTURE (return exact JSON):
     "forcas": ["Complementary strength 1", "Complementary strength 2", "Complementary strength 3"]
   },
   "tabela_traducao": {
-    "titulo": "Intention Translation Table",
+    "titulo": "Couple Translation Table",
     "descricao": "This section should generate immediate relief: 'Now I understand what was happening.'",
     "traducoes_usuario_a": [
       {
-        "quando_diz": "What [NAME_A] usually says or does",
-        "intencao_real": "The real intention behind it in essence",
-        "outro_ouve": "What [NAME_B] usually hears or feels"
+        "quando_faz": "What [NAME_A] usually does (specific behavior)",
+        "voce_sente": "What [NAME_B] usually feels when this happens",
+        "verdade_por_tras": "The truth behind it - what their essence really means"
       }
     ],
     "traducoes_usuario_b": [
       {
-        "quando_diz": "What [NAME_B] usually says or does",
-        "intencao_real": "The real intention behind it in essence",
-        "outro_ouve": "What [NAME_A] usually hears or feels"
+        "quando_faz": "What [NAME_B] usually does (specific behavior)",
+        "voce_sente": "What [NAME_A] usually feels when this happens",
+        "verdade_por_tras": "The truth behind it - what their essence really means"
+      }
+    ]
+  },
+  "protocolo_paz": {
+    "titulo": "Unified Peace Protocol",
+    "descricao": "3 golden rules specific to the couple based on their combined risk patterns",
+    "regras": [
+      {
+        "numero": 1,
+        "regra": "Clear and specific rule (e.g., Never discuss deadlines after 8pm, as the Choleric is exhausted and the Melancholic is reflective)",
+        "porque": "Explanation based on both profiles"
+      },
+      {
+        "numero": 2,
+        "regra": "Second specific rule",
+        "porque": "Justification based on profiles"
+      },
+      {
+        "numero": 3,
+        "regra": "Third specific rule",
+        "porque": "Justification based on profiles"
       }
     ]
   },

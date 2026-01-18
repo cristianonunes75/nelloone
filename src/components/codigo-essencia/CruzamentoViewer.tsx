@@ -16,9 +16,13 @@ import {
   Lightbulb,
   HandHeart,
   Clock,
-  ExternalLink
+  ExternalLink,
+  Sparkles,
+  Flame,
+  Scale
 } from "lucide-react";
 import { toast } from "sonner";
+import { SynergyRadarChart } from "./SynergyRadarChart";
 
 interface CruzamentoViewerProps {
   crossing: {
@@ -48,13 +52,17 @@ const TRANSLATIONS = {
       semaforo_relacional: "Semáforo Relacional",
       encontro_essencias: "O Encontro das Essências",
       potencializacao: "Onde Vocês se Potencializam",
-      tabela_traducao: "Tabela de Tradução de Intenção",
+      tabela_traducao: "Tabela de Tradução do Casal",
       manual_conjuge_a: "Manual do Cônjuge",
       manual_conjuge_b: "Manual do Cônjuge",
       alertas_pressao: "Alertas de Pressão",
       desafio_conexao: "Desafio de Conexão 24h",
       quando_buscar_ajuda: "Quando Procurar Ajuda",
       cta_ativacao: "Próximo Passo",
+      santo_bate: "Onde o Santo Bate",
+      bicho_pega: "Onde o Bicho Pega",
+      protocolo_paz: "Protocolo de Paz Unificado",
+      grafico_sobreposicao: "Gráfico de Sobreposição",
       // Legacy sections for backwards compatibility
       perfil_conjunto: "Vocês como casal",
       dinamica_familiar: "A dinâmica entre vocês",
@@ -81,13 +89,17 @@ const TRANSLATIONS = {
       vermelho: "Zona de Choque"
     },
     translationTable: {
-      whenSays: "Quando diz/faz",
-      realIntent: "Intenção real",
-      otherHears: "O outro ouve/sente"
+      whenDoes: "Quando faz/diz",
+      youFeel: "Você sente",
+      truthBehind: "A Verdade por trás"
     },
     manual: {
       orientations: "Orientações",
       disarmWords: "Palavras que desarmam"
+    },
+    peaceProtocol: {
+      rule: "Regra",
+      why: "Por quê"
     },
     pressureAlerts: {
       behavior: "Comportamento",
@@ -111,13 +123,17 @@ const TRANSLATIONS = {
       semaforo_relacional: "Semáforo Relacional",
       encontro_essencias: "O Encontro das Essências",
       potencializacao: "Onde Vocês se Potencializam",
-      tabela_traducao: "Tabela de Tradução de Intenção",
+      tabela_traducao: "Tabela de Tradução do Casal",
       manual_conjuge_a: "Manual do Cônjuge",
       manual_conjuge_b: "Manual do Cônjuge",
       alertas_pressao: "Alertas de Pressão",
       desafio_conexao: "Desafio de Conexão 24h",
       quando_buscar_ajuda: "Quando Procurar Ajuda",
       cta_ativacao: "Próximo Passo",
+      santo_bate: "Onde o Santo Bate",
+      bicho_pega: "Onde o Bicho Pega",
+      protocolo_paz: "Protocolo de Paz Unificado",
+      grafico_sobreposicao: "Gráfico de Sobreposição",
       perfil_conjunto: "Vocês como casal",
       dinamica_familiar: "A dinâmica entre vocês",
       dinamica_fraternal: "A relação entre vocês",
@@ -143,13 +159,17 @@ const TRANSLATIONS = {
       vermelho: "Zona de Choque"
     },
     translationTable: {
-      whenSays: "Quando diz/faz",
-      realIntent: "Intenção real",
-      otherHears: "O outro ouve/sente"
+      whenDoes: "Quando faz/diz",
+      youFeel: "Você sente",
+      truthBehind: "A Verdade por trás"
     },
     manual: {
       orientations: "Orientações",
       disarmWords: "Palavras que desarmam"
+    },
+    peaceProtocol: {
+      rule: "Regra",
+      why: "Por quê"
     },
     pressureAlerts: {
       behavior: "Comportamento",
@@ -173,13 +193,17 @@ const TRANSLATIONS = {
       semaforo_relacional: "Relational Traffic Light",
       encontro_essencias: "The Meeting of Essences",
       potencializacao: "Where You Empower Each Other",
-      tabela_traducao: "Intention Translation Table",
+      tabela_traducao: "Couple Translation Table",
       manual_conjuge_a: "Spouse Manual",
       manual_conjuge_b: "Spouse Manual",
       alertas_pressao: "Pressure Alerts",
       desafio_conexao: "24h Connection Challenge",
       quando_buscar_ajuda: "When to Seek Help",
       cta_ativacao: "Next Step",
+      santo_bate: "Where You Click",
+      bicho_pega: "Where You Clash",
+      protocolo_paz: "Unified Peace Protocol",
+      grafico_sobreposicao: "Overlap Chart",
       perfil_conjunto: "You as a couple",
       dinamica_familiar: "The dynamic between you",
       dinamica_fraternal: "Your relationship",
@@ -205,13 +229,17 @@ const TRANSLATIONS = {
       vermelho: "Shock Zone"
     },
     translationTable: {
-      whenSays: "When says/does",
-      realIntent: "Real intention",
-      otherHears: "Other hears/feels"
+      whenDoes: "When does/says",
+      youFeel: "You feel",
+      truthBehind: "The Truth behind"
     },
     manual: {
       orientations: "Guidance",
       disarmWords: "Words that disarm"
+    },
+    peaceProtocol: {
+      rule: "Rule",
+      why: "Why"
     },
     pressureAlerts: {
       behavior: "Behavior",
@@ -381,16 +409,16 @@ export const CruzamentoViewer = ({ crossing, language, onBack }: CruzamentoViewe
           {translations.map((item: any, i: number) => (
             <div key={i} className="p-4 rounded-lg bg-muted/50 space-y-2">
               <div className="flex items-start gap-2">
-                <span className="text-xs font-medium text-muted-foreground min-w-[100px]">{t.translationTable.whenSays}:</span>
-                <span className="text-sm">{item.quando_diz}</span>
+                <span className="text-xs font-medium text-muted-foreground min-w-[100px]">{t.translationTable.whenDoes}:</span>
+                <span className="text-sm">{item.quando_faz || item.quando_diz}</span>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-xs font-medium text-primary min-w-[100px]">{t.translationTable.realIntent}:</span>
-                <span className="text-sm font-medium">{item.intencao_real}</span>
+                <span className="text-xs font-medium text-amber-600 dark:text-amber-400 min-w-[100px]">{t.translationTable.youFeel}:</span>
+                <span className="text-sm">{item.voce_sente || item.outro_ouve || item.filho_ouve || item.pai_ouve}</span>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-xs font-medium text-amber-600 dark:text-amber-400 min-w-[100px]">{t.translationTable.otherHears}:</span>
-                <span className="text-sm">{item.outro_ouve || item.filho_ouve || item.pai_ouve}</span>
+                <span className="text-xs font-medium text-primary min-w-[100px]">{t.translationTable.truthBehind}:</span>
+                <span className="text-sm font-medium">{item.verdade_por_tras || item.intencao_real}</span>
               </div>
             </div>
           ))}
