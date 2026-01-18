@@ -338,6 +338,135 @@ export const CruzamentoViewer = ({ crossing, language, onBack }: CruzamentoViewe
     );
   };
 
+  // ============== SYNERGY RADAR CHART ==============
+  const renderSynergyRadarChart = () => {
+    const dados = content.dados_grafico;
+    if (!dados?.usuario_a || !dados?.usuario_b) return null;
+
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Scale className="w-5 h-5 text-primary" />
+            <CardTitle className="text-base">{t.sections.grafico_sobreposicao}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <SynergyRadarChart
+            profileA={{
+              name: dados.usuario_a.nome,
+              disc: dados.usuario_a.disc
+            }}
+            profileB={{
+              name: dados.usuario_b.nome,
+              disc: dados.usuario_b.disc
+            }}
+            language={language}
+          />
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== ONDE O SANTO BATE ==============
+  const renderSantoBate = () => {
+    const santo = content.santo_bate;
+    if (!santo) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-emerald-500/5 to-teal-500/5 border-emerald-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-emerald-500" />
+            <CardTitle className="text-base">{santo.titulo || t.sections.santo_bate}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {santo.descricao && (
+            <p className="text-sm text-muted-foreground">{santo.descricao}</p>
+          )}
+          {santo.areas?.map((area: any, i: number) => (
+            <div key={i} className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-1">✨ {area.titulo}</h4>
+              <p className="text-sm text-foreground/80">{area.descricao}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== ONDE O BICHO PEGA ==============
+  const renderBichoPega = () => {
+    const bicho = content.bicho_pega;
+    if (!bicho) return null;
+
+    return (
+      <Card className="border-amber-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Flame className="w-5 h-5 text-amber-500" />
+            <CardTitle className="text-base">{bicho.titulo || t.sections.bicho_pega}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {bicho.descricao && (
+            <p className="text-sm text-muted-foreground">{bicho.descricao}</p>
+          )}
+          {bicho.atritios?.map((atrito: any, i: number) => (
+            <div key={i} className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-3">
+              <h4 className="font-semibold text-amber-700 dark:text-amber-400">⚡ {atrito.titulo}</h4>
+              <p className="text-sm text-foreground/80">{atrito.descricao}</p>
+              {atrito.como_lidar && (
+                <div className="p-3 rounded bg-emerald-500/10 border border-emerald-500/20">
+                  <p className="text-sm text-emerald-700 dark:text-emerald-400">
+                    <span className="font-medium">💡 Como lidar: </span>
+                    {atrito.como_lidar}
+                  </p>
+                </div>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== PROTOCOLO DE PAZ UNIFICADO ==============
+  const renderProtocoloPaz = () => {
+    const protocolo = content.protocolo_paz;
+    if (!protocolo) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-blue-500/5 to-purple-500/5 border-blue-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-blue-500" />
+            <CardTitle className="text-base">{protocolo.titulo || t.sections.protocolo_paz}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {protocolo.descricao && (
+            <p className="text-sm text-muted-foreground italic">{protocolo.descricao}</p>
+          )}
+          {protocolo.regras?.map((regra: any, i: number) => (
+            <div key={i} className="p-4 rounded-lg bg-muted/50 border space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-sm">
+                  {regra.numero || i + 1}
+                </span>
+                <h4 className="font-semibold text-foreground">{regra.regra}</h4>
+              </div>
+              {regra.porque && (
+                <p className="text-sm text-muted-foreground pl-9">{t.peaceProtocol.why}: {regra.porque}</p>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
   // ============== MEETING OF ESSENCES ==============
   const renderMeetingOfEssences = () => {
     const encontro = content.encontro_essencias;
@@ -595,7 +724,8 @@ export const CruzamentoViewer = ({ crossing, language, onBack }: CruzamentoViewe
       'tabela_traducao', 'manual_conjuge_a', 'manual_conjuge_b',
       'alertas_pressao', 'desafio_conexao', 'quando_buscar_ajuda',
       'cta_ativacao', 'abertura', 'fechamento', 'desafio_conexao_familiar',
-      'tabela_traducao_familiar', 'tabela_traducao_fraternal'
+      'tabela_traducao_familiar', 'tabela_traducao_fraternal',
+      'dados_grafico', 'santo_bate', 'bicho_pega', 'protocolo_paz'
     ];
     
     if (newFormatKeys.includes(key)) return null;
@@ -695,9 +825,13 @@ export const CruzamentoViewer = ({ crossing, language, onBack }: CruzamentoViewe
 
       {/* NEW FORMAT SECTIONS */}
       {renderTrafficLight()}
+      {renderSynergyRadarChart()}
       {renderMeetingOfEssences()}
+      {renderSantoBate()}
+      {renderBichoPega()}
       {renderPotentialization()}
       {renderTranslationTable()}
+      {renderProtocoloPaz()}
       {renderSpouseManual(content.manual_conjuge_a, 'manual_conjuge_a')}
       {renderSpouseManual(content.manual_conjuge_b, 'manual_conjuge_b')}
       {renderPressureAlerts()}
