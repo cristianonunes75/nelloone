@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageSquare, Send, Loader2, User, Bot } from 'lucide-react';
+import { MessageSquare, Send, Loader2, User, Bot, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { SEOHead } from '@/components/SEOHead';
@@ -7,6 +7,7 @@ import { FlowLayout } from '../components/FlowLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
+import { useEssenceProfile } from '../hooks/useEssenceProfile';
 
 interface Message {
   id: string;
@@ -17,6 +18,18 @@ interface Message {
 
 export default function FlowMentor() {
   const { user } = useAuth();
+  const { 
+    doorType, 
+    doorName, 
+    doorIcon, 
+    mentorGreeting, 
+    mentorTone,
+    dom,
+    chamado,
+    essencia,
+    hasEssenceData,
+  } = useEssenceProfile();
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -70,9 +83,20 @@ export default function FlowMentor() {
         message: userMessage,
       });
 
-      // Call AI
+      // Call AI with essence context
       const { data, error } = await supabase.functions.invoke('flow-mentor', {
-        body: { message: userMessage, userId: user.id },
+        body: { 
+          message: userMessage, 
+          userId: user.id,
+          essenceContext: hasEssenceData ? {
+            doorType,
+            doorName,
+            mentorTone,
+            dom,
+            chamado,
+            essencia,
+          } : null,
+        },
       });
 
       if (error) throw error;
@@ -105,19 +129,46 @@ export default function FlowMentor() {
     }
   };
 
+  // Personalized mentor subtitle based on door type
+  const getMentorSubtitle = () => {
+    switch (doorType) {
+      case 'visionary':
+        return 'Desafiador e direto. Focado em resultados.';
+      case 'seeker':
+        return 'Acolhedor e guia. Vamos descobrir juntos.';
+      case 'executor':
+        return 'Pragmático e metódico. Otimização é o jogo.';
+      default:
+        return 'Seu mentor pé no chão, focado em viabilidade e execução';
+    }
+  };
+
   return (
     <>
-      <SEOHead title="Conversar com Nello | Nello Flow" description="Seu mentor digital pé no chão, focado em viabilidade e execução" />
+      <SEOHead title="Conversar com Nello | Nello Flow" description="Seu mentor digital adaptativo baseado na sua essência" />
       
       <FlowLayout>
         <div className="max-w-3xl mx-auto h-[calc(100vh-8rem)] flex flex-col">
           {/* Header */}
           <div className="mb-4">
-            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-              <MessageSquare className="w-7 h-7 text-violet-400" />
-              Conversar com Nello
-            </h1>
-            <p className="text-slate-400 mt-1">Seu mentor pé no chão, focado em viabilidade e execução</p>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+                <MessageSquare className="w-7 h-7 text-violet-400" />
+                Conversar com Nello
+              </h1>
+              {hasEssenceData && (
+                <span className="text-lg" title={`Modo ${doorName}`}>{doorIcon}</span>
+              )}
+            </div>
+            <p className="text-slate-400">{getMentorSubtitle()}</p>
+            {hasEssenceData && (
+              <div className="flex items-center gap-2 mt-2">
+                <Sparkles className="w-3 h-3 text-violet-400" />
+                <span className="text-xs text-violet-300">
+                  Tom adaptado ao seu perfil: {doorName}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Messages */}
@@ -129,10 +180,15 @@ export default function FlowMentor() {
             ) : messages.length === 0 ? (
               <div className="text-center py-12">
                 <Bot className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-white mb-2">Olá! Sou o Nello</h3>
+                <h3 className="text-lg font-medium text-white mb-2">Olá! Sou o Nello {doorIcon}</h3>
                 <p className="text-slate-400 max-w-md mx-auto">
-                  Estou aqui para te ajudar a clarear ideias, estruturar sua oferta e criar planos de ação possíveis. Sem enrolação, focado em resultados. Como posso te ajudar hoje?
+                  {mentorGreeting}
                 </p>
+                {hasEssenceData && (
+                  <p className="text-sm text-violet-300 mt-4">
+                    Adaptei meu tom ao seu perfil de {doorName}.
+                  </p>
+                )}
               </div>
             ) : (
               messages.map(msg => (
