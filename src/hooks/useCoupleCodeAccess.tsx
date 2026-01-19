@@ -18,11 +18,12 @@ export function useCoupleCodeAccess(): CoupleCodeAccess {
       if (!user?.id) return null;
 
       // Check for codigo_casal purchase in test_purchases
+      // Fixed: Only use purchase_category column (product_type doesn't exist)
       const { data, error } = await supabase
         .from("test_purchases")
         .select("id, purchased_at, payment_status")
         .eq("user_id", user.id)
-        .or("product_type.eq.codigo_casal,purchase_category.eq.codigo_casal")
+        .eq("purchase_category", "codigo_casal")
         .eq("payment_status", "completed")
         .maybeSingle();
 

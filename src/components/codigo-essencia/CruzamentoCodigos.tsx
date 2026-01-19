@@ -282,11 +282,12 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
 
   const handlePurchaseCouple = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('stripe-checkout', {
+      // Fixed: Use create-checkout function with correct parameters
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
-          product_type: 'codigo_casal',
-          success_url: `${window.location.origin}/essencia?tab=cruzamento&success=true`,
-          cancel_url: `${window.location.origin}/essencia?tab=cruzamento`,
+          productType: 'codigo_casal',
+          language: language,
+          currency: language === 'en' ? 'usd' : language === 'pt-pt' ? 'eur' : 'brl',
         }
       });
       
