@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CruzamentoViewer } from "./CruzamentoViewer";
+import { useCoupleCodeAccess } from "@/hooks/useCoupleCodeAccess";
 
 interface CruzamentoCodigosProps {
   language: 'pt' | 'pt-pt' | 'en';
@@ -277,9 +278,26 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
     );
   }
 
-  const handlePurchaseCouple = () => {
-    // TODO: Integrate with Stripe checkout for couple's code
-    toast.info(language === 'en' ? 'Coming soon!' : 'Em breve!');
+  const { hasPurchased: hasCoupleCodePurchased, isLoading: purchaseLoading } = useCoupleCodeAccess();
+
+  const handlePurchaseCouple = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('stripe-checkout', {
+        body: {
+          product_type: 'codigo_casal',
+          success_url: `${window.location.origin}/essencia?tab=cruzamento&success=true`,
+          cancel_url: `${window.location.origin}/essencia?tab=cruzamento`,
+        }
+      });
+      
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Error starting checkout:', error);
+      toast.error(language === 'en' ? 'Error starting checkout' : 'Erro ao iniciar checkout');
+    }
   };
 
   if (selectedCrossing) {
@@ -287,7 +305,7 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
       <CruzamentoViewer 
         crossing={{
           ...selectedCrossing,
-          isPurchased: true // For now, default to true - integrate with purchase status later
+          isPurchased: hasCoupleCodePurchased
         }} 
         language={language}
         onBack={() => setSelectedCrossing(null)}
