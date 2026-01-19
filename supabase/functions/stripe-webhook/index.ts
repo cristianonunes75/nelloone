@@ -288,6 +288,92 @@ serve(async (req) => {
         // Fall through to jornada_completa handling below
       }
 
+      // ====== CÓDIGO DO CASAL PURCHASE ======
+      if (productType === "codigo_casal") {
+        logStep("Processing Código do Casal purchase", { userId });
+        
+        if (!userId || userId === "guest") {
+          logStep("ERROR: Código do Casal requires authenticated user");
+          return new Response(JSON.stringify({ error: "User authentication required" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        // Record purchase in test_purchases
+        const { error: purchaseError } = await supabase
+          .from("test_purchases")
+          .insert({
+            user_id: userId,
+            test_id: null,
+            payment_status: "completed",
+            amount_paid: (session.amount_total || 0) / 100,
+            currency: session.metadata?.currency?.toUpperCase() || "BRL",
+            stripe_session_id: session.id,
+            purchase_category: "codigo_casal",
+            transaction_id: session.payment_intent as string,
+            metadata: {
+              session_id: session.id,
+              product_type: "codigo_casal",
+              purchase_origin: session.metadata?.purchase_origin || "couple_paywall",
+            },
+          });
+
+        if (purchaseError) {
+          logStep("ERROR: Failed to record Código do Casal purchase", { error: purchaseError });
+          throw purchaseError;
+        }
+
+        logStep("Código do Casal purchase recorded successfully", { userId });
+
+        // Send confirmation email
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", userId)
+            .single();
+
+          const { data: userAuth } = await supabase.auth.admin.getUserById(userId);
+          const userEmail = userAuth?.user?.email;
+
+          if (userEmail) {
+            const language = session.metadata?.language || "pt";
+            const currencySymbol = session.metadata?.currency === "usd" ? "$" : 
+                            session.metadata?.currency === "eur" ? "€" : "R$";
+            const amountPaid = (session.amount_total || 0) / 100;
+
+            await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${supabaseServiceKey}`,
+              },
+              body: JSON.stringify({
+                type: "purchase_confirmation",
+                to: userEmail,
+                data: {
+                  name: profile?.full_name || userEmail.split("@")[0],
+                  testNames: [language === "en" ? "Couple's Code" : "Código do Casal"],
+                  amount: amountPaid,
+                  currency: currencySymbol,
+                  language,
+                },
+              }),
+            });
+
+            logStep("Confirmation email sent for Código do Casal", { userEmail });
+          }
+        } catch (emailError) {
+          logStep("WARN: Failed to send email", { error: emailError });
+        }
+
+        return new Response(JSON.stringify({ received: true, product: "codigo_casal" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
       // ====== ATIVAÇÃO DO CÓDIGO PURCHASE ======
       if (productType === "ativacao_codigo") {
         logStep("Processing Ativação do Código purchase", { userId });
