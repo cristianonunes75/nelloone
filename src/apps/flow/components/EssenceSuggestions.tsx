@@ -1,10 +1,14 @@
 import { useState } from 'react';
-import { Sparkles, ArrowRight, Check, Loader2 } from 'lucide-react';
+import { Sparkles, ArrowRight, Check, Loader2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEssenceProfile } from '../hooks/useEssenceProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { useFeatureUsage } from '@/hooks/useFeatureUsage';
+import { FeatureUsageIndicator } from '@/components/monetization/FeatureUsageIndicator';
+import { PremiumLock } from '@/components/monetization/PremiumLock';
+import { useFlowSubscription } from '../hooks/useFlowSubscription';
 
 interface Suggestion {
   title: string;
@@ -26,6 +30,8 @@ export function EssenceSuggestions({
   onGenerate,
 }: EssenceSuggestionsProps) {
   const { user } = useAuth();
+  const { usage, trackUsage, canUseFeature } = useFeatureUsage();
+  const { isSubscribed, startCheckout } = useFlowSubscription();
   const { 
     doorName, 
     doorIcon, 
@@ -48,10 +54,24 @@ export function EssenceSuggestions({
       toast.error('Complete seu Código da Essência primeiro');
       return;
     }
+
+    // Check if user can use this feature
+    if (!canUseFeature('flow_sparks')) {
+      toast.error('Você atingiu o limite de centelhas. Assine o Nello Flow Pro para continuar.');
+      return;
+    }
     
     setIsLoading(true);
     
     try {
+      // Track usage before generating
+      const tracked = await trackUsage('flow_sparks', { action: 'generate_suggestions' });
+      if (!tracked && !isSubscribed) {
+        toast.error('Limite atingido. Assine para continuar.');
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('flow-mentor', {
         body: { 
           message: `GERAR_SUGESTOES_CENTELHA`,
@@ -145,18 +165,62 @@ export function EssenceSuggestions({
     return null;
   }
   
+  const flowUsage = usage.flow_sparks;
+  const canGenerate = canUseFeature('flow_sparks');
+
+  // Show premium lock if limit reached
+  if (!canGenerate && displaySuggestions.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-slate-400">
+            <Sparkles className="w-4 h-4 text-violet-400" />
+            <span>Gerador de Centelhas</span>
+            <span className="text-lg">{doorIcon}</span>
+          </div>
+          <FeatureUsageIndicator
+            remaining={flowUsage.remaining}
+            limit={flowUsage.limit}
+            isPremium={flowUsage.isPremium}
+            featureName="Centelhas"
+            language="pt"
+            compact
+          />
+        </div>
+        
+        <PremiumLock
+          featureType="flow_sparks"
+          language="pt"
+          onUnlock={startCheckout}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 text-sm text-slate-400">
-        <Sparkles className="w-4 h-4 text-violet-400" />
-        <span>Gerador de Centelhas</span>
-        <span className="text-lg">{doorIcon}</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-sm text-slate-400">
+          <Sparkles className="w-4 h-4 text-violet-400" />
+          <span>Gerador de Centelhas</span>
+          <span className="text-lg">{doorIcon}</span>
+        </div>
+        {!flowUsage.isPremium && (
+          <FeatureUsageIndicator
+            remaining={flowUsage.remaining}
+            limit={flowUsage.limit}
+            isPremium={flowUsage.isPremium}
+            featureName="Centelhas"
+            language="pt"
+            compact
+          />
+        )}
       </div>
       
       {displaySuggestions.length === 0 ? (
         <Button
           onClick={onGenerate || generateSuggestions}
-          disabled={loading}
+          disabled={loading || !canGenerate}
           className="w-full bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 hover:from-violet-500/30 hover:to-fuchsia-500/30 border border-violet-500/30 text-white"
         >
           {loading ? (
