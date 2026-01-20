@@ -6,10 +6,12 @@ import { useAuth } from "./useAuth";
 import { useImpersonate } from "@/contexts/ImpersonateContext";
 import { supabase } from "@/integrations/supabase/client";
 import { TEST_TYPE_TO_SLUG } from "@/utils/journey";
+import { useEntryPath } from "./useEntryPath";
 
 // Define the sequential order of tests in the NELLO ONE journey
 // OFFICIAL SLUGS: These are the canonical identifiers for the journey
-const JOURNEY_ORDER = [
+// This is now the fallback - actual order comes from useEntryPath
+const DEFAULT_JOURNEY_ORDER = [
   "arquetipos_proposito",
   "inteligencias_multiplas",
   "estilos_conexao",
@@ -19,7 +21,7 @@ const JOURNEY_ORDER = [
   "temperamentos",
 ] as const;
 
-export type TestType = typeof JOURNEY_ORDER[number];
+export type TestType = typeof DEFAULT_JOURNEY_ORDER[number];
 
 // Extended test status to handle freemium flow
 export type ExtendedTestStatus = 
@@ -50,6 +52,7 @@ export interface JourneyStep {
 export function useJourneyProgress(targetUserId?: string) {
   const { user } = useAuth();
   const { impersonatedUserId, isImpersonating } = useImpersonate();
+  const { journeyOrder } = useEntryPath();
   
   // Use impersonated user if active, otherwise use targetUserId or current user
   const effectiveUserId = targetUserId || (isImpersonating ? impersonatedUserId : user?.id);
@@ -95,7 +98,7 @@ export function useJourneyProgress(targetUserId?: string) {
     // Track which step we're on (first incomplete test)
     let currentStepFound = false;
 
-    return JOURNEY_ORDER.map((journeySlug, index) => {
+    return journeyOrder.map((journeySlug, index) => {
       // Find the test by either the journey slug or the original database type
       const test = testByType.get(journeySlug);
       if (!test) return null;
@@ -180,7 +183,7 @@ export function useJourneyProgress(targetUserId?: string) {
         needsContinuation,
       };
     }).filter(Boolean) as JourneyStep[];
-  }, [tests, userTests, getTestStatus, hasPurchased, isViewingOther]);
+  }, [tests, userTests, getTestStatus, hasPurchased, isViewingOther, journeyOrder]);
 
   const completedTests = useMemo(() => {
     return journeySteps.filter(step => 
