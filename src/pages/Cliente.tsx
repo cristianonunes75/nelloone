@@ -3,6 +3,7 @@ import { useTests } from "@/hooks/useTests";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { useCodigoEssenciaAccess } from "@/hooks/useCodigoEssenciaAccess";
 import { useImpersonate } from "@/contexts/ImpersonateContext";
+import { useEntryPath } from "@/hooks/useEntryPath";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -18,6 +19,7 @@ import { LogoText } from "@/components/LogoText";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { ImpersonateBanner } from "@/components/ImpersonateBanner";
 import { OnboardingModal } from "@/components/cliente/OnboardingModal";
+import { EntryPathModal, type EntryPath } from "@/components/cliente/EntryPathModal";
 import { LogOut, User } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
@@ -45,6 +47,7 @@ const Cliente = () => {
   const { user, profile, signOut, userRole, isLoading: isAuthLoading } = useAuth();
   const { startTestAsync, userTests, resetTest } = useTests();
   const { isImpersonating, impersonatedUserName, impersonatedUserId, setImpersonation } = useImpersonate();
+  const { needsPathSelection, hasSelectedPath } = useEntryPath();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
@@ -55,6 +58,7 @@ const Cliente = () => {
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [stepToReset, setStepToReset] = useState<any>(null);
   const [ativacaoPurchaseOpen, setAtivacaoPurchaseOpen] = useState(false);
+  const [showEntryPathModal, setShowEntryPathModal] = useState(false);
 
   // State to track if we're validating impersonation token
   const [isValidatingImpersonation, setIsValidatingImpersonation] = useState(() => {
@@ -226,6 +230,16 @@ const Cliente = () => {
       setSearchParams(searchParams);
     }
   }, [searchParams, setSearchParams, toast, queryClient]);
+
+  // Check if we need to show entry path modal on mount (user hasn't selected a path)
+  useEffect(() => {
+    if (completedCount === 0 && needsPathSelection && !localStorage.getItem("nello_onboarding_seen")) {
+      // Don't show yet - wait for onboarding to complete
+    } else if (completedCount === 0 && needsPathSelection && localStorage.getItem("nello_onboarding_seen")) {
+      // Onboarding done but no path selected
+      setShowEntryPathModal(true);
+    }
+  }, [completedCount, needsPathSelection]);
 
   // Map test types to their keys in testSlugs
   const testTypeToSlugKey: Record<string, keyof typeof testSlugs> = {
@@ -509,20 +523,47 @@ const Cliente = () => {
     : profile?.full_name?.split(" ")[0] || user?.user_metadata?.full_name?.split(" ")[0] || "Viajante";
 
   const handleOnboardingComplete = () => {
-    // Start the first test after onboarding
+    // After onboarding, show entry path selection if not already selected
+    if (needsPathSelection) {
+      setShowEntryPathModal(true);
+    } else {
+      // Start the first test after onboarding
+      const firstStep = journeySteps[0];
+      if (firstStep) {
+        handleStartTest(firstStep);
+      }
+    }
+  };
+
+  const handleEntryPathComplete = (path: EntryPath) => {
+    setShowEntryPathModal(false);
+    // Invalidate queries to refetch with new journey order
+    queryClient.invalidateQueries({ queryKey: ["user-tests"] });
+    // Start the first test after path selection
     const firstStep = journeySteps[0];
     if (firstStep) {
       handleStartTest(firstStep);
     }
   };
 
+
   return (
     <div className={`min-h-screen pb-24 md:pb-0 ${isImpersonating ? 'bg-amber-50/30' : 'bg-background'}`}>
+      {/* Entry Path Modal - shows after onboarding when user needs to select their preferred path */}
+      {user && (
+        <EntryPathModal
+          userId={user.id}
+          userName={displayName}
+          open={showEntryPathModal}
+          onComplete={handleEntryPathComplete}
+        />
+      )}
+      
       {/* Onboarding Modal - shows only when user hasn't completed any test */}
       <OnboardingModal 
         userName={displayName} 
         onComplete={handleOnboardingComplete}
-        enabled={completedCount === 0}
+        enabled={completedCount === 0 && !showEntryPathModal}
       />
       {/* Impersonate Banner */}
       <ImpersonateBanner />

@@ -2864,6 +2864,7 @@ export type Database = {
           created_at: string
           deleted_at: string | null
           deleted_by: string | null
+          entry_path: string | null
           full_name: string
           id: string
           is_blocked: boolean | null
@@ -2886,6 +2887,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           deleted_by?: string | null
+          entry_path?: string | null
           full_name: string
           id: string
           is_blocked?: boolean | null
@@ -2908,6 +2910,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           deleted_by?: string | null
+          entry_path?: string | null
           full_name?: string
           id?: string
           is_blocked?: boolean | null
