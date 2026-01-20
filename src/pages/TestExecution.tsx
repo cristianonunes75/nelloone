@@ -38,6 +38,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { InteligenciasIntroScreen } from "@/components/tests/inteligencias/InteligenciasIntroScreen";
 import { IntelligenceTooltip, getIntelligenceKeyFromQuestionNumber } from "@/components/tests/inteligencias/IntelligenceTooltip";
 import { TestTimeEstimate } from "@/components/tests/TestTimeEstimate";
+import { TestProgressFeedback, AutoSaveIndicator } from "@/components/tests/TestProgressFeedback";
 
 export default function TestExecution() {
   const { testId, userTestId } = useParams();
@@ -54,6 +55,8 @@ export default function TestExecution() {
   const [navigationDirection, setNavigationDirection] = useState<"left" | "right">("left");
   const [testStartTime] = useState<Date>(new Date());
   const [isProcessingPurchase, setIsProcessingPurchase] = useState(false);
+  const [showSavedIndicator, setShowSavedIndicator] = useState(false);
+  const autoAdvanceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
   const [partialArchetypes, setPartialArchetypes] = useState<{
     primary: { archetype: string; score: number };
@@ -179,14 +182,53 @@ export default function TestExecution() {
     }
   }, [currentQuestion, getAnswerForQuestion]);
 
+  // Determine if current question is Likert scale (used for answer format)
+  const currentOptions = currentQuestion?.options as any;
+  const isLikertScale = currentOptions && (currentOptions.scale || currentOptions.type === "likert");
+
+  // Handle answer change with auto-advance
   const handleAnswerChange = (value: string) => {
     setSelectedAnswer(value);
+    
+    // Show saved indicator briefly
+    setShowSavedIndicator(true);
+    setTimeout(() => setShowSavedIndicator(false), 1500);
+    
+    // Clear any existing auto-advance timeout
+    if (autoAdvanceTimeoutRef.current) {
+      clearTimeout(autoAdvanceTimeoutRef.current);
+    }
+    
+    // Auto-advance after a short delay (600ms) for non-last questions
+    // This gives users time to see their selection before moving
+    if (!isLastQuestion && currentQuestion) {
+      autoAdvanceTimeoutRef.current = setTimeout(() => {
+        // Save the answer
+        saveAnswer({
+          questionId: currentQuestion.id,
+          answer: { value: isLikertScale ? parseInt(value) : value },
+        });
+        setNavigationDirection("left");
+        nextQuestion();
+      }, 600);
+    }
   };
+  
+  // Cleanup auto-advance timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (autoAdvanceTimeoutRef.current) {
+        clearTimeout(autoAdvanceTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleNext = () => {
+    // Cancel auto-advance if user manually clicks next
+    if (autoAdvanceTimeoutRef.current) {
+      clearTimeout(autoAdvanceTimeoutRef.current);
+    }
     if (currentQuestion && selectedAnswer) {
-      // For Likert scale, save the numeric value
-      // For multiple choice, save the value string
       saveAnswer({
         questionId: currentQuestion.id,
         answer: { value: isLikertScale ? parseInt(selectedAnswer) : selectedAnswer },
@@ -197,6 +239,10 @@ export default function TestExecution() {
   };
 
   const handlePrevious = () => {
+    // Cancel auto-advance if user manually clicks previous
+    if (autoAdvanceTimeoutRef.current) {
+      clearTimeout(autoAdvanceTimeoutRef.current);
+    }
     if (currentQuestion && selectedAnswer) {
       saveAnswer({
         questionId: currentQuestion.id,
@@ -420,9 +466,8 @@ export default function TestExecution() {
     );
   }
 
-  // Handle both Likert scale and multiple choice formats
+  // Handle both Likert scale and multiple choice formats (options already parsed above)
   const options = currentQuestion.options as any;
-  const isLikertScale = options && (options.scale || options.type === "likert");
   const isMultipleChoice = options && options.type === "multiple_choice";
   const isSituational = options && options.type === "situational";
   
@@ -807,7 +852,7 @@ export default function TestExecution() {
                     language === 'en' ? 'Lifetime access to all results' : 'Acesso vitalício a todos os resultados',
                   ].map((benefit, index) => (
                     <div key={index} className="flex items-center gap-2 text-sm">
-                      <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                      <Check className="w-4 h-4 text-primary flex-shrink-0" />
                       <span>{benefit}</span>
                     </div>
                   ))}
@@ -1017,6 +1062,14 @@ export default function TestExecution() {
       <TestCelebration 
         isVisible={showCelebration} 
         testName={testDetails?.name}
+      />
+
+      {/* Progress feedback overlay */}
+      <TestProgressFeedback
+        currentIndex={currentQuestionIndex}
+        totalQuestions={questions?.length || 0}
+        testType={testDetails?.type}
+        showSavedIndicator={showSavedIndicator}
       />
     </div>
   );
