@@ -41,14 +41,14 @@ export const OnboardingModal = ({ userName, onComplete, enabled = true }: Onboar
             autoconhecimento com 7 testes que revelam quem você realmente é.
           </p>
 
-          <div className="bg-accent/30 rounded-xl p-4 space-y-3">
+          <div className="bg-accent/30 rounded-xl p-4 space-y-4">
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-full">
                 <Map className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <p className="font-medium text-sm">Seu objetivo</p>
-                <p className="text-sm text-muted-foreground">Completar os 7 testes</p>
+                <p className="font-medium text-sm">Cada teste em etapas curtas</p>
+                <p className="text-sm text-muted-foreground">Responda no seu tempo, seu progresso é salvo automaticamente</p>
               </div>
             </div>
 
@@ -57,13 +57,25 @@ export const OnboardingModal = ({ userName, onComplete, enabled = true }: Onboar
                 <Sparkles className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <p className="font-medium text-sm">Sua recompensa</p>
+                <p className="font-medium text-sm">Resultado claro ao final de cada teste</p>
+                <p className="text-sm text-muted-foreground">Nada fica incompleto sem retorno</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-primary/10 rounded-full">
+                <Map className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <p className="font-medium text-sm">Sua recompensa final</p>
                 <p className="text-sm text-muted-foreground">Código da Essência (seu mapa pessoal completo)</p>
               </div>
             </div>
           </div>
 
-          <p className="text-center text-xs text-muted-foreground">Tempo estimado: 2-3 horas (no seu ritmo)</p>
+          <p className="text-center text-xs text-muted-foreground">
+            Tempo estimado: 2 a 3 horas no total (no seu ritmo)
+          </p>
         </div>
 
         <Button onClick={handleComplete} className="w-full gap-2" size="lg">
