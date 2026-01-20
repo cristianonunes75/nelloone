@@ -42,6 +42,8 @@ import {
   DashboardStageRevelation,
   DashboardStagePotency
 } from "@/components/cliente/dashboard";
+import { TestInsightScreen, getProvisionalInsight, getMirrorPhrase } from "@/components/tests/TestInsightScreen";
+import { StrategicCheckpoint, generateCheckpointContent } from "@/components/tests/StrategicCheckpoint";
 
 const Cliente = () => {
   const { user, profile, signOut, userRole, isLoading: isAuthLoading } = useAuth();
@@ -59,6 +61,11 @@ const Cliente = () => {
   const [stepToReset, setStepToReset] = useState<any>(null);
   const [ativacaoPurchaseOpen, setAtivacaoPurchaseOpen] = useState(false);
   const [showEntryPathModal, setShowEntryPathModal] = useState(false);
+  
+  // Check URL params for journey flow state
+  const flowParam = searchParams.get("flow");
+  const flowTestType = searchParams.get("testType");
+  const flowUserTestId = searchParams.get("userTestId");
 
   // State to track if we're validating impersonation token
   const [isValidatingImpersonation, setIsValidatingImpersonation] = useState(() => {
@@ -546,6 +553,73 @@ const Cliente = () => {
     }
   };
 
+  // Get language for translations
+  const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
+  
+  // Handle insight screen continue
+  const handleInsightContinue = () => {
+    // Clear flow params and show dashboard
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete("flow");
+      next.delete("testType");
+      next.delete("userTestId");
+      return next;
+    });
+  };
+  
+  // Handle insight screen view details
+  const handleInsightViewDetails = () => {
+    if (flowUserTestId) {
+      const basePath = getBasePath();
+      navigate(`${basePath}/cliente/test-results/${flowUserTestId}`);
+    }
+  };
+  
+  // Handle checkpoint continue to final report
+  const handleCheckpointContinue = () => {
+    const basePath = getBasePath();
+    navigate(`${basePath}/cliente/codigo-essencia`);
+  };
+
+  // Get test name for insight screen
+  const getTestNameForFlow = (): string => {
+    if (!flowTestType) return "";
+    const step = journeySteps.find(s => s.testType === flowTestType);
+    return step?.name || flowTestType;
+  };
+
+  // Show insight screen
+  if (flowParam === "insight" && flowTestType) {
+    return (
+      <TestInsightScreen
+        testName={getTestNameForFlow()}
+        testType={flowTestType}
+        insightText={getProvisionalInsight(flowTestType, lang)}
+        mirrorPhrase={getMirrorPhrase(flowTestType, lang)}
+        completedTests={completedCount}
+        totalTests={totalSteps}
+        onContinueJourney={handleInsightContinue}
+        onViewDetails={handleInsightViewDetails}
+        lang={lang}
+      />
+    );
+  }
+  
+  // Show strategic checkpoint
+  if (flowParam === "checkpoint" && isJourneyComplete) {
+    const checkpointContent = generateCheckpointContent(testResults, lang);
+    return (
+      <StrategicCheckpoint
+        userName={displayName}
+        affirmations={checkpointContent.affirmations}
+        contradiction={checkpointContent.contradiction}
+        provocativeQuestion={checkpointContent.provocativeQuestion}
+        onViewFullReport={handleCheckpointContinue}
+        lang={lang}
+      />
+    );
+  }
 
   return (
     <div className={`min-h-screen pb-24 md:pb-0 ${isImpersonating ? 'bg-amber-50/30' : 'bg-background'}`}>

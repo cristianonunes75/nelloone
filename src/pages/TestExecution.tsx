@@ -25,6 +25,8 @@ import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { updateJourneyProgress, getJourneySlugFromTestType } from "@/utils/journey";
+import { useTestJourneyFlow } from "@/hooks/useTestJourneyFlow";
+import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { 
   TestBackgroundVisual, 
   TestProgressRing, 
@@ -39,6 +41,8 @@ import { InteligenciasIntroScreen } from "@/components/tests/inteligencias/Intel
 import { IntelligenceTooltip, getIntelligenceKeyFromQuestionNumber } from "@/components/tests/inteligencias/IntelligenceTooltip";
 import { TestTimeEstimate } from "@/components/tests/TestTimeEstimate";
 import { TestProgressFeedback, AutoSaveIndicator, ResumeIndicator } from "@/components/tests/TestProgressFeedback";
+import { SymbolicProgress } from "@/components/tests/SymbolicProgress";
+import { AbandonmentRecovery, useAbandonmentDetection } from "@/components/tests/AbandonmentRecovery";
 
 export default function TestExecution() {
   const { testId, userTestId } = useParams();
@@ -160,7 +164,23 @@ export default function TestExecution() {
     totalQuestions,
   } = useTestExecution(testId!, userTestId);
 
-  // Get test details for purchase dialog and welcome screen
+  // Get journey progress for symbolic progress
+  const { completedCount, totalSteps } = useJourneyProgress();
+  
+  // Abandonment detection
+  const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
+  const {
+    abandonmentType,
+    showRecovery,
+    remainingMinutes,
+    remainingQuestions: abandonmentRemainingQuestions,
+    recordActivity,
+    dismissRecovery,
+  } = useAbandonmentDetection(
+    currentQuestionIndex,
+    questions?.length || 0,
+    testStartTime
+  );
   const { data: testDetails } = useQuery({
     queryKey: ["test-details", testId],
     queryFn: async () => {
@@ -205,6 +225,7 @@ export default function TestExecution() {
   // Handle answer change with auto-advance
   const handleAnswerChange = (value: string) => {
     setSelectedAnswer(value);
+    recordActivity(); // Track activity to reset abandonment timer
     
     // Show saved indicator briefly
     setShowSavedIndicator(true);
@@ -440,7 +461,7 @@ export default function TestExecution() {
       setShowCelebration(true);
       
       // Complete test after celebration animation
-      setTimeout(() => {
+      setTimeout(async () => {
         // Complete test and update journey progress
         completeTest(resultData);
         
@@ -448,9 +469,13 @@ export default function TestExecution() {
         if (user?.id && testType) {
           const journeySlug = getJourneySlugFromTestType(testType);
           if (journeySlug) {
-            updateJourneyProgress(user.id, journeySlug, 'completed').catch(console.error);
+            await updateJourneyProgress(user.id, journeySlug, 'completed').catch(console.error);
           }
         }
+
+        // Navigate to insight screen instead of results directly
+        const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
+        navigate(`${basePath}/cliente?flow=insight&testType=${testType}&userTestId=${userTestId}`);
       }, 3500);
     }
   };
@@ -983,11 +1008,18 @@ export default function TestExecution() {
           </div>
 
           {/* Visual progress indicator */}
-          <div className="mb-6">
+          <div className="mb-6 space-y-4">
             <TestQuestionIndicator
               testType={testDetails?.type || 'disc'}
               currentIndex={currentQuestionIndex}
               total={questions?.length || 0}
+            />
+            {/* Symbolic journey progress */}
+            <SymbolicProgress
+              currentTestIndex={completedCount}
+              totalTests={totalSteps}
+              testType={testDetails?.type}
+              lang={lang}
             />
           </div>
 
@@ -1095,7 +1127,21 @@ export default function TestExecution() {
         totalQuestions={questions?.length || 0}
         testType={testDetails?.type}
         showSavedIndicator={showSavedIndicator}
-        lang={language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt'}
+        lang={lang}
+      />
+
+      {/* Abandonment recovery dialog */}
+      <AbandonmentRecovery
+        isOpen={showRecovery}
+        abandonmentType={abandonmentType}
+        remainingMinutes={remainingMinutes}
+        remainingQuestions={abandonmentRemainingQuestions}
+        onContinueNow={dismissRecovery}
+        onSaveAndExit={() => {
+          dismissRecovery();
+          navigate(`${basePath}/cliente`);
+        }}
+        lang={lang}
       />
     </div>
   );

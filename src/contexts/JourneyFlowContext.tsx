@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useEntryPath } from "./useEntryPath";
+import { useEntryPath } from "@/hooks/useEntryPath";
 
 export type JourneyFlowState = 
   | "test_execution" 
@@ -18,7 +18,26 @@ interface TestCompletionData {
   resultData: Record<string, any>;
 }
 
-export function useTestJourneyFlow() {
+interface JourneyFlowContextValue {
+  flowState: JourneyFlowState;
+  showInsight: boolean;
+  completedTestData: TestCompletionData | null;
+  journeyOrder: string[];
+  handleTestComplete: (data: TestCompletionData) => void;
+  continueToNextTest: () => void;
+  viewTestDetails: () => void;
+  goToCheckpoint: () => void;
+  goToFinalReport: () => void;
+  resetFlow: () => void;
+  getNextTestSlug: (currentTestType: string) => string | null;
+  getCurrentTestIndex: (testType: string) => number;
+  completedTestCount: number;
+  setCompletedTestCount: (count: number) => void;
+}
+
+const JourneyFlowContext = createContext<JourneyFlowContextValue | null>(null);
+
+export function JourneyFlowProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const { journeyOrder } = useEntryPath();
@@ -27,6 +46,7 @@ export function useTestJourneyFlow() {
   const [flowState, setFlowState] = useState<JourneyFlowState>("test_execution");
   const [completedTestData, setCompletedTestData] = useState<TestCompletionData | null>(null);
   const [showInsight, setShowInsight] = useState(false);
+  const [completedTestCount, setCompletedTestCount] = useState(0);
 
   // Calculate which test comes next based on entry path order
   const getNextTestSlug = useCallback((currentTestType: string): string | null => {
@@ -48,8 +68,8 @@ export function useTestJourneyFlow() {
     setCompletedTestData(data);
     setShowInsight(true);
     setFlowState("insight_screen");
-    // Navigate to cliente with flow param to show insight
-    navigate(`${basePath}/cliente?flow=insight&testType=${data.testType}&userTestId=${data.userTestId}`);
+    // Navigate to cliente which will now show insight screen
+    navigate(`${basePath}/cliente?flow=insight`);
   }, [basePath, navigate]);
 
   // Continue to next test from insight screen
@@ -59,13 +79,13 @@ export function useTestJourneyFlow() {
     const nextSlug = getNextTestSlug(completedTestData.testType);
     
     if (!nextSlug) {
-      // Last test - go to strategic checkpoint, then final report
+      // Last test - go to strategic checkpoint
       setFlowState("strategic_checkpoint");
       navigate(`${basePath}/cliente?flow=checkpoint`);
       return;
     }
 
-    // Navigate to client dashboard which will show next test
+    // Reset and go to dashboard to start next test
     setShowInsight(false);
     setFlowState("test_execution");
     navigate(`${basePath}/cliente`);
@@ -88,6 +108,7 @@ export function useTestJourneyFlow() {
   // Go to final essence code report
   const goToFinalReport = useCallback(() => {
     setFlowState("final_report");
+    setShowInsight(false);
     navigate(`${basePath}/codigo-essencia`);
   }, [basePath, navigate]);
 
@@ -98,20 +119,32 @@ export function useTestJourneyFlow() {
     setShowInsight(false);
   }, []);
 
-  return {
-    flowState,
-    showInsight,
-    completedTestData,
-    journeyOrder,
-    handleTestComplete,
-    continueToNextTest,
-    viewTestDetails,
-    goToCheckpoint,
-    goToFinalReport,
-    resetFlow,
-    getNextTestSlug,
-    getCurrentTestIndex,
-    setFlowState,
-    setCompletedTestData,
-  };
+  return (
+    <JourneyFlowContext.Provider value={{
+      flowState,
+      showInsight,
+      completedTestData,
+      journeyOrder,
+      handleTestComplete,
+      continueToNextTest,
+      viewTestDetails,
+      goToCheckpoint,
+      goToFinalReport,
+      resetFlow,
+      getNextTestSlug,
+      getCurrentTestIndex,
+      completedTestCount,
+      setCompletedTestCount,
+    }}>
+      {children}
+    </JourneyFlowContext.Provider>
+  );
+}
+
+export function useJourneyFlow() {
+  const context = useContext(JourneyFlowContext);
+  if (!context) {
+    throw new Error("useJourneyFlow must be used within JourneyFlowProvider");
+  }
+  return context;
 }
