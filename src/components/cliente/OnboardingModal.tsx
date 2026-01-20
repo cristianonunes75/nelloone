@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Map, Sparkles } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { ArrowRight, Map, Sparkles, CheckCircle } from "lucide-react";
 
 interface OnboardingModalProps {
   userName: string;
@@ -42,6 +43,19 @@ export const OnboardingModal = ({ userName, onComplete, enabled = true }: Onboar
             Você está começando uma jornada de autoconhecimento construída um passo de cada vez.
           </p>
 
+          {/* Test count indicator */}
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <div className="flex gap-1">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div 
+                  key={i} 
+                  className="w-2 h-2 rounded-full bg-primary/30"
+                />
+              ))}
+            </div>
+            <span>7 testes • 1 por vez</span>
+          </div>
+
           <div className="bg-accent/30 rounded-xl p-4 space-y-4">
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-full">
@@ -55,7 +69,7 @@ export const OnboardingModal = ({ userName, onComplete, enabled = true }: Onboar
 
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-full">
-                <Map className="w-4 h-4 text-primary" />
+                <CheckCircle className="w-4 h-4 text-primary" />
               </div>
               <div>
                 <p className="font-medium text-sm">Etapas curtas e flexíveis</p>
