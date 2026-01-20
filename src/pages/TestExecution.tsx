@@ -38,7 +38,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { InteligenciasIntroScreen } from "@/components/tests/inteligencias/InteligenciasIntroScreen";
 import { IntelligenceTooltip, getIntelligenceKeyFromQuestionNumber } from "@/components/tests/inteligencias/IntelligenceTooltip";
 import { TestTimeEstimate } from "@/components/tests/TestTimeEstimate";
-import { TestProgressFeedback, AutoSaveIndicator } from "@/components/tests/TestProgressFeedback";
+import { TestProgressFeedback, AutoSaveIndicator, ResumeIndicator } from "@/components/tests/TestProgressFeedback";
 
 export default function TestExecution() {
   const { testId, userTestId } = useParams();
@@ -56,6 +56,8 @@ export default function TestExecution() {
   const [testStartTime] = useState<Date>(new Date());
   const [isProcessingPurchase, setIsProcessingPurchase] = useState(false);
   const [showSavedIndicator, setShowSavedIndicator] = useState(false);
+  const [isResuming, setIsResuming] = useState(false);
+  const [resumeRemainingQuestions, setResumeRemainingQuestions] = useState(0);
   const autoAdvanceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
   const [partialArchetypes, setPartialArchetypes] = useState<{
@@ -173,7 +175,7 @@ export default function TestExecution() {
     },
   });
 
-  // Load existing answer when question changes
+  // Load existing answer when question changes and detect resume
   useEffect(() => {
     if (currentQuestion) {
       const existingAnswer = getAnswerForQuestion(currentQuestion.id);
@@ -181,6 +183,20 @@ export default function TestExecution() {
       setSelectedAnswer(answerData?.value || "");
     }
   }, [currentQuestion, getAnswerForQuestion]);
+
+  // Detect if user is resuming a test (has previous answers)
+  useEffect(() => {
+    if (currentQuestionIndex > 0 && questions?.length && !showWelcome) {
+      const remaining = (questions?.length || 0) - currentQuestionIndex;
+      if (remaining > 0) {
+        setIsResuming(true);
+        setResumeRemainingQuestions(remaining);
+        // Auto-hide after 5 seconds
+        const timer = setTimeout(() => setIsResuming(false), 5000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [currentQuestionIndex, questions?.length, showWelcome]);
 
   // Determine if current question is Likert scale (used for answer format)
   const currentOptions = currentQuestion?.options as any;
@@ -917,6 +933,15 @@ export default function TestExecution() {
 
       <Card className="border-none shadow-lg bg-card/95 backdrop-blur-sm">
         <CardHeader className="pb-6">
+          {/* Resume indicator - shows when returning to incomplete test */}
+          {isResuming && resumeRemainingQuestions > 0 && (
+            <ResumeIndicator 
+              remainingQuestions={resumeRemainingQuestions}
+              testName={testDetails?.name}
+              lang={language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt'}
+            />
+          )}
+
           {/* Top navigation bar */}
           <div className="flex items-center justify-between mb-4">
             <Button
@@ -1070,6 +1095,7 @@ export default function TestExecution() {
         totalQuestions={questions?.length || 0}
         testType={testDetails?.type}
         showSavedIndicator={showSavedIndicator}
+        lang={language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt'}
       />
     </div>
   );

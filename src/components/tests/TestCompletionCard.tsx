@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ArrowRight, Pause, CheckCircle, Sparkles } from "lucide-react";
+import { ArrowRight, Pause, CheckCircle, Sparkles, Users } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface TestCompletionCardProps {
@@ -35,9 +35,9 @@ export function TestCompletionCard({
         en: 'Test completed'
       },
       oneOfSeven: {
-        pt: `Esse é um dos ${totalTests} mapas do seu perfil. Quando quiser, siga para o próximo.`,
-        'pt-pt': `Este é um dos ${totalTests} mapas do seu perfil. Quando quiser, siga para o próximo.`,
-        en: `This is one of ${totalTests} maps of your profile. Continue when ready.`
+        pt: `Esse é um dos ${totalTests} mapas do seu perfil.`,
+        'pt-pt': `Este é um dos ${totalTests} mapas do seu perfil.`,
+        en: `This is one of ${totalTests} maps of your profile.`
       },
       remaining: {
         pt: `Faltam ${totalTests - completedTests} testes para completar o Código da Essência`,
@@ -49,10 +49,15 @@ export function TestCompletionCard({
         'pt-pt': 'Completou todos os testes! O seu Código da Essência está pronto.',
         en: 'You completed all tests! Your Essence Code is ready.'
       },
+      startNextNow: {
+        pt: 'Iniciar próximo teste agora',
+        'pt-pt': 'Iniciar próximo teste agora',
+        en: 'Start next test now'
+      },
       continueBtn: {
-        pt: 'Continuar quando quiser',
-        'pt-pt': 'Continuar quando quiser',
-        en: 'Continue when ready'
+        pt: 'Continuar depois',
+        'pt-pt': 'Continuar depois',
+        en: 'Continue later'
       },
       pauseBtn: {
         pt: 'Pausar por agora',
@@ -60,14 +65,24 @@ export function TestCompletionCard({
         en: 'Pause for now'
       },
       progressSaved: {
-        pt: 'Você pode parar agora. Seu progresso está salvo.',
-        'pt-pt': 'Pode parar agora. O seu progresso está guardado.',
-        en: 'You can stop now. Your progress is saved.'
+        pt: 'Seu progresso está salvo.',
+        'pt-pt': 'O seu progresso está guardado.',
+        en: 'Your progress is saved.'
       },
       viewEssence: {
         pt: 'Ver Código da Essência',
         'pt-pt': 'Ver Código da Essência',
         en: 'View Essence Code'
+      },
+      socialProof: {
+        pt: 'A maioria das pessoas segue para o próximo enquanto o mapa ainda está fresco.',
+        'pt-pt': 'A maioria das pessoas segue para o próximo enquanto o mapa ainda está fresco.',
+        en: 'Most people continue to the next while the insights are still fresh.'
+      },
+      nextTest: {
+        pt: 'Próximo',
+        'pt-pt': 'Próximo',
+        en: 'Next'
       }
     };
     return texts[key]?.[lang] || texts[key]?.pt || key;
@@ -103,7 +118,7 @@ export function TestCompletionCard({
               {isLastTest ? (
                 <span className="flex items-center gap-1.5 text-primary">
                   <Sparkles className="h-4 w-4" />
-                  Jornada completa!
+                  {lang === 'en' ? 'Journey complete!' : 'Jornada completa!'}
                 </span>
               ) : (
                 getText('remaining')
@@ -114,17 +129,34 @@ export function TestCompletionCard({
           <Progress value={progressPercent} className="h-2" />
         </div>
 
+        {/* Social proof message - only if not last test */}
+        {!isLastTest && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 px-3 py-2 rounded-lg">
+            <Users className="h-3.5 w-3.5 text-primary/70" />
+            <span>{getText('socialProof')}</span>
+          </div>
+        )}
+
+        {/* Next test preview */}
+        {!isLastTest && nextTestName && (
+          <div className="text-xs text-muted-foreground">
+            <span className="font-medium text-foreground">{getText('nextTest')}:</span> {nextTestName}
+          </div>
+        )}
+
         {/* Action buttons */}
         <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          {/* Primary CTA - Start next test NOW */}
           <Button 
             onClick={onContinue}
             size="lg"
             className="flex-1 group"
           >
-            {isLastTest ? getText('viewEssence') : getText('continueBtn')}
+            {isLastTest ? getText('viewEssence') : getText('startNextNow')}
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
           
+          {/* Secondary CTA - Continue later */}
           {!isLastTest && onPause && (
             <Button 
               onClick={onPause}
@@ -133,7 +165,7 @@ export function TestCompletionCard({
               className="flex-1"
             >
               <Pause className="mr-2 h-4 w-4" />
-              {getText('pauseBtn')}
+              {getText('continueBtn')}
             </Button>
           )}
         </div>
