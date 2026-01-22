@@ -149,3 +149,6 @@ verify_jwt = false
 
 [functions.nello-ativacao-codigo]
 verify_jwt = true
+
+[functions.nello-post-factory]
+verify_jwt = true
