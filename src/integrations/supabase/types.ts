@@ -2590,6 +2590,47 @@ export type Database = {
         }
         Relationships: []
       }
+      post_publish_history: {
+        Row: {
+          created_at: string | null
+          engagement_metrics: Json | null
+          error_message: string | null
+          id: string
+          platform: string
+          post_id: string | null
+          published_at: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          engagement_metrics?: Json | null
+          error_message?: string | null
+          id?: string
+          platform: string
+          post_id?: string | null
+          published_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          engagement_metrics?: Json | null
+          error_message?: string | null
+          id?: string
+          platform?: string
+          post_id?: string | null
+          published_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_publish_history_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "social_media_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pricing_plans: {
         Row: {
           active: boolean
@@ -3134,6 +3175,126 @@ export type Database = {
           session_id?: string
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      social_media_posts: {
+        Row: {
+          ai_generated: boolean | null
+          background_image_url: string | null
+          content_type: string
+          copy: string
+          created_at: string | null
+          created_by: string | null
+          cta_text: string | null
+          format: string
+          generated_image_url: string | null
+          id: string
+          image_opacity: number | null
+          platforms: Json | null
+          product: string
+          published_at: string | null
+          scheduled_at: string | null
+          scripture: string | null
+          scripture_ref: string | null
+          status: string | null
+          subtitle: string | null
+          theme: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ai_generated?: boolean | null
+          background_image_url?: string | null
+          content_type: string
+          copy: string
+          created_at?: string | null
+          created_by?: string | null
+          cta_text?: string | null
+          format: string
+          generated_image_url?: string | null
+          id?: string
+          image_opacity?: number | null
+          platforms?: Json | null
+          product: string
+          published_at?: string | null
+          scheduled_at?: string | null
+          scripture?: string | null
+          scripture_ref?: string | null
+          status?: string | null
+          subtitle?: string | null
+          theme?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ai_generated?: boolean | null
+          background_image_url?: string | null
+          content_type?: string
+          copy?: string
+          created_at?: string | null
+          created_by?: string | null
+          cta_text?: string | null
+          format?: string
+          generated_image_url?: string | null
+          id?: string
+          image_opacity?: number | null
+          platforms?: Json | null
+          product?: string
+          published_at?: string | null
+          scheduled_at?: string | null
+          scripture?: string | null
+          scripture_ref?: string | null
+          status?: string | null
+          subtitle?: string | null
+          theme?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      social_media_templates: {
+        Row: {
+          background_image_url: string | null
+          colors: Json | null
+          content_type: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          format: string
+          id: string
+          is_default: boolean | null
+          product: string
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          background_image_url?: string | null
+          colors?: Json | null
+          content_type: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          format: string
+          id?: string
+          is_default?: boolean | null
+          product: string
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          background_image_url?: string | null
+          colors?: Json | null
+          content_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          format?: string
+          id?: string
+          is_default?: boolean | null
+          product?: string
+          title?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
