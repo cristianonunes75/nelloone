@@ -33,6 +33,7 @@ const AdminNotificationsHistory = lazy(() => import("@/components/admin/AdminNot
 const AdminSendReports = lazy(() => import("@/components/admin/AdminSendReports").then(m => ({ default: m.AdminSendReports })));
 const AdminEngagementCenter = lazy(() => import("@/components/admin/AdminEngagementCenter").then(m => ({ default: m.default })));
 const AdminTools = lazy(() => import("@/components/admin/AdminTools").then(m => ({ default: m.AdminTools })));
+const AdminPostFactory = lazy(() => import("@/components/admin/AdminPostFactory").then(m => ({ default: m.AdminPostFactory })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -89,6 +90,7 @@ const Admin = () => {
                 <Route path="depoimentos" element={<TestimonialsManagement />} />
                 <Route path="codigo-essencia" element={<AdminCodigoEssencia />} />
                 <Route path="identidade-visual" element={<AdminBrandIdentity />} />
+                <Route path="post-factory" element={<AdminPostFactory />} />
                 <Route path="comunicacao" element={<CommunicationManagement />} />
                 <Route path="engajamento" element={<AdminEngagementCenter />} />
                 <Route path="enviar-relatorios" element={<AdminSendReports />} />
