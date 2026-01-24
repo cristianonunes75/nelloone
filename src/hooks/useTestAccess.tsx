@@ -11,7 +11,7 @@ export const useTestAccess = () => {
   const effectiveUserId = isImpersonating ? impersonatedUserId : user?.id;
 
   // Fetch test purchases for effective user - include test type and purchase_category for cross-language and bundle matching
-  const { data: purchases } = useQuery({
+  const { data: purchases, isLoading: purchasesLoading } = useQuery({
     queryKey: ["test-purchases", effectiveUserId],
     enabled: !!effectiveUserId,
     queryFn: async () => {
@@ -29,7 +29,7 @@ export const useTestAccess = () => {
   });
 
   // Fetch user profile to check journey_completed_tests
-  const { data: userProfile } = useQuery({
+  const { data: userProfile, isLoading: profileLoading } = useQuery({
     queryKey: ["user-profile-journey", effectiveUserId],
     enabled: !!effectiveUserId,
     queryFn: async () => {
@@ -51,12 +51,15 @@ export const useTestAccess = () => {
     (p as any).purchase_category === 'jornada_completa'
   ) || false;
 
-  // NEW: Check if user completed Arquétipos (step 5, which is journey_completed_tests >= 5)
+  // Check if user completed Arquétipos (step 5, which is journey_completed_tests >= 5)
   // After completing Arquétipos, all remaining tests should be unlocked
   const hasCompletedArquetipos = (userProfile?.journey_completed_tests ?? 0) >= 5;
 
   // Full journey access = bundle purchase OR completed Arquétipos
   const hasFullJourneyAccess = hasBundlePurchase || hasCompletedArquetipos;
+  
+  // Loading state - important to avoid false negatives during data fetch
+  const isLoading = purchasesLoading || profileLoading;
 
   // Fetch all tests to enable cross-language matching by type
   const { data: allTests } = useQuery({
@@ -87,6 +90,10 @@ export const useTestAccess = () => {
     // Admins have access to all tests
     if (userRole === "admin") return true;
     
+    // While loading, be permissive to avoid blocking legitimate users
+    // The test execution component will handle loading states
+    if (isLoading) return true;
+    
     // Users with full journey purchase OR completed Arquétipos have access to all tests
     if (hasFullJourneyAccess) return true;
     
@@ -110,6 +117,10 @@ export const useTestAccess = () => {
   // Check if user has purchased a test
   // Also supports cross-language matching
   const hasPurchased = (testId: string) => {
+    // While loading, be permissive to allow questions to load
+    // Once loaded, proper access checks will apply
+    if (isLoading) return true;
+    
     // Users with full journey purchase have access to all tests
     if (hasFullJourneyAccess) return true;
     
@@ -127,5 +138,5 @@ export const useTestAccess = () => {
     return false;
   };
 
-  return { hasAccess, hasPurchased, purchases, hasFullJourneyAccess };
+  return { hasAccess, hasPurchased, purchases, hasFullJourneyAccess, isLoading };
 };
