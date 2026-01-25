@@ -192,16 +192,23 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
     if (!user?.id) return;
     
     try {
+      // Fetch crossings where user is either user_a or user_b
       const { data, error } = await supabase
         .from('codigo_cruzamentos')
         .select(`
           *,
-          profiles:user_b_id(full_name)
+          profiles:user_b_id(full_name),
+          user_a_profile:user_a_id(full_name)
         `)
         .or(`user_a_id.eq.${user.id},user_b_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading crossings:', error);
+        throw error;
+      }
+      
+      console.log('Crossings loaded:', data);
       setCrossings((data || []) as unknown as Crossing[]);
     } catch (err) {
       console.error('Error loading crossings:', err);
