@@ -12,10 +12,15 @@ const COLORS = {
   text: { r: 50, g: 50, b: 50 },
   muted: { r: 120, g: 120, b: 120 },
   green: { r: 16, g: 185, b: 129 },
+  greenLight: { r: 240, g: 253, b: 244 },
   amber: { r: 245, g: 158, b: 11 },
+  amberLight: { r: 255, g: 251, b: 235 },
   red: { r: 244, g: 63, b: 94 },
+  redLight: { r: 254, g: 242, b: 242 },
   blue: { r: 59, g: 130, b: 246 },
+  blueLight: { r: 239, g: 246, b: 255 },
   purple: { r: 139, g: 92, b: 246 },
+  purpleLight: { r: 250, g: 245, b: 255 },
 };
 
 const TRANSLATIONS = {
@@ -28,8 +33,11 @@ const TRANSLATIONS = {
     trafficLight: {
       title: "Semáforo Relacional",
       green: "Sinergia Natural",
+      greenDesc: "Onde a conexão flui com leveza",
       yellow: "Atenção e Ajuste",
-      red: "Zona de Choque"
+      yellowDesc: "Pontos que exigem diálogo consciente",
+      red: "Zona de Choque",
+      redDesc: "Onde o conflito tende a surgir sob pressão"
     },
     sections: {
       encontro: "O Encontro das Essências",
@@ -53,8 +61,11 @@ const TRANSLATIONS = {
       autoDefense: "Defesa automática",
       riskSituation: "Situação de risco"
     },
+    howToDeal: "Como lidar",
+    disarmWords: "Palavras que desarmam",
     disclaimer: "Este relatório é uma ferramenta simbólica de autoconhecimento. Não substitui terapia ou aconselhamento profissional.",
-    footer: "NELLO ONE • Código do Casal"
+    footer: "NELLO ONE • Código do Casal",
+    why: "Por quê"
   },
   'pt-pt': {
     reportTitle: "Código do Casal",
@@ -65,8 +76,11 @@ const TRANSLATIONS = {
     trafficLight: {
       title: "Semáforo Relacional",
       green: "Sinergia Natural",
+      greenDesc: "Onde a conexão flui com leveza",
       yellow: "Atenção e Ajuste",
-      red: "Zona de Choque"
+      yellowDesc: "Pontos que exigem diálogo consciente",
+      red: "Zona de Choque",
+      redDesc: "Onde o conflito tende a surgir sob pressão"
     },
     sections: {
       encontro: "O Encontro das Essências",
@@ -90,8 +104,11 @@ const TRANSLATIONS = {
       autoDefense: "Defesa automática",
       riskSituation: "Situação de risco"
     },
+    howToDeal: "Como lidar",
+    disarmWords: "Palavras que desarmam",
     disclaimer: "Este relatório é uma ferramenta simbólica de autoconhecimento. Não substitui terapia ou aconselhamento profissional.",
-    footer: "NELLO ONE • Código do Casal"
+    footer: "NELLO ONE • Código do Casal",
+    why: "Porquê"
   },
   en: {
     reportTitle: "Couple Code",
@@ -102,8 +119,11 @@ const TRANSLATIONS = {
     trafficLight: {
       title: "Relational Traffic Light",
       green: "Natural Synergy",
+      greenDesc: "Where connection flows with ease",
       yellow: "Attention and Adjustment",
-      red: "Shock Zone"
+      yellowDesc: "Points that require conscious dialogue",
+      red: "Shock Zone",
+      redDesc: "Where conflict tends to arise under pressure"
     },
     sections: {
       encontro: "The Meeting of Essences",
@@ -127,642 +147,850 @@ const TRANSLATIONS = {
       autoDefense: "Auto defense",
       riskSituation: "Risk situation"
     },
+    howToDeal: "How to deal",
+    disarmWords: "Disarming words",
     disclaimer: "This report is a symbolic tool for self-knowledge. It does not replace therapy or professional counseling.",
-    footer: "NELLO ONE • Couple Code"
+    footer: "NELLO ONE • Couple Code",
+    why: "Why"
   }
 };
 
-export const createCodigoCasalPDF = (
-  content: any,
-  relationshipType: string,
-  options?: PDFOptions
-): jsPDF => {
-  const lang = options?.language || 'pt';
-  const t = TRANSLATIONS[lang];
-  
-  const doc = new jsPDF({
-    orientation: "portrait",
-    unit: "mm",
-    format: "a4",
-  });
+class PDFGenerator {
+  private doc: jsPDF;
+  private pageWidth: number;
+  private pageHeight: number;
+  private margin: number;
+  private contentWidth: number;
+  private currentY: number;
+  private pageNumber: number;
+  private t: typeof TRANSLATIONS['pt'];
+  private footerHeight = 15;
+  private lineHeight = 5;
 
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 20;
-  const contentWidth = pageWidth - margin * 2;
+  constructor(lang: 'pt' | 'pt-pt' | 'en' = 'pt') {
+    this.doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+    this.pageWidth = this.doc.internal.pageSize.getWidth();
+    this.pageHeight = this.doc.internal.pageSize.getHeight();
+    this.margin = 20;
+    this.contentWidth = this.pageWidth - this.margin * 2;
+    this.currentY = this.margin;
+    this.pageNumber = 0;
+    this.t = TRANSLATIONS[lang];
+  }
 
-  let pageNumber = 0;
-  let currentY = margin;
+  private addFooter() {
+    this.doc.setFontSize(8);
+    this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+    this.doc.text(this.t.footer, this.margin, this.pageHeight - 8);
+    this.doc.text(`${this.pageNumber}`, this.pageWidth - this.margin, this.pageHeight - 8, { align: "right" });
+  }
 
-  // Helper functions
-  const addPageNumber = () => {
-    pageNumber++;
-    doc.setFontSize(8);
-    doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-    doc.text(t.footer, margin, pageHeight - 10);
-    doc.text(`${pageNumber}`, pageWidth - margin, pageHeight - 10, { align: "right" });
-  };
+  private addNewPage() {
+    if (this.pageNumber > 0) {
+      this.addFooter();
+    }
+    this.doc.addPage();
+    this.pageNumber++;
+    this.currentY = this.margin;
+  }
 
-  const checkNewPage = (requiredHeight: number) => {
-    if (currentY + requiredHeight > pageHeight - 20) {
-      addPageNumber();
-      doc.addPage();
-      currentY = margin;
+  private getAvailableHeight(): number {
+    return this.pageHeight - this.currentY - this.footerHeight;
+  }
+
+  private ensureSpace(requiredHeight: number): boolean {
+    if (this.currentY + requiredHeight > this.pageHeight - this.footerHeight) {
+      this.addNewPage();
       return true;
     }
     return false;
-  };
+  }
 
-  const addSectionHeader = (title: string, color = COLORS.primary) => {
-    checkNewPage(30);
-    doc.setFillColor(color.r, color.g, color.b);
-    doc.roundedRect(margin, currentY, contentWidth, 12, 2, 2, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text(title, margin + 5, currentY + 8);
-    currentY += 18;
-  };
+  private measureTextHeight(text: string, width: number, fontSize: number): number {
+    this.doc.setFontSize(fontSize);
+    const lines = this.doc.splitTextToSize(text, width);
+    return lines.length * (fontSize * 0.4);
+  }
 
-  const writeText = (text: string, fontSize = 10, color = COLORS.text, bold = false) => {
-    if (!text) return;
-    doc.setTextColor(color.r, color.g, color.b);
-    doc.setFontSize(fontSize);
-    doc.setFont("helvetica", bold ? "bold" : "normal");
-    const lines = doc.splitTextToSize(text, contentWidth);
-    const lineHeight = fontSize * 0.5;
+  private writeWrappedText(text: string, x: number, y: number, maxWidth: number, fontSize = 10, color = COLORS.text, fontStyle: 'normal' | 'bold' | 'italic' = 'normal'): number {
+    if (!text) return y;
+    
+    this.doc.setFontSize(fontSize);
+    this.doc.setTextColor(color.r, color.g, color.b);
+    this.doc.setFont("helvetica", fontStyle);
+    
+    const lines = this.doc.splitTextToSize(text, maxWidth);
+    const lineHeight = fontSize * 0.45;
     
     lines.forEach((line: string) => {
-      checkNewPage(lineHeight + 2);
-      doc.text(line, margin, currentY);
-      currentY += lineHeight;
+      if (y > this.pageHeight - this.footerHeight - 5) {
+        this.addNewPage();
+        y = this.currentY;
+      }
+      this.doc.text(line, x, y);
+      y += lineHeight;
     });
-    currentY += 3;
-  };
-
-  const writeBulletPoint = (text: string, bulletColor = COLORS.primary) => {
-    if (!text) return;
-    checkNewPage(8);
-    doc.setFillColor(bulletColor.r, bulletColor.g, bulletColor.b);
-    doc.circle(margin + 2, currentY - 1.5, 1.5, "F");
-    doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    const lines = doc.splitTextToSize(text, contentWidth - 10);
-    lines.forEach((line: string, idx: number) => {
-      doc.text(line, margin + 8, currentY + (idx * 5));
-    });
-    currentY += lines.length * 5 + 2;
-  };
+    
+    return y;
+  }
 
   // ==========================================
   // COVER PAGE
   // ==========================================
-  doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-  doc.rect(0, 0, pageWidth, pageHeight, "F");
+  private renderCover() {
+    this.pageNumber = 1;
+    
+    // Full background
+    this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
+    this.doc.rect(0, 0, this.pageWidth, this.pageHeight, "F");
 
-  // Decorative accent line
-  doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
-  doc.rect(0, pageHeight / 3 - 2, pageWidth, 4, "F");
+    // Decorative pink accent line
+    this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
+    this.doc.rect(0, this.pageHeight / 3 - 2, this.pageWidth, 4, "F");
 
-  // Heart icon placeholder
-  doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
-  doc.circle(pageWidth / 2, pageHeight / 2 - 60, 20, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(24);
-  doc.text("♥", pageWidth / 2, pageHeight / 2 - 55, { align: "center" });
+    // Heart circle
+    this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
+    this.doc.circle(this.pageWidth / 2, this.pageHeight / 2 - 60, 22, "F");
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(28);
+    this.doc.text("♥", this.pageWidth / 2, this.pageHeight / 2 - 54, { align: "center" });
 
-  // Title
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(32);
-  doc.setFont("helvetica", "bold");
-  doc.text(t.reportTitle, pageWidth / 2, pageHeight / 2 - 20, { align: "center" });
+    // Title
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(36);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text(this.t.reportTitle, this.pageWidth / 2, this.pageHeight / 2 - 15, { align: "center" });
 
-  // Subtitle
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(200, 200, 200);
-  doc.text(t.subtitle, pageWidth / 2, pageHeight / 2, { align: "center" });
+    // Subtitle
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.setTextColor(200, 200, 200);
+    this.doc.text(this.t.subtitle, this.pageWidth / 2, this.pageHeight / 2 + 5, { align: "center" });
 
-  // Signature
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "italic");
-  doc.setTextColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
-  doc.text(t.signature, pageWidth / 2, pageHeight / 2 + 15, { align: "center" });
+    // Signature
+    this.doc.setFontSize(12);
+    this.doc.setFont("helvetica", "italic");
+    this.doc.setTextColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
+    this.doc.text(this.t.signature, this.pageWidth / 2, this.pageHeight / 2 + 22, { align: "center" });
 
-  // Date
-  const dateLocale = lang === 'en' ? 'en-US' : 'pt-BR';
-  const date = new Date().toLocaleDateString(dateLocale, {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-  doc.setFontSize(12);
-  doc.setTextColor(180, 180, 180);
-  doc.text(date, pageWidth / 2, pageHeight / 2 + 35, { align: "center" });
+    // Date
+    const date = new Date().toLocaleDateString(this.t === TRANSLATIONS.en ? 'en-US' : 'pt-BR', {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+    this.doc.setFontSize(11);
+    this.doc.setTextColor(180, 180, 180);
+    this.doc.text(date, this.pageWidth / 2, this.pageHeight / 2 + 40, { align: "center" });
 
-  // Brand footer
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
-  doc.text("NELLO ONE", pageWidth / 2, pageHeight - 25, { align: "center" });
+    // Brand footer
+    this.doc.setFontSize(11);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.setTextColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
+    this.doc.text("NELLO ONE", this.pageWidth / 2, this.pageHeight - 25, { align: "center" });
+  }
 
   // ==========================================
-  // PAGE 2: BOAT METAPHOR
+  // BOAT METAPHOR SECTION
   // ==========================================
-  doc.addPage();
-  addPageNumber();
-  currentY = margin;
-
-  // Boat metaphor intro
-  doc.setFillColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b, 0.1);
-  doc.roundedRect(margin, currentY, contentWidth, 40, 3, 3, "F");
-  doc.setDrawColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
-  doc.roundedRect(margin, currentY, contentWidth, 40, 3, 3, "S");
-  
-  doc.setTextColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text("⛵ " + t.boatTitle, margin + 5, currentY + 10);
-  
-  doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "italic");
-  const boatLines = doc.splitTextToSize(t.boatText, contentWidth - 10);
-  doc.text(boatLines, margin + 5, currentY + 18);
-  currentY += 50;
+  private renderBoatMetaphor() {
+    this.addNewPage();
+    
+    const boxHeight = 45;
+    this.ensureSpace(boxHeight);
+    
+    // Blue bordered box
+    this.doc.setFillColor(COLORS.blueLight.r, COLORS.blueLight.g, COLORS.blueLight.b);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, boxHeight, 4, 4, "F");
+    this.doc.setDrawColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
+    this.doc.setLineWidth(0.5);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, boxHeight, 4, 4, "S");
+    
+    // Icon and title
+    this.doc.setTextColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text("⛵ " + this.t.boatTitle, this.margin + 8, this.currentY + 12);
+    
+    // Description text
+    this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+    this.doc.setFontSize(10);
+    this.doc.setFont("helvetica", "italic");
+    const boatLines = this.doc.splitTextToSize(this.t.boatText, this.contentWidth - 16);
+    this.doc.text(boatLines, this.margin + 8, this.currentY + 22);
+    
+    this.currentY += boxHeight + 12;
+  }
 
   // ==========================================
   // TRAFFIC LIGHT SECTION
   // ==========================================
-  const semaforo = content.semaforo_relacional;
-  if (semaforo) {
-    addSectionHeader(semaforo.titulo || t.trafficLight.title);
+  private renderTrafficLight(content: any) {
+    const semaforo = content.semaforo_relacional;
+    if (!semaforo) return;
 
-    // Green zone
-    if (semaforo.verde) {
-      doc.setFillColor(COLORS.green.r, COLORS.green.g, COLORS.green.b, 0.1);
-      checkNewPage(40);
-      const boxY = currentY;
-      doc.roundedRect(margin, currentY, contentWidth, 35, 2, 2, "F");
-      doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text("🟢 " + (semaforo.verde.titulo || t.trafficLight.green), margin + 5, currentY + 8);
-      doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      if (semaforo.verde.descricao) {
-        const greenLines = doc.splitTextToSize(semaforo.verde.descricao, contentWidth - 10);
-        doc.text(greenLines, margin + 5, currentY + 15);
-      }
-      if (semaforo.verde.pontos?.length) {
-        let pointY = currentY + 22;
-        semaforo.verde.pontos.slice(0, 3).forEach((ponto: string) => {
-          doc.text("✓ " + ponto.substring(0, 60) + (ponto.length > 60 ? "..." : ""), margin + 5, pointY);
-          pointY += 5;
-        });
-      }
-      currentY += 42;
+    // Section title
+    this.doc.setTextColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
+    this.doc.setFontSize(16);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text(semaforo.titulo || this.t.trafficLight.title, this.margin, this.currentY);
+    this.currentY += 10;
+
+    // Render each zone
+    this.renderTrafficZone(semaforo.verde, COLORS.green, COLORS.greenLight, "🟢", this.t.trafficLight.green, this.t.trafficLight.greenDesc);
+    this.renderTrafficZone(semaforo.amarelo, COLORS.amber, COLORS.amberLight, "🟡", this.t.trafficLight.yellow, this.t.trafficLight.yellowDesc);
+    this.renderTrafficZone(semaforo.vermelho, COLORS.red, COLORS.redLight, "🔴", this.t.trafficLight.red, this.t.trafficLight.redDesc);
+  }
+
+  private renderTrafficZone(zone: any, mainColor: any, bgColor: any, icon: string, title: string, desc: string) {
+    if (!zone) return;
+
+    const points = zone.pontos || [];
+    const textHeight = 25 + (points.length * 8);
+    this.ensureSpace(Math.min(textHeight, 60));
+
+    const startY = this.currentY;
+    
+    // Background box
+    this.doc.setFillColor(bgColor.r, bgColor.g, bgColor.b);
+    
+    // Calculate actual height needed
+    let tempY = startY + 20;
+    if (zone.descricao) {
+      const descLines = this.doc.splitTextToSize(zone.descricao, this.contentWidth - 16);
+      tempY += descLines.length * 4.5;
+    }
+    points.forEach((ponto: string) => {
+      const pointLines = this.doc.splitTextToSize("• " + ponto, this.contentWidth - 20);
+      tempY += pointLines.length * 4.5 + 2;
+    });
+    
+    const boxHeight = Math.max(tempY - startY + 8, 30);
+    
+    // Check if we need a new page for this entire box
+    if (this.currentY + boxHeight > this.pageHeight - this.footerHeight) {
+      this.addNewPage();
     }
 
-    // Yellow zone
-    if (semaforo.amarelo) {
-      doc.setFillColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b, 0.1);
-      checkNewPage(40);
-      doc.roundedRect(margin, currentY, contentWidth, 35, 2, 2, "F");
-      doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text("🟡 " + (semaforo.amarelo.titulo || t.trafficLight.yellow), margin + 5, currentY + 8);
-      doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      if (semaforo.amarelo.descricao) {
-        const yellowLines = doc.splitTextToSize(semaforo.amarelo.descricao, contentWidth - 10);
-        doc.text(yellowLines, margin + 5, currentY + 15);
-      }
-      if (semaforo.amarelo.pontos?.length) {
-        let pointY = currentY + 22;
-        semaforo.amarelo.pontos.slice(0, 3).forEach((ponto: string) => {
-          doc.text("⚠ " + ponto.substring(0, 60) + (ponto.length > 60 ? "..." : ""), margin + 5, pointY);
-          pointY += 5;
-        });
-      }
-      currentY += 42;
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, boxHeight, 3, 3, "F");
+    this.doc.setDrawColor(mainColor.r, mainColor.g, mainColor.b);
+    this.doc.setLineWidth(0.3);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, boxHeight, 3, 3, "S");
+
+    // Title with icon
+    this.doc.setTextColor(mainColor.r, mainColor.g, mainColor.b);
+    this.doc.setFontSize(12);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text(icon + " " + (zone.titulo || title), this.margin + 6, this.currentY + 10);
+    
+    // Subtitle description
+    this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+    this.doc.setFontSize(9);
+    this.doc.setFont("helvetica", "italic");
+    this.doc.text(desc, this.margin + 6, this.currentY + 16);
+
+    let innerY = this.currentY + 22;
+
+    // Zone description
+    if (zone.descricao) {
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "normal");
+      const descLines = this.doc.splitTextToSize(zone.descricao, this.contentWidth - 16);
+      this.doc.text(descLines, this.margin + 6, innerY);
+      innerY += descLines.length * 4.5 + 4;
     }
 
-    // Red zone
-    if (semaforo.vermelho) {
-      doc.setFillColor(COLORS.red.r, COLORS.red.g, COLORS.red.b, 0.1);
-      checkNewPage(40);
-      doc.roundedRect(margin, currentY, contentWidth, 35, 2, 2, "F");
-      doc.setTextColor(COLORS.red.r, COLORS.red.g, COLORS.red.b);
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text("🔴 " + (semaforo.vermelho.titulo || t.trafficLight.red), margin + 5, currentY + 8);
-      doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      if (semaforo.vermelho.descricao) {
-        const redLines = doc.splitTextToSize(semaforo.vermelho.descricao, contentWidth - 10);
-        doc.text(redLines, margin + 5, currentY + 15);
-      }
-      if (semaforo.vermelho.pontos?.length) {
-        let pointY = currentY + 22;
-        semaforo.vermelho.pontos.slice(0, 3).forEach((ponto: string) => {
-          doc.text("⛔ " + ponto.substring(0, 60) + (ponto.length > 60 ? "..." : ""), margin + 5, pointY);
-          pointY += 5;
-        });
-      }
-      currentY += 42;
-    }
+    // Points
+    points.forEach((ponto: string) => {
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "normal");
+      const pointLines = this.doc.splitTextToSize("• " + ponto, this.contentWidth - 20);
+      this.doc.text(pointLines, this.margin + 10, innerY);
+      innerY += pointLines.length * 4.5 + 2;
+    });
+
+    this.currentY += boxHeight + 8;
+  }
+
+  // ==========================================
+  // SECTION WITH COLORED HEADER
+  // ==========================================
+  private renderSectionHeader(title: string, color = COLORS.primary) {
+    this.ensureSpace(20);
+    
+    this.doc.setFillColor(color.r, color.g, color.b);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 10, 2, 2, "F");
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(11);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text(title, this.margin + 6, this.currentY + 7);
+    this.currentY += 16;
   }
 
   // ==========================================
   // MEETING OF ESSENCES
   // ==========================================
-  const encontro = content.encontro_essencias;
-  if (encontro) {
-    doc.addPage();
-    addPageNumber();
-    currentY = margin;
+  private renderMeetingOfEssences(content: any) {
+    const encontro = content.encontro_essencias;
+    if (!encontro) return;
 
-    addSectionHeader(encontro.titulo || t.sections.encontro, COLORS.pink);
+    this.addNewPage();
+    this.renderSectionHeader(encontro.titulo || this.t.sections.encontro, COLORS.pink);
 
+    // Metaphor title (centered, highlighted)
     if (encontro.metafora) {
-      doc.setTextColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
-      doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
-      doc.text("✨ " + encontro.metafora + " ✨", pageWidth / 2, currentY, { align: "center" });
-      currentY += 10;
+      this.ensureSpace(15);
+      this.doc.setTextColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
+      this.doc.setFontSize(14);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text("✨ " + encontro.metafora + " ✨", this.pageWidth / 2, this.currentY, { align: "center" });
+      this.currentY += 12;
     }
 
+    // Description text
     if (encontro.descricao) {
-      writeText(encontro.descricao);
+      this.currentY = this.writeWrappedText(encontro.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal');
+      this.currentY += 6;
+    }
+
+    // Descriptions for each person
+    if (encontro.descricao_usuario_a) {
+      this.currentY = this.writeWrappedText(encontro.descricao_usuario_a, this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal');
+      this.currentY += 6;
+    }
+    if (encontro.descricao_usuario_b) {
+      this.currentY = this.writeWrappedText(encontro.descricao_usuario_b, this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal');
+      this.currentY += 6;
     }
   }
 
   // ==========================================
   // ONDE O SANTO BATE
   // ==========================================
-  const santoBate = content.santo_bate;
-  if (santoBate) {
-    doc.addPage();
-    addPageNumber();
-    currentY = margin;
+  private renderSantoBate(content: any) {
+    const santo = content.santo_bate;
+    if (!santo) return;
 
-    addSectionHeader(santoBate.titulo || t.sections.santoBate, COLORS.green);
+    this.addNewPage();
+    this.renderSectionHeader(santo.titulo || this.t.sections.santoBate, COLORS.green);
 
-    if (santoBate.descricao) {
-      writeText(santoBate.descricao);
+    if (santo.descricao) {
+      this.currentY = this.writeWrappedText(santo.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+      this.currentY += 8;
     }
 
-    santoBate.areas?.forEach((area: any) => {
-      checkNewPage(25);
-      doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text("✨ " + area.titulo, margin, currentY);
-      currentY += 6;
+    // Areas cards
+    santo.areas?.forEach((area: any) => {
+      const areaHeight = this.measureTextHeight(area.descricao || '', this.contentWidth - 20, 10) + 20;
+      this.ensureSpace(areaHeight);
+
+      // Card background
+      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, areaHeight, 3, 3, "F");
+      this.doc.setDrawColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+      this.doc.setLineWidth(0.2);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, areaHeight, 3, 3, "S");
+
+      // Title
+      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text("✨ " + area.titulo, this.margin + 6, this.currentY + 10);
+
+      // Description
       if (area.descricao) {
-        writeText(area.descricao);
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFontSize(10);
+        this.doc.setFont("helvetica", "normal");
+        const lines = this.doc.splitTextToSize(area.descricao, this.contentWidth - 16);
+        this.doc.text(lines, this.margin + 6, this.currentY + 18);
       }
+
+      this.currentY += areaHeight + 6;
     });
   }
 
   // ==========================================
   // ONDE O BICHO PEGA
   // ==========================================
-  const bichoPega = content.bicho_pega;
-  if (bichoPega) {
-    doc.addPage();
-    addPageNumber();
-    currentY = margin;
+  private renderBichoPega(content: any) {
+    const bicho = content.bicho_pega;
+    if (!bicho) return;
 
-    addSectionHeader(bichoPega.titulo || t.sections.bichoPega, COLORS.amber);
+    this.addNewPage();
+    this.renderSectionHeader(bicho.titulo || this.t.sections.bichoPega, COLORS.amber);
 
-    if (bichoPega.descricao) {
-      writeText(bichoPega.descricao);
+    if (bicho.descricao) {
+      this.currentY = this.writeWrappedText(bicho.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+      this.currentY += 8;
     }
 
-    bichoPega.atritios?.forEach((atrito: any) => {
-      checkNewPage(30);
-      doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text("⚡ " + atrito.titulo, margin, currentY);
-      currentY += 6;
+    // Friction cards
+    bicho.atritios?.forEach((atrito: any) => {
+      const descHeight = this.measureTextHeight(atrito.descricao || '', this.contentWidth - 20, 10);
+      const howToHeight = atrito.como_lidar ? this.measureTextHeight(atrito.como_lidar, this.contentWidth - 30, 9) + 15 : 0;
+      const cardHeight = descHeight + howToHeight + 25;
+      
+      this.ensureSpace(cardHeight);
+
+      // Card background
+      this.doc.setFillColor(COLORS.amberLight.r, COLORS.amberLight.g, COLORS.amberLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "F");
+      this.doc.setDrawColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+      this.doc.setLineWidth(0.2);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "S");
+
+      // Title
+      this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text("⚡ " + atrito.titulo, this.margin + 6, this.currentY + 10);
+
+      let innerY = this.currentY + 18;
+
+      // Description
       if (atrito.descricao) {
-        writeText(atrito.descricao);
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFontSize(10);
+        this.doc.setFont("helvetica", "normal");
+        const lines = this.doc.splitTextToSize(atrito.descricao, this.contentWidth - 16);
+        this.doc.text(lines, this.margin + 6, innerY);
+        innerY += lines.length * 4.5 + 6;
       }
+
+      // How to deal box
       if (atrito.como_lidar) {
-        doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "italic");
-        doc.text("💡 Como lidar: " + atrito.como_lidar.substring(0, 80), margin, currentY);
-        currentY += 8;
+        this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
+        const howToBoxHeight = this.measureTextHeight(atrito.como_lidar, this.contentWidth - 30, 9) + 10;
+        this.doc.roundedRect(this.margin + 6, innerY, this.contentWidth - 12, howToBoxHeight, 2, 2, "F");
+        
+        this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+        this.doc.setFontSize(9);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text("💡 " + this.t.howToDeal + ":", this.margin + 10, innerY + 6);
+        
+        this.doc.setFont("helvetica", "normal");
+        const howLines = this.doc.splitTextToSize(atrito.como_lidar, this.contentWidth - 35);
+        this.doc.text(howLines, this.margin + 10, innerY + 12);
       }
+
+      this.currentY += cardHeight + 8;
     });
   }
 
   // ==========================================
   // POTENTIALIZATION
   // ==========================================
-  const pot = content.potencializacao;
-  if (pot) {
-    doc.addPage();
-    addPageNumber();
-    currentY = margin;
+  private renderPotentialization(content: any) {
+    const pot = content.potencializacao;
+    if (!pot) return;
 
-    addSectionHeader(pot.titulo || t.sections.potencializacao, COLORS.purple);
+    this.addNewPage();
+    this.renderSectionHeader(pot.titulo || this.t.sections.potencializacao, COLORS.purple);
 
     if (pot.descricao) {
-      writeText(pot.descricao);
+      this.currentY = this.writeWrappedText(pot.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+      this.currentY += 8;
     }
 
+    // Strengths list
     pot.forcas?.forEach((forca: string) => {
-      writeBulletPoint(forca, COLORS.pink);
+      const forceHeight = this.measureTextHeight(forca, this.contentWidth - 16, 10) + 6;
+      this.ensureSpace(forceHeight);
+
+      this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
+      this.doc.circle(this.margin + 4, this.currentY, 2, "F");
+      
+      this.currentY = this.writeWrappedText(forca, this.margin + 10, this.currentY + 2, this.contentWidth - 12, 10, COLORS.text, 'normal');
+      this.currentY += 4;
     });
   }
 
   // ==========================================
   // TRANSLATION TABLE
   // ==========================================
-  const tabela = content.tabela_traducao;
-  if (tabela) {
-    doc.addPage();
-    addPageNumber();
-    currentY = margin;
+  private renderTranslationTable(content: any) {
+    const tabela = content.tabela_traducao;
+    if (!tabela) return;
 
-    addSectionHeader(tabela.titulo || t.sections.tabelaTraducao, COLORS.blue);
+    this.addNewPage();
+    this.renderSectionHeader(tabela.titulo || this.t.sections.tabelaTraducao, COLORS.blue);
 
     if (tabela.descricao) {
-      writeText(tabela.descricao, 10, COLORS.muted, false);
+      this.currentY = this.writeWrappedText(tabela.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+      this.currentY += 10;
     }
 
     const renderTranslations = (translations: any[], personName: string) => {
       if (!translations?.length) return;
       
-      doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text(personName, margin, currentY);
-      currentY += 6;
+      this.ensureSpace(15);
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(12);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(personName, this.margin, this.currentY);
+      this.currentY += 8;
 
       translations.forEach((item: any) => {
-        checkNewPage(25);
-        doc.setFillColor(240, 240, 245);
-        doc.roundedRect(margin, currentY, contentWidth, 22, 2, 2, "F");
-        
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        doc.text(t.translationTable.whenDoes + ": ", margin + 3, currentY + 6);
-        doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
         const whenText = item.quando_faz || item.quando_diz || "";
-        doc.text(whenText.substring(0, 60), margin + 30, currentY + 6);
-
-        doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-        doc.text(t.translationTable.youFeel + ": ", margin + 3, currentY + 12);
-        doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
         const feelText = item.voce_sente || item.outro_ouve || "";
-        doc.text(feelText.substring(0, 60), margin + 30, currentY + 12);
-
-        doc.setTextColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-        doc.text(t.translationTable.truthBehind + ": ", margin + 3, currentY + 18);
-        doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
         const truthText = item.verdade_por_tras || item.intencao_real || "";
-        doc.text(truthText.substring(0, 60), margin + 35, currentY + 18);
+        
+        const totalHeight = 
+          this.measureTextHeight(whenText, this.contentWidth - 50, 9) +
+          this.measureTextHeight(feelText, this.contentWidth - 50, 9) +
+          this.measureTextHeight(truthText, this.contentWidth - 50, 9) + 20;
+        
+        this.ensureSpace(totalHeight);
 
-        currentY += 26;
+        this.doc.setFillColor(245, 245, 248);
+        this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, totalHeight, 3, 3, "F");
+
+        let innerY = this.currentY + 8;
+
+        // When does/says
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.setFontSize(9);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text(this.t.translationTable.whenDoes + ":", this.margin + 6, innerY);
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFont("helvetica", "normal");
+        const whenLines = this.doc.splitTextToSize(whenText, this.contentWidth - 50);
+        this.doc.text(whenLines, this.margin + 45, innerY);
+        innerY += whenLines.length * 4 + 5;
+
+        // You feel
+        this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text(this.t.translationTable.youFeel + ":", this.margin + 6, innerY);
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFont("helvetica", "normal");
+        const feelLines = this.doc.splitTextToSize(feelText, this.contentWidth - 50);
+        this.doc.text(feelLines, this.margin + 45, innerY);
+        innerY += feelLines.length * 4 + 5;
+
+        // Truth behind
+        this.doc.setTextColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text(this.t.translationTable.truthBehind + ":", this.margin + 6, innerY);
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFont("helvetica", "normal");
+        const truthLines = this.doc.splitTextToSize(truthText, this.contentWidth - 50);
+        this.doc.text(truthLines, this.margin + 45, innerY);
+
+        this.currentY += totalHeight + 6;
       });
     };
 
-    if (tabela.traducoes_usuario_a) renderTranslations(tabela.traducoes_usuario_a, "Pessoa A");
-    if (tabela.traducoes_usuario_b) renderTranslations(tabela.traducoes_usuario_b, "Pessoa B");
+    if (tabela.traducoes_usuario_a) renderTranslations(tabela.traducoes_usuario_a, tabela.nome_usuario_a || "Pessoa A");
+    if (tabela.traducoes_usuario_b) {
+      this.currentY += 6;
+      renderTranslations(tabela.traducoes_usuario_b, tabela.nome_usuario_b || "Pessoa B");
+    }
   }
 
   // ==========================================
-  // PROTOCOLO DE PAZ
+  // PEACE PROTOCOL
   // ==========================================
-  const protocolo = content.protocolo_paz;
-  if (protocolo) {
-    doc.addPage();
-    addPageNumber();
-    currentY = margin;
+  private renderPeaceProtocol(content: any) {
+    const protocolo = content.protocolo_paz;
+    if (!protocolo) return;
 
-    addSectionHeader(protocolo.titulo || t.sections.protocoloPaz, COLORS.blue);
+    this.addNewPage();
+    this.renderSectionHeader(protocolo.titulo || this.t.sections.protocoloPaz, COLORS.blue);
 
     if (protocolo.descricao) {
-      writeText(protocolo.descricao, 10, COLORS.muted, false);
+      this.currentY = this.writeWrappedText(protocolo.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+      this.currentY += 10;
     }
 
     protocolo.regras?.forEach((regra: any, idx: number) => {
-      checkNewPage(20);
-      doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-      doc.circle(margin + 5, currentY, 5, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "bold");
-      doc.text(String(regra.numero || idx + 1), margin + 5, currentY + 1, { align: "center" });
+      const regraHeight = this.measureTextHeight(regra.regra || '', this.contentWidth - 30, 11);
+      const porqueHeight = regra.porque ? this.measureTextHeight(regra.porque, this.contentWidth - 30, 9) : 0;
+      const totalHeight = regraHeight + porqueHeight + 20;
+      
+      this.ensureSpace(totalHeight);
 
-      doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      doc.setFontSize(11);
-      doc.text(regra.regra, margin + 14, currentY + 1);
-      currentY += 8;
+      // Number circle
+      this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
+      this.doc.circle(this.margin + 6, this.currentY + 5, 6, "F");
+      this.doc.setTextColor(255, 255, 255);
+      this.doc.setFontSize(10);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(String(regra.numero || idx + 1), this.margin + 6, this.currentY + 7, { align: "center" });
 
+      // Rule text
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "bold");
+      const regraLines = this.doc.splitTextToSize(regra.regra, this.contentWidth - 25);
+      this.doc.text(regraLines, this.margin + 18, this.currentY + 7);
+      let innerY = this.currentY + 10 + regraLines.length * 5;
+
+      // Why explanation
       if (regra.porque) {
-        doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "italic");
-        const porqueLines = doc.splitTextToSize("Por quê: " + regra.porque, contentWidth - 15);
-        doc.text(porqueLines, margin + 14, currentY);
-        currentY += porqueLines.length * 4 + 4;
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.setFontSize(9);
+        this.doc.setFont("helvetica", "italic");
+        const porqueLines = this.doc.splitTextToSize(this.t.why + ": " + regra.porque, this.contentWidth - 25);
+        this.doc.text(porqueLines, this.margin + 18, innerY);
+        innerY += porqueLines.length * 4 + 4;
       }
+
+      this.currentY = innerY + 6;
     });
   }
 
   // ==========================================
   // SPOUSE MANUALS
   // ==========================================
-  const manualA = content.manual_conjuge_a;
-  const manualB = content.manual_conjuge_b;
-  
-  if (manualA || manualB) {
-    doc.addPage();
-    addPageNumber();
-    currentY = margin;
+  private renderSpouseManuals(content: any) {
+    const manualA = content.manual_conjuge_a;
+    const manualB = content.manual_conjuge_b;
+    
+    if (!manualA && !manualB) return;
 
-    if (manualA) {
-      addSectionHeader(manualA.titulo || t.sections.manualConjuge + " A", COLORS.purple);
+    this.addNewPage();
+
+    const renderManual = (manual: any) => {
+      if (!manual) return;
       
-      if (manualA.orientacoes?.length) {
-        manualA.orientacoes.forEach((item: string) => {
-          writeBulletPoint(item, COLORS.purple);
+      this.renderSectionHeader(manual.titulo || this.t.sections.manualConjuge, COLORS.purple);
+
+      // Orientations
+      if (manual.orientacoes?.length) {
+        manual.orientacoes.forEach((item: string) => {
+          const itemHeight = this.measureTextHeight(item, this.contentWidth - 16, 10) + 6;
+          this.ensureSpace(itemHeight);
+
+          this.doc.setFillColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+          this.doc.circle(this.margin + 4, this.currentY, 2, "F");
+          
+          this.currentY = this.writeWrappedText(item, this.margin + 10, this.currentY + 2, this.contentWidth - 12, 10, COLORS.text, 'normal');
+          this.currentY += 4;
         });
       }
-      
-      if (manualA.palavras_desarmam?.length) {
-        currentY += 5;
-        doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "bold");
-        doc.text("Palavras que desarmam:", margin, currentY);
-        currentY += 6;
-        doc.setFont("helvetica", "normal");
-        doc.text(manualA.palavras_desarmam.map((p: string) => `"${p}"`).join(", "), margin, currentY);
-        currentY += 10;
-      }
-    }
 
+      // Disarming words
+      if (manual.palavras_desarmam?.length) {
+        this.currentY += 6;
+        this.ensureSpace(20);
+        
+        this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
+        this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 2, 2, "F");
+        
+        this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+        this.doc.setFontSize(10);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text(this.t.disarmWords + ":", this.margin + 6, this.currentY + 8);
+        
+        this.doc.setFont("helvetica", "normal");
+        const wordsText = manual.palavras_desarmam.map((p: string) => `"${p}"`).join(", ");
+        this.doc.text(wordsText, this.margin + 6, this.currentY + 15);
+        
+        this.currentY += 26;
+      }
+    };
+
+    renderManual(manualA);
     if (manualB) {
-      currentY += 10;
-      addSectionHeader(manualB.titulo || t.sections.manualConjuge + " B", COLORS.purple);
-      
-      if (manualB.orientacoes?.length) {
-        manualB.orientacoes.forEach((item: string) => {
-          writeBulletPoint(item, COLORS.purple);
-        });
-      }
-      
-      if (manualB.palavras_desarmam?.length) {
-        currentY += 5;
-        doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "bold");
-        doc.text("Palavras que desarmam:", margin, currentY);
-        currentY += 6;
-        doc.setFont("helvetica", "normal");
-        doc.text(manualB.palavras_desarmam.map((p: string) => `"${p}"`).join(", "), margin, currentY);
-        currentY += 10;
-      }
+      this.currentY += 10;
+      renderManual(manualB);
     }
   }
 
   // ==========================================
   // PRESSURE ALERTS
   // ==========================================
-  const alertas = content.alertas_pressao;
-  if (alertas) {
-    doc.addPage();
-    addPageNumber();
-    currentY = margin;
+  private renderPressureAlerts(content: any) {
+    const alertas = content.alertas_pressao;
+    if (!alertas) return;
 
-    addSectionHeader(alertas.titulo || t.sections.alertasPressao, COLORS.amber);
+    this.addNewPage();
+    this.renderSectionHeader(alertas.titulo || this.t.sections.alertasPressao, COLORS.amber);
 
     if (alertas.descricao) {
-      writeText(alertas.descricao);
+      this.currentY = this.writeWrappedText(alertas.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+      this.currentY += 10;
     }
 
     alertas.gatilhos?.forEach((gatilho: any) => {
-      checkNewPage(25);
-      doc.setFillColor(255, 251, 235);
-      doc.roundedRect(margin, currentY, contentWidth, 22, 2, 2, "F");
-      
-      doc.setFontSize(9);
-      doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-      doc.text(t.pressureAlerts.behavior + ": ", margin + 3, currentY + 6);
-      doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      doc.text((gatilho.comportamento || "").substring(0, 60), margin + 30, currentY + 6);
+      const cardHeight = 35;
+      this.ensureSpace(cardHeight);
 
-      doc.setTextColor(COLORS.red.r, COLORS.red.g, COLORS.red.b);
-      doc.text(t.pressureAlerts.autoDefense + ": ", margin + 3, currentY + 12);
-      doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      doc.text((gatilho.defesa_automatica || "").substring(0, 60), margin + 35, currentY + 12);
+      this.doc.setFillColor(COLORS.amberLight.r, COLORS.amberLight.g, COLORS.amberLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "F");
 
-      doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-      doc.text(t.pressureAlerts.riskSituation + ": ", margin + 3, currentY + 18);
-      doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      doc.text((gatilho.situacao_risco || "").substring(0, 60), margin + 35, currentY + 18);
+      let innerY = this.currentY + 8;
 
-      currentY += 26;
+      // Behavior
+      this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(this.t.pressureAlerts.behavior + ":", this.margin + 6, innerY);
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFont("helvetica", "normal");
+      this.doc.text(gatilho.comportamento || "", this.margin + 40, innerY);
+      innerY += 8;
+
+      // Auto defense
+      this.doc.setTextColor(COLORS.red.r, COLORS.red.g, COLORS.red.b);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(this.t.pressureAlerts.autoDefense + ":", this.margin + 6, innerY);
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFont("helvetica", "normal");
+      this.doc.text(gatilho.defesa_automatica || "", this.margin + 45, innerY);
+      innerY += 8;
+
+      // Risk situation
+      this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(this.t.pressureAlerts.riskSituation + ":", this.margin + 6, innerY);
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFont("helvetica", "normal");
+      this.doc.text(gatilho.situacao_risco || "", this.margin + 45, innerY);
+
+      this.currentY += cardHeight + 6;
     });
   }
 
   // ==========================================
   // CONNECTION CHALLENGE
   // ==========================================
-  const desafio = content.desafio_conexao || content.desafio_conexao_familiar;
-  if (desafio) {
-    doc.addPage();
-    addPageNumber();
-    currentY = margin;
+  private renderConnectionChallenge(content: any) {
+    const desafio = content.desafio_conexao || content.desafio_conexao_familiar;
+    if (!desafio) return;
 
-    addSectionHeader(desafio.titulo || t.sections.desafioConexao, COLORS.green);
+    this.ensureSpace(60);
+    this.renderSectionHeader(desafio.titulo || this.t.sections.desafioConexao, COLORS.green);
 
     if (desafio.descricao) {
-      writeText(desafio.descricao);
+      this.currentY = this.writeWrappedText(desafio.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal');
+      this.currentY += 8;
     }
 
     if (desafio.acao) {
-      checkNewPage(20);
-      doc.setFillColor(COLORS.green.r, COLORS.green.g, COLORS.green.b, 0.1);
-      doc.roundedRect(margin, currentY, contentWidth, 20, 3, 3, "F");
-      doc.setDrawColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      doc.roundedRect(margin, currentY, contentWidth, 20, 3, 3, "S");
+      const acaoHeight = this.measureTextHeight(desafio.acao, this.contentWidth - 16, 11) + 15;
+      this.ensureSpace(acaoHeight);
       
-      doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      const acaoLines = doc.splitTextToSize(desafio.acao, contentWidth - 10);
-      doc.text(acaoLines, margin + 5, currentY + 8);
-      currentY += 25;
+      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, acaoHeight, 3, 3, "F");
+      this.doc.setDrawColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+      this.doc.setLineWidth(0.5);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, acaoHeight, 3, 3, "S");
+      
+      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "bold");
+      const acaoLines = this.doc.splitTextToSize(desafio.acao, this.contentWidth - 16);
+      this.doc.text(acaoLines, this.margin + 8, this.currentY + 10);
+      
+      this.currentY += acaoHeight + 10;
     }
   }
 
   // ==========================================
   // WHEN TO SEEK HELP
   // ==========================================
-  const ajuda = content.quando_buscar_ajuda;
-  if (ajuda) {
-    currentY += 10;
-    addSectionHeader(ajuda.titulo || t.sections.quandoBuscar, COLORS.blue);
+  private renderSeekHelp(content: any) {
+    const ajuda = content.quando_buscar_ajuda;
+    if (!ajuda) return;
+
+    this.ensureSpace(40);
+    this.renderSectionHeader(ajuda.titulo || this.t.sections.quandoBuscar, COLORS.blue);
 
     if (ajuda.descricao) {
-      writeText(ajuda.descricao, 10, COLORS.blue, true);
+      this.currentY = this.writeWrappedText(ajuda.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.blue, 'bold');
+      this.currentY += 6;
     }
 
     ajuda.sugestoes?.forEach((sugestao: string) => {
-      writeBulletPoint(sugestao, COLORS.blue);
+      const suggestionHeight = this.measureTextHeight(sugestao, this.contentWidth - 16, 10) + 6;
+      this.ensureSpace(suggestionHeight);
+
+      this.doc.setFillColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
+      this.doc.circle(this.margin + 4, this.currentY, 2, "F");
+      
+      this.currentY = this.writeWrappedText(sugestao, this.margin + 10, this.currentY + 2, this.contentWidth - 12, 10, COLORS.text, 'normal');
+      this.currentY += 4;
     });
   }
 
   // ==========================================
   // CLOSING & DISCLAIMER
   // ==========================================
-  doc.addPage();
-  addPageNumber();
-  currentY = margin;
+  private renderClosing(content: any) {
+    this.addNewPage();
 
-  // Closing message
-  if (content.fechamento) {
-    doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b, 0.05);
-    doc.roundedRect(margin, currentY, contentWidth, 40, 3, 3, "F");
-    doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "italic");
-    const closingLines = doc.splitTextToSize(content.fechamento, contentWidth - 10);
-    doc.text(closingLines, pageWidth / 2, currentY + 15, { align: "center" });
-    currentY += 50;
+    // Closing message
+    if (content.fechamento) {
+      const closingHeight = this.measureTextHeight(content.fechamento, this.contentWidth - 20, 11) + 25;
+      this.ensureSpace(closingHeight);
+      
+      this.doc.setFillColor(COLORS.blueLight.r, COLORS.blueLight.g, COLORS.blueLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, closingHeight, 4, 4, "F");
+      
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "italic");
+      const closingLines = this.doc.splitTextToSize(content.fechamento, this.contentWidth - 20);
+      this.doc.text(closingLines, this.pageWidth / 2, this.currentY + 15, { align: "center", maxWidth: this.contentWidth - 20 });
+      
+      this.currentY += closingHeight + 30;
+    }
+
+    // Disclaimer at bottom
+    this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+    this.doc.setFontSize(8);
+    this.doc.setFont("helvetica", "normal");
+    const disclaimerLines = this.doc.splitTextToSize(this.t.disclaimer, this.contentWidth);
+    this.doc.text(disclaimerLines, this.pageWidth / 2, this.pageHeight - 45, { align: "center" });
+
+    // Final brand
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.setTextColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
+    this.doc.text("NELLO ONE", this.pageWidth / 2, this.pageHeight - 28, { align: "center" });
+
+    this.addFooter();
   }
 
-  // Disclaimer
-  doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "normal");
-  const disclaimerLines = doc.splitTextToSize(t.disclaimer, contentWidth);
-  doc.text(disclaimerLines, pageWidth / 2, pageHeight - 40, { align: "center" });
+  // ==========================================
+  // MAIN GENERATION
+  // ==========================================
+  public generate(content: any): jsPDF {
+    this.renderCover();
+    this.renderBoatMetaphor();
+    this.renderTrafficLight(content);
+    this.renderMeetingOfEssences(content);
+    this.renderSantoBate(content);
+    this.renderBichoPega(content);
+    this.renderPotentialization(content);
+    this.renderTranslationTable(content);
+    this.renderPeaceProtocol(content);
+    this.renderSpouseManuals(content);
+    this.renderPressureAlerts(content);
+    this.renderConnectionChallenge(content);
+    this.renderSeekHelp(content);
+    this.renderClosing(content);
 
-  // Final brand
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-  doc.text("NELLO ONE", pageWidth / 2, pageHeight - 25, { align: "center" });
+    return this.doc;
+  }
+}
 
-  addPageNumber();
-
-  return doc;
+export const createCodigoCasalPDF = (
+  content: any,
+  relationshipType: string,
+  options?: PDFOptions
+): jsPDF => {
+  const generator = new PDFGenerator(options?.language || 'pt');
+  return generator.generate(content);
 };
 
 export const generateCodigoCasalPDF = (
