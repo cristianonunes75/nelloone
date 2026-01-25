@@ -20,7 +20,7 @@ import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { ImpersonateBanner } from "@/components/ImpersonateBanner";
 import { OnboardingModal } from "@/components/cliente/OnboardingModal";
 import { EntryPathModal, type EntryPath } from "@/components/cliente/EntryPathModal";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Users, ArrowRight } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -733,6 +733,34 @@ const Cliente = () => {
               />
             );
           })()}
+
+          {/* Cruzamentos CTA Card */}
+          <div className="mt-8 p-6 rounded-2xl bg-gradient-to-br from-lavender/40 to-bruma/30 border border-lavender-deep/20">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-ink/10 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-ink" />
+                </div>
+                <div className="text-center md:text-left">
+                  <h3 className="font-semibold text-ink text-lg">
+                    {language === 'en' ? 'Code Crossings' : 'Cruzamento de Códigos'}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {language === 'en' 
+                      ? 'Discover the synergy between you and someone special' 
+                      : 'Descubra a sinergia entre você e alguém especial'}
+                  </p>
+                </div>
+              </div>
+              <Button 
+                onClick={() => navigate(`${getBasePath()}/cliente/cruzamentos`)}
+                className="bg-ink hover:bg-ink/90 text-white w-full md:w-auto"
+              >
+                {language === 'en' ? 'Explore' : 'Explorar'}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </div>
 
           {/* Disclaimer */}
           <div className="bg-accent/10 border border-border rounded-xl md:rounded-2xl p-4 md:p-6 text-center mt-8">
