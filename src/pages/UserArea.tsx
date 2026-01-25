@@ -30,7 +30,8 @@ import {
   CheckCircle2,
   Clock,
   Lock,
-  ChevronRight
+  ChevronRight,
+  Users
 } from "lucide-react";
 import { format } from "date-fns";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -179,6 +180,7 @@ const UserArea = () => {
     { id: "profile" as TabType, label: t.sidebar.profile, icon: User },
     { id: "tests" as TabType, label: t.sidebar.my_tests, icon: FileText },
     { id: "map" as TabType, label: t.sidebar.map, icon: Map },
+    { id: "crossings" as const, label: t.sidebar.crossings, icon: Users, isExternal: true },
     { id: "history" as TabType, label: t.sidebar.history, icon: History },
     { id: "billing" as TabType, label: t.sidebar.billing, icon: CreditCard },
   ];
@@ -212,7 +214,13 @@ const UserArea = () => {
               {sidebarItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => {
+                    if (item.id === "crossings") {
+                      handleNavigation("/cliente/cruzamentos");
+                    } else {
+                      setActiveTab(item.id as TabType);
+                    }
+                  }}
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
                     activeTab === item.id
