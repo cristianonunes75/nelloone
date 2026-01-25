@@ -30,6 +30,7 @@ import Contact from "./pages/Contact";
 import { TestDetailPage } from "./components/tests/TestDetailPage";
 import CodigoEssencia from "./pages/CodigoEssencia";
 import AtivacaoCodigoPage from "./pages/cliente/AtivacaoCodigoPage";
+import CruzamentosPage from "./pages/cliente/CruzamentosPage";
 // CodigoEssencia sales pages removed - now included in journey
 import ComprarTeste from "./pages/ComprarTeste";
 import DiagnosticoPDF from "./pages/DiagnosticoPDF";
@@ -403,6 +404,47 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute allowedRoles={["cliente", "admin"]}>
           <AtivacaoCodigoPage />
+        </ProtectedRoute>
+      }
+    />
+    {/* Cruzamentos (Code Crossing) routes */}
+    <Route
+      path="/cliente/cruzamentos"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <CruzamentosPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/cruzamentos"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <CruzamentosPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/crossings"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <CruzamentosPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/cliente/cruzamentos"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <CruzamentosPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/pt-pt/cliente/cruzamentos"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <CruzamentosPage />
         </ProtectedRoute>
       }
     />
