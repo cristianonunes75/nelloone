@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, User, Settings, LogOut, Compass } from "lucide-react";
+import { Menu, X, User, Settings, LogOut, Compass, Users } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { getNelloAppUrl, NelloApp, useSubdomain } from "@/hooks/useSubdomain";
@@ -264,6 +264,10 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
                     <Compass className="w-4 h-4 mr-2" />
                     {language === 'en' ? 'My Journey' : 'Minha Jornada'}
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/cliente/cruzamentos')}>
+                    <Users className="w-4 h-4 mr-2" />
+                    {language === 'en' ? 'Code Crossings' : 'Cruzamentos'}
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/cliente/configuracoes')}>
                     <Settings className="w-4 h-4 mr-2" />
                     {language === 'en' ? 'Settings' : 'Configurações'}
@@ -364,6 +368,15 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
                         <Compass className="w-5 h-5 text-nello-gold" />
                         <span className="font-medium">
                           {language === 'en' ? 'My Journey' : 'Minha Jornada'}
+                        </span>
+                      </button>
+                      <button
+                        onClick={() => { navigate('/cliente/cruzamentos'); setMobileMenuOpen(false); }}
+                        className="flex items-center gap-3 w-full px-3 py-3 rounded-lg transition-colors hover:bg-muted text-left"
+                      >
+                        <Users className="w-5 h-5 text-pink-500" />
+                        <span className="font-medium">
+                          {language === 'en' ? 'Code Crossings' : 'Cruzamentos'}
                         </span>
                       </button>
                     </div>
