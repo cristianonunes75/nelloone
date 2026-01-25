@@ -275,50 +275,15 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
   const handleDownloadPDF = async () => {
     setIsGeneratingPdf(true);
     try {
-      const { default: html2canvas } = await import('html2canvas');
-      const { jsPDF } = await import('jspdf');
+      const { generateCodigoCasalPDF } = await import('@/lib/pdfCodigoCasal');
       
-      if (!reportRef.current) {
-        throw new Error('Report element not found');
-      }
-
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 10;
-
-      // Add pages if content is longer
-      let heightLeft = imgHeight * ratio;
-      let position = 0;
-
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      heightLeft -= pdfHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight * ratio;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', imgX, position, imgWidth * ratio, imgHeight * ratio);
-        heightLeft -= pdfHeight;
-      }
-
-      pdf.save(`codigo-do-casal-${crossing.id.slice(0, 8)}.pdf`);
+      generateCodigoCasalPDF(
+        content,
+        crossing.relationship_type,
+        crossing.id,
+        { language }
+      );
+      
       toast.success(language === 'en' ? 'PDF downloaded!' : 'PDF baixado!');
     } catch (error) {
       console.error('Error generating PDF:', error);
