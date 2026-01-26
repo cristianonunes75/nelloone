@@ -256,8 +256,8 @@ export default function BusinessHiringAssessment() {
     }));
   };
 
-  const saveCurrentAnswer = async () => {
-    if (!currentAssessment) return;
+  const saveCurrentAnswer = async (): Promise<boolean> => {
+    if (!currentAssessment) return false;
     
     const question = questions[currentIndex];
     const answer = answers[question.id];
@@ -284,7 +284,8 @@ export default function BusinessHiringAssessment() {
           
           if (error) {
             console.error("Error updating answer:", error);
-            toast.error("Erro ao salvar resposta");
+            toast.error("Erro ao salvar resposta. Tente novamente.");
+            return false;
           }
         } else {
           // Insert new answer
@@ -299,20 +300,32 @@ export default function BusinessHiringAssessment() {
           
           if (error) {
             console.error("Error inserting answer:", error);
-            toast.error("Erro ao salvar resposta");
+            toast.error("Erro ao salvar resposta. Tente novamente.");
+            return false;
           }
         }
+        
+        console.log(`Answer saved: Q${question.question_number} = ${answer}`);
+        return true;
       } catch (error) {
         console.error("Error saving answer:", error);
-        toast.error("Erro ao salvar resposta");
+        toast.error("Erro ao salvar resposta. Verifique sua conexão.");
+        return false;
       }
     }
+    return true; // No answer to save
   };
 
   // IMPORTANT: do not memoize these handlers with incomplete deps,
   // otherwise they can capture stale state and fail to persist answers.
   const nextQuestion = async () => {
-    await saveCurrentAnswer();
+    const saved = await saveCurrentAnswer();
+    
+    if (!saved) {
+      // Don't proceed if save failed - user will see error toast
+      console.error("Failed to save answer, blocking progression");
+      return;
+    }
 
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
@@ -383,8 +396,8 @@ export default function BusinessHiringAssessment() {
         resultData = calculateTemperamentos(answersWithMetadata);
       }
 
-      // Update assessment
-      await supabase
+      // Update assessment with explicit error handling
+      const { error: updateError } = await supabase
         .from("hiring_assessments")
         .update({
           status: "completed",
@@ -393,6 +406,19 @@ export default function BusinessHiringAssessment() {
           algorithm_version: resultData?.algorithm_version || null
         })
         .eq("id", currentAssessment.id);
+
+      if (updateError) {
+        console.error("CRITICAL: Failed to save assessment results:", updateError);
+        toast.error("Erro crítico ao salvar resultados. Por favor, tente novamente.");
+        setSaving(false);
+        return;
+      }
+
+      console.log("Assessment saved successfully:", {
+        assessmentId: currentAssessment.id,
+        testType: phase,
+        resultData
+      });
 
       // Refresh assessments
       const { data: updatedAssessments } = await supabase
