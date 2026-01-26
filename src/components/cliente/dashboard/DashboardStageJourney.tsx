@@ -46,7 +46,7 @@ export function DashboardStageJourney({
   onViewResult,
   onPurchase,
 }: DashboardStageJourneyProps) {
-  const { hasAccess } = useTestAccess();
+  const { hasAccess, hasFullJourneyAccess } = useTestAccess();
   const progressPercentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
   const remainingSteps = totalSteps - completedCount;
 
@@ -124,7 +124,7 @@ export function DashboardStageJourney({
                 onClick={() => {
                   if (nextStep.status === "in_progress") {
                     onContinueTest(nextStep);
-                  } else if (hasAccess(nextStep.testId, nextStep.isFree)) {
+                  } else if (hasFullJourneyAccess || hasAccess(nextStep.testId, nextStep.isFree)) {
                     onStartTest(nextStep);
                   } else {
                     onPurchase(nextStep);
@@ -154,7 +154,7 @@ export function DashboardStageJourney({
           const isCompleted = step.status === "completed";
           const isLocked = !step.isUnlocked;
           const isCurrent = step.isCurrentStep && !isCompleted;
-          const canAccess = hasAccess(step.testId, step.isFree);
+          const canAccess = hasFullJourneyAccess || hasAccess(step.testId, step.isFree);
           
           return (
             <motion.button

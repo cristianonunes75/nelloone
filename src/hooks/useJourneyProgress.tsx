@@ -59,7 +59,7 @@ export function useJourneyProgress(targetUserId?: string) {
   const isViewingOther = (!!targetUserId && targetUserId !== user?.id) || isImpersonating;
   
   const { tests, userTests: currentUserTests, getTestStatus, isLoading: testsLoading } = useTests();
-  const { hasPurchased } = useTestAccess();
+  const { hasPurchased, hasFullJourneyAccess } = useTestAccess();
 
   // When viewing another user (admin impersonate), fetch their user_tests directly
   const { data: targetUserTests, isLoading: targetLoading } = useQuery({
@@ -115,7 +115,7 @@ export function useJourneyProgress(targetUserId?: string) {
         ? (userTest?.status as "not_started" | "in_progress" | "completed" || "not_started")
         : getTestStatus(test.id);
       
-      const isPurchased = isViewingOther ? true : hasPurchased(test.id); // Assume purchased for admin view
+      const isPurchased = isViewingOther ? true : (hasFullJourneyAccess || hasPurchased(test.id)); // Full journey access bypasses individual check
       
       const resultData = userTest?.result_data as any;
       
