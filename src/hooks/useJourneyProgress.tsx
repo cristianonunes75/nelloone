@@ -5,7 +5,7 @@ import { useTestAccess } from "./useTestAccessV2";
 import { useAuth } from "./useAuth";
 import { useImpersonate } from "@/contexts/ImpersonateContext";
 import { supabase } from "@/integrations/supabase/client";
-import { TEST_TYPE_TO_SLUG } from "@/utils/journey";
+import { TEST_TYPE_TO_SLUG, SLUG_TO_DB_TYPES, type JourneyTestSlug } from "@/utils/journey";
 import { useEntryPath } from "./useEntryPath";
 
 // Define the sequential order of tests in the NELLO ONE journey
@@ -82,16 +82,25 @@ export function useJourneyProgress(targetUserId?: string) {
   const journeySteps = useMemo<JourneyStep[]>(() => {
     if (!tests) return [];
 
-    // Create a map of test type to test data
-    // Support both old and new slugs by normalizing test types
-    const testByType = new Map<string, typeof tests[0]>();
-    tests.forEach(t => {
-      // Store under original type
-      testByType.set(t.type, t);
-      // Also store under normalized slug for journey lookup
-      const slug = TEST_TYPE_TO_SLUG[t.type];
-      if (slug && slug !== t.type) {
-        testByType.set(slug, t);
+    // Create a map of journey slug to the best test data (prioritizing tests with questions)
+    // This handles duplicates and legacy type names
+    const testBySlug = new Map<string, typeof tests[0]>();
+    
+    // For each journey slug, find the best matching test (one with questions)
+    (Object.keys(SLUG_TO_DB_TYPES) as JourneyTestSlug[]).forEach(slug => {
+      const possibleTypes = SLUG_TO_DB_TYPES[slug];
+      
+      // Find all tests matching any of the possible types
+      const matchingTests = tests.filter(t => possibleTypes.includes(t.type));
+      
+      if (matchingTests.length > 0) {
+        // Prioritize tests with questions
+        const bestTest = matchingTests.reduce((best, current) => {
+          const bestCount = best.questions_count || 0;
+          const currentCount = current.questions_count || 0;
+          return currentCount > bestCount ? current : best;
+        });
+        testBySlug.set(slug, bestTest);
       }
     });
 
@@ -100,14 +109,15 @@ export function useJourneyProgress(targetUserId?: string) {
 
     return journeyOrder.map((journeySlug, index) => {
       // Find the test by either the journey slug or the original database type
-      const test = testByType.get(journeySlug);
+      const test = testBySlug.get(journeySlug);
       if (!test) return null;
 
       // When viewing another user, derive status from their user_tests directly
+      // Match by any possible type for this journey slug (handles legacy type names)
+      const possibleTypes = SLUG_TO_DB_TYPES[journeySlug as JourneyTestSlug] || [test.type];
       const userTest = userTests?.find(ut => {
-        // Match by test type since test IDs may differ across languages
         const utTest = ut.tests as any;
-        return utTest?.type === test.type || ut.test_id === test.id;
+        return possibleTypes.includes(utTest?.type) || ut.test_id === test.id;
       });
       
       // Get base status from userTest or fallback

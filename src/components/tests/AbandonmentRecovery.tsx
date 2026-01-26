@@ -106,8 +106,8 @@ export function AbandonmentRecovery({
   const message = content.message.replace('{minutes}', String(remainingMinutes));
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onContinueNow(); }}>
+      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
         <DialogHeader>
           <div className="flex justify-center mb-4">
             <motion.div
