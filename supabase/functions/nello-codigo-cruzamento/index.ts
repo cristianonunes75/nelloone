@@ -1336,18 +1336,59 @@ serve(async (req) => {
 
     console.log('✅ [Identity v2.0] AI response received, parsing JSON...');
 
-    // Parse JSON from response
+    // Parse JSON from response - validate completeness before accepting
     let content: any;
+    let isValidReport = false;
+    
     try {
       const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         content = JSON.parse(jsonMatch[0]);
+        
+        // Validate that we have essential sections for a complete report
+        const requiredSections = [
+          'papeis_identificados',
+          'metafora_central', 
+          'zonas'
+        ];
+        
+        const hasRequiredSections = requiredSections.some(section => 
+          content[section] && Object.keys(content[section]).length > 0
+        );
+        
+        // Check if content is substantial (at least 2000 chars when stringified)
+        const contentSize = JSON.stringify(content).length;
+        isValidReport = hasRequiredSections && contentSize > 2000;
+        
+        if (!isValidReport) {
+          console.error('❌ Report incomplete - size:', contentSize, 'has sections:', hasRequiredSections);
+          throw new Error(`Report incomplete: size ${contentSize}, sections: ${hasRequiredSections}`);
+        }
+        
+        console.log('✅ Report validated - size:', contentSize);
       } else {
         throw new Error('No JSON found in response');
       }
     } catch (parseError) {
       console.error('JSON parse error:', parseError);
-      content = { raw: rawContent };
+      
+      // Mark as error status so user knows to retry
+      await supabase
+        .from('codigo_cruzamentos')
+        .update({
+          status: 'error',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', cruzamentoId);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Falha ao gerar relatório completo. Por favor, tente regenerar.',
+          details: parseError instanceof Error ? parseError.message : 'Unknown error'
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Inject programmatic role assignment data to ensure consistency
