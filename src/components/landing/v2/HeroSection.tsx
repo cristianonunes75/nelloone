@@ -78,14 +78,19 @@ export const HeroSection = () => {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            <Button 
-              size="lg" 
-              className="group w-full sm:w-auto h-14 md:h-16 px-10 md:px-12 text-base md:text-lg rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg hover:shadow-gold hover-lift press-effect font-sans-ui font-medium"
-              onClick={() => navigate(getAuthPath())}
-            >
-              {t.landing.hero.cta_primary}
-              <ArrowRight className="ml-2 w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform duration-300" />
-            </Button>
+            <div className="flex flex-col items-center gap-3">
+              <Button 
+                size="lg" 
+                className="group w-full sm:w-auto h-14 md:h-16 px-10 md:px-12 text-base md:text-lg rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg hover:shadow-gold hover-lift press-effect font-sans-ui font-medium"
+                onClick={() => navigate(getAuthPath())}
+              >
+                Revelar meu Código da Essência
+                <Sparkles className="ml-2 w-5 h-5 md:w-6 md:h-6 text-white/90 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
+              </Button>
+              <p className="text-xs md:text-sm text-muted-foreground/70">
+                Acesso vitalício à sua jornada de identidade.
+              </p>
+            </div>
           </div>
 
           {/* Social proof */}
