@@ -984,13 +984,90 @@ class PDFGenerator {
   }
 }
 
+// ==========================================
+// CONTENT NORMALIZER - Maps Identity v1.0 to PDF expected format
+// ==========================================
+const normalizeContent = (content: any): any => {
+  if (!content) return {};
+  
+  const normalized = { ...content };
+  
+  // Map zona_harmonia/zona_sinergia/zona_ajuste/zona_choque to semaforo_relacional if needed
+  if (!normalized.semaforo_relacional && (normalized.zona_harmonia || normalized.zona_sinergia || normalized.zona_ajuste || normalized.zona_choque)) {
+    const harmonia = normalized.zona_harmonia || normalized.zona_sinergia;
+    normalized.semaforo_relacional = {
+      titulo: "Semáforo Relacional",
+      verde: harmonia ? {
+        titulo: harmonia.titulo || "Zona de Harmonia",
+        descricao: harmonia.descricao,
+        pontos: harmonia.valores_compartilhados || harmonia.sinergias || harmonia.pontos || [],
+        proposito: harmonia.proposito_comum
+      } : null,
+      amarelo: normalized.zona_ajuste ? {
+        titulo: normalized.zona_ajuste.titulo || "Zona de Ajuste",
+        descricao: normalized.zona_ajuste.descricao,
+        pontos: normalized.zona_ajuste.diferencas?.map((d: any) => `${d.aspecto}: ${d.descricao}`) || normalized.zona_ajuste.pontos || []
+      } : null,
+      vermelho: normalized.zona_choque ? {
+        titulo: normalized.zona_choque.titulo || "Zona de Choque",
+        descricao: normalized.zona_choque.descricao,
+        pontos: normalized.zona_choque.gatilhos?.map((g: any) => typeof g === 'string' ? g : g.descricao) || normalized.zona_choque.pontos || []
+      } : null
+    };
+  }
+  
+  // Map metafora_central to encontro_essencias if needed
+  if (!normalized.encontro_essencias && normalized.metafora_central) {
+    normalized.encontro_essencias = {
+      titulo: "O Encontro das Essências",
+      metafora: normalized.metafora_central.titulo,
+      descricao: normalized.metafora_central.descricao
+    };
+  }
+  
+  // Map papeis_identificados to additional context
+  if (normalized.papeis_identificados) {
+    const sensor = normalized.papeis_identificados.sensor_direcao;
+    const condutor = normalized.papeis_identificados.condutor_curso;
+    
+    if (!normalized.encontro_essencias) {
+      normalized.encontro_essencias = { titulo: "O Encontro das Essências" };
+    }
+    
+    if (sensor && condutor) {
+      normalized.encontro_essencias.descricao_usuario_a = `${sensor.nome}: ${sensor.justificativa}`;
+      normalized.encontro_essencias.descricao_usuario_b = `${condutor.nome}: ${condutor.justificativa}`;
+    }
+  }
+  
+  // Map acao_pratica_24h to desafio_conexao
+  if (!normalized.desafio_conexao && normalized.acao_pratica_24h) {
+    normalized.desafio_conexao = {
+      titulo: normalized.acao_pratica_24h.titulo || "Desafio de Conexão 24h",
+      descricao: normalized.acao_pratica_24h.descricao,
+      acao: normalized.acao_pratica_24h.acao
+    };
+  }
+  
+  // Map fechamento to closing section
+  if (!normalized.mensagem_final && normalized.fechamento) {
+    normalized.mensagem_final = {
+      titulo: normalized.fechamento.titulo,
+      mensagem: normalized.fechamento.mensagem
+    };
+  }
+  
+  return normalized;
+};
+
 export const createCodigoCasalPDF = (
   content: any,
   relationshipType: string,
   options?: PDFOptions
 ): jsPDF => {
+  const normalizedContent = normalizeContent(content);
   const generator = new PDFGenerator(options?.language || 'pt');
-  return generator.generate(content);
+  return generator.generate(normalizedContent);
 };
 
 export const generateCodigoCasalPDF = (

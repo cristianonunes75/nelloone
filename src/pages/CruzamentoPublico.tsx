@@ -19,6 +19,48 @@ import { toast } from "sonner";
 
 type LangKey = 'pt' | 'pt-pt' | 'en';
 
+// Normalize Identity v1.0 content to expected display format
+const normalizeContent = (content: any): any => {
+  if (!content) return {};
+  
+  const normalized = { ...content };
+  
+  // Map zona_harmonia/zona_sinergia/zona_ajuste/zona_choque to semaforo_relacional
+  if (!normalized.semaforo_relacional && (normalized.zona_harmonia || normalized.zona_sinergia || normalized.zona_ajuste || normalized.zona_choque)) {
+    const harmonia = normalized.zona_harmonia || normalized.zona_sinergia;
+    normalized.semaforo_relacional = {
+      titulo: "Semáforo Relacional",
+      verde: harmonia ? {
+        titulo: harmonia.titulo || "Zona de Harmonia",
+        descricao: harmonia.descricao,
+        pontos: harmonia.valores_compartilhados || harmonia.sinergias || harmonia.pontos || [],
+        proposito: harmonia.proposito_comum
+      } : null,
+      amarelo: normalized.zona_ajuste ? {
+        titulo: normalized.zona_ajuste.titulo || "Zona de Ajuste",
+        descricao: normalized.zona_ajuste.descricao,
+        pontos: normalized.zona_ajuste.diferencas?.map((d: any) => `${d.aspecto}: ${d.descricao}`) || normalized.zona_ajuste.pontos || []
+      } : null,
+      vermelho: normalized.zona_choque ? {
+        titulo: normalized.zona_choque.titulo || "Zona de Choque",
+        descricao: normalized.zona_choque.descricao,
+        pontos: normalized.zona_choque.gatilhos?.map((g: any) => typeof g === 'string' ? g : g.descricao) || normalized.zona_choque.pontos || []
+      } : null
+    };
+  }
+  
+  // Map metafora_central to encontro_essencias
+  if (!normalized.encontro_essencias && normalized.metafora_central) {
+    normalized.encontro_essencias = {
+      titulo: "O Encontro das Essências",
+      metafora: normalized.metafora_central.titulo,
+      descricao: normalized.metafora_central.descricao
+    };
+  }
+  
+  return normalized;
+};
+
 const TRANSLATIONS = {
   pt: {
     loading: "Carregando...",
@@ -208,9 +250,11 @@ export default function CruzamentoPublico() {
     );
   }
 
-  const content = report?.content || {};
+  // Normalize content to handle Identity v1.0 format
+  const rawContent = report?.content || {};
+  const content = normalizeContent(rawContent);
   const semaforo = content.semaforo_relacional;
-  const encontro = content.encontro_essencias;
+  const encontro = content.encontro_essencias || content.metafora_central;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-pink-50/30 dark:to-pink-950/10">
