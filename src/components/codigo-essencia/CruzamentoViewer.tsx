@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -259,13 +260,90 @@ const TRANSLATIONS = {
 export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: CruzamentoViewerProps) => {
   const [linkCopied, setLinkCopied] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [liveCrossing, setLiveCrossing] = useState(crossing);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
   const t = TRANSLATIONS[language];
-  const content = crossing.content || {};
-  const isPurchased = crossing.isPurchased !== false; // Default to true for backwards compatibility
+
+  // Keep local copy updated when parent passes a new crossing
+  useEffect(() => {
+    setLiveCrossing(crossing);
+  }, [crossing]);
+
+  const content = useMemo(() => {
+    const c = (liveCrossing as any)?.content;
+    return c && typeof c === "object" ? c : {};
+  }, [liveCrossing]);
+
+  const hasReportContent = useMemo(() => {
+    // Any known key indicates we have a renderable report
+    const keys = Object.keys(content || {});
+    if (keys.length === 0) return false;
+    const knownKeys = [
+      "metafora_barco",
+      "zona_harmonia",
+      "zona_ajuste",
+      "zona_choque",
+      "tabela_traducao",
+      "protocolo_paz",
+      "semaforo_relacional",
+      "encontro_essencias",
+      "potencializacao",
+    ];
+    return knownKeys.some((k) => (content as any)?.[k] != null);
+  }, [content]);
+
+  const isPurchased = liveCrossing.isPurchased !== false; // Default to true for backwards compatibility
+
+  const refreshCrossing = async () => {
+    setIsRefreshing(true);
+    try {
+      const { data, error } = await supabase
+        .from("codigo_cruzamentos")
+        .select("*")
+        .eq("id", liveCrossing.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (data) {
+        setLiveCrossing((prev) => ({ ...prev, ...(data as any) }));
+      }
+    } catch (e) {
+      console.error("Error refreshing crossing:", e);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  // After regeneration, content can be temporarily empty while the backend updates.
+  // Auto-refresh a few times to avoid blank screens.
+  useEffect(() => {
+    if (hasReportContent) return;
+
+    let cancelled = false;
+    let attempts = 0;
+
+    const tick = async () => {
+      if (cancelled) return;
+      attempts += 1;
+      await refreshCrossing();
+      if (cancelled) return;
+      if (attempts < 5 && !hasReportContent) {
+        window.setTimeout(tick, 1200);
+      }
+    };
+
+    // Small delay gives time for the regeneration request to finish updating the row.
+    const id = window.setTimeout(tick, 700);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(id);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [liveCrossing.id, hasReportContent]);
 
   const handleCopyLink = () => {
-    const link = `${window.location.origin}/cruzamento/${crossing.public_token}`;
+    const link = `${window.location.origin}/cruzamento/${liveCrossing.public_token}`;
     navigator.clipboard.writeText(link);
     setLinkCopied(true);
     toast.success(t.linkCopied);
@@ -279,8 +357,8 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
       
       generateCodigoCasalPDF(
         content,
-        crossing.relationship_type,
-        crossing.id,
+        liveCrossing.relationship_type,
+        liveCrossing.id,
         { language }
       );
       
@@ -1220,7 +1298,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <Users className="w-6 h-6 text-primary" />
             </div>
             <h2 className="text-xl font-bold">
-              {t.relationshipLabels[crossing.relationship_type as keyof typeof t.relationshipLabels] || t.relationshipLabels.spouse}
+              {t.relationshipLabels[liveCrossing.relationship_type as keyof typeof t.relationshipLabels] || t.relationshipLabels.spouse}
             </h2>
           </CardContent>
         </Card>
@@ -1252,6 +1330,38 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         <p className="text-xs text-muted-foreground text-center px-4">
           {t.disclaimer}
         </p>
+      </div>
+    );
+  }
+
+  // When report is being regenerated, avoid rendering sections that may assume structure.
+  if (!hasReportContent) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" size="sm" onClick={onBack} className="gap-1">
+            <ArrowLeft className="w-4 h-4" />
+            {t.back}
+          </Button>
+          <Button variant="outline" size="sm" onClick={refreshCrossing} disabled={isRefreshing}>
+            {isRefreshing ? "..." : language === "en" ? "Refresh" : "Recarregar"}
+          </Button>
+        </div>
+
+        <Card className="border-border">
+          <CardHeader>
+            <CardTitle className="text-base">
+              {language === "en" ? "Generating your updated report…" : "A gerar o relatório atualizado…"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              {language === "en"
+                ? "This can take a few seconds after regeneration. We'll keep trying to load it."
+                : "Isto pode demorar alguns segundos após a regeneração. Vamos tentar carregar automaticamente."}
+            </p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -1291,7 +1401,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <Users className="w-6 h-6 text-primary" />
             </div>
             <h2 className="text-xl font-bold">
-              {t.relationshipLabels[crossing.relationship_type as keyof typeof t.relationshipLabels] || t.relationshipLabels.spouse}
+              {t.relationshipLabels[liveCrossing.relationship_type as keyof typeof t.relationshipLabels] || t.relationshipLabels.spouse}
             </h2>
           </CardContent>
         </Card>
