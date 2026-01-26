@@ -2913,6 +2913,10 @@ export type Database = {
           deleted_by: string | null
           entry_path: string | null
           full_name: string
+          has_activation_couple: boolean | null
+          has_activation_individual: boolean | null
+          has_identity_couple_premium: boolean | null
+          has_nello_couple: boolean | null
           id: string
           is_blocked: boolean | null
           is_deleted: boolean | null
@@ -2936,6 +2940,10 @@ export type Database = {
           deleted_by?: string | null
           entry_path?: string | null
           full_name: string
+          has_activation_couple?: boolean | null
+          has_activation_individual?: boolean | null
+          has_identity_couple_premium?: boolean | null
+          has_nello_couple?: boolean | null
           id: string
           is_blocked?: boolean | null
           is_deleted?: boolean | null
@@ -2959,6 +2967,10 @@ export type Database = {
           deleted_by?: string | null
           entry_path?: string | null
           full_name?: string
+          has_activation_couple?: boolean | null
+          has_activation_individual?: boolean | null
+          has_identity_couple_premium?: boolean | null
+          has_nello_couple?: boolean | null
           id?: string
           is_blocked?: boolean | null
           is_deleted?: boolean | null
