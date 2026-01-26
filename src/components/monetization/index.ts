@@ -9,3 +9,4 @@ export { ProductPaywallModal, type ProductInfo } from "./ProductPaywallModal";
 export { LockedModuleCard } from "./LockedModuleCard";
 export { UpsellTrigger, CodigoEssenciaUpsell } from "./UpsellTrigger";
 export { PRODUCT_CATALOG, getProductInfo, isValidProductType } from "./productCatalog";
+export { IdentityCouplePremiumModal } from "./IdentityCouplePremiumModal";
