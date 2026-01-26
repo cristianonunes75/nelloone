@@ -36,6 +36,17 @@ export const TEST_TYPE_TO_SLUG: Record<string, JourneyTestSlug> = {
   'mbti': 'nello16', // Old name for Nello 16
 };
 
+// Reverse mapping: journey slug to ALL possible database types
+export const SLUG_TO_DB_TYPES: Record<JourneyTestSlug, string[]> = {
+  'arquetipos_proposito': ['arquetipos_proposito', 'arquetipos'],
+  'inteligencias_multiplas': ['inteligencias_multiplas'],
+  'estilos_conexao': ['estilos_conexao', 'linguagens_amor'],
+  'nello16': ['nello16', 'mbti'],
+  'disc': ['disc'],
+  'eneagrama': ['eneagrama'],
+  'temperamentos': ['temperamentos'],
+};
+
 /**
  * Converts a database test type to the journey test slug
  */
