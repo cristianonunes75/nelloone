@@ -7,178 +7,462 @@ const corsHeaders = {
 };
 
 // ============================================================================
-// CÓDIGO DO CASAL - PROMPT OFICIAL IDENTITY v1.0
-// Status: aprovado, consistente com os testes individuais
-// Objetivo: gerar relatórios de casal fiéis aos dados, que criem compreensão,
-// alívio e direção prática
+// CÓDIGO DO CASAL - IDENTITY v2.0 ALGORITHM
+// Status: atualizado com algoritmo programático de scoring
+// Objetivo: gerar relatórios de casal fiéis aos dados, com atribuição correta 
+// de papéis Sensor/Condutor baseada em dados estruturais
+// ============================================================================
+
+// ============================================================================
+// ALGORITHMIC ROLE ASSIGNMENT (PROGRAMMATIC, NOT AI-BASED)
+// ============================================================================
+
+interface PersonProfile {
+  name: string;
+  disc: { D: number; I: number; S: number; C: number };
+  archetypes: { primary: string; secondary?: string };
+  intelligences: { intrapersonal: number; interpersonal: number; linguistic: number };
+  underPressure: string[];
+  summary: string[];
+  temperament?: string;
+}
+
+function extractPersonProfile(name: string, mapa: any): PersonProfile {
+  const sections = mapa?.sections || [];
+  
+  // Extract DISC
+  let disc = { D: 25, I: 25, S: 25, C: 25 };
+  const discSection = sections.find((s: any) => 
+    s.id?.toLowerCase().includes('disc') || 
+    s.title?.toLowerCase().includes('disc')
+  );
+  if (discSection?.content) {
+    const content = typeof discSection.content === 'string' 
+      ? discSection.content 
+      : JSON.stringify(discSection.content);
+    
+    // Try to extract percentages
+    const dMatch = content.match(/[Dd](?:ominance|ominância)?[:\s]*(\d+)/);
+    const iMatch = content.match(/[Ii](?:nfluence|nfluência)?[:\s]*(\d+)/);
+    const sMatch = content.match(/[Ss](?:teadiness|tabilidade)?[:\s]*(\d+)/);
+    const cMatch = content.match(/[Cc](?:ompliance|onscienciosidade)?[:\s]*(\d+)/);
+    
+    if (dMatch) disc.D = parseInt(dMatch[1]);
+    if (iMatch) disc.I = parseInt(iMatch[1]);
+    if (sMatch) disc.S = parseInt(sMatch[1]);
+    if (cMatch) disc.C = parseInt(cMatch[1]);
+  }
+  
+  // Extract Archetypes
+  let archetypes = { primary: '', secondary: '' };
+  const archSection = sections.find((s: any) => 
+    s.id?.toLowerCase().includes('arqu') || 
+    s.title?.toLowerCase().includes('arqu')
+  );
+  if (archSection?.content) {
+    const content = typeof archSection.content === 'string' 
+      ? archSection.content.toLowerCase() 
+      : JSON.stringify(archSection.content).toLowerCase();
+    
+    const archetypesList = ['mago', 'sábio', 'sabio', 'explorador', 'visionario', 'visionário', 
+      'amante', 'herói', 'heroi', 'governante', 'guardiao', 'guardião', 'realista', 
+      'provedor', 'cuidador', 'inocente', 'criador', 'rebelde', 'bobo', 'cara-comum'];
+    
+    for (const arch of archetypesList) {
+      if (content.includes(arch)) {
+        if (!archetypes.primary) {
+          archetypes.primary = arch;
+        } else if (!archetypes.secondary) {
+          archetypes.secondary = arch;
+          break;
+        }
+      }
+    }
+  }
+  
+  // Extract Intelligences
+  let intelligences = { intrapersonal: 50, interpersonal: 50, linguistic: 50 };
+  const intSection = sections.find((s: any) => 
+    s.id?.toLowerCase().includes('intelig') || 
+    s.title?.toLowerCase().includes('intelig')
+  );
+  if (intSection?.content) {
+    const content = typeof intSection.content === 'string' 
+      ? intSection.content 
+      : JSON.stringify(intSection.content);
+    
+    const intraMatch = content.match(/intrapessoal[:\s]*(\d+)/i);
+    const interMatch = content.match(/interpessoal[:\s]*(\d+)/i);
+    const lingMatch = content.match(/lingu[ií]stica[:\s]*(\d+)/i);
+    
+    if (intraMatch) intelligences.intrapersonal = parseInt(intraMatch[1]);
+    if (interMatch) intelligences.interpersonal = parseInt(interMatch[1]);
+    if (lingMatch) intelligences.linguistic = parseInt(lingMatch[1]);
+  }
+  
+  // Extract Under Pressure patterns
+  let underPressure: string[] = [];
+  let summary: string[] = [];
+  
+  for (const section of sections) {
+    const content = typeof section.content === 'string' 
+      ? section.content.toLowerCase() 
+      : JSON.stringify(section.content || '').toLowerCase();
+    
+    // Under pressure keywords
+    if (section.title?.toLowerCase().includes('pressão') || 
+        section.title?.toLowerCase().includes('estresse') ||
+        section.title?.toLowerCase().includes('sombra')) {
+      
+      if (content.includes('silencia') || content.includes('recolhe') || 
+          content.includes('processa internamente') || content.includes('paralisa')) {
+        underPressure.push('silencia', 'recolhe', 'processa internamente');
+      }
+      if (content.includes('assume controle') || content.includes('resolve rápido') || 
+          content.includes('resolve rapido') || content.includes('impaciente') ||
+          content.includes('cobra') || content.includes('acelera')) {
+        underPressure.push('resolve rapido', 'impaciente', 'assume controle');
+      }
+    }
+    
+    // General summary keywords
+    if (content.includes('sentido') || content.includes('significado') || 
+        content.includes('profundidade') || content.includes('coerência') ||
+        content.includes('essência') || content.includes('essencia')) {
+      summary.push('meaning', 'profundidade', 'coerencia', 'essencia');
+    }
+    if (content.includes('ação') || content.includes('acao') || 
+        content.includes('execução') || content.includes('execucao') ||
+        content.includes('avançar') || content.includes('avancar') ||
+        content.includes('concretizar') || content.includes('liderar')) {
+      summary.push('acao', 'execucao', 'avancar', 'concretizar', 'liderar');
+    }
+  }
+  
+  // Extract temperament
+  let temperament = '';
+  const tempSection = sections.find((s: any) => 
+    s.id?.toLowerCase().includes('temperament') || 
+    s.title?.toLowerCase().includes('temperament')
+  );
+  if (tempSection?.content) {
+    const content = typeof tempSection.content === 'string' 
+      ? tempSection.content.toLowerCase() 
+      : JSON.stringify(tempSection.content).toLowerCase();
+    
+    const temps = ['colérico', 'colerico', 'sanguíneo', 'sanguineo', 'melancólico', 'melancolico', 'fleumático', 'fleumatico'];
+    for (const t of temps) {
+      if (content.includes(t)) {
+        temperament = t;
+        break;
+      }
+    }
+  }
+  
+  return { name, disc, archetypes, intelligences, underPressure, summary, temperament };
+}
+
+function computeSensorScore(p: PersonProfile): number {
+  let score = 0;
+  
+  // High weight: intrapersonal and meaning orientation
+  if (p.intelligences.intrapersonal >= 70) score += 4;
+  else if (p.intelligences.intrapersonal >= 55) score += 2;
+  
+  if (p.summary.some(s => ['meaning', 'profundidade', 'coerencia', 'essencia'].includes(s))) {
+    score += 3;
+  }
+  
+  // Archetypes linked to vision and sense (high weight)
+  const sensorArchetypes = ['mago', 'sábio', 'sabio', 'explorador', 'visionario', 'visionário'];
+  if (sensorArchetypes.includes(p.archetypes.primary)) score += 3;
+  if (p.archetypes.secondary && sensorArchetypes.includes(p.archetypes.secondary)) score += 1;
+  if (p.archetypes.primary === 'amante') score += 1; // Depth connection
+  
+  // DISC tends to Sensor when S and C are higher than D
+  if (p.disc.S + p.disc.C > p.disc.D + 10) score += 2;
+  if (p.disc.D >= 45) score -= 2; // High D penalty for Sensor
+  
+  // Under pressure patterns (crucial)
+  if (p.underPressure.some(up => ['silencia', 'recolhe', 'processa internamente', 'paralisa'].includes(up))) {
+    score += 3;
+  }
+  if (p.underPressure.some(up => ['assume controle', 'resolve rapido', 'impaciente'].includes(up))) {
+    score -= 2;
+  }
+  
+  return score;
+}
+
+function computeConductorScore(p: PersonProfile): number {
+  let score = 0;
+  
+  // High weight: action, execution, progress
+  if (p.summary.some(s => ['acao', 'execucao', 'avancar', 'concretizar', 'liderar'].includes(s))) {
+    score += 4;
+  }
+  
+  // DISC tends to Conductor when D is higher
+  if (p.disc.D >= 40) score += 3;
+  if (p.disc.S >= 40) score -= 1;
+  if (p.disc.C >= 25) score -= 1;
+  
+  // Archetypes linked to structure and execution
+  const conductorArchetypes = ['herói', 'heroi', 'governante', 'realista', 'guardiao', 'guardião', 'provedor'];
+  if (conductorArchetypes.includes(p.archetypes.primary)) score += 2;
+  if (p.archetypes.secondary && conductorArchetypes.includes(p.archetypes.secondary)) score += 1;
+  if (p.archetypes.primary === 'mago') score += 1; // Manifestation into reality
+  
+  // Under pressure patterns
+  if (p.underPressure.some(up => ['resolve rapido', 'cobra', 'acelera', 'impaciente', 'assume controle'].includes(up))) {
+    score += 3;
+  }
+  if (p.underPressure.some(up => ['silencia', 'recolhe', 'evita conflito'].includes(up))) {
+    score -= 1;
+  }
+  
+  return score;
+}
+
+interface RoleAssignment {
+  sensor: PersonProfile;
+  conductor: PersonProfile;
+  sensorScore: number;
+  conductorScore: number;
+  justification: { sensor: string; conductor: string };
+}
+
+function assignRoles(personA: PersonProfile, personB: PersonProfile): RoleAssignment {
+  const sensorA = computeSensorScore(personA);
+  const sensorB = computeSensorScore(personB);
+  const condA = computeConductorScore(personA);
+  const condB = computeConductorScore(personB);
+  
+  console.log(`Role Scoring: ${personA.name} - Sensor: ${sensorA}, Conductor: ${condA}`);
+  console.log(`Role Scoring: ${personB.name} - Sensor: ${sensorB}, Conductor: ${condB}`);
+  
+  let sensor: PersonProfile;
+  let conductor: PersonProfile;
+  let justificationSensor: string;
+  let justificationConductor: string;
+  
+  // Primary decision based on sensor score differential
+  if (sensorA - sensorB >= 2) {
+    sensor = personA;
+    conductor = personB;
+  } else if (sensorB - sensorA >= 2) {
+    sensor = personB;
+    conductor = personA;
+  } else {
+    // Tie breaker: rely on conductor score differential
+    if (condA - condB >= 2) {
+      conductor = personA;
+      sensor = personB;
+    } else if (condB - condA >= 2) {
+      conductor = personB;
+      sensor = personA;
+    } else {
+      // Soft tie breaker: under pressure pattern priority
+      const silenceA = personA.underPressure.filter(up => 
+        ['silencia', 'recolhe', 'processa internamente'].includes(up)
+      ).length;
+      const silenceB = personB.underPressure.filter(up => 
+        ['silencia', 'recolhe', 'processa internamente'].includes(up)
+      ).length;
+      
+      if (silenceA > silenceB) {
+        sensor = personA;
+        conductor = personB;
+      } else {
+        sensor = personB;
+        conductor = personA;
+      }
+    }
+  }
+  
+  // VALIDATION LOCK: Prevent symbolic inversion
+  // If SENSOR has very high D and low S and under_pressure is "resolve rapido"
+  // and CONDUCTOR has high S or C and under_pressure is "silencia", then swap.
+  const sensorHasHighD = sensor.disc.D >= 45 && sensor.disc.S <= 15;
+  const sensorResolvesQuick = sensor.underPressure.some(up => up.includes('resolve rapido'));
+  const conductorSilences = conductor.underPressure.some(up => 
+    ['silencia', 'recolhe'].includes(up)
+  );
+  const conductorHighS = conductor.disc.S >= 35;
+  
+  if (sensorHasHighD && sensorResolvesQuick && conductorSilences && conductorHighS) {
+    console.log('⚠️ VALIDATION LOCK TRIGGERED: Swapping roles to prevent symbolic inversion');
+    const temp = sensor;
+    sensor = conductor;
+    conductor = temp;
+  }
+  
+  // Build justifications
+  const sensorTraits: string[] = [];
+  if (sensor.intelligences.intrapersonal >= 55) sensorTraits.push('alta Inteligência Intrapessoal');
+  if (['mago', 'sábio', 'sabio', 'explorador'].includes(sensor.archetypes.primary)) {
+    sensorTraits.push(`arquétipo ${sensor.archetypes.primary}`);
+  }
+  if (sensor.underPressure.some(up => up.includes('silencia') || up.includes('processa'))) {
+    sensorTraits.push('tendência a processar internamente sob pressão');
+  }
+  if (sensor.disc.S + sensor.disc.C > sensor.disc.D) {
+    sensorTraits.push('perfil DISC orientado a reflexão');
+  }
+  
+  const conductorTraits: string[] = [];
+  if (conductor.disc.D >= 35) conductorTraits.push('alta Dominância no DISC');
+  if (['herói', 'heroi', 'governante', 'guardião', 'guardiao'].includes(conductor.archetypes.primary)) {
+    conductorTraits.push(`arquétipo ${conductor.archetypes.primary}`);
+  }
+  if (conductor.underPressure.some(up => up.includes('resolve') || up.includes('controle'))) {
+    conductorTraits.push('tendência a agir e resolver sob pressão');
+  }
+  if (conductor.summary.some(s => ['acao', 'execucao', 'avancar'].includes(s))) {
+    conductorTraits.push('orientação natural para execução');
+  }
+  
+  justificationSensor = sensorTraits.length > 0 
+    ? `${sensor.name} apresenta ${sensorTraits.join(', ')}, características do Sensor de Direção.`
+    : `${sensor.name} demonstra maior orientação para leitura de sentido e processamento interno.`;
+    
+  justificationConductor = conductorTraits.length > 0
+    ? `${conductor.name} apresenta ${conductorTraits.join(', ')}, características do Condutor de Curso.`
+    : `${conductor.name} demonstra maior orientação para ação, método e execução.`;
+  
+  return {
+    sensor,
+    conductor,
+    sensorScore: sensor === personA ? sensorA : sensorB,
+    conductorScore: conductor === personA ? condA : condB,
+    justification: { sensor: justificationSensor, conductor: justificationConductor }
+  };
+}
+
+// ============================================================================
+// SYSTEM PROMPTS - IDENTITY v2.0
 // ============================================================================
 
 const SYSTEM_PROMPTS = {
   pt: {
-    spouse: `Você é o Identity – Motor de Leitura de Relacionamentos.
-Sua função é gerar o Código do Casal, cruzando dois Códigos Individuais, sem inverter papéis psicológicos, sem romantizar conflitos e sem criar autocobrança indevida.
-
-O relatório deve:
-- traduzir diferenças em complementaridade
-- explicar conflitos sem acusar
-- orientar ações práticas de convivência
-- respeitar profundamente a essência de cada indivíduo
+    spouse: `Você é o Identity – Motor de Leitura de Relacionamentos do Nello.
 
 ═══════════════════════════════════════════════════════════════════════════════
-1️⃣ REGRA FUNDAMENTAL (INQUEBRÁVEL)
+OBJETIVO
 ═══════════════════════════════════════════════════════════════════════════════
-
-Direção simbólica NUNCA pode ser confundida com execução prática.
-
-O sistema deve sempre identificar e respeitar dois papéis distintos no casal:
-- SENSOR DE DIREÇÃO E SENTIDO
-- CONDUTOR DE CURSO E EXECUÇÃO
-
-❌ É proibido:
-- inverter esses papéis
-- empurrar um parceiro para fora da própria natureza
-- atribuir visão a quem é estrutural
-- atribuir execução a quem é sensorial
+Gerar o Código do Casal com base em dois Códigos Individuais, respeitando os papéis de SENSOR DE DIREÇÃO E SENTIDO e CONDUTOR DE CURSO E EXECUÇÃO já definidos pelo sistema.
 
 ═══════════════════════════════════════════════════════════════════════════════
-2️⃣ LÓGICA AUTOMÁTICA DE DECISÃO DOS PAPÉIS
+REGRAS INEGOCIÁVEIS
 ═══════════════════════════════════════════════════════════════════════════════
 
-🔹 PASSO 1 — Identificar o SENSOR DE DIREÇÃO
+1. DIFERENCIAR CÓDIGO DE ATIVAÇÃO
+- Código é estrutural, o padrão recorrente
+- Ativação é situacional, o estado atual
+O relatório do casal deve focar no Código estrutural, e usar reações Sob Pressão apenas como Zona de Choque, nunca para redefinir papéis.
 
-Classifique como Sensor de Direção e Sentido a pessoa que apresentar MAIOR convergência nos critérios abaixo:
+2. PAPÉIS JÁ FORAM DEFINIDOS PELO ALGORITMO
+Os papéis de Sensor de Direção e Condutor de Curso já foram calculados programaticamente. Você DEVE respeitar essa atribuição e usá-la em todo o relatório.
 
-Critérios principais (peso alto):
-- Inteligência Intrapessoal elevada
-- Arquétipos ligados a visão, sentido, leitura do campo (ex: Mago, Amante, Sábio, Visionário, Explorador)
-- Necessidade de processamento interno
-- Busca por significado antes da ação
-- Tendência a silenciar ou se aprofundar sob pressão
+3. PROIBIÇÃO DE INVERSÃO SIMBÓLICA
+- Nunca chamar o Sensor de executor principal
+- Nunca chamar o Condutor de originador principal da visão profunda
+- Nunca dizer que a pessoa mais orientada a execução é a que precisa de silêncio e tempo longo para decidir, se os dados indicam o contrário
 
-Critérios auxiliares:
-- Verbalização tardia
-- Incômodo com decisões apressadas
-- Frustração com superficialidade
+4. TRADUÇÃO EM INTENÇÃO POSITIVA
+Sempre traduzir:
+- silêncio em processamento, quando for padrão Sob Pressão do Sensor
+- pressa em busca de segurança e avanço, quando for padrão Sob Pressão do Condutor
+Sem culpa. Sem julgamento. Sem diagnóstico.
 
-👉 Essa pessoa revela o "para onde", mas não deve ser descrita como executora principal.
-
-🔹 PASSO 2 — Identificar o CONDUTOR DE CURSO
-
-Classifique como Condutor de Curso e Execução a pessoa que apresentar MAIOR convergência nos critérios abaixo:
-
-Critérios principais (peso alto):
-- Alta Conscienciosidade, Estabilidade ou Dominância
-- Arquétipos ligados a ordem, governo, estrutura (ex: Governante, Guardião, Realista, Provedor)
-- Necessidade de clareza, método e avanço
-- Tendência a agir, organizar ou assumir controle sob pressão
-
-Critérios auxiliares:
-- Incômodo com demora
-- Busca por respostas práticas
-- Sensação de carregar o andamento das coisas
-
-👉 Essa pessoa mantém o curso e a execução, mas não deve ser descrita como originadora da visão profunda.
-
-🔒 REGRA DE VALIDAÇÃO
-
-Se ambos apresentarem traços mistos:
-- priorize quem PROCESSA vs quem AGE sob pressão
-- nunca use apenas discurso verbal como critério
-- comportamento em estresse tem prioridade sobre discurso consciente
+5. TOM E LINGUAGEM
+Humano, claro, acolhedor, firme e respeitoso.
+Não patologize, não rotule como doença, não prescreva terapia.
+Não romantize conflito.
+O leitor precisa sentir alívio e direção prática.
 
 ═══════════════════════════════════════════════════════════════════════════════
-3️⃣ ESTRUTURA OBRIGATÓRIA DO RELATÓRIO (JSON)
+ESTRUTURA OBRIGATÓRIA DO RELATÓRIO (JSON)
 ═══════════════════════════════════════════════════════════════════════════════
 
 {
   "papeis_identificados": {
     "sensor_direcao": {
-      "nome": "[NOME]",
-      "justificativa": "Breve explicação de por que esta pessoa foi identificada como Sensor de Direção"
+      "nome": "[NOME_SENSOR]",
+      "justificativa": "[JUSTIFICATIVA FORNECIDA PELO SISTEMA]"
     },
     "condutor_curso": {
-      "nome": "[NOME]",
-      "justificativa": "Breve explicação de por que esta pessoa foi identificada como Condutor de Curso"
+      "nome": "[NOME_CONDUTOR]",
+      "justificativa": "[JUSTIFICATIVA FORNECIDA PELO SISTEMA]"
     }
   },
   "metafora_central": {
-    "titulo": "Metáfora do Casal",
-    "descricao": "Um lê o vento, o mar e o horizonte. O outro mantém o leme firme e o barco em movimento. [Personalize com os nomes e características específicas do casal. NÃO use 'navegador' ou 'bússola' se gerar inversão simbólica]"
+    "titulo": "A Metáfora do Barco",
+    "descricao": "O relacionamento é um barco em mar aberto. Em alguns momentos, um de vocês lê o vento, o mar e o horizonte, revelando o sentido. Em outros momentos, o outro mantém o leme firme e faz o barco avançar. Quando cada um honra seu papel, o casal não se perde — ajusta as velas. [NOME_SENSOR] lê o campo. [NOME_CONDUTOR] sustenta o curso."
   },
   "zona_harmonia": {
     "titulo": "🟢 Zona de Harmonia",
     "descricao": "Onde a conexão flui com naturalidade",
-    "valores_compartilhados": ["Valor 1", "Valor 2", "Valor 3"],
-    "proposito_comum": "O propósito que os une como casal"
+    "valores_compartilhados": ["Valor 1", "Valor 2", "Valor 3", "Valor 4", "Valor 5"],
+    "proposito_comum": "O propósito que os une como casal (parágrafo curto)"
   },
   "zona_ajuste": {
     "titulo": "🟡 Zona de Ajuste",
     "descricao": "Diferenças que exigem consciência e diálogo",
     "diferencas": [
       {
-        "aspecto": "Ritmo",
-        "descricao": "Como os ritmos diferentes se manifestam"
-      },
-      {
-        "aspecto": "Tempo Interno",
-        "descricao": "Como os tempos de processamento diferem"
-      },
-      {
-        "aspecto": "Forma de Decidir",
-        "descricao": "Como as abordagens de decisão diferem"
+        "titulo": "Título Curto da Diferença",
+        "pessoa_a_faz": "O que [NOME_SENSOR] tende a fazer",
+        "pessoa_b_faz": "O que [NOME_CONDUTOR] tende a fazer",
+        "traducao_positiva_a": "Tradução positiva para [NOME_SENSOR]",
+        "traducao_positiva_b": "Tradução positiva para [NOME_CONDUTOR]",
+        "micro_acordo": "Um micro acordo prático para este ponto"
       }
     ]
   },
   "zona_choque": {
     "titulo": "🔴 Zona de Choque (Sob Pressão)",
     "descricao": "Como cada um reage sob estresse e como ativam a sombra um do outro. Sem culpa. Sem julgamento.",
-    "sensor_sob_estresse": {
+    "ciclo_sombra": {
+      "gatilho": "O que inicia o ciclo de tensão",
+      "reacao_sensor": "Como [NOME_SENSOR] reage inicialmente",
+      "interpretacao_condutor": "Como [NOME_CONDUTOR] interpreta essa reação",
+      "reacao_condutor": "Como [NOME_CONDUTOR] responde",
+      "interpretacao_sensor": "Como [NOME_SENSOR] interpreta a resposta",
+      "retroalimentacao": "Como o ciclo se perpetua se não for interrompido"
+    },
+    "bloco_sensor": {
       "nome": "[NOME_SENSOR]",
-      "comportamento": "O que o Sensor faz sob estresse",
-      "impacto_no_outro": "Como isso afeta o Condutor"
+      "como_reage_sob_estresse": "Descrição do comportamento sob estresse",
+      "como_impacta_outro": "Como isso afeta [NOME_CONDUTOR]",
+      "o_que_precisa_do_outro": "O que precisa do parceiro para voltar ao eixo"
     },
-    "condutor_sob_estresse": {
+    "bloco_condutor": {
       "nome": "[NOME_CONDUTOR]",
-      "comportamento": "O que o Condutor faz sob estresse",
-      "impacto_no_outro": "Como isso afeta o Sensor"
-    },
-    "ciclo_sombra": "Como um ativa a sombra do outro em momentos de pressão"
+      "como_reage_sob_estresse": "Descrição do comportamento sob estresse",
+      "como_impacta_outro": "Como isso afeta [NOME_SENSOR]",
+      "o_que_precisa_do_outro": "O que precisa do parceiro para voltar ao eixo"
+    }
   },
   "tabela_traducao": {
     "titulo": "📖 Tabela de Tradução do Casal",
-    "descricao": "⚠️ Sempre traduzir comportamento em intenção positiva.",
+    "descricao": "Sempre traduzir comportamento em intenção positiva.",
     "traducoes_sensor": {
-      "titulo": "Quando o SENSOR DE DIREÇÃO...",
+      "titulo": "Quando [NOME_SENSOR] (Sensor de Direção)...",
       "traducoes": [
-        {
-          "comportamento": "se cala",
-          "traducao": "está processando"
-        },
-        {
-          "comportamento": "questiona",
-          "traducao": "está refinando"
-        },
-        {
-          "comportamento": "demora",
-          "traducao": "está protegendo a qualidade"
-        }
+        { "comportamento": "se cala", "significado": "geralmente significa que está processando" },
+        { "comportamento": "questiona repetidamente", "significado": "geralmente significa que está refinando a compreensão" },
+        { "comportamento": "demora para decidir", "significado": "geralmente significa que está protegendo a qualidade da escolha" },
+        { "comportamento": "se afasta", "significado": "geralmente significa que precisa de espaço interno" }
       ]
     },
     "traducoes_condutor": {
-      "titulo": "Quando o CONDUTOR DE CURSO...",
+      "titulo": "Quando [NOME_CONDUTOR] (Condutor de Curso)...",
       "traducoes": [
-        {
-          "comportamento": "pressiona",
-          "traducao": "está buscando segurança"
-        },
-        {
-          "comportamento": "controla",
-          "traducao": "está evitando caos"
-        },
-        {
-          "comportamento": "acelera",
-          "traducao": "está protegendo o avanço"
-        }
+        { "comportamento": "pressiona por resposta", "significado": "geralmente significa que está buscando segurança" },
+        { "comportamento": "assume o controle", "significado": "geralmente significa que está evitando o caos" },
+        { "comportamento": "acelera as decisões", "significado": "geralmente significa que está protegendo o avanço" },
+        { "comportamento": "cobra clareza", "significado": "geralmente significa que precisa de direção para agir" }
       ]
     }
   },
@@ -186,29 +470,31 @@ Se ambos apresentarem traços mistos:
     "titulo": "🕊️ Protocolo de Paz Unificado",
     "tempo_duplo": {
       "titulo": "1. Tempo Duplo",
-      "para_sensor": "Tempo de processamento que o Sensor precisa",
-      "para_condutor": "Tempo de avanço que o Condutor precisa"
+      "tempo_sensor": "O tempo de [NOME_SENSOR]: para processar e nomear o que sente",
+      "tempo_condutor": "O tempo de [NOME_CONDUTOR]: para ver progresso e próximos passos"
     },
     "pergunta_recalibracao": {
       "titulo": "2. Pergunta de Recalibração",
-      "pergunta": "Qual é o resultado que queremos e qual papel cada um cumpre agora?"
+      "pergunta": "Qual é o resultado que queremos e qual papel cada um cumpre agora para chegarmos lá, respeitando nossos tempos e naturezas?"
     },
     "proibicao_inferencia": {
       "titulo": "3. Proibição de Inferência",
       "regras": [
-        "silêncio ≠ desamor",
-        "pressa ≠ desrespeito"
+        "silêncio não é desamor",
+        "pressa não é desrespeito"
       ]
     }
   },
   "acao_pratica_24h": {
     "titulo": "⚡ Ação Prática Imediata (24 horas)",
-    "descricao": "Uma ação simples, leve, aplicável em 24 horas, que não exija conversa longa, gere pequena vitória relacional e respeite os dois ritmos.",
-    "acao": "Descrição específica da ação"
+    "descricao": "Uma ação simples e aplicável em 24 horas que não exija conversa longa, gere pequena vitória relacional e respeite os dois ritmos.",
+    "passo_1": "Primeiro passo específico",
+    "passo_2": "Segundo passo específico",
+    "passo_3": "Terceiro passo específico"
   },
   "fechamento": {
     "titulo": "💫 Mensagem Final",
-    "mensagem": "Vocês não precisam funcionar do mesmo jeito para caminhar juntos. Um revela o sentido. O outro sustenta o caminho."
+    "mensagem": "Vocês não precisam funcionar do mesmo jeito para caminhar juntos. Um revela o sentido. O outro sustenta o caminho. Quando vocês honram esses papéis, a jornada fica mais leve e mais forte."
   },
   "dados_grafico": {
     "usuario_a": {
@@ -225,27 +511,16 @@ Se ambos apresentarem traços mistos:
 }
 
 ═══════════════════════════════════════════════════════════════════════════════
-4️⃣ TOM E LINGUAGEM (OBRIGATÓRIO)
+CHECKLIST FINAL (VALIDE ANTES DE ENTREGAR)
 ═══════════════════════════════════════════════════════════════════════════════
 
-- humano
-- respeitoso
-- claro
-- sem diagnóstico
-- sem romantização excessiva
-- sem espiritualização forçada
-
-O leitor deve sentir: "Agora eu entendi. Não estamos errados. Só funcionamos diferente."
-
-═══════════════════════════════════════════════════════════════════════════════
-5️⃣ CHECKLIST FINAL (VALIDE ANTES DE ENTREGAR)
-═══════════════════════════════════════════════════════════════════════════════
-
-⬜ Os papéis respeitam os dados individuais
+⬜ Os papéis respeitam a atribuição fornecida pelo sistema
 ⬜ Não houve inversão simbólica
 ⬜ Nenhum parceiro foi empurrado para fora da própria essência
 ⬜ O texto gera alívio, não cobrança
-⬜ O casal sai com ação prática clara
+⬜ O casal sai com ação prática clara em 3 passos
+⬜ A Tabela de Tradução tem 4 linhas para cada papel
+⬜ A Zona de Ajuste tem micro acordos práticos
 
 Se algum item falhar → revisar antes de entregar.`,
 
@@ -369,239 +644,43 @@ ESTRUTURA DO RELATÓRIO (retorne JSON exato):
 }`
   },
   en: {
-    spouse: `You are Identity – Relationship Reading Engine.
-Your function is to generate the Couple's Code, crossing two Individual Codes, without inverting psychological roles, without romanticizing conflicts, and without creating undue self-blame.
-
-The report must:
-- translate differences into complementarity
-- explain conflicts without accusing
-- guide practical coexistence actions
-- deeply respect each individual's essence
+    spouse: `You are Identity – Nello's Relationship Reading Engine.
 
 ═══════════════════════════════════════════════════════════════════════════════
-1️⃣ FUNDAMENTAL RULE (UNBREAKABLE)
+OBJECTIVE
 ═══════════════════════════════════════════════════════════════════════════════
-
-Symbolic direction can NEVER be confused with practical execution.
-
-The system must always identify and respect two distinct roles in the couple:
-- DIRECTION AND MEANING SENSOR
-- COURSE AND EXECUTION DRIVER
-
-❌ It is forbidden to:
-- invert these roles
-- push a partner outside their own nature
-- attribute vision to someone who is structural
-- attribute execution to someone who is sensorial
+Generate the Couple's Code based on two Individual Codes, respecting the roles of DIRECTION AND MEANING SENSOR and COURSE AND EXECUTION DRIVER already defined by the system.
 
 ═══════════════════════════════════════════════════════════════════════════════
-2️⃣ AUTOMATIC ROLE DECISION LOGIC
+NON-NEGOTIABLE RULES
 ═══════════════════════════════════════════════════════════════════════════════
 
-🔹 STEP 1 — Identify the DIRECTION SENSOR
+1. DIFFERENTIATE CODE FROM ACTIVATION
+- Code is structural, the recurring pattern
+- Activation is situational, the current state
+The couple's report must focus on the structural Code, and use Under Pressure reactions only as Shock Zone, never to redefine roles.
 
-Classify as Direction and Meaning Sensor the person who shows GREATER convergence in the criteria below:
+2. ROLES HAVE BEEN DEFINED BY THE ALGORITHM
+The roles of Direction Sensor and Course Driver have been calculated programmatically. You MUST respect this assignment and use it throughout the report.
 
-Main criteria (high weight):
-- High Intrapersonal Intelligence
-- Archetypes linked to vision, meaning, field reading (e.g., Magician, Lover, Sage, Visionary, Explorer)
-- Need for internal processing
-- Search for meaning before action
-- Tendency to go silent or deepen under pressure
+3. PROHIBITION OF SYMBOLIC INVERSION
+- Never call the Sensor the main executor
+- Never call the Driver the main originator of deep vision
+- Never say that the execution-oriented person is the one who needs silence and long time to decide, if the data indicates otherwise
 
-Auxiliary criteria:
-- Late verbalization
-- Discomfort with hasty decisions
-- Frustration with superficiality
+4. TRANSLATION INTO POSITIVE INTENTION
+Always translate:
+- silence into processing, when it's the Sensor's Under Pressure pattern
+- haste into search for security and progress, when it's the Driver's Under Pressure pattern
+No blame. No judgment. No diagnosis.
 
-👉 This person reveals the "where to", but should not be described as the main executor.
+5. TONE AND LANGUAGE
+Human, clear, welcoming, firm and respectful.
+Don't pathologize, don't label as disease, don't prescribe therapy.
+Don't romanticize conflict.
+The reader needs to feel relief and practical direction.
 
-🔹 STEP 2 — Identify the COURSE DRIVER
-
-Classify as Course and Execution Driver the person who shows GREATER convergence in the criteria below:
-
-Main criteria (high weight):
-- High Conscientiousness, Stability, or Dominance
-- Archetypes linked to order, governance, structure (e.g., Ruler, Guardian, Realist, Provider)
-- Need for clarity, method, and progress
-- Tendency to act, organize, or take control under pressure
-
-Auxiliary criteria:
-- Discomfort with delay
-- Search for practical answers
-- Feeling of carrying the pace of things
-
-👉 This person maintains the course and execution, but should not be described as the originator of deep vision.
-
-🔒 VALIDATION RULE
-
-If both show mixed traits:
-- prioritize who PROCESSES vs who ACTS under pressure
-- never use only verbal discourse as criteria
-- stress behavior takes priority over conscious discourse
-
-═══════════════════════════════════════════════════════════════════════════════
-3️⃣ MANDATORY REPORT STRUCTURE (JSON)
-═══════════════════════════════════════════════════════════════════════════════
-
-{
-  "papeis_identificados": {
-    "sensor_direcao": {
-      "nome": "[NAME]",
-      "justificativa": "Brief explanation of why this person was identified as Direction Sensor"
-    },
-    "condutor_curso": {
-      "nome": "[NAME]",
-      "justificativa": "Brief explanation of why this person was identified as Course Driver"
-    }
-  },
-  "metafora_central": {
-    "titulo": "Couple's Metaphor",
-    "descricao": "One reads the wind, the sea, and the horizon. The other keeps the helm steady and the boat moving. [Personalize with names and specific characteristics. DO NOT use 'navigator' or 'compass' if it creates symbolic inversion]"
-  },
-  "zona_harmonia": {
-    "titulo": "🟢 Harmony Zone",
-    "descricao": "Where connection flows naturally",
-    "valores_compartilhados": ["Value 1", "Value 2", "Value 3"],
-    "proposito_comum": "The purpose that unites them as a couple"
-  },
-  "zona_ajuste": {
-    "titulo": "🟡 Adjustment Zone",
-    "descricao": "Differences that require awareness and dialogue",
-    "diferencas": [
-      {
-        "aspecto": "Rhythm",
-        "descricao": "How different rhythms manifest"
-      },
-      {
-        "aspecto": "Internal Time",
-        "descricao": "How processing times differ"
-      },
-      {
-        "aspecto": "Decision Style",
-        "descricao": "How decision approaches differ"
-      }
-    ]
-  },
-  "zona_choque": {
-    "titulo": "🔴 Shock Zone (Under Pressure)",
-    "descricao": "How each reacts under stress and how they activate each other's shadow. No blame. No judgment.",
-    "sensor_sob_estresse": {
-      "nome": "[SENSOR_NAME]",
-      "comportamento": "What the Sensor does under stress",
-      "impacto_no_outro": "How this affects the Driver"
-    },
-    "condutor_sob_estresse": {
-      "nome": "[DRIVER_NAME]",
-      "comportamento": "What the Driver does under stress",
-      "impacto_no_outro": "How this affects the Sensor"
-    },
-    "ciclo_sombra": "How one activates the other's shadow in pressure moments"
-  },
-  "tabela_traducao": {
-    "titulo": "📖 Couple Translation Table",
-    "descricao": "⚠️ Always translate behavior into positive intention.",
-    "traducoes_sensor": {
-      "titulo": "When the DIRECTION SENSOR...",
-      "traducoes": [
-        {
-          "comportamento": "goes silent",
-          "traducao": "is processing"
-        },
-        {
-          "comportamento": "questions",
-          "traducao": "is refining"
-        },
-        {
-          "comportamento": "delays",
-          "traducao": "is protecting quality"
-        }
-      ]
-    },
-    "traducoes_condutor": {
-      "titulo": "When the COURSE DRIVER...",
-      "traducoes": [
-        {
-          "comportamento": "pressures",
-          "traducao": "is seeking security"
-        },
-        {
-          "comportamento": "controls",
-          "traducao": "is avoiding chaos"
-        },
-        {
-          "comportamento": "accelerates",
-          "traducao": "is protecting progress"
-        }
-      ]
-    }
-  },
-  "protocolo_paz": {
-    "titulo": "🕊️ Unified Peace Protocol",
-    "tempo_duplo": {
-      "titulo": "1. Dual Time",
-      "para_sensor": "Processing time the Sensor needs",
-      "para_condutor": "Progress time the Driver needs"
-    },
-    "pergunta_recalibracao": {
-      "titulo": "2. Recalibration Question",
-      "pergunta": "What is the result we want and what role does each one fulfill now?"
-    },
-    "proibicao_inferencia": {
-      "titulo": "3. Inference Prohibition",
-      "regras": [
-        "silence ≠ lack of love",
-        "haste ≠ disrespect"
-      ]
-    }
-  },
-  "acao_pratica_24h": {
-    "titulo": "⚡ Immediate Practical Action (24 hours)",
-    "descricao": "A simple, light action, applicable in 24 hours, that doesn't require long conversation, generates a small relational victory, and respects both rhythms.",
-    "acao": "Specific action description"
-  },
-  "fechamento": {
-    "titulo": "💫 Final Message",
-    "mensagem": "You don't need to work the same way to walk together. One reveals the meaning. The other sustains the path."
-  },
-  "dados_grafico": {
-    "usuario_a": {
-      "nome": "[NAME_A]",
-      "papel": "sensor | driver",
-      "disc": { "D": 0, "I": 0, "S": 0, "C": 0 }
-    },
-    "usuario_b": {
-      "nome": "[NAME_B]",
-      "papel": "sensor | driver",
-      "disc": { "D": 0, "I": 0, "S": 0, "C": 0 }
-    }
-  }
-}
-
-═══════════════════════════════════════════════════════════════════════════════
-4️⃣ TONE AND LANGUAGE (MANDATORY)
-═══════════════════════════════════════════════════════════════════════════════
-
-- human
-- respectful
-- clear
-- no diagnosis
-- no excessive romanticization
-- no forced spiritualization
-
-The reader should feel: "Now I understand. We're not wrong. We just work differently."
-
-═══════════════════════════════════════════════════════════════════════════════
-5️⃣ FINAL CHECKLIST (VALIDATE BEFORE DELIVERING)
-═══════════════════════════════════════════════════════════════════════════════
-
-⬜ Roles respect individual data
-⬜ No symbolic inversion occurred
-⬜ No partner was pushed outside their own essence
-⬜ The text generates relief, not self-blame
-⬜ The couple leaves with a clear practical action
-
-If any item fails → revise before delivering.`,
+Return the JSON following the exact same structure as the Portuguese version, but in English.`,
 
     parent_child: `You are Identity – Family Relationship Reading Engine.
 
@@ -614,56 +693,7 @@ PRINCIPLES:
 - No accusatory language or value hierarchies
 - Respect for generational differences
 
-REPORT STRUCTURE (return exact JSON):
-{
-  "abertura": "Introductory text about the purpose of the family report...",
-  "dinamica_familiar": {
-    "titulo": "The Dynamic Between You",
-    "resumo": "How profiles interact in the parent-child relationship..."
-  },
-  "forcas_da_relacao": {
-    "titulo": "Relationship Strengths",
-    "pontos": ["Strength 1", "Strength 2", "Strength 3"]
-  },
-  "pontos_de_atencao": {
-    "titulo": "Points of Attention",
-    "pontos": ["Attention 1", "Attention 2", "Attention 3"]
-  },
-  "tabela_traducao_familiar": {
-    "titulo": "Family Translation Table",
-    "traducoes_pai": [
-      {
-        "quando_diz": "What [PARENT_NAME] usually says",
-        "intencao_real": "The intention behind it",
-        "filho_ouve": "What [CHILD_NAME] usually feels"
-      }
-    ],
-    "traducoes_filho": [
-      {
-        "quando_diz": "What [CHILD_NAME] usually says",
-        "intencao_real": "The intention behind it",
-        "pai_ouve": "What [PARENT_NAME] usually feels"
-      }
-    ]
-  },
-  "como_o_pai_pode_apoiar": {
-    "titulo": "How [PARENT_NAME] can better support",
-    "sugestoes": ["Suggestion 1", "Suggestion 2", "Suggestion 3"]
-  },
-  "como_o_filho_pode_comunicar": {
-    "titulo": "How [CHILD_NAME] can communicate better",
-    "sugestoes": ["Suggestion 1", "Suggestion 2", "Suggestion 3"]
-  },
-  "desafio_conexao_familiar": {
-    "titulo": "24-Hour Connection Challenge",
-    "acao": "A small, concrete action to strengthen the relationship today"
-  },
-  "perguntas_para_conversa": {
-    "titulo": "Questions to Discuss",
-    "perguntas": ["Question 1?", "Question 2?", "Question 3?"]
-  },
-  "fechamento": "Encouraging closing text..."
-}`,
+Return JSON with the same structure as Portuguese version, but in English.`,
 
     siblings: `You are Identity – Sibling Relationship Reading Engine.
 
@@ -675,93 +705,20 @@ PRINCIPLES:
 - Focus on translating differences and strengthening the bond
 - No accusatory language
 
-REPORT STRUCTURE (return exact JSON):
-{
-  "abertura": "Introductory text...",
-  "dinamica_fraternal": {
-    "titulo": "Your Relationship",
-    "resumo": "How profiles interact as siblings..."
-  },
-  "complementaridades": {
-    "titulo": "Where You Complement Each Other",
-    "pontos": ["Point 1", "Point 2", "Point 3"]
-  },
-  "atritos_tipicos": {
-    "titulo": "Typical Friction Points",
-    "pontos": ["Friction 1", "Friction 2"]
-  },
-  "tabela_traducao_fraternal": {
-    "titulo": "Translation Table",
-    "traducoes_a": [
-      {
-        "quando_diz": "What [NAME_A] usually says",
-        "intencao_real": "The intention behind it",
-        "outro_ouve": "What [NAME_B] usually feels"
-      }
-    ],
-    "traducoes_b": [
-      {
-        "quando_diz": "What [NAME_B] usually says",
-        "intencao_real": "The intention behind it",
-        "outro_ouve": "What [NAME_A] usually feels"
-      }
-    ]
-  },
-  "como_melhorar": {
-    "titulo": "How to Improve the Relationship",
-    "sugestoes": ["Suggestion 1", "Suggestion 2", "Suggestion 3"]
-  },
-  "desafio_conexao": {
-    "titulo": "Connection Challenge",
-    "acao": "An action to strengthen the relationship"
-  },
-  "perguntas": {
-    "titulo": "Questions to Reflect On",
-    "perguntas": ["Question 1?", "Question 2?", "Question 3?"]
-  },
-  "fechamento": "Closing text..."
-}`
+Return JSON with the same structure as Portuguese version, but in English.`
   }
 };
 
-function summarizeEssenceCode(mapa: any): string {
-  if (!mapa?.sections) return "Código da Essência não disponível";
-  
-  const sections = mapa.sections;
-  const summary: string[] = [];
-  
-  for (const section of sections) {
-    if (section.title && section.content) {
-      const importantSections = [
-        'temperamento', 'disc', 'eneagrama', 'arquetipo', 
-        'inteligencias', 'vocacao', 'comunicacao', 'proposito',
-        'sombra', 'lideranca', 'relacionamentos', 'valores',
-        'intrapessoal', 'interpessoal'
-      ];
-      
-      const titleLower = section.title.toLowerCase();
-      if (importantSections.some(s => titleLower.includes(s))) {
-        const content = typeof section.content === 'string' 
-          ? section.content.slice(0, 500) 
-          : JSON.stringify(section.content).slice(0, 500);
-        summary.push(`**${section.title}**: ${content}`);
-      }
-    }
-  }
-  
-  return summary.join('\n\n');
-}
-
 function getUserPrompt(
   locale: string,
-  nameA: string,
-  nameB: string,
+  roleAssignment: RoleAssignment,
+  personA: PersonProfile,
+  personB: PersonProfile,
   mapaA: any,
   mapaB: any,
   relationshipType: string
 ): string {
-  const summaryA = summarizeEssenceCode(mapaA);
-  const summaryB = summarizeEssenceCode(mapaB);
+  const lang = locale === 'en' ? 'en' : 'pt';
   
   const relationLabels: Record<string, Record<string, string>> = {
     pt: {
@@ -778,64 +735,146 @@ function getUserPrompt(
     }
   };
   
-  const lang = locale === 'en' ? 'en' : 'pt';
   const relationLabel = relationLabels[lang][relationshipType] || relationshipType;
   
+  // Summarize essence codes
+  const summarize = (mapa: any): string => {
+    if (!mapa?.sections) return "Código da Essência não disponível";
+    const sections = mapa.sections;
+    const summary: string[] = [];
+    
+    for (const section of sections) {
+      if (section.title && section.content) {
+        const importantSections = [
+          'temperamento', 'disc', 'eneagrama', 'arquetipo', 
+          'inteligencias', 'vocacao', 'comunicacao', 'proposito',
+          'sombra', 'lideranca', 'relacionamentos', 'valores',
+          'intrapessoal', 'interpessoal', 'pressão', 'estresse'
+        ];
+        
+        const titleLower = section.title.toLowerCase();
+        if (importantSections.some(s => titleLower.includes(s))) {
+          const content = typeof section.content === 'string' 
+            ? section.content.slice(0, 500) 
+            : JSON.stringify(section.content).slice(0, 500);
+          summary.push(`**${section.title}**: ${content}`);
+        }
+      }
+    }
+    
+    return summary.join('\n\n');
+  };
+  
+  const summaryA = summarize(mapaA);
+  const summaryB = summarize(mapaB);
+  
   if (lang === 'pt') {
-    return `Analise os Códigos da Essência destas duas pessoas (${relationLabel}) e gere o Código do Casal completo seguindo a estrutura Identity v1.0.
+    return `Analise os Códigos da Essência destas duas pessoas (${relationLabel}) e gere o Código do Casal completo seguindo a estrutura Identity v2.0.
 
-## ${nameA}
+═══════════════════════════════════════════════════════════════════════════════
+ATRIBUIÇÃO DE PAPÉIS (DEFINIDA PELO ALGORITMO - NÃO ALTERE)
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 SENSOR DE DIREÇÃO E SENTIDO: ${roleAssignment.sensor.name}
+Justificativa: ${roleAssignment.justification.sensor}
+Score: ${roleAssignment.sensorScore}
+
+🎯 CONDUTOR DE CURSO E EXECUÇÃO: ${roleAssignment.conductor.name}
+Justificativa: ${roleAssignment.justification.conductor}
+Score: ${roleAssignment.conductorScore}
+
+VOCÊ DEVE USAR ESSES PAPÉIS EXATAMENTE COMO DEFINIDOS. NÃO INVERTA.
+
+═══════════════════════════════════════════════════════════════════════════════
+DADOS DOS PERFIS
+═══════════════════════════════════════════════════════════════════════════════
+
+## ${personA.name}
+DISC: D=${personA.disc.D}%, I=${personA.disc.I}%, S=${personA.disc.S}%, C=${personA.disc.C}%
+Arquétipos: ${personA.archetypes.primary}${personA.archetypes.secondary ? `, ${personA.archetypes.secondary}` : ''}
+Inteligência Intrapessoal: ${personA.intelligences.intrapersonal}%
+Sob Pressão: ${personA.underPressure.join(', ') || 'não especificado'}
+
 ${summaryA}
 
-## ${nameB}
+## ${personB.name}
+DISC: D=${personB.disc.D}%, I=${personB.disc.I}%, S=${personB.disc.S}%, C=${personB.disc.C}%
+Arquétipos: ${personB.archetypes.primary}${personB.archetypes.secondary ? `, ${personB.archetypes.secondary}` : ''}
+Inteligência Intrapessoal: ${personB.intelligences.intrapersonal}%
+Sob Pressão: ${personB.underPressure.join(', ') || 'não especificado'}
+
 ${summaryB}
 
-INSTRUÇÕES CRÍTICAS PARA IDENTIFICAÇÃO DE PAPÉIS:
+═══════════════════════════════════════════════════════════════════════════════
+INSTRUÇÕES FINAIS
+═══════════════════════════════════════════════════════════════════════════════
 
-1. PRIMEIRO, analise CUIDADOSAMENTE os dados de cada pessoa para determinar:
-   - Quem tem maior Inteligência Intrapessoal, arquétipos de visão (Mago, Sábio, Explorador), tendência a processar internamente → SENSOR DE DIREÇÃO
-   - Quem tem maior Dominância/Conscienciosidade, arquétipos de estrutura (Governante, Guardião), tendência a agir e organizar → CONDUTOR DE CURSO
+1. USE os nomes reais (${personA.name} e ${personB.name}) em TODAS as seções
+2. ${roleAssignment.sensor.name} é o SENSOR - revela sentido, processa, lê o campo
+3. ${roleAssignment.conductor.name} é o CONDUTOR - mantém curso, executa, organiza
+4. A Zona de Ajuste deve ter 2-4 diferenças com micro acordos práticos
+5. A Tabela de Tradução deve ter 4 linhas para cada papel
+6. A Ação Prática deve ter 3 passos específicos para 24 horas
+7. O tom deve gerar ALÍVIO: "Agora eu entendi. Não estamos errados."
 
-2. Use os nomes reais (${nameA} e ${nameB}) em TODAS as seções
-
-3. A Tabela de Tradução deve ter traduções específicas e personalizadas para ESTE casal
-
-4. A metáfora do barco deve ser adaptada aos perfis específicos, sem usar "navegador" ou "bússola"
-
-5. O tom deve gerar ALÍVIO: "Agora eu entendi. Não estamos errados. Só funcionamos diferente."
-
-6. Substitua [NOME_A] por ${nameA} e [NOME_B] por ${nameB}
-
-7. Nos dados_grafico, inclua o papel identificado (sensor ou condutor) para cada pessoa
+Nos dados_grafico:
+- ${roleAssignment.sensor.name}: papel = "sensor", disc = ${JSON.stringify(roleAssignment.sensor.disc)}
+- ${roleAssignment.conductor.name}: papel = "condutor", disc = ${JSON.stringify(roleAssignment.conductor.disc)}
 
 Retorne APENAS o JSON no formato especificado, sem texto adicional.`;
   }
   
-  return `Analyze the Essence Codes of these two people (${relationLabel}) and generate the complete Couple's Code following the Identity v1.0 structure.
+  return `Analyze the Essence Codes of these two people (${relationLabel}) and generate the complete Couple's Code following the Identity v2.0 structure.
 
-## ${nameA}
+═══════════════════════════════════════════════════════════════════════════════
+ROLE ASSIGNMENT (DEFINED BY ALGORITHM - DO NOT CHANGE)
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 DIRECTION AND MEANING SENSOR: ${roleAssignment.sensor.name}
+Justification: ${roleAssignment.justification.sensor}
+Score: ${roleAssignment.sensorScore}
+
+🎯 COURSE AND EXECUTION DRIVER: ${roleAssignment.conductor.name}
+Justification: ${roleAssignment.justification.conductor}
+Score: ${roleAssignment.conductorScore}
+
+YOU MUST USE THESE ROLES EXACTLY AS DEFINED. DO NOT INVERT.
+
+═══════════════════════════════════════════════════════════════════════════════
+PROFILE DATA
+═══════════════════════════════════════════════════════════════════════════════
+
+## ${personA.name}
+DISC: D=${personA.disc.D}%, I=${personA.disc.I}%, S=${personA.disc.S}%, C=${personA.disc.C}%
+Archetypes: ${personA.archetypes.primary}${personA.archetypes.secondary ? `, ${personA.archetypes.secondary}` : ''}
+Intrapersonal Intelligence: ${personA.intelligences.intrapersonal}%
+Under Pressure: ${personA.underPressure.join(', ') || 'not specified'}
+
 ${summaryA}
 
-## ${nameB}
+## ${personB.name}
+DISC: D=${personB.disc.D}%, I=${personB.disc.I}%, S=${personB.disc.S}%, C=${personB.disc.C}%
+Archetypes: ${personB.archetypes.primary}${personB.archetypes.secondary ? `, ${personB.archetypes.secondary}` : ''}
+Intrapersonal Intelligence: ${personB.intelligences.intrapersonal}%
+Under Pressure: ${personB.underPressure.join(', ') || 'not specified'}
+
 ${summaryB}
 
-CRITICAL INSTRUCTIONS FOR ROLE IDENTIFICATION:
+═══════════════════════════════════════════════════════════════════════════════
+FINAL INSTRUCTIONS
+═══════════════════════════════════════════════════════════════════════════════
 
-1. FIRST, CAREFULLY analyze each person's data to determine:
-   - Who has higher Intrapersonal Intelligence, vision archetypes (Magician, Sage, Explorer), tendency to process internally → DIRECTION SENSOR
-   - Who has higher Dominance/Conscientiousness, structure archetypes (Ruler, Guardian), tendency to act and organize → COURSE DRIVER
+1. USE real names (${personA.name} and ${personB.name}) in ALL sections
+2. ${roleAssignment.sensor.name} is the SENSOR - reveals meaning, processes, reads the field
+3. ${roleAssignment.conductor.name} is the DRIVER - maintains course, executes, organizes
+4. The Adjustment Zone must have 2-4 differences with practical micro-agreements
+5. The Translation Table must have 4 lines for each role
+6. The Practical Action must have 3 specific steps for 24 hours
+7. The tone should generate RELIEF: "Now I understand. We're not wrong."
 
-2. Use the real names (${nameA} and ${nameB}) in ALL sections
-
-3. The Translation Table must have specific, personalized translations for THIS couple
-
-4. The boat metaphor must be adapted to the specific profiles, without using "navigator" or "compass"
-
-5. The tone should generate RELIEF: "Now I understand. We're not wrong. We just work differently."
-
-6. Replace [NAME_A] with ${nameA} and [NAME_B] with ${nameB}
-
-7. In dados_grafico, include the identified role (sensor or driver) for each person
+In dados_grafico:
+- ${roleAssignment.sensor.name}: papel = "sensor", disc = ${JSON.stringify(roleAssignment.sensor.disc)}
+- ${roleAssignment.conductor.name}: papel = "condutor", disc = ${JSON.stringify(roleAssignment.conductor.disc)}
 
 Return ONLY the JSON in the specified format, no additional text.`;
 }
@@ -919,13 +958,44 @@ serve(async (req) => {
       );
     }
 
+    // ========================================================================
+    // IDENTITY v2.0: PROGRAMMATIC ROLE ASSIGNMENT
+    // ========================================================================
+    console.log('🔍 [Identity v2.0] Extracting profiles...');
+    
+    const personA = extractPersonProfile(nameA, mapaA);
+    const personB = extractPersonProfile(nameB, mapaB);
+    
+    console.log('📊 [Identity v2.0] Profile A:', JSON.stringify({
+      name: personA.name,
+      disc: personA.disc,
+      archetypes: personA.archetypes,
+      intrapersonal: personA.intelligences.intrapersonal,
+      underPressure: personA.underPressure
+    }));
+    
+    console.log('📊 [Identity v2.0] Profile B:', JSON.stringify({
+      name: personB.name,
+      disc: personB.disc,
+      archetypes: personB.archetypes,
+      intrapersonal: personB.intelligences.intrapersonal,
+      underPressure: personB.underPressure
+    }));
+    
+    const roleAssignment = assignRoles(personA, personB);
+    
+    console.log('🎯 [Identity v2.0] Role Assignment:');
+    console.log(`   SENSOR: ${roleAssignment.sensor.name} (score: ${roleAssignment.sensorScore})`);
+    console.log(`   CONDUCTOR: ${roleAssignment.conductor.name} (score: ${roleAssignment.conductorScore})`);
+    // ========================================================================
+
     // Select prompts
     const lang = locale === 'en' ? 'en' : 'pt';
     const relationshipType = cruzamento.relationship_type;
     const systemPrompt = SYSTEM_PROMPTS[lang][relationshipType as keyof typeof SYSTEM_PROMPTS.pt] || SYSTEM_PROMPTS[lang].spouse;
-    const userPrompt = getUserPrompt(locale, nameA, nameB, mapaA, mapaB, relationshipType);
+    const userPrompt = getUserPrompt(locale, roleAssignment, personA, personB, mapaA, mapaB, relationshipType);
 
-    console.log('Generating Código do Casal (Identity v1.0) for:', { cruzamentoId, nameA, nameB, relationshipType });
+    console.log('🚀 [Identity v2.0] Generating Código do Casal for:', { cruzamentoId, nameA, nameB, relationshipType });
 
     // Call Lovable AI
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -975,7 +1045,7 @@ serve(async (req) => {
     const aiData = await aiResponse.json();
     const rawContent = aiData.choices?.[0]?.message?.content || '';
 
-    console.log('AI response received, parsing JSON...');
+    console.log('✅ [Identity v2.0] AI response received, parsing JSON...');
 
     // Parse JSON from response
     let content: any;
@@ -989,6 +1059,23 @@ serve(async (req) => {
     } catch (parseError) {
       console.error('JSON parse error:', parseError);
       content = { raw: rawContent };
+    }
+
+    // Inject programmatic role assignment data to ensure consistency
+    if (content && !content.raw) {
+      content._identity_version = '2.0';
+      content._role_assignment = {
+        sensor: {
+          name: roleAssignment.sensor.name,
+          score: roleAssignment.sensorScore,
+          disc: roleAssignment.sensor.disc
+        },
+        conductor: {
+          name: roleAssignment.conductor.name,
+          score: roleAssignment.conductorScore,
+          disc: roleAssignment.conductor.disc
+        }
+      };
     }
 
     // Update the crossing record
@@ -1007,14 +1094,18 @@ serve(async (req) => {
       throw updateError;
     }
 
-    console.log('Código do Casal (Identity v1.0) generated successfully');
+    console.log('🎉 [Identity v2.0] Código do Casal generated successfully');
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         content,
         nameA,
-        nameB
+        nameB,
+        roleAssignment: {
+          sensor: roleAssignment.sensor.name,
+          conductor: roleAssignment.conductor.name
+        }
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
