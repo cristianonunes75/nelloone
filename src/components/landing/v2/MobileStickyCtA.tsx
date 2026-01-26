@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useState } from "react";
@@ -33,11 +33,11 @@ export const MobileStickyCtA = () => {
     >
       <Button
         size="lg"
-        className="w-full h-14 text-base rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-medium group"
+        className="w-full h-14 text-base rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg group"
         onClick={() => navigate(language === "en" ? "/en/auth" : "/auth")}
       >
-        {t.landing.hero.cta_primary}
-        <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+        Revelar meu Código
+        <Sparkles className="ml-2 w-5 h-5 text-white/90 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
       </Button>
     </div>
   );

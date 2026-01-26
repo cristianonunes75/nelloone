@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const FinalCTA = () => {
@@ -23,28 +23,18 @@ export const FinalCTA = () => {
             Descubra quem você realmente é e comunique isso com verdade e propósito.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col items-center gap-3">
             <Button 
               size="lg" 
-              className="bg-gold hover:bg-gold-dark text-foreground font-semibold text-lg px-8 py-6"
-              onClick={() => {
-                const pricingSection = document.getElementById('planos');
-                pricingSection?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
-              <Sparkles className="w-5 h-5 mr-2" />
-              Ver Planos e Comprar
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-            
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="border-gold text-gold hover:bg-gold/10 font-semibold text-lg px-8 py-6"
+              className="bg-nello-gold hover:bg-nello-gold-deep text-white font-semibold text-lg px-8 py-6 rounded-full shadow-lg group"
               onClick={() => navigate("/auth")}
             >
-              Entrar na Plataforma
+              Revelar meu Código da Essência
+              <Sparkles className="w-5 h-5 ml-2 text-white/90 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
             </Button>
+            <p className="text-xs text-muted-foreground/70">
+              Acesso vitalício à sua jornada de identidade.
+            </p>
           </div>
 
           <p className="text-sm text-muted-foreground mt-8 italic">

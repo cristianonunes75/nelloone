@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check, Sparkles, Shield } from "lucide-react";
+import { Check, Sparkles, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
@@ -81,14 +81,19 @@ export const SimplifiedPricingSection = () => {
               </ul>
               
               {/* CTA */}
-              <Button 
-                size="lg" 
-                className="w-full h-14 text-base rounded-full bg-ink-blue hover:bg-ink-deep text-primary-foreground group"
-                onClick={() => navigate("/auth")}
-              >
-                Começar Minha Jornada
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              <div className="flex flex-col items-center gap-3">
+                <Button 
+                  size="lg" 
+                  className="w-full h-14 text-base rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg group"
+                  onClick={() => navigate("/auth")}
+                >
+                  Revelar meu Código da Essência
+                  <Sparkles className="ml-2 w-5 h-5 text-white/90 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
+                </Button>
+                <p className="text-xs text-muted-foreground/70">
+                  Acesso vitalício à sua jornada de identidade.
+                </p>
+              </div>
               
               {/* Trust badge */}
               <div className="flex items-center justify-center gap-2 mt-6 text-muted-foreground">
