@@ -296,13 +296,59 @@ const INTELLIGENCE_NAMES: Record<string, Record<string, string>> = {
   existential: { pt: 'Existencial', 'pt-pt': 'Existencial', en: 'Existential' },
 };
 
-// Connection style names
+// Connection style names - using canonical keys and supporting all variations
 const CONNECTION_NAMES: Record<string, Record<string, string>> = {
+  // Canonical keys
+  presenca_ativa: { pt: 'Presença Ativa', 'pt-pt': 'Presença Ativa', en: 'Active Presence' },
+  expressao_verbal: { pt: 'Expressão Verbal', 'pt-pt': 'Expressão Verbal', en: 'Verbal Expression' },
+  cuidado_pratico: { pt: 'Cuidado Prático', 'pt-pt': 'Cuidado Prático', en: 'Practical Care' },
+  gestos_simbolicos: { pt: 'Gestos Simbólicos', 'pt-pt': 'Gestos Simbólicos', en: 'Symbolic Gestures' },
+  conexao_fisica: { pt: 'Conexão Física', 'pt-pt': 'Conexão Física', en: 'Physical Connection' },
+  // Legacy English keys
   verbal_expression: { pt: 'Expressão Verbal', 'pt-pt': 'Expressão Verbal', en: 'Verbal Expression' },
   practical_care: { pt: 'Cuidado Prático', 'pt-pt': 'Cuidado Prático', en: 'Practical Care' },
   active_presence: { pt: 'Presença Ativa', 'pt-pt': 'Presença Ativa', en: 'Active Presence' },
   symbolic_gestures: { pt: 'Gestos Simbólicos', 'pt-pt': 'Gestos Simbólicos', en: 'Symbolic Gestures' },
   physical_connection: { pt: 'Conexão Física', 'pt-pt': 'Conexão Física', en: 'Physical Connection' },
+  // Legacy PT keys
+  tempo_qualidade: { pt: 'Presença Ativa', 'pt-pt': 'Presença Ativa', en: 'Active Presence' },
+  palavras_afirmacao: { pt: 'Expressão Verbal', 'pt-pt': 'Expressão Verbal', en: 'Verbal Expression' },
+  atos_servico: { pt: 'Cuidado Prático', 'pt-pt': 'Cuidado Prático', en: 'Practical Care' },
+  presentes: { pt: 'Gestos Simbólicos', 'pt-pt': 'Gestos Simbólicos', en: 'Symbolic Gestures' },
+  toque_fisico: { pt: 'Conexão Física', 'pt-pt': 'Conexão Física', en: 'Physical Connection' },
+};
+
+// Normalize connection style keys to canonical format
+const normalizeConnectionKey = (value: unknown): string => {
+  if (!value) return '';
+  const str = String(value).toLowerCase().trim().replace(/\s+/g, '_');
+  const mapping: Record<string, string> = {
+    // PT display names
+    'presença_ativa': 'presenca_ativa',
+    'expressão_verbal': 'expressao_verbal', 
+    'cuidado_prático': 'cuidado_pratico',
+    'gestos_simbólicos': 'gestos_simbolicos',
+    'conexão_física': 'conexao_fisica',
+    // Legacy PT
+    'tempo_qualidade': 'presenca_ativa',
+    'palavras_afirmacao': 'expressao_verbal',
+    'atos_servico': 'cuidado_pratico',
+    'presentes': 'gestos_simbolicos',
+    'toque_fisico': 'conexao_fisica',
+    // EN
+    'active_presence': 'presenca_ativa',
+    'verbal_expression': 'expressao_verbal',
+    'practical_care': 'cuidado_pratico',
+    'symbolic_gestures': 'gestos_simbolicos',
+    'physical_connection': 'conexao_fisica',
+    // Already canonical
+    'presenca_ativa': 'presenca_ativa',
+    'expressao_verbal': 'expressao_verbal',
+    'cuidado_pratico': 'cuidado_pratico',
+    'gestos_simbolicos': 'gestos_simbolicos',
+    'conexao_fisica': 'conexao_fisica',
+  };
+  return mapping[str] || str;
 };
 
 // Temperament names
@@ -387,8 +433,12 @@ const buildCodigoEssenciaDoc = (options: CodigoEssenciaOptions): jsPDF => {
   const intelligence = getKeyValue(testResults.inteligencias_multiplas?.primary);
   const intelligenceName = INTELLIGENCE_NAMES[intelligence]?.[lang] || intelligence;
 
-  const connectionStyle = getKeyValue(testResults.linguagens_amor?.primary);
-  const connectionName = CONNECTION_NAMES[connectionStyle]?.[lang] || connectionStyle;
+  // Try multiple sources for connection style
+  const connectionRaw = testResults.linguagens_amor?.primary || 
+    (testResults as any).estilos_conexao_afetiva?.primary ||
+    (testResults as any).estilos_conexao?.primary;
+  const connectionStyle = normalizeConnectionKey(connectionRaw);
+  const connectionName = CONNECTION_NAMES[connectionStyle]?.[lang] || connectionRaw || connectionStyle;
 
   const nello16Type = getKeyValue(testResults.mbti?.type);
 

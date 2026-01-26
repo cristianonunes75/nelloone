@@ -335,9 +335,10 @@ const CodigoEssenciaInner = () => {
         top: intelligencesPrimary ? [toStringSafe(intelligencesPrimary)] : [],
       },
       connectionStyle: {
-        primary: pickConnectionKey(connection?.primary),
-        secondary: pickConnectionKey(connection?.secondary),
-        scores: connection?.scores || visualData?.connection_style?.scores,
+        // Prefer test results, then visual_data from AI
+        primary: pickConnectionKey(connection?.primary) || visualData?.connection_style?.primary || '',
+        secondary: pickConnectionKey(connection?.secondary) || visualData?.connection_style?.secondary || '',
+        scores: connection?.scores || visualData?.connection_style?.scores || {},
       },
     };
   }, [testResults, visualData]);
