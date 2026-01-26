@@ -156,7 +156,7 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
         <div className="flex items-center justify-between h-16 lg:h-18">
           {/* Left: Logo/Brand */}
           <a 
-            href="https://nello.one"
+            href="https://identity.nello.one"
             className="flex items-center gap-1.5 group"
           >
             <span className={cn(
@@ -169,7 +169,7 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
               "font-serif text-xl font-light tracking-tight transition-colors",
               isDark ? "text-nello-gold" : "text-nello-gold-deep"
             )}>
-              ONE
+              IDENTITY
             </span>
           </a>
 

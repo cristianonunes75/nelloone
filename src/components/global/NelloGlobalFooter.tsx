@@ -104,7 +104,7 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
             <div className="col-span-2 md:col-span-1">
               {/* Brand */}
               <a 
-                href="https://nello.one"
+                href="https://identity.nello.one"
                 className="inline-flex items-center gap-1.5 mb-4"
               >
                 <span className={cn(
@@ -117,7 +117,7 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
                   "font-serif text-lg font-light",
                   isDark ? "text-nello-gold" : "text-nello-gold-deep"
                 )}>
-                  ONE
+                  IDENTITY
                 </span>
               </a>
               
