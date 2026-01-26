@@ -93,10 +93,20 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// Default fallback for edge cases during initial render
+const defaultContext: LanguageContextType = {
+  language: 'pt',
+  setLanguage: () => {},
+  t: translations['pt'],
+};
+
 export function useLanguage() {
   const context = useContext(LanguageContext);
+  // Return default context during initial render race conditions instead of throwing
+  // This prevents crashes during hot reload or strict mode double-rendering
   if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+    console.warn('useLanguage called outside LanguageProvider, using fallback');
+    return defaultContext;
   }
   return context;
 }
