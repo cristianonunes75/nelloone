@@ -97,6 +97,23 @@ export function AbandonmentRecovery({
   onSaveAndExit,
   lang = 'pt'
 }: AbandonmentRecoveryProps) {
+  const [open, setOpen] = useState(isOpen);
+
+  // Sync internal state with prop
+  useEffect(() => {
+    setOpen(isOpen);
+  }, [isOpen]);
+
+  const handleContinue = () => {
+    setOpen(false);
+    onContinueNow();
+  };
+
+  const handleSaveExit = () => {
+    setOpen(false);
+    onSaveAndExit();
+  };
+
   if (!abandonmentType) return null;
 
   const content = ABANDONMENT_CONTENT[abandonmentType][lang];
@@ -106,8 +123,8 @@ export function AbandonmentRecovery({
   const message = content.message.replace('{minutes}', String(remainingMinutes));
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onContinueNow(); }}>
-      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex justify-center mb-4">
             <motion.div
@@ -166,7 +183,7 @@ export function AbandonmentRecovery({
           {/* Action buttons */}
           <div className="flex flex-col gap-3 pt-2">
             <Button 
-              onClick={onContinueNow}
+              onClick={handleContinue}
               size="lg"
               className="w-full gap-2"
             >
@@ -175,7 +192,7 @@ export function AbandonmentRecovery({
             </Button>
             
             <Button 
-              onClick={onSaveAndExit}
+              onClick={handleSaveExit}
               variant="outline"
               size="lg"
               className="w-full"
