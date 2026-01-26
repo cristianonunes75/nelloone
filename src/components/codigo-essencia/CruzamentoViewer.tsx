@@ -31,6 +31,7 @@ import { CouplePaywall } from "./CouplePaywall";
 import {
   generateFullPeaceProtocol,
   generateTranslationTable,
+  generateCrisisCommunicationTable,
   type CoupleProfiles
 } from "@/lib/coupleSynergyLogic";
 
@@ -1523,7 +1524,111 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     );
   };
 
-  // ============== FECHAMENTO V2 (Identity v1.0) ==============
+  // ============== COMUNICAÇÃO EM CRISE (Crisis Communication) ==============
+  const renderCrisisCommunication = () => {
+    // Try to extract DISC data from content
+    const discA = content.dados_grafico?.pessoa_a?.disc || content.dados_usuario_a?.disc;
+    const discB = content.dados_grafico?.pessoa_b?.disc || content.dados_usuario_b?.disc;
+    const nameA = content.dados_grafico?.pessoa_a?.nome || content.metafora_barco?.papeis_identificados?.sensor?.nome || 'Pessoa A';
+    const nameB = content.dados_grafico?.pessoa_b?.nome || content.metafora_barco?.papeis_identificados?.condutor?.nome || 'Pessoa B';
+
+    if (!discA || !discB) return null;
+
+    const profiles: CoupleProfiles = {
+      personA: { name: nameA, disc: discA },
+      personB: { name: nameB, disc: discB }
+    };
+
+    const crisisTable = generateCrisisCommunicationTable(profiles, language);
+
+    const sectionTitle = {
+      pt: 'Comunicação em Crise',
+      'pt-pt': 'Comunicação em Crise',
+      en: 'Crisis Communication'
+    };
+
+    const columnLabels = {
+      pt: { situacao: 'Situação', falar: `Como ${nameA} deve falar`, ouvir: `Como ${nameB} deve ouvir` },
+      'pt-pt': { situacao: 'Situação', falar: `Como ${nameA} deve falar`, ouvir: `Como ${nameB} deve ouvir` },
+      en: { situacao: 'Situation', falar: `How ${nameA} should speak`, ouvir: `How ${nameB} should hear` }
+    };
+
+    const labels = columnLabels[language];
+
+    return (
+      <Card className="bg-gradient-to-br from-orange-500/5 to-red-500/5 border-orange-500/20">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2">
+            <Flame className="w-5 h-5 text-orange-500" />
+            <CardTitle className="text-base">{sectionTitle[language]}</CardTitle>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {language === 'en' 
+              ? 'Practical phrases for stress and feedback situations'
+              : 'Frases práticas para situações de estresse e feedback'}
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {/* Desktop Table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-2 px-3 font-semibold text-muted-foreground w-1/5">{labels.situacao}</th>
+                  <th className="text-left py-2 px-3 font-semibold text-orange-700 dark:text-orange-400 w-2/5">🗣️ {labels.falar}</th>
+                  <th className="text-left py-2 px-3 font-semibold text-blue-700 dark:text-blue-400 w-2/5">👂 {labels.ouvir}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {crisisTable.map((row, i) => (
+                  <tr key={i} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                    <td className="py-3 px-3 font-medium text-foreground">{row.situacao}</td>
+                    <td className="py-3 px-3 text-foreground/80 italic">{row.como_falar}</td>
+                    <td className="py-3 px-3 text-foreground/80 italic">{row.como_ouvir}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-4">
+            {crisisTable.map((row, i) => (
+              <div key={i} className="p-4 rounded-lg bg-muted/30 border border-border/50 space-y-3">
+                <div className="font-semibold text-foreground flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-orange-500/20 text-orange-700 dark:text-orange-300 flex items-center justify-center text-xs">{i + 1}</span>
+                  {row.situacao}
+                </div>
+                <div className="pl-8 space-y-2">
+                  <div className="p-2 rounded bg-orange-500/10 border border-orange-500/20">
+                    <p className="text-xs font-medium text-orange-700 dark:text-orange-400 mb-1">🗣️ {labels.falar}</p>
+                    <p className="text-sm italic text-foreground/80">{row.como_falar}</p>
+                  </div>
+                  <div className="p-2 rounded bg-blue-500/10 border border-blue-500/20">
+                    <p className="text-xs font-medium text-blue-700 dark:text-blue-400 mb-1">👂 {labels.ouvir}</p>
+                    <p className="text-sm italic text-foreground/80">{row.como_ouvir}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Insight Box */}
+          <div className="mt-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <p className="text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
+              <Lightbulb className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <span>
+                {language === 'en'
+                  ? 'These phrases translate natural behaviors into safe language for the relationship. Use them especially in moments of tension.'
+                  : 'Essas frases traduzem comportamentos naturais em linguagem segura para a relação. Use-as especialmente em momentos de tensão.'}
+              </span>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   const renderFechamentoV2 = () => {
     const fechamento = content.fechamento;
     if (!fechamento) return null;
@@ -1690,6 +1795,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           {renderZonaAjuste()}
           {renderZonaChoque()}
           {renderTabelaTraducaoV2()}
+          {renderCrisisCommunication()}
           {renderProtocoloPazV2()}
           {renderAcaoPratica()}
           

@@ -374,6 +374,490 @@ export const generateFullPeaceProtocol = (
 };
 
 /**
+ * Crisis Communication Table - Dynamic phrases based on DISC profile combinations
+ */
+export interface CrisisCommunicationRow {
+  situacao: string;
+  como_falar: string;
+  como_ouvir: string;
+}
+
+export const generateCrisisCommunicationTable = (
+  profiles: CoupleProfiles,
+  language: Language
+): CrisisCommunicationRow[] => {
+  const dominantA = getDominantTrait(profiles.personA.disc);
+  const dominantB = getDominantTrait(profiles.personB.disc);
+  const nameA = profiles.personA.name;
+  const nameB = profiles.personB.name;
+
+  // Helper to get trait label
+  const traitLabels = {
+    pt: { D: 'Dominante', I: 'Influente', S: 'Estável', C: 'Conforme' },
+    'pt-pt': { D: 'Dominante', I: 'Influente', S: 'Estável', C: 'Conforme' },
+    en: { D: 'Dominant', I: 'Influential', S: 'Steady', C: 'Conscientious' }
+  };
+
+  const labelA = traitLabels[language][dominantA];
+  const labelB = traitLabels[language][dominantB];
+
+  // D vs S (Dominant vs Steady) - Most common tension
+  if ((dominantA === 'D' && dominantB === 'S') || (dominantA === 'S' && dominantB === 'D')) {
+    const isDominantA = dominantA === 'D';
+    const dominantName = isDominantA ? nameA : nameB;
+    const steadyName = isDominantA ? nameB : nameA;
+
+    const tables = {
+      pt: [
+        {
+          situacao: 'Sob Pressão',
+          como_falar: `"Estou focado em resolver o problema agora, não é nada contra você. Preciso de agilidade."`,
+          como_ouvir: `"O tom ríspido de ${dominantName} é apenas foco no resultado. Não perdi o apoio ou a segurança na relação."`
+        },
+        {
+          situacao: 'Dar Feedback',
+          como_falar: `"Gostaria que você fosse mais rápido nessa tarefa, mas valorizo muito a sua qualidade."`,
+          como_ouvir: `"${dominantName} quer melhorar o processo, não está criticando quem eu sou como pessoa."`
+        },
+        {
+          situacao: 'Receber Feedback',
+          como_falar: `"Pode falar direto o que te incomoda, eu prefiro a verdade nua e crua."`,
+          como_ouvir: `"Posso ser honesto(a) sem medo de causar um conflito. ${dominantName} respeita a minha sinceridade."`
+        },
+        {
+          situacao: 'Discussão Calorosa',
+          como_falar: `"Vamos dar uma pausa de 10 minutos para eu não falar algo que não devo."`,
+          como_ouvir: `"A pausa é um gesto de cuidado com a nossa harmonia, não um abandono da conversa."`
+        },
+        {
+          situacao: 'Alinhamento de Expectativas',
+          como_falar: `"O que eu espero de você é X, Y e Z. Ficou claro ou precisamos ajustar?"`,
+          como_ouvir: `"A clareza de ${dominantName} me dá segurança para saber exatamente onde pisar e como contribuir."`
+        }
+      ],
+      'pt-pt': [
+        {
+          situacao: 'Sob Pressão',
+          como_falar: `"Estou focado em resolver o problema agora, não é nada contra ti. Preciso de agilidade."`,
+          como_ouvir: `"O tom ríspido de ${dominantName} é apenas foco no resultado. Não perdi o apoio ou a segurança na relação."`
+        },
+        {
+          situacao: 'Dar Feedback',
+          como_falar: `"Gostaria que fosses mais rápido nessa tarefa, mas valorizo muito a tua qualidade."`,
+          como_ouvir: `"${dominantName} quer melhorar o processo, não está a criticar quem eu sou como pessoa."`
+        },
+        {
+          situacao: 'Receber Feedback',
+          como_falar: `"Podes falar direto o que te incomoda, eu prefiro a verdade nua e crua."`,
+          como_ouvir: `"Posso ser honesto(a) sem medo de causar um conflito. ${dominantName} respeita a minha sinceridade."`
+        },
+        {
+          situacao: 'Discussão Acesa',
+          como_falar: `"Vamos fazer uma pausa de 10 minutos para eu não dizer algo que não devo."`,
+          como_ouvir: `"A pausa é um gesto de cuidado com a nossa harmonia, não um abandono da conversa."`
+        },
+        {
+          situacao: 'Alinhamento de Expectativas',
+          como_falar: `"O que eu espero de ti é X, Y e Z. Ficou claro ou precisamos ajustar?"`,
+          como_ouvir: `"A clareza de ${dominantName} dá-me segurança para saber exatamente onde pisar e como contribuir."`
+        }
+      ],
+      en: [
+        {
+          situacao: 'Under Pressure',
+          como_falar: `"I'm focused on solving the problem now, it's nothing against you. I need speed."`,
+          como_ouvir: `"${dominantName}'s sharp tone is just focus on results. I haven't lost support or security in the relationship."`
+        },
+        {
+          situacao: 'Giving Feedback',
+          como_falar: `"I'd like you to be faster on this task, but I really value your quality."`,
+          como_ouvir: `"${dominantName} wants to improve the process, not criticize who I am as a person."`
+        },
+        {
+          situacao: 'Receiving Feedback',
+          como_falar: `"You can tell me directly what bothers you, I prefer the raw truth."`,
+          como_ouvir: `"I can be honest without fear of causing conflict. ${dominantName} respects my sincerity."`
+        },
+        {
+          situacao: 'Heated Discussion',
+          como_falar: `"Let's take a 10-minute break so I don't say something I shouldn't."`,
+          como_ouvir: `"The pause is a gesture of care for our harmony, not abandonment of the conversation."`
+        },
+        {
+          situacao: 'Aligning Expectations',
+          como_falar: `"What I expect from you is X, Y, and Z. Is that clear or do we need to adjust?"`,
+          como_ouvir: `"${dominantName}'s clarity gives me security to know exactly where to step and how to contribute."`
+        }
+      ]
+    };
+    return tables[language];
+  }
+
+  // D vs C (Dominant vs Conscientious) - Speed vs Precision
+  if ((dominantA === 'D' && dominantB === 'C') || (dominantA === 'C' && dominantB === 'D')) {
+    const isDominantA = dominantA === 'D';
+    const dominantName = isDominantA ? nameA : nameB;
+    const conscientiousName = isDominantA ? nameB : nameA;
+
+    const tables = {
+      pt: [
+        {
+          situacao: 'Sob Pressão',
+          como_falar: `"Preciso de uma decisão agora, podemos ajustar os detalhes depois."`,
+          como_ouvir: `"${dominantName} não está descartando minha análise, está priorizando ação imediata."`
+        },
+        {
+          situacao: 'Dar Feedback',
+          como_falar: `"Os dados que você trouxe são ótimos. Agora, como aplicamos isso rapidamente?"`,
+          como_ouvir: `"${dominantName} valoriza meu trabalho, só quer ver o resultado aplicado."`
+        },
+        {
+          situacao: 'Receber Feedback',
+          como_falar: `"Me diz o essencial primeiro, depois entramos nos detalhes se precisar."`,
+          como_ouvir: `"Posso ser preciso sem ser exaustivo. ${dominantName} absorve melhor informação em doses."`
+        },
+        {
+          situacao: 'Discussão Calorosa',
+          como_falar: `"Vamos separar o que é fato do que é interpretação antes de continuar."`,
+          como_ouvir: `"A pausa para organizar é respeitada. ${dominantName} quer resolver, não ignorar."`
+        },
+        {
+          situacao: 'Definir Prazos',
+          como_falar: `"Qual é o mínimo viável que você consegue entregar até [data]?"`,
+          como_ouvir: `"${dominantName} não está pedindo perfeição, está pedindo progresso."`
+        }
+      ],
+      'pt-pt': [
+        {
+          situacao: 'Sob Pressão',
+          como_falar: `"Preciso de uma decisão agora, podemos ajustar os detalhes depois."`,
+          como_ouvir: `"${dominantName} não está a descartar a minha análise, está a priorizar ação imediata."`
+        },
+        {
+          situacao: 'Dar Feedback',
+          como_falar: `"Os dados que trouxeste são ótimos. Agora, como aplicamos isso rapidamente?"`,
+          como_ouvir: `"${dominantName} valoriza o meu trabalho, só quer ver o resultado aplicado."`
+        },
+        {
+          situacao: 'Receber Feedback',
+          como_falar: `"Diz-me o essencial primeiro, depois entramos nos detalhes se precisar."`,
+          como_ouvir: `"Posso ser preciso sem ser exaustivo. ${dominantName} absorve melhor informação em doses."`
+        },
+        {
+          situacao: 'Discussão Acesa',
+          como_falar: `"Vamos separar o que é facto do que é interpretação antes de continuar."`,
+          como_ouvir: `"A pausa para organizar é respeitada. ${dominantName} quer resolver, não ignorar."`
+        },
+        {
+          situacao: 'Definir Prazos',
+          como_falar: `"Qual é o mínimo viável que consegues entregar até [data]?"`,
+          como_ouvir: `"${dominantName} não está a pedir perfeição, está a pedir progresso."`
+        }
+      ],
+      en: [
+        {
+          situacao: 'Under Pressure',
+          como_falar: `"I need a decision now, we can adjust details later."`,
+          como_ouvir: `"${dominantName} isn't dismissing my analysis, they're prioritizing immediate action."`
+        },
+        {
+          situacao: 'Giving Feedback',
+          como_falar: `"The data you brought is great. Now, how do we apply this quickly?"`,
+          como_ouvir: `"${dominantName} values my work, they just want to see results applied."`
+        },
+        {
+          situacao: 'Receiving Feedback',
+          como_falar: `"Tell me the essentials first, then we can go into details if needed."`,
+          como_ouvir: `"I can be precise without being exhaustive. ${dominantName} absorbs information better in doses."`
+        },
+        {
+          situacao: 'Heated Discussion',
+          como_falar: `"Let's separate facts from interpretation before continuing."`,
+          como_ouvir: `"The pause to organize is respected. ${dominantName} wants to resolve, not ignore."`
+        },
+        {
+          situacao: 'Setting Deadlines',
+          como_falar: `"What's the minimum viable you can deliver by [date]?"`,
+          como_ouvir: `"${dominantName} isn't asking for perfection, they're asking for progress."`
+        }
+      ]
+    };
+    return tables[language];
+  }
+
+  // I vs S (Influential vs Steady) - Energy vs Calm
+  if ((dominantA === 'I' && dominantB === 'S') || (dominantA === 'S' && dominantB === 'I')) {
+    const isInfluentialA = dominantA === 'I';
+    const influentialName = isInfluentialA ? nameA : nameB;
+    const steadyName = isInfluentialA ? nameB : nameA;
+
+    const tables = {
+      pt: [
+        {
+          situacao: 'Sob Pressão',
+          como_falar: `"Estou animado com essa ideia, mas quero ouvir sua opinião antes de avançar."`,
+          como_ouvir: `"A energia de ${influentialName} não é pressão, é entusiasmo. Posso processar no meu tempo."`
+        },
+        {
+          situacao: 'Dar Feedback',
+          como_falar: `"Adorei sua contribuição! O que acha de adicionarmos isso também?"`,
+          como_ouvir: `"${influentialName} não está insatisfeito, está expandindo a ideia."`
+        },
+        {
+          situacao: 'Receber Feedback',
+          como_falar: `"Me conta o que você achou, mesmo que seja uma crítica. Prometo ouvir."`,
+          como_ouvir: `"${influentialName} realmente quer ouvir. Posso ser honesto sem magoar."`
+        },
+        {
+          situacao: 'Discussão Calorosa',
+          como_falar: `"Sei que estou falando demais. Vou ouvir você agora."`,
+          como_ouvir: `"${influentialName} reconhece minha necessidade de espaço. Isso é respeito."`
+        },
+        {
+          situacao: 'Tomar Decisões',
+          como_falar: `"Não precisa responder agora. Me diz amanhã o que você decidiu."`,
+          como_ouvir: `"${influentialName} respeita meu ritmo. Posso confiar no espaço que me deu."`
+        }
+      ],
+      'pt-pt': [
+        {
+          situacao: 'Sob Pressão',
+          como_falar: `"Estou animado com essa ideia, mas quero ouvir a tua opinião antes de avançar."`,
+          como_ouvir: `"A energia de ${influentialName} não é pressão, é entusiasmo. Posso processar no meu tempo."`
+        },
+        {
+          situacao: 'Dar Feedback',
+          como_falar: `"Adorei a tua contribuição! O que achas de adicionarmos isto também?"`,
+          como_ouvir: `"${influentialName} não está insatisfeito, está a expandir a ideia."`
+        },
+        {
+          situacao: 'Receber Feedback',
+          como_falar: `"Conta-me o que achaste, mesmo que seja uma crítica. Prometo ouvir."`,
+          como_ouvir: `"${influentialName} realmente quer ouvir. Posso ser honesto sem magoar."`
+        },
+        {
+          situacao: 'Discussão Acesa',
+          como_falar: `"Sei que estou a falar demais. Vou ouvir-te agora."`,
+          como_ouvir: `"${influentialName} reconhece a minha necessidade de espaço. Isso é respeito."`
+        },
+        {
+          situacao: 'Tomar Decisões',
+          como_falar: `"Não precisas responder agora. Diz-me amanhã o que decidiste."`,
+          como_ouvir: `"${influentialName} respeita o meu ritmo. Posso confiar no espaço que me deu."`
+        }
+      ],
+      en: [
+        {
+          situacao: 'Under Pressure',
+          como_falar: `"I'm excited about this idea, but I want to hear your opinion before moving forward."`,
+          como_ouvir: `"${influentialName}'s energy isn't pressure, it's enthusiasm. I can process at my own pace."`
+        },
+        {
+          situacao: 'Giving Feedback',
+          como_falar: `"I loved your contribution! What do you think about adding this too?"`,
+          como_ouvir: `"${influentialName} isn't dissatisfied, they're expanding the idea."`
+        },
+        {
+          situacao: 'Receiving Feedback',
+          como_falar: `"Tell me what you thought, even if it's criticism. I promise to listen."`,
+          como_ouvir: `"${influentialName} really wants to hear. I can be honest without hurting."`
+        },
+        {
+          situacao: 'Heated Discussion',
+          como_falar: `"I know I'm talking too much. I'll listen to you now."`,
+          como_ouvir: `"${influentialName} recognizes my need for space. That's respect."`
+        },
+        {
+          situacao: 'Making Decisions',
+          como_falar: `"You don't need to answer now. Tell me tomorrow what you decided."`,
+          como_ouvir: `"${influentialName} respects my pace. I can trust the space they gave me."`
+        }
+      ]
+    };
+    return tables[language];
+  }
+
+  // I vs C (Influential vs Conscientious) - Spontaneity vs Structure
+  if ((dominantA === 'I' && dominantB === 'C') || (dominantA === 'C' && dominantB === 'I')) {
+    const isInfluentialA = dominantA === 'I';
+    const influentialName = isInfluentialA ? nameA : nameB;
+    const conscientiousName = isInfluentialA ? nameB : nameA;
+
+    const tables = {
+      pt: [
+        {
+          situacao: 'Sob Pressão',
+          como_falar: `"Sei que você precisa de mais dados. O que é essencial para avançar?"`,
+          como_ouvir: `"${influentialName} não está sendo superficial, está buscando momentum."`
+        },
+        {
+          situacao: 'Dar Feedback',
+          como_falar: `"Sua análise foi incrível! Agora, vamos simplificar para os outros entenderem?"`,
+          como_ouvir: `"${influentialName} valoriza meu trabalho, só quer torná-lo acessível."`
+        },
+        {
+          situacao: 'Receber Feedback',
+          como_falar: `"Pode me dar um resumo executivo? Depois vejo os detalhes."`,
+          como_ouvir: `"Posso ser conciso primeiro e expandir depois. ${influentialName} não rejeita profundidade."`
+        },
+        {
+          situacao: 'Discussão Calorosa',
+          como_falar: `"Vamos listar os pontos de concordância antes de discutir as diferenças."`,
+          como_ouvir: `"${influentialName} quer encontrar terreno comum. Isso não invalida minha posição."`
+        },
+        {
+          situacao: 'Planejar Juntos',
+          como_falar: `"Qual é o passo 1 que podemos dar hoje?"`,
+          como_ouvir: `"${influentialName} não está ignorando o plano, está começando a execução."`
+        }
+      ],
+      'pt-pt': [
+        {
+          situacao: 'Sob Pressão',
+          como_falar: `"Sei que precisas de mais dados. O que é essencial para avançar?"`,
+          como_ouvir: `"${influentialName} não está a ser superficial, está a buscar momentum."`
+        },
+        {
+          situacao: 'Dar Feedback',
+          como_falar: `"A tua análise foi incrível! Agora, vamos simplificar para os outros entenderem?"`,
+          como_ouvir: `"${influentialName} valoriza o meu trabalho, só quer torná-lo acessível."`
+        },
+        {
+          situacao: 'Receber Feedback',
+          como_falar: `"Podes dar-me um resumo executivo? Depois vejo os detalhes."`,
+          como_ouvir: `"Posso ser conciso primeiro e expandir depois. ${influentialName} não rejeita profundidade."`
+        },
+        {
+          situacao: 'Discussão Acesa',
+          como_falar: `"Vamos listar os pontos de concordância antes de discutir as diferenças."`,
+          como_ouvir: `"${influentialName} quer encontrar terreno comum. Isso não invalida a minha posição."`
+        },
+        {
+          situacao: 'Planear Juntos',
+          como_falar: `"Qual é o passo 1 que podemos dar hoje?"`,
+          como_ouvir: `"${influentialName} não está a ignorar o plano, está a começar a execução."`
+        }
+      ],
+      en: [
+        {
+          situacao: 'Under Pressure',
+          como_falar: `"I know you need more data. What's essential to move forward?"`,
+          como_ouvir: `"${influentialName} isn't being superficial, they're seeking momentum."`
+        },
+        {
+          situacao: 'Giving Feedback',
+          como_falar: `"Your analysis was incredible! Now, shall we simplify it for others to understand?"`,
+          como_ouvir: `"${influentialName} values my work, they just want to make it accessible."`
+        },
+        {
+          situacao: 'Receiving Feedback',
+          como_falar: `"Can you give me an executive summary? I'll look at details later."`,
+          como_ouvir: `"I can be concise first and expand later. ${influentialName} doesn't reject depth."`
+        },
+        {
+          situacao: 'Heated Discussion',
+          como_falar: `"Let's list the points of agreement before discussing differences."`,
+          como_ouvir: `"${influentialName} wants to find common ground. That doesn't invalidate my position."`
+        },
+        {
+          situacao: 'Planning Together',
+          como_falar: `"What's step 1 we can take today?"`,
+          como_ouvir: `"${influentialName} isn't ignoring the plan, they're starting execution."`
+        }
+      ]
+    };
+    return tables[language];
+  }
+
+  // Default/Generic table for other combinations
+  const defaultTables = {
+    pt: [
+      {
+        situacao: 'Sob Pressão',
+        como_falar: `"Estou me sentindo pressionado. Podemos falar sobre isso com calma?"`,
+        como_ouvir: `"${nameA} está pedindo espaço, não se afastando. Posso dar esse tempo."`
+      },
+      {
+        situacao: 'Dar Feedback',
+        como_falar: `"Gostaria de compartilhar uma observação. Posso?"`,
+        como_ouvir: `"Isso é uma tentativa de melhorar nossa dinâmica, não uma crítica pessoal."`
+      },
+      {
+        situacao: 'Receber Feedback',
+        como_falar: `"Obrigado por me dizer. Vou refletir sobre isso."`,
+        como_ouvir: `"${nameA} está processando, não rejeitando minha contribuição."`
+      },
+      {
+        situacao: 'Discussão Calorosa',
+        como_falar: `"Vamos pausar e retomar quando estivermos mais calmos."`,
+        como_ouvir: `"A pausa é para proteger a relação, não para fugir do assunto."`
+      },
+      {
+        situacao: 'Alinhamento',
+        como_falar: `"O que você precisa de mim neste momento?"`,
+        como_ouvir: `"${nameA} está demonstrando cuidado ao perguntar. Posso ser honesto."`
+      }
+    ],
+    'pt-pt': [
+      {
+        situacao: 'Sob Pressão',
+        como_falar: `"Estou a sentir-me pressionado. Podemos falar sobre isto com calma?"`,
+        como_ouvir: `"${nameA} está a pedir espaço, não se está a afastar. Posso dar esse tempo."`
+      },
+      {
+        situacao: 'Dar Feedback',
+        como_falar: `"Gostaria de partilhar uma observação. Posso?"`,
+        como_ouvir: `"Isto é uma tentativa de melhorar a nossa dinâmica, não uma crítica pessoal."`
+      },
+      {
+        situacao: 'Receber Feedback',
+        como_falar: `"Obrigado por me dizeres. Vou refletir sobre isso."`,
+        como_ouvir: `"${nameA} está a processar, não está a rejeitar a minha contribuição."`
+      },
+      {
+        situacao: 'Discussão Acesa',
+        como_falar: `"Vamos fazer uma pausa e retomar quando estivermos mais calmos."`,
+        como_ouvir: `"A pausa é para proteger a relação, não para fugir do assunto."`
+      },
+      {
+        situacao: 'Alinhamento',
+        como_falar: `"O que precisas de mim neste momento?"`,
+        como_ouvir: `"${nameA} está a demonstrar cuidado ao perguntar. Posso ser honesto."`
+      }
+    ],
+    en: [
+      {
+        situacao: 'Under Pressure',
+        como_falar: `"I'm feeling pressured. Can we talk about this calmly?"`,
+        como_ouvir: `"${nameA} is asking for space, not pulling away. I can give that time."`
+      },
+      {
+        situacao: 'Giving Feedback',
+        como_falar: `"I'd like to share an observation. May I?"`,
+        como_ouvir: `"This is an attempt to improve our dynamic, not a personal criticism."`
+      },
+      {
+        situacao: 'Receiving Feedback',
+        como_falar: `"Thank you for telling me. I'll reflect on that."`,
+        como_ouvir: `"${nameA} is processing, not rejecting my input."`
+      },
+      {
+        situacao: 'Heated Discussion',
+        como_falar: `"Let's pause and resume when we're calmer."`,
+        como_ouvir: `"The pause is to protect the relationship, not to escape the subject."`
+      },
+      {
+        situacao: 'Alignment',
+        como_falar: `"What do you need from me right now?"`,
+        como_ouvir: `"${nameA} is showing care by asking. I can be honest."`
+      }
+    ]
+  };
+
+  return defaultTables[language];
+};
+
+/**
  * Extract DISC data for radar charts
  */
 export const extractChartData = (profiles: CoupleProfiles) => {
