@@ -39,6 +39,7 @@ interface Crossing {
   id: string;
   relationship_type: string;
   invite_email: string | null;
+  invite_token: string | null;
   status: string;
   user_a_id: string;
   user_b_id: string | null;
@@ -49,6 +50,7 @@ interface Crossing {
   public_token: string;
   is_public_active: boolean;
   profiles?: { full_name: string | null };
+  user_a_profile?: { full_name: string | null };
 }
 
 const TRANSLATIONS = {
@@ -84,7 +86,12 @@ const TRANSLATIONS = {
     },
     viewReport: "Ver Relatório",
     generateReport: "Gerar Relatório",
-    waitingConsent: "Aguardando consentimento"
+    waitingConsent: "Aguardando consentimento",
+    acceptInvite: "Aceitar Convite",
+    accepting: "Aceitando...",
+    acceptSuccess: "Convite aceito com sucesso!",
+    acceptError: "Erro ao aceitar convite",
+    invitedBy: "Convidado por"
   },
   'pt-pt': {
     title: "Cruzamento de Códigos",
@@ -118,7 +125,12 @@ const TRANSLATIONS = {
     },
     viewReport: "Ver Relatório",
     generateReport: "Gerar Relatório",
-    waitingConsent: "A aguardar consentimento"
+    waitingConsent: "A aguardar consentimento",
+    acceptInvite: "Aceitar Convite",
+    accepting: "A aceitar...",
+    acceptSuccess: "Convite aceite com sucesso!",
+    acceptError: "Erro ao aceitar convite",
+    invitedBy: "Convidado por"
   },
   en: {
     title: "Code Crossings",
@@ -152,7 +164,12 @@ const TRANSLATIONS = {
     },
     viewReport: "View Report",
     generateReport: "Generate Report",
-    waitingConsent: "Waiting for consent"
+    waitingConsent: "Waiting for consent",
+    acceptInvite: "Accept Invite",
+    accepting: "Accepting...",
+    acceptSuccess: "Invite accepted successfully!",
+    acceptError: "Error accepting invite",
+    invitedBy: "Invited by"
   }
 };
 
@@ -180,6 +197,7 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
   const [crossings, setCrossings] = useState<Crossing[]>([]);
   const [selectedCrossing, setSelectedCrossing] = useState<Crossing | null>(null);
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
+  const [isAccepting, setIsAccepting] = useState<string | null>(null);
 
   const t = TRANSLATIONS[language];
 
@@ -193,7 +211,9 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
     if (!user?.id) return;
     
     try {
-      // Fetch crossings where user is either user_a or user_b
+      // Fetch crossings where user is either user_a, user_b, or invited by email
+      const userEmail = user.email?.toLowerCase() || '';
+      
       const { data, error } = await supabase
         .from('codigo_cruzamentos')
         .select(`
@@ -201,7 +221,7 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
           profiles:user_b_id(full_name),
           user_a_profile:user_a_id(full_name)
         `)
-        .or(`user_a_id.eq.${user.id},user_b_id.eq.${user.id}`)
+        .or(`user_a_id.eq.${user.id},user_b_id.eq.${user.id},invite_email.ilike.${userEmail}`)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -271,6 +291,34 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
       toast.error(language === 'en' ? 'Error generating report' : 'Erro ao gerar relatório');
     } finally {
       setIsGenerating(null);
+    }
+  };
+
+  const handleAcceptInvite = async (crossing: Crossing) => {
+    if (!crossing.invite_token) {
+      toast.error(t.acceptError);
+      return;
+    }
+    
+    setIsAccepting(crossing.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('nello-accept-cruzamento', {
+        body: { invite_token: crossing.invite_token }
+      });
+
+      if (error) throw error;
+      
+      if (data?.success) {
+        toast.success(t.acceptSuccess);
+        loadCrossings();
+      } else {
+        throw new Error(data?.error || 'Unknown error');
+      }
+    } catch (err: any) {
+      console.error('Error accepting invite:', err);
+      toast.error(t.acceptError);
+    } finally {
+      setIsAccepting(null);
     }
   };
 
@@ -420,29 +468,38 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
               const StatusConfig = STATUS_CONFIG[crossing.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending;
               const StatusIcon = StatusConfig.icon;
               const isUserA = crossing.user_a_id === user?.id;
-              const partnerName = crossing.profiles?.full_name || crossing.invite_email || 'Convidado';
+              const isUserB = crossing.user_b_id === user?.id || (!crossing.user_b_id && crossing.invite_email?.toLowerCase() === user?.email?.toLowerCase());
+              
+              // For user_a, show user_b's name; for user_b, show user_a's name
+              const partnerName = isUserA 
+                ? (crossing.profiles?.full_name || crossing.invite_email || 'Convidado')
+                : (crossing.user_a_profile?.full_name || 'Quem te convidou');
+              
               const canGenerate = crossing.status === 'accepted' && crossing.user_a_consent_at && crossing.user_b_consent_at;
+              
+              // User B can accept if: status is pending, they're user_b (by id or email), and haven't consented yet
+              const canAccept = crossing.status === 'pending' && isUserB && !crossing.user_b_consent_at;
               
               return (
                 <Card key={crossing.id} className="hover:bg-muted/50 transition-colors">
                   <CardContent className="py-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                           <RelIcon className="w-5 h-5 text-primary" />
                         </div>
-                        <div>
-                          <p className="font-medium">{partnerName}</p>
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{partnerName}</p>
                           <div className="flex items-center gap-2 text-sm">
-                            <StatusIcon className={`w-3 h-3 ${StatusConfig.color}`} />
-                            <span className="text-muted-foreground">
+                            <StatusIcon className={`w-3 h-3 shrink-0 ${StatusConfig.color}`} />
+                            <span className="text-muted-foreground truncate">
                               {t.status[crossing.status as keyof typeof t.status] || crossing.status}
                             </span>
                           </div>
                         </div>
                       </div>
                       
-                      <div>
+                      <div className="shrink-0">
                         {crossing.status === 'generated' ? (
                           <div className="flex gap-2">
                             <Button 
@@ -470,6 +527,20 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
                               {language === 'en' ? 'Regenerate' : 'Regenerar'}
                             </Button>
                           </div>
+                        ) : canAccept ? (
+                          <Button 
+                            size="sm"
+                            onClick={() => handleAcceptInvite(crossing)}
+                            disabled={isAccepting === crossing.id}
+                            className="gap-1"
+                          >
+                            {isAccepting === crossing.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Check className="w-4 h-4" />
+                            )}
+                            {isAccepting === crossing.id ? t.accepting : t.acceptInvite}
+                          </Button>
                         ) : canGenerate ? (
                           <Button 
                             size="sm"
