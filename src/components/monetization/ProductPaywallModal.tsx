@@ -8,7 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Lock, Sparkles, CreditCard, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Check, Lock, CreditCard, Loader2, Tag, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -52,6 +53,8 @@ export function ProductPaywallModal({
   const { user } = useAuth();
   const { language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [showCouponInput, setShowCouponInput] = useState(false);
 
   const isEn = language === "en";
   const isPtPt = language === "pt-pt";
@@ -87,12 +90,30 @@ export function ProductPaywallModal({
           productType: product.productType,
           currency: isEn ? "usd" : isPtPt ? "eur" : "brl",
           language,
+          couponCode: couponCode.trim().toUpperCase() || undefined,
           successUrl: `${window.location.origin}/cliente?purchase_success=true&product=${product.productType}`,
           cancelUrl: window.location.href,
         },
       });
 
       if (error) throw error;
+
+      // Handle specific coupon errors
+      if (data?.code === "COUPON_INVALID_PRODUCT") {
+        toast.error(isEn ? data.error_en : data.error);
+        setIsLoading(false);
+        return;
+      }
+      if (data?.code === "COUPON_EXPIRED") {
+        toast.error(isEn ? data.error_en : data.error);
+        setIsLoading(false);
+        return;
+      }
+      if (data?.code === "COUPON_MAX_USES") {
+        toast.error(isEn ? data.error_en : data.error);
+        setIsLoading(false);
+        return;
+      }
 
       if (data?.url) {
         window.open(data.url, "_blank");
@@ -104,7 +125,7 @@ export function ProductPaywallModal({
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -161,6 +182,38 @@ export function ProductPaywallModal({
                   : `ou ${product.installments}x de ${priceInfo.symbol} ${product.installmentPrice}`
                 }
               </p>
+            )}
+          </div>
+
+          {/* Coupon Code Section */}
+          <div className="space-y-2">
+            {!showCouponInput ? (
+              <button
+                onClick={() => setShowCouponInput(true)}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Tag className="h-4 w-4" />
+                {isEn ? "Have a coupon code?" : "Tem um cupom de desconto?"}
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  placeholder={isEn ? "Enter coupon code" : "Digite o código do cupom"}
+                  className="flex-1 uppercase"
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    setShowCouponInput(false);
+                    setCouponCode("");
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             )}
           </div>
         </div>

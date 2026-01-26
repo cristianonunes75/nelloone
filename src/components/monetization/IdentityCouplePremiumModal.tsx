@@ -4,7 +4,8 @@ import {
   DialogContent,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Sparkles, Dna, Brain, Theater, Heart, Scale, Target } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, Sparkles, Dna, Brain, Theater, Heart, Scale, Target, Tag, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -56,6 +57,8 @@ export function IdentityCouplePremiumModal({
   const { user } = useAuth();
   const { language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [showCouponInput, setShowCouponInput] = useState(false);
 
   const product = PRODUCT_CATALOG.identity_couple_premium;
   const isEn = language === "en";
@@ -89,12 +92,30 @@ export function IdentityCouplePremiumModal({
           productType: product.productType,
           currency: isEn ? "usd" : isPtPt ? "eur" : "brl",
           language,
+          couponCode: couponCode.trim().toUpperCase() || undefined,
           successUrl: `${window.location.origin}/cliente?purchase_success=true&product=${product.productType}`,
           cancelUrl: window.location.href,
         },
       });
 
       if (error) throw error;
+
+      // Handle specific coupon errors
+      if (data?.code === "COUPON_INVALID_PRODUCT") {
+        toast.error(isEn ? data.error_en : data.error);
+        setIsLoading(false);
+        return;
+      }
+      if (data?.code === "COUPON_EXPIRED") {
+        toast.error(isEn ? data.error_en : data.error);
+        setIsLoading(false);
+        return;
+      }
+      if (data?.code === "COUPON_MAX_USES") {
+        toast.error(isEn ? data.error_en : data.error);
+        setIsLoading(false);
+        return;
+      }
 
       if (data?.url) {
         window.open(data.url, "_blank");
@@ -190,9 +211,42 @@ export function IdentityCouplePremiumModal({
                 <span className="text-gold text-sm">,70</span>
               </div>
             </div>
-            <p className="text-gray-400 text-sm mb-6">
+            <p className="text-gray-400 text-sm mb-4">
               (ou <span className="text-white font-semibold">R$ 997,00</span> à vista)
             </p>
+
+            {/* Coupon Code Section */}
+            <div className="mb-4">
+              {!showCouponInput ? (
+                <button
+                  onClick={() => setShowCouponInput(true)}
+                  className="flex items-center gap-2 text-sm text-gray-400 hover:text-gold transition-colors mx-auto"
+                >
+                  <Tag className="h-4 w-4" />
+                  Tem um cupom de desconto?
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 max-w-xs mx-auto">
+                  <Input
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    placeholder="Digite o código"
+                    className="flex-1 uppercase bg-white/10 border-white/20 text-white placeholder:text-gray-500"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setShowCouponInput(false);
+                      setCouponCode("");
+                    }}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
 
             <Button
               onClick={handlePurchase}
