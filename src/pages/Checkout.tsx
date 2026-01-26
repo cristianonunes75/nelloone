@@ -196,6 +196,101 @@ const Checkout = () => {
     setCouponCode("");
   };
 
+  // Process zero-value purchase directly in database
+  const processZeroValuePurchase = async () => {
+    try {
+      // Update profile to grant journey access
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({
+          journey_status: "in_progress",
+          journey_started_at: new Date().toISOString(),
+          codigo_essencia_unlocked: true,
+        })
+        .eq("id", user!.id);
+
+      if (profileError) throw profileError;
+
+      // Get all tests to create purchase records
+      const { data: allTests, error: testsError } = await supabase
+        .from("tests")
+        .select("id, name, type")
+        .eq("active", true);
+
+      if (testsError) throw testsError;
+
+      if (allTests && allTests.length > 0) {
+        const purchaseRecords = allTests.map(test => ({
+          user_id: user!.id,
+          test_id: test.id,
+          price_paid: 0,
+          payment_status: "completed",
+          payment_method: "coupon_100",
+          transaction_id: `coupon_${appliedCoupon?.code}_${Date.now()}`,
+          purchase_category: "jornada_completa",
+          test_slug: test.type,
+          metadata: {
+            coupon_code: appliedCoupon?.code,
+            product_type: "jornada_completa",
+            zero_value_purchase: true,
+            processed_at: new Date().toISOString(),
+          },
+        }));
+
+        const { error: purchaseError } = await supabase
+          .from("test_purchases")
+          .upsert(purchaseRecords, { onConflict: "user_id,test_id", ignoreDuplicates: false });
+
+        if (purchaseError) throw purchaseError;
+      }
+
+      // Update coupon usage
+      if (appliedCoupon?.code) {
+        const { data: couponData } = await supabase
+          .from("coupons")
+          .select("times_used")
+          .eq("code", appliedCoupon.code)
+          .single();
+        
+        if (couponData) {
+          await supabase
+            .from("coupons")
+            .update({ times_used: (couponData.times_used || 0) + 1 })
+            .eq("code", appliedCoupon.code);
+        }
+      }
+
+      // Log the transaction
+      await supabase.from("audit_logs").insert({
+        action: "ZERO_VALUE_PURCHASE",
+        table_name: "test_purchases",
+        record_id: user!.id,
+        user_id: user!.id,
+        new_data: {
+          coupon_code: appliedCoupon?.code,
+          product_type: "jornada_completa",
+          currency: currency.toLowerCase(),
+          processed_at: new Date().toISOString(),
+        },
+      });
+
+      toast({
+        title: language === 'en' ? "Access Granted!" : "Acesso Liberado!",
+        description: language === 'en' 
+          ? "Your Complete Journey has been activated." 
+          : "Sua Jornada Completa foi ativada.",
+      });
+
+      // Redirect to dashboard
+      const dashboardPath = language === 'en' ? '/en/cliente' : language === 'pt-pt' ? '/pt-pt/cliente' : '/cliente';
+      navigate(dashboardPath);
+      
+    } catch (error: any) {
+      console.error("Zero value purchase error:", error);
+      throw error;
+    }
+  };
+
   // Process payment
   const handleCheckout = async () => {
     if (!user) {
@@ -209,6 +304,14 @@ const Checkout = () => {
     setIsProcessing(true);
     
     try {
+      const finalPriceValue = calculateFinalPrice();
+      
+      // If price is zero (100% discount), process directly without Stripe
+      if (finalPriceValue === 0) {
+        await processZeroValuePurchase();
+        return;
+      }
+      
       const affiliateCode = getAffiliateCode();
       
       const { data, error } = await supabase.functions.invoke("create-checkout", {
