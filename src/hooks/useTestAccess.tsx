@@ -28,7 +28,7 @@ export const useTestAccess = () => {
     },
   });
 
-  // Fetch user profile to check journey_completed_tests
+  // Fetch user profile to check journey_completed_tests AND ativacao_codigo_unlocked
   const { data: userProfile, isLoading: profileLoading } = useQuery({
     queryKey: ["user-profile-journey", effectiveUserId],
     enabled: !!effectiveUserId,
@@ -37,7 +37,7 @@ export const useTestAccess = () => {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("journey_completed_tests, journey_status")
+        .select("journey_completed_tests, journey_status, ativacao_codigo_unlocked")
         .eq("id", effectiveUserId)
         .single();
 
@@ -51,28 +51,26 @@ export const useTestAccess = () => {
     (p as any).purchase_category === 'jornada_completa'
   ) || false;
 
-  // Debug: Log purchase detection
-  console.log("[useTestAccess] Purchase Detection:", {
-    userId: effectiveUserId,
-    hasBundlePurchase,
-    purchasesCount: purchases?.length || 0,
-    bundlePurchases: purchases?.filter(p => (p as any).purchase_category === 'jornada_completa').length || 0,
-    isLoading: purchasesLoading || profileLoading,
-  });
+  // Check if user has ativacao_codigo_unlocked flag (indicates full journey purchase)
+  const hasProfileUnlock = !!(userProfile as any)?.ativacao_codigo_unlocked;
 
   // Check if user completed Arquétipos (step 5, which is journey_completed_tests >= 5)
   // After completing Arquétipos, all remaining tests should be unlocked
   const hasCompletedArquetipos = (userProfile?.journey_completed_tests ?? 0) >= 5;
 
-  // Full journey access = bundle purchase OR completed Arquétipos
-  const hasFullJourneyAccess = hasBundlePurchase || hasCompletedArquetipos;
+  // Full journey access = bundle purchase OR profile unlock flags OR completed Arquétipos
+  const hasFullJourneyAccess = hasBundlePurchase || hasProfileUnlock || hasCompletedArquetipos;
   
   // Debug: Log final access decision
-  console.log("[useTestAccess] Final Access Status:", {
+  console.log("[useTestAccess] Access Check:", {
+    userId: effectiveUserId,
     hasFullJourneyAccess,
     hasBundlePurchase,
+    hasProfileUnlock,
+    ativacao_codigo_unlocked: (userProfile as any)?.ativacao_codigo_unlocked,
     hasCompletedArquetipos,
     journeyCompletedTests: userProfile?.journey_completed_tests ?? 0,
+    isLoading: purchasesLoading || profileLoading,
   });
   
   // Loading state - important to avoid false negatives during data fetch
