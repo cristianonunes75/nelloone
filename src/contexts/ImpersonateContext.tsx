@@ -125,4 +125,22 @@ export const ImpersonateProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useImpersonate = () => useContext(ImpersonateContext);
+// Defensive fallback if used outside provider (prevents crashes during hot reload)
+const defaultContext: ImpersonateContextType = {
+  impersonatedUserId: null,
+  impersonatedUserName: null,
+  isImpersonating: false,
+  setImpersonation: () => {},
+  clearImpersonation: () => {},
+};
+
+export const useImpersonate = () => {
+  const context = useContext(ImpersonateContext);
+  // The context has default values, so this should always be truthy
+  // But add defensive check for edge cases
+  if (!context) {
+    console.warn('useImpersonate called outside ImpersonateProvider, using fallback');
+    return defaultContext;
+  }
+  return context;
+};

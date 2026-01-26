@@ -20,15 +20,25 @@ export function useCrossAppAuth() {
   useEffect(() => {
     const crossAppToken = searchParams.get("crossAppToken");
     
-    // No token - nothing to do
+    // No token - nothing to do, mark as complete immediately
     if (!crossAppToken) {
-      setValidationComplete(true);
+      if (!validationComplete) {
+        setValidationComplete(true);
+      }
       return;
     }
 
     // Wait for auth to finish loading before validating
+    // But set a reasonable timeout to prevent infinite loading
     if (authLoading) {
-      return;
+      // Set a timeout to mark as complete even if auth takes too long
+      const timeoutId = setTimeout(() => {
+        if (!validationComplete) {
+          console.warn("Cross-app auth: Auth loading took too long, proceeding without validation");
+          setValidationComplete(true);
+        }
+      }, 5000);
+      return () => clearTimeout(timeoutId);
     }
 
     // If user is already authenticated, just clean up the URL
@@ -36,7 +46,9 @@ export function useCrossAppAuth() {
       const newParams = new URLSearchParams(searchParams);
       newParams.delete("crossAppToken");
       setSearchParams(newParams, { replace: true });
-      setValidationComplete(true);
+      if (!validationComplete) {
+        setValidationComplete(true);
+      }
       return;
     }
 
