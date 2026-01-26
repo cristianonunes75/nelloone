@@ -292,11 +292,54 @@ export default function CruzamentoPublico() {
             <p className="text-muted-foreground">{zona.descricao}</p>
           )}
           {zona.diferencas?.map((diff: any, i: number) => (
-            <div key={i} className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
-              <h4 className="font-medium text-amber-700 dark:text-amber-400 mb-1">
-                ⚡ {diff.aspecto}
-              </h4>
-              <p className="text-sm">{diff.descricao}</p>
+            <div key={i} className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 space-y-2">
+              {/* Legacy format: aspecto + descricao */}
+              {diff.aspecto && (
+                <h4 className="font-medium text-amber-700 dark:text-amber-400 mb-1">
+                  ⚡ {diff.aspecto}
+                </h4>
+              )}
+              {/* v2.0 format: titulo */}
+              {diff.titulo && !diff.aspecto && (
+                <h4 className="font-medium text-amber-700 dark:text-amber-400 mb-1">
+                  ⚡ {diff.titulo}
+                </h4>
+              )}
+              {diff.descricao && (
+                <p className="text-sm">{diff.descricao}</p>
+              )}
+              {/* v2.0 format: pessoa_a_faz + pessoa_b_faz */}
+              {diff.pessoa_a_faz && (
+                <div className="text-sm">
+                  <strong className="text-purple-700 dark:text-purple-400">
+                    🧭 {lang === 'en' ? 'Person A tends to:' : 'Sensor de Direção:'}
+                  </strong>
+                  <p className="text-foreground/80 mt-1">{diff.pessoa_a_faz}</p>
+                  {diff.traducao_positiva_a && (
+                    <p className="text-xs text-muted-foreground italic mt-1">→ {diff.traducao_positiva_a}</p>
+                  )}
+                </div>
+              )}
+              {diff.pessoa_b_faz && (
+                <div className="text-sm mt-2">
+                  <strong className="text-orange-700 dark:text-orange-400">
+                    ⚓ {lang === 'en' ? 'Person B tends to:' : 'Condutor de Curso:'}
+                  </strong>
+                  <p className="text-foreground/80 mt-1">{diff.pessoa_b_faz}</p>
+                  {diff.traducao_positiva_b && (
+                    <p className="text-xs text-muted-foreground italic mt-1">→ {diff.traducao_positiva_b}</p>
+                  )}
+                </div>
+              )}
+              {/* v2.0 format: micro_acordo */}
+              {diff.micro_acordo && (
+                <div className="mt-3 p-2 rounded bg-emerald-500/10 border border-emerald-500/20">
+                  <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-1">
+                    💡 {lang === 'en' ? 'Micro-agreement:' : 'Micro-acordo:'}
+                  </p>
+                  <p className="text-sm">{diff.micro_acordo}</p>
+                </div>
+              )}
             </div>
           ))}
         </CardContent>
@@ -383,40 +426,54 @@ export default function CruzamentoPublico() {
     const tabela = content.tabela_traducao;
     if (!tabela) return null;
 
+    // Support both v2.0 (traducoes_sensor/traducoes_condutor) and legacy (sensor/condutor) formats
+    const sensorItems = tabela.traducoes_sensor?.traducoes || tabela.sensor || [];
+    const condutorItems = tabela.traducoes_condutor?.traducoes || tabela.condutor || [];
+    
+    // Get titles from v2.0 format or use defaults
+    const sensorTitle = tabela.traducoes_sensor?.titulo || (lang === 'en' ? 'When the Direction Sensor...' : 'Quando o Sensor de Direção...');
+    const condutorTitle = tabela.traducoes_condutor?.titulo || (lang === 'en' ? 'When the Course Conductor...' : 'Quando o Condutor de Curso...');
+
+    // If no data in either format, don't render
+    if (sensorItems.length === 0 && condutorItems.length === 0) return null;
+
     return (
       <Card className="border-indigo-200 bg-gradient-to-br from-indigo-50/50 to-blue-50/50 dark:from-indigo-950/20 dark:to-blue-950/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-indigo-600">
             <MessageCircle className="w-5 h-5" />
-            {tabela.titulo || (lang === 'en' ? 'Translation Table' : 'Tabela de Tradução')}
+            {tabela.titulo || (lang === 'en' ? 'Translation Table' : 'Tabela de Tradução do Casal')}
           </CardTitle>
+          {tabela.descricao && (
+            <p className="text-sm text-muted-foreground italic">{tabela.descricao}</p>
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
-          {tabela.sensor && (
+          {sensorItems.length > 0 && (
             <div className="space-y-2">
               <h4 className="font-medium text-purple-700 dark:text-purple-400">
-                🧭 {lang === 'en' ? 'When the Direction Sensor...' : 'Quando o Sensor de Direção...'}
+                🧭 {sensorTitle}
               </h4>
-              {tabela.sensor.map((item: any, i: number) => (
+              {sensorItems.map((item: any, i: number) => (
                 <div key={i} className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 text-sm">
                   <span className="font-medium">{item.comportamento}</span>
                   <span className="text-muted-foreground"> → </span>
-                  <span className="text-purple-700 dark:text-purple-400">{item.significa}</span>
+                  <span className="text-purple-700 dark:text-purple-400">{item.significado || item.significa}</span>
                 </div>
               ))}
             </div>
           )}
 
-          {tabela.condutor && (
+          {condutorItems.length > 0 && (
             <div className="space-y-2">
               <h4 className="font-medium text-orange-700 dark:text-orange-400">
-                ⚓ {lang === 'en' ? 'When the Course Conductor...' : 'Quando o Condutor de Curso...'}
+                ⚓ {condutorTitle}
               </h4>
-              {tabela.condutor.map((item: any, i: number) => (
+              {condutorItems.map((item: any, i: number) => (
                 <div key={i} className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 text-sm">
                   <span className="font-medium">{item.comportamento}</span>
                   <span className="text-muted-foreground"> → </span>
-                  <span className="text-orange-700 dark:text-orange-400">{item.significa}</span>
+                  <span className="text-orange-700 dark:text-orange-400">{item.significado || item.significa}</span>
                 </div>
               ))}
             </div>
@@ -430,52 +487,67 @@ export default function CruzamentoPublico() {
     const protocolo = content.protocolo_paz;
     if (!protocolo) return null;
 
+    // Support both v2.0 (tempo_sensor/tempo_condutor) and legacy (para_sensor/para_condutor) formats
+    const tempoDuplo = protocolo.tempo_duplo;
+    const tempoSensorText = tempoDuplo?.tempo_sensor || tempoDuplo?.para_sensor || '';
+    const tempoCondutorText = tempoDuplo?.tempo_condutor || tempoDuplo?.para_condutor || '';
+
     return (
       <Card className="border-blue-200 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-blue-600">
             <Shield className="w-5 h-5" />
-            {protocolo.titulo || (lang === 'en' ? 'Peace Protocol' : 'Protocolo de Paz')}
+            {protocolo.titulo || (lang === 'en' ? 'Peace Protocol' : 'Protocolo de Paz Unificado')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {protocolo.tempo_duplo && (
+          {tempoDuplo && (tempoSensorText || tempoCondutorText) && (
             <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
               <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-3 flex items-center gap-2">
                 <Clock className="w-4 h-4" />
-                {protocolo.tempo_duplo.titulo || '1. Tempo Duplo'}
+                {tempoDuplo.titulo || '1. Tempo Duplo'}
               </h4>
               <div className="grid gap-3 md:grid-cols-2">
-                <div className="p-3 rounded bg-purple-500/10 border border-purple-500/20">
-                  <p className="text-sm">{protocolo.tempo_duplo.para_sensor}</p>
-                </div>
-                <div className="p-3 rounded bg-orange-500/10 border border-orange-500/20">
-                  <p className="text-sm">{protocolo.tempo_duplo.para_condutor}</p>
-                </div>
+                {tempoSensorText && (
+                  <div className="p-3 rounded bg-purple-500/10 border border-purple-500/20">
+                    <p className="text-xs font-medium text-purple-700 dark:text-purple-400 mb-1">
+                      🧭 {lang === 'en' ? 'Direction Sensor' : 'Sensor de Direção'}
+                    </p>
+                    <p className="text-sm">{tempoSensorText}</p>
+                  </div>
+                )}
+                {tempoCondutorText && (
+                  <div className="p-3 rounded bg-orange-500/10 border border-orange-500/20">
+                    <p className="text-xs font-medium text-orange-700 dark:text-orange-400 mb-1">
+                      ⚓ {lang === 'en' ? 'Course Conductor' : 'Condutor de Curso'}
+                    </p>
+                    <p className="text-sm">{tempoCondutorText}</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
 
-          {protocolo.pergunta_recalibracao && (
+          {protocolo.pergunta_recalibracao && protocolo.pergunta_recalibracao.pergunta && (
             <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-2 flex items-center gap-2">
                 <HelpCircle className="w-4 h-4" />
                 {protocolo.pergunta_recalibracao.titulo || '2. Pergunta de Recalibração'}
               </h4>
-              <p className="text-sm italic font-medium text-center py-2">
+              <p className="text-sm italic font-medium text-center py-2 bg-emerald-500/10 rounded-lg px-4">
                 "{protocolo.pergunta_recalibracao.pergunta}"
               </p>
             </div>
           )}
 
-          {protocolo.proibicao_inferencia && (
+          {protocolo.proibicao_inferencia && protocolo.proibicao_inferencia.regras?.length > 0 && (
             <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/20">
               <h4 className="font-semibold text-rose-700 dark:text-rose-400 mb-2 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" />
                 {protocolo.proibicao_inferencia.titulo || '3. Proibição de Inferência'}
               </h4>
               <ul className="space-y-2">
-                {protocolo.proibicao_inferencia.regras?.map((regra: string, i: number) => (
+                {protocolo.proibicao_inferencia.regras.map((regra: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <span className="text-rose-500">✕</span>
                     <span>{regra}</span>
@@ -509,6 +581,9 @@ export default function CruzamentoPublico() {
     const acao = content.acao_pratica_24h;
     if (!acao) return null;
 
+    // Support v2.0 format with passo_1, passo_2, passo_3
+    const passos = [acao.passo_1, acao.passo_2, acao.passo_3].filter(Boolean);
+
     return (
       <Card className="border-emerald-300 bg-gradient-to-br from-emerald-100/50 to-teal-100/50 dark:from-emerald-900/30 dark:to-teal-900/30">
         <CardHeader>
@@ -517,10 +592,31 @@ export default function CruzamentoPublico() {
             {acao.titulo || (lang === 'en' ? '24-Hour Practical Action' : 'Ação Prática Imediata')}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="p-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30">
-            <p className="font-medium text-emerald-700 dark:text-emerald-300">{acao.descricao}</p>
-          </div>
+        <CardContent className="space-y-4">
+          {acao.descricao && (
+            <p className="text-sm text-muted-foreground italic">{acao.descricao}</p>
+          )}
+          
+          {/* v2.0 format: 3 passos */}
+          {passos.length > 0 && (
+            <div className="space-y-3">
+              {passos.map((passo: string, i: number) => (
+                <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                  <span className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
+                    {i + 1}
+                  </span>
+                  <p className="text-sm">{passo}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Legacy format: single descricao action */}
+          {passos.length === 0 && acao.acao && (
+            <div className="p-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30">
+              <p className="font-medium text-emerald-700 dark:text-emerald-300">{acao.acao}</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     );
