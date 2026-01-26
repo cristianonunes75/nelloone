@@ -534,6 +534,197 @@ serve(async (req) => {
         });
       }
 
+      // ====== ACTIVATION INDIVIDUAL PURCHASE ======
+      if (productType === "activation_individual") {
+        logStep("Processing Activation Individual purchase", { userId });
+        
+        if (!userId || userId === "guest") {
+          logStep("ERROR: Activation Individual requires authenticated user");
+          return new Response(JSON.stringify({ error: "User authentication required" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        // Update profile to unlock activation_individual
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ has_activation_individual: true })
+          .eq("id", userId);
+
+        if (updateError) {
+          logStep("ERROR: Failed to unlock Activation Individual", { error: updateError });
+          throw updateError;
+        }
+
+        // Record purchase
+        const { error: purchaseError } = await supabase
+          .from("test_purchases")
+          .insert({
+            user_id: userId,
+            test_id: null,
+            payment_status: "completed",
+            amount_paid: (session.amount_total || 0) / 100,
+            currency: session.metadata?.currency?.toUpperCase() || "BRL",
+            stripe_session_id: session.id,
+            purchase_category: "activation_individual",
+          });
+
+        if (purchaseError) {
+          logStep("ERROR: Failed to record purchase", { error: purchaseError });
+        }
+
+        logStep("Activation Individual unlocked successfully", { userId });
+
+        return new Response(JSON.stringify({ received: true, product: "activation_individual" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // ====== NELLO COUPLE PURCHASE ======
+      if (productType === "nello_couple") {
+        logStep("Processing Nello Couple purchase", { userId });
+        
+        if (!userId || userId === "guest") {
+          logStep("ERROR: Nello Couple requires authenticated user");
+          return new Response(JSON.stringify({ error: "User authentication required" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ has_nello_couple: true })
+          .eq("id", userId);
+
+        if (updateError) {
+          logStep("ERROR: Failed to unlock Nello Couple", { error: updateError });
+          throw updateError;
+        }
+
+        const { error: purchaseError } = await supabase
+          .from("test_purchases")
+          .insert({
+            user_id: userId,
+            test_id: null,
+            payment_status: "completed",
+            amount_paid: (session.amount_total || 0) / 100,
+            currency: session.metadata?.currency?.toUpperCase() || "BRL",
+            stripe_session_id: session.id,
+            purchase_category: "nello_couple",
+          });
+
+        if (purchaseError) {
+          logStep("ERROR: Failed to record purchase", { error: purchaseError });
+        }
+
+        logStep("Nello Couple unlocked successfully", { userId });
+
+        return new Response(JSON.stringify({ received: true, product: "nello_couple" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // ====== ACTIVATION COUPLE PURCHASE ======
+      if (productType === "activation_couple") {
+        logStep("Processing Activation Couple purchase", { userId });
+        
+        if (!userId || userId === "guest") {
+          logStep("ERROR: Activation Couple requires authenticated user");
+          return new Response(JSON.stringify({ error: "User authentication required" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ has_activation_couple: true })
+          .eq("id", userId);
+
+        if (updateError) {
+          logStep("ERROR: Failed to unlock Activation Couple", { error: updateError });
+          throw updateError;
+        }
+
+        const { error: purchaseError } = await supabase
+          .from("test_purchases")
+          .insert({
+            user_id: userId,
+            test_id: null,
+            payment_status: "completed",
+            amount_paid: (session.amount_total || 0) / 100,
+            currency: session.metadata?.currency?.toUpperCase() || "BRL",
+            stripe_session_id: session.id,
+            purchase_category: "activation_couple",
+          });
+
+        if (purchaseError) {
+          logStep("ERROR: Failed to record purchase", { error: purchaseError });
+        }
+
+        logStep("Activation Couple unlocked successfully", { userId });
+
+        return new Response(JSON.stringify({ received: true, product: "activation_couple" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // ====== IDENTITY COUPLE PREMIUM PURCHASE (HIGH TICKET R$997) ======
+      if (productType === "identity_couple_premium") {
+        logStep("Processing Identity Couple Premium purchase (R$997)", { userId });
+        
+        if (!userId || userId === "guest") {
+          logStep("ERROR: Identity Couple Premium requires authenticated user");
+          return new Response(JSON.stringify({ error: "User authentication required" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        // Premium includes all couple features
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ 
+            has_identity_couple_premium: true,
+            has_nello_couple: true,
+            has_activation_couple: true,
+          })
+          .eq("id", userId);
+
+        if (updateError) {
+          logStep("ERROR: Failed to unlock Identity Couple Premium", { error: updateError });
+          throw updateError;
+        }
+
+        const { error: purchaseError } = await supabase
+          .from("test_purchases")
+          .insert({
+            user_id: userId,
+            test_id: null,
+            payment_status: "completed",
+            amount_paid: (session.amount_total || 0) / 100,
+            currency: session.metadata?.currency?.toUpperCase() || "BRL",
+            stripe_session_id: session.id,
+            purchase_category: "identity_couple_premium",
+          });
+
+        if (purchaseError) {
+          logStep("ERROR: Failed to record purchase", { error: purchaseError });
+        }
+
+        logStep("Identity Couple Premium unlocked (includes all couple features)", { userId });
+
+        return new Response(JSON.stringify({ received: true, product: "identity_couple_premium" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
       // ====== JORNADA COMPLETA PURCHASE ======
       // VALIDATION PHASE: Jornada Completa now includes Código da Essência
       if (productType === "jornada_completa" || productType === "journey") {

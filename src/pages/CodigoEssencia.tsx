@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { CodigoEssenciaUpsell } from "@/components/monetization";
 import { useAuth } from "@/hooks/useAuth";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { useCodigoEssencia } from "@/hooks/useCodigoEssencia";
@@ -993,6 +994,9 @@ const CodigoEssenciaInner = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Upsell: Show Ativação offer after viewing Código da Essência */}
+      {hasGenerated && <CodigoEssenciaUpsell />}
     </div>
   );
 };
