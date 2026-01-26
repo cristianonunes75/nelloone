@@ -28,6 +28,11 @@ import {
 import { toast } from "sonner";
 import { SynergyRadarChart } from "./SynergyRadarChart";
 import { CouplePaywall } from "./CouplePaywall";
+import {
+  generateFullPeaceProtocol,
+  generateTranslationTable,
+  type CoupleProfiles
+} from "@/lib/coupleSynergyLogic";
 
 interface CruzamentoViewerProps {
   crossing: {
@@ -274,6 +279,46 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     const c = (liveCrossing as any)?.content;
     return c && typeof c === "object" ? c : {};
   }, [liveCrossing]);
+
+  // Extract couple profiles for synergy logic
+  const coupleProfiles = useMemo((): CoupleProfiles | null => {
+    const dados = content?.dados_grafico;
+    if (!dados?.usuario_a?.disc || !dados?.usuario_b?.disc) return null;
+    
+    return {
+      personA: {
+        name: dados.usuario_a.nome || 'Pessoa A',
+        disc: {
+          D: dados.usuario_a.disc.D || 50,
+          I: dados.usuario_a.disc.I || 50,
+          S: dados.usuario_a.disc.S || 50,
+          C: dados.usuario_a.disc.C || 50,
+        },
+        enneagram: dados.usuario_a.eneagrama?.toString()
+      },
+      personB: {
+        name: dados.usuario_b.nome || 'Pessoa B',
+        disc: {
+          D: dados.usuario_b.disc.D || 50,
+          I: dados.usuario_b.disc.I || 50,
+          S: dados.usuario_b.disc.S || 50,
+          C: dados.usuario_b.disc.C || 50,
+        },
+        enneagram: dados.usuario_b.eneagrama?.toString()
+      }
+    };
+  }, [content]);
+
+  // Generate dynamic content based on synergy logic when backend data is missing
+  const dynamicPeaceProtocol = useMemo(() => {
+    if (!coupleProfiles) return null;
+    return generateFullPeaceProtocol(coupleProfiles, language);
+  }, [coupleProfiles, language]);
+
+  const dynamicTranslationTable = useMemo(() => {
+    if (!coupleProfiles) return null;
+    return generateTranslationTable(coupleProfiles, language);
+  }, [coupleProfiles, language]);
 
   const hasReportContent = useMemo(() => {
     // Any known key indicates we have a renderable report.
@@ -1248,18 +1293,26 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     );
   };
 
-  // ============== TABELA TRADUÇÃO (Identity v2.0) ==============
+  // ============== TABELA TRADUÇÃO (Identity v2.0 with Dynamic Fallback) ==============
   const renderTabelaTraducaoV2 = () => {
     const tabela = content.tabela_traducao;
-    if (!tabela) return null;
-
+    
     // Support both v2.0 (traducoes_sensor/traducoes_condutor) and legacy (sensor/condutor) formats
-    const traducoesSensor = tabela.traducoes_sensor;
-    const traducoesCondutor = tabela.traducoes_condutor;
+    const traducoesSensor = tabela?.traducoes_sensor;
+    const traducoesCondutor = tabela?.traducoes_condutor;
     
     // Extract translations array - handles nested structure with .traducoes
-    const sensorItems = asArray<any>(traducoesSensor?.traducoes || (tabela as any)?.sensor);
-    const condutorItems = asArray<any>(traducoesCondutor?.traducoes || (tabela as any)?.condutor);
+    let sensorItems = asArray<any>(traducoesSensor?.traducoes || (tabela as any)?.sensor);
+    let condutorItems = asArray<any>(traducoesCondutor?.traducoes || (tabela as any)?.condutor);
+    
+    // Use dynamic translation table if backend data is empty
+    if (sensorItems.length === 0 && condutorItems.length === 0 && dynamicTranslationTable) {
+      sensorItems = dynamicTranslationTable.sensor;
+      condutorItems = dynamicTranslationTable.condutor;
+    }
+    
+    // If still no data, don't render
+    if (sensorItems.length === 0 && condutorItems.length === 0) return null;
     
     // Get header titles from data
     const sensorTitle = traducoesSensor?.titulo || (language === 'en' ? 'When the DIRECTION SENSOR...' : 'Quando o SENSOR DE DIREÇÃO...');
@@ -1271,10 +1324,10 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           <div className="flex items-center gap-2">
             <MessageCircle className="w-5 h-5 text-indigo-500" />
             <CardTitle className="text-base">
-              {tabela.titulo || (language === 'en' ? 'Couple Translation Table' : 'Tabela de Tradução do Casal')}
+              {tabela?.titulo || (language === 'en' ? 'Couple Translation Table' : 'Tabela de Tradução do Casal')}
             </CardTitle>
           </div>
-          {tabela.descricao && (
+          {tabela?.descricao && (
             <p className="text-sm text-muted-foreground italic">{tabela.descricao}</p>
           )}
         </CardHeader>
@@ -1315,16 +1368,19 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     );
   };
 
-  // ============== PROTOCOLO PAZ (Identity v2.0 Enhanced) ==============
+  // ============== PROTOCOLO PAZ (Identity v2.0 Enhanced with Dynamic Fallback) ==============
   const renderProtocoloPazV2 = () => {
     const protocolo = content.protocolo_paz;
-    if (!protocolo) return null;
+    
+    // Use dynamic protocol if no backend data exists
+    const effectiveProtocol = protocolo || dynamicPeaceProtocol;
+    if (!effectiveProtocol) return null;
 
-    const tempoDuplo = (protocolo as any)?.tempo_duplo;
-    const perguntaRecalibracao = (protocolo as any)?.pergunta_recalibracao;
-    const proibicaoInferencia = (protocolo as any)?.proibicao_inferencia;
+    const tempoDuplo = (effectiveProtocol as any)?.tempo_duplo;
+    const perguntaRecalibracao = (effectiveProtocol as any)?.pergunta_recalibracao;
+    const proibicaoInferencia = (effectiveProtocol as any)?.proibicao_inferencia;
     const proibicaoRegras = asArray<string>(proibicaoInferencia?.regras);
-    const legacyRegras = asArray<any>((protocolo as any)?.regras);
+    const legacyRegras = asArray<any>((effectiveProtocol as any)?.regras);
 
     // Extract tempo_sensor/tempo_condutor (v2.0) OR para_sensor/para_condutor (legacy)
     const tempoSensorText = tempoDuplo?.tempo_sensor || tempoDuplo?.para_sensor || '';
@@ -1335,12 +1391,12 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         <CardHeader className="pb-2">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-blue-500" />
-            <CardTitle className="text-base">{protocolo.titulo || t.sections.protocolo_paz}</CardTitle>
+            <CardTitle className="text-base">{effectiveProtocol.titulo || t.sections.protocolo_paz}</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Tempo Duplo */}
-          {tempoDuplo && (tempoSensorText || tempoCondutorText) && (
+          {(tempoSensorText || tempoCondutorText) && (
             <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20">
               <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-3 flex items-center gap-2">
                 <Clock className="w-4 h-4" />
@@ -1368,7 +1424,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           )}
 
           {/* Pergunta de Recalibração */}
-          {perguntaRecalibracao && (
+          {perguntaRecalibracao && (perguntaRecalibracao.pergunta) && (
             <div className="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
               <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-2 flex items-center gap-2">
                 <HelpCircle className="w-4 h-4" />
@@ -1381,7 +1437,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           )}
 
           {/* Proibição de Inferência */}
-          {proibicaoInferencia && proibicaoRegras.length > 0 && (
+          {proibicaoRegras.length > 0 && (
             <div className="p-4 rounded-lg bg-red-500/5 border border-red-500/20">
               <h4 className="font-semibold text-red-700 dark:text-red-400 mb-2 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" />
@@ -1391,7 +1447,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                 {proibicaoRegras.map((regra: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <span className="text-red-500">✕</span>
-                    <span className="capitalize">{regra}</span>
+                    <span>{regra}</span>
                   </li>
                 ))}
               </ul>
