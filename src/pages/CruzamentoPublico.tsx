@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -9,57 +9,21 @@ import {
   AlertTriangle, 
   Users,
   Loader2,
-  ExternalLink,
   Ship,
   Anchor,
   Sparkles,
-  FileDown
+  FileDown,
+  Shield,
+  Clock,
+  HelpCircle,
+  MessageCircle,
+  Zap,
+  Flame,
+  Check
 } from "lucide-react";
 import { toast } from "sonner";
 
 type LangKey = 'pt' | 'pt-pt' | 'en';
-
-// Normalize Identity v1.0 content to expected display format
-const normalizeContent = (content: any): any => {
-  if (!content) return {};
-  
-  const normalized = { ...content };
-  
-  // Map zona_harmonia/zona_sinergia/zona_ajuste/zona_choque to semaforo_relacional
-  if (!normalized.semaforo_relacional && (normalized.zona_harmonia || normalized.zona_sinergia || normalized.zona_ajuste || normalized.zona_choque)) {
-    const harmonia = normalized.zona_harmonia || normalized.zona_sinergia;
-    normalized.semaforo_relacional = {
-      titulo: "Semáforo Relacional",
-      verde: harmonia ? {
-        titulo: harmonia.titulo || "Zona de Harmonia",
-        descricao: harmonia.descricao,
-        pontos: harmonia.valores_compartilhados || harmonia.sinergias || harmonia.pontos || [],
-        proposito: harmonia.proposito_comum
-      } : null,
-      amarelo: normalized.zona_ajuste ? {
-        titulo: normalized.zona_ajuste.titulo || "Zona de Ajuste",
-        descricao: normalized.zona_ajuste.descricao,
-        pontos: normalized.zona_ajuste.diferencas?.map((d: any) => `${d.aspecto}: ${d.descricao}`) || normalized.zona_ajuste.pontos || []
-      } : null,
-      vermelho: normalized.zona_choque ? {
-        titulo: normalized.zona_choque.titulo || "Zona de Choque",
-        descricao: normalized.zona_choque.descricao,
-        pontos: normalized.zona_choque.gatilhos?.map((g: any) => typeof g === 'string' ? g : g.descricao) || normalized.zona_choque.pontos || []
-      } : null
-    };
-  }
-  
-  // Map metafora_central to encontro_essencias
-  if (!normalized.encontro_essencias && normalized.metafora_central) {
-    normalized.encontro_essencias = {
-      titulo: "O Encontro das Essências",
-      metafora: normalized.metafora_central.titulo,
-      descricao: normalized.metafora_central.descricao
-    };
-  }
-  
-  return normalized;
-};
 
 const TRANSLATIONS = {
   pt: {
@@ -71,19 +35,6 @@ const TRANSLATIONS = {
     title: "Código do Casal",
     subtitle: "Relatório de Compatibilidade",
     downloadPdf: "Baixar PDF",
-    viewFull: "Ver versão completa",
-    sections: {
-      semaforo_relacional: "Semáforo Relacional",
-      encontro_essencias: "O Encontro das Essências",
-      santo_bate: "Onde o Santo Bate",
-      bicho_pega: "Onde o Bicho Pega",
-      protocolo_paz: "Protocolo de Paz"
-    },
-    trafficLight: {
-      verde: "Sinergia Natural",
-      amarelo: "Atenção e Ajuste",
-      vermelho: "Zona de Choque"
-    },
     disclaimer: "Este relatório é uma ferramenta simbólica de autoconhecimento. Não substitui terapia ou aconselhamento profissional.",
     footer: "Gerado com NELLO ONE"
   },
@@ -96,19 +47,6 @@ const TRANSLATIONS = {
     title: "Código do Casal",
     subtitle: "Relatório de Compatibilidade",
     downloadPdf: "Transferir PDF",
-    viewFull: "Ver versão completa",
-    sections: {
-      semaforo_relacional: "Semáforo Relacional",
-      encontro_essencias: "O Encontro das Essências",
-      santo_bate: "Onde o Santo Bate",
-      bicho_pega: "Onde o Bicho Pega",
-      protocolo_paz: "Protocolo de Paz"
-    },
-    trafficLight: {
-      verde: "Sinergia Natural",
-      amarelo: "Atenção e Ajuste",
-      vermelho: "Zona de Choque"
-    },
     disclaimer: "Este relatório é uma ferramenta simbólica de autoconhecimento. Não substitui terapia ou aconselhamento profissional.",
     footer: "Gerado com NELLO ONE"
   },
@@ -121,19 +59,6 @@ const TRANSLATIONS = {
     title: "Couple Code",
     subtitle: "Compatibility Report",
     downloadPdf: "Download PDF",
-    viewFull: "View full version",
-    sections: {
-      semaforo_relacional: "Relational Traffic Light",
-      encontro_essencias: "The Meeting of Essences",
-      santo_bate: "Where You Connect",
-      bicho_pega: "Where Friction Happens",
-      protocolo_paz: "Peace Protocol"
-    },
-    trafficLight: {
-      verde: "Natural Synergy",
-      amarelo: "Attention and Adjustment",
-      vermelho: "Shock Zone"
-    },
     disclaimer: "This report is a symbolic tool for self-knowledge. It does not replace therapy or professional counseling.",
     footer: "Generated with NELLO ONE"
   }
@@ -174,14 +99,12 @@ export default function CruzamentoPublico() {
           return;
         }
 
-        // Check if active
         if (!data.is_public_active) {
           setError(t.disabled);
           setIsLoading(false);
           return;
         }
 
-        // Check if expired
         if (data.public_expires_at && new Date(data.public_expires_at) < new Date()) {
           setError(t.expired);
           setIsLoading(false);
@@ -250,11 +173,377 @@ export default function CruzamentoPublico() {
     );
   }
 
-  // Normalize content to handle Identity v1.0 format
-  const rawContent = report?.content || {};
-  const content = normalizeContent(rawContent);
-  const semaforo = content.semaforo_relacional;
-  const encontro = content.encontro_essencias || content.metafora_central;
+  const content = report?.content || {};
+
+  // Render components for each section
+  const renderMetaforaCentral = () => {
+    const metafora = content.metafora_central;
+    if (!metafora) return null;
+
+    return (
+      <Card className="border-pink-200 bg-gradient-to-br from-pink-50/50 to-rose-50/50 dark:from-pink-950/20 dark:to-rose-950/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-pink-600">
+            <Sparkles className="w-5 h-5" />
+            {metafora.titulo || (lang === 'en' ? 'The Meeting of Essences' : 'O Encontro das Essências')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground leading-relaxed">{metafora.descricao}</p>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderPapeisIdentificados = () => {
+    const papeis = content.papeis_identificados;
+    if (!papeis) return null;
+
+    return (
+      <Card className="border-indigo-200 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 dark:from-indigo-950/20 dark:to-purple-950/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-indigo-600">
+            <Users className="w-5 h-5" />
+            {lang === 'en' ? 'Identified Roles' : 'Papéis Identificados'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid md:grid-cols-2 gap-4">
+          {papeis.sensor_direcao && (
+            <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
+              <h4 className="font-semibold text-purple-700 dark:text-purple-400 mb-2 flex items-center gap-2">
+                🧭 {lang === 'en' ? 'Direction Sensor' : 'Sensor de Direção'}
+              </h4>
+              <p className="font-medium">{papeis.sensor_direcao.nome}</p>
+              <p className="text-sm text-muted-foreground mt-1">{papeis.sensor_direcao.justificativa}</p>
+            </div>
+          )}
+          {papeis.condutor_curso && (
+            <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
+              <h4 className="font-semibold text-orange-700 dark:text-orange-400 mb-2 flex items-center gap-2">
+                ⚓ {lang === 'en' ? 'Course Conductor' : 'Condutor de Curso'}
+              </h4>
+              <p className="font-medium">{papeis.condutor_curso.nome}</p>
+              <p className="text-sm text-muted-foreground mt-1">{papeis.condutor_curso.justificativa}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderZonaHarmonia = () => {
+    const zona = content.zona_harmonia;
+    if (!zona) return null;
+
+    return (
+      <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/20 dark:to-teal-950/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-emerald-600">
+            <span className="text-xl">🟢</span>
+            {zona.titulo || (lang === 'en' ? 'Harmony Zone' : 'Zona de Harmonia')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {zona.descricao && (
+            <p className="text-muted-foreground">{zona.descricao}</p>
+          )}
+          {zona.valores_compartilhados && (
+            <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <h4 className="font-medium text-emerald-700 dark:text-emerald-400 mb-2">
+                {lang === 'en' ? 'Shared Values' : 'Valores Compartilhados'}
+              </h4>
+              <ul className="space-y-2">
+                {zona.valores_compartilhados.map((valor: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <Check className="w-4 h-4 mt-0.5 text-emerald-500" />
+                    <span>{valor}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {zona.proposito_comum && (
+            <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <h4 className="font-medium text-emerald-700 dark:text-emerald-400 mb-2">
+                {lang === 'en' ? 'Common Purpose' : 'Propósito Comum'}
+              </h4>
+              <p>{zona.proposito_comum}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderZonaAjuste = () => {
+    const zona = content.zona_ajuste;
+    if (!zona) return null;
+
+    return (
+      <Card className="border-amber-200 bg-gradient-to-br from-amber-50/50 to-yellow-50/50 dark:from-amber-950/20 dark:to-yellow-950/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-amber-600">
+            <span className="text-xl">🟡</span>
+            {zona.titulo || (lang === 'en' ? 'Adjustment Zone' : 'Zona de Ajuste')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {zona.descricao && (
+            <p className="text-muted-foreground">{zona.descricao}</p>
+          )}
+          {zona.diferencas?.map((diff: any, i: number) => (
+            <div key={i} className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <h4 className="font-medium text-amber-700 dark:text-amber-400 mb-1">
+                ⚡ {diff.aspecto}
+              </h4>
+              <p className="text-sm">{diff.descricao}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderZonaChoque = () => {
+    const zona = content.zona_choque;
+    if (!zona) return null;
+
+    return (
+      <Card className="border-rose-200 bg-gradient-to-br from-rose-50/50 to-red-50/50 dark:from-rose-950/20 dark:to-red-950/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-rose-600">
+            <span className="text-xl">🔴</span>
+            {zona.titulo || (lang === 'en' ? 'Shock Zone' : 'Zona de Choque')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {zona.descricao && (
+            <p className="text-muted-foreground italic">{zona.descricao}</p>
+          )}
+          
+          {zona.ciclo_sombra && (
+            <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/20">
+              <h4 className="font-medium text-rose-700 dark:text-rose-400 mb-2 flex items-center gap-2">
+                <Flame className="w-4 h-4" />
+                {lang === 'en' ? 'The Shadow Cycle' : 'O Ciclo de Sombra'}
+              </h4>
+              <p className="text-sm">{zona.ciclo_sombra}</p>
+            </div>
+          )}
+
+          {zona.sensor_sob_estresse && (
+            <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
+              <h4 className="font-medium text-purple-700 dark:text-purple-400 mb-2">
+                🧭 {zona.sensor_sob_estresse.nome} ({lang === 'en' ? 'Under Stress' : 'Sob Estresse'})
+              </h4>
+              <p className="text-sm mb-2">{zona.sensor_sob_estresse.comportamento}</p>
+              {zona.sensor_sob_estresse.impacto_no_outro && (
+                <p className="text-xs text-muted-foreground">
+                  <strong>{lang === 'en' ? 'Impact:' : 'Impacto:'}</strong> {zona.sensor_sob_estresse.impacto_no_outro}
+                </p>
+              )}
+            </div>
+          )}
+
+          {zona.condutor_sob_estresse && (
+            <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
+              <h4 className="font-medium text-orange-700 dark:text-orange-400 mb-2">
+                ⚓ {zona.condutor_sob_estresse.nome} ({lang === 'en' ? 'Under Stress' : 'Sob Estresse'})
+              </h4>
+              <p className="text-sm mb-2">{zona.condutor_sob_estresse.comportamento}</p>
+              {zona.condutor_sob_estresse.impacto_no_outro && (
+                <p className="text-xs text-muted-foreground">
+                  <strong>{lang === 'en' ? 'Impact:' : 'Impacto:'}</strong> {zona.condutor_sob_estresse.impacto_no_outro}
+                </p>
+              )}
+            </div>
+          )}
+
+          {zona.gatilhos && (
+            <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/20">
+              <h4 className="font-medium text-rose-700 dark:text-rose-400 mb-2">
+                {lang === 'en' ? 'Triggers' : 'Gatilhos'}
+              </h4>
+              <ul className="space-y-1">
+                {zona.gatilhos.map((gatilho: any, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <span className="text-rose-500">!</span>
+                    <span>{typeof gatilho === 'string' ? gatilho : gatilho.descricao}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderTabelaTraducao = () => {
+    const tabela = content.tabela_traducao;
+    if (!tabela) return null;
+
+    return (
+      <Card className="border-indigo-200 bg-gradient-to-br from-indigo-50/50 to-blue-50/50 dark:from-indigo-950/20 dark:to-blue-950/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-indigo-600">
+            <MessageCircle className="w-5 h-5" />
+            {tabela.titulo || (lang === 'en' ? 'Translation Table' : 'Tabela de Tradução')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {tabela.sensor && (
+            <div className="space-y-2">
+              <h4 className="font-medium text-purple-700 dark:text-purple-400">
+                🧭 {lang === 'en' ? 'When the Direction Sensor...' : 'Quando o Sensor de Direção...'}
+              </h4>
+              {tabela.sensor.map((item: any, i: number) => (
+                <div key={i} className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 text-sm">
+                  <span className="font-medium">{item.comportamento}</span>
+                  <span className="text-muted-foreground"> → </span>
+                  <span className="text-purple-700 dark:text-purple-400">{item.significa}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {tabela.condutor && (
+            <div className="space-y-2">
+              <h4 className="font-medium text-orange-700 dark:text-orange-400">
+                ⚓ {lang === 'en' ? 'When the Course Conductor...' : 'Quando o Condutor de Curso...'}
+              </h4>
+              {tabela.condutor.map((item: any, i: number) => (
+                <div key={i} className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 text-sm">
+                  <span className="font-medium">{item.comportamento}</span>
+                  <span className="text-muted-foreground"> → </span>
+                  <span className="text-orange-700 dark:text-orange-400">{item.significa}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderProtocoloPaz = () => {
+    const protocolo = content.protocolo_paz;
+    if (!protocolo) return null;
+
+    return (
+      <Card className="border-blue-200 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-blue-600">
+            <Shield className="w-5 h-5" />
+            {protocolo.titulo || (lang === 'en' ? 'Peace Protocol' : 'Protocolo de Paz')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {protocolo.tempo_duplo && (
+            <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+              <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-3 flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                {protocolo.tempo_duplo.titulo || '1. Tempo Duplo'}
+              </h4>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="p-3 rounded bg-purple-500/10 border border-purple-500/20">
+                  <p className="text-sm">{protocolo.tempo_duplo.para_sensor}</p>
+                </div>
+                <div className="p-3 rounded bg-orange-500/10 border border-orange-500/20">
+                  <p className="text-sm">{protocolo.tempo_duplo.para_condutor}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {protocolo.pergunta_recalibracao && (
+            <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-2 flex items-center gap-2">
+                <HelpCircle className="w-4 h-4" />
+                {protocolo.pergunta_recalibracao.titulo || '2. Pergunta de Recalibração'}
+              </h4>
+              <p className="text-sm italic font-medium text-center py-2">
+                "{protocolo.pergunta_recalibracao.pergunta}"
+              </p>
+            </div>
+          )}
+
+          {protocolo.proibicao_inferencia && (
+            <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/20">
+              <h4 className="font-semibold text-rose-700 dark:text-rose-400 mb-2 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" />
+                {protocolo.proibicao_inferencia.titulo || '3. Proibição de Inferência'}
+              </h4>
+              <ul className="space-y-2">
+                {protocolo.proibicao_inferencia.regras?.map((regra: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <span className="text-rose-500">✕</span>
+                    <span>{regra}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {protocolo.regras?.map((regra: any, i: number) => (
+            <div key={i} className="p-4 rounded-lg bg-muted/50 border space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-sm">
+                  {regra.numero || i + 1}
+                </span>
+                <h4 className="font-semibold">{regra.regra}</h4>
+              </div>
+              {regra.porque && (
+                <p className="text-sm text-muted-foreground pl-9">
+                  {lang === 'en' ? 'Why:' : 'Por quê:'} {regra.porque}
+                </p>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderAcaoPratica = () => {
+    const acao = content.acao_pratica_24h;
+    if (!acao) return null;
+
+    return (
+      <Card className="border-emerald-300 bg-gradient-to-br from-emerald-100/50 to-teal-100/50 dark:from-emerald-900/30 dark:to-teal-900/30">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+            <Zap className="w-5 h-5" />
+            {acao.titulo || (lang === 'en' ? '24-Hour Practical Action' : 'Ação Prática Imediata')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30">
+            <p className="font-medium text-emerald-700 dark:text-emerald-300">{acao.descricao}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderFechamento = () => {
+    const fechamento = content.fechamento;
+    if (!fechamento) return null;
+
+    const titulo = typeof fechamento === 'object' ? fechamento.titulo : null;
+    const mensagem = typeof fechamento === 'object' ? fechamento.mensagem : fechamento;
+
+    return (
+      <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-pink-500/5">
+        <CardContent className="pt-6 text-center space-y-3">
+          {titulo && (
+            <h3 className="font-semibold text-lg">{titulo}</h3>
+          )}
+          <p className="text-foreground/80 whitespace-pre-line font-medium leading-relaxed">{mensagem}</p>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-pink-50/30 dark:to-pink-950/10">
@@ -285,199 +574,34 @@ export default function CruzamentoPublico() {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="container max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Boat Metaphor */}
-        {content.metafora_barco && (
-          <Card className="border-blue-200 bg-blue-50/50 dark:bg-blue-950/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-600">
-                <Ship className="w-5 h-5" />
-                {lang === 'en' ? 'The Boat Metaphor' : 'A Metáfora do Barco'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground italic">{content.metafora_barco}</p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Meeting of Essences */}
-        {encontro && (
-          <Card className="border-pink-200 bg-pink-50/50 dark:bg-pink-950/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-pink-600">
-                <Sparkles className="w-5 h-5" />
-                {encontro.titulo || t.sections.encontro_essencias}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {encontro.metafora && (
-                <p className="text-center text-lg font-medium text-pink-600">
-                  ✨ {encontro.metafora} ✨
-                </p>
-              )}
-              {encontro.descricao && (
-                <p className="text-muted-foreground">{encontro.descricao}</p>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Traffic Light */}
-        {semaforo && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                {semaforo.titulo || t.sections.semaforo_relacional}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Green Zone */}
-              {semaforo.verde && (
-                <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200">
-                  <h4 className="font-semibold text-emerald-600 mb-2 flex items-center gap-2">
-                    🟢 {semaforo.verde.titulo || t.trafficLight.verde}
-                  </h4>
-                  {semaforo.verde.descricao && (
-                    <p className="text-sm text-muted-foreground mb-2">{semaforo.verde.descricao}</p>
-                  )}
-                  {semaforo.verde.pontos && (
-                    <ul className="space-y-1 text-sm">
-                      {semaforo.verde.pontos.map((point: string, i: number) => (
-                        <li key={i}>• {point}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
-
-              {/* Yellow Zone */}
-              {semaforo.amarelo && (
-                <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200">
-                  <h4 className="font-semibold text-amber-600 mb-2 flex items-center gap-2">
-                    🟡 {semaforo.amarelo.titulo || t.trafficLight.amarelo}
-                  </h4>
-                  {semaforo.amarelo.descricao && (
-                    <p className="text-sm text-muted-foreground mb-2">{semaforo.amarelo.descricao}</p>
-                  )}
-                  {semaforo.amarelo.pontos && (
-                    <ul className="space-y-1 text-sm">
-                      {semaforo.amarelo.pontos.map((point: string, i: number) => (
-                        <li key={i}>• {point}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
-
-              {/* Red Zone */}
-              {semaforo.vermelho && (
-                <div className="p-4 rounded-lg bg-rose-50 dark:bg-rose-950/30 border border-rose-200">
-                  <h4 className="font-semibold text-rose-600 mb-2 flex items-center gap-2">
-                    🔴 {semaforo.vermelho.titulo || t.trafficLight.vermelho}
-                  </h4>
-                  {semaforo.vermelho.descricao && (
-                    <p className="text-sm text-muted-foreground mb-2">{semaforo.vermelho.descricao}</p>
-                  )}
-                  {semaforo.vermelho.pontos && (
-                    <ul className="space-y-1 text-sm">
-                      {semaforo.vermelho.pontos.map((point: string, i: number) => (
-                        <li key={i}>• {point}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Where You Connect */}
-        {content.santo_bate && (
-          <Card className="border-emerald-200">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-emerald-600">
-                <Heart className="w-5 h-5" />
-                {content.santo_bate.titulo || t.sections.santo_bate}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {content.santo_bate.descricao && (
-                <p className="text-muted-foreground mb-4">{content.santo_bate.descricao}</p>
-              )}
-              {content.santo_bate.pontos && (
-                <ul className="space-y-2">
-                  {content.santo_bate.pontos.map((point: string, i: number) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-emerald-500">✓</span>
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Where Friction Happens */}
-        {content.bicho_pega && (
-          <Card className="border-rose-200">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-rose-600">
-                <AlertTriangle className="w-5 h-5" />
-                {content.bicho_pega.titulo || t.sections.bicho_pega}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {content.bicho_pega.descricao && (
-                <p className="text-muted-foreground mb-4">{content.bicho_pega.descricao}</p>
-              )}
-              {content.bicho_pega.pontos && (
-                <ul className="space-y-2">
-                  {content.bicho_pega.pontos.map((point: string, i: number) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-rose-500">!</span>
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Peace Protocol */}
-        {content.protocolo_paz && (
-          <Card className="border-purple-200 bg-purple-50/50 dark:bg-purple-950/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-purple-600">
-                <Anchor className="w-5 h-5" />
-                {content.protocolo_paz.titulo || t.sections.protocolo_paz}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {content.protocolo_paz.descricao && (
-                <p className="text-muted-foreground mb-4">{content.protocolo_paz.descricao}</p>
-              )}
-              {content.protocolo_paz.regras && (
-                <ul className="space-y-3">
-                  {content.protocolo_paz.regras.map((regra: any, i: number) => (
-                    <li key={i} className="p-3 bg-white/50 dark:bg-black/20 rounded-lg">
-                      <p className="font-medium">{regra.regra || regra}</p>
-                      {regra.porque && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {lang === 'en' ? 'Why: ' : 'Por quê: '}{regra.porque}
-                        </p>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-        )}
+      {/* Content - ALL SECTIONS */}
+      <div className="container max-w-4xl mx-auto px-4 py-8 space-y-6">
+        {/* 1. Metáfora Central / Encontro das Essências */}
+        {renderMetaforaCentral()}
+        
+        {/* 2. Papéis Identificados (Sensor + Condutor) */}
+        {renderPapeisIdentificados()}
+        
+        {/* 3. Zona de Harmonia (Verde) */}
+        {renderZonaHarmonia()}
+        
+        {/* 4. Zona de Ajuste (Amarelo) */}
+        {renderZonaAjuste()}
+        
+        {/* 5. Zona de Choque (Vermelho) */}
+        {renderZonaChoque()}
+        
+        {/* 6. Tabela de Tradução */}
+        {renderTabelaTraducao()}
+        
+        {/* 7. Protocolo de Paz */}
+        {renderProtocoloPaz()}
+        
+        {/* 8. Ação Prática 24h */}
+        {renderAcaoPratica()}
+        
+        {/* 9. Fechamento */}
+        {renderFechamento()}
 
         {/* Disclaimer */}
         <div className="text-center py-6 text-sm text-muted-foreground">
