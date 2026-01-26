@@ -6,7 +6,7 @@ import { BackButton } from "@/components/ui/back-button";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTests } from "@/hooks/useTests";
-import { useTestAccess } from "@/hooks/useTestAccess";
+import { useTestAccess } from "@/hooks/useTestAccessV2";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { TestImprovementsCard } from "@/components/growth/TestImprovementsCard";

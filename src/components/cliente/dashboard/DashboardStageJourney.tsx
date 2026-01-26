@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { JourneyStep } from "@/hooks/useJourneyProgress";
 import * as Icons from "lucide-react";
-import { useTestAccess } from "@/hooks/useTestAccess";
+import { useTestAccess } from "@/hooks/useTestAccessV2";
 
 interface DashboardStageJourneyProps {
   displayName: string;
