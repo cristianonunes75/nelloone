@@ -116,18 +116,18 @@ export const SynergyRadarChart = ({ profileA, profileB, language }: SynergyRadar
           <Radar
             name={profileA.name}
             dataKey={profileA.name}
-            stroke="hsl(var(--primary))"
-            fill="hsl(var(--primary))"
+            stroke="rgb(212, 175, 55)"
+            fill="rgb(212, 175, 55)"
             fillOpacity={0.3}
-            strokeWidth={2}
+            strokeWidth={3}
           />
           <Radar
             name={profileB.name}
             dataKey={profileB.name}
-            stroke="#ec4899"
-            fill="#ec4899"
+            stroke="rgb(74, 74, 74)"
+            fill="rgb(74, 74, 74)"
             fillOpacity={0.3}
-            strokeWidth={2}
+            strokeWidth={3}
           />
           <Legend 
             wrapperStyle={{ 
