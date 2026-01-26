@@ -186,5 +186,5 @@
      return false;
    };
  
-   return { hasAccess, hasPurchased, purchases, hasFullJourneyAccess, isLoading };
+   return { hasAccess, hasPurchased, purchases, hasFullJourneyAccess, isLoading, userProfile };
  };
