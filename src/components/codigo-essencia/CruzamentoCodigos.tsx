@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { CruzamentoViewer } from "./CruzamentoViewer";
 import { useCoupleCodeAccess } from "@/hooks/useCoupleCodeAccess";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 interface CruzamentoCodigosProps {
   language: 'pt' | 'pt-pt' | 'en';
@@ -310,15 +311,17 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
 
   if (selectedCrossing) {
     return (
-      <CruzamentoViewer 
-        crossing={{
-          ...selectedCrossing,
-          isPurchased: hasCoupleCodePurchased
-        }} 
-        language={language}
-        onBack={() => setSelectedCrossing(null)}
-        onPurchase={handlePurchaseCouple}
-      />
+      <ErrorBoundary fallbackTitle={language === "en" ? "Couldn't open the report" : "Não foi possível abrir o relatório"}>
+        <CruzamentoViewer 
+          crossing={{
+            ...selectedCrossing,
+            isPurchased: hasCoupleCodePurchased
+          }} 
+          language={language}
+          onBack={() => setSelectedCrossing(null)}
+          onPurchase={handlePurchaseCouple}
+        />
+      </ErrorBoundary>
     );
   }
 

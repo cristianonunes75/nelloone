@@ -276,21 +276,55 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
   }, [liveCrossing]);
 
   const hasReportContent = useMemo(() => {
-    // Any known key indicates we have a renderable report
+    // Any known key indicates we have a renderable report.
+    // Also accept legacy formats to avoid getting stuck in the “A gerar…” gate.
     const keys = Object.keys(content || {});
     if (keys.length === 0) return false;
+
     const knownKeys = [
+      // Identity v1.0
       "metafora_barco",
       "zona_harmonia",
       "zona_ajuste",
       "zona_choque",
       "tabela_traducao",
       "protocolo_paz",
+      "acao_pratica_24h",
+
+      // Current UI sections
       "semaforo_relacional",
       "encontro_essencias",
       "potencializacao",
+      "dados_grafico",
+      "santo_bate",
+      "bicho_pega",
+
+      // Legacy
+      "perfil_conjunto",
+      "harmonias",
+      "forcas_da_relacao",
+      "complementaridades",
+      "tensoes",
+      "pontos_de_atencao",
+      "como_melhorar",
+      "perguntas",
+      "fechamento",
+      "abertura",
     ];
-    return knownKeys.some((k) => (content as any)?.[k] != null);
+
+    if (knownKeys.some((k) => (content as any)?.[k] != null)) return true;
+
+    // Last-resort heuristic: if any object has a recognizable content field.
+    return Object.values(content as any).some((v: any) => {
+      if (!v || typeof v !== "object") return false;
+      return (
+        typeof v.titulo === "string" ||
+        typeof v.resumo === "string" ||
+        typeof v.conteudo === "string" ||
+        Array.isArray(v.pontos) ||
+        Array.isArray(v.perguntas)
+      );
+    });
   }, [content]);
 
   const asArray = <T,>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
@@ -392,11 +426,11 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xl">🟢</span>
-                <h4 className="font-semibold text-emerald-700 dark:text-emerald-400">{semaforo.verde.titulo || t.trafficLight.verde}</h4>
+                <h4 className="font-semibold text-emerald-700 dark:text-emerald-400">{semaforo.verde?.titulo || t.trafficLight.verde}</h4>
               </div>
-              <p className="text-sm text-muted-foreground mb-3">{semaforo.verde.descricao}</p>
+              <p className="text-sm text-muted-foreground mb-3">{semaforo.verde?.descricao}</p>
               <ul className="space-y-1">
-                {semaforo.verde.pontos?.map((ponto: string, i: number) => (
+                {asArray<string>(semaforo.verde?.pontos).map((ponto: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <Check className="w-4 h-4 mt-0.5 text-emerald-500" />
                     <span>{ponto}</span>
@@ -411,11 +445,11 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xl">🟡</span>
-                <h4 className="font-semibold text-amber-700 dark:text-amber-400">{semaforo.amarelo.titulo || t.trafficLight.amarelo}</h4>
+                <h4 className="font-semibold text-amber-700 dark:text-amber-400">{semaforo.amarelo?.titulo || t.trafficLight.amarelo}</h4>
               </div>
-              <p className="text-sm text-muted-foreground mb-3">{semaforo.amarelo.descricao}</p>
+              <p className="text-sm text-muted-foreground mb-3">{semaforo.amarelo?.descricao}</p>
               <ul className="space-y-1">
-                {semaforo.amarelo.pontos?.map((ponto: string, i: number) => (
+                {asArray<string>(semaforo.amarelo?.pontos).map((ponto: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <AlertTriangle className="w-4 h-4 mt-0.5 text-amber-500" />
                     <span>{ponto}</span>
@@ -430,11 +464,11 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xl">🔴</span>
-                <h4 className="font-semibold text-red-700 dark:text-red-400">{semaforo.vermelho.titulo || t.trafficLight.vermelho}</h4>
+                <h4 className="font-semibold text-red-700 dark:text-red-400">{semaforo.vermelho?.titulo || t.trafficLight.vermelho}</h4>
               </div>
-              <p className="text-sm text-muted-foreground mb-3">{semaforo.vermelho.descricao}</p>
+              <p className="text-sm text-muted-foreground mb-3">{semaforo.vermelho?.descricao}</p>
               <ul className="space-y-1">
-                {semaforo.vermelho.pontos?.map((ponto: string, i: number) => (
+                {asArray<string>(semaforo.vermelho?.pontos).map((ponto: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <Shield className="w-4 h-4 mt-0.5 text-red-500" />
                     <span>{ponto}</span>
