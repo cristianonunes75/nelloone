@@ -933,10 +933,12 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     );
   };
 
-  // ============== BOAT METAPHOR INTRO (Identity v1.0) ==============
+  // ============== BOAT METAPHOR INTRO (Identity v2.0) ==============
   const renderBoatMetaphor = () => {
-    // First check if we have AI-generated metafora_barco
-    const metaforaBarco = content.metafora_barco;
+    // Support both metafora_barco (legacy) and metafora_central (v2.0)
+    const metaforaBarco = content.metafora_barco || content.metafora_central;
+    const papeis = content.papeis_identificados;
+    
     if (metaforaBarco) {
       return (
         <Card className="bg-gradient-to-br from-blue-500/5 via-cyan-500/5 to-teal-500/5 border-blue-500/20">
@@ -945,13 +947,47 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
                 <Ship className="w-6 h-6 text-blue-500" />
               </div>
-              <div>
+              <div className="flex-1">
                 <h3 className="font-semibold text-blue-700 dark:text-blue-400 mb-2">
                   {metaforaBarco.titulo || (language === 'en' ? 'The Boat Metaphor' : 'A Metáfora do Barco')}
                 </h3>
-                <p className="text-foreground/80 italic">{metaforaBarco.texto}</p>
+                <p className="text-foreground/80 italic">{metaforaBarco.texto || metaforaBarco.descricao}</p>
               </div>
             </div>
+            
+            {/* Roles identification - papeis_identificados */}
+            {papeis && (
+              <div className="grid gap-3 md:grid-cols-2 mt-4 pt-4 border-t border-blue-500/20">
+                {papeis.sensor_direcao && (
+                  <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-lg">🧭</span>
+                      <span className="font-semibold text-purple-700 dark:text-purple-400 text-sm">
+                        {language === 'en' ? 'Direction Sensor' : 'Sensor de Direção'}
+                      </span>
+                    </div>
+                    <p className="font-medium text-sm">{papeis.sensor_direcao.nome}</p>
+                    {papeis.sensor_direcao.justificativa && (
+                      <p className="text-xs text-muted-foreground mt-1">{papeis.sensor_direcao.justificativa}</p>
+                    )}
+                  </div>
+                )}
+                {papeis.condutor_curso && (
+                  <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-lg">⚓</span>
+                      <span className="font-semibold text-orange-700 dark:text-orange-400 text-sm">
+                        {language === 'en' ? 'Course Conductor' : 'Condutor de Curso'}
+                      </span>
+                    </div>
+                    <p className="font-medium text-sm">{papeis.condutor_curso.nome}</p>
+                    {papeis.condutor_curso.justificativa && (
+                      <p className="text-xs text-muted-foreground mt-1">{papeis.condutor_curso.justificativa}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       );
@@ -1212,13 +1248,22 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     );
   };
 
-  // ============== TABELA TRADUÇÃO (Identity v1.0) ==============
+  // ============== TABELA TRADUÇÃO (Identity v2.0) ==============
   const renderTabelaTraducaoV2 = () => {
     const tabela = content.tabela_traducao;
     if (!tabela) return null;
 
-     const sensorItems = asArray<any>((tabela as any)?.sensor);
-     const condutorItems = asArray<any>((tabela as any)?.condutor);
+    // Support both v2.0 (traducoes_sensor/traducoes_condutor) and legacy (sensor/condutor) formats
+    const traducoesSensor = tabela.traducoes_sensor;
+    const traducoesCondutor = tabela.traducoes_condutor;
+    
+    // Extract translations array - handles nested structure with .traducoes
+    const sensorItems = asArray<any>(traducoesSensor?.traducoes || (tabela as any)?.sensor);
+    const condutorItems = asArray<any>(traducoesCondutor?.traducoes || (tabela as any)?.condutor);
+    
+    // Get header titles from data
+    const sensorTitle = traducoesSensor?.titulo || (language === 'en' ? 'When the DIRECTION SENSOR...' : 'Quando o SENSOR DE DIREÇÃO...');
+    const condutorTitle = traducoesCondutor?.titulo || (language === 'en' ? 'When the COURSE CONDUCTOR...' : 'Quando o CONDUTOR DE CURSO...');
 
     return (
       <Card className="bg-gradient-to-br from-indigo-500/5 to-blue-500/5 border-indigo-500/20">
@@ -1229,19 +1274,22 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               {tabela.titulo || (language === 'en' ? 'Couple Translation Table' : 'Tabela de Tradução do Casal')}
             </CardTitle>
           </div>
+          {tabela.descricao && (
+            <p className="text-sm text-muted-foreground italic">{tabela.descricao}</p>
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Sensor translations */}
           {sensorItems.length > 0 && (
             <div className="space-y-2">
               <h4 className="font-medium text-purple-700 dark:text-purple-400 text-sm flex items-center gap-2">
-                🧭 {language === 'en' ? 'When the DIRECTION SENSOR...' : 'Quando o SENSOR DE DIREÇÃO...'}
+                🧭 {sensorTitle}
               </h4>
               {sensorItems.map((item: any, i: number) => (
                 <div key={i} className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/10 text-sm">
                   <span className="font-medium">{item.comportamento}</span>
                   <span className="text-muted-foreground"> → </span>
-                  <span className="text-purple-700 dark:text-purple-400">{item.significa}</span>
+                  <span className="text-purple-700 dark:text-purple-400">{item.significado || item.significa}</span>
                 </div>
               ))}
             </div>
@@ -1251,13 +1299,13 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           {condutorItems.length > 0 && (
             <div className="space-y-2">
               <h4 className="font-medium text-orange-700 dark:text-orange-400 text-sm flex items-center gap-2">
-                ⚓ {language === 'en' ? 'When the COURSE CONDUCTOR...' : 'Quando o CONDUTOR DE CURSO...'}
+                ⚓ {condutorTitle}
               </h4>
               {condutorItems.map((item: any, i: number) => (
                 <div key={i} className="p-3 rounded-lg bg-orange-500/5 border border-orange-500/10 text-sm">
                   <span className="font-medium">{item.comportamento}</span>
                   <span className="text-muted-foreground"> → </span>
-                  <span className="text-orange-700 dark:text-orange-400">{item.significa}</span>
+                  <span className="text-orange-700 dark:text-orange-400">{item.significado || item.significa}</span>
                 </div>
               ))}
             </div>
@@ -1267,7 +1315,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     );
   };
 
-  // ============== PROTOCOLO PAZ (Identity v1.0 Enhanced) ==============
+  // ============== PROTOCOLO PAZ (Identity v2.0 Enhanced) ==============
   const renderProtocoloPazV2 = () => {
     const protocolo = content.protocolo_paz;
     if (!protocolo) return null;
@@ -1277,6 +1325,10 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     const proibicaoInferencia = (protocolo as any)?.proibicao_inferencia;
     const proibicaoRegras = asArray<string>(proibicaoInferencia?.regras);
     const legacyRegras = asArray<any>((protocolo as any)?.regras);
+
+    // Extract tempo_sensor/tempo_condutor (v2.0) OR para_sensor/para_condutor (legacy)
+    const tempoSensorText = tempoDuplo?.tempo_sensor || tempoDuplo?.para_sensor || '';
+    const tempoCondutorText = tempoDuplo?.tempo_condutor || tempoDuplo?.para_condutor || '';
 
     return (
       <Card className="bg-gradient-to-br from-blue-500/5 to-purple-500/5 border-blue-500/20">
@@ -1288,19 +1340,29 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Tempo Duplo */}
-          {tempoDuplo && (
+          {tempoDuplo && (tempoSensorText || tempoCondutorText) && (
             <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20">
               <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-3 flex items-center gap-2">
                 <Clock className="w-4 h-4" />
-                {tempoDuplo?.titulo || '1. Tempo Duplo'}
+                {tempoDuplo?.titulo || (language === 'en' ? '1. Double Time' : '1. Tempo Duplo')}
               </h4>
               <div className="grid gap-3 md:grid-cols-2">
-                <div className="p-3 rounded bg-purple-500/10 border border-purple-500/20">
-                  <p className="text-sm">{tempoDuplo?.para_sensor || ''}</p>
-                </div>
-                <div className="p-3 rounded bg-orange-500/10 border border-orange-500/20">
-                  <p className="text-sm">{tempoDuplo?.para_condutor || ''}</p>
-                </div>
+                {tempoSensorText && (
+                  <div className="p-3 rounded bg-purple-500/10 border border-purple-500/20">
+                    <p className="text-xs font-medium text-purple-700 dark:text-purple-400 mb-1">
+                      🧭 {language === 'en' ? 'Direction Sensor' : 'Sensor de Direção'}
+                    </p>
+                    <p className="text-sm">{tempoSensorText}</p>
+                  </div>
+                )}
+                {tempoCondutorText && (
+                  <div className="p-3 rounded bg-orange-500/10 border border-orange-500/20">
+                    <p className="text-xs font-medium text-orange-700 dark:text-orange-400 mb-1">
+                      ⚓ {language === 'en' ? 'Course Conductor' : 'Condutor de Curso'}
+                    </p>
+                    <p className="text-sm">{tempoCondutorText}</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -1310,26 +1372,26 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <div className="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
               <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-2 flex items-center gap-2">
                 <HelpCircle className="w-4 h-4" />
-                {perguntaRecalibracao?.titulo || '2. Pergunta de Recalibração'}
+                {perguntaRecalibracao?.titulo || (language === 'en' ? '2. Recalibration Question' : '2. Pergunta de Recalibração')}
               </h4>
-              <p className="text-sm italic font-medium text-center py-2">
+              <p className="text-sm italic font-medium text-center py-2 bg-emerald-500/10 rounded-lg px-4">
                 "{perguntaRecalibracao?.pergunta || ''}"
               </p>
             </div>
           )}
 
           {/* Proibição de Inferência */}
-          {proibicaoInferencia && (
+          {proibicaoInferencia && proibicaoRegras.length > 0 && (
             <div className="p-4 rounded-lg bg-red-500/5 border border-red-500/20">
               <h4 className="font-semibold text-red-700 dark:text-red-400 mb-2 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" />
-                {proibicaoInferencia?.titulo || '3. Proibição de Inferência'}
+                {proibicaoInferencia?.titulo || (language === 'en' ? '3. Inference Prohibition' : '3. Proibição de Inferência')}
               </h4>
               <ul className="space-y-2">
                 {proibicaoRegras.map((regra: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <span className="text-red-500">✕</span>
-                    <span>{regra}</span>
+                    <span className="capitalize">{regra}</span>
                   </li>
                 ))}
               </ul>
@@ -1337,7 +1399,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           )}
 
           {/* Legacy rules format */}
-          {legacyRegras.map((regra: any, i: number) => (
+          {legacyRegras.length > 0 && legacyRegras.map((regra: any, i: number) => (
             <div key={i} className="p-4 rounded-lg bg-muted/50 border space-y-2">
               <div className="flex items-center gap-2">
                 <span className="w-7 h-7 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-sm">
@@ -1355,10 +1417,12 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     );
   };
 
-  // ============== AÇÃO PRÁTICA 24H (Identity v1.0) ==============
+  // ============== AÇÃO PRÁTICA 24H (Identity v2.0) ==============
   const renderAcaoPratica = () => {
     const acao = content.acao_pratica_24h;
     if (!acao) return null;
+
+    const passos = [acao.passo_1, acao.passo_2, acao.passo_3].filter(Boolean);
 
     return (
       <Card className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/30">
@@ -1370,10 +1434,34 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             </CardTitle>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="p-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30">
-            <p className="font-medium text-emerald-700 dark:text-emerald-300">{acao.descricao}</p>
-          </div>
+        <CardContent className="space-y-4">
+          {acao.descricao && (
+            <p className="text-sm text-muted-foreground italic">{acao.descricao}</p>
+          )}
+          
+          {/* 3 Steps */}
+          {passos.length > 0 && (
+            <div className="space-y-3">
+              {passos.map((passo: string, i: number) => (
+                <div 
+                  key={i} 
+                  className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3"
+                >
+                  <span className="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold flex items-center justify-center text-sm flex-shrink-0">
+                    {i + 1}
+                  </span>
+                  <p className="text-sm text-foreground/90">{passo}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Fallback for legacy format without steps */}
+          {passos.length === 0 && acao.acao && (
+            <div className="p-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30">
+              <p className="font-medium text-emerald-700 dark:text-emerald-300">{acao.acao}</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     );
