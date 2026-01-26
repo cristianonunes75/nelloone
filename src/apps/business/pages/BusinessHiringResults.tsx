@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Loader2, Mail, Phone, Briefcase, Calendar, CheckCircle2, Clock, AlertCircle, Target, AlertTriangle, Users, Compass, Eye, UserCircle, FileText, ExternalLink } from "lucide-react";
+import { ArrowLeft, Loader2, Mail, Phone, Briefcase, Calendar, CheckCircle2, Clock, AlertCircle, Target, AlertTriangle, Users, Compass, Eye, UserCircle, FileText, ExternalLink, Download } from "lucide-react";
 import { CandidateAttachments } from "../components/CandidateAttachments";
 import { CandidateResultsFeedback } from "../components/CandidateResultsFeedback";
 import { HiringAssessmentProgressCard } from "../components/HiringAssessmentProgressCard";
@@ -24,6 +24,8 @@ import {
   getCombinedProfileInsights 
 } from "@/lib/discHiringInsights";
 import { getUnifiedDiscRanking, getDiscDisplayData, type DiscRankingItem } from "@/lib/discRanking";
+import { generateHiringResultsPDF } from "../lib/pdfHiringResults";
+import { toast } from "sonner";
 
 // Total questions for progress calculation
 const TOTAL_QUESTIONS = {
@@ -97,6 +99,7 @@ export default function BusinessHiringResults() {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [jobOrigin, setJobOrigin] = useState<JobApplicationOrigin | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
   
   // View mode: 'hr' (default) or 'candidate'
   const viewMode = searchParams.get('view') || 'hr';
@@ -272,6 +275,37 @@ export default function BusinessHiringResults() {
   const status = getCompletionStatus();
   const bothCompleted = discAssessment?.status === "completed" && temperamentAssessment?.status === "completed";
 
+  const handleExportPDF = async () => {
+    if (!bothCompleted || !discAssessment?.result_data || !temperamentAssessment?.result_data) {
+      toast.error("Os testes precisam estar completos para exportar o PDF");
+      return;
+    }
+
+    setIsExportingPDF(true);
+    try {
+      await generateHiringResultsPDF({
+        candidate: {
+          full_name: candidate.full_name,
+          email: candidate.email,
+          phone: candidate.phone,
+          position_applied: candidate.position_applied,
+          created_at: candidate.created_at,
+        },
+        assessments: {
+          discResult: discAssessment.result_data,
+          temperamentResult: temperamentAssessment.result_data,
+        },
+        companyName: company?.name,
+      });
+      toast.success("PDF gerado com sucesso!");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Erro ao gerar o PDF. Tente novamente.");
+    } finally {
+      setIsExportingPDF(false);
+    }
+  };
+
   return (
     <BusinessLayout>
       <div className="space-y-6 max-w-4xl mx-auto">
@@ -284,19 +318,36 @@ export default function BusinessHiringResults() {
             <h1 className="text-2xl font-bold tracking-tight">{candidate.full_name}</h1>
             <p className="text-muted-foreground">Relatório de Avaliação Comportamental</p>
           </div>
-          <Badge variant={status.completed === status.total ? "default" : "secondary"}>
-            {status.completed === status.total ? (
-              <>
-                <CheckCircle2 className="h-3 w-3 mr-1" />
-                Avaliação Completa
-              </>
-            ) : (
-              <>
-                <Clock className="h-3 w-3 mr-1" />
-                {status.completed}/{status.total} Testes
-              </>
+          <div className="flex items-center gap-2">
+            {bothCompleted && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleExportPDF}
+                disabled={isExportingPDF}
+              >
+                {isExportingPDF ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4 mr-2" />
+                )}
+                Exportar PDF
+              </Button>
             )}
-          </Badge>
+            <Badge variant={status.completed === status.total ? "default" : "secondary"}>
+              {status.completed === status.total ? (
+                <>
+                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                  Avaliação Completa
+                </>
+              ) : (
+                <>
+                  <Clock className="h-3 w-3 mr-1" />
+                  {status.completed}/{status.total} Testes
+                </>
+              )}
+            </Badge>
+          </div>
         </div>
 
         {/* View Mode Toggle - Only show when both tests complete */}
