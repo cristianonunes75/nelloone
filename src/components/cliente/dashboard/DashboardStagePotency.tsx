@@ -20,6 +20,8 @@ import { cn } from "@/lib/utils";
 import type { JourneyStep } from "@/hooks/useJourneyProgress";
 import * as Icons from "lucide-react";
 import { getNelloAppUrl } from "@/hooks/useSubdomain";
+import { ProgressiveUpsellSection } from "@/components/monetization/ProgressiveUpsellSection";
+import { useProgressiveFunnel } from "@/hooks/useProgressiveFunnel";
 
 interface TestResult {
   testType: string;
@@ -136,6 +138,9 @@ export function DashboardStagePotency({
   onViewCodigo,
   onViewResult,
 }: DashboardStagePotencyProps) {
+  // Get progressive funnel state for upsells
+  const funnelState = useProgressiveFunnel();
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -338,6 +343,18 @@ export function DashboardStagePotency({
           })}
         </div>
       </motion.div>
+
+      {/* Progressive Upsell Section - Couple & Premium Products */}
+      <ProgressiveUpsellSection
+        journeyCompleted={funnelState.journeyCompleted}
+        hasSavedCodigo={funnelState.hasSavedCodigo}
+        hasActivationIndividual={funnelState.hasActivationIndividual}
+        hasNelloCouple={funnelState.hasNelloCouple}
+        hasActivationCouple={funnelState.hasActivationCouple}
+        hasIdentityCouplePremium={funnelState.hasIdentityCouplePremium}
+        hasCompletedCruzamento={funnelState.hasCompletedCruzamento}
+        onViewActivation={onViewAtivacao}
+      />
 
       {/* Business CTA */}
       <motion.div 
