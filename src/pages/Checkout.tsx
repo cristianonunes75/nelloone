@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +28,7 @@ import { Badge } from "@/components/ui/badge";
 
 const Checkout = () => {
   const { user, isLoading: authLoading } = useAuth();
+  const queryClient = useQueryClient();
   const { language } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -296,6 +298,12 @@ const Checkout = () => {
       console.log("[ZERO-VALUE] Purchase completed successfully!");
 
       console.log("[ZERO-VALUE] Purchase completed successfully!");
+      
+      // CRITICAL: Invalidate caches to ensure UI shows access immediately
+      console.log("[ZERO-VALUE] Invalidating query caches...");
+      await queryClient.invalidateQueries({ queryKey: ["test-purchases"] });
+      await queryClient.invalidateQueries({ queryKey: ["user-tests"] });
+      await queryClient.invalidateQueries({ queryKey: ["profile-ativacao-unlocked"] });
       
       toast({
         title: language === 'en' ? "Access Granted!" : "Acesso Liberado!",

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
@@ -66,6 +67,7 @@ const MESSAGES = {
 export default function CheckoutSuccess() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { language } = useLanguage();
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<VerifyStatus>("verifying");
@@ -144,11 +146,12 @@ export default function CheckoutSuccess() {
       }
 
       if (data.success) {
-        // Invalidate queries to ensure fresh data on redirect
+        // Invalidate ALL queries to force refresh - using predicate to catch userId-specific queries
+        queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "test-purchases" });
+        queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "user-tests" });
+        queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "user-profile-journey" });
         queryClient.invalidateQueries({ queryKey: ["ativacao-codigo-purchase"] });
         queryClient.invalidateQueries({ queryKey: ["profile-ativacao-unlocked"] });
-        queryClient.invalidateQueries({ queryKey: ["test-purchases"] });
-        queryClient.invalidateQueries({ queryKey: ["user-tests"] });
         
         if (data.already_processed) {
           setStatus("already_processed");

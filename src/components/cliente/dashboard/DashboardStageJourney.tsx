@@ -46,7 +46,16 @@ export function DashboardStageJourney({
   onViewResult,
   onPurchase,
 }: DashboardStageJourneyProps) {
-  const { hasAccess, hasFullJourneyAccess } = useTestAccess();
+  const { hasAccess, hasFullJourneyAccess, purchases, isLoading } = useTestAccess();
+  
+  // Debug: Log access status on render
+  console.log("[DashboardStageJourney] Access Status:", {
+    hasFullJourneyAccess,
+    purchasesCount: purchases?.length || 0,
+    isLoading,
+    hasBundlePurchase: purchases?.some(p => (p as any).purchase_category === 'jornada_completa'),
+  });
+
   const progressPercentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
   const remainingSteps = totalSteps - completedCount;
 
@@ -122,6 +131,16 @@ export function DashboardStageJourney({
               <Button 
                 size="lg" 
                 onClick={() => {
+                  console.log("[DashboardStageJourney] Next Step Click:", {
+                    testId: nextStep.testId,
+                    testName: nextStep.name,
+                    status: nextStep.status,
+                    hasFullJourneyAccess,
+                    hasAccess: hasAccess(nextStep.testId, nextStep.isFree),
+                    isFree: nextStep.isFree,
+                    willNavigateTo: nextStep.status === "in_progress" ? "continue" : (hasFullJourneyAccess || hasAccess(nextStep.testId, nextStep.isFree)) ? "start" : "purchase"
+                  });
+
                   if (nextStep.status === "in_progress") {
                     onContinueTest(nextStep);
                   } else if (hasFullJourneyAccess || hasAccess(nextStep.testId, nextStep.isFree)) {
@@ -161,6 +180,17 @@ export function DashboardStageJourney({
               key={step.testId}
               variants={itemVariants}
               onClick={() => {
+                console.log("[DashboardStageJourney] Step Click:", {
+                  testId: step.testId,
+                  testName: step.name,
+                  status: step.status,
+                  isCompleted,
+                  isLocked,
+                  hasFullJourneyAccess,
+                  canAccess,
+                  willNavigateTo: isCompleted ? 'results' : isLocked ? 'blocked' : step.status === 'in_progress' ? 'continue' : canAccess ? 'start' : 'purchase'
+                });
+
                 if (isCompleted) {
                   onViewResult(step);
                 } else if (isLocked) {
