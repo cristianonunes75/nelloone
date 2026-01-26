@@ -275,10 +275,10 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onClick={handleSignOut} 
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-yellow-400 rounded-lg"
+                    className="text-destructive"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
-                    🔥 {language === 'en' ? 'Sign Out' : 'Sair'} 🔥
+                    {language === 'en' ? 'Sign Out' : 'Sair'}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
