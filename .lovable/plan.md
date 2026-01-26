@@ -1,142 +1,174 @@
 
+# Plano: Exibir Resultados Parciais Assim que Cada Teste For Concluído
 
-# Plano: Garantir Persistência de Testes de Recrutamento + Monitoramento em Tempo Real
+## Problema Atual
 
-## Diagnóstico do Problema
+A página de detalhes do candidato (`BusinessHiringResults.tsx`) só exibe resultados quando **ambos os testes** (DISC e Temperamentos) estão completos. Enquanto isso, mostra apenas uma mensagem "Aguardando avaliações" com badges indicando o status de cada teste.
 
-Identifiquei **dois problemas críticos** que causaram a perda de dados do Paulo Haruo e podem afetar outros candidatos:
-
-### 1. Política de Segurança (RLS) com Status Incorreto
-A política de INSERT na tabela `hiring_answers` verifica:
-```text
-status IN ('pending', 'assessment_sent', 'assessment_started')
-```
-
-**Problema**: Quando o candidato começa o teste, o status muda para `in_progress` - que **não está na lista permitida**! Isso bloqueia a inserção de respostas.
-
-### 2. Falta de Política de UPDATE
-O código tenta atualizar respostas existentes (quando o candidato volta a uma pergunta), mas **não existe política de UPDATE** para a tabela `hiring_answers`. Com RLS ativado, isso é bloqueado automaticamente.
+Isso significa que quando a Dariane termina o DISC, você não vê o resultado - precisa esperar ela terminar também o Temperamentos.
 
 ---
 
 ## Solução Proposta
 
-### Fase 1: Corrigir Políticas de Segurança (RLS)
+### 1. Reestruturar a Lógica de Exibição
 
-Criar uma migração de banco de dados que:
+Substituir a lógica binária atual:
 
-1. **Atualiza a política de INSERT** em `hiring_answers` para incluir `in_progress` e `completed`
-2. **Cria política de UPDATE** permitindo que candidatos editem suas próprias respostas
-3. **Aplica a mesma correção** nas políticas de `hiring_assessments`
+```text
+SE ambos_completos:
+   mostrar_relatório_completo
+SENÃO:
+   mostrar_aguardando
+```
 
-### Fase 2: Melhorar Tratamento de Erros no Frontend
+Por uma lógica incremental:
 
-Atualizar `BusinessHiringAssessment.tsx`:
+```text
+SE disc_completo:
+   mostrar_card_DISC
+SENÃO:
+   mostrar_progresso_DISC (se iniciado) ou badge_pendente
 
-1. **Auto-retry** com backoff exponencial quando uma operação falha
-2. **Indicador visual de salvamento** para cada resposta
-3. **Modo offline** que armazena respostas localmente e sincroniza quando a conexão voltar
-4. **Validação final** antes de completar o teste verificando se todas as respostas estão salvas
+SE temperamentos_completo:
+   mostrar_card_Temperamento
+SENÃO:
+   mostrar_progresso_Temperamentos (se iniciado) ou badge_pendente
 
-### Fase 3: Implementar Monitoramento em Tempo Real
+SE ambos_completos:
+   mostrar_cards_adicionais (Resumo Executivo, Pontos Fortes, etc.)
+```
 
-Criar funcionalidade para acompanhar candidatos em tempo real:
+### 2. Adicionar Atualização em Tempo Real
 
-1. **Ativar Realtime** nas tabelas `hiring_assessments` e `hiring_candidates`
-2. **Criar componente de monitoramento** no painel de recrutamento
-3. **Exibir informações em tempo real**:
-   - Qual teste o candidato está fazendo
-   - Em qual pergunta está (ex: "Pergunta 15/28")
-   - Última atividade (há quanto tempo)
-   - Status de conclusão
+Conectar a página de detalhes ao Realtime do Supabase para atualizar automaticamente quando um teste for concluído (sem precisar recarregar a página).
+
+### 3. Indicador Visual de Progresso
+
+Para testes em andamento, mostrar qual pergunta o candidato está respondendo (usando os dados de `current_question_number` que já salvamos).
 
 ---
 
-## Detalhes Técnicos
+## Mudanças Técnicas
 
-### Migração de Banco de Dados
+### Arquivo: `src/apps/business/pages/BusinessHiringResults.tsx`
+
+**1. Adicionar Subscription Realtime:**
 
 ```text
--- 1. Corrigir política de INSERT em hiring_answers
-DROP POLICY IF EXISTS "Secure answer insert" ON public.hiring_answers;
-CREATE POLICY "Secure answer insert" ON public.hiring_answers
-FOR INSERT WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM hiring_assessments ha
-    JOIN hiring_candidates hc ON hc.id = ha.candidate_id
-    WHERE ha.id = hiring_answers.assessment_id
-    AND hc.invite_token IS NOT NULL
-    AND hc.status IN ('pending', 'assessment_sent', 'assessment_started', 'in_progress')
-  )
-  OR ... [admin check]
-);
-
--- 2. Criar política de UPDATE (NOVA)
-CREATE POLICY "Secure answer update" ON public.hiring_answers
-FOR UPDATE USING (
-  EXISTS (
-    SELECT 1 FROM hiring_assessments ha
-    JOIN hiring_candidates hc ON hc.id = ha.candidate_id
-    WHERE ha.id = hiring_answers.assessment_id
-    AND hc.invite_token IS NOT NULL
-    AND hc.status IN ('pending', 'assessment_sent', 'assessment_started', 'in_progress')
-  )
-  OR ... [admin check]
-);
-
--- 3. Ativar realtime
-ALTER PUBLICATION supabase_realtime ADD TABLE hiring_assessments;
-ALTER PUBLICATION supabase_realtime ADD TABLE hiring_candidates;
+useEffect(() => {
+  // Subscribe to assessment changes for this candidate
+  const channel = supabase
+    .channel('candidate-assessments')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'hiring_assessments',
+      filter: `candidate_id=eq.${candidateId}`,
+    }, () => fetchCandidateData())
+    .subscribe();
+  
+  return () => supabase.removeChannel(channel);
+}, [candidateId]);
 ```
 
-### Componente de Monitoramento
-
-Será exibido como um card ou seção no painel `/business/recrutamento`:
+**2. Criar Componente de Progresso ao Vivo:**
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│ 👁️ MONITORAMENTO AO VIVO                      [Atualização automática] │
-├─────────────────────────────────────────────────────────────┤
-│ 🟢 Dariane Martins     │ DISC      │ Pergunta 25/28 │ Agora │
-│ 🟡 Manoela Pereira     │ DISC      │ Pergunta 23/28 │ 2 min │
-│ ⚪ Barbara Lorrane     │ -         │ Não iniciou    │ -     │
-└─────────────────────────────────────────────────────────────┘
+function TestProgressCard({ assessment, testType }) {
+  SE status === 'completed':
+    retornar Card com resultado completo
+  SE status === 'in_progress':
+    retornar Card com progresso (Pergunta X/Y + barra de progresso)
+  SENÃO:
+    retornar Card com status "Pendente"
+}
 ```
 
-### Fluxo de Salvamento Melhorado
+**3. Substituir a Seção Condicional (linhas 373-475):**
 
 ```text
-┌──────────────┐     ┌─────────────┐     ┌─────────────┐
-│  Responder   │────▶│   Salvar    │────▶│ Verificar   │
-│  Pergunta    │     │   no DB     │     │ Sucesso     │
-└──────────────┘     └─────────────┘     └──────┬──────┘
-                                                │
-                           ┌────────────────────┼────────────────────┐
-                           │                    │                    │
-                           ▼                    ▼                    ▼
-                     ┌───────────┐        ┌───────────┐        ┌───────────┐
-                     │ Sucesso   │        │ Retry x3  │        │ Salvar    │
-                     │ Avançar   │        │ c/Backoff │        │ Local     │
-                     └───────────┘        └───────────┘        └───────────┘
+Antes:
+{bothCompleted ? (
+  <RelatórioCompleto />
+) : (
+  <CardAguardando />
+)}
+
+Depois:
+{/* Cards individuais - sempre visíveis */}
+<PartialDISCCard 
+  assessment={discAssessment} 
+  status={discAssessment?.status} 
+/>
+
+<PartialTemperamentCard 
+  assessment={temperamentAssessment} 
+  status={temperamentAssessment?.status} 
+/>
+
+{/* Cards combinados - só quando ambos completos */}
+{bothCompleted && (
+  <>
+    <ExecutiveSummaryCard ... />
+    <StrengthsCard ... />
+    ...
+  </>
+)}
 ```
 
 ---
 
-## Arquivos a Serem Modificados/Criados
+## Estrutura Visual Proposta
 
-| Arquivo | Ação | Descrição |
-|---------|------|-----------|
-| `supabase/migrations/xxx_fix_hiring_rls.sql` | Criar | Corrige políticas RLS |
-| `src/apps/business/pages/BusinessHiringAssessment.tsx` | Editar | Adiciona retry, indicadores visuais |
-| `src/apps/business/components/LiveCandidateMonitor.tsx` | Criar | Componente de monitoramento em tempo real |
-| `src/apps/business/pages/BusinessHiring.tsx` | Editar | Integra monitoramento + realtime subscription |
+```text
+┌─────────────────────────────────────────────────────────────────────┐
+│  Dariane dos Santos Martins                          ⏱️ 1/2 Testes  │
+│  Relatório de Avaliação Comportamental                              │
+├─────────────────────────────────────────────────────────────────────┤
+│  📧 email  📞 telefone  💼 cargo  📅 data                          │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  🎯 Perfil DISC                                    ✅ COMPLETO      │
+├─────────────────────────────────────────────────────────────────────┤
+│  [D] Dominância    [I] Influência   [S] Estabilidade  [C] Conform. │
+│   🟠 Predominante   ⚪ Baixo          ⚪ Moderado       ⚪ Baixo     │
+│                                                                      │
+│  Perfil predominante: D - Dominância                                 │
+│  "Foco em resultados, direto, assertivo..."                          │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  🔥 Temperamentos                                  ⏳ EM ANDAMENTO   │
+├─────────────────────────────────────────────────────────────────────┤
+│  Pergunta 23 de 40                                                  │
+│  [████████████████░░░░░░░░░░░░░░░░░░░░░░░░] 57%                     │
+│                                                                      │
+│  Última atividade: há 2 minutos                                     │
+│  🟢 Candidato ativo agora                                           │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────┐
+│  📊 Resumo Executivo                       │
+│  (Disponível quando ambos os testes       │
+│   estiverem completos)                     │
+└────────────────────────────────────────────┘
+```
+
+---
+
+## Arquivos a Modificar
+
+| Arquivo | Descrição |
+|---------|-----------|
+| `src/apps/business/pages/BusinessHiringResults.tsx` | Adicionar realtime subscription, refatorar layout para mostrar resultados parciais |
 
 ---
 
 ## Benefícios
 
-1. **Confiabilidade**: Respostas não serão mais bloqueadas pelas políticas de RLS
-2. **Visibilidade**: Você verá exatamente quem está fazendo testes e o progresso
-3. **Diagnóstico**: Se algo falhar, você saberá imediatamente
-4. **Experiência**: Candidatos terão feedback visual de que suas respostas estão sendo salvas
-
+1. **Visibilidade Imediata**: Ver o resultado do DISC assim que a Dariane terminar, sem esperar o Temperamentos
+2. **Acompanhamento ao Vivo**: Ver em qual pergunta o candidato está durante o teste
+3. **Sem Refresh Manual**: A página atualiza automaticamente via Realtime
+4. **Progressão Visual**: Entender claramente o status de cada teste individualmente
