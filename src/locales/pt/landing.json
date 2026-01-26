@@ -211,30 +211,30 @@
     "closing": "O valor está na jornada. Não apenas no resultado."
   },
   "pricing": {
-    "label": "Jornada Completa",
-    "title": "NELLO ONE",
-    "subtitle": "7 testes + PDFs Premium + Código da Essência",
-    "bundle_label": "Jornada Completa",
-    "bundle_title": "NELLO ONE",
-    "bundle_description": "7 testes + PDFs Premium + Código da Essência",
+    "label": "Jornada Identity",
+    "title": "JORNADA IDENTITY",
+    "subtitle": "7 camadas + PDFs Premium + Código da Essência",
+    "bundle_label": "Jornada Identity",
+    "bundle_title": "JORNADA IDENTITY",
+    "bundle_description": "7 camadas + PDFs Premium + Código da Essência",
     "benefits": [
       "7 testes completos",
       "PDFs Premium de cada teste",
       "Código da Essência incluso",
       "Acesso vitalício",
-      "Acompanhamento do Miguel"
+      "Acompanhamento do Nello"
     ],
     "from": "De",
     "now": "Por",
     "save": "",
-    "cta": "Começar minha jornada",
+    "cta": "Revelar meu Código da Essência",
     "individual_title": "",
     "questions": "",
     "free": "",
     "currency": "R$",
     "bundle_original": 597,
     "bundle_price": 297,
-    "microcopy": "Sem pressa. Um passo de cada vez."
+    "microcopy": "Acesso vitalício à sua jornada de identidade."
   },
   "faq": {
     "title": "Perguntas Frequentes",
@@ -267,8 +267,8 @@
     "button": "Começar minha jornada"
   },
   "footer": {
-    "brand": "Nello One",
-    "tagline": "Uma jornada de autoconhecimento.",
+    "brand": "Nello Identity",
+    "tagline": "O Identity não te define. Ele te liberta.",
     "links": {
       "privacy": "Política de Privacidade",
       "terms": "Termos de Serviço",

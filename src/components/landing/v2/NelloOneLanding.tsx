@@ -112,16 +112,20 @@ export const NelloOneLanding = () => {
         <div className="relative z-10 container px-5 sm:px-6 lg:px-8 py-16 md:py-24">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-sm sm:text-base text-nello-gold font-medium tracking-wide mb-6">
-              Uma jornada de autoconhecimento em 7 etapas
+              A Jornada Identity em 7 etapas
             </p>
             
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-tight tracking-tight mb-6">
-              Clareza para entender<br />
-              <span className="text-nello-gold">quem você é.</span>
+              O Identity não te define.<br />
+              <span className="text-nello-gold">Ele te liberta.</span>
             </h1>
             
-            <p className="text-xl sm:text-2xl text-foreground/80 font-display leading-relaxed max-w-2xl mx-auto mb-10">
-              Descubra seus padrões, talentos e propósitos.
+            <p className="text-xl sm:text-2xl text-foreground/80 font-display leading-relaxed max-w-2xl mx-auto mb-4">
+              Pare de tentar se encaixar.
+            </p>
+            
+            <p className="text-base text-foreground/60 leading-relaxed max-w-2xl mx-auto mb-10">
+              A Jornada Identity é o processo de remoção de tudo o que não é você.
             </p>
             
             <div className="max-w-md mx-auto space-y-4">
@@ -130,8 +134,8 @@ export const NelloOneLanding = () => {
                 size="lg" 
                 className="text-base px-10 w-full min-h-[56px] bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-medium rounded-full transition-all duration-300 hover:scale-[1.02] shadow-lg group"
               >
-                Começar minha jornada
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                Revelar meu Código da Essência
+                <Sparkles className="ml-2 h-5 w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors" strokeWidth={1.5} />
               </Button>
               <FreePlanBenefits variant="light" />
             </div>
@@ -201,11 +205,12 @@ export const NelloOneLanding = () => {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-semibold text-foreground mb-4">
-              Uma jornada em 7 etapas
+              A Jornada Identity em 7 etapas
             </h2>
             <CrossDivider className="mb-6" />
             <p className="text-base text-foreground/70 max-w-xl mx-auto">
-              Um teste por vez. Sem pressa. Com profundidade.
+              O mundo passou anos tentando te "formatar". O Identity faz o caminho inverso — 
+              decodificando o que sempre esteve aí, mas foi abafado.
             </p>
           </div>
           
@@ -224,7 +229,7 @@ export const NelloOneLanding = () => {
           {/* O que vai descobrir */}
           <div className="text-center mb-8">
             <h3 className="font-display text-xl sm:text-2xl font-semibold text-foreground mb-2">
-              O que você vai descobrir
+              As 7 camadas que o Identity revela
             </h3>
           </div>
           
@@ -306,7 +311,7 @@ export const NelloOneLanding = () => {
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-semibold text-foreground mb-3">
-              Comece sua jornada
+              Inicie a Jornada Identity
             </h2>
             <CrossDivider className="mb-4" />
           </div>
@@ -318,7 +323,7 @@ export const NelloOneLanding = () => {
               
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Sparkles className="w-4 h-4 text-nello-gold" strokeWidth={1.5} />
-                <span className="text-sm font-medium text-nello-gold">Jornada Completa</span>
+                <span className="text-sm font-medium text-nello-gold">Jornada Identity Completa</span>
               </div>
               
               <div className="text-center mb-6">
@@ -341,14 +346,19 @@ export const NelloOneLanding = () => {
                 ))}
               </ul>
               
-              <Button 
-                onClick={handleCTA}
-                size="lg" 
-                className="w-full min-h-[52px] text-base rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-medium group"
-              >
-                Garantir minha vaga
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              <div className="flex flex-col items-center gap-2">
+                <Button 
+                  onClick={handleCTA}
+                  size="lg" 
+                  className="w-full min-h-[52px] text-base rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-medium group"
+                >
+                  Revelar meu Código da Essência
+                  <Sparkles className="ml-2 w-5 h-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors" strokeWidth={1.5} />
+                </Button>
+                <p className="text-xs text-muted-foreground/70">
+                  Acesso vitalício à sua jornada de identidade.
+                </p>
+              </div>
               
               <div className="flex items-center justify-center gap-2 mt-4 text-muted-foreground">
                 <Shield className="w-4 h-4" />
@@ -372,11 +382,12 @@ export const NelloOneLanding = () => {
           <Sparkles className="w-6 h-6 text-nello-gold mx-auto mb-4" strokeWidth={1.5} />
           
           <h2 className="font-display text-2xl sm:text-3xl font-semibold text-white mb-4">
-            Dê o primeiro passo.
+            O Identity não adiciona nada novo.
           </h2>
           
           <p className="text-white/70 text-base mb-6">
-            Um passo de cada vez. Com clareza. Com verdade.
+            Ele apenas decodifica o que sempre esteve aí.<br />
+            A única coisa que realmente importa: <span className="text-nello-gold">seu Código da Essência</span>.
           </p>
           
           <div className="max-w-sm mx-auto space-y-3">
@@ -385,11 +396,11 @@ export const NelloOneLanding = () => {
               size="lg" 
               className="text-base px-8 w-full min-h-[52px] bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-medium rounded-full transition-all duration-300 hover:scale-[1.02] shadow-lg group"
             >
-              Começar agora
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              Revelar meu Código da Essência
+              <Sparkles className="ml-2 h-5 w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors" strokeWidth={1.5} />
             </Button>
             <p className="text-white/50 text-xs">
-              5 perguntas grátis · Resultados parciais · Sem pressa
+              Acesso vitalício · Jornada em 7 camadas · Clareza definitiva
             </p>
           </div>
         </div>
