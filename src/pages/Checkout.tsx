@@ -341,7 +341,11 @@ const Checkout = () => {
 
   // Process payment
   const handleCheckout = async () => {
+   console.log("=== HANDLECHECKOUT STARTED ===");
+   
+   // STEP 1: Check if user is logged in
     if (!user) {
+     console.log("No user found, showing login toast");
       toast({
         title: texts.loginRequired,
         variant: "destructive",
@@ -351,55 +355,68 @@ const Checkout = () => {
     
     setIsProcessing(true);
     
-    try {
-      const finalPriceValue = calculateFinalPrice();
-      
-      // If price is zero (100% discount), process directly without Stripe
-      if (finalPriceValue === 0) {
-        await processZeroValuePurchase();
-        return;
-      }
-      
-      const affiliateCode = getAffiliateCode();
-      
-      const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: {
-          isBundle: true,
-          language,
-          currency: currency.toLowerCase(),
-          couponCode: appliedCoupon?.code,
-          affiliateCode,
-        },
-      });
-      
-      if (error) throw error;
-      
-      // Handle currency mismatch
-      if (data?.code === "CURRENCY_MISMATCH") {
-        toast({
-          title: language === 'en' ? "Currency Error" : "Erro de Moeda",
-          description: data.error,
-          variant: "destructive",
-        });
-        setIsProcessing(false);
-        return;
-      }
-      
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error(language === 'en' 
-          ? "Could not create payment session" 
-          : "Não foi possível criar a sessão de pagamento");
-      }
-    } catch (error: any) {
-      console.error("Checkout error:", error);
-      toast({
-        title: language === 'en' ? "Payment Error" : "Erro ao processar pagamento",
-        description: error.message || (language === 'en' ? "Try again later." : "Tente novamente mais tarde."),
-        variant: "destructive",
-      });
-      setIsProcessing(false);
+   // STEP 2: Calculate final price FIRST
+   const finalPriceValue = calculateFinalPrice();
+   console.log("Final price calculated:", finalPriceValue);
+   console.log("Applied coupon:", appliedCoupon);
+   console.log("Base price:", priceInfo.price);
+   
+   // STEP 3: IMMEDIATELY check if price is zero - NO API CALLS BEFORE THIS
+   if (finalPriceValue === 0 || finalPriceValue < 0.01) {
+     console.log("=== ZERO VALUE DETECTED - PROCESSING LOCALLY ===");
+     try {
+       await processZeroValuePurchase();
+       console.log("Zero value purchase completed successfully");
+     } catch (error) {
+       console.error("Zero value purchase failed:", error);
+       setIsProcessing(false);
+     }
+     return; // EXIT IMMEDIATELY - NO STRIPE CALLS
+   }
+   
+   // STEP 4: Only if price is NOT zero, proceed with Stripe
+   console.log("=== NON-ZERO VALUE - PROCEEDING WITH STRIPE ===");
+   try {
+     const affiliateCode = getAffiliateCode();
+     
+     const { data, error } = await supabase.functions.invoke("create-checkout", {
+       body: {
+         isBundle: true,
+         language,
+         currency: currency.toLowerCase(),
+         couponCode: appliedCoupon?.code,
+         affiliateCode,
+       },
+     });
+     
+     if (error) throw error;
+     
+     // Handle currency mismatch
+     if (data?.code === "CURRENCY_MISMATCH") {
+       toast({
+         title: language === 'en' ? "Currency Error" : "Erro de Moeda",
+         description: data.error,
+         variant: "destructive",
+       });
+       setIsProcessing(false);
+       return;
+     }
+     
+     if (data?.url) {
+       window.location.href = data.url;
+     } else {
+       throw new Error(language === 'en' 
+         ? "Could not create payment session" 
+         : "Não foi possível criar a sessão de pagamento");
+     }
+   } catch (error: any) {
+     console.error("Checkout error:", error);
+     toast({
+       title: language === 'en' ? "Payment Error" : "Erro ao processar pagamento",
+       description: error.message || (language === 'en' ? "Try again later." : "Tente novamente mais tarde."),
+       variant: "destructive",
+     });
+     setIsProcessing(false);
     }
   };
 
