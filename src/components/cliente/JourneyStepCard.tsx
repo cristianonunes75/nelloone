@@ -21,7 +21,7 @@ interface JourneyStepCardProps {
 }
 
 export function JourneyStepCard({ step, onStart, onContinue, onPurchase, onViewResult, onReset, onShare, resultSummary, completedAt }: JourneyStepCardProps) {
-  const { hasAccess } = useTestAccess();
+  const { hasAccess, hasFullJourneyAccess } = useTestAccess();
   const { userRole } = useAuth();
   const isAdmin = userRole === "admin";
   const IconComponent = (Icons as any)[step.icon] || Icons.Circle;
@@ -43,8 +43,8 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase, onViewR
   const needsContinuation = step.needsContinuation || extendedStatus === "full_version_available";
   const isInProgress = step.status === "in_progress" && !isAwaitingPayment && !needsContinuation;
   const isSequentiallyLocked = !step.isUnlocked;
-  const canAccess = hasAccess(step.testId, step.isFree);
-  const needsPurchase = step.isUnlocked && !canAccess && !step.isFree && !isAwaitingPayment;
+  const canAccess = hasFullJourneyAccess || hasAccess(step.testId, step.isFree);
+  const needsPurchase = step.isUnlocked && !canAccess && !step.isFree && !isAwaitingPayment && !hasFullJourneyAccess;
 
   // Determine what action button to show
   const getActionButton = () => {
