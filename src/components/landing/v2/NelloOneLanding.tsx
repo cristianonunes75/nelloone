@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { CrossDivider } from "./CrossDivider";
 import { FreePlanBenefits } from "./FreePlanBenefits";
 import { ApprovedTestimonialsSection } from "./ApprovedTestimonialsSection";
+import { StrategicFAQ } from "./StrategicFAQ";
 import { NavSection } from "./NavSection";
 import { NelloGlobalFooter } from "@/components/global/NelloGlobalFooter";
 import heroDawn from "@/assets/hero-dawn.jpg";
@@ -362,7 +363,10 @@ export const NelloOneLanding = () => {
         </div>
       </section>
 
-      {/* ========== 7️⃣ CTA FINAL ========== */}
+      {/* ========== 7️⃣ FAQ ESTRATÉGICO ========== */}
+      <StrategicFAQ />
+
+      {/* ========== 8️⃣ CTA FINAL ========== */}
       <section className="py-16 md:py-20 px-5 sm:px-6 lg:px-8 bg-nello-graphite">
         <div className="max-w-xl mx-auto text-center">
           <Sparkles className="w-6 h-6 text-nello-gold mx-auto mb-4" strokeWidth={1.5} />
