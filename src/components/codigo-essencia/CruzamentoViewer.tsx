@@ -755,7 +755,10 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
       'alertas_pressao', 'desafio_conexao', 'quando_buscar_ajuda',
       'cta_ativacao', 'abertura', 'fechamento', 'desafio_conexao_familiar',
       'tabela_traducao_familiar', 'tabela_traducao_fraternal',
-      'dados_grafico', 'santo_bate', 'bicho_pega', 'protocolo_paz'
+      'dados_grafico', 'santo_bate', 'bicho_pega', 'protocolo_paz',
+      // Identity v1.0 new fields
+      'metafora_barco', 'zona_harmonia', 'zona_ajuste', 'zona_choque',
+      'acao_pratica_24h'
     ];
     
     if (newFormatKeys.includes(key)) return null;
@@ -816,8 +819,31 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     );
   };
 
-  // ============== BOAT METAPHOR INTRO ==============
+  // ============== BOAT METAPHOR INTRO (Identity v1.0) ==============
   const renderBoatMetaphor = () => {
+    // First check if we have AI-generated metafora_barco
+    const metaforaBarco = content.metafora_barco;
+    if (metaforaBarco) {
+      return (
+        <Card className="bg-gradient-to-br from-blue-500/5 via-cyan-500/5 to-teal-500/5 border-blue-500/20">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <Ship className="w-6 h-6 text-blue-500" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-blue-700 dark:text-blue-400 mb-2">
+                  {metaforaBarco.titulo || (language === 'en' ? 'The Boat Metaphor' : 'A Metáfora do Barco')}
+                </h3>
+                <p className="text-foreground/80 italic">{metaforaBarco.texto}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // Fallback to hardcoded metaphor
     const metaphorText = {
       pt: {
         title: "A Metáfora do Barco",
@@ -847,6 +873,329 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <p className="text-foreground/80 italic">{m.text}</p>
             </div>
           </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== ZONA HARMONIA (Identity v1.0) ==============
+  const renderZonaHarmonia = () => {
+    const zona = content.zona_harmonia;
+    if (!zona) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-emerald-500/5 to-teal-500/5 border-emerald-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🟢</span>
+            <CardTitle className="text-base text-emerald-700 dark:text-emerald-400">
+              {zona.titulo || (language === 'en' ? 'Harmony Zone' : 'Zona de Harmonia')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {zona.descricao && (
+            <p className="text-sm text-muted-foreground">{zona.descricao}</p>
+          )}
+          {zona.valores_compartilhados && (
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <h4 className="font-medium text-emerald-700 dark:text-emerald-400 mb-2 text-sm">
+                {language === 'en' ? 'Shared Values' : 'Valores Compartilhados'}
+              </h4>
+              <ul className="space-y-1">
+                {zona.valores_compartilhados.map((valor: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <Check className="w-4 h-4 mt-0.5 text-emerald-500" />
+                    <span>{valor}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {zona.proposito_comum && (
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <h4 className="font-medium text-emerald-700 dark:text-emerald-400 mb-1 text-sm">
+                {language === 'en' ? 'Common Purpose' : 'Propósito Comum'}
+              </h4>
+              <p className="text-sm">{zona.proposito_comum}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== ZONA AJUSTE (Identity v1.0) ==============
+  const renderZonaAjuste = () => {
+    const zona = content.zona_ajuste;
+    if (!zona) return null;
+
+    return (
+      <Card className="border-amber-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🟡</span>
+            <CardTitle className="text-base text-amber-700 dark:text-amber-400">
+              {zona.titulo || (language === 'en' ? 'Adjustment Zone' : 'Zona de Ajuste')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {zona.descricao && (
+            <p className="text-sm text-muted-foreground">{zona.descricao}</p>
+          )}
+          {zona.diferencas?.map((diff: any, i: number) => (
+            <div key={i} className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20">
+              <h4 className="font-medium text-amber-700 dark:text-amber-400 mb-1 text-sm">
+                ⚡ {diff.aspecto}
+              </h4>
+              <p className="text-sm">{diff.descricao}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== ZONA CHOQUE (Identity v1.0) ==============
+  const renderZonaChoque = () => {
+    const zona = content.zona_choque;
+    if (!zona) return null;
+
+    return (
+      <Card className="border-red-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🔴</span>
+            <CardTitle className="text-base text-red-700 dark:text-red-400">
+              {zona.titulo || (language === 'en' ? 'Shock Zone (Under Pressure)' : 'Zona de Choque (Sob Pressão)')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {zona.descricao && (
+            <p className="text-sm text-muted-foreground italic">{zona.descricao}</p>
+          )}
+          
+          {/* Shadow Cycle */}
+          {zona.ciclo_sombra && (
+            <div className="p-4 rounded-lg bg-red-500/5 border border-red-500/20">
+              <h4 className="font-medium text-red-700 dark:text-red-400 mb-2 text-sm flex items-center gap-2">
+                <Flame className="w-4 h-4" />
+                {language === 'en' ? 'The Shadow Cycle' : 'O Ciclo de Sombra'}
+              </h4>
+              <p className="text-sm">{zona.ciclo_sombra}</p>
+            </div>
+          )}
+
+          {/* Sensor under stress */}
+          {zona.sensor_sob_estresse && (
+            <div className="p-4 rounded-lg bg-purple-500/5 border border-purple-500/20">
+              <h4 className="font-medium text-purple-700 dark:text-purple-400 mb-2 text-sm">
+                🧭 {zona.sensor_sob_estresse.nome} ({language === 'en' ? 'Direction Sensor' : 'Sensor de Direção'})
+              </h4>
+              <p className="text-sm mb-2">{zona.sensor_sob_estresse.comportamento}</p>
+              {zona.sensor_sob_estresse.impacto_no_outro && (
+                <p className="text-xs text-muted-foreground">
+                  <strong>{language === 'en' ? 'Impact:' : 'Impacto:'}</strong> {zona.sensor_sob_estresse.impacto_no_outro}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Conductor under stress */}
+          {zona.condutor_sob_estresse && (
+            <div className="p-4 rounded-lg bg-orange-500/5 border border-orange-500/20">
+              <h4 className="font-medium text-orange-700 dark:text-orange-400 mb-2 text-sm">
+                ⚓ {zona.condutor_sob_estresse.nome} ({language === 'en' ? 'Course Conductor' : 'Condutor de Curso'})
+              </h4>
+              <p className="text-sm mb-2">{zona.condutor_sob_estresse.comportamento}</p>
+              {zona.condutor_sob_estresse.impacto_no_outro && (
+                <p className="text-xs text-muted-foreground">
+                  <strong>{language === 'en' ? 'Impact:' : 'Impacto:'}</strong> {zona.condutor_sob_estresse.impacto_no_outro}
+                </p>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== TABELA TRADUÇÃO (Identity v1.0) ==============
+  const renderTabelaTraducaoV2 = () => {
+    const tabela = content.tabela_traducao;
+    if (!tabela) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-indigo-500/5 to-blue-500/5 border-indigo-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <MessageCircle className="w-5 h-5 text-indigo-500" />
+            <CardTitle className="text-base">
+              {tabela.titulo || (language === 'en' ? 'Couple Translation Table' : 'Tabela de Tradução do Casal')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Sensor translations */}
+          {tabela.sensor && (
+            <div className="space-y-2">
+              <h4 className="font-medium text-purple-700 dark:text-purple-400 text-sm flex items-center gap-2">
+                🧭 {language === 'en' ? 'When the DIRECTION SENSOR...' : 'Quando o SENSOR DE DIREÇÃO...'}
+              </h4>
+              {tabela.sensor.map((item: any, i: number) => (
+                <div key={i} className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/10 text-sm">
+                  <span className="font-medium">{item.comportamento}</span>
+                  <span className="text-muted-foreground"> → </span>
+                  <span className="text-purple-700 dark:text-purple-400">{item.significa}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Conductor translations */}
+          {tabela.condutor && (
+            <div className="space-y-2">
+              <h4 className="font-medium text-orange-700 dark:text-orange-400 text-sm flex items-center gap-2">
+                ⚓ {language === 'en' ? 'When the COURSE CONDUCTOR...' : 'Quando o CONDUTOR DE CURSO...'}
+              </h4>
+              {tabela.condutor.map((item: any, i: number) => (
+                <div key={i} className="p-3 rounded-lg bg-orange-500/5 border border-orange-500/10 text-sm">
+                  <span className="font-medium">{item.comportamento}</span>
+                  <span className="text-muted-foreground"> → </span>
+                  <span className="text-orange-700 dark:text-orange-400">{item.significa}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== PROTOCOLO PAZ (Identity v1.0 Enhanced) ==============
+  const renderProtocoloPazV2 = () => {
+    const protocolo = content.protocolo_paz;
+    if (!protocolo) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-blue-500/5 to-purple-500/5 border-blue-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-blue-500" />
+            <CardTitle className="text-base">{protocolo.titulo || t.sections.protocolo_paz}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Tempo Duplo */}
+          {protocolo.tempo_duplo && (
+            <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20">
+              <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-3 flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                {protocolo.tempo_duplo.titulo || '1. Tempo Duplo'}
+              </h4>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="p-3 rounded bg-purple-500/10 border border-purple-500/20">
+                  <p className="text-sm">{protocolo.tempo_duplo.para_sensor}</p>
+                </div>
+                <div className="p-3 rounded bg-orange-500/10 border border-orange-500/20">
+                  <p className="text-sm">{protocolo.tempo_duplo.para_condutor}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Pergunta de Recalibração */}
+          {protocolo.pergunta_recalibracao && (
+            <div className="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
+              <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-2 flex items-center gap-2">
+                <HelpCircle className="w-4 h-4" />
+                {protocolo.pergunta_recalibracao.titulo || '2. Pergunta de Recalibração'}
+              </h4>
+              <p className="text-sm italic font-medium text-center py-2">
+                "{protocolo.pergunta_recalibracao.pergunta}"
+              </p>
+            </div>
+          )}
+
+          {/* Proibição de Inferência */}
+          {protocolo.proibicao_inferencia && (
+            <div className="p-4 rounded-lg bg-red-500/5 border border-red-500/20">
+              <h4 className="font-semibold text-red-700 dark:text-red-400 mb-2 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" />
+                {protocolo.proibicao_inferencia.titulo || '3. Proibição de Inferência'}
+              </h4>
+              <ul className="space-y-2">
+                {protocolo.proibicao_inferencia.regras?.map((regra: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <span className="text-red-500">✕</span>
+                    <span>{regra}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Legacy rules format */}
+          {protocolo.regras?.map((regra: any, i: number) => (
+            <div key={i} className="p-4 rounded-lg bg-muted/50 border space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-sm">
+                  {regra.numero || i + 1}
+                </span>
+                <h4 className="font-semibold text-foreground">{regra.regra}</h4>
+              </div>
+              {regra.porque && (
+                <p className="text-sm text-muted-foreground pl-9">{t.peaceProtocol.why}: {regra.porque}</p>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== AÇÃO PRÁTICA 24H (Identity v1.0) ==============
+  const renderAcaoPratica = () => {
+    const acao = content.acao_pratica_24h;
+    if (!acao) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/30">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Zap className="w-5 h-5 text-emerald-500" />
+            <CardTitle className="text-base">
+              {acao.titulo || (language === 'en' ? '24-Hour Practical Action' : 'Ação Prática Imediata')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30">
+            <p className="font-medium text-emerald-700 dark:text-emerald-300">{acao.descricao}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== FECHAMENTO V2 (Identity v1.0) ==============
+  const renderFechamentoV2 = () => {
+    const fechamento = content.fechamento;
+    if (!fechamento) return null;
+
+    // Handle both string format and object format
+    const titulo = typeof fechamento === 'object' ? fechamento.titulo : null;
+    const mensagem = typeof fechamento === 'object' ? fechamento.mensagem : fechamento;
+
+    return (
+      <Card className="bg-gradient-to-br from-primary/5 to-pink-500/5 border-primary/20">
+        <CardContent className="pt-6 text-center space-y-3">
+          {titulo && (
+            <h3 className="font-semibold text-lg">{titulo}</h3>
+          )}
+          <p className="text-foreground/80 whitespace-pre-line font-medium leading-relaxed">{mensagem}</p>
         </CardContent>
       </Card>
     );
@@ -959,8 +1308,17 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           </Card>
         )}
 
-        {/* NEW FORMAT SECTIONS */}
+        {/* NEW FORMAT SECTIONS - Identity v1.0 */}
         <div className="space-y-6 mt-6">
+          {/* New Identity v1.0 sections */}
+          {renderZonaHarmonia()}
+          {renderZonaAjuste()}
+          {renderZonaChoque()}
+          {renderTabelaTraducaoV2()}
+          {renderProtocoloPazV2()}
+          {renderAcaoPratica()}
+          
+          {/* Legacy sections for backwards compatibility */}
           {renderTrafficLight()}
           {renderSynergyRadarChart()}
           {renderMeetingOfEssences()}
@@ -981,14 +1339,10 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           {Object.entries(content).map(([key, value]) => renderLegacySection(key, value))}
         </div>
 
-        {/* Closing */}
-        {content.fechamento && (
-          <Card className="bg-gradient-to-br from-primary/5 to-pink-500/5 border-primary/20 mt-6">
-            <CardContent className="pt-6">
-              <p className="text-foreground/80 whitespace-pre-line text-center font-medium">{content.fechamento}</p>
-            </CardContent>
-          </Card>
-        )}
+        {/* Closing - Use new v2 renderer that handles both formats */}
+        <div className="mt-6">
+          {renderFechamentoV2()}
+        </div>
 
         {/* CTA Activation */}
         <div className="mt-6">
