@@ -71,38 +71,43 @@ export const SynergyRadarChart = ({ profileA, profileB, language }: SynergyRadar
     const discA = profileA.disc || { D: 50, I: 50, S: 50, C: 50 };
     const discB = profileB.disc || { D: 50, I: 50, S: 50, C: 50 };
 
+    // Use fixed keys to ensure two distinct datasets regardless of names
     return [
       {
         subject: t.dimensions.dominance,
-        [profileA.name]: discA.D || 50,
-        [profileB.name]: discB.D || 50,
+        personA: discA.D ?? 50,
+        personB: discB.D ?? 50,
         fullMark: 100,
       },
       {
         subject: t.dimensions.influence,
-        [profileA.name]: discA.I || 50,
-        [profileB.name]: discB.I || 50,
+        personA: discA.I ?? 50,
+        personB: discB.I ?? 50,
         fullMark: 100,
       },
       {
         subject: t.dimensions.stability,
-        [profileA.name]: discA.S || 50,
-        [profileB.name]: discB.S || 50,
+        personA: discA.S ?? 50,
+        personB: discB.S ?? 50,
         fullMark: 100,
       },
       {
         subject: t.dimensions.conformity,
-        [profileA.name]: discA.C || 50,
-        [profileB.name]: discB.C || 50,
+        personA: discA.C ?? 50,
+        personB: discB.C ?? 50,
         fullMark: 100,
       },
     ];
-  }, [profileA, profileB, t]);
+  }, [profileA.disc, profileB.disc, t]);
+
+  // Ensure names are distinct for legend display
+  const nameA = profileA.name || "Pessoa A";
+  const nameB = profileB.name || "Pessoa B";
 
   return (
-    <div className="w-full h-[300px]">
+    <div className="w-full h-[350px]">
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+        <RadarChart cx="50%" cy="50%" outerRadius="65%" data={chartData}>
           <PolarGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground)/0.3)" />
           <PolarAngleAxis 
             dataKey="subject" 
@@ -112,28 +117,32 @@ export const SynergyRadarChart = ({ profileA, profileB, language }: SynergyRadar
             angle={30} 
             domain={[0, 100]} 
             tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
+            tickCount={5}
           />
+          {/* Dataset A - Gold/Amber with semi-transparent fill */}
           <Radar
-            name={profileA.name}
-            dataKey={profileA.name}
-            stroke="rgb(212, 175, 55)"
-            fill="rgb(212, 175, 55)"
-            fillOpacity={0.3}
-            strokeWidth={3}
+            name={nameA}
+            dataKey="personA"
+            stroke="hsl(45, 70%, 50%)"
+            fill="hsl(45, 70%, 50%)"
+            fillOpacity={0.35}
+            strokeWidth={2.5}
           />
+          {/* Dataset B - Purple/Indigo with semi-transparent fill */}
           <Radar
-            name={profileB.name}
-            dataKey={profileB.name}
-            stroke="rgb(74, 74, 74)"
-            fill="rgb(74, 74, 74)"
-            fillOpacity={0.3}
-            strokeWidth={3}
+            name={nameB}
+            dataKey="personB"
+            stroke="hsl(260, 60%, 55%)"
+            fill="hsl(260, 60%, 55%)"
+            fillOpacity={0.35}
+            strokeWidth={2.5}
           />
           <Legend 
             wrapperStyle={{ 
-              paddingTop: '10px',
-              fontSize: '12px'
+              paddingTop: '16px',
+              fontSize: '13px'
             }}
+            iconType="circle"
           />
         </RadarChart>
       </ResponsiveContainer>
