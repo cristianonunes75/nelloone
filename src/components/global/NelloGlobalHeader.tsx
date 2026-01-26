@@ -118,9 +118,9 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
   const handleJourneyClick = () => {
     if (!user) {
       // Redirect to login with return URL
-      navigate('/autenticacao?redirect=/cliente/jornada');
+      navigate('/autenticacao?redirect=/cliente');
     } else {
-      navigate('/cliente/jornada');
+      navigate('/cliente');
     }
     setMobileMenuOpen(false);
   };
@@ -260,7 +260,7 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
                     <User className="w-4 h-4 mr-2" />
                     {language === 'en' ? 'My Profile' : 'Meu Perfil'}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/cliente/jornada')}>
+                  <DropdownMenuItem onClick={() => navigate('/cliente')}>
                     <Compass className="w-4 h-4 mr-2" />
                     {language === 'en' ? 'My Journey' : 'Minha Jornada'}
                   </DropdownMenuItem>
