@@ -34,11 +34,11 @@ const DISC_LABELS: Record<string, string> = {
   C: "Conformidade",
 };
 
-const TEMPERAMENT_DATA: Record<string, { name: string; emoji: string }> = {
-  sanguineo: { name: "Sanguíneo", emoji: "🌬️" },
-  colerico: { name: "Colérico", emoji: "🔥" },
-  melancolico: { name: "Melancólico", emoji: "💧" },
-  fleumatico: { name: "Fleumático", emoji: "🌍" },
+const TEMPERAMENT_DATA: Record<string, { name: string }> = {
+  sanguineo: { name: "Sanguineo" },
+  colerico: { name: "Colerico" },
+  melancolico: { name: "Melancolico" },
+  fleumatico: { name: "Fleumatico" },
 };
 
 interface CandidateData {
@@ -152,7 +152,7 @@ class HiringResultsPDFGenerator {
     this.doc.roundedRect(x, y, w, h, 3, 3, "FD");
   }
 
-  private drawSectionTitle(title: string, emoji?: string) {
+  private drawSectionTitle(title: string) {
     this.ensureSpace(15);
     this.currentY += 6;
 
@@ -164,16 +164,14 @@ class HiringResultsPDFGenerator {
     this.doc.setFontSize(12);
     this.doc.setFont("helvetica", "bold");
     this.doc.setTextColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-    const titleText = emoji ? `${emoji} ${title}` : title;
-    this.doc.text(titleText, this.margin + 6, this.currentY + 6);
+    this.doc.text(title, this.margin + 6, this.currentY + 6);
     this.currentY += 14;
   }
 
   private drawBulletList(
     items: string[],
     bgColor: { r: number; g: number; b: number },
-    iconColor: { r: number; g: number; b: number },
-    iconSymbol = "•"
+    iconColor: { r: number; g: number; b: number }
   ) {
     items.forEach((item) => {
       this.ensureSpace(12);
@@ -181,13 +179,9 @@ class HiringResultsPDFGenerator {
       // Background card
       this.drawCard(this.margin, this.currentY, this.contentWidth, 10, bgColor);
 
-      // Icon circle
+      // Icon circle (no text symbol - just colored circle)
       this.doc.setFillColor(iconColor.r, iconColor.g, iconColor.b);
       this.doc.circle(this.margin + 6, this.currentY + 5, 2.5, "F");
-      this.doc.setTextColor(255, 255, 255);
-      this.doc.setFontSize(8);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(iconSymbol, this.margin + 6, this.currentY + 6.5, { align: "center" });
 
       // Text
       this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
@@ -275,7 +269,7 @@ class HiringResultsPDFGenerator {
   }
 
   private renderExecutiveSummary(discResult: any, temperamentResult: any) {
-    this.drawSectionTitle("Resumo Executivo", "📊");
+    this.drawSectionTitle("Resumo Executivo");
 
     const discDisplay = getDiscDisplayData(discResult);
     const tempPrimary = temperamentResult?.primary?.temperament || "";
@@ -315,11 +309,11 @@ class HiringResultsPDFGenerator {
     this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
     this.doc.text("TEMPERAMENTO", tempX + 5, this.currentY + 8);
 
-    const tempData = TEMPERAMENT_DATA[tempPrimary] || { name: tempPrimary, emoji: "🔥" };
+    const tempData = TEMPERAMENT_DATA[tempPrimary] || { name: tempPrimary };
     this.doc.setFontSize(12);
     this.doc.setFont("helvetica", "bold");
     this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-    this.doc.text(`${tempData.emoji} ${tempData.name}`, tempX + 5, this.currentY + 20);
+    this.doc.text(tempData.name, tempX + 5, this.currentY + 20);
 
     const tempSecData = TEMPERAMENT_DATA[tempSecondary] || { name: tempSecondary };
     this.doc.setFontSize(9);
@@ -331,7 +325,7 @@ class HiringResultsPDFGenerator {
   }
 
   private renderDISCProfile(discResult: any) {
-    this.drawSectionTitle("Perfil DISC Detalhado", "🎯");
+    this.drawSectionTitle("Perfil DISC Detalhado");
 
     const percentages = discResult?.percentages || { D: 25, I: 25, S: 25, C: 25 };
     const discDisplay = getDiscDisplayData(discResult);
@@ -403,7 +397,7 @@ class HiringResultsPDFGenerator {
   }
 
   private renderTemperamentProfile(temperamentResult: any) {
-    this.drawSectionTitle("Perfil de Temperamento", "🌡️");
+    this.drawSectionTitle("Perfil de Temperamento");
 
     const ranking = temperamentResult?.ranking || [];
     const primary = temperamentResult?.primary;
@@ -420,7 +414,7 @@ class HiringResultsPDFGenerator {
       const x = this.margin + (index % 2) * (cardWidth + 5);
       const y = this.currentY;
 
-      const tempData = TEMPERAMENT_DATA[item.temperament] || { name: item.temperament, emoji: "🔥" };
+      const tempData = TEMPERAMENT_DATA[item.temperament] || { name: item.temperament };
       const isPrimary = item.temperament === primary?.temperament;
 
       // Card background
@@ -432,11 +426,11 @@ class HiringResultsPDFGenerator {
         this.doc.rect(x, y, 3, cardHeight, "F");
       }
 
-      // Emoji and name
+      // Name
       this.doc.setFontSize(11);
       this.doc.setFont("helvetica", isPrimary ? "bold" : "normal");
       this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.text(`${tempData.emoji} ${tempData.name}`, x + 6, y + 12);
+      this.doc.text(tempData.name, x + 6, y + 12);
 
       // Badge
       if (isPrimary) {
@@ -469,7 +463,7 @@ class HiringResultsPDFGenerator {
   }
 
   private renderStrengths(discPrimary: string, temperamentPrimary: string) {
-    this.drawSectionTitle("Tendências Observáveis", "✓");
+    this.drawSectionTitle("Tendencias Observaveis");
 
     const discInsights = DISC_HIRING_INSIGHTS[discPrimary];
     const tempInsights = TEMPERAMENT_HIRING_INSIGHTS[temperamentPrimary];
@@ -479,11 +473,11 @@ class HiringResultsPDFGenerator {
       ...(tempInsights?.strengths?.slice(0, 2) || []),
     ];
 
-    this.drawBulletList(strengths, COLORS.greenLight, COLORS.green, "✓");
+    this.drawBulletList(strengths, COLORS.greenLight, COLORS.green);
   }
 
   private renderRisks(discPrimary: string, temperamentPrimary: string) {
-    this.drawSectionTitle("Pontos de Atenção", "!");
+    this.drawSectionTitle("Pontos de Atencao");
 
     const discInsights = DISC_HIRING_INSIGHTS[discPrimary];
     const tempInsights = TEMPERAMENT_HIRING_INSIGHTS[temperamentPrimary];
@@ -493,11 +487,11 @@ class HiringResultsPDFGenerator {
       ...(tempInsights?.workplaceRisks?.slice(0, 2) || []),
     ].slice(0, 4);
 
-    this.drawBulletList(risks, COLORS.amberLight, COLORS.amber, "!");
+    this.drawBulletList(risks, COLORS.amberLight, COLORS.amber);
   }
 
   private renderLeadershipGuide(discPrimary: string) {
-    this.drawSectionTitle("Como Liderar este Perfil", "👥");
+    this.drawSectionTitle("Como Liderar este Perfil");
 
     const insights = DISC_HIRING_INSIGHTS[discPrimary];
     if (!insights?.leadershipGuide) return;
@@ -528,7 +522,7 @@ class HiringResultsPDFGenerator {
   }
 
   private renderContextIndication(discPrimary: string, temperamentPrimary: string) {
-    this.drawSectionTitle("Indicação de Contexto", "🧭");
+    this.drawSectionTitle("Indicacao de Contexto");
 
     const discInsights = DISC_HIRING_INSIGHTS[discPrimary];
     const tempInsights = TEMPERAMENT_HIRING_INSIGHTS[temperamentPrimary];
