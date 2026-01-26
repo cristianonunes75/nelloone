@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useToast } from "./use-toast";
 import { useNavigate } from "react-router-dom";
-import { useTestAccess } from "./useTestAccess";
+import { useTestAccess } from "./useTestAccessV2";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export const useTestExecution = (testId: string, userTestId?: string) => {

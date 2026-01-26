@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTests } from "./useTests";
-import { useTestAccess } from "./useTestAccess";
+import { useTestAccess } from "./useTestAccessV2";
 import { useAuth } from "./useAuth";
 import { useImpersonate } from "@/contexts/ImpersonateContext";
 import { supabase } from "@/integrations/supabase/client";
