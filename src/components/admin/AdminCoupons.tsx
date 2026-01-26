@@ -56,12 +56,28 @@ const PRODUCT_TYPE_OPTIONS = [
   { value: "nello_business", label: "🏢 Nello Business (Empresas)", color: "bg-amber-500/10 text-amber-600" },
 ];
 
-// Opções específicas dentro do Nello One
+// Produtos monetizados do ecossistema Nello One
+const MONETIZATION_PRODUCTS = [
+  { value: "all", label: "✅ Válido para Todos", description: "Aplicável a qualquer produto" },
+  { value: "jornada_completa", label: "🎯 Jornada Completa", description: "Pacote completo R$197" },
+  { value: "codigo_essencia", label: "🧬 Código da Essência", description: "Relatório individual" },
+  { value: "activation_individual", label: "🔥 Ativação Individual", description: "R$97" },
+  { value: "nello_couple", label: "💕 Nello Couple", description: "Cruzamento de casal R$147" },
+  { value: "activation_couple", label: "💑 Ativação Casal", description: "R$197" },
+  { value: "identity_couple_premium", label: "👑 Identity Couple Premium", description: "Manual do Casal R$997" },
+  { value: "test_avulso", label: "📝 Testes Avulsos", description: "Qualquer teste individual" },
+  { value: "fundadores", label: "🏆 Fundadores", description: "Acesso vitalício" },
+];
+
+// Opções específicas dentro do Nello One (legacy - mantido para compatibilidade)
 const NELLO_ONE_SUB_OPTIONS = [
   { value: "all", label: "Todos os produtos One" },
   { value: "jornada_completa", label: "Jornada Completa" },
   { value: "codigo_essencia", label: "Código da Essência" },
-  { value: "ativacao_codigo", label: "🔥 Ativação do Código (R$97)" },
+  { value: "activation_individual", label: "🔥 Ativação Individual (R$97)" },
+  { value: "nello_couple", label: "💕 Nello Couple (R$147)" },
+  { value: "activation_couple", label: "💑 Ativação Casal (R$197)" },
+  { value: "identity_couple_premium", label: "👑 Identity Couple Premium (R$997)" },
   { value: "test_avulso", label: "Apenas Testes Avulsos" },
   { value: "disc", label: "DISC" },
   { value: "temperamentos", label: "Temperamentos" },
@@ -90,6 +106,7 @@ export const AdminCoupons = () => {
     redeem_by_months: 1,
     productType: "nello_one", // nello_one ou nello_business
     appliesTo: "all", // sub-opção dentro do nello_one
+    selectedProducts: ["all"] as string[], // Multi-select para produtos específicos
     testesAvulsosOnly: false,
     isFreeAccess: false,
   });
@@ -135,9 +152,14 @@ export const AdminCoupons = () => {
     setCreating(true);
     try {
       // Determinar o allowed_product_type baseado na seleção
+      // Se "all" está selecionado ou múltiplos produtos, usa a string de produtos
+      const selectedProductsStr = newCoupon.selectedProducts.includes("all") 
+        ? "all" 
+        : newCoupon.selectedProducts.join(",");
+      
       const allowedProductType = newCoupon.productType === "nello_business" 
         ? "nello_business" 
-        : newCoupon.appliesTo; // Para Nello One, usa a sub-opção
+        : selectedProductsStr; // Para Nello One, usa os produtos selecionados
 
       const payload: any = {
         name: newCoupon.name.toUpperCase(),
@@ -193,6 +215,7 @@ export const AdminCoupons = () => {
         redeem_by_months: 1,
         productType: "nello_one",
         appliesTo: "all",
+        selectedProducts: ["all"],
         testesAvulsosOnly: false,
         isFreeAccess: false,
       });
@@ -523,37 +546,77 @@ export const AdminCoupons = () => {
               </Select>
             </div>
 
-            {/* Sub-opções apenas para Nello One */}
+            {/* Multi-select de produtos para Nello One */}
             {newCoupon.productType === "nello_one" && (
-              <>
-                <div className="space-y-2">
-                  <Label>Aplicar a (Nello One)</Label>
-                  <Select 
-                    value={newCoupon.appliesTo}
-                    onValueChange={(v) => setNewCoupon({ ...newCoupon, appliesTo: v })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {NELLO_ONE_SUB_OPTIONS.map(opt => (
-                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              <div className="space-y-3">
+                <Label className="font-semibold">Produtos Válidos</Label>
+                <p className="text-xs text-muted-foreground">Selecione os produtos onde este cupom será aceito</p>
+                
+                <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto p-2 border rounded-lg bg-muted/30">
+                  {MONETIZATION_PRODUCTS.map((product) => {
+                    const isSelected = newCoupon.selectedProducts.includes(product.value);
+                    const isAllSelected = newCoupon.selectedProducts.includes("all");
+                    
+                    const handleToggle = () => {
+                      if (product.value === "all") {
+                        // Se clicar em "all", seleciona apenas "all"
+                        setNewCoupon({ ...newCoupon, selectedProducts: ["all"], appliesTo: "all" });
+                      } else {
+                        // Remove "all" se estiver selecionado e adiciona/remove o produto específico
+                        let newSelected = newCoupon.selectedProducts.filter(p => p !== "all");
+                        if (isSelected) {
+                          newSelected = newSelected.filter(p => p !== product.value);
+                        } else {
+                          newSelected = [...newSelected, product.value];
+                        }
+                        // Se não sobrar nenhum, volta para "all"
+                        if (newSelected.length === 0) {
+                          newSelected = ["all"];
+                        }
+                        setNewCoupon({ 
+                          ...newCoupon, 
+                          selectedProducts: newSelected,
+                          appliesTo: newSelected.length === 1 ? newSelected[0] : "multiple"
+                        });
+                      }
+                    };
+                    
+                    return (
+                      <div 
+                        key={product.value}
+                        onClick={handleToggle}
+                        className={`flex items-center gap-3 p-2.5 rounded-md cursor-pointer transition-colors ${
+                          isSelected || (isAllSelected && product.value === "all")
+                            ? "bg-primary/10 border border-primary/30" 
+                            : "hover:bg-muted border border-transparent"
+                        }`}
+                      >
+                        <Checkbox 
+                          checked={isSelected || (isAllSelected && product.value === "all")}
+                          className="pointer-events-none"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{product.label}</p>
+                          <p className="text-xs text-muted-foreground">{product.description}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-
-                <div className="flex items-center gap-3">
-                  <Checkbox 
-                    id="testesOnly"
-                    checked={newCoupon.testesAvulsosOnly}
-                    onCheckedChange={(checked) => setNewCoupon({ ...newCoupon, testesAvulsosOnly: !!checked })}
-                  />
-                  <Label htmlFor="testesOnly" className="text-sm">
-                    Apenas para testes avulsos
-                  </Label>
-                </div>
-              </>
+                
+                {newCoupon.selectedProducts.length > 0 && !newCoupon.selectedProducts.includes("all") && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {newCoupon.selectedProducts.map(p => {
+                      const product = MONETIZATION_PRODUCTS.find(m => m.value === p);
+                      return product ? (
+                        <Badge key={p} variant="secondary" className="text-xs">
+                          {product.label}
+                        </Badge>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+              </div>
             )}
 
             <div className="grid grid-cols-2 gap-4">

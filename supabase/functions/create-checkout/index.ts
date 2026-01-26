@@ -689,12 +689,41 @@ serve(async (req) => {
       }
       
       if (dbCoupon) {
-        // For fundadores coupon, always valid for fundadores product type
-        const productType = isFundadores ? "fundadores" : isBundle ? "jornada" : "test_avulso";
-        const isValidForProduct = !dbCoupon.allowed_product_type || 
-          dbCoupon.allowed_product_type === productType ||
-          dbCoupon.allowed_product_type === "all_products" ||
-          (isFundadores && dbCoupon.allowed_product_type === "fundadores");
+        // Determine the product type being purchased
+        const productType = body.productType || (
+          isCodigoCasal ? "nello_couple" : 
+          isAtivacaoCodigo ? "activation_individual" : 
+          isFundadores ? "fundadores" : 
+          isBundle ? "jornada_completa" : 
+          "test_avulso"
+        );
+        
+        // Check if coupon is valid for this product
+        // allowed_product_type can be:
+        // - null/undefined: valid for all products
+        // - "all" or "all_products": valid for all products
+        // - single product: "nello_couple", "activation_individual", etc.
+        // - comma-separated list: "nello_couple,activation_individual,identity_couple_premium"
+        const allowedProducts = dbCoupon.allowed_product_type;
+        let isValidForProduct = false;
+        
+        if (!allowedProducts || allowedProducts === "all" || allowedProducts === "all_products") {
+          isValidForProduct = true;
+        } else if (allowedProducts.includes(",")) {
+          // Multi-product coupon - check if current product is in the list
+          const allowedList = allowedProducts.split(",").map((p: string) => p.trim());
+          isValidForProduct = allowedList.includes(productType);
+        } else {
+          // Single product coupon
+          isValidForProduct = allowedProducts === productType;
+        }
+        
+        logStep("Coupon product validation", { 
+          couponCode, 
+          allowedProducts, 
+          productType, 
+          isValidForProduct 
+        });
         
         // Validate expiration and usage
         const isNotExpired = !dbCoupon.expires_at || new Date(dbCoupon.expires_at) > new Date();
@@ -745,7 +774,41 @@ serve(async (req) => {
             
           logStep("Coupon usage incremented", { couponId: dbCoupon.id });
         } else {
-          logStep("Coupon validation failed", { isValidForProduct, isNotExpired, hasUsesLeft, productType });
+          // Return specific error for invalid coupon
+          if (!isValidForProduct) {
+            logStep("Coupon not valid for product", { couponCode, allowedProducts, productType });
+            return new Response(JSON.stringify({ 
+              error: "Este cupom não é válido para este produto.",
+              error_en: "This coupon is not valid for this product.",
+              code: "COUPON_INVALID_PRODUCT",
+              details: { couponCode, productType, allowedProducts }
+            }), {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              status: 400,
+            });
+          }
+          if (!isNotExpired) {
+            logStep("Coupon expired", { couponCode, expires_at: dbCoupon.expires_at });
+            return new Response(JSON.stringify({ 
+              error: "Este cupom expirou.",
+              error_en: "This coupon has expired.",
+              code: "COUPON_EXPIRED"
+            }), {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              status: 400,
+            });
+          }
+          if (!hasUsesLeft) {
+            logStep("Coupon max uses reached", { couponCode, max_uses: dbCoupon.max_uses, times_used: dbCoupon.times_used });
+            return new Response(JSON.stringify({ 
+              error: "Este cupom atingiu o limite máximo de usos.",
+              error_en: "This coupon has reached its maximum number of uses.",
+              code: "COUPON_MAX_USES"
+            }), {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              status: 400,
+            });
+          }
         }
       }
     } else if (discountPercentage > 0) {
