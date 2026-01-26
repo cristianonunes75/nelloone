@@ -47,8 +47,8 @@ export const HeroSection = () => {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            <span className="block">{t.landing.hero.subtitle.split('.')[0]}.</span>
-            <span className="block text-nello-gold">{t.landing.hero.subtitle.split('.')[1]?.trim()}.</span>
+            <span className="block">O Identity não te define.</span>
+            <span className="block text-nello-gold">Ele te liberta.</span>
           </h1>
 
           {/* Subheadline */}
@@ -58,7 +58,7 @@ export const HeroSection = () => {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            {t.landing.hero.description}
+            Pare de tentar se encaixar. A Jornada Identity é o processo de remoção de tudo o que não é você.
           </p>
           
           {/* Tagline */}
@@ -68,7 +68,7 @@ export const HeroSection = () => {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             )}
           >
-            {t.landing.hero.tagline}
+            Uma jornada em 7 camadas para revelar seu Código da Essência.
           </p>
 
           {/* CTA Button - Golden warm */}

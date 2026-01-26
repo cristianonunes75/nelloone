@@ -24,13 +24,13 @@ export const SimplifiedPricingSection = () => {
           {/* Section header */}
           <div className="text-center mb-10">
             <span className="inline-block text-ink-blue font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4">
-              Oferta Única
+              Acesso Completo
             </span>
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-foreground mb-4">
-              Jornada Completa NELLO ONE
+              Jornada Identity Completa
             </h2>
             <p className="text-base md:text-lg text-muted-foreground">
-              Tudo que você precisa para se conhecer de verdade
+              Tudo que você precisa para se libertar do que não é você
             </p>
           </div>
 

@@ -309,15 +309,15 @@
     }
   },
   "pricing": {
-    "label": "Investimento",
-    "title": "Escolhe o teu caminho",
-    "subtitle": "Começa grátis com o Teste de Arquétipos ou desbloqueia a tua jornada completa.",
-    "bundle_label": "Jornada Completa",
-    "bundle_title": "NELLO ONE Completo",
-    "bundle_description": "Todos os 7 testes + o teu Mapa NELLO ONE personalizado gerado por IA. A experiência completa de autoconhecimento.",
+    "label": "Acesso Completo",
+    "title": "Jornada Identity",
+    "subtitle": "7 camadas + PDFs Premium + Código da Essência",
+    "bundle_label": "Jornada Identity",
+    "bundle_title": "JORNADA IDENTITY",
+    "bundle_description": "Todas as 7 camadas + o teu Código da Essência personalizado gerado por IA. A experiência completa de autoconhecimento.",
     "benefits": [
-      "Acesso a todos os 7 testes completos",
-      "Mapa NELLO ONE personalizado",
+      "Acesso a todas as 7 avaliações completas",
+      "Código da Essência personalizado",
       "Análise integrada por IA",
       "Exportação profissional em PDF",
       "Acesso vitalício aos teus resultados"
@@ -325,14 +325,14 @@
     "from": "De",
     "now": "Agora",
     "save": "Poupa",
-    "cta": "Iniciar Jornada Completa",
+    "cta": "Revelar o meu Código da Essência",
     "individual_title": "Ou compra testes individualmente",
     "questions": "perguntas",
     "free": "Grátis",
     "currency": "€",
     "bundle_original": 184,
     "bundle_price": 89,
-    "microcopy": "Já estás a pagar o preço da confusão. É aqui que a transformas."
+    "microcopy": "Acesso vitalício à tua jornada de identidade."
   },
   "cta": {
     "title": "Conhecer te é um processo. Começa agora.",
@@ -340,17 +340,17 @@
     "button": "Começar a minha jornada"
   },
   "footer": {
-    "brand": "NELLO ONE",
-    "tagline": "O caminho começa por dentro.",
+    "brand": "Nello Identity",
+    "tagline": "O Identity não te define. Ele liberta-te.",
     "links": {
       "privacy": "Política de Privacidade",
       "terms": "Termos de Serviço",
       "contact": "Contacto"
     },
-    "copyright": "© 2024 NELLO ONE. Todos os direitos reservados.",
+    "copyright": "© 2024 Nello Identity. Todos os direitos reservados.",
     "payment_secure": "Pagamento 100% seguro via",
     "payment_methods": "Cartão de Crédito, MBWay ou PayPal",
-    "instant_access": "Após confirmação do pagamento, recebes acesso instantâneo aos testes."
+    "instant_access": "Após confirmação do pagamento, recebes acesso instantâneo."
   },
   "nav": {
     "about": "Sobre",

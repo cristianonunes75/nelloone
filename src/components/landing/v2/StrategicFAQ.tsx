@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 const faqItems = [
   {
     question: "Por que não posso comprar apenas um dos testes separadamente?",
-    answer: "Porque a verdade sobre quem você é não está em um único teste. O Nello Identity não é uma prateleira de testes, mas um processo de síntese. O Código da Essência só é revelado quando cruzamos as 7 camadas da sua personalidade. Vender um teste isolado seria te entregar apenas uma peça de um quebra-cabeça de 1000 peças.",
+    answer: "Porque a verdade sobre quem você é não está em um único teste. A Jornada Identity não é uma prateleira de testes, mas um processo de síntese. O Código da Essência só é revelado quando cruzamos as 7 camadas da sua personalidade. Vender um teste isolado seria te entregar apenas uma peça de um quebra-cabeça de 1000 peças.",
   },
   {
     question: "O que torna o Código da Essência diferente de um relatório comum?",
@@ -22,8 +22,8 @@ const faqItems = [
     answer: "O Código da Essência é construído em tempo real enquanto você caminha. A cada etapa concluída, o Nello (seu guia) adiciona uma nova camada de profundidade à sua análise. Ao final da 7ª etapa, o sistema consolida tudo, entregando a visão completa e definitiva da sua estrutura humana.",
   },
   {
-    question: "Por que o Nello Identity é pago, se existem testes gratuitos na internet?",
-    answer: "Testes gratuitos entregam rótulos isolados e genéricos. O Nello Identity é uma plataforma de inteligência comportamental. Nós não apenas aplicamos os testes, mas cruzamos os dados entre eles usando uma lógica proprietária. Você não paga por um teste, paga pela integração dos resultados e pela clareza de como cada parte da sua personalidade influencia a outra.",
+    question: "Por que a Jornada Identity é paga, se existem testes gratuitos na internet?",
+    answer: "Testes gratuitos entregam rótulos isolados e genéricos. A Jornada Identity é uma plataforma de inteligência comportamental. Nós não apenas aplicamos os testes, mas cruzamos os dados entre eles usando uma lógica proprietária. Você não paga por um teste, paga pela integração dos resultados e pela clareza de como cada parte da sua personalidade influencia a outra.",
   },
   {
     question: "Por quanto tempo terei acesso aos meus resultados?",
@@ -49,7 +49,7 @@ export const StrategicFAQ = () => {
           </h2>
           <CrossDivider className="mb-4" />
           <p className="text-base text-foreground/70 max-w-xl mx-auto">
-            Entenda por que o Nello Identity é diferente de qualquer outro teste
+            Entenda por que a Jornada Identity é diferente de qualquer outro teste
           </p>
         </div>
 
