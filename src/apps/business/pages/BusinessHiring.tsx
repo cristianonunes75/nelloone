@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Plus, Users, Search, Mail, Eye, Clock, CheckCircle2, AlertCircle, Trash2, Send, Loader2, UserPlus, ClipboardList, RotateCcw, MoreHorizontal, Download, Sparkles } from "lucide-react";
+import { LiveCandidateMonitor } from "../components/LiveCandidateMonitor";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { format, formatDistanceToNow, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -472,6 +473,11 @@ export default function BusinessHiring() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Live Monitoring */}
+        {company?.id && (
+          <LiveCandidateMonitor companyId={company.id} />
+        )}
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4">
