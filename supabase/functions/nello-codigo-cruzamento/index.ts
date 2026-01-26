@@ -17,14 +17,45 @@ const corsHeaders = {
 // ALGORITHMIC ROLE ASSIGNMENT (PROGRAMMATIC, NOT AI-BASED)
 // ============================================================================
 
+// ============================================================================
+// EXPANDED PROFILE INTERFACE - 7 PILLARS
+// ============================================================================
+
 interface PersonProfile {
   name: string;
   disc: { D: number; I: number; S: number; C: number };
-  archetypes: { primary: string; secondary?: string };
-  intelligences: { intrapersonal: number; interpersonal: number; linguistic: number };
+  archetypes: { primary: string; secondary?: string; tertiary?: string };
+  intelligences: { 
+    intrapersonal: number; 
+    interpersonal: number; 
+    linguistic: number;
+    logical: number;
+    spatial: number;
+    musical: number;
+    kinesthetic: number;
+    naturalistic: number;
+    existential: number;
+  };
   underPressure: string[];
   summary: string[];
-  temperament?: string;
+  temperament: { 
+    primary: string; 
+    secondary?: string;
+    scores: { sanguineo: number; colerico: number; melancolico: number; fleumatico: number };
+  };
+  connectionStyle: {
+    primary: string;
+    secondary?: string;
+    scores: Record<string, number>;
+  };
+  nello16: {
+    type: string;
+    dimensions: { E: number; I: number; S: number; N: number; T: number; F: number; J: number; P: number };
+  };
+  enneagram: {
+    type: number;
+    wing?: number;
+  };
 }
 
 function extractPersonProfile(name: string, mapa: any): PersonProfile {
@@ -41,7 +72,6 @@ function extractPersonProfile(name: string, mapa: any): PersonProfile {
       ? discSection.content 
       : JSON.stringify(discSection.content);
     
-    // Try to extract percentages
     const dMatch = content.match(/[Dd](?:ominance|ominância)?[:\s]*(\d+)/);
     const iMatch = content.match(/[Ii](?:nfluence|nfluência)?[:\s]*(\d+)/);
     const sMatch = content.match(/[Ss](?:teadiness|tabilidade)?[:\s]*(\d+)/);
@@ -54,7 +84,7 @@ function extractPersonProfile(name: string, mapa: any): PersonProfile {
   }
   
   // Extract Archetypes
-  let archetypes = { primary: '', secondary: '' };
+  let archetypes = { primary: '', secondary: '', tertiary: '' };
   const archSection = sections.find((s: any) => 
     s.id?.toLowerCase().includes('arqu') || 
     s.title?.toLowerCase().includes('arqu')
@@ -70,18 +100,18 @@ function extractPersonProfile(name: string, mapa: any): PersonProfile {
     
     for (const arch of archetypesList) {
       if (content.includes(arch)) {
-        if (!archetypes.primary) {
-          archetypes.primary = arch;
-        } else if (!archetypes.secondary) {
-          archetypes.secondary = arch;
-          break;
-        }
+        if (!archetypes.primary) archetypes.primary = arch;
+        else if (!archetypes.secondary) archetypes.secondary = arch;
+        else if (!archetypes.tertiary) { archetypes.tertiary = arch; break; }
       }
     }
   }
   
-  // Extract Intelligences
-  let intelligences = { intrapersonal: 50, interpersonal: 50, linguistic: 50 };
+  // Extract ALL Intelligences (7 pillars expansion)
+  let intelligences = { 
+    intrapersonal: 50, interpersonal: 50, linguistic: 50, logical: 50,
+    spatial: 50, musical: 50, kinesthetic: 50, naturalistic: 50, existential: 50
+  };
   const intSection = sections.find((s: any) => 
     s.id?.toLowerCase().includes('intelig') || 
     s.title?.toLowerCase().includes('intelig')
@@ -91,13 +121,128 @@ function extractPersonProfile(name: string, mapa: any): PersonProfile {
       ? intSection.content 
       : JSON.stringify(intSection.content);
     
-    const intraMatch = content.match(/intrapessoal[:\s]*(\d+)/i);
-    const interMatch = content.match(/interpessoal[:\s]*(\d+)/i);
-    const lingMatch = content.match(/lingu[ií]stica[:\s]*(\d+)/i);
+    const matches = {
+      intrapersonal: content.match(/intrapessoal[:\s]*(\d+)/i),
+      interpersonal: content.match(/interpessoal[:\s]*(\d+)/i),
+      linguistic: content.match(/lingu[ií]stica[:\s]*(\d+)/i),
+      logical: content.match(/l[oó]gic[ao][\s\-]*matem[aá]tica[:\s]*(\d+)/i),
+      spatial: content.match(/espacial[:\s]*(\d+)/i),
+      musical: content.match(/musical[:\s]*(\d+)/i),
+      kinesthetic: content.match(/corporal[\s\-]*cinest[eé]sica[:\s]*(\d+)/i),
+      naturalistic: content.match(/naturalista[:\s]*(\d+)/i),
+      existential: content.match(/existencial[:\s]*(\d+)/i),
+    };
     
-    if (intraMatch) intelligences.intrapersonal = parseInt(intraMatch[1]);
-    if (interMatch) intelligences.interpersonal = parseInt(interMatch[1]);
-    if (lingMatch) intelligences.linguistic = parseInt(lingMatch[1]);
+    Object.entries(matches).forEach(([key, match]) => {
+      if (match) intelligences[key as keyof typeof intelligences] = parseInt(match[1]);
+    });
+  }
+  
+  // Extract Temperament with scores
+  let temperament = { 
+    primary: '', secondary: '',
+    scores: { sanguineo: 25, colerico: 25, melancolico: 25, fleumatico: 25 }
+  };
+  const tempSection = sections.find((s: any) => 
+    s.id?.toLowerCase().includes('temperament') || 
+    s.title?.toLowerCase().includes('temperament')
+  );
+  if (tempSection?.content) {
+    const content = typeof tempSection.content === 'string' 
+      ? tempSection.content.toLowerCase() 
+      : JSON.stringify(tempSection.content).toLowerCase();
+    
+    const temps = ['colérico', 'colerico', 'sanguíneo', 'sanguineo', 'melancólico', 'melancolico', 'fleumático', 'fleumatico'];
+    const normalizedTemps: string[] = [];
+    for (const t of temps) {
+      if (content.includes(t)) {
+        const normalized = t.replace(/[éí]/g, 'e').replace(/ó/g, 'o').replace(/á/g, 'a').replace(/ú/g, 'u');
+        if (!normalizedTemps.includes(normalized)) normalizedTemps.push(normalized);
+      }
+    }
+    if (normalizedTemps.length > 0) temperament.primary = normalizedTemps[0];
+    if (normalizedTemps.length > 1) temperament.secondary = normalizedTemps[1];
+    
+    // Try to extract scores
+    const sangMatch = content.match(/sangu[ií]neo[:\s]*(\d+)/i);
+    const colMatch = content.match(/col[eé]rico[:\s]*(\d+)/i);
+    const melMatch = content.match(/melanc[oó]lico[:\s]*(\d+)/i);
+    const fleMatch = content.match(/fleum[aá]tico[:\s]*(\d+)/i);
+    
+    if (sangMatch) temperament.scores.sanguineo = parseInt(sangMatch[1]);
+    if (colMatch) temperament.scores.colerico = parseInt(colMatch[1]);
+    if (melMatch) temperament.scores.melancolico = parseInt(melMatch[1]);
+    if (fleMatch) temperament.scores.fleumatico = parseInt(fleMatch[1]);
+  }
+  
+  // Extract Connection Style (Love Languages)
+  let connectionStyle = { primary: '', secondary: '', scores: {} as Record<string, number> };
+  const connSection = sections.find((s: any) => 
+    s.id?.toLowerCase().includes('conexao') || s.id?.toLowerCase().includes('amor') ||
+    s.title?.toLowerCase().includes('conexão') || s.title?.toLowerCase().includes('amor') ||
+    s.title?.toLowerCase().includes('linguagens')
+  );
+  if (connSection?.content) {
+    const content = typeof connSection.content === 'string' 
+      ? connSection.content.toLowerCase() 
+      : JSON.stringify(connSection.content).toLowerCase();
+    
+    const styles = [
+      { key: 'expressao_verbal', patterns: ['expressão verbal', 'expressao verbal', 'palavras de afirmação', 'palavras de afirmacao'] },
+      { key: 'presenca_ativa', patterns: ['presença ativa', 'presenca ativa', 'tempo de qualidade'] },
+      { key: 'cuidado_pratico', patterns: ['cuidado prático', 'cuidado pratico', 'atos de serviço', 'atos de servico'] },
+      { key: 'gestos_simbolicos', patterns: ['gestos simbólicos', 'gestos simbolicos', 'presentes'] },
+      { key: 'conexao_fisica', patterns: ['conexão física', 'conexao fisica', 'toque físico', 'toque fisico'] },
+    ];
+    
+    for (const style of styles) {
+      for (const pattern of style.patterns) {
+        if (content.includes(pattern)) {
+          if (!connectionStyle.primary) connectionStyle.primary = style.key;
+          else if (!connectionStyle.secondary && connectionStyle.primary !== style.key) {
+            connectionStyle.secondary = style.key;
+            break;
+          }
+        }
+      }
+    }
+  }
+  
+  // Extract Nello 16 (MBTI-style)
+  let nello16 = { 
+    type: '', 
+    dimensions: { E: 50, I: 50, S: 50, N: 50, T: 50, F: 50, J: 50, P: 50 }
+  };
+  const mbtiSection = sections.find((s: any) => 
+    s.id?.toLowerCase().includes('nello16') || s.id?.toLowerCase().includes('mbti') ||
+    s.title?.toLowerCase().includes('16 personalidades') || s.title?.toLowerCase().includes('nello 16')
+  );
+  if (mbtiSection?.content) {
+    const content = typeof mbtiSection.content === 'string' 
+      ? mbtiSection.content.toUpperCase() 
+      : JSON.stringify(mbtiSection.content).toUpperCase();
+    
+    // Match MBTI type pattern
+    const typeMatch = content.match(/\b([EI][NS][TF][JP])\b/);
+    if (typeMatch) nello16.type = typeMatch[1];
+  }
+  
+  // Extract Enneagram
+  let enneagram = { type: 0, wing: undefined as number | undefined };
+  const ennSection = sections.find((s: any) => 
+    s.id?.toLowerCase().includes('eneagrama') || s.id?.toLowerCase().includes('enneagram') ||
+    s.title?.toLowerCase().includes('eneagrama')
+  );
+  if (ennSection?.content) {
+    const content = typeof ennSection.content === 'string' 
+      ? ennSection.content 
+      : JSON.stringify(ennSection.content);
+    
+    const typeMatch = content.match(/tipo\s*(\d)/i) || content.match(/type\s*(\d)/i);
+    const wingMatch = content.match(/asa\s*(\d)/i) || content.match(/wing\s*(\d)/i);
+    
+    if (typeMatch) enneagram.type = parseInt(typeMatch[1]);
+    if (wingMatch) enneagram.wing = parseInt(wingMatch[1]);
   }
   
   // Extract Under Pressure patterns
@@ -109,7 +254,6 @@ function extractPersonProfile(name: string, mapa: any): PersonProfile {
       ? section.content.toLowerCase() 
       : JSON.stringify(section.content || '').toLowerCase();
     
-    // Under pressure keywords
     if (section.title?.toLowerCase().includes('pressão') || 
         section.title?.toLowerCase().includes('estresse') ||
         section.title?.toLowerCase().includes('sombra')) {
@@ -125,7 +269,6 @@ function extractPersonProfile(name: string, mapa: any): PersonProfile {
       }
     }
     
-    // General summary keywords
     if (content.includes('sentido') || content.includes('significado') || 
         content.includes('profundidade') || content.includes('coerência') ||
         content.includes('essência') || content.includes('essencia')) {
@@ -139,27 +282,10 @@ function extractPersonProfile(name: string, mapa: any): PersonProfile {
     }
   }
   
-  // Extract temperament
-  let temperament = '';
-  const tempSection = sections.find((s: any) => 
-    s.id?.toLowerCase().includes('temperament') || 
-    s.title?.toLowerCase().includes('temperament')
-  );
-  if (tempSection?.content) {
-    const content = typeof tempSection.content === 'string' 
-      ? tempSection.content.toLowerCase() 
-      : JSON.stringify(tempSection.content).toLowerCase();
-    
-    const temps = ['colérico', 'colerico', 'sanguíneo', 'sanguineo', 'melancólico', 'melancolico', 'fleumático', 'fleumatico'];
-    for (const t of temps) {
-      if (content.includes(t)) {
-        temperament = t;
-        break;
-      }
-    }
-  }
-  
-  return { name, disc, archetypes, intelligences, underPressure, summary, temperament };
+  return { 
+    name, disc, archetypes, intelligences, underPressure, summary, 
+    temperament, connectionStyle, nello16, enneagram 
+  };
 }
 
 function computeSensorScore(p: PersonProfile): number {
@@ -382,8 +508,17 @@ Não romantize conflito.
 O leitor precisa sentir alívio e direção prática.
 
 ═══════════════════════════════════════════════════════════════════════════════
-ESTRUTURA OBRIGATÓRIA DO RELATÓRIO (JSON)
+ESTRUTURA OBRIGATÓRIA DO RELATÓRIO PREMIUM 7 PILARES (JSON)
 ═══════════════════════════════════════════════════════════════════════════════
+
+O relatório deve ter 15-20 páginas, integrando TODOS os 7 pilares da jornada Identity:
+1. DISC (comportamento)
+2. Eneagrama (motivação)
+3. Temperamentos (ritmo biológico)
+4. Inteligências Múltiplas (talentos)
+5. Arquétipos (papéis)
+6. Estilos de Conexão (linguagens de amor)
+7. Nello 16 (processamento de decisão)
 
 {
   "papeis_identificados": {
@@ -398,20 +533,20 @@ ESTRUTURA OBRIGATÓRIA DO RELATÓRIO (JSON)
   },
   "metafora_central": {
     "titulo": "A Metáfora do Barco",
-    "descricao": "O relacionamento é um barco em mar aberto. Em alguns momentos, um de vocês lê o vento, o mar e o horizonte, revelando o sentido. Em outros momentos, o outro mantém o leme firme e faz o barco avançar. Quando cada um honra seu papel, o casal não se perde — ajusta as velas. [NOME_SENSOR] lê o campo. [NOME_CONDUTOR] sustenta o curso."
+    "descricao": "O relacionamento é um barco em mar aberto. [NOME_SENSOR] lê o campo. [NOME_CONDUTOR] sustenta o curso."
   },
   "zona_harmonia": {
-    "titulo": "🟢 Zona de Harmonia",
+    "titulo": "Zona de Harmonia",
     "descricao": "Onde a conexão flui com naturalidade",
     "valores_compartilhados": ["Valor 1", "Valor 2", "Valor 3", "Valor 4", "Valor 5"],
-    "proposito_comum": "O propósito que os une como casal (parágrafo curto)"
+    "proposito_comum": "O propósito que os une como casal"
   },
   "zona_ajuste": {
-    "titulo": "🟡 Zona de Ajuste",
+    "titulo": "Zona de Ajuste",
     "descricao": "Diferenças que exigem consciência e diálogo",
     "diferencas": [
       {
-        "titulo": "Título Curto da Diferença",
+        "titulo": "Título da Diferença",
         "pessoa_a_faz": "O que [NOME_SENSOR] tende a fazer",
         "pessoa_b_faz": "O que [NOME_CONDUTOR] tende a fazer",
         "traducao_positiva_a": "Tradução positiva para [NOME_SENSOR]",
@@ -421,91 +556,175 @@ ESTRUTURA OBRIGATÓRIA DO RELATÓRIO (JSON)
     ]
   },
   "zona_choque": {
-    "titulo": "🔴 Zona de Choque (Sob Pressão)",
-    "descricao": "Como cada um reage sob estresse e como ativam a sombra um do outro. Sem culpa. Sem julgamento.",
+    "titulo": "Zona de Choque (Sob Pressão)",
+    "descricao": "Como cada um reage sob estresse",
     "ciclo_sombra": {
-      "gatilho": "O que inicia o ciclo de tensão",
-      "reacao_sensor": "Como [NOME_SENSOR] reage inicialmente",
-      "interpretacao_condutor": "Como [NOME_CONDUTOR] interpreta essa reação",
+      "gatilho": "O que inicia o ciclo",
+      "reacao_sensor": "Como [NOME_SENSOR] reage",
+      "interpretacao_condutor": "Como [NOME_CONDUTOR] interpreta",
       "reacao_condutor": "Como [NOME_CONDUTOR] responde",
-      "interpretacao_sensor": "Como [NOME_SENSOR] interpreta a resposta",
-      "retroalimentacao": "Como o ciclo se perpetua se não for interrompido"
+      "interpretacao_sensor": "Como [NOME_SENSOR] interpreta",
+      "retroalimentacao": "Como o ciclo se perpetua"
     },
     "bloco_sensor": {
       "nome": "[NOME_SENSOR]",
-      "como_reage_sob_estresse": "Descrição do comportamento sob estresse",
-      "como_impacta_outro": "Como isso afeta [NOME_CONDUTOR]",
-      "o_que_precisa_do_outro": "O que precisa do parceiro para voltar ao eixo"
+      "como_reage_sob_estresse": "Descrição do comportamento",
+      "como_impacta_outro": "Como afeta o parceiro",
+      "o_que_precisa_do_outro": "O que precisa para voltar ao eixo"
     },
     "bloco_condutor": {
       "nome": "[NOME_CONDUTOR]",
-      "como_reage_sob_estresse": "Descrição do comportamento sob estresse",
-      "como_impacta_outro": "Como isso afeta [NOME_SENSOR]",
-      "o_que_precisa_do_outro": "O que precisa do parceiro para voltar ao eixo"
+      "como_reage_sob_estresse": "Descrição do comportamento",
+      "como_impacta_outro": "Como afeta o parceiro",
+      "o_que_precisa_do_outro": "O que precisa para voltar ao eixo"
     }
   },
+  "ritmos_biologicos": {
+    "titulo": "Ritmos Biológicos do Casal (Temperamentos)",
+    "temperamento_a": {
+      "nome": "[NOME_A]",
+      "temperamento_primario": "[TEMPERAMENTO]",
+      "caracteristicas": "Como se manifesta no dia a dia"
+    },
+    "temperamento_b": {
+      "nome": "[NOME_B]",
+      "temperamento_primario": "[TEMPERAMENTO]",
+      "caracteristicas": "Como se manifesta no dia a dia"
+    },
+    "sinergia": "Como os ritmos interagem - harmonia e tensão",
+    "ajuste_pratico": "Ajuste prático para sincronizar os ritmos"
+  },
+  "sinergia_talentos": {
+    "titulo": "Sinergia de Talentos (Inteligências Múltiplas)",
+    "talentos_a": {
+      "nome": "[NOME_A]",
+      "top_3": ["Inteligência 1", "Inteligência 2", "Inteligência 3"],
+      "contribuicao": "Como esses talentos contribuem para o casal"
+    },
+    "talentos_b": {
+      "nome": "[NOME_B]",
+      "top_3": ["Inteligência 1", "Inteligência 2", "Inteligência 3"],
+      "contribuicao": "Como esses talentos contribuem para o casal"
+    },
+    "complementaridade": "Como os talentos se complementam",
+    "projeto_conjunto": "Sugestão de projeto que usa os talentos de ambos"
+  },
+  "dinamica_arquetipos": {
+    "titulo": "Dinâmica de Papéis Arquetípicos",
+    "arquetipo_a": {
+      "nome": "[NOME_A]",
+      "arquetipos": "[PRIMÁRIO] + [SECUNDÁRIO]",
+      "papel_no_casal": "Que papel tende a assumir"
+    },
+    "arquetipo_b": {
+      "nome": "[NOME_B]",
+      "arquetipos": "[PRIMÁRIO] + [SECUNDÁRIO]",
+      "papel_no_casal": "Que papel tende a assumir"
+    },
+    "interacao": "Como os arquétipos dançam juntos",
+    "potencial": "O que podem criar juntos",
+    "armadilha": "O que evitar nessa dinâmica"
+  },
+  "linguagens_conexao": {
+    "titulo": "Linguagens de Conexão Afetiva",
+    "linguagem_a": {
+      "nome": "[NOME_A]",
+      "estilo_primario": "[ESTILO]",
+      "como_se_sente_amado": "O que faz se sentir amado(a)"
+    },
+    "linguagem_b": {
+      "nome": "[NOME_B]",
+      "estilo_primario": "[ESTILO]",
+      "como_se_sente_amado": "O que faz se sentir amado(a)"
+    },
+    "desalinhamento_comum": "Onde costumam errar um com o outro",
+    "micro_acordos": [
+      "Micro acordo 1 para praticar a linguagem do outro",
+      "Micro acordo 2 para praticar a linguagem do outro"
+    ]
+  },
+  "processamento_decisao": {
+    "titulo": "Processamento de Decisão (Nello 16)",
+    "tipo_a": {
+      "nome": "[NOME_A]",
+      "tipo_nello16": "[TIPO]",
+      "como_decide": "Como processa e decide"
+    },
+    "tipo_b": {
+      "nome": "[NOME_B]",
+      "tipo_nello16": "[TIPO]",
+      "como_decide": "Como processa e decide"
+    },
+    "tensao_potencial": "Onde podem colidir no processo de decisão",
+    "sinergia": "Como podem decidir melhor juntos"
+  },
   "tabela_traducao": {
-    "titulo": "📖 Tabela de Tradução do Casal",
+    "titulo": "Tabela de Tradução do Casal",
     "descricao": "Sempre traduzir comportamento em intenção positiva.",
     "traducoes_sensor": {
       "titulo": "Quando [NOME_SENSOR] (Sensor de Direção)...",
       "traducoes": [
-        { "comportamento": "se cala", "significado": "geralmente significa que está processando" },
-        { "comportamento": "questiona repetidamente", "significado": "geralmente significa que está refinando a compreensão" },
-        { "comportamento": "demora para decidir", "significado": "geralmente significa que está protegendo a qualidade da escolha" },
-        { "comportamento": "se afasta", "significado": "geralmente significa que precisa de espaço interno" }
+        { "comportamento": "se cala", "significado": "está processando" },
+        { "comportamento": "questiona repetidamente", "significado": "está refinando a compreensão" },
+        { "comportamento": "demora para decidir", "significado": "está protegendo a qualidade" },
+        { "comportamento": "se afasta", "significado": "precisa de espaço interno" }
       ]
     },
     "traducoes_condutor": {
       "titulo": "Quando [NOME_CONDUTOR] (Condutor de Curso)...",
       "traducoes": [
-        { "comportamento": "pressiona por resposta", "significado": "geralmente significa que está buscando segurança" },
-        { "comportamento": "assume o controle", "significado": "geralmente significa que está evitando o caos" },
-        { "comportamento": "acelera as decisões", "significado": "geralmente significa que está protegendo o avanço" },
-        { "comportamento": "cobra clareza", "significado": "geralmente significa que precisa de direção para agir" }
+        { "comportamento": "pressiona por resposta", "significado": "está buscando segurança" },
+        { "comportamento": "assume o controle", "significado": "está evitando o caos" },
+        { "comportamento": "acelera as decisões", "significado": "está protegendo o avanço" },
+        { "comportamento": "cobra clareza", "significado": "precisa de direção para agir" }
       ]
     }
   },
   "protocolo_paz": {
-    "titulo": "🕊️ Protocolo de Paz Unificado",
+    "titulo": "Protocolo de Paz Unificado",
     "tempo_duplo": {
       "titulo": "1. Tempo Duplo",
-      "tempo_sensor": "O tempo de [NOME_SENSOR]: para processar e nomear o que sente",
-      "tempo_condutor": "O tempo de [NOME_CONDUTOR]: para ver progresso e próximos passos"
+      "tempo_sensor": "O tempo de [NOME_SENSOR]",
+      "tempo_condutor": "O tempo de [NOME_CONDUTOR]"
     },
     "pergunta_recalibracao": {
       "titulo": "2. Pergunta de Recalibração",
-      "pergunta": "Qual é o resultado que queremos e qual papel cada um cumpre agora para chegarmos lá, respeitando nossos tempos e naturezas?"
+      "pergunta": "Qual é o resultado que queremos e qual papel cada um cumpre?"
     },
     "proibicao_inferencia": {
       "titulo": "3. Proibição de Inferência",
-      "regras": [
-        "silêncio não é desamor",
-        "pressa não é desrespeito"
-      ]
+      "regras": ["silêncio não é desamor", "pressa não é desrespeito"]
     }
   },
   "acao_pratica_24h": {
-    "titulo": "⚡ Ação Prática Imediata (24 horas)",
-    "descricao": "Uma ação simples e aplicável em 24 horas que não exija conversa longa, gere pequena vitória relacional e respeite os dois ritmos.",
-    "passo_1": "Primeiro passo específico",
-    "passo_2": "Segundo passo específico",
-    "passo_3": "Terceiro passo específico"
+    "titulo": "Ação Prática Imediata (24 horas)",
+    "descricao": "Uma ação aplicável hoje",
+    "passo_1": "Primeiro passo",
+    "passo_2": "Segundo passo",
+    "passo_3": "Terceiro passo"
   },
   "fechamento": {
-    "titulo": "💫 Mensagem Final",
-    "mensagem": "Vocês não precisam funcionar do mesmo jeito para caminhar juntos. Um revela o sentido. O outro sustenta o caminho. Quando vocês honram esses papéis, a jornada fica mais leve e mais forte."
+    "titulo": "Mensagem Final",
+    "mensagem": "Vocês não precisam funcionar do mesmo jeito para caminhar juntos."
   },
   "dados_grafico": {
     "usuario_a": {
       "nome": "[NOME_A]",
       "papel": "sensor | condutor",
-      "disc": { "D": 0, "I": 0, "S": 0, "C": 0 }
+      "disc": { "D": 0, "I": 0, "S": 0, "C": 0 },
+      "temperamento": "[TEMPERAMENTO]",
+      "arquetipo": "[ARQUÉTIPO]",
+      "nello16": "[TIPO]",
+      "estilo_conexao": "[ESTILO]"
     },
     "usuario_b": {
       "nome": "[NOME_B]",
       "papel": "sensor | condutor",
-      "disc": { "D": 0, "I": 0, "S": 0, "C": 0 }
+      "disc": { "D": 0, "I": 0, "S": 0, "C": 0 },
+      "temperamento": "[TEMPERAMENTO]",
+      "arquetipo": "[ARQUÉTIPO]",
+      "nello16": "[TIPO]",
+      "estilo_conexao": "[ESTILO]"
     }
   }
 }
@@ -768,8 +987,17 @@ function getUserPrompt(
   const summaryA = summarize(mapaA);
   const summaryB = summarize(mapaB);
   
+  // Helper to get top 3 intelligences
+  const getTopIntelligences = (int: PersonProfile['intelligences']): string[] => {
+    const entries = Object.entries(int);
+    return entries.sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k]) => k);
+  };
+  
+  const topIntA = getTopIntelligences(personA.intelligences);
+  const topIntB = getTopIntelligences(personB.intelligences);
+  
   if (lang === 'pt') {
-    return `Analise os Códigos da Essência destas duas pessoas (${relationLabel}) e gere o Código do Casal completo seguindo a estrutura Identity v2.0.
+    return `Analise os Códigos da Essência destas duas pessoas (${relationLabel}) e gere o RELATÓRIO PREMIUM 7 PILARES completo.
 
 ═══════════════════════════════════════════════════════════════════════════════
 ATRIBUIÇÃO DE PAPÉIS (DEFINIDA PELO ALGORITMO - NÃO ALTERE)
@@ -786,40 +1014,101 @@ Score: ${roleAssignment.conductorScore}
 VOCÊ DEVE USAR ESSES PAPÉIS EXATAMENTE COMO DEFINIDOS. NÃO INVERTA.
 
 ═══════════════════════════════════════════════════════════════════════════════
-DADOS DOS PERFIS
+DADOS COMPLETOS DOS 7 PILARES
 ═══════════════════════════════════════════════════════════════════════════════
 
-## ${personA.name}
-DISC: D=${personA.disc.D}%, I=${personA.disc.I}%, S=${personA.disc.S}%, C=${personA.disc.C}%
-Arquétipos: ${personA.archetypes.primary}${personA.archetypes.secondary ? `, ${personA.archetypes.secondary}` : ''}
-Inteligência Intrapessoal: ${personA.intelligences.intrapersonal}%
-Sob Pressão: ${personA.underPressure.join(', ') || 'não especificado'}
+## ${personA.name} - PERFIL COMPLETO
 
-${summaryA}
+### 1. DISC (Comportamento)
+D=${personA.disc.D}%, I=${personA.disc.I}%, S=${personA.disc.S}%, C=${personA.disc.C}%
 
-## ${personB.name}
-DISC: D=${personB.disc.D}%, I=${personB.disc.I}%, S=${personB.disc.S}%, C=${personB.disc.C}%
-Arquétipos: ${personB.archetypes.primary}${personB.archetypes.secondary ? `, ${personB.archetypes.secondary}` : ''}
-Inteligência Intrapessoal: ${personB.intelligences.intrapersonal}%
-Sob Pressão: ${personB.underPressure.join(', ') || 'não especificado'}
+### 2. Eneagrama (Motivação)
+Tipo: ${personA.enneagram.type || 'não identificado'}${personA.enneagram.wing ? ` asa ${personA.enneagram.wing}` : ''}
 
-${summaryB}
+### 3. Temperamento (Ritmo Biológico)
+Primário: ${personA.temperament.primary || 'não identificado'}
+${personA.temperament.secondary ? `Secundário: ${personA.temperament.secondary}` : ''}
+Scores: Sanguíneo=${personA.temperament.scores.sanguineo}%, Colérico=${personA.temperament.scores.colerico}%, Melancólico=${personA.temperament.scores.melancolico}%, Fleumático=${personA.temperament.scores.fleumatico}%
+
+### 4. Inteligências Múltiplas (Talentos)
+Top 3: ${topIntA.join(', ')}
+Intrapessoal: ${personA.intelligences.intrapersonal}%, Interpessoal: ${personA.intelligences.interpersonal}%, Linguística: ${personA.intelligences.linguistic}%
+Lógica: ${personA.intelligences.logical}%, Espacial: ${personA.intelligences.spatial}%, Musical: ${personA.intelligences.musical}%
+Cinestésica: ${personA.intelligences.kinesthetic}%, Naturalista: ${personA.intelligences.naturalistic}%, Existencial: ${personA.intelligences.existential}%
+
+### 5. Arquétipos (Papéis)
+Primário: ${personA.archetypes.primary || 'não identificado'}
+${personA.archetypes.secondary ? `Secundário: ${personA.archetypes.secondary}` : ''}
+${personA.archetypes.tertiary ? `Terciário: ${personA.archetypes.tertiary}` : ''}
+
+### 6. Estilo de Conexão (Linguagem de Amor)
+Primário: ${personA.connectionStyle.primary || 'não identificado'}
+${personA.connectionStyle.secondary ? `Secundário: ${personA.connectionStyle.secondary}` : ''}
+
+### 7. Nello 16 (Processamento de Decisão)
+Tipo: ${personA.nello16.type || 'não identificado'}
+
+### Sob Pressão
+${personA.underPressure.join(', ') || 'não especificado'}
+
+---
+
+## ${personB.name} - PERFIL COMPLETO
+
+### 1. DISC (Comportamento)
+D=${personB.disc.D}%, I=${personB.disc.I}%, S=${personB.disc.S}%, C=${personB.disc.C}%
+
+### 2. Eneagrama (Motivação)
+Tipo: ${personB.enneagram.type || 'não identificado'}${personB.enneagram.wing ? ` asa ${personB.enneagram.wing}` : ''}
+
+### 3. Temperamento (Ritmo Biológico)
+Primário: ${personB.temperament.primary || 'não identificado'}
+${personB.temperament.secondary ? `Secundário: ${personB.temperament.secondary}` : ''}
+Scores: Sanguíneo=${personB.temperament.scores.sanguineo}%, Colérico=${personB.temperament.scores.colerico}%, Melancólico=${personB.temperament.scores.melancolico}%, Fleumático=${personB.temperament.scores.fleumatico}%
+
+### 4. Inteligências Múltiplas (Talentos)
+Top 3: ${topIntB.join(', ')}
+Intrapessoal: ${personB.intelligences.intrapersonal}%, Interpessoal: ${personB.intelligences.interpersonal}%, Linguística: ${personB.intelligences.linguistic}%
+Lógica: ${personB.intelligences.logical}%, Espacial: ${personB.intelligences.spatial}%, Musical: ${personB.intelligences.musical}%
+Cinestésica: ${personB.intelligences.kinesthetic}%, Naturalista: ${personB.intelligences.naturalistic}%, Existencial: ${personB.intelligences.existential}%
+
+### 5. Arquétipos (Papéis)
+Primário: ${personB.archetypes.primary || 'não identificado'}
+${personB.archetypes.secondary ? `Secundário: ${personB.archetypes.secondary}` : ''}
+${personB.archetypes.tertiary ? `Terciário: ${personB.archetypes.tertiary}` : ''}
+
+### 6. Estilo de Conexão (Linguagem de Amor)
+Primário: ${personB.connectionStyle.primary || 'não identificado'}
+${personB.connectionStyle.secondary ? `Secundário: ${personB.connectionStyle.secondary}` : ''}
+
+### 7. Nello 16 (Processamento de Decisão)
+Tipo: ${personB.nello16.type || 'não identificado'}
+
+### Sob Pressão
+${personB.underPressure.join(', ') || 'não especificado'}
 
 ═══════════════════════════════════════════════════════════════════════════════
-INSTRUÇÕES FINAIS
+INSTRUÇÕES PARA O RELATÓRIO PREMIUM
 ═══════════════════════════════════════════════════════════════════════════════
 
 1. USE os nomes reais (${personA.name} e ${personB.name}) em TODAS as seções
 2. ${roleAssignment.sensor.name} é o SENSOR - revela sentido, processa, lê o campo
 3. ${roleAssignment.conductor.name} é o CONDUTOR - mantém curso, executa, organiza
-4. A Zona de Ajuste deve ter 2-4 diferenças com micro acordos práticos
-5. A Tabela de Tradução deve ter 4 linhas para cada papel
-6. A Ação Prática deve ter 3 passos específicos para 24 horas
+4. PREENCHA TODAS as seções do relatório 7 pilares:
+   - zona_harmonia, zona_ajuste, zona_choque (DISC + Eneagrama)
+   - ritmos_biologicos (Temperamentos)
+   - sinergia_talentos (Inteligências Múltiplas)
+   - dinamica_arquetipos (Arquétipos)
+   - linguagens_conexao (Estilos de Conexão)
+   - processamento_decisao (Nello 16)
+   - tabela_traducao, protocolo_paz, acao_pratica_24h
+5. A Zona de Ajuste deve ter 2-4 diferenças com micro acordos práticos
+6. Cada seção de pilar deve ter conteúdo DINÂMICO baseado nos dados reais
 7. O tom deve gerar ALÍVIO: "Agora eu entendi. Não estamos errados."
 
 Nos dados_grafico:
-- ${roleAssignment.sensor.name}: papel = "sensor", disc = ${JSON.stringify(roleAssignment.sensor.disc)}
-- ${roleAssignment.conductor.name}: papel = "condutor", disc = ${JSON.stringify(roleAssignment.conductor.disc)}
+- ${roleAssignment.sensor.name}: papel = "sensor", disc = ${JSON.stringify(roleAssignment.sensor.disc)}, temperamento = "${roleAssignment.sensor.temperament.primary}", arquetipo = "${roleAssignment.sensor.archetypes.primary}", nello16 = "${roleAssignment.sensor.nello16.type}", estilo_conexao = "${roleAssignment.sensor.connectionStyle.primary}"
+- ${roleAssignment.conductor.name}: papel = "condutor", disc = ${JSON.stringify(roleAssignment.conductor.disc)}, temperamento = "${roleAssignment.conductor.temperament.primary}", arquetipo = "${roleAssignment.conductor.archetypes.primary}", nello16 = "${roleAssignment.conductor.nello16.type}", estilo_conexao = "${roleAssignment.conductor.connectionStyle.primary}"
 
 Retorne APENAS o JSON no formato especificado, sem texto adicional.`;
   }
