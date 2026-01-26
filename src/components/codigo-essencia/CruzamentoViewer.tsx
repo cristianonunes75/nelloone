@@ -621,7 +621,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           <p className="text-foreground/80 whitespace-pre-line">{pot.descricao}</p>
           {pot.forcas && (
             <ul className="space-y-2 mt-4">
-              {pot.forcas.map((forca: string, i: number) => (
+              {asArray<string>(pot.forcas).map((forca: string, i: number) => (
                 <li key={i} className="flex items-start gap-2">
                   <Heart className="w-4 h-4 mt-1 text-pink-500" />
                   <span className="text-foreground/80">{forca}</span>
@@ -705,7 +705,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <div>
               <h4 className="text-sm font-semibold text-muted-foreground mb-2">{t.manual.orientations}</h4>
               <ul className="space-y-2">
-                {manual.orientacoes.map((item: string, i: number) => (
+                {asArray<string>(manual.orientacoes).map((item: string, i: number) => (
                   <li key={i} className="flex items-start gap-2">
                     <Target className="w-4 h-4 mt-0.5 text-purple-500" />
                     <span className="text-sm">{item}</span>
@@ -718,7 +718,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <h4 className="text-sm font-semibold text-emerald-700 dark:text-emerald-400 mb-2">{t.manual.disarmWords}</h4>
               <div className="flex flex-wrap gap-2">
-                {manual.palavras_desarmam.map((palavra: string, i: number) => (
+                {asArray<string>(manual.palavras_desarmam).map((palavra: string, i: number) => (
                   <span key={i} className="px-3 py-1 bg-emerald-500/20 rounded-full text-sm text-emerald-700 dark:text-emerald-300">
                     "{palavra}"
                   </span>
@@ -983,7 +983,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                 {language === 'en' ? 'Shared Values' : 'Valores Compartilhados'}
               </h4>
               <ul className="space-y-1">
-                {zona.valores_compartilhados.map((valor: string, i: number) => (
+                {asArray<string>(zona.valores_compartilhados).map((valor: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <Check className="w-4 h-4 mt-0.5 text-emerald-500" />
                     <span>{valor}</span>
