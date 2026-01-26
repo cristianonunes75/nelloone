@@ -21,101 +21,109 @@ const COLORS = {
   blueLight: { r: 239, g: 246, b: 255 },
   purple: { r: 139, g: 92, b: 246 },
   purpleLight: { r: 250, g: 245, b: 255 },
+  gold: { r: 180, g: 140, b: 50 },       // Person A color for chart
+  indigo: { r: 100, g: 80, b: 180 },     // Person B color for chart
 };
 
 const TRANSLATIONS = {
   pt: {
-    reportTitle: "Código do Casal",
-    subtitle: "Relatório de Compatibilidade e Sinergia",
+    reportTitle: "Codigo do Casal",
+    subtitle: "Relatorio de Compatibilidade e Sinergia",
     signature: "por NELLO ONE",
-    boatTitle: "A Metáfora do Barco",
-    boatText: "O relacionamento não é um porto seguro — é um barco em mar aberto. Vocês são os navegadores. Este relatório é o mapa e a bússola que vão ajudá-los a ajustar as velas quando a tempestade vier.",
+    boatTitle: "A Metafora do Barco",
+    boatText: "O relacionamento nao e um porto seguro - e um barco em mar aberto. Voces sao os navegadores. Este relatorio e o mapa e a bussola que vao ajuda-los a ajustar as velas quando a tempestade vier.",
     trafficLight: {
-      title: "Semáforo Relacional",
+      title: "Semaforo Relacional",
       green: "Sinergia Natural",
-      greenDesc: "Onde a conexão flui com leveza",
-      yellow: "Atenção e Ajuste",
-      yellowDesc: "Pontos que exigem diálogo consciente",
+      greenDesc: "Onde a conexao flui com leveza",
+      yellow: "Atencao e Ajuste",
+      yellowDesc: "Pontos que exigem dialogo consciente",
       red: "Zona de Choque",
-      redDesc: "Onde o conflito tende a surgir sob pressão"
+      redDesc: "Onde o conflito tende a surgir sob pressao"
     },
     sections: {
-      encontro: "O Encontro das Essências",
+      encontro: "O Encontro das Essencias",
       santoBate: "Onde o Santo Bate",
       bichoPega: "Onde o Bicho Pega",
-      potencializacao: "Onde Vocês se Potencializam",
-      tabelaTraducao: "Tabela de Tradução do Casal",
+      potencializacao: "Onde Voces se Potencializam",
+      tabelaTraducao: "Tabela de Traducao do Casal",
       protocoloPaz: "Protocolo de Paz Unificado",
-      manualConjuge: "Manual do Cônjuge",
-      alertasPressao: "Alertas de Pressão",
-      desafioConexao: "Desafio de Conexão 24h",
-      quandoBuscar: "Quando Procurar Ajuda"
+      manualConjuge: "Manual do Conjuge",
+      alertasPressao: "Alertas de Pressao",
+      desafioConexao: "Desafio de Conexao 24h",
+      quandoBuscar: "Quando Procurar Ajuda",
+      radarComparativo: "Perfil DISC Comparativo"
     },
     translationTable: {
       whenDoes: "Quando faz/diz",
-      youFeel: "Você sente",
-      truthBehind: "A Verdade por trás"
+      youFeel: "Voce sente",
+      truthBehind: "A Verdade por tras"
     },
     pressureAlerts: {
       behavior: "Comportamento",
-      autoDefense: "Defesa automática",
-      riskSituation: "Situação de risco"
+      autoDefense: "Defesa automatica",
+      riskSituation: "Situacao de risco"
     },
     howToDeal: "Como lidar",
     disarmWords: "Palavras que desarmam",
-    disclaimer: "Este relatório é uma ferramenta simbólica de autoconhecimento. Não substitui terapia ou aconselhamento profissional.",
-    footer: "NELLO ONE • Código do Casal",
-    why: "Por quê"
+    disclaimer: "Este relatorio e uma ferramenta simbolica de autoconhecimento. Nao substitui terapia ou aconselhamento profissional.",
+    footer: "NELLO ONE - Codigo do Casal",
+    why: "Por que",
+    personA: "Pessoa A",
+    personB: "Pessoa B"
   },
   'pt-pt': {
-    reportTitle: "Código do Casal",
-    subtitle: "Relatório de Compatibilidade e Sinergia",
+    reportTitle: "Codigo do Casal",
+    subtitle: "Relatorio de Compatibilidade e Sinergia",
     signature: "por NELLO ONE",
-    boatTitle: "A Metáfora do Barco",
-    boatText: "O relacionamento não é um porto seguro — é um barco em mar aberto. Vocês são os navegadores. Este relatório é o mapa e a bússola que vos vão ajudar a ajustar as velas quando a tempestade vier.",
+    boatTitle: "A Metafora do Barco",
+    boatText: "O relacionamento nao e um porto seguro - e um barco em mar aberto. Voces sao os navegadores. Este relatorio e o mapa e a bussola que vos vao ajudar a ajustar as velas quando a tempestade vier.",
     trafficLight: {
-      title: "Semáforo Relacional",
+      title: "Semaforo Relacional",
       green: "Sinergia Natural",
-      greenDesc: "Onde a conexão flui com leveza",
-      yellow: "Atenção e Ajuste",
-      yellowDesc: "Pontos que exigem diálogo consciente",
+      greenDesc: "Onde a conexao flui com leveza",
+      yellow: "Atencao e Ajuste",
+      yellowDesc: "Pontos que exigem dialogo consciente",
       red: "Zona de Choque",
-      redDesc: "Onde o conflito tende a surgir sob pressão"
+      redDesc: "Onde o conflito tende a surgir sob pressao"
     },
     sections: {
-      encontro: "O Encontro das Essências",
+      encontro: "O Encontro das Essencias",
       santoBate: "Onde o Santo Bate",
       bichoPega: "Onde o Bicho Pega",
-      potencializacao: "Onde Vocês se Potencializam",
-      tabelaTraducao: "Tabela de Tradução do Casal",
+      potencializacao: "Onde Voces se Potencializam",
+      tabelaTraducao: "Tabela de Traducao do Casal",
       protocoloPaz: "Protocolo de Paz Unificado",
-      manualConjuge: "Manual do Cônjuge",
-      alertasPressao: "Alertas de Pressão",
-      desafioConexao: "Desafio de Conexão 24h",
-      quandoBuscar: "Quando Procurar Ajuda"
+      manualConjuge: "Manual do Conjuge",
+      alertasPressao: "Alertas de Pressao",
+      desafioConexao: "Desafio de Conexao 24h",
+      quandoBuscar: "Quando Procurar Ajuda",
+      radarComparativo: "Perfil DISC Comparativo"
     },
     translationTable: {
       whenDoes: "Quando faz/diz",
       youFeel: "Tu sentes",
-      truthBehind: "A Verdade por trás"
+      truthBehind: "A Verdade por tras"
     },
     pressureAlerts: {
       behavior: "Comportamento",
-      autoDefense: "Defesa automática",
-      riskSituation: "Situação de risco"
+      autoDefense: "Defesa automatica",
+      riskSituation: "Situacao de risco"
     },
     howToDeal: "Como lidar",
     disarmWords: "Palavras que desarmam",
-    disclaimer: "Este relatório é uma ferramenta simbólica de autoconhecimento. Não substitui terapia ou aconselhamento profissional.",
-    footer: "NELLO ONE • Código do Casal",
-    why: "Porquê"
+    disclaimer: "Este relatorio e uma ferramenta simbolica de autoconhecimento. Nao substitui terapia ou aconselhamento profissional.",
+    footer: "NELLO ONE - Codigo do Casal",
+    why: "Porque",
+    personA: "Pessoa A",
+    personB: "Pessoa B"
   },
   en: {
     reportTitle: "Couple Code",
     subtitle: "Compatibility and Synergy Report",
     signature: "by NELLO ONE",
     boatTitle: "The Boat Metaphor",
-    boatText: "A relationship isn't a safe harbor — it's a boat on open water. You are the navigators. This report is the map and compass that will help you adjust the sails when the storm comes.",
+    boatText: "A relationship is not a safe harbor - it is a boat on open water. You are the navigators. This report is the map and compass that will help you adjust the sails when the storm comes.",
     trafficLight: {
       title: "Relational Traffic Light",
       green: "Natural Synergy",
@@ -135,7 +143,8 @@ const TRANSLATIONS = {
       manualConjuge: "Partner Manual",
       alertasPressao: "Pressure Alerts",
       desafioConexao: "24h Connection Challenge",
-      quandoBuscar: "When to Seek Help"
+      quandoBuscar: "When to Seek Help",
+      radarComparativo: "Comparative DISC Profile"
     },
     translationTable: {
       whenDoes: "When does/says",
@@ -150,8 +159,10 @@ const TRANSLATIONS = {
     howToDeal: "How to deal",
     disarmWords: "Disarming words",
     disclaimer: "This report is a symbolic tool for self-knowledge. It does not replace therapy or professional counseling.",
-    footer: "NELLO ONE • Couple Code",
-    why: "Why"
+    footer: "NELLO ONE - Couple Code",
+    why: "Why",
+    personA: "Person A",
+    personB: "Person B"
   }
 };
 
@@ -238,6 +249,12 @@ class PDFGenerator {
     return y;
   }
 
+  // Helper to draw a small icon shape instead of emoji
+  private drawIconCircle(x: number, y: number, color: { r: number; g: number; b: number }, radius = 3) {
+    this.doc.setFillColor(color.r, color.g, color.b);
+    this.doc.circle(x, y, radius, "F");
+  }
+
   // ==========================================
   // COVER PAGE
   // ==========================================
@@ -252,12 +269,12 @@ class PDFGenerator {
     this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
     this.doc.rect(0, this.pageHeight / 3 - 2, this.pageWidth, 4, "F");
 
-    // Heart circle
+    // Heart circle (use pink circle instead of heart emoji)
     this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
     this.doc.circle(this.pageWidth / 2, this.pageHeight / 2 - 60, 22, "F");
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(28);
-    this.doc.text("♥", this.pageWidth / 2, this.pageHeight / 2 - 54, { align: "center" });
+    // Draw a small inner accent
+    this.doc.setFillColor(255, 255, 255);
+    this.doc.circle(this.pageWidth / 2, this.pageHeight / 2 - 60, 8, "F");
 
     // Title
     this.doc.setTextColor(255, 255, 255);
@@ -310,11 +327,12 @@ class PDFGenerator {
     this.doc.setLineWidth(0.5);
     this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, boxHeight, 4, 4, "S");
     
-    // Icon and title
+    // Icon (blue circle instead of boat emoji) and title
+    this.drawIconCircle(this.margin + 10, this.currentY + 10, COLORS.blue, 4);
     this.doc.setTextColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
     this.doc.setFontSize(14);
     this.doc.setFont("helvetica", "bold");
-    this.doc.text("⛵ " + this.t.boatTitle, this.margin + 8, this.currentY + 12);
+    this.doc.text(this.t.boatTitle, this.margin + 18, this.currentY + 12);
     
     // Description text
     this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
@@ -340,13 +358,13 @@ class PDFGenerator {
     this.doc.text(semaforo.titulo || this.t.trafficLight.title, this.margin, this.currentY);
     this.currentY += 10;
 
-    // Render each zone
-    this.renderTrafficZone(semaforo.verde, COLORS.green, COLORS.greenLight, "🟢", this.t.trafficLight.green, this.t.trafficLight.greenDesc);
-    this.renderTrafficZone(semaforo.amarelo, COLORS.amber, COLORS.amberLight, "🟡", this.t.trafficLight.yellow, this.t.trafficLight.yellowDesc);
-    this.renderTrafficZone(semaforo.vermelho, COLORS.red, COLORS.redLight, "🔴", this.t.trafficLight.red, this.t.trafficLight.redDesc);
+    // Render each zone with colored circles instead of emoji
+    this.renderTrafficZone(semaforo.verde, COLORS.green, COLORS.greenLight, this.t.trafficLight.green, this.t.trafficLight.greenDesc);
+    this.renderTrafficZone(semaforo.amarelo, COLORS.amber, COLORS.amberLight, this.t.trafficLight.yellow, this.t.trafficLight.yellowDesc);
+    this.renderTrafficZone(semaforo.vermelho, COLORS.red, COLORS.redLight, this.t.trafficLight.red, this.t.trafficLight.redDesc);
   }
 
-  private renderTrafficZone(zone: any, mainColor: any, bgColor: any, icon: string, title: string, desc: string) {
+  private renderTrafficZone(zone: any, mainColor: any, bgColor: any, title: string, desc: string) {
     if (!zone) return;
 
     const points = zone.pontos || [];
@@ -365,7 +383,7 @@ class PDFGenerator {
       tempY += descLines.length * 4.5;
     }
     points.forEach((ponto: string) => {
-      const pointLines = this.doc.splitTextToSize("• " + ponto, this.contentWidth - 20);
+      const pointLines = this.doc.splitTextToSize("- " + ponto, this.contentWidth - 20);
       tempY += pointLines.length * 4.5 + 2;
     });
     
@@ -381,11 +399,12 @@ class PDFGenerator {
     this.doc.setLineWidth(0.3);
     this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, boxHeight, 3, 3, "S");
 
-    // Title with icon
+    // Title with colored circle icon instead of emoji
+    this.drawIconCircle(this.margin + 10, this.currentY + 8, mainColor, 4);
     this.doc.setTextColor(mainColor.r, mainColor.g, mainColor.b);
     this.doc.setFontSize(12);
     this.doc.setFont("helvetica", "bold");
-    this.doc.text(icon + " " + (zone.titulo || title), this.margin + 6, this.currentY + 10);
+    this.doc.text(zone.titulo || title, this.margin + 18, this.currentY + 10);
     
     // Subtitle description
     this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
@@ -405,13 +424,14 @@ class PDFGenerator {
       innerY += descLines.length * 4.5 + 4;
     }
 
-    // Points
+    // Points with bullet circles
     points.forEach((ponto: string) => {
+      this.drawIconCircle(this.margin + 8, innerY - 1, mainColor, 1.5);
       this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
       this.doc.setFontSize(9);
       this.doc.setFont("helvetica", "normal");
-      const pointLines = this.doc.splitTextToSize("• " + ponto, this.contentWidth - 20);
-      this.doc.text(pointLines, this.margin + 10, innerY);
+      const pointLines = this.doc.splitTextToSize(ponto, this.contentWidth - 20);
+      this.doc.text(pointLines, this.margin + 14, innerY);
       innerY += pointLines.length * 4.5 + 2;
     });
 
@@ -434,6 +454,128 @@ class PDFGenerator {
   }
 
   // ==========================================
+  // DISC RADAR CHART (Native jsPDF rendering)
+  // ==========================================
+  private renderDISCRadarChart(content: any) {
+    // Extract DISC data from content
+    const discA = content.perfil_a?.disc || content.usuario_a?.disc || { D: 50, I: 50, S: 50, C: 50 };
+    const discB = content.perfil_b?.disc || content.usuario_b?.disc || { D: 50, I: 50, S: 50, C: 50 };
+    
+    // Only render if we have DISC data
+    if (!discA && !discB) return;
+
+    this.addNewPage();
+    this.renderSectionHeader(this.t.sections.radarComparativo, COLORS.purple);
+
+    const centerX = this.pageWidth / 2;
+    const centerY = this.currentY + 55;
+    const maxRadius = 45;
+    
+    // Draw background circles (grid)
+    this.doc.setDrawColor(200, 200, 200);
+    this.doc.setLineWidth(0.2);
+    for (let i = 1; i <= 4; i++) {
+      const r = (maxRadius / 4) * i;
+      this.doc.circle(centerX, centerY, r, "S");
+    }
+
+    // Draw axis lines
+    const angles = [0, 90, 180, 270]; // D, I, S, C positions
+    const labels = ["D", "I", "S", "C"];
+    const fullLabels = ["Dominancia", "Influencia", "Estabilidade", "Conformidade"];
+    
+    angles.forEach((angle, idx) => {
+      const rad = (angle - 90) * (Math.PI / 180);
+      const x2 = centerX + maxRadius * Math.cos(rad);
+      const y2 = centerY + maxRadius * Math.sin(rad);
+      
+      this.doc.setDrawColor(180, 180, 180);
+      this.doc.line(centerX, centerY, x2, y2);
+      
+      // Labels
+      const labelX = centerX + (maxRadius + 8) * Math.cos(rad);
+      const labelY = centerY + (maxRadius + 8) * Math.sin(rad);
+      this.doc.setFontSize(10);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.text(labels[idx], labelX, labelY + 3, { align: "center" });
+    });
+
+    // Helper to get point coordinates
+    const getPoint = (value: number, angleIndex: number) => {
+      const rad = (angles[angleIndex] - 90) * (Math.PI / 180);
+      const r = (value / 100) * maxRadius;
+      return {
+        x: centerX + r * Math.cos(rad),
+        y: centerY + r * Math.sin(rad)
+      };
+    };
+
+    // Draw Person A polygon (Gold)
+    const valuesA = [discA.D || 50, discA.I || 50, discA.S || 50, discA.C || 50];
+    const pointsA = valuesA.map((v, i) => getPoint(v, i));
+    
+    this.doc.setFillColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
+    this.doc.setDrawColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
+    this.doc.setLineWidth(2);
+    
+    // Draw filled polygon for A
+    const pathA: number[][] = pointsA.map(p => [p.x, p.y]);
+    pathA.push([pointsA[0].x, pointsA[0].y]); // Close path
+    
+    // Draw lines
+    for (let i = 0; i < pointsA.length; i++) {
+      const next = (i + 1) % pointsA.length;
+      this.doc.line(pointsA[i].x, pointsA[i].y, pointsA[next].x, pointsA[next].y);
+    }
+    
+    // Draw points
+    pointsA.forEach(p => {
+      this.doc.setFillColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
+      this.doc.circle(p.x, p.y, 2, "F");
+    });
+
+    // Draw Person B polygon (Indigo)
+    const valuesB = [discB.D || 50, discB.I || 50, discB.S || 50, discB.C || 50];
+    const pointsB = valuesB.map((v, i) => getPoint(v, i));
+    
+    this.doc.setDrawColor(COLORS.indigo.r, COLORS.indigo.g, COLORS.indigo.b);
+    this.doc.setLineWidth(2);
+    
+    // Draw lines for B
+    for (let i = 0; i < pointsB.length; i++) {
+      const next = (i + 1) % pointsB.length;
+      this.doc.line(pointsB[i].x, pointsB[i].y, pointsB[next].x, pointsB[next].y);
+    }
+    
+    // Draw points
+    pointsB.forEach(p => {
+      this.doc.setFillColor(COLORS.indigo.r, COLORS.indigo.g, COLORS.indigo.b);
+      this.doc.circle(p.x, p.y, 2, "F");
+    });
+
+    // Legend
+    const legendY = centerY + maxRadius + 20;
+    
+    // Person A legend
+    this.doc.setFillColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
+    this.doc.circle(centerX - 35, legendY, 4, "F");
+    this.doc.setFontSize(10);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+    const nameA = content.perfil_a?.nome || content.usuario_a?.nome || this.t.personA;
+    this.doc.text(nameA, centerX - 28, legendY + 3);
+    
+    // Person B legend
+    this.doc.setFillColor(COLORS.indigo.r, COLORS.indigo.g, COLORS.indigo.b);
+    this.doc.circle(centerX + 25, legendY, 4, "F");
+    const nameB = content.perfil_b?.nome || content.usuario_b?.nome || this.t.personB;
+    this.doc.text(nameB, centerX + 32, legendY + 3);
+
+    this.currentY = legendY + 15;
+  }
+
+  // ==========================================
   // MEETING OF ESSENCES
   // ==========================================
   private renderMeetingOfEssences(content: any) {
@@ -443,14 +585,19 @@ class PDFGenerator {
     this.addNewPage();
     this.renderSectionHeader(encontro.titulo || this.t.sections.encontro, COLORS.pink);
 
-    // Metaphor title (centered, highlighted)
+    // Metaphor title (centered, highlighted) - no emoji, use accent bar
     if (encontro.metafora) {
-      this.ensureSpace(15);
+      this.ensureSpace(18);
+      
+      // Draw accent bar
+      this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
+      this.doc.rect(this.margin, this.currentY - 2, 3, 12, "F");
+      
       this.doc.setTextColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
       this.doc.setFontSize(14);
       this.doc.setFont("helvetica", "bold");
-      this.doc.text("✨ " + encontro.metafora + " ✨", this.pageWidth / 2, this.currentY, { align: "center" });
-      this.currentY += 12;
+      this.doc.text(encontro.metafora, this.margin + 8, this.currentY + 6);
+      this.currentY += 16;
     }
 
     // Description text
@@ -497,11 +644,12 @@ class PDFGenerator {
       this.doc.setLineWidth(0.2);
       this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, areaHeight, 3, 3, "S");
 
-      // Title
+      // Title with circle icon instead of sparkle emoji
+      this.drawIconCircle(this.margin + 8, this.currentY + 8, COLORS.green, 3);
       this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
       this.doc.setFontSize(11);
       this.doc.setFont("helvetica", "bold");
-      this.doc.text("✨ " + area.titulo, this.margin + 6, this.currentY + 10);
+      this.doc.text(area.titulo, this.margin + 14, this.currentY + 10);
 
       // Description
       if (area.descricao) {
@@ -546,11 +694,12 @@ class PDFGenerator {
       this.doc.setLineWidth(0.2);
       this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "S");
 
-      // Title
+      // Title with amber circle instead of lightning emoji
+      this.drawIconCircle(this.margin + 8, this.currentY + 8, COLORS.amber, 3);
       this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
       this.doc.setFontSize(11);
       this.doc.setFont("helvetica", "bold");
-      this.doc.text("⚡ " + atrito.titulo, this.margin + 6, this.currentY + 10);
+      this.doc.text(atrito.titulo, this.margin + 14, this.currentY + 10);
 
       let innerY = this.currentY + 18;
 
@@ -564,16 +713,17 @@ class PDFGenerator {
         innerY += lines.length * 4.5 + 6;
       }
 
-      // How to deal box
+      // How to deal box with green circle icon instead of lightbulb
       if (atrito.como_lidar) {
         this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
         const howToBoxHeight = this.measureTextHeight(atrito.como_lidar, this.contentWidth - 30, 9) + 10;
         this.doc.roundedRect(this.margin + 6, innerY, this.contentWidth - 12, howToBoxHeight, 2, 2, "F");
         
+        this.drawIconCircle(this.margin + 12, innerY + 5, COLORS.green, 2.5);
         this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
         this.doc.setFontSize(9);
         this.doc.setFont("helvetica", "bold");
-        this.doc.text("💡 " + this.t.howToDeal + ":", this.margin + 10, innerY + 6);
+        this.doc.text(this.t.howToDeal + ":", this.margin + 18, innerY + 6);
         
         this.doc.setFont("helvetica", "normal");
         const howLines = this.doc.splitTextToSize(atrito.como_lidar, this.contentWidth - 35);
@@ -599,7 +749,7 @@ class PDFGenerator {
       this.currentY += 8;
     }
 
-    // Strengths list
+    // Strengths list with bullet circles
     pot.forcas?.forEach((forca: string) => {
       const forceHeight = this.measureTextHeight(forca, this.contentWidth - 16, 10) + 6;
       this.ensureSpace(forceHeight);
@@ -969,6 +1119,7 @@ class PDFGenerator {
     this.renderBoatMetaphor();
     this.renderTrafficLight(content);
     this.renderMeetingOfEssences(content);
+    this.renderDISCRadarChart(content); // Add the radar chart
     this.renderSantoBate(content);
     this.renderBichoPega(content);
     this.renderPotentialization(content);
@@ -996,7 +1147,7 @@ const normalizeContent = (content: any): any => {
   if (!normalized.semaforo_relacional && (normalized.zona_harmonia || normalized.zona_sinergia || normalized.zona_ajuste || normalized.zona_choque)) {
     const harmonia = normalized.zona_harmonia || normalized.zona_sinergia;
     normalized.semaforo_relacional = {
-      titulo: "Semáforo Relacional",
+      titulo: "Semaforo Relacional",
       verde: harmonia ? {
         titulo: harmonia.titulo || "Zona de Harmonia",
         descricao: harmonia.descricao,
@@ -1019,7 +1170,7 @@ const normalizeContent = (content: any): any => {
   // Map metafora_central to encontro_essencias if needed
   if (!normalized.encontro_essencias && normalized.metafora_central) {
     normalized.encontro_essencias = {
-      titulo: "O Encontro das Essências",
+      titulo: "O Encontro das Essencias",
       metafora: normalized.metafora_central.titulo,
       descricao: normalized.metafora_central.descricao
     };
@@ -1031,7 +1182,7 @@ const normalizeContent = (content: any): any => {
     const condutor = normalized.papeis_identificados.condutor_curso;
     
     if (!normalized.encontro_essencias) {
-      normalized.encontro_essencias = { titulo: "O Encontro das Essências" };
+      normalized.encontro_essencias = { titulo: "O Encontro das Essencias" };
     }
     
     if (sensor && condutor) {
@@ -1043,7 +1194,7 @@ const normalizeContent = (content: any): any => {
   // Map acao_pratica_24h to desafio_conexao
   if (!normalized.desafio_conexao && normalized.acao_pratica_24h) {
     normalized.desafio_conexao = {
-      titulo: normalized.acao_pratica_24h.titulo || "Desafio de Conexão 24h",
+      titulo: normalized.acao_pratica_24h.titulo || "Desafio de Conexao 24h",
       descricao: normalized.acao_pratica_24h.descricao,
       acao: normalized.acao_pratica_24h.acao
     };
