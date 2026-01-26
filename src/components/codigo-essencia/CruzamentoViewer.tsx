@@ -1093,50 +1093,90 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           
           {/* Shadow Cycle */}
           {zona.ciclo_sombra && (
-            <div className="p-4 rounded-lg bg-red-500/5 border border-red-500/20">
+            <div className="p-4 rounded-lg bg-red-500/5 border border-red-500/20 space-y-3">
               <h4 className="font-medium text-red-700 dark:text-red-400 mb-2 text-sm flex items-center gap-2">
                 <Flame className="w-4 h-4" />
                 {language === 'en' ? 'The Shadow Cycle' : 'O Ciclo de Sombra'}
               </h4>
-              <p className="text-sm">{zona.ciclo_sombra}</p>
+              {/* Handle object format with gatilho, reacao_sensor, etc. */}
+              {typeof zona.ciclo_sombra === 'string' ? (
+                <p className="text-sm">{zona.ciclo_sombra}</p>
+              ) : (
+                <div className="space-y-2 text-sm">
+                  {zona.ciclo_sombra?.gatilho && (
+                    <p><strong>{language === 'en' ? 'Trigger:' : 'Gatilho:'}</strong> {zona.ciclo_sombra.gatilho}</p>
+                  )}
+                  {zona.ciclo_sombra?.reacao_sensor && (
+                    <p><strong>{language === 'en' ? 'Sensor reaction:' : 'Reação do Sensor:'}</strong> {zona.ciclo_sombra.reacao_sensor}</p>
+                  )}
+                  {zona.ciclo_sombra?.interpretacao_condutor && (
+                    <p><strong>{language === 'en' ? 'Conductor interpretation:' : 'Interpretação do Condutor:'}</strong> {zona.ciclo_sombra.interpretacao_condutor}</p>
+                  )}
+                  {zona.ciclo_sombra?.reacao_condutor && (
+                    <p><strong>{language === 'en' ? 'Conductor reaction:' : 'Reação do Condutor:'}</strong> {zona.ciclo_sombra.reacao_condutor}</p>
+                  )}
+                  {zona.ciclo_sombra?.interpretacao_sensor && (
+                    <p><strong>{language === 'en' ? 'Sensor interpretation:' : 'Interpretação do Sensor:'}</strong> {zona.ciclo_sombra.interpretacao_sensor}</p>
+                  )}
+                  {zona.ciclo_sombra?.retroalimentacao && (
+                    <p className="text-muted-foreground italic">{zona.ciclo_sombra.retroalimentacao}</p>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
-          {/* Sensor under stress */}
-          {zona.sensor_sob_estresse && (
-            <div className="p-4 rounded-lg bg-purple-500/5 border border-purple-500/20">
-              <h4 className="font-medium text-purple-700 dark:text-purple-400 mb-2 text-sm">
-                🧭 {zona.sensor_sob_estresse?.nome || (language === 'en' ? 'Direction Sensor' : 'Sensor de Direção')}
-                {" "}({language === 'en' ? 'Direction Sensor' : 'Sensor de Direção'})
-              </h4>
-              {zona.sensor_sob_estresse?.comportamento && (
-                <p className="text-sm mb-2">{zona.sensor_sob_estresse.comportamento}</p>
-              )}
-              {zona.sensor_sob_estresse?.impacto_no_outro && (
-                <p className="text-xs text-muted-foreground">
-                  <strong>{language === 'en' ? 'Impact:' : 'Impacto:'}</strong> {zona.sensor_sob_estresse.impacto_no_outro}
-                </p>
-              )}
-            </div>
-          )}
+          {/* Sensor under stress - supports both sensor_sob_estresse and bloco_sensor keys */}
+          {(zona.sensor_sob_estresse || zona.bloco_sensor) && (() => {
+            const sensor = zona.sensor_sob_estresse || zona.bloco_sensor;
+            return (
+              <div className="p-4 rounded-lg bg-purple-500/5 border border-purple-500/20">
+                <h4 className="font-medium text-purple-700 dark:text-purple-400 mb-2 text-sm">
+                  🧭 {sensor?.nome || (language === 'en' ? 'Direction Sensor' : 'Sensor de Direção')}
+                  {" "}({language === 'en' ? 'Direction Sensor' : 'Sensor de Direção'})
+                </h4>
+                {(sensor?.comportamento || sensor?.como_reage_sob_estresse) && (
+                  <p className="text-sm mb-2">{sensor.comportamento || sensor.como_reage_sob_estresse}</p>
+                )}
+                {(sensor?.impacto_no_outro || sensor?.como_impacta_outro) && (
+                  <p className="text-xs text-muted-foreground">
+                    <strong>{language === 'en' ? 'Impact:' : 'Impacto:'}</strong> {sensor.impacto_no_outro || sensor.como_impacta_outro}
+                  </p>
+                )}
+                {sensor?.o_que_precisa_do_outro && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    <strong>{language === 'en' ? 'Needs:' : 'Precisa:'}</strong> {sensor.o_que_precisa_do_outro}
+                  </p>
+                )}
+              </div>
+            );
+          })()}
 
-          {/* Conductor under stress */}
-          {zona.condutor_sob_estresse && (
-            <div className="p-4 rounded-lg bg-orange-500/5 border border-orange-500/20">
-              <h4 className="font-medium text-orange-700 dark:text-orange-400 mb-2 text-sm">
-                ⚓ {zona.condutor_sob_estresse?.nome || (language === 'en' ? 'Course Conductor' : 'Condutor de Curso')}
-                {" "}({language === 'en' ? 'Course Conductor' : 'Condutor de Curso'})
-              </h4>
-              {zona.condutor_sob_estresse?.comportamento && (
-                <p className="text-sm mb-2">{zona.condutor_sob_estresse.comportamento}</p>
-              )}
-              {zona.condutor_sob_estresse?.impacto_no_outro && (
-                <p className="text-xs text-muted-foreground">
-                  <strong>{language === 'en' ? 'Impact:' : 'Impacto:'}</strong> {zona.condutor_sob_estresse.impacto_no_outro}
-                </p>
-              )}
-            </div>
-          )}
+          {/* Conductor under stress - supports both condutor_sob_estresse and bloco_condutor keys */}
+          {(zona.condutor_sob_estresse || zona.bloco_condutor) && (() => {
+            const condutor = zona.condutor_sob_estresse || zona.bloco_condutor;
+            return (
+              <div className="p-4 rounded-lg bg-orange-500/5 border border-orange-500/20">
+                <h4 className="font-medium text-orange-700 dark:text-orange-400 mb-2 text-sm">
+                  ⚓ {condutor?.nome || (language === 'en' ? 'Course Conductor' : 'Condutor de Curso')}
+                  {" "}({language === 'en' ? 'Course Conductor' : 'Condutor de Curso'})
+                </h4>
+                {(condutor?.comportamento || condutor?.como_reage_sob_estresse) && (
+                  <p className="text-sm mb-2">{condutor.comportamento || condutor.como_reage_sob_estresse}</p>
+                )}
+                {(condutor?.impacto_no_outro || condutor?.como_impacta_outro) && (
+                  <p className="text-xs text-muted-foreground">
+                    <strong>{language === 'en' ? 'Impact:' : 'Impacto:'}</strong> {condutor.impacto_no_outro || condutor.como_impacta_outro}
+                  </p>
+                )}
+                {condutor?.o_que_precisa_do_outro && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    <strong>{language === 'en' ? 'Needs:' : 'Precisa:'}</strong> {condutor.o_que_precisa_do_outro}
+                  </p>
+                )}
+              </div>
+            );
+          })()}
         </CardContent>
       </Card>
     );
