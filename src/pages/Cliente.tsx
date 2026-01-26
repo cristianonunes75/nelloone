@@ -40,7 +40,8 @@ import { PurchaseAtivacaoDialog } from "@/components/cliente/PurchaseAtivacaoDia
 import { 
   DashboardStageJourney,
   DashboardStageRevelation,
-  DashboardStagePotency
+  DashboardStagePotency,
+  DebugAccessPanel
 } from "@/components/cliente/dashboard";
 import { TestInsightScreen, getProvisionalInsight, getMirrorPhrase } from "@/components/tests/TestInsightScreen";
 import { StrategicCheckpoint, generateCheckpointContent } from "@/components/tests/StrategicCheckpoint";
@@ -834,6 +835,9 @@ const Cliente = () => {
         currentStep={currentStep}
         testResults={testResults}
       />
+
+      {/* Temporary Debug Panel - REMOVE AFTER FIX */}
+      <DebugAccessPanel />
     </div>
   );
 };
