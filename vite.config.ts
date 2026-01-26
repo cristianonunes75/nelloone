@@ -6,9 +6,18 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  optimizeDeps: {
+    force: true // Force rebuild all dependencies
+  },
   server: {
     host: "::",
     port: 8080,
+    hmr: {
+      overlay: true
+    },
+    watch: {
+      usePolling: true // Force file watching
+    }
   },
   plugins: [
     react(), 
