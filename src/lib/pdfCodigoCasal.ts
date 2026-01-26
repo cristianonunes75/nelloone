@@ -1112,17 +1112,202 @@ class PDFGenerator {
   }
 
   // ==========================================
-  // MAIN GENERATION
+  // 7 PILLARS - TEMPERAMENTS (Ritmos Biológicos)
+  // ==========================================
+  private renderTemperaments(content: any) {
+    const ritmos = content.ritmos_biologicos;
+    if (!ritmos) return;
+
+    this.addNewPage();
+    this.renderSectionHeader(ritmos.titulo || "Ritmos Biologicos do Casal", COLORS.amber);
+
+    if (ritmos.temperamento_a) {
+      this.currentY = this.writeWrappedText(
+        `${ritmos.temperamento_a.nome}: ${ritmos.temperamento_a.temperamento_primario} - ${ritmos.temperamento_a.caracteristicas || ''}`,
+        this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal'
+      );
+      this.currentY += 8;
+    }
+    if (ritmos.temperamento_b) {
+      this.currentY = this.writeWrappedText(
+        `${ritmos.temperamento_b.nome}: ${ritmos.temperamento_b.temperamento_primario} - ${ritmos.temperamento_b.caracteristicas || ''}`,
+        this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal'
+      );
+      this.currentY += 8;
+    }
+    if (ritmos.sinergia) {
+      this.currentY = this.writeWrappedText(ritmos.sinergia, this.margin, this.currentY, this.contentWidth, 10, COLORS.green, 'bold');
+      this.currentY += 6;
+    }
+    if (ritmos.ajuste_pratico) {
+      this.currentY = this.writeWrappedText(ritmos.ajuste_pratico, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+    }
+  }
+
+  // ==========================================
+  // 7 PILLARS - INTELLIGENCES (Sinergia de Talentos)
+  // ==========================================
+  private renderIntelligences(content: any) {
+    const talentos = content.sinergia_talentos;
+    if (!talentos) return;
+
+    this.addNewPage();
+    this.renderSectionHeader(talentos.titulo || "Sinergia de Talentos", COLORS.blue);
+
+    if (talentos.talentos_a) {
+      this.currentY = this.writeWrappedText(
+        `${talentos.talentos_a.nome}: ${(talentos.talentos_a.top_3 || []).join(', ')}`,
+        this.margin, this.currentY, this.contentWidth, 11, COLORS.text, 'bold'
+      );
+      if (talentos.talentos_a.contribuicao) {
+        this.currentY = this.writeWrappedText(talentos.talentos_a.contribuicao, this.margin, this.currentY + 4, this.contentWidth, 10, COLORS.muted, 'normal');
+      }
+      this.currentY += 10;
+    }
+    if (talentos.talentos_b) {
+      this.currentY = this.writeWrappedText(
+        `${talentos.talentos_b.nome}: ${(talentos.talentos_b.top_3 || []).join(', ')}`,
+        this.margin, this.currentY, this.contentWidth, 11, COLORS.text, 'bold'
+      );
+      if (talentos.talentos_b.contribuicao) {
+        this.currentY = this.writeWrappedText(talentos.talentos_b.contribuicao, this.margin, this.currentY + 4, this.contentWidth, 10, COLORS.muted, 'normal');
+      }
+      this.currentY += 10;
+    }
+    if (talentos.complementaridade) {
+      this.currentY = this.writeWrappedText(talentos.complementaridade, this.margin, this.currentY, this.contentWidth, 10, COLORS.green, 'bold');
+    }
+  }
+
+  // ==========================================
+  // 7 PILLARS - ARCHETYPES (Dinamica de Papeis)
+  // ==========================================
+  private renderArchetypes(content: any) {
+    const arquetipos = content.dinamica_arquetipos;
+    if (!arquetipos) return;
+
+    this.addNewPage();
+    this.renderSectionHeader(arquetipos.titulo || "Dinamica de Papeis Arquetipicos", COLORS.purple);
+
+    if (arquetipos.arquetipo_a) {
+      this.currentY = this.writeWrappedText(
+        `${arquetipos.arquetipo_a.nome}: ${arquetipos.arquetipo_a.arquetipos} - ${arquetipos.arquetipo_a.papel_no_casal || ''}`,
+        this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal'
+      );
+      this.currentY += 8;
+    }
+    if (arquetipos.arquetipo_b) {
+      this.currentY = this.writeWrappedText(
+        `${arquetipos.arquetipo_b.nome}: ${arquetipos.arquetipo_b.arquetipos} - ${arquetipos.arquetipo_b.papel_no_casal || ''}`,
+        this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal'
+      );
+      this.currentY += 8;
+    }
+    if (arquetipos.interacao) {
+      this.currentY = this.writeWrappedText(arquetipos.interacao, this.margin, this.currentY, this.contentWidth, 10, COLORS.primary, 'bold');
+      this.currentY += 6;
+    }
+    if (arquetipos.potencial) {
+      this.currentY = this.writeWrappedText(`Potencial: ${arquetipos.potencial}`, this.margin, this.currentY, this.contentWidth, 10, COLORS.green, 'normal');
+      this.currentY += 4;
+    }
+    if (arquetipos.armadilha) {
+      this.currentY = this.writeWrappedText(`Cuidado: ${arquetipos.armadilha}`, this.margin, this.currentY, this.contentWidth, 10, COLORS.amber, 'normal');
+    }
+  }
+
+  // ==========================================
+  // 7 PILLARS - CONNECTION STYLES (Linguagens de Amor)
+  // ==========================================
+  private renderConnectionStyles(content: any) {
+    const linguagens = content.linguagens_conexao;
+    if (!linguagens) return;
+
+    this.addNewPage();
+    this.renderSectionHeader(linguagens.titulo || "Linguagens de Conexao Afetiva", COLORS.pink);
+
+    if (linguagens.linguagem_a) {
+      this.currentY = this.writeWrappedText(
+        `${linguagens.linguagem_a.nome}: ${linguagens.linguagem_a.estilo_primario}`,
+        this.margin, this.currentY, this.contentWidth, 11, COLORS.text, 'bold'
+      );
+      if (linguagens.linguagem_a.como_se_sente_amado) {
+        this.currentY = this.writeWrappedText(linguagens.linguagem_a.como_se_sente_amado, this.margin, this.currentY + 4, this.contentWidth, 10, COLORS.muted, 'normal');
+      }
+      this.currentY += 10;
+    }
+    if (linguagens.linguagem_b) {
+      this.currentY = this.writeWrappedText(
+        `${linguagens.linguagem_b.nome}: ${linguagens.linguagem_b.estilo_primario}`,
+        this.margin, this.currentY, this.contentWidth, 11, COLORS.text, 'bold'
+      );
+      if (linguagens.linguagem_b.como_se_sente_amado) {
+        this.currentY = this.writeWrappedText(linguagens.linguagem_b.como_se_sente_amado, this.margin, this.currentY + 4, this.contentWidth, 10, COLORS.muted, 'normal');
+      }
+      this.currentY += 10;
+    }
+    if (linguagens.micro_acordos?.length) {
+      this.currentY = this.writeWrappedText("Micro acordos:", this.margin, this.currentY, this.contentWidth, 10, COLORS.green, 'bold');
+      linguagens.micro_acordos.forEach((acordo: string) => {
+        this.drawIconCircle(this.margin + 4, this.currentY + 5, COLORS.green, 2);
+        this.currentY = this.writeWrappedText(acordo, this.margin + 10, this.currentY + 4, this.contentWidth - 12, 9, COLORS.text, 'normal');
+      });
+    }
+  }
+
+  // ==========================================
+  // 7 PILLARS - NELLO 16 (Processamento de Decisao)
+  // ==========================================
+  private renderNello16(content: any) {
+    const proc = content.processamento_decisao;
+    if (!proc) return;
+
+    this.addNewPage();
+    this.renderSectionHeader(proc.titulo || "Processamento de Decisao", COLORS.primary);
+
+    if (proc.tipo_a) {
+      this.currentY = this.writeWrappedText(
+        `${proc.tipo_a.nome}: ${proc.tipo_a.tipo_nello16} - ${proc.tipo_a.como_decide || ''}`,
+        this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal'
+      );
+      this.currentY += 8;
+    }
+    if (proc.tipo_b) {
+      this.currentY = this.writeWrappedText(
+        `${proc.tipo_b.nome}: ${proc.tipo_b.tipo_nello16} - ${proc.tipo_b.como_decide || ''}`,
+        this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal'
+      );
+      this.currentY += 8;
+    }
+    if (proc.tensao_potencial) {
+      this.currentY = this.writeWrappedText(`Tensao: ${proc.tensao_potencial}`, this.margin, this.currentY, this.contentWidth, 10, COLORS.amber, 'normal');
+      this.currentY += 4;
+    }
+    if (proc.sinergia) {
+      this.currentY = this.writeWrappedText(`Sinergia: ${proc.sinergia}`, this.margin, this.currentY, this.contentWidth, 10, COLORS.green, 'bold');
+    }
+  }
+
+  // ==========================================
+  // MAIN GENERATION - UPDATED FOR 7 PILLARS
   // ==========================================
   public generate(content: any): jsPDF {
     this.renderCover();
     this.renderBoatMetaphor();
     this.renderTrafficLight(content);
     this.renderMeetingOfEssences(content);
-    this.renderDISCRadarChart(content); // Add the radar chart
+    this.renderDISCRadarChart(content);
     this.renderSantoBate(content);
     this.renderBichoPega(content);
     this.renderPotentialization(content);
+    
+    // 7 PILLARS PREMIUM SECTIONS
+    this.renderTemperaments(content);
+    this.renderIntelligences(content);
+    this.renderArchetypes(content);
+    this.renderConnectionStyles(content);
+    this.renderNello16(content);
+    
     this.renderTranslationTable(content);
     this.renderPeaceProtocol(content);
     this.renderSpouseManuals(content);
