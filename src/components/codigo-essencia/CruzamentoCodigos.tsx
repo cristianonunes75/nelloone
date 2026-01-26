@@ -214,23 +214,53 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
       // Fetch crossings where user is either user_a, user_b, or invited by email
       const userEmail = user.email?.toLowerCase() || '';
       
-      const { data, error } = await supabase
+      // First query: where user is user_a or user_b
+      const { data: dataById, error: errorById } = await supabase
         .from('codigo_cruzamentos')
         .select(`
           *,
           profiles:user_b_id(full_name),
           user_a_profile:user_a_id(full_name)
         `)
-        .or(`user_a_id.eq.${user.id},user_b_id.eq.${user.id},invite_email.ilike.${userEmail}`)
+        .or(`user_a_id.eq.${user.id},user_b_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error loading crossings:', error);
-        throw error;
+      // Second query: where user was invited by email (for pending invites)
+      let dataByEmail: any[] = [];
+      if (userEmail) {
+        const { data: emailData, error: errorEmail } = await supabase
+          .from('codigo_cruzamentos')
+          .select(`
+            *,
+            profiles:user_b_id(full_name),
+            user_a_profile:user_a_id(full_name)
+          `)
+          .ilike('invite_email', userEmail)
+          .order('created_at', { ascending: false });
+        
+        if (!errorEmail && emailData) {
+          dataByEmail = emailData;
+        }
+      }
+
+      if (errorById) {
+        console.error('Error loading crossings:', errorById);
+        throw errorById;
       }
       
-      console.log('Crossings loaded:', data);
-      setCrossings((data || []) as unknown as Crossing[]);
+      // Combine and deduplicate results
+      const allData = [...(dataById || [])];
+      for (const emailCrossing of dataByEmail) {
+        if (!allData.some(c => c.id === emailCrossing.id)) {
+          allData.push(emailCrossing);
+        }
+      }
+      
+      // Sort by created_at descending
+      allData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      
+      console.log('Crossings loaded:', allData);
+      setCrossings(allData as unknown as Crossing[]);
     } catch (err) {
       console.error('Error loading crossings:', err);
     } finally {
@@ -468,17 +498,21 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
               const StatusConfig = STATUS_CONFIG[crossing.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending;
               const StatusIcon = StatusConfig.icon;
               const isUserA = crossing.user_a_id === user?.id;
-              const isUserB = crossing.user_b_id === user?.id || (!crossing.user_b_id && crossing.invite_email?.toLowerCase() === user?.email?.toLowerCase());
+              const isUserBById = crossing.user_b_id === user?.id;
+              const isUserBByEmail = !crossing.user_b_id && crossing.invite_email?.toLowerCase() === user?.email?.toLowerCase();
+              const isUserB = isUserBById || isUserBByEmail;
               
               // For user_a, show user_b's name; for user_b, show user_a's name
-              const partnerName = isUserA 
+              const partnerName = isUserA && !isUserB
                 ? (crossing.profiles?.full_name || crossing.invite_email || 'Convidado')
-                : (crossing.user_a_profile?.full_name || 'Quem te convidou');
+                : isUserB
+                  ? (crossing.user_a_profile?.full_name || 'Quem te convidou')
+                  : (crossing.profiles?.full_name || crossing.invite_email || 'Parceiro');
               
               const canGenerate = crossing.status === 'accepted' && crossing.user_a_consent_at && crossing.user_b_consent_at;
               
-              // User B can accept if: status is pending, they're user_b (by id or email), and haven't consented yet
-              const canAccept = crossing.status === 'pending' && isUserB && !crossing.user_b_consent_at;
+              // User B can accept if: status is pending, they're user_b (by id or email), they're NOT user_a, and haven't consented yet
+              const canAccept = crossing.status === 'pending' && isUserB && !isUserA && !crossing.user_b_consent_at;
               
               return (
                 <Card key={crossing.id} className="hover:bg-muted/50 transition-colors">
