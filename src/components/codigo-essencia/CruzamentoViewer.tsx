@@ -1058,12 +1058,42 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           {zona.descricao && (
             <p className="text-sm text-muted-foreground">{zona.descricao}</p>
           )}
-          {zona.diferencas?.map((diff: any, i: number) => (
-            <div key={i} className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20">
-              <h4 className="font-medium text-amber-700 dark:text-amber-400 mb-1 text-sm">
-                ⚡ {diff.aspecto}
-              </h4>
-              <p className="text-sm">{diff.descricao}</p>
+          {asArray<any>(zona.diferencas).map((diff: any, i: number) => (
+            <div key={i} className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-2">
+              {/* Support for both old (aspecto/descricao) and new (pessoa_a_faz/pessoa_b_faz/micro_acordo) formats */}
+              {diff.aspecto && (
+                <h4 className="font-medium text-amber-700 dark:text-amber-400 mb-1 text-sm">
+                  ⚡ {diff.aspecto}
+                </h4>
+              )}
+              {diff.descricao && (
+                <p className="text-sm">{diff.descricao}</p>
+              )}
+              {/* New Identity v2.0 format */}
+              {diff.pessoa_a_faz && (
+                <div className="text-sm">
+                  <strong className="text-amber-700 dark:text-amber-400">
+                    {language === 'en' ? 'Person A tends to:' : 'Pessoa A tende a:'}
+                  </strong>
+                  <p className="text-foreground/80 mt-1">{diff.pessoa_a_faz}</p>
+                </div>
+              )}
+              {diff.pessoa_b_faz && (
+                <div className="text-sm">
+                  <strong className="text-amber-700 dark:text-amber-400">
+                    {language === 'en' ? 'Person B tends to:' : 'Pessoa B tende a:'}
+                  </strong>
+                  <p className="text-foreground/80 mt-1">{diff.pessoa_b_faz}</p>
+                </div>
+              )}
+              {diff.micro_acordo && (
+                <div className="p-2 rounded bg-emerald-500/10 border border-emerald-500/20">
+                  <strong className="text-xs text-emerald-700 dark:text-emerald-400">
+                    💡 {language === 'en' ? 'Micro-agreement:' : 'Micro-acordo:'}
+                  </strong>
+                  <p className="text-sm text-foreground/80 mt-1">{diff.micro_acordo}</p>
+                </div>
+              )}
             </div>
           ))}
         </CardContent>
