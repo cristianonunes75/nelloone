@@ -256,43 +256,86 @@ class PDFGenerator {
   }
 
   // ==========================================
-  // COVER PAGE
+  // PREMIUM BOOK-STYLE COVER PAGE
   // ==========================================
-  private renderCover() {
+  private renderCover(personAName?: string, personBName?: string) {
     this.pageNumber = 1;
     
-    // Full background
+    // Full background - Deep Navy
     this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
     this.doc.rect(0, 0, this.pageWidth, this.pageHeight, "F");
 
-    // Decorative pink accent line
-    this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
-    this.doc.rect(0, this.pageHeight / 3 - 2, this.pageWidth, 4, "F");
+    // Decorative gold accent lines
+    this.doc.setFillColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
+    this.doc.rect(20, 40, this.pageWidth - 40, 1, "F");
+    this.doc.rect(20, this.pageHeight - 50, this.pageWidth - 40, 1, "F");
+    
+    // Decorative corner elements
+    this.doc.setDrawColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
+    this.doc.setLineWidth(0.5);
+    // Top left corner
+    this.doc.line(20, 40, 20, 55);
+    this.doc.line(20, 40, 35, 40);
+    // Top right corner
+    this.doc.line(this.pageWidth - 20, 40, this.pageWidth - 20, 55);
+    this.doc.line(this.pageWidth - 20, 40, this.pageWidth - 35, 40);
+    // Bottom left
+    this.doc.line(20, this.pageHeight - 50, 20, this.pageHeight - 65);
+    this.doc.line(20, this.pageHeight - 50, 35, this.pageHeight - 50);
+    // Bottom right
+    this.doc.line(this.pageWidth - 20, this.pageHeight - 50, this.pageWidth - 20, this.pageHeight - 65);
+    this.doc.line(this.pageWidth - 20, this.pageHeight - 50, this.pageWidth - 35, this.pageHeight - 50);
 
-    // Heart circle (use pink circle instead of heart emoji)
+    // Infinity/Heart symbol using circles
+    const centerX = this.pageWidth / 2;
+    const symbolY = 95;
     this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
-    this.doc.circle(this.pageWidth / 2, this.pageHeight / 2 - 60, 22, "F");
-    // Draw a small inner accent
-    this.doc.setFillColor(255, 255, 255);
-    this.doc.circle(this.pageWidth / 2, this.pageHeight / 2 - 60, 8, "F");
+    this.doc.circle(centerX - 12, symbolY, 15, "S");
+    this.doc.circle(centerX + 12, symbolY, 15, "S");
+    this.doc.setFillColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
+    this.doc.circle(centerX, symbolY, 5, "F");
 
-    // Title
+    // Book Title
     this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(36);
+    this.doc.setFontSize(11);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.text("IDENTITY COUPLE PREMIUM", centerX, 135, { align: "center" });
+    
+    this.doc.setFontSize(32);
     this.doc.setFont("helvetica", "bold");
-    this.doc.text(this.t.reportTitle, this.pageWidth / 2, this.pageHeight / 2 - 15, { align: "center" });
+    this.doc.text("MAPA DEFINITIVO", centerX, 155, { align: "center" });
+    this.doc.text("DO CASAL", centerX, 170, { align: "center" });
+
+    // Couple names if provided
+    if (personAName && personBName) {
+      this.doc.setFontSize(16);
+      this.doc.setFont("helvetica", "italic");
+      this.doc.setTextColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
+      this.doc.text(`${personAName} & ${personBName}`, centerX, 195, { align: "center" });
+    }
 
     // Subtitle
-    this.doc.setFontSize(14);
+    this.doc.setFontSize(12);
     this.doc.setFont("helvetica", "normal");
     this.doc.setTextColor(200, 200, 200);
-    this.doc.text(this.t.subtitle, this.pageWidth / 2, this.pageHeight / 2 + 5, { align: "center" });
+    this.doc.text("O Livro da Identidade do Seu Relacionamento", centerX, 215, { align: "center" });
+    this.doc.text("7 Pilares de Autoconhecimento Integrado", centerX, 228, { align: "center" });
 
-    // Signature
-    this.doc.setFontSize(12);
-    this.doc.setFont("helvetica", "italic");
-    this.doc.setTextColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
-    this.doc.text(this.t.signature, this.pageWidth / 2, this.pageHeight / 2 + 22, { align: "center" });
+    // 7 Pillars Icons (small circles in a row)
+    const pillarsY = 250;
+    const pillarsColors = [COLORS.blue, COLORS.purple, COLORS.amber, COLORS.green, COLORS.pink, COLORS.red, COLORS.accent];
+    const pillarsNames = ["DISC", "Eneagrama", "Temperamentos", "Inteligencias", "Arquetipos", "Conexao", "Nello 16"];
+    const startX = 35;
+    const spacing = (this.pageWidth - 70) / 6;
+    
+    pillarsColors.forEach((color, i) => {
+      const x = startX + (i * spacing);
+      this.doc.setFillColor(color.r, color.g, color.b);
+      this.doc.circle(x, pillarsY, 4, "F");
+      this.doc.setFontSize(6);
+      this.doc.setTextColor(180, 180, 180);
+      this.doc.text(pillarsNames[i], x, pillarsY + 10, { align: "center" });
+    });
 
     // Date
     const date = new Date().toLocaleDateString(this.t === TRANSLATIONS.en ? 'en-US' : 'pt-BR', {
@@ -300,15 +343,86 @@ class PDFGenerator {
       month: "long",
       year: "numeric",
     });
-    this.doc.setFontSize(11);
-    this.doc.setTextColor(180, 180, 180);
-    this.doc.text(date, this.pageWidth / 2, this.pageHeight / 2 + 40, { align: "center" });
+    this.doc.setFontSize(10);
+    this.doc.setTextColor(150, 150, 150);
+    this.doc.text(date, centerX, this.pageHeight - 75, { align: "center" });
 
     // Brand footer
-    this.doc.setFontSize(11);
+    this.doc.setFontSize(14);
     this.doc.setFont("helvetica", "bold");
     this.doc.setTextColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
-    this.doc.text("NELLO ONE", this.pageWidth / 2, this.pageHeight - 25, { align: "center" });
+    this.doc.text("NELLO ONE", centerX, this.pageHeight - 60, { align: "center" });
+    
+    this.doc.setFontSize(8);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.setTextColor(100, 100, 100);
+    this.doc.text("O Metodo Identity de Autoconhecimento", centerX, this.pageHeight - 55, { align: "center" });
+  }
+
+  // ==========================================
+  // TABLE OF CONTENTS (SUMARIO)
+  // ==========================================
+  private renderTableOfContents() {
+    this.addNewPage();
+    
+    const centerX = this.pageWidth / 2;
+    
+    // Title
+    this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 15, 3, 3, "F");
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text("SUMARIO", centerX, this.currentY + 10, { align: "center" });
+    this.currentY += 25;
+
+    const chapters = [
+      { num: "1", title: "A Metafora do Barco", desc: "Seu relacionamento como uma navegacao compartilhada" },
+      { num: "2", title: "Semaforo Relacional", desc: "Zonas de harmonia, ajuste e atencao" },
+      { num: "3", title: "O Encontro das Essencias", desc: "Onde suas identidades se cruzam" },
+      { num: "4", title: "Perfil DISC Comparativo", desc: "Comportamentos e estilos de acao" },
+      { num: "5", title: "Ritmos Biologicos (Temperamentos)", desc: "Protocolo de Ritmo do Casal" },
+      { num: "6", title: "Sinergia de Talentos (Inteligencias)", desc: "Como seus dons se complementam" },
+      { num: "7", title: "Dinamica de Papeis (Arquetipos)", desc: "O Mito do Casal" },
+      { num: "8", title: "Linguagens de Conexao Afetiva", desc: "Plano de Abastecimento Emocional" },
+      { num: "9", title: "Processamento de Decisao (Nello 16)", desc: "Como voces decidem juntos" },
+      { num: "10", title: "Tabela de Traducao do Casal", desc: "Decodificando comportamentos" },
+      { num: "11", title: "Protocolo de Paz Unificado", desc: "Regras para conflitos saudaveis" },
+      { num: "12", title: "Manual do Parceiro(a)", desc: "Guia pratico de convivencia" },
+      { num: "13", title: "Alertas de Pressao", desc: "Gatilhos e defesas automaticas" },
+      { num: "14", title: "Desafio de Conexao 24h", desc: "Acao pratica imediata" },
+      { num: "15", title: "Proximos Passos: Ativacoes", desc: "Continuidade e evolucao" },
+    ];
+
+    chapters.forEach((chapter, idx) => {
+      const isEven = idx % 2 === 0;
+      if (isEven) {
+        this.doc.setFillColor(248, 248, 252);
+        this.doc.rect(this.margin, this.currentY - 3, this.contentWidth, 14, "F");
+      }
+      
+      // Chapter number circle
+      this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
+      this.doc.circle(this.margin + 8, this.currentY + 4, 5, "F");
+      this.doc.setTextColor(255, 255, 255);
+      this.doc.setFontSize(8);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(chapter.num, this.margin + 8, this.currentY + 6, { align: "center" });
+      
+      // Title
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(10);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(chapter.title, this.margin + 18, this.currentY + 5);
+      
+      // Description
+      this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+      this.doc.setFontSize(8);
+      this.doc.setFont("helvetica", "normal");
+      this.doc.text(chapter.desc, this.margin + 18, this.currentY + 11);
+      
+      this.currentY += 16;
+    });
   }
 
   // ==========================================
@@ -1112,35 +1226,115 @@ class PDFGenerator {
   }
 
   // ==========================================
-  // 7 PILLARS - TEMPERAMENTS (Ritmos Biológicos)
+  // 7 PILLARS - TEMPERAMENTS (Protocolo de Ritmo do Casal)
   // ==========================================
   private renderTemperaments(content: any) {
     const ritmos = content.ritmos_biologicos;
     if (!ritmos) return;
 
     this.addNewPage();
-    this.renderSectionHeader(ritmos.titulo || "Ritmos Biologicos do Casal", COLORS.amber);
+    
+    // Premium header with chapter number
+    this.doc.setFillColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(8);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.text("CAPITULO 5", this.margin + 8, this.currentY + 7);
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text("PROTOCOLO DE RITMO DO CASAL", this.margin + 8, this.currentY + 16);
+    this.currentY += 30;
 
+    // Intro text
+    const intro = "Os temperamentos revelam o ritmo biologico de cada um - como voces processam energia, lidam com mudancas e se recuperam do estresse. Entender isso evita conflitos desnecessarios.";
+    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+    this.currentY += 12;
+
+    // Person A temperament card
     if (ritmos.temperamento_a) {
-      this.currentY = this.writeWrappedText(
-        `${ritmos.temperamento_a.nome}: ${ritmos.temperamento_a.temperamento_primario} - ${ritmos.temperamento_a.caracteristicas || ''}`,
-        this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal'
-      );
-      this.currentY += 8;
+      this.ensureSpace(50);
+      this.doc.setFillColor(COLORS.amberLight.r, COLORS.amberLight.g, COLORS.amberLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
+      
+      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.amber, 6);
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(12);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(ritmos.temperamento_a.nome || "Pessoa A", this.margin + 24, this.currentY + 14);
+      
+      this.doc.setFontSize(14);
+      this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+      this.doc.text(ritmos.temperamento_a.temperamento_primario || "", this.margin + 8, this.currentY + 28);
+      
+      if (ritmos.temperamento_a.caracteristicas) {
+        this.doc.setFontSize(9);
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.setFont("helvetica", "normal");
+        const charLines = this.doc.splitTextToSize(ritmos.temperamento_a.caracteristicas, this.contentWidth - 20);
+        this.doc.text(charLines, this.margin + 8, this.currentY + 38);
+      }
+      this.currentY += 52;
     }
+
+    // Person B temperament card
     if (ritmos.temperamento_b) {
-      this.currentY = this.writeWrappedText(
-        `${ritmos.temperamento_b.nome}: ${ritmos.temperamento_b.temperamento_primario} - ${ritmos.temperamento_b.caracteristicas || ''}`,
-        this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal'
-      );
-      this.currentY += 8;
+      this.ensureSpace(50);
+      this.doc.setFillColor(COLORS.purpleLight.r, COLORS.purpleLight.g, COLORS.purpleLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
+      
+      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.purple, 6);
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(12);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(ritmos.temperamento_b.nome || "Pessoa B", this.margin + 24, this.currentY + 14);
+      
+      this.doc.setFontSize(14);
+      this.doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+      this.doc.text(ritmos.temperamento_b.temperamento_primario || "", this.margin + 8, this.currentY + 28);
+      
+      if (ritmos.temperamento_b.caracteristicas) {
+        this.doc.setFontSize(9);
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.setFont("helvetica", "normal");
+        const charLines = this.doc.splitTextToSize(ritmos.temperamento_b.caracteristicas, this.contentWidth - 20);
+        this.doc.text(charLines, this.margin + 8, this.currentY + 38);
+      }
+      this.currentY += 52;
     }
+
+    // Synergy box
     if (ritmos.sinergia) {
-      this.currentY = this.writeWrappedText(ritmos.sinergia, this.margin, this.currentY, this.contentWidth, 10, COLORS.green, 'bold');
-      this.currentY += 6;
+      this.ensureSpace(35);
+      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 30, 4, 4, "F");
+      this.doc.setDrawColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 30, 4, 4, "S");
+      
+      this.drawIconCircle(this.margin + 10, this.currentY + 8, COLORS.green, 4);
+      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+      this.doc.setFontSize(10);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text("Sinergia de Ritmos", this.margin + 18, this.currentY + 10);
+      
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "normal");
+      const synLines = this.doc.splitTextToSize(ritmos.sinergia, this.contentWidth - 20);
+      this.doc.text(synLines, this.margin + 8, this.currentY + 20);
+      this.currentY += 36;
     }
+
+    // Practical adjustment
     if (ritmos.ajuste_pratico) {
-      this.currentY = this.writeWrappedText(ritmos.ajuste_pratico, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+      this.ensureSpace(25);
+      this.doc.setFillColor(248, 248, 252);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 3, 3, "F");
+      this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "italic");
+      const adjLines = this.doc.splitTextToSize("Ajuste Pratico: " + ritmos.ajuste_pratico, this.contentWidth - 16);
+      this.doc.text(adjLines, this.margin + 8, this.currentY + 12);
     }
   }
 
@@ -1152,30 +1346,106 @@ class PDFGenerator {
     if (!talentos) return;
 
     this.addNewPage();
-    this.renderSectionHeader(talentos.titulo || "Sinergia de Talentos", COLORS.blue);
+    
+    // Premium header
+    this.doc.setFillColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(8);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.text("CAPITULO 6", this.margin + 8, this.currentY + 7);
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text("SINERGIA DE TALENTOS", this.margin + 8, this.currentY + 16);
+    this.currentY += 30;
 
+    const intro = "Cada pessoa possui um mosaico unico de inteligencias. Quando os talentos de um suprem as fraquezas do outro, o casal se torna mais forte que a soma das partes.";
+    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+    this.currentY += 12;
+
+    // Person A talents
     if (talentos.talentos_a) {
-      this.currentY = this.writeWrappedText(
-        `${talentos.talentos_a.nome}: ${(talentos.talentos_a.top_3 || []).join(', ')}`,
-        this.margin, this.currentY, this.contentWidth, 11, COLORS.text, 'bold'
-      );
+      this.ensureSpace(55);
+      this.doc.setFillColor(COLORS.blueLight.r, COLORS.blueLight.g, COLORS.blueLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 50, 4, 4, "F");
+      
+      this.doc.setTextColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(talentos.talentos_a.nome || "Pessoa A", this.margin + 8, this.currentY + 12);
+      
+      // Top 3 as badges
+      const top3 = talentos.talentos_a.top_3 || [];
+      let badgeX = this.margin + 8;
+      this.doc.setFontSize(8);
+      top3.forEach((talent: string, i: number) => {
+        const textWidth = this.doc.getTextWidth(talent) + 8;
+        this.doc.setFillColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
+        this.doc.roundedRect(badgeX, this.currentY + 16, textWidth, 10, 2, 2, "F");
+        this.doc.setTextColor(255, 255, 255);
+        this.doc.text(talent, badgeX + 4, this.currentY + 23);
+        badgeX += textWidth + 4;
+      });
+
       if (talentos.talentos_a.contribuicao) {
-        this.currentY = this.writeWrappedText(talentos.talentos_a.contribuicao, this.margin, this.currentY + 4, this.contentWidth, 10, COLORS.muted, 'normal');
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFontSize(9);
+        this.doc.setFont("helvetica", "normal");
+        const contLines = this.doc.splitTextToSize(talentos.talentos_a.contribuicao, this.contentWidth - 20);
+        this.doc.text(contLines, this.margin + 8, this.currentY + 38);
       }
-      this.currentY += 10;
+      this.currentY += 56;
     }
+
+    // Person B talents
     if (talentos.talentos_b) {
-      this.currentY = this.writeWrappedText(
-        `${talentos.talentos_b.nome}: ${(talentos.talentos_b.top_3 || []).join(', ')}`,
-        this.margin, this.currentY, this.contentWidth, 11, COLORS.text, 'bold'
-      );
+      this.ensureSpace(55);
+      this.doc.setFillColor(COLORS.purpleLight.r, COLORS.purpleLight.g, COLORS.purpleLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 50, 4, 4, "F");
+      
+      this.doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(talentos.talentos_b.nome || "Pessoa B", this.margin + 8, this.currentY + 12);
+      
+      const top3 = talentos.talentos_b.top_3 || [];
+      let badgeX = this.margin + 8;
+      this.doc.setFontSize(8);
+      top3.forEach((talent: string) => {
+        const textWidth = this.doc.getTextWidth(talent) + 8;
+        this.doc.setFillColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+        this.doc.roundedRect(badgeX, this.currentY + 16, textWidth, 10, 2, 2, "F");
+        this.doc.setTextColor(255, 255, 255);
+        this.doc.text(talent, badgeX + 4, this.currentY + 23);
+        badgeX += textWidth + 4;
+      });
+
       if (talentos.talentos_b.contribuicao) {
-        this.currentY = this.writeWrappedText(talentos.talentos_b.contribuicao, this.margin, this.currentY + 4, this.contentWidth, 10, COLORS.muted, 'normal');
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFontSize(9);
+        this.doc.setFont("helvetica", "normal");
+        const contLines = this.doc.splitTextToSize(talentos.talentos_b.contribuicao, this.contentWidth - 20);
+        this.doc.text(contLines, this.margin + 8, this.currentY + 38);
       }
-      this.currentY += 10;
+      this.currentY += 56;
     }
+
+    // Complementarity
     if (talentos.complementaridade) {
-      this.currentY = this.writeWrappedText(talentos.complementaridade, this.margin, this.currentY, this.contentWidth, 10, COLORS.green, 'bold');
+      this.ensureSpace(30);
+      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 25, 4, 4, "F");
+      this.drawIconCircle(this.margin + 10, this.currentY + 8, COLORS.green, 4);
+      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+      this.doc.setFontSize(10);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text("Complementaridade", this.margin + 18, this.currentY + 10);
+      
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "normal");
+      const compLines = this.doc.splitTextToSize(talentos.complementaridade, this.contentWidth - 20);
+      this.doc.text(compLines, this.margin + 8, this.currentY + 18);
     }
   }
 
@@ -1289,10 +1559,116 @@ class PDFGenerator {
   }
 
   // ==========================================
-  // MAIN GENERATION - UPDATED FOR 7 PILLARS
+  // NEXT STEPS: ACTIVATIONS (Proximos Passos)
+  // ==========================================
+  private renderNextStepsActivations(content: any) {
+    this.addNewPage();
+    
+    // Premium section header
+    this.doc.setFillColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 15, 3, 3, "F");
+    this.doc.setTextColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
+    this.doc.setFontSize(12);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text("PROXIMOS PASSOS: ATIVACOES", this.pageWidth / 2, this.currentY + 10, { align: "center" });
+    this.currentY += 25;
+
+    // Intro text
+    const introText = "Seu Mapa Definitivo e apenas o comeco. A jornada de autoconhecimento do casal continua com acoes praticas e acompanhamento. Aqui estao os proximos passos para transformar esse conhecimento em evolucao real.";
+    this.currentY = this.writeWrappedText(introText, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+    this.currentY += 12;
+
+    const activations = [
+      {
+        title: "Ativacao 1: Semana do Espelho",
+        desc: "Durante 7 dias, cada parceiro pratica uma acao especifica baseada na linguagem de conexao do outro. Ao final, compartilham o que sentiram.",
+        color: COLORS.pink
+      },
+      {
+        title: "Ativacao 2: Conselho do Casal",
+        desc: "Agendem uma 'reuniao mensal' de 30 minutos para revisar o Semaforo Relacional e celebrar progressos na zona verde.",
+        color: COLORS.green
+      },
+      {
+        title: "Ativacao 3: Diario de Traducao",
+        desc: "Usem a Tabela de Traducao sempre que surgirem mal-entendidos. Anotem situacoes reais para expandir seu vocabulario compartilhado.",
+        color: COLORS.blue
+      },
+      {
+        title: "Ativacao 4: Protocolo de Paz em Acao",
+        desc: "Na proxima discussao, apliquem uma das regras do Protocolo de Paz. Depois, avaliem: funcionou? O que ajustar?",
+        color: COLORS.amber
+      },
+      {
+        title: "Ativacao 5: Revisao Trimestral",
+        desc: "A cada 3 meses, releiam o Mapa juntos. Identifiquem o que evoluiu e o que ainda precisa de atencao. Celebrem o crescimento.",
+        color: COLORS.purple
+      }
+    ];
+
+    activations.forEach((activation, idx) => {
+      const cardHeight = 45;
+      this.ensureSpace(cardHeight);
+
+      // Card background
+      this.doc.setFillColor(248, 248, 252);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 4, 4, "F");
+      
+      // Colored left border
+      this.doc.setFillColor(activation.color.r, activation.color.g, activation.color.b);
+      this.doc.rect(this.margin, this.currentY, 4, cardHeight, "F");
+
+      // Number badge
+      this.drawIconCircle(this.margin + 15, this.currentY + 10, activation.color, 6);
+      this.doc.setTextColor(255, 255, 255);
+      this.doc.setFontSize(10);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(String(idx + 1), this.margin + 15, this.currentY + 12, { align: "center" });
+
+      // Title
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(activation.title, this.margin + 28, this.currentY + 12);
+
+      // Description
+      this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "normal");
+      const descLines = this.doc.splitTextToSize(activation.desc, this.contentWidth - 35);
+      this.doc.text(descLines, this.margin + 10, this.currentY + 22);
+
+      this.currentY += cardHeight + 6;
+    });
+
+    // CTA for recurrence
+    this.currentY += 10;
+    this.ensureSpace(40);
+    
+    this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 35, 4, 4, "F");
+    
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(12);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text("Quer acompanhamento personalizado?", this.pageWidth / 2, this.currentY + 12, { align: "center" });
+    
+    this.doc.setFontSize(10);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.text("Conheca o Programa Identity Couple Mentoria", this.pageWidth / 2, this.currentY + 22, { align: "center" });
+    this.doc.text("nello.one/couple-mentoria", this.pageWidth / 2, this.currentY + 30, { align: "center" });
+  }
+
+  // ==========================================
+  // MAIN GENERATION - PREMIUM 7 PILLARS BOOK
   // ==========================================
   public generate(content: any): jsPDF {
-    this.renderCover();
+    // Extract names for cover
+    const personAName = content.perfil_a?.nome || content.usuario_a?.nome || content.papeis_identificados?.sensor_direcao?.nome;
+    const personBName = content.perfil_b?.nome || content.usuario_b?.nome || content.papeis_identificados?.condutor_curso?.nome;
+    
+    this.renderCover(personAName, personBName);
+    this.renderTableOfContents();
     this.renderBoatMetaphor();
     this.renderTrafficLight(content);
     this.renderMeetingOfEssences(content);
@@ -1314,6 +1690,7 @@ class PDFGenerator {
     this.renderPressureAlerts(content);
     this.renderConnectionChallenge(content);
     this.renderSeekHelp(content);
+    this.renderNextStepsActivations(content);
     this.renderClosing(content);
 
     return this.doc;
