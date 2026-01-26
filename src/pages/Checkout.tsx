@@ -198,8 +198,11 @@ const Checkout = () => {
 
   // Process zero-value purchase directly in database
   const processZeroValuePurchase = async () => {
+    console.log("[ZERO-VALUE] Starting zero-value purchase for user:", user?.id);
+    
     try {
-      // Update profile to grant journey access
+      // Step 1: Update profile to grant journey access
+      console.log("[ZERO-VALUE] Step 1: Updating profile...");
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
@@ -209,43 +212,80 @@ const Checkout = () => {
         })
         .eq("id", user!.id);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("[ZERO-VALUE] Profile update error:", profileError);
+        throw new Error(`Profile update failed: ${profileError.message}`);
+      }
+      console.log("[ZERO-VALUE] Profile updated successfully");
 
-      // Get all tests to create purchase records
+      // Step 2: Get all active tests
+      console.log("[ZERO-VALUE] Step 2: Fetching tests...");
       const { data: allTests, error: testsError } = await supabase
         .from("tests")
         .select("id, name, type")
         .eq("active", true);
 
-      if (testsError) throw testsError;
+      if (testsError) {
+        console.error("[ZERO-VALUE] Tests fetch error:", testsError);
+        throw new Error(`Tests fetch failed: ${testsError.message}`);
+      }
+      console.log("[ZERO-VALUE] Found tests:", allTests?.length || 0);
 
+      // Step 3: Create purchase records for each test
       if (allTests && allTests.length > 0) {
-        const purchaseRecords = allTests.map(test => ({
-          user_id: user!.id,
-          test_id: test.id,
-          price_paid: 0,
-          payment_status: "completed",
-          payment_method: "coupon_100",
-          transaction_id: `coupon_${appliedCoupon?.code}_${Date.now()}`,
-          purchase_category: "jornada_completa",
-          test_slug: test.type,
-          metadata: {
-            coupon_code: appliedCoupon?.code,
-            product_type: "jornada_completa",
-            zero_value_purchase: true,
-            processed_at: new Date().toISOString(),
-          },
-        }));
+        console.log("[ZERO-VALUE] Step 3: Creating purchase records...");
+        const transactionId = `coupon_${appliedCoupon?.code || 'free'}_${Date.now()}`;
+        
+        for (const test of allTests) {
+          const purchaseData = {
+            user_id: user!.id,
+            test_id: test.id,
+            price_paid: 0,
+            payment_status: "completed",
+            payment_method: "coupon_100",
+            transaction_id: transactionId,
+            purchase_category: "jornada_completa",
+            test_slug: test.type,
+            metadata: {
+              coupon_code: appliedCoupon?.code || null,
+              product_type: "jornada_completa",
+              zero_value_purchase: true,
+              processed_at: new Date().toISOString(),
+            },
+          };
 
-        const { error: purchaseError } = await supabase
-          .from("test_purchases")
-          .upsert(purchaseRecords, { onConflict: "user_id,test_id", ignoreDuplicates: false });
+          // Try insert first, if conflict, update
+          const { error: insertError } = await supabase
+            .from("test_purchases")
+            .insert(purchaseData);
 
-        if (purchaseError) throw purchaseError;
+          if (insertError) {
+            // If duplicate, update existing record
+            if (insertError.code === '23505') {
+              console.log(`[ZERO-VALUE] Updating existing purchase for test ${test.id}`);
+              await supabase
+                .from("test_purchases")
+                .update({
+                  price_paid: 0,
+                  payment_status: "completed",
+                  payment_method: "coupon_100",
+                  transaction_id: transactionId,
+                  purchase_category: "jornada_completa",
+                  metadata: purchaseData.metadata,
+                })
+                .eq("user_id", user!.id)
+                .eq("test_id", test.id);
+            } else {
+              console.error(`[ZERO-VALUE] Insert error for test ${test.id}:`, insertError);
+            }
+          }
+        }
+        console.log("[ZERO-VALUE] Purchase records created/updated");
       }
 
-      // Update coupon usage
+      // Step 4: Update coupon usage
       if (appliedCoupon?.code) {
+        console.log("[ZERO-VALUE] Step 4: Updating coupon usage...");
         const { data: couponData } = await supabase
           .from("coupons")
           .select("times_used")
@@ -260,20 +300,23 @@ const Checkout = () => {
         }
       }
 
-      // Log the transaction
+      // Step 5: Log the transaction
+      console.log("[ZERO-VALUE] Step 5: Logging transaction...");
       await supabase.from("audit_logs").insert({
         action: "ZERO_VALUE_PURCHASE",
         table_name: "test_purchases",
         record_id: user!.id,
         user_id: user!.id,
         new_data: {
-          coupon_code: appliedCoupon?.code,
+          coupon_code: appliedCoupon?.code || null,
           product_type: "jornada_completa",
           currency: currency.toLowerCase(),
           processed_at: new Date().toISOString(),
         },
       });
 
+      console.log("[ZERO-VALUE] Purchase completed successfully!");
+      
       toast({
         title: language === 'en' ? "Access Granted!" : "Acesso Liberado!",
         description: language === 'en' 
@@ -286,8 +329,13 @@ const Checkout = () => {
       navigate(dashboardPath);
       
     } catch (error: any) {
-      console.error("Zero value purchase error:", error);
-      throw error;
+      console.error("[ZERO-VALUE] Purchase error:", error);
+      setIsProcessing(false);
+      toast({
+        title: language === 'en' ? "Error" : "Erro",
+        description: error.message || (language === 'en' ? "Failed to activate access" : "Falha ao ativar acesso"),
+        variant: "destructive",
+      });
     }
   };
 
