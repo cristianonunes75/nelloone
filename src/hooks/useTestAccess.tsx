@@ -51,12 +51,29 @@ export const useTestAccess = () => {
     (p as any).purchase_category === 'jornada_completa'
   ) || false;
 
+  // Debug: Log purchase detection
+  console.log("[useTestAccess] Purchase Detection:", {
+    userId: effectiveUserId,
+    hasBundlePurchase,
+    purchasesCount: purchases?.length || 0,
+    bundlePurchases: purchases?.filter(p => (p as any).purchase_category === 'jornada_completa').length || 0,
+    isLoading: purchasesLoading || profileLoading,
+  });
+
   // Check if user completed Arquétipos (step 5, which is journey_completed_tests >= 5)
   // After completing Arquétipos, all remaining tests should be unlocked
   const hasCompletedArquetipos = (userProfile?.journey_completed_tests ?? 0) >= 5;
 
   // Full journey access = bundle purchase OR completed Arquétipos
   const hasFullJourneyAccess = hasBundlePurchase || hasCompletedArquetipos;
+  
+  // Debug: Log final access decision
+  console.log("[useTestAccess] Final Access Status:", {
+    hasFullJourneyAccess,
+    hasBundlePurchase,
+    hasCompletedArquetipos,
+    journeyCompletedTests: userProfile?.journey_completed_tests ?? 0,
+  });
   
   // Loading state - important to avoid false negatives during data fetch
   const isLoading = purchasesLoading || profileLoading;

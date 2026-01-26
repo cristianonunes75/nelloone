@@ -283,10 +283,17 @@ const Cliente = () => {
   };
 
   const handleStartTest = async (step: typeof journeySteps[0]) => {
+    console.log("[Cliente] handleStartTest called:", {
+      testId: step.testId,
+      testName: step.name,
+      testType: step.testType,
+    });
+
     // Start test directly and navigate to test execution
     try {
       const userTest = await startTestAsync(step.testId);
       const basePath = getBasePath();
+      console.log("[Cliente] Navigating to test execution:", `${basePath}/cliente/test-execution/${step.testId}/${userTest.id}`);
       navigate(`${basePath}/cliente/test-execution/${step.testId}/${userTest.id}`);
     } catch (error) {
       toast({
@@ -729,7 +736,14 @@ const Cliente = () => {
                 onStartTest={handleStartTest}
                 onContinueTest={handleContinueTest}
                 onViewResult={handleViewResult}
-                onPurchase={(step) => navigate(`${getBasePath()}/cliente/comprar/${step.testId}`)}
+                onPurchase={(step) => {
+                  console.log("[Cliente] onPurchase called:", {
+                    testId: step.testId,
+                    testName: step.name,
+                    navigatingTo: `${getBasePath()}/cliente/comprar/${step.testId}`,
+                  });
+                  navigate(`${getBasePath()}/cliente/comprar/${step.testId}`);
+                }}
               />
             );
           })()}
