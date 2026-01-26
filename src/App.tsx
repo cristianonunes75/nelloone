@@ -35,6 +35,7 @@ import CruzamentosPage from "./pages/cliente/CruzamentosPage";
 import ComprarTeste from "./pages/ComprarTeste";
 import DiagnosticoPDF from "./pages/DiagnosticoPDF";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
+import Checkout from "./pages/Checkout";
 import RelatorioConjugePublico from "./pages/RelatorioConjugePublico";
 import RelatorioContextualPublico from "./pages/RelatorioContextualPublico";
 import ResetPassword from "./pages/ResetPassword";
@@ -72,6 +73,11 @@ const AppRoutes = () => (
     <Route path="/relatorio/:tipo/:token" element={<RelatorioContextualPublico />} />
     <Route path="/en/report/:tipo/:token" element={<RelatorioContextualPublico />} />
     <Route path="/pt-pt/relatorio/:tipo/:token" element={<RelatorioContextualPublico />} />
+    
+    {/* Checkout page - purchase journey */}
+    <Route path="/checkout" element={<Checkout />} />
+    <Route path="/en/checkout" element={<Checkout />} />
+    <Route path="/pt-pt/checkout" element={<Checkout />} />
     
     {/* Checkout success - verifies payment server-side */}
     <Route path="/checkout/success" element={<CheckoutSuccess />} />
