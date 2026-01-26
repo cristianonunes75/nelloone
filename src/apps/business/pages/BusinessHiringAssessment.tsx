@@ -217,20 +217,62 @@ export default function BusinessHiringAssessment() {
 
       if (questionsError) throw questionsError;
 
-      setQuestions((questionsData || []).map(q => ({ ...q, question: q.question_text })));
-      setCurrentIndex(0);
-      setAnswers({});
+      const mappedQuestions = (questionsData || []).map(q => ({ ...q, question: q.question_text }));
+      setQuestions(mappedQuestions);
       
-      // Find and update assessment
+      // Find assessment
       const assessment = assessments.find(a => a.test_type === testType);
+      
+      // RESTORE PROGRESS: Load existing answers if any
+      let restoredAnswers: Record<string, string | number> = {};
+      let startIndex = 0;
+      
       if (assessment) {
+        // Fetch existing answers for this assessment
+        const { data: existingAnswers, error: answersError } = await supabase
+          .from("hiring_answers")
+          .select("question_number, answer")
+          .eq("assessment_id", assessment.id)
+          .order("question_number");
+        
+        if (!answersError && existingAnswers && existingAnswers.length > 0) {
+          console.log(`📥 Restoring ${existingAnswers.length} saved answers`);
+          
+          // Map answers back to state format (question_id -> value)
+          existingAnswers.forEach(savedAnswer => {
+            const matchingQuestion = mappedQuestions.find(q => q.question_number === savedAnswer.question_number);
+            const answerData = savedAnswer.answer as { value?: string | number } | null;
+            if (matchingQuestion && answerData?.value !== undefined) {
+              restoredAnswers[matchingQuestion.id] = answerData.value;
+            }
+          });
+          
+          // Start from the last answered question (or next unanswered)
+          const lastAnsweredNumber = Math.max(...existingAnswers.map(a => a.question_number));
+          const nextQuestionIndex = mappedQuestions.findIndex(q => q.question_number > lastAnsweredNumber);
+          
+          // If all questions answered, start at last one; otherwise start at next unanswered
+          startIndex = nextQuestionIndex >= 0 ? nextQuestionIndex : mappedQuestions.length - 1;
+          
+          toast.success(`Progresso restaurado! Continuando da pergunta ${startIndex + 1}.`);
+        }
+        
+        // Update assessment status
+        const isNewStart = Object.keys(restoredAnswers).length === 0;
         await supabase
           .from("hiring_assessments")
-          .update({ status: "in_progress", started_at: new Date().toISOString() })
+          .update({ 
+            status: "in_progress", 
+            started_at: isNewStart ? new Date().toISOString() : (assessment as any).started_at || new Date().toISOString(),
+            last_activity_at: new Date().toISOString()
+          })
           .eq("id", assessment.id);
         
         setCurrentAssessment(assessment);
       }
+
+      setAnswers(restoredAnswers);
+      setCurrentIndex(startIndex);
 
       // Update candidate status
       if (candidate.status === "pending" || candidate.status === "invited") {
