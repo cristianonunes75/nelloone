@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useBusinessAuth } from "../hooks/useBusinessAuth";
@@ -11,6 +11,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Loader2, Mail, Phone, Briefcase, Calendar, CheckCircle2, Clock, AlertCircle, Target, AlertTriangle, Users, Compass, Eye, UserCircle, FileText, ExternalLink } from "lucide-react";
 import { CandidateAttachments } from "../components/CandidateAttachments";
 import { CandidateResultsFeedback } from "../components/CandidateResultsFeedback";
+import { HiringAssessmentProgressCard } from "../components/HiringAssessmentProgressCard";
+import { HiringPartialDISCResult } from "../components/HiringPartialDISCResult";
+import { HiringPartialTemperamentResult } from "../components/HiringPartialTemperamentResult";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DISC_PROFILES, type DISCScores } from "@/lib/disc";
@@ -21,6 +24,12 @@ import {
   getCombinedProfileInsights 
 } from "@/lib/discHiringInsights";
 import { getUnifiedDiscRanking, getDiscDisplayData, type DiscRankingItem } from "@/lib/discRanking";
+
+// Total questions for progress calculation
+const TOTAL_QUESTIONS = {
+  disc: 28,
+  temperamentos: 40
+};
 
 interface Attachment {
   id: string;
@@ -60,6 +69,8 @@ interface Assessment {
   status: string;
   completed_at: string | null;
   result_data: any;
+  current_question_number?: number | null;
+  last_activity_at?: string | null;
 }
 
 const temperamentData: Record<string, { name: string; emoji: string; color: string }> = {
@@ -94,13 +105,7 @@ export default function BusinessHiringResults() {
     setSearchParams({ view: mode });
   };
 
-  useEffect(() => {
-    if (candidateId && company?.id) {
-      fetchCandidateData();
-    }
-  }, [candidateId, company?.id]);
-
-  const fetchCandidateData = async () => {
+  const fetchCandidateData = useCallback(async () => {
     if (!candidateId) return;
     setLoading(true);
     try {
@@ -124,7 +129,7 @@ export default function BusinessHiringResults() {
 
       const { data: assessmentsData, error: assessmentsError } = await supabase
         .from("hiring_assessments")
-        .select("*")
+        .select("*, current_question_number, last_activity_at")
         .eq("candidate_id", candidateId);
 
       if (assessmentsError) throw assessmentsError;
@@ -177,7 +182,40 @@ export default function BusinessHiringResults() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [candidateId]);
+
+  // Initial data fetch
+  useEffect(() => {
+    if (candidateId && company?.id) {
+      fetchCandidateData();
+    }
+  }, [candidateId, company?.id, fetchCandidateData]);
+
+  // Realtime subscription for live updates
+  useEffect(() => {
+    if (!candidateId) return;
+
+    const channel = supabase
+      .channel(`candidate-assessments-${candidateId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'hiring_assessments',
+          filter: `candidate_id=eq.${candidateId}`,
+        },
+        () => {
+          console.log('Assessment updated, refreshing data...');
+          fetchCandidateData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [candidateId, fetchCandidateData]);
 
   const handleOpenResume = async (resumeUrl: string) => {
     try {
@@ -369,12 +407,35 @@ export default function BusinessHiringResults() {
           </Card>
         )}
 
-        {/* Show full report only when both tests are complete */}
+        {/* Progress Cards - Always visible */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <HiringAssessmentProgressCard 
+            assessment={discAssessment as any}
+            testType="disc"
+            totalQuestions={TOTAL_QUESTIONS.disc}
+          />
+          <HiringAssessmentProgressCard 
+            assessment={temperamentAssessment as any}
+            testType="temperamentos"
+            totalQuestions={TOTAL_QUESTIONS.temperamentos}
+          />
+        </div>
+
+        {/* Partial DISC Result - Show as soon as completed */}
+        {discAssessment?.status === "completed" && discAssessment.result_data && (
+          <HiringPartialDISCResult result={discAssessment.result_data} />
+        )}
+
+        {/* Partial Temperament Result - Show as soon as completed */}
+        {temperamentAssessment?.status === "completed" && temperamentAssessment.result_data && (
+          <HiringPartialTemperamentResult result={temperamentAssessment.result_data} />
+        )}
+
+        {/* Full Report - Only when both complete */}
         {bothCompleted ? (
           viewMode === 'candidate' ? (
             /* Candidate View - Preview of what the candidate sees */
             (() => {
-              // SINGLE SOURCE OF TRUTH: Calculate DISC ranking for candidate view too
               const discDisplay = getDiscDisplayData(discAssessment.result_data);
               
               return (
@@ -407,9 +468,8 @@ export default function BusinessHiringResults() {
               );
             })()
           ) : (
-            /* HR View - Full detailed report */
+            /* HR View - Full detailed report (combined insights) */
             (() => {
-              // SINGLE SOURCE OF TRUTH: Calculate DISC ranking ONCE for all cards
               const discDisplay = getDiscDisplayData(discAssessment.result_data);
               const calculatedDiscPrimary = discDisplay.primaryKey || '';
               const tempPrimary = temperamentAssessment.result_data?.primary?.temperament || '';
@@ -422,30 +482,24 @@ export default function BusinessHiringResults() {
                     temperamentResult={temperamentAssessment.result_data}
                   />
 
-                  {/* 3. Perfil DISC Predominante */}
-                  <DISCProfileCard result={discAssessment.result_data} />
-
-                  {/* 4. Temperamento */}
-                  <TemperamentProfileCard result={temperamentAssessment.result_data} />
-
-                  {/* 5. Tendências Observáveis - Uses calculated primary */}
+                  {/* 5. Tendências Observáveis */}
                   <StrengthsCard 
                     discPrimary={calculatedDiscPrimary}
                     temperamentPrimary={tempPrimary}
                   />
 
-                  {/* 6. Pontos de Atenção - Uses calculated primary */}
+                  {/* 6. Pontos de Atenção */}
                   <WorkplaceRisksCard 
                     discPrimary={calculatedDiscPrimary}
                     temperamentPrimary={tempPrimary}
                   />
 
-                  {/* 7. Como Liderar este Perfil - Uses calculated primary */}
+                  {/* 7. Como Liderar este Perfil */}
                   <LeadershipGuideCard 
                     discPrimary={calculatedDiscPrimary}
                   />
 
-                  {/* 8. Indicação de Contexto - Uses calculated primary */}
+                  {/* 8. Indicação de Contexto */}
                   <ContextIndicationCard 
                     discPrimary={calculatedDiscPrimary}
                     temperamentPrimary={tempPrimary}
@@ -455,21 +509,15 @@ export default function BusinessHiringResults() {
             })()
           )
         ) : (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <Clock className="h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="text-lg font-medium mb-1">Aguardando avaliações</h3>
-              <p className="text-muted-foreground text-sm text-center max-w-md">
-                O relatório completo será exibido quando o candidato completar os testes de DISC e Temperamentos.
+          /* Waiting message when not both completed */
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-8">
+              <p className="text-sm text-muted-foreground text-center max-w-md">
+                {discAssessment?.status === "completed" || temperamentAssessment?.status === "completed" 
+                  ? "O resumo executivo e insights combinados serão exibidos quando ambos os testes estiverem completos."
+                  : "Os resultados serão exibidos assim que o candidato completar cada teste."
+                }
               </p>
-              <div className="mt-4 flex gap-3">
-                <Badge variant={discAssessment?.status === "completed" ? "default" : "secondary"}>
-                  DISC: {discAssessment?.status === "completed" ? "Completo" : "Pendente"}
-                </Badge>
-                <Badge variant={temperamentAssessment?.status === "completed" ? "default" : "secondary"}>
-                  Temperamentos: {temperamentAssessment?.status === "completed" ? "Completo" : "Pendente"}
-                </Badge>
-              </div>
             </CardContent>
           </Card>
         )}
