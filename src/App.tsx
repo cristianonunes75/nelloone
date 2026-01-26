@@ -41,6 +41,7 @@ import RelatorioContextualPublico from "./pages/RelatorioContextualPublico";
 import ResetPassword from "./pages/ResetPassword";
 import SubscriptionManagement from "./pages/SubscriptionManagement";
 import AcceptCrossingPage from "./pages/AcceptCrossingPage";
+import CruzamentoPublico from "./pages/CruzamentoPublico";
 const queryClient = new QueryClient();
 
 // Component to run version check hook
@@ -62,7 +63,11 @@ const AppRoutes = () => (
     <Route path="/aceitar-cruzamento/:token" element={<AcceptCrossingPage />} />
     <Route path="/en/accept-crossing/:token" element={<AcceptCrossingPage />} />
     <Route path="/pt-pt/aceitar-cruzamento/:token" element={<AcceptCrossingPage />} />
-    <Route path="/reset-password" element={<ResetPassword />} />
+    
+    {/* Public crossing report routes */}
+    <Route path="/cruzamento/:token" element={<CruzamentoPublico />} />
+    <Route path="/en/crossing/:token" element={<CruzamentoPublico />} />
+    <Route path="/pt-pt/cruzamento/:token" element={<CruzamentoPublico />} />
     
     {/* Public spouse report route (legacy) */}
     <Route path="/relatorio-conjuge/:token" element={<RelatorioConjugePublico />} />
