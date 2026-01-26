@@ -627,6 +627,19 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     const protocolo = content.protocolo_paz;
     if (!protocolo) return null;
 
+    // If this is the v2.0 structure, let renderProtocoloPazV2 handle it.
+    // Avoid rendering a legacy card that can appear empty.
+    const looksLikeV2 =
+      !!(protocolo as any)?.tempo_duplo ||
+      !!(protocolo as any)?.pergunta_recalibracao ||
+      !!(protocolo as any)?.proibicao_inferencia;
+    if (looksLikeV2) return null;
+
+    // If there are no rules, don't render an empty card.
+    const regras = Array.isArray((protocolo as any)?.regras) ? (protocolo as any).regras : [];
+    const hasAnyRule = regras.some((r: any) => r && (r.regra || r.porque));
+    if (!hasAnyRule) return null;
+
     return (
       <Card className="bg-gradient-to-br from-blue-500/5 to-purple-500/5 border-blue-500/20">
         <CardHeader className="pb-2">
@@ -718,6 +731,25 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
   const renderTranslationTable = () => {
     const tabela = content.tabela_traducao;
     if (!tabela) return null;
+
+    // If this is the v2.0 structure, let renderTabelaTraducaoV2 handle it.
+    // Avoid rendering a legacy card that can appear empty.
+    const looksLikeV2 =
+      !!(tabela as any)?.traducoes_sensor ||
+      !!(tabela as any)?.traducoes_condutor;
+    if (looksLikeV2) return null;
+
+    // Legacy cards can show up with only title/description if arrays are missing.
+    // Only render when at least one translation group has items.
+    const groups = [
+      (tabela as any)?.traducoes_usuario_a,
+      (tabela as any)?.traducoes_usuario_b,
+      (tabela as any)?.traducoes_pai,
+      (tabela as any)?.traducoes_filho,
+      (tabela as any)?.traducoes_a,
+      (tabela as any)?.traducoes_b,
+    ].filter((g) => Array.isArray(g) && g.length > 0);
+    if (groups.length === 0) return null;
 
     const renderTranslations = (translations: any[], title: string) => {
       if (!translations?.length) return null;
