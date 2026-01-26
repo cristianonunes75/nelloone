@@ -42,6 +42,7 @@ import ResetPassword from "./pages/ResetPassword";
 import SubscriptionManagement from "./pages/SubscriptionManagement";
 import AcceptCrossingPage from "./pages/AcceptCrossingPage";
 import CruzamentoPublico from "./pages/CruzamentoPublico";
+import WhatsApp from "./pages/WhatsApp";
 const queryClient = new QueryClient();
 
 // Component to run version check hook
@@ -58,6 +59,9 @@ const AppRoutes = () => (
     <Route path="/auth" element={<Auth />} />
     <Route path="/login" element={<Auth />} />
     <Route path="/reset-password" element={<ResetPassword />} />
+    <Route path="/whatsapp" element={<WhatsApp />} />
+    <Route path="/en/whatsapp" element={<WhatsApp />} />
+    <Route path="/pt-pt/whatsapp" element={<WhatsApp />} />
     
     {/* Accept crossing invitation routes - public but requires login */}
     <Route path="/aceitar-cruzamento/:token" element={<AcceptCrossingPage />} />

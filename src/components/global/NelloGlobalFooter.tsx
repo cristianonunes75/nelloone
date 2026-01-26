@@ -41,8 +41,8 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
     },
     { 
       label: 'WhatsApp', 
-      href: 'https://wa.me/5561992430090',
-      external: true,
+      href: '/whatsapp',
+      external: false,
       icon: MessageCircle
     },
     { 
