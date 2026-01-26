@@ -59,193 +59,180 @@ interface PersonProfile {
 }
 
 function extractPersonProfile(name: string, mapa: any): PersonProfile {
-  const sections = mapa?.sections || [];
+  const sections = mapa?.sections || mapa || [];
   
-  // Extract DISC
+  // First, try to find visual_data in any section (it's typically in retrato_essencial)
+  let visualData: any = null;
+  for (const section of sections) {
+    if (section?.visual_data) {
+      visualData = section.visual_data;
+      break;
+    }
+  }
+  
+  console.log(`[ExtractProfile] ${name} - Found visual_data:`, visualData ? 'YES' : 'NO');
+  
+  // ============================================================================
+  // EXTRACT DISC - Priority: visual_data > regex fallback
+  // ============================================================================
   let disc = { D: 25, I: 25, S: 25, C: 25 };
-  const discSection = sections.find((s: any) => 
-    s.id?.toLowerCase().includes('disc') || 
-    s.title?.toLowerCase().includes('disc')
-  );
-  if (discSection?.content) {
-    const content = typeof discSection.content === 'string' 
-      ? discSection.content 
-      : JSON.stringify(discSection.content);
-    
-    const dMatch = content.match(/[Dd](?:ominance|ominância)?[:\s]*(\d+)/);
-    const iMatch = content.match(/[Ii](?:nfluence|nfluência)?[:\s]*(\d+)/);
-    const sMatch = content.match(/[Ss](?:teadiness|tabilidade)?[:\s]*(\d+)/);
-    const cMatch = content.match(/[Cc](?:ompliance|onscienciosidade)?[:\s]*(\d+)/);
-    
-    if (dMatch) disc.D = parseInt(dMatch[1]);
-    if (iMatch) disc.I = parseInt(iMatch[1]);
-    if (sMatch) disc.S = parseInt(sMatch[1]);
-    if (cMatch) disc.C = parseInt(cMatch[1]);
-  }
   
-  // Extract Archetypes
-  let archetypes = { primary: '', secondary: '', tertiary: '' };
-  const archSection = sections.find((s: any) => 
-    s.id?.toLowerCase().includes('arqu') || 
-    s.title?.toLowerCase().includes('arqu')
-  );
-  if (archSection?.content) {
-    const content = typeof archSection.content === 'string' 
-      ? archSection.content.toLowerCase() 
-      : JSON.stringify(archSection.content).toLowerCase();
-    
-    const archetypesList = ['mago', 'sábio', 'sabio', 'explorador', 'visionario', 'visionário', 
-      'amante', 'herói', 'heroi', 'governante', 'guardiao', 'guardião', 'realista', 
-      'provedor', 'cuidador', 'inocente', 'criador', 'rebelde', 'bobo', 'cara-comum'];
-    
-    for (const arch of archetypesList) {
-      if (content.includes(arch)) {
-        if (!archetypes.primary) archetypes.primary = arch;
-        else if (!archetypes.secondary) archetypes.secondary = arch;
-        else if (!archetypes.tertiary) { archetypes.tertiary = arch; break; }
-      }
-    }
-  }
-  
-  // Extract ALL Intelligences (7 pillars expansion)
-  let intelligences = { 
-    intrapersonal: 50, interpersonal: 50, linguistic: 50, logical: 50,
-    spatial: 50, musical: 50, kinesthetic: 50, naturalistic: 50, existential: 50
-  };
-  const intSection = sections.find((s: any) => 
-    s.id?.toLowerCase().includes('intelig') || 
-    s.title?.toLowerCase().includes('intelig')
-  );
-  if (intSection?.content) {
-    const content = typeof intSection.content === 'string' 
-      ? intSection.content 
-      : JSON.stringify(intSection.content);
-    
-    const matches = {
-      intrapersonal: content.match(/intrapessoal[:\s]*(\d+)/i),
-      interpersonal: content.match(/interpessoal[:\s]*(\d+)/i),
-      linguistic: content.match(/lingu[ií]stica[:\s]*(\d+)/i),
-      logical: content.match(/l[oó]gic[ao][\s\-]*matem[aá]tica[:\s]*(\d+)/i),
-      spatial: content.match(/espacial[:\s]*(\d+)/i),
-      musical: content.match(/musical[:\s]*(\d+)/i),
-      kinesthetic: content.match(/corporal[\s\-]*cinest[eé]sica[:\s]*(\d+)/i),
-      naturalistic: content.match(/naturalista[:\s]*(\d+)/i),
-      existential: content.match(/existencial[:\s]*(\d+)/i),
+  if (visualData?.disc) {
+    disc = {
+      D: visualData.disc.D ?? visualData.disc.d ?? 25,
+      I: visualData.disc.I ?? visualData.disc.i ?? 25,
+      S: visualData.disc.S ?? visualData.disc.s ?? 25,
+      C: visualData.disc.C ?? visualData.disc.c ?? 25
     };
-    
-    Object.entries(matches).forEach(([key, match]) => {
-      if (match) intelligences[key as keyof typeof intelligences] = parseInt(match[1]);
-    });
-  }
-  
-  // Extract Temperament with scores
-  let temperament = { 
-    primary: '', secondary: '',
-    scores: { sanguineo: 25, colerico: 25, melancolico: 25, fleumatico: 25 }
-  };
-  const tempSection = sections.find((s: any) => 
-    s.id?.toLowerCase().includes('temperament') || 
-    s.title?.toLowerCase().includes('temperament')
-  );
-  if (tempSection?.content) {
-    const content = typeof tempSection.content === 'string' 
-      ? tempSection.content.toLowerCase() 
-      : JSON.stringify(tempSection.content).toLowerCase();
-    
-    const temps = ['colérico', 'colerico', 'sanguíneo', 'sanguineo', 'melancólico', 'melancolico', 'fleumático', 'fleumatico'];
-    const normalizedTemps: string[] = [];
-    for (const t of temps) {
-      if (content.includes(t)) {
-        const normalized = t.replace(/[éí]/g, 'e').replace(/ó/g, 'o').replace(/á/g, 'a').replace(/ú/g, 'u');
-        if (!normalizedTemps.includes(normalized)) normalizedTemps.push(normalized);
-      }
+    console.log(`[ExtractProfile] ${name} - DISC from visual_data:`, disc);
+  } else {
+    // Fallback: try to find DISC section with content
+    const discSection = sections.find((s: any) => 
+      s.id?.toLowerCase().includes('disc') || 
+      s.title?.toLowerCase().includes('disc')
+    );
+    if (discSection?.content) {
+      const content = typeof discSection.content === 'string' 
+        ? discSection.content 
+        : JSON.stringify(discSection.content);
+      
+      const dMatch = content.match(/[Dd](?:ominance|ominância)?[:\s]*(\d+)/);
+      const iMatch = content.match(/[Ii](?:nfluence|nfluência)?[:\s]*(\d+)/);
+      const sMatch = content.match(/[Ss](?:teadiness|tabilidade)?[:\s]*(\d+)/);
+      const cMatch = content.match(/[Cc](?:ompliance|onscienciosidade)?[:\s]*(\d+)/);
+      
+      if (dMatch) disc.D = parseInt(dMatch[1]);
+      if (iMatch) disc.I = parseInt(iMatch[1]);
+      if (sMatch) disc.S = parseInt(sMatch[1]);
+      if (cMatch) disc.C = parseInt(cMatch[1]);
     }
-    if (normalizedTemps.length > 0) temperament.primary = normalizedTemps[0];
-    if (normalizedTemps.length > 1) temperament.secondary = normalizedTemps[1];
-    
-    // Try to extract scores
-    const sangMatch = content.match(/sangu[ií]neo[:\s]*(\d+)/i);
-    const colMatch = content.match(/col[eé]rico[:\s]*(\d+)/i);
-    const melMatch = content.match(/melanc[oó]lico[:\s]*(\d+)/i);
-    const fleMatch = content.match(/fleum[aá]tico[:\s]*(\d+)/i);
-    
-    if (sangMatch) temperament.scores.sanguineo = parseInt(sangMatch[1]);
-    if (colMatch) temperament.scores.colerico = parseInt(colMatch[1]);
-    if (melMatch) temperament.scores.melancolico = parseInt(melMatch[1]);
-    if (fleMatch) temperament.scores.fleumatico = parseInt(fleMatch[1]);
   }
   
-  // Extract Connection Style (Love Languages)
-  let connectionStyle = { primary: '', secondary: '', scores: {} as Record<string, number> };
-  const connSection = sections.find((s: any) => 
-    s.id?.toLowerCase().includes('conexao') || s.id?.toLowerCase().includes('amor') ||
-    s.title?.toLowerCase().includes('conexão') || s.title?.toLowerCase().includes('amor') ||
-    s.title?.toLowerCase().includes('linguagens')
-  );
-  if (connSection?.content) {
-    const content = typeof connSection.content === 'string' 
-      ? connSection.content.toLowerCase() 
-      : JSON.stringify(connSection.content).toLowerCase();
-    
-    const styles = [
-      { key: 'expressao_verbal', patterns: ['expressão verbal', 'expressao verbal', 'palavras de afirmação', 'palavras de afirmacao'] },
-      { key: 'presenca_ativa', patterns: ['presença ativa', 'presenca ativa', 'tempo de qualidade'] },
-      { key: 'cuidado_pratico', patterns: ['cuidado prático', 'cuidado pratico', 'atos de serviço', 'atos de servico'] },
-      { key: 'gestos_simbolicos', patterns: ['gestos simbólicos', 'gestos simbolicos', 'presentes'] },
-      { key: 'conexao_fisica', patterns: ['conexão física', 'conexao fisica', 'toque físico', 'toque fisico'] },
-    ];
-    
-    for (const style of styles) {
-      for (const pattern of style.patterns) {
-        if (content.includes(pattern)) {
-          if (!connectionStyle.primary) connectionStyle.primary = style.key;
-          else if (!connectionStyle.secondary && connectionStyle.primary !== style.key) {
-            connectionStyle.secondary = style.key;
-            break;
-          }
+  // ============================================================================
+  // EXTRACT ARCHETYPES - Priority: visual_data > regex fallback
+  // ============================================================================
+  let archetypes = { primary: '', secondary: '', tertiary: '' };
+  
+  if (visualData?.archetypes) {
+    archetypes = {
+      primary: visualData.archetypes.primary || '',
+      secondary: visualData.archetypes.secondary || '',
+      tertiary: visualData.archetypes.tertiary || ''
+    };
+    console.log(`[ExtractProfile] ${name} - Archetypes from visual_data:`, archetypes);
+  } else {
+    // Fallback: regex search in content
+    const archSection = sections.find((s: any) => 
+      s.id?.toLowerCase().includes('arqu') || 
+      s.title?.toLowerCase().includes('arqu')
+    );
+    if (archSection?.content) {
+      const content = typeof archSection.content === 'string' 
+        ? archSection.content.toLowerCase() 
+        : JSON.stringify(archSection.content).toLowerCase();
+      
+      const archetypesList = ['mago', 'sábio', 'sabio', 'explorador', 'visionario', 'visionário', 
+        'amante', 'herói', 'heroi', 'governante', 'guardiao', 'guardião', 'realista', 
+        'provedor', 'cuidador', 'inocente', 'criador', 'rebelde', 'bobo', 'cara-comum'];
+      
+      for (const arch of archetypesList) {
+        if (content.includes(arch)) {
+          if (!archetypes.primary) archetypes.primary = arch;
+          else if (!archetypes.secondary) archetypes.secondary = arch;
+          else if (!archetypes.tertiary) { archetypes.tertiary = arch; break; }
         }
       }
     }
   }
   
-  // Extract Nello 16 (MBTI-style)
+  // ============================================================================
+  // EXTRACT INTELLIGENCES - Priority: visual_data > regex fallback
+  // ============================================================================
+  let intelligences = { 
+    intrapersonal: 50, interpersonal: 50, linguistic: 50, logical: 50,
+    spatial: 50, musical: 50, kinesthetic: 50, naturalistic: 50, existential: 50
+  };
+  
+  if (visualData?.intelligences?.scores) {
+    const scores = visualData.intelligences.scores;
+    intelligences = {
+      intrapersonal: scores.intrapessoal ?? scores.intrapersonal ?? 50,
+      interpersonal: scores.interpessoal ?? scores.interpersonal ?? 50,
+      linguistic: scores.linguistica ?? scores.linguistic ?? 50,
+      logical: scores.logico_matematica ?? scores.logical ?? 50,
+      spatial: scores.espacial ?? scores.spatial ?? 50,
+      musical: scores.musical ?? 50,
+      kinesthetic: scores.corporal_cinestesica ?? scores.kinesthetic ?? 50,
+      naturalistic: scores.naturalista ?? scores.naturalistic ?? 50,
+      existential: scores.existencial ?? scores.existential ?? 50
+    };
+    console.log(`[ExtractProfile] ${name} - Intelligences from visual_data:`, intelligences);
+  }
+  
+  // ============================================================================
+  // EXTRACT TEMPERAMENT - Priority: visual_data > regex fallback
+  // ============================================================================
+  let temperament = { 
+    primary: '', secondary: '',
+    scores: { sanguineo: 25, colerico: 25, melancolico: 25, fleumatico: 25 }
+  };
+  
+  if (visualData?.temperament) {
+    temperament = {
+      primary: visualData.temperament.primary || '',
+      secondary: visualData.temperament.secondary || '',
+      scores: visualData.temperament.scores || { sanguineo: 25, colerico: 25, melancolico: 25, fleumatico: 25 }
+    };
+    console.log(`[ExtractProfile] ${name} - Temperament from visual_data:`, temperament);
+  }
+  
+  // ============================================================================
+  // EXTRACT CONNECTION STYLE - Priority: visual_data > regex fallback
+  // ============================================================================
+  let connectionStyle = { primary: '', secondary: '', scores: {} as Record<string, number> };
+  
+  if (visualData?.connection_style) {
+    connectionStyle = {
+      primary: visualData.connection_style.primary || '',
+      secondary: visualData.connection_style.secondary || '',
+      scores: visualData.connection_style.scores || {}
+    };
+    console.log(`[ExtractProfile] ${name} - Connection Style from visual_data:`, connectionStyle);
+  }
+  
+  // ============================================================================
+  // EXTRACT NELLO 16 - Priority: visual_data > regex fallback
+  // ============================================================================
   let nello16 = { 
     type: '', 
     dimensions: { E: 50, I: 50, S: 50, N: 50, T: 50, F: 50, J: 50, P: 50 }
   };
-  const mbtiSection = sections.find((s: any) => 
-    s.id?.toLowerCase().includes('nello16') || s.id?.toLowerCase().includes('mbti') ||
-    s.title?.toLowerCase().includes('16 personalidades') || s.title?.toLowerCase().includes('nello 16')
-  );
-  if (mbtiSection?.content) {
-    const content = typeof mbtiSection.content === 'string' 
-      ? mbtiSection.content.toUpperCase() 
-      : JSON.stringify(mbtiSection.content).toUpperCase();
-    
-    // Match MBTI type pattern
-    const typeMatch = content.match(/\b([EI][NS][TF][JP])\b/);
-    if (typeMatch) nello16.type = typeMatch[1];
+  
+  if (visualData?.nello16) {
+    nello16 = {
+      type: visualData.nello16.name || visualData.nello16.type || visualData.nello16.code || '',
+      dimensions: visualData.nello16.dimensions || { E: 50, I: 50, S: 50, N: 50, T: 50, F: 50, J: 50, P: 50 }
+    };
+    console.log(`[ExtractProfile] ${name} - Nello16 from visual_data:`, nello16);
   }
   
-  // Extract Enneagram
+  // ============================================================================
+  // EXTRACT ENNEAGRAM - Priority: visual_data > regex fallback
+  // ============================================================================
   let enneagram = { type: 0, wing: undefined as number | undefined };
-  const ennSection = sections.find((s: any) => 
-    s.id?.toLowerCase().includes('eneagrama') || s.id?.toLowerCase().includes('enneagram') ||
-    s.title?.toLowerCase().includes('eneagrama')
-  );
-  if (ennSection?.content) {
-    const content = typeof ennSection.content === 'string' 
-      ? ennSection.content 
-      : JSON.stringify(ennSection.content);
-    
-    const typeMatch = content.match(/tipo\s*(\d)/i) || content.match(/type\s*(\d)/i);
-    const wingMatch = content.match(/asa\s*(\d)/i) || content.match(/wing\s*(\d)/i);
-    
-    if (typeMatch) enneagram.type = parseInt(typeMatch[1]);
-    if (wingMatch) enneagram.wing = parseInt(wingMatch[1]);
+  
+  if (visualData?.enneagram) {
+    const eType = visualData.enneagram.type;
+    enneagram = {
+      type: typeof eType === 'number' ? eType : (parseInt(eType) || 0),
+      wing: visualData.enneagram.wing ? parseInt(visualData.enneagram.wing) : undefined
+    };
+    console.log(`[ExtractProfile] ${name} - Enneagram from visual_data:`, enneagram);
   }
   
-  // Extract Under Pressure patterns
+  // ============================================================================
+  // EXTRACT UNDER PRESSURE PATTERNS - Always from content analysis
+  // ============================================================================
   let underPressure: string[] = [];
   let summary: string[] = [];
   
@@ -256,7 +243,9 @@ function extractPersonProfile(name: string, mapa: any): PersonProfile {
     
     if (section.title?.toLowerCase().includes('pressão') || 
         section.title?.toLowerCase().includes('estresse') ||
-        section.title?.toLowerCase().includes('sombra')) {
+        section.title?.toLowerCase().includes('sombra') ||
+        section.id?.toLowerCase().includes('pressao') ||
+        section.id?.toLowerCase().includes('sombra')) {
       
       if (content.includes('silencia') || content.includes('recolhe') || 
           content.includes('processa internamente') || content.includes('paralisa')) {
@@ -281,6 +270,15 @@ function extractPersonProfile(name: string, mapa: any): PersonProfile {
       summary.push('acao', 'execucao', 'avancar', 'concretizar', 'liderar');
     }
   }
+  
+  // Deduplicate
+  underPressure = [...new Set(underPressure)];
+  summary = [...new Set(summary)];
+  
+  console.log(`[ExtractProfile] ${name} - FINAL PROFILE:`, {
+    disc, archetypes: archetypes.primary, temperament: temperament.primary,
+    connectionStyle: connectionStyle.primary, nello16: nello16.type
+  });
   
   return { 
     name, disc, archetypes, intelligences, underPressure, summary, 
