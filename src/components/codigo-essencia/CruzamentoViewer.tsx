@@ -293,6 +293,8 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     return knownKeys.some((k) => (content as any)?.[k] != null);
   }, [content]);
 
+  const asArray = <T,>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
+
   const isPurchased = liveCrossing.isPurchased !== false; // Default to true for backwards compatibility
 
   const refreshCrossing = async () => {
@@ -1070,10 +1072,13 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           {zona.sensor_sob_estresse && (
             <div className="p-4 rounded-lg bg-purple-500/5 border border-purple-500/20">
               <h4 className="font-medium text-purple-700 dark:text-purple-400 mb-2 text-sm">
-                🧭 {zona.sensor_sob_estresse.nome} ({language === 'en' ? 'Direction Sensor' : 'Sensor de Direção'})
+                🧭 {zona.sensor_sob_estresse?.nome || (language === 'en' ? 'Direction Sensor' : 'Sensor de Direção')}
+                {" "}({language === 'en' ? 'Direction Sensor' : 'Sensor de Direção'})
               </h4>
-              <p className="text-sm mb-2">{zona.sensor_sob_estresse.comportamento}</p>
-              {zona.sensor_sob_estresse.impacto_no_outro && (
+              {zona.sensor_sob_estresse?.comportamento && (
+                <p className="text-sm mb-2">{zona.sensor_sob_estresse.comportamento}</p>
+              )}
+              {zona.sensor_sob_estresse?.impacto_no_outro && (
                 <p className="text-xs text-muted-foreground">
                   <strong>{language === 'en' ? 'Impact:' : 'Impacto:'}</strong> {zona.sensor_sob_estresse.impacto_no_outro}
                 </p>
@@ -1085,10 +1090,13 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           {zona.condutor_sob_estresse && (
             <div className="p-4 rounded-lg bg-orange-500/5 border border-orange-500/20">
               <h4 className="font-medium text-orange-700 dark:text-orange-400 mb-2 text-sm">
-                ⚓ {zona.condutor_sob_estresse.nome} ({language === 'en' ? 'Course Conductor' : 'Condutor de Curso'})
+                ⚓ {zona.condutor_sob_estresse?.nome || (language === 'en' ? 'Course Conductor' : 'Condutor de Curso')}
+                {" "}({language === 'en' ? 'Course Conductor' : 'Condutor de Curso'})
               </h4>
-              <p className="text-sm mb-2">{zona.condutor_sob_estresse.comportamento}</p>
-              {zona.condutor_sob_estresse.impacto_no_outro && (
+              {zona.condutor_sob_estresse?.comportamento && (
+                <p className="text-sm mb-2">{zona.condutor_sob_estresse.comportamento}</p>
+              )}
+              {zona.condutor_sob_estresse?.impacto_no_outro && (
                 <p className="text-xs text-muted-foreground">
                   <strong>{language === 'en' ? 'Impact:' : 'Impacto:'}</strong> {zona.condutor_sob_estresse.impacto_no_outro}
                 </p>
@@ -1105,6 +1113,9 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     const tabela = content.tabela_traducao;
     if (!tabela) return null;
 
+     const sensorItems = asArray<any>((tabela as any)?.sensor);
+     const condutorItems = asArray<any>((tabela as any)?.condutor);
+
     return (
       <Card className="bg-gradient-to-br from-indigo-500/5 to-blue-500/5 border-indigo-500/20">
         <CardHeader className="pb-2">
@@ -1117,12 +1128,12 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Sensor translations */}
-          {tabela.sensor && (
+          {sensorItems.length > 0 && (
             <div className="space-y-2">
               <h4 className="font-medium text-purple-700 dark:text-purple-400 text-sm flex items-center gap-2">
                 🧭 {language === 'en' ? 'When the DIRECTION SENSOR...' : 'Quando o SENSOR DE DIREÇÃO...'}
               </h4>
-              {tabela.sensor.map((item: any, i: number) => (
+              {sensorItems.map((item: any, i: number) => (
                 <div key={i} className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/10 text-sm">
                   <span className="font-medium">{item.comportamento}</span>
                   <span className="text-muted-foreground"> → </span>
@@ -1133,12 +1144,12 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           )}
 
           {/* Conductor translations */}
-          {tabela.condutor && (
+          {condutorItems.length > 0 && (
             <div className="space-y-2">
               <h4 className="font-medium text-orange-700 dark:text-orange-400 text-sm flex items-center gap-2">
                 ⚓ {language === 'en' ? 'When the COURSE CONDUCTOR...' : 'Quando o CONDUTOR DE CURSO...'}
               </h4>
-              {tabela.condutor.map((item: any, i: number) => (
+              {condutorItems.map((item: any, i: number) => (
                 <div key={i} className="p-3 rounded-lg bg-orange-500/5 border border-orange-500/10 text-sm">
                   <span className="font-medium">{item.comportamento}</span>
                   <span className="text-muted-foreground"> → </span>
@@ -1157,6 +1168,12 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     const protocolo = content.protocolo_paz;
     if (!protocolo) return null;
 
+    const tempoDuplo = (protocolo as any)?.tempo_duplo;
+    const perguntaRecalibracao = (protocolo as any)?.pergunta_recalibracao;
+    const proibicaoInferencia = (protocolo as any)?.proibicao_inferencia;
+    const proibicaoRegras = asArray<string>(proibicaoInferencia?.regras);
+    const legacyRegras = asArray<any>((protocolo as any)?.regras);
+
     return (
       <Card className="bg-gradient-to-br from-blue-500/5 to-purple-500/5 border-blue-500/20">
         <CardHeader className="pb-2">
@@ -1167,45 +1184,45 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Tempo Duplo */}
-          {protocolo.tempo_duplo && (
+          {tempoDuplo && (
             <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20">
               <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-3 flex items-center gap-2">
                 <Clock className="w-4 h-4" />
-                {protocolo.tempo_duplo.titulo || '1. Tempo Duplo'}
+                {tempoDuplo?.titulo || '1. Tempo Duplo'}
               </h4>
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="p-3 rounded bg-purple-500/10 border border-purple-500/20">
-                  <p className="text-sm">{protocolo.tempo_duplo.para_sensor}</p>
+                  <p className="text-sm">{tempoDuplo?.para_sensor || ''}</p>
                 </div>
                 <div className="p-3 rounded bg-orange-500/10 border border-orange-500/20">
-                  <p className="text-sm">{protocolo.tempo_duplo.para_condutor}</p>
+                  <p className="text-sm">{tempoDuplo?.para_condutor || ''}</p>
                 </div>
               </div>
             </div>
           )}
 
           {/* Pergunta de Recalibração */}
-          {protocolo.pergunta_recalibracao && (
+          {perguntaRecalibracao && (
             <div className="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
               <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-2 flex items-center gap-2">
                 <HelpCircle className="w-4 h-4" />
-                {protocolo.pergunta_recalibracao.titulo || '2. Pergunta de Recalibração'}
+                {perguntaRecalibracao?.titulo || '2. Pergunta de Recalibração'}
               </h4>
               <p className="text-sm italic font-medium text-center py-2">
-                "{protocolo.pergunta_recalibracao.pergunta}"
+                "{perguntaRecalibracao?.pergunta || ''}"
               </p>
             </div>
           )}
 
           {/* Proibição de Inferência */}
-          {protocolo.proibicao_inferencia && (
+          {proibicaoInferencia && (
             <div className="p-4 rounded-lg bg-red-500/5 border border-red-500/20">
               <h4 className="font-semibold text-red-700 dark:text-red-400 mb-2 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" />
-                {protocolo.proibicao_inferencia.titulo || '3. Proibição de Inferência'}
+                {proibicaoInferencia?.titulo || '3. Proibição de Inferência'}
               </h4>
               <ul className="space-y-2">
-                {protocolo.proibicao_inferencia.regras?.map((regra: string, i: number) => (
+                {proibicaoRegras.map((regra: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <span className="text-red-500">✕</span>
                     <span>{regra}</span>
@@ -1216,7 +1233,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           )}
 
           {/* Legacy rules format */}
-          {protocolo.regras?.map((regra: any, i: number) => (
+          {legacyRegras.map((regra: any, i: number) => (
             <div key={i} className="p-4 rounded-lg bg-muted/50 border space-y-2">
               <div className="flex items-center gap-2">
                 <span className="w-7 h-7 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-sm">
