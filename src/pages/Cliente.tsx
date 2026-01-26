@@ -44,6 +44,7 @@ import {
 } from "@/components/cliente/dashboard";
 import { TestInsightScreen, getProvisionalInsight, getMirrorPhrase } from "@/components/tests/TestInsightScreen";
 import { StrategicCheckpoint, generateCheckpointContent } from "@/components/tests/StrategicCheckpoint";
+import { CelebrationModal, PRODUCT_CATALOG } from "@/components/monetization";
 
 const Cliente = () => {
   const { user, profile, signOut, userRole, isLoading: isAuthLoading } = useAuth();
@@ -61,6 +62,15 @@ const Cliente = () => {
   const [stepToReset, setStepToReset] = useState<any>(null);
   const [ativacaoPurchaseOpen, setAtivacaoPurchaseOpen] = useState(false);
   const [showEntryPathModal, setShowEntryPathModal] = useState(false);
+  
+  // Celebration modal state for product purchases
+  const [celebrationModalOpen, setCelebrationModalOpen] = useState(false);
+  const [celebrationData, setCelebrationData] = useState<{
+    title: string;
+    subtitle: string;
+    message: string;
+    nextLevel?: { name: string; description: string; onUnlock: () => void };
+  } | null>(null);
   
   // Check URL params for journey flow state
   const flowParam = searchParams.get("flow");
@@ -213,7 +223,80 @@ const Cliente = () => {
   // Handle payment success callback
   useEffect(() => {
     const paymentStatus = searchParams.get("payment");
+    const purchaseSuccess = searchParams.get("purchase_success");
+    const productType = searchParams.get("product");
     
+    // Handle new product purchase success with celebration modal
+    if (purchaseSuccess === "true" && productType) {
+      queryClient.invalidateQueries({ queryKey: ["product-access"] });
+      queryClient.invalidateQueries({ queryKey: ["all-product-access"] });
+      queryClient.invalidateQueries({ queryKey: ["progressive-funnel"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      
+      // Show celebration modal based on product type
+      const celebrationConfig: Record<string, {
+        title: string;
+        subtitle: string;
+        message: string;
+        nextLevel?: { name: string; description: string; productKey: keyof typeof PRODUCT_CATALOG };
+      }> = {
+        activation_individual: {
+          title: "Ativação do Código Desbloqueada!",
+          subtitle: "Conquista",
+          message: "Seu plano personalizado de 90 dias está pronto. Transforme autoconhecimento em ação!",
+          nextLevel: {
+            name: "Nello Couple",
+            description: "Descubra como sua essência se conecta com quem você ama.",
+            productKey: "nello_couple",
+          },
+        },
+        nello_couple: {
+          title: "Código do Casal Desbloqueado!",
+          subtitle: "Conquista",
+          message: "Agora você pode gerar o relatório de sinergia do seu relacionamento.",
+          nextLevel: {
+            name: "Identity Couple Premium",
+            description: "O mapa definitivo do casal com 7 pilares de inteligência cruzada.",
+            productKey: "identity_couple_premium",
+          },
+        },
+        activation_couple: {
+          title: "Ativação do Casal Desbloqueada!",
+          subtitle: "Conquista",
+          message: "Rituais e ações personalizadas para fortalecer a conexão do casal estão prontos!",
+        },
+        identity_couple_premium: {
+          title: "Identity Couple Premium Desbloqueado!",
+          subtitle: "Premium",
+          message: "Parabéns! Você desbloqueou o mapa definitivo do casal com 7 pilares de inteligência cruzada.",
+        },
+      };
+      
+      const config = celebrationConfig[productType];
+      if (config) {
+        setCelebrationData({
+          title: config.title,
+          subtitle: config.subtitle,
+          message: config.message,
+          nextLevel: config.nextLevel ? {
+            name: config.nextLevel.name,
+            description: config.nextLevel.description,
+            onUnlock: () => {
+              setCelebrationModalOpen(false);
+              // Would open the next product modal - for now just close
+            },
+          } : undefined,
+        });
+        setCelebrationModalOpen(true);
+      }
+      
+      // Clean up URL params
+      searchParams.delete("purchase_success");
+      searchParams.delete("product");
+      setSearchParams(searchParams);
+    }
+    
+    // Handle legacy payment success
     if (paymentStatus === "success") {
       toast({
         title: "Pagamento confirmado! 🎉",
@@ -827,6 +910,19 @@ const Cliente = () => {
         open={ativacaoPurchaseOpen} 
         onOpenChange={setAtivacaoPurchaseOpen} 
       />
+
+      {/* Celebration Modal for product purchases */}
+      {celebrationData && (
+        <CelebrationModal
+          open={celebrationModalOpen}
+          onOpenChange={setCelebrationModalOpen}
+          title={celebrationData.title}
+          subtitle={celebrationData.subtitle}
+          message={celebrationData.message}
+          nextLevel={celebrationData.nextLevel}
+          continueLabel="Continuar"
+        />
+      )}
 
       <NelloAgent 
         location="cliente" 

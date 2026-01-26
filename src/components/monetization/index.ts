@@ -10,3 +10,7 @@ export { LockedModuleCard } from "./LockedModuleCard";
 export { UpsellTrigger, CodigoEssenciaUpsell } from "./UpsellTrigger";
 export { PRODUCT_CATALOG, getProductInfo, isValidProductType } from "./productCatalog";
 export { IdentityCouplePremiumModal } from "./IdentityCouplePremiumModal";
+
+// Progressive Sales Funnel
+export { CelebrationModal } from "./CelebrationModal";
+export { ProgressiveUpsellSection } from "./ProgressiveUpsellSection";
