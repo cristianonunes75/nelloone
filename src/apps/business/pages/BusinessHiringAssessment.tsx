@@ -256,64 +256,87 @@ export default function BusinessHiringAssessment() {
     }));
   };
 
-  const saveCurrentAnswer = async (): Promise<boolean> => {
+  const saveCurrentAnswer = async (retryCount = 0): Promise<boolean> => {
     if (!currentAssessment) return false;
     
     const question = questions[currentIndex];
     const answer = answers[question.id];
     
-    if (answer !== undefined) {
-      try {
-        // First check if answer exists
-        const { data: existing } = await supabase
-          .from("hiring_answers")
-          .select("id")
-          .eq("assessment_id", currentAssessment.id)
-          .eq("question_number", question.question_number)
-          .maybeSingle();
-        
-        if (existing) {
-          // Update existing answer
-          const { error } = await supabase
-            .from("hiring_answers")
-            .update({
-              question_id: question.id,
-              answer: { value: answer, options: question.options }
-            })
-            .eq("id", existing.id);
-          
-          if (error) {
-            console.error("Error updating answer:", error);
-            toast.error("Erro ao salvar resposta. Tente novamente.");
-            return false;
-          }
-        } else {
-          // Insert new answer
-          const { error } = await supabase
-            .from("hiring_answers")
-            .insert({
-              assessment_id: currentAssessment.id,
-              question_id: question.id,
-              question_number: question.question_number,
-              answer: { value: answer, options: question.options }
-            });
-          
-          if (error) {
-            console.error("Error inserting answer:", error);
-            toast.error("Erro ao salvar resposta. Tente novamente.");
-            return false;
-          }
-        }
-        
-        console.log(`Answer saved: Q${question.question_number} = ${answer}`);
-        return true;
-      } catch (error) {
-        console.error("Error saving answer:", error);
-        toast.error("Erro ao salvar resposta. Verifique sua conexão.");
-        return false;
+    if (answer === undefined) return true; // No answer to save
+
+    const maxRetries = 3;
+    const retryDelay = Math.pow(2, retryCount) * 500; // Exponential backoff: 500ms, 1s, 2s
+    
+    try {
+      // First check if answer exists
+      const { data: existing, error: selectError } = await supabase
+        .from("hiring_answers")
+        .select("id")
+        .eq("assessment_id", currentAssessment.id)
+        .eq("question_number", question.question_number)
+        .maybeSingle();
+
+      if (selectError) {
+        console.error("Error checking existing answer:", selectError);
+        throw selectError;
       }
+      
+      if (existing) {
+        // Update existing answer
+        const { error } = await supabase
+          .from("hiring_answers")
+          .update({
+            question_id: question.id,
+            answer: { value: answer, options: question.options }
+          })
+          .eq("id", existing.id);
+        
+        if (error) {
+          console.error("Error updating answer:", error);
+          throw error;
+        }
+      } else {
+        // Insert new answer
+        const { error } = await supabase
+          .from("hiring_answers")
+          .insert({
+            assessment_id: currentAssessment.id,
+            question_id: question.id,
+            question_number: question.question_number,
+            answer: { value: answer, options: question.options }
+          });
+        
+        if (error) {
+          console.error("Error inserting answer:", error);
+          throw error;
+        }
+      }
+      
+      // Update assessment progress for real-time monitoring
+      await supabase
+        .from("hiring_assessments")
+        .update({
+          current_question_number: question.question_number,
+          last_activity_at: new Date().toISOString()
+        })
+        .eq("id", currentAssessment.id);
+      
+      console.log(`✓ Answer saved: Q${question.question_number} = ${answer}`);
+      return true;
+    } catch (error: any) {
+      console.error(`Error saving answer (attempt ${retryCount + 1}):`, error);
+      
+      // Retry with exponential backoff
+      if (retryCount < maxRetries) {
+        console.log(`Retrying in ${retryDelay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+        return saveCurrentAnswer(retryCount + 1);
+      }
+      
+      // All retries failed
+      toast.error("Erro ao salvar resposta. Verifique sua conexão e tente novamente.");
+      return false;
     }
-    return true; // No answer to save
   };
 
   // IMPORTANT: do not memoize these handlers with incomplete deps,

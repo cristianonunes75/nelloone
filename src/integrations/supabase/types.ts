@@ -2003,8 +2003,10 @@ export type Database = {
           candidate_id: string
           completed_at: string | null
           created_at: string
+          current_question_number: number | null
           id: string
           imported_from_user_id: string | null
+          last_activity_at: string | null
           original_completed_at: string | null
           result_data: Json | null
           started_at: string | null
@@ -2016,8 +2018,10 @@ export type Database = {
           candidate_id: string
           completed_at?: string | null
           created_at?: string
+          current_question_number?: number | null
           id?: string
           imported_from_user_id?: string | null
+          last_activity_at?: string | null
           original_completed_at?: string | null
           result_data?: Json | null
           started_at?: string | null
@@ -2029,8 +2033,10 @@ export type Database = {
           candidate_id?: string
           completed_at?: string | null
           created_at?: string
+          current_question_number?: number | null
           id?: string
           imported_from_user_id?: string | null
+          last_activity_at?: string | null
           original_completed_at?: string | null
           result_data?: Json | null
           started_at?: string | null
