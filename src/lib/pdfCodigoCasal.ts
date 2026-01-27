@@ -896,34 +896,57 @@ class PDFGenerator {
   }
 
   // ==========================================
-  // TRANSLATION TABLE
+  // TRANSLATION TABLE (with FALLBACKS)
   // ==========================================
   private renderTranslationTable(content: any) {
     const tabela = content.tabela_traducao;
-    if (!tabela) return;
-
+    
+    // FALLBACK: Generate default translations if empty
+    const sensorName = content.papeis_identificados?.sensor_direcao?.nome || content.perfil_a?.nome || 'Sensor';
+    const condutorName = content.papeis_identificados?.condutor_curso?.nome || content.perfil_b?.nome || 'Condutor';
+    
+    const defaultSensorTranslations = [
+      { quando_faz: "se cala", voce_sente: "pode parecer distanciamento", verdade_por_tras: "esta processando a situacao internamente" },
+      { quando_faz: "questiona repetidamente", voce_sente: "pode parecer inseguranca", verdade_por_tras: "esta refinando a compreensao antes de decidir" },
+      { quando_faz: "demora para decidir", voce_sente: "pode parecer indecisao", verdade_por_tras: "esta protegendo a qualidade da escolha" },
+      { quando_faz: "se afasta", voce_sente: "pode parecer rejeicao", verdade_por_tras: "precisa de espaco interno para reorganizar" },
+    ];
+    
+    const defaultCondutorTranslations = [
+      { quando_faz: "pressiona por resposta", voce_sente: "pode parecer impaciencia", verdade_por_tras: "esta buscando seguranca e avanço" },
+      { quando_faz: "assume o controle", voce_sente: "pode parecer dominio", verdade_por_tras: "esta evitando o caos e protegendo a estrutura" },
+      { quando_faz: "acelera as decisões", voce_sente: "pode parecer pressa", verdade_por_tras: "esta protegendo o progresso do casal" },
+      { quando_faz: "cobra clareza", voce_sente: "pode parecer cobranca", verdade_por_tras: "precisa de direcao para agir com confianca" },
+    ];
+    
+    // Use existing data or fallback
+    const traducoesSensor = tabela?.traducoes_sensor?.traducoes || tabela?.traducoes_usuario_a || defaultSensorTranslations;
+    const traducoesCondutor = tabela?.traducoes_condutor?.traducoes || tabela?.traducoes_usuario_b || defaultCondutorTranslations;
+    
     this.addNewPage();
-    this.renderSectionHeader(tabela.titulo || this.t.sections.tabelaTraducao, COLORS.blue);
+    this.renderSectionHeader(tabela?.titulo || "Tabela de Traducao do Casal", COLORS.blue);
 
-    if (tabela.descricao) {
-      this.currentY = this.writeWrappedText(tabela.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-      this.currentY += 10;
-    }
+    const descricao = tabela?.descricao || "Esta tabela ajuda a traduzir comportamentos que podem ser mal-interpretados. Quando um age de certa forma, o outro pode sentir algo diferente da intencao real.";
+    this.currentY = this.writeWrappedText(descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+    this.currentY += 10;
 
-    const renderTranslations = (translations: any[], personName: string) => {
+    const renderTranslations = (translations: any[], personName: string, role: string) => {
       if (!translations?.length) return;
       
       this.ensureSpace(15);
       this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
       this.doc.setFontSize(12);
       this.doc.setFont("helvetica", "bold");
-      this.doc.text(personName, this.margin, this.currentY);
+      this.doc.text(`Quando ${personName} (${role})...`, this.margin, this.currentY);
       this.currentY += 8;
 
       translations.forEach((item: any) => {
-        const whenText = item.quando_faz || item.quando_diz || "";
-        const feelText = item.voce_sente || item.outro_ouve || "";
+        const whenText = item.quando_faz || item.comportamento || item.quando_diz || "";
+        const feelText = item.voce_sente || item.significado || item.outro_ouve || "";
         const truthText = item.verdade_por_tras || item.intencao_real || "";
+        
+        // Skip if all empty
+        if (!whenText && !feelText && !truthText) return;
         
         const totalHeight = 
           this.measureTextHeight(whenText, this.contentWidth - 50, 9) +
@@ -971,11 +994,258 @@ class PDFGenerator {
       });
     };
 
-    if (tabela.traducoes_usuario_a) renderTranslations(tabela.traducoes_usuario_a, tabela.nome_usuario_a || "Pessoa A");
-    if (tabela.traducoes_usuario_b) {
-      this.currentY += 6;
-      renderTranslations(tabela.traducoes_usuario_b, tabela.nome_usuario_b || "Pessoa B");
+    renderTranslations(traducoesSensor, sensorName, "Sensor de Direcao");
+    this.currentY += 6;
+    renderTranslations(traducoesCondutor, condutorName, "Condutor de Curso");
+  }
+
+  // ==========================================
+  // REFLECTIVE PROMPTS (NEW - LIVRO DE BORDO PREMIUM)
+  // ==========================================
+  private renderReflectivePrompts(content: any) {
+    const reflexoes = content.reflexoes_praticas;
+    const rituais = content.rituais_casal;
+    const frases = content.frases_ponte;
+    const alertas = content.alertas_dia_a_dia;
+    
+    // Skip if no reflective content
+    if (!reflexoes?.reflexoes?.length && !rituais && !frases?.frases?.length && !alertas) return;
+    
+    this.addNewPage();
+    
+    // Premium chapter header
+    this.doc.setFillColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(8);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.text("CAPITULO 10", this.margin + 8, this.currentY + 7);
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text("REFLEXOES PRATICAS DO CASAL", this.margin + 8, this.currentY + 16);
+    this.currentY += 30;
+
+    const intro = "Esta secao contem orientacoes praticas do tipo 'Considere fazer X para que Y perceba Z'. Use-as como um livro de bordo para o dia a dia do relacionamento.";
+    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+    this.currentY += 12;
+
+    // Render reflective prompts
+    const reflexoesArr = reflexoes?.reflexoes || reflexoes || [];
+    if (Array.isArray(reflexoesArr) && reflexoesArr.length > 0) {
+      this.ensureSpace(20);
+      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text("Considere fazer...", this.margin, this.currentY);
+      this.currentY += 8;
+      
+      reflexoesArr.slice(0, 6).forEach((ref: any) => {
+        const para = ref.para || "";
+        const acao = ref.acao || "";
+        const efeito = ref.efeito || "";
+        
+        if (!acao) return;
+        
+        const totalText = `${para}: ${acao} - ${efeito}`;
+        const cardHeight = this.measureTextHeight(totalText, this.contentWidth - 20, 9) + 14;
+        
+        this.ensureSpace(cardHeight);
+        
+        this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
+        this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "F");
+        
+        this.drawIconCircle(this.margin + 8, this.currentY + 7, COLORS.green, 3);
+        
+        this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+        this.doc.setFontSize(10);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text(para, this.margin + 15, this.currentY + 9);
+        
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFontSize(9);
+        this.doc.setFont("helvetica", "normal");
+        const acaoLines = this.doc.splitTextToSize(`${acao} - ${efeito}`, this.contentWidth - 25);
+        this.doc.text(acaoLines, this.margin + 8, this.currentY + 17);
+        
+        this.currentY += cardHeight + 4;
+      });
     }
+
+    // Render bridge phrases
+    const frasesArr = frases?.frases || frases || [];
+    if (Array.isArray(frasesArr) && frasesArr.length > 0) {
+      this.ensureSpace(25);
+      this.currentY += 8;
+      this.doc.setTextColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text("Frases que Constroem", this.margin, this.currentY);
+      this.currentY += 10;
+      
+      frasesArr.slice(0, 4).forEach((frase: any) => {
+        const aoInves = frase.ao_inves_de || "";
+        const experimente = frase.experimente || "";
+        const porque = frase.porque_funciona || "";
+        
+        if (!aoInves || !experimente) return;
+        
+        const cardHeight = 35;
+        this.ensureSpace(cardHeight);
+        
+        this.doc.setFillColor(COLORS.blueLight.r, COLORS.blueLight.g, COLORS.blueLight.b);
+        this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "F");
+        
+        // "Ao invés de" line
+        this.doc.setTextColor(COLORS.red.r, COLORS.red.g, COLORS.red.b);
+        this.doc.setFontSize(8);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text("Ao inves de:", this.margin + 6, this.currentY + 8);
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.setFont("helvetica", "normal");
+        this.doc.text(`"${aoInves}"`, this.margin + 35, this.currentY + 8);
+        
+        // "Experimente" line
+        this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text("Experimente:", this.margin + 6, this.currentY + 18);
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFont("helvetica", "normal");
+        const expLines = this.doc.splitTextToSize(`"${experimente}"`, this.contentWidth - 45);
+        this.doc.text(expLines, this.margin + 35, this.currentY + 18);
+        
+        // "Porque funciona" line
+        if (porque) {
+          this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+          this.doc.setFontSize(7);
+          this.doc.setFont("helvetica", "italic");
+          this.doc.text(`${porque}`, this.margin + 6, this.currentY + 30);
+        }
+        
+        this.currentY += cardHeight + 4;
+      });
+    }
+
+    // Render daily alerts
+    const alertasArr = alertas?.alerta_sensor && alertas?.alerta_condutor ? [alertas.alerta_sensor, alertas.alerta_condutor] : [];
+    if (alertasArr.length > 0) {
+      this.ensureSpace(25);
+      this.currentY += 8;
+      this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text("Alertas do Dia-a-Dia", this.margin, this.currentY);
+      this.currentY += 10;
+      
+      alertasArr.forEach((alerta: any) => {
+        if (!alerta?.alerta) return;
+        
+        const cardHeight = 40;
+        this.ensureSpace(cardHeight);
+        
+        this.doc.setFillColor(COLORS.amberLight.r, COLORS.amberLight.g, COLORS.amberLight.b);
+        this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "F");
+        this.doc.setDrawColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+        this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "S");
+        
+        // Alert line
+        this.drawIconCircle(this.margin + 8, this.currentY + 8, COLORS.amber, 4);
+        this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+        this.doc.setFontSize(9);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text("ALERTA:", this.margin + 16, this.currentY + 10);
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFont("helvetica", "normal");
+        const alertaLines = this.doc.splitTextToSize(alerta.alerta, this.contentWidth - 50);
+        this.doc.text(alertaLines, this.margin + 35, this.currentY + 10);
+        
+        // Consider line
+        this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text("Considere:", this.margin + 6, this.currentY + 22);
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFont("helvetica", "normal");
+        const considereLines = this.doc.splitTextToSize(alerta.considere || '', this.contentWidth - 45);
+        this.doc.text(considereLines, this.margin + 30, this.currentY + 22);
+        
+        // Effect line
+        if (alerta.efeito) {
+          this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+          this.doc.setFontSize(8);
+          this.doc.setFont("helvetica", "italic");
+          this.doc.text(`Efeito: ${alerta.efeito}`, this.margin + 6, this.currentY + 35);
+        }
+        
+        this.currentY += cardHeight + 4;
+      });
+    }
+  }
+
+  // ==========================================
+  // RITUALS OF THE COUPLE (NEW - LIVRO DE BORDO PREMIUM)
+  // ==========================================
+  private renderRituals(content: any) {
+    const rituais = content.rituais_casal;
+    if (!rituais) return;
+    
+    this.addNewPage();
+    
+    // Premium chapter header
+    this.doc.setFillColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(8);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.text("CAPITULO 11", this.margin + 8, this.currentY + 7);
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text("RITUAIS DO CASAL", this.margin + 8, this.currentY + 16);
+    this.currentY += 30;
+
+    const intro = "Rituais sao ancoras que mantem o casal conectado. Pratiquem regularmente para fortalecer o vinculo.";
+    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+    this.currentY += 12;
+
+    const renderRitual = (ritual: any, color: any) => {
+      if (!ritual) return;
+      
+      const titulo = ritual.titulo || ritual.frequencia || "";
+      const descricao = ritual.descricao || "";
+      const passos = ritual.perguntas || ritual.passos || [];
+      
+      const cardHeight = 30 + (passos.length * 12);
+      this.ensureSpace(cardHeight);
+      
+      this.doc.setFillColor(color.r, color.g, color.b, 0.1);
+      this.doc.setFillColor(248, 248, 252);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 4, 4, "F");
+      this.doc.setDrawColor(color.r, color.g, color.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 4, 4, "S");
+      
+      this.drawIconCircle(this.margin + 10, this.currentY + 10, color, 5);
+      this.doc.setTextColor(color.r, color.g, color.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(titulo, this.margin + 20, this.currentY + 12);
+      
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "normal");
+      const descLines = this.doc.splitTextToSize(descricao, this.contentWidth - 25);
+      this.doc.text(descLines, this.margin + 8, this.currentY + 22);
+      
+      let innerY = this.currentY + 22 + (descLines.length * 4);
+      passos.forEach((passo: string, i: number) => {
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.text(`${i + 1}. ${passo}`, this.margin + 12, innerY + 6);
+        innerY += 10;
+      });
+      
+      this.currentY += cardHeight + 8;
+    };
+    
+    renderRitual(rituais.ritual_diario, COLORS.green);
+    renderRitual(rituais.ritual_semanal, COLORS.blue);
+    renderRitual(rituais.ritual_mensal, COLORS.purple);
   }
 
   // ==========================================
@@ -1910,7 +2180,7 @@ class PDFGenerator {
   }
 
   // ==========================================
-  // MAIN GENERATION - PREMIUM 7 PILLARS BOOK
+  // MAIN GENERATION - PREMIUM 7 PILLARS BOOK (LIVRO DE BORDO)
   // ==========================================
   public generate(content: any): jsPDF {
     // Extract names for cover
@@ -1933,6 +2203,10 @@ class PDFGenerator {
     this.renderArchetypes(content);
     this.renderConnectionStyles(content);
     this.renderNello16(content);
+    
+    // NEW: LIVRO DE BORDO PREMIUM SECTIONS
+    this.renderReflectivePrompts(content);
+    this.renderRituals(content);
     
     this.renderTranslationTable(content);
     this.renderPeaceProtocol(content);
