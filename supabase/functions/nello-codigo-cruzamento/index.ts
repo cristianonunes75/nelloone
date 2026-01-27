@@ -766,7 +766,119 @@ ESTRUTURA OBRIGATÓRIA DO RELATÓRIO (9 SEÇÕES - JSON)
     "titulo": "Mensagem Final",
     "mensagem": "Vocês não precisam funcionar do mesmo jeito para caminhar juntos."
   }
+},
+  "reflexoes_praticas": {
+    "titulo": "Reflexões Práticas do Casal",
+    "reflexoes": [
+      {
+        "para": "[NOME_A]",
+        "acao": "Considere [AÇÃO ESPECÍFICA]",
+        "efeito": "para que [NOME_B] perceba [RESULTADO]"
+      },
+      {
+        "para": "[NOME_B]",
+        "acao": "Considere [AÇÃO ESPECÍFICA]",
+        "efeito": "para que [NOME_A] perceba [RESULTADO]"
+      },
+      {
+        "para": "[NOME_A]",
+        "acao": "Quando [SITUAÇÃO], experimente [AÇÃO]",
+        "efeito": "isso mostra a [NOME_B] que [MENSAGEM]"
+      },
+      {
+        "para": "[NOME_B]",
+        "acao": "Evite [COMPORTAMENTO]",
+        "efeito": "pois [NOME_A] pode interpretar como [MAL-ENTENDIDO]"
+      }
+    ]
+  },
+  "rituais_casal": {
+    "titulo": "Rituais do Casal",
+    "ritual_diario": {
+      "titulo": "Ritual Diário",
+      "descricao": "Toda noite, antes de dormir, cada um diz UMA coisa que apreciou no outro hoje."
+    },
+    "ritual_semanal": {
+      "titulo": "Check-in do Barco (Semanal)",
+      "descricao": "Todo fim de semana, reservem 15 minutos para responder juntos:",
+      "perguntas": [
+        "Como você se sentiu amado(a) esta semana?",
+        "O que poderia ter sido diferente?",
+        "Qual é o nosso foco para a próxima semana?"
+      ]
+    },
+    "ritual_mensal": {
+      "titulo": "Avaliação Mensal",
+      "descricao": "Uma vez por mês, façam uma 'reunião de bordo' para revisar acordos e ajustar expectativas."
+    }
+  },
+  "frases_ponte": {
+    "titulo": "Frases que Constroem",
+    "frases": [
+      {
+        "ao_inves_de": "Você nunca me ouve",
+        "experimente": "Sinto que preciso ser mais ouvido(a)",
+        "porque_funciona": "Evita defensividade e abre espaço"
+      },
+      {
+        "ao_inves_de": "Sempre faço tudo",
+        "experimente": "Gostaria de dividir X com você",
+        "porque_funciona": "Convite, não acusação"
+      },
+      {
+        "ao_inves_de": "Você está errado(a)",
+        "experimente": "Posso entender de outra forma?",
+        "porque_funciona": "Curiosidade genuína"
+      },
+      {
+        "ao_inves_de": "Preciso de espaço",
+        "experimente": "Preciso de 15 minutos, depois conversamos",
+        "porque_funciona": "Comunica necessidade com prazo"
+      }
+    ]
+  },
+  "alertas_dia_a_dia": {
+    "titulo": "Alertas do Dia-a-Dia",
+    "alerta_sensor": {
+      "alerta": "[NOME_SENSOR] sob pressão tende a [COMPORTAMENTO_PRESSÃO]",
+      "considere": "[NOME_CONDUTOR], [AÇÃO_RECOMENDADA]",
+      "efeito": "[NOME_SENSOR] sentirá [RESULTADO]"
+    },
+    "alerta_condutor": {
+      "alerta": "[NOME_CONDUTOR] sob pressão tende a [COMPORTAMENTO_PRESSÃO]",
+      "considere": "[NOME_SENSOR], [AÇÃO_RECOMENDADA]",
+      "efeito": "[NOME_CONDUTOR] sentirá [RESULTADO]"
+    }
+  }
 }
+
+═══════════════════════════════════════════════════════════════════════════════
+REGRA CRÍTICA: DENSIDADE REFLEXIVA (LIVRO DE BORDO PREMIUM)
+═══════════════════════════════════════════════════════════════════════════════
+
+Este relatório é um LIVRO DE BORDO PREMIUM. Cada seção DEVE conter conteúdo denso e reflexivo.
+
+1. PROMPTS REFLEXIVOS (mínimo 2-3 por seção):
+   - Formato: "Considere [AÇÃO] para que [NOME] perceba/sinta [RESULTADO]"
+   - Exemplo: "Lisa, considere verbalizar 'preciso de 10 minutos' antes de se recolher. Cristiano interpretará como comunicação, não rejeição."
+
+2. RITUAIS PRÁTICOS (mínimo 1 por seção):
+   - Formato: "[FREQUÊNCIA], façam [AÇÃO ESPECÍFICA]"
+   - Exemplo: "Toda noite, antes de dormir, cada um diz UMA coisa que apreciou no outro hoje."
+
+3. FRASES-PONTE (em seções de conflito):
+   - Ao invés de: "Você sempre..."
+   - Experimente: "Quando [situação], eu sinto [emoção]. Podemos [proposta]?"
+
+4. NUNCA DEIXAR SEÇÕES VAZIAS:
+   - Se não houver dados específicos, gere conteúdo baseado nos papéis (Sensor/Condutor)
+   - Use fallbacks inteligentes: "Como casal com dinâmica [TIPO], vocês podem..."
+
+5. DENSIDADE MÍNIMA POR SEÇÃO:
+   - zona_ajuste: obrigatório ter reflexoes_praticas com pelo menos 3 itens
+   - tabela_traducao: obrigatório ter pelo menos 4 traducoes por papel
+   - protocolo_paz: obrigatório ter rituais_diarios (mínimo 2)
+   - acao_pratica_24h: obrigatório ter 3 passos detalhados com justificativa
 
 ═══════════════════════════════════════════════════════════════════════════════
 OBJETIVO FINAL

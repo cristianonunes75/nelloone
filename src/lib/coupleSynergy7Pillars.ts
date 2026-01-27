@@ -674,12 +674,183 @@ export const generateNello16Synergy = (
 };
 
 // ============================================================================
+// GENERATE DAILY REFLECTIONS (NEW - LIVRO DE BORDO PREMIUM)
+// ============================================================================
+
+interface ReflexaoPratica {
+  para: string;
+  acao: string;
+  efeito: string;
+}
+
+interface RitualCasal {
+  titulo: string;
+  frequencia: string;
+  descricao: string;
+  passos?: string[];
+}
+
+interface FrasePonte {
+  ao_inves_de: string;
+  experimente: string;
+  porque_funciona: string;
+}
+
+interface AlertaDiaDia {
+  alerta: string;
+  considere: string;
+  efeito: string;
+}
+
+export interface DailyReflectionsOutput {
+  reflexoes_praticas: ReflexaoPratica[];
+  rituais_casal: RitualCasal[];
+  frases_ponte: FrasePonte[];
+  alertas_dia_a_dia: AlertaDiaDia[];
+}
+
+const DISC_PRESSURE_BEHAVIORS: Record<string, Record<Language, { behavior: string; need: string; support: string }>> = {
+  D: {
+    pt: { behavior: 'acelerar decisões e cobrar resultados', need: 'sentir progresso e controle', support: 'ofereça opções claras e prazos definidos' },
+    'pt-pt': { behavior: 'acelerar decisões e cobrar resultados', need: 'sentir progresso e controlo', support: 'ofereça opções claras e prazos definidos' },
+    en: { behavior: 'rush decisions and demand results', need: 'feel progress and control', support: 'offer clear options and defined deadlines' },
+  },
+  I: {
+    pt: { behavior: 'buscar validação e evitar confronto direto', need: 'sentir conexão e aprovação', support: 'valide os sentimentos antes de oferecer soluções' },
+    'pt-pt': { behavior: 'buscar validação e evitar confronto direto', need: 'sentir conexão e aprovação', support: 'valide os sentimentos antes de oferecer soluções' },
+    en: { behavior: 'seek validation and avoid direct confrontation', need: 'feel connection and approval', support: 'validate feelings before offering solutions' },
+  },
+  S: {
+    pt: { behavior: 'silenciar e processar internamente', need: 'tempo e espaço seguro', support: 'pergunte "Precisa de espaço ou de companhia?" ao invés de pressionar' },
+    'pt-pt': { behavior: 'silenciar e processar internamente', need: 'tempo e espaço seguro', support: 'pergunte "Precisa de espaço ou de companhia?" ao invés de pressionar' },
+    en: { behavior: 'become quiet and process internally', need: 'time and safe space', support: 'ask "Do you need space or company?" instead of pressing' },
+  },
+  C: {
+    pt: { behavior: 'analisar excessivamente e adiar ação', need: 'clareza e informação completa', support: 'traga dados e dê tempo para processar' },
+    'pt-pt': { behavior: 'analisar excessivamente e adiar ação', need: 'clareza e informação completa', support: 'traga dados e dê tempo para processar' },
+    en: { behavior: 'over-analyze and delay action', need: 'clarity and complete information', support: 'bring data and give time to process' },
+  },
+};
+
+export const generateDailyReflections = (
+  profiles: FullCoupleProfiles,
+  sensorName: string,
+  conductorName: string,
+  language: Language
+): DailyReflectionsOutput => {
+  const nameA = profiles.personA.name;
+  const nameB = profiles.personB.name;
+  
+  // Determine dominant DISC for each person (simplified)
+  const getDominantDISC = (person: typeof profiles.personA): 'D' | 'I' | 'S' | 'C' => {
+    // Default based on archetype role mapping
+    const arch = person.archetypes?.primary?.toLowerCase() || '';
+    if (['heroi', 'herói', 'governante', 'guardiao', 'guardião'].includes(arch)) return 'D';
+    if (['amante', 'bobo', 'inocente'].includes(arch)) return 'I';
+    if (['cuidador', 'provedor', 'cara-comum'].includes(arch)) return 'S';
+    if (['mago', 'sabio', 'sábio', 'explorador'].includes(arch)) return 'C';
+    return 'S'; // Default
+  };
+  
+  const discA = getDominantDISC(profiles.personA);
+  const discB = getDominantDISC(profiles.personB);
+  
+  const pressureA = DISC_PRESSURE_BEHAVIORS[discA]?.[language] || DISC_PRESSURE_BEHAVIORS.S[language];
+  const pressureB = DISC_PRESSURE_BEHAVIORS[discB]?.[language] || DISC_PRESSURE_BEHAVIORS.S[language];
+  
+  const templates: Record<Language, {
+    reflexoes: (na: string, nb: string) => ReflexaoPratica[];
+    rituais: () => RitualCasal[];
+    frases: () => FrasePonte[];
+    alertas: (sensor: string, condutor: string, pA: typeof pressureA, pB: typeof pressureA) => AlertaDiaDia[];
+  }> = {
+    pt: {
+      reflexoes: (na, nb) => [
+        { para: na, acao: `Considere avisar "${nb}, preciso de alguns minutos para processar"`, efeito: `${nb} entenderá como comunicação, não como rejeição` },
+        { para: nb, acao: `Quando ${na} silenciar, experimente perguntar "Precisa de espaço ou quer que eu fique aqui?"`, efeito: `${na} se sentirá respeitado(a) no seu tempo` },
+        { para: na, acao: `Antes de uma conversa difícil, pergunte "Qual resultado queremos juntos?"`, efeito: `isso alinha expectativas e evita escalada` },
+        { para: nb, acao: `Evite interpretar pausas como desinteresse`, efeito: `${na} processa internamente antes de responder - isso é cuidado, não descaso` },
+        { para: na, acao: `Quando sentir urgência para resolver, verbalize "Estou ansioso(a) para avançar, mas quero ouvir você primeiro"`, efeito: `${nb} sentirá que sua voz importa` },
+        { para: nb, acao: `Celebre pequenas vitórias em voz alta`, efeito: `${na} precisa ouvir que o esforço foi notado` },
+      ],
+      rituais: () => [
+        { titulo: 'Ritual da Gratidão Noturna', frequencia: 'Toda noite', descricao: 'Antes de dormir, cada um diz UMA coisa específica que apreciou no outro hoje.' },
+        { titulo: 'Check-in do Barco', frequencia: 'Todo fim de semana', descricao: 'Reservem 15 minutos para responder juntos:', passos: ['Como você se sentiu amado(a) esta semana?', 'O que poderia ter sido diferente?', 'Qual é o nosso foco para a próxima semana?'] },
+        { titulo: 'Reunião de Bordo', frequencia: 'Mensalmente', descricao: 'Revisem os acordos do casal e ajustem expectativas. Celebrem progressos.' },
+      ],
+      frases: () => [
+        { ao_inves_de: 'Você nunca me ouve', experimente: 'Sinto que preciso ser mais ouvido(a). Podemos conversar sobre isso?', porque_funciona: 'Evita defensividade e abre espaço para diálogo' },
+        { ao_inves_de: 'Sempre faço tudo sozinho(a)', experimente: 'Gostaria de dividir [tarefa específica] com você. Como podemos organizar?', porque_funciona: 'Transforma acusação em convite colaborativo' },
+        { ao_inves_de: 'Você está errado(a)', experimente: 'Posso estar vendo de forma diferente. Me ajuda a entender seu ponto?', porque_funciona: 'Demonstra curiosidade genuína ao invés de julgamento' },
+        { ao_inves_de: 'Preciso de espaço', experimente: 'Preciso de 15 minutos para organizar meus pensamentos. Depois conversamos, ok?', porque_funciona: 'Comunica a necessidade com prazo, evitando abandono' },
+        { ao_inves_de: 'Você me magoou', experimente: 'Quando [situação específica], eu me senti [emoção]. Não sei se foi intencional.', porque_funciona: 'Descreve impacto sem atribuir intenção' },
+      ],
+      alertas: (sensor, condutor, pA, pB) => [
+        { alerta: `${sensor} sob pressão tende a ${pA.behavior}`, considere: `${condutor}, ${pA.support}`, efeito: `${sensor} sentirá ${pA.need}` },
+        { alerta: `${condutor} sob pressão tende a ${pB.behavior}`, considere: `${sensor}, ${pB.support}`, efeito: `${condutor} sentirá ${pB.need}` },
+      ],
+    },
+    'pt-pt': {
+      reflexoes: (na, nb) => [
+        { para: na, acao: `Considere avisar "${nb}, preciso de alguns minutos para processar"`, efeito: `${nb} entenderá como comunicação, não como rejeição` },
+        { para: nb, acao: `Quando ${na} silenciar, experimente perguntar "Precisas de espaço ou queres que fique aqui?"`, efeito: `${na} sentir-se-á respeitado(a) no seu tempo` },
+        { para: na, acao: `Antes de uma conversa difícil, pergunte "Qual resultado queremos juntos?"`, efeito: `isso alinha expectativas e evita escalada` },
+        { para: nb, acao: `Evite interpretar pausas como desinteresse`, efeito: `${na} processa internamente antes de responder - isso é cuidado, não descaso` },
+      ],
+      rituais: () => [
+        { titulo: 'Ritual da Gratidão Noturna', frequencia: 'Toda noite', descricao: 'Antes de dormir, cada um diz UMA coisa específica que apreciou no outro hoje.' },
+        { titulo: 'Check-in do Barco', frequencia: 'Todo fim de semana', descricao: 'Reservem 15 minutos para responder juntos:', passos: ['Como te sentiste amado(a) esta semana?', 'O que poderia ter sido diferente?', 'Qual é o nosso foco para a próxima semana?'] },
+      ],
+      frases: () => [
+        { ao_inves_de: 'Nunca me ouves', experimente: 'Sinto que preciso ser mais ouvido(a). Podemos conversar sobre isso?', porque_funciona: 'Evita defensividade e abre espaço para diálogo' },
+        { ao_inves_de: 'Faço sempre tudo sozinho(a)', experimente: 'Gostaria de dividir [tarefa específica] contigo. Como podemos organizar?', porque_funciona: 'Transforma acusação em convite colaborativo' },
+      ],
+      alertas: (sensor, condutor, pA, pB) => [
+        { alerta: `${sensor} sob pressão tende a ${pA.behavior}`, considere: `${condutor}, ${pA.support}`, efeito: `${sensor} sentirá ${pA.need}` },
+        { alerta: `${condutor} sob pressão tende a ${pB.behavior}`, considere: `${sensor}, ${pB.support}`, efeito: `${condutor} sentirá ${pB.need}` },
+      ],
+    },
+    en: {
+      reflexoes: (na, nb) => [
+        { para: na, acao: `Consider saying "${nb}, I need a few minutes to process"`, efeito: `${nb} will understand as communication, not rejection` },
+        { para: nb, acao: `When ${na} goes quiet, try asking "Do you need space or do you want me here?"`, efeito: `${na} will feel respected in their timing` },
+        { para: na, acao: `Before a difficult conversation, ask "What outcome do we want together?"`, efeito: `this aligns expectations and prevents escalation` },
+        { para: nb, acao: `Avoid interpreting pauses as disinterest`, efeito: `${na} processes internally before responding - this is care, not neglect` },
+      ],
+      rituais: () => [
+        { titulo: 'Nightly Gratitude Ritual', frequencia: 'Every night', descricao: 'Before bed, each person says ONE specific thing they appreciated about the other today.' },
+        { titulo: 'Boat Check-in', frequencia: 'Every weekend', descricao: 'Set aside 15 minutes to answer together:', passos: ['How did you feel loved this week?', 'What could have been different?', 'What is our focus for next week?'] },
+      ],
+      frases: () => [
+        { ao_inves_de: 'You never listen to me', experimente: 'I feel like I need to be heard more. Can we talk about this?', porque_funciona: 'Avoids defensiveness and opens space for dialogue' },
+        { ao_inves_de: 'I always do everything alone', experimente: 'I\'d like to share [specific task] with you. How can we organize?', porque_funciona: 'Turns accusation into collaborative invitation' },
+      ],
+      alertas: (sensor, condutor, pA, pB) => [
+        { alerta: `${sensor} under pressure tends to ${pA.behavior}`, considere: `${condutor}, ${pA.support}`, efeito: `${sensor} will feel ${pA.need}` },
+        { alerta: `${condutor} under pressure tends to ${pB.behavior}`, considere: `${sensor}, ${pB.support}`, efeito: `${condutor} will feel ${pB.need}` },
+      ],
+    },
+  };
+  
+  const t = templates[language];
+  
+  return {
+    reflexoes_praticas: t.reflexoes(nameA, nameB),
+    rituais_casal: t.rituais(),
+    frases_ponte: t.frases(),
+    alertas_dia_a_dia: t.alertas(sensorName, conductorName, pressureA, pressureB),
+  };
+};
+
+// ============================================================================
 // GENERATE FULL 7-PILLAR SYNERGY
 // ============================================================================
 
 export const generate7PillarSynergy = (
   profiles: FullCoupleProfiles,
-  language: Language
+  language: Language,
+  sensorName?: string,
+  conductorName?: string
 ) => {
   return {
     temperamentos: generateTemperamentSynergy(profiles, language),
@@ -687,5 +858,8 @@ export const generate7PillarSynergy = (
     arquetipos: generateArchetypesSynergy(profiles, language),
     estilos_conexao: generateConnectionStylesSynergy(profiles, language),
     nello16: generateNello16Synergy(profiles, language),
+    reflexoes_diarias: sensorName && conductorName 
+      ? generateDailyReflections(profiles, sensorName, conductorName, language) 
+      : null,
   };
 };
