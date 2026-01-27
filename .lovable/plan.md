@@ -1,174 +1,174 @@
 
-# Plano: Exibir Resultados Parciais Assim que Cada Teste For Concluído
 
-## Problema Atual
+# Plano: Transformar o Relatório do Casal em "Livro de Bordo Premium"
 
-A página de detalhes do candidato (`BusinessHiringResults.tsx`) só exibe resultados quando **ambos os testes** (DISC e Temperamentos) estão completos. Enquanto isso, mostra apenas uma mensagem "Aguardando avaliações" com badges indicando o status de cada teste.
+## Diagnóstico Completo
 
-Isso significa que quando a Dariane termina o DISC, você não vê o resultado - precisa esperar ela terminar também o Temperamentos.
+Após análise detalhada do PDF gerado e do código-fonte, identifiquei os seguintes problemas:
 
----
+### Páginas Vazias / Incompletas
+| Página | Seção | Status Atual |
+|--------|-------|--------------|
+| 3 | Semáforo Relacional / Zona de Ajuste | Vazia - apenas título |
+| 8 | Arquétipos | Mostra "Sombra: undefined" |
+| 9 | Linguagens de Conexão | Micro acordos truncados |
+| 11 | Tabela de Tradução | Completamente vazia |
+| 12 | Protocolo de Paz + Ação 24h | Apenas títulos |
 
-## Solução Proposta
-
-### 1. Reestruturar a Lógica de Exibição
-
-Substituir a lógica binária atual:
-
-```text
-SE ambos_completos:
-   mostrar_relatório_completo
-SENÃO:
-   mostrar_aguardando
-```
-
-Por uma lógica incremental:
-
-```text
-SE disc_completo:
-   mostrar_card_DISC
-SENÃO:
-   mostrar_progresso_DISC (se iniciado) ou badge_pendente
-
-SE temperamentos_completo:
-   mostrar_card_Temperamento
-SENÃO:
-   mostrar_progresso_Temperamentos (se iniciado) ou badge_pendente
-
-SE ambos_completos:
-   mostrar_cards_adicionais (Resumo Executivo, Pontos Fortes, etc.)
-```
-
-### 2. Adicionar Atualização em Tempo Real
-
-Conectar a página de detalhes ao Realtime do Supabase para atualizar automaticamente quando um teste for concluído (sem precisar recarregar a página).
-
-### 3. Indicador Visual de Progresso
-
-Para testes em andamento, mostrar qual pergunta o candidato está respondendo (usando os dados de `current_question_number` que já salvamos).
+### Problema Principal
+O conteúdo gerado pela IA (edge function) está estruturado, mas:
+1. Não está sendo mapeado corretamente para o gerador de PDF
+2. Falta densidade reflexiva com frases do tipo "Considere fazer X para que Y sinta Z"
+3. O prompt v2.1 não enfatiza geração de conteúdo prático do dia-a-dia
 
 ---
 
-## Mudanças Técnicas
+## Solução Proposta: 3 Frentes
 
-### Arquivo: `src/apps/business/pages/BusinessHiringResults.tsx`
-
-**1. Adicionar Subscription Realtime:**
+### Frente 1: Enriquecer o Prompt da IA (Edge Function)
+Adicionar instruções explícitas para gerar "Prompts Reflexivos" em cada seção:
 
 ```text
-useEffect(() => {
-  // Subscribe to assessment changes for this candidate
-  const channel = supabase
-    .channel('candidate-assessments')
-    .on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'hiring_assessments',
-      filter: `candidate_id=eq.${candidateId}`,
-    }, () => fetchCandidateData())
-    .subscribe();
-  
-  return () => supabase.removeChannel(channel);
-}, [candidateId]);
+REGRA DE DENSIDADE DE CONTEÚDO:
+Para cada seção, inclua pelo menos 2-3 "Prompts Reflexivos" no formato:
+- "Considere [AÇÃO ESPECÍFICA] para que [NOME] perceba [RESULTADO]"
+- "Quando [SITUAÇÃO], experimente [AÇÃO] - isso mostra a [NOME] que [MENSAGEM]"
+- "Evite [COMPORTAMENTO] pois [NOME] pode interpretar como [MAL-ENTENDIDO]"
+
+Exemplos obrigatórios por seção:
+- zona_ajuste: "Cristiano, considere pausar 30 segundos antes de cobrar resposta. Lisa verá isso como respeito pelo tempo dela."
+- linguagens_conexao: "Lisa, quando Cristiano pedir 'tempo juntos', entenda como 'preciso me sentir importante para você'."
+- protocolo_paz: "Antes de discutir finanças, pergunte: 'Qual resultado queremos?' Isso alinha expectativas."
 ```
 
-**2. Criar Componente de Progresso ao Vivo:**
+### Frente 2: Expandir a Estrutura JSON do Prompt
+Adicionar campos obrigatórios para conteúdo reflexivo:
 
-```text
-function TestProgressCard({ assessment, testType }) {
-  SE status === 'completed':
-    retornar Card com resultado completo
-  SE status === 'in_progress':
-    retornar Card com progresso (Pergunta X/Y + barra de progresso)
-  SENÃO:
-    retornar Card com status "Pendente"
+```json
+{
+  "zona_ajuste": {
+    "ponto_principal": "...",
+    "risco_se_nao_ajustar": "...",
+    "ajuste_proposto": "...",
+    "reflexoes_praticas": [
+      {
+        "para": "[NOME_A]",
+        "acao": "Considere fazer X",
+        "efeito": "para que [NOME_B] sinta Y"
+      }
+    ],
+    "micro_acordos": [...]
+  },
+  "tabela_traducao": {
+    "traducoes_sensor": [...],
+    "traducoes_condutor": [...],
+    "reflexoes_diarias": [
+      {
+        "situacao": "Quando ele/ela se cala",
+        "considere": "Pergunte 'Você precisa de tempo ou de companhia?' ao invés de pressionar"
+      }
+    ]
+  },
+  "protocolo_paz": {
+    "regras": [...],
+    "rituais_diarios": [
+      "Todo fim de semana, dediquem 10 minutos para a 'Pergunta do Barco': Como estamos navegando?",
+      "Antes de dormir, compartilhem uma gratidão específica sobre o outro"
+    ]
+  }
 }
 ```
 
-**3. Substituir a Seção Condicional (linhas 373-475):**
+### Frente 3: Corrigir o Mapeamento no PDF Generator
+1. **Sanitizar "undefined"** - Remover qualquer texto com "undefined"
+2. **Fallbacks inteligentes** - Se `reflexoes_praticas` vier vazio, gerar baseado no DISC
+3. **Preencher seções vazias** - Usar `coupleSynergyLogic.ts` para gerar conteúdo dinâmico
 
-```text
-Antes:
-{bothCompleted ? (
-  <RelatórioCompleto />
-) : (
-  <CardAguardando />
-)}
+---
 
-Depois:
-{/* Cards individuais - sempre visíveis */}
-<PartialDISCCard 
-  assessment={discAssessment} 
-  status={discAssessment?.status} 
-/>
+## Novas Seções de Conteúdo Sugeridas
 
-<PartialTemperamentCard 
-  assessment={temperamentAssessment} 
-  status={temperamentAssessment?.status} 
-/>
+### 1. "Ritual Semanal do Casal" (Nova seção)
+```
+Toda semana, reservem 15 minutos para o "Check-in do Barco":
+1. Como você se sentiu amado(a) esta semana?
+2. O que poderia ter sido diferente?
+3. Qual é o nosso foco para a próxima semana?
+```
 
-{/* Cards combinados - só quando ambos completos */}
-{bothCompleted && (
-  <>
-    <ExecutiveSummaryCard ... />
-    <StrengthsCard ... />
-    ...
-  </>
-)}
+### 2. "Frases que Constroem" (Expandir Tabela de Tradução)
+| Ao invés de... | Experimente dizer... | Por que funciona |
+|----------------|----------------------|------------------|
+| "Você nunca me ouve" | "Sinto que preciso ser mais ouvido(a)" | Evita defensividade |
+| "Sempre faço tudo" | "Gostaria de dividir X com você" | Convite, não acusação |
+
+### 3. "Alertas do Dia-a-Dia" (Enriquecer Alertas de Pressão)
+```
+⚠️ ALERTA: Cristiano sob pressão tende a acelerar decisões
+   Considere: Lisa, se perceber pressa excessiva, sugira "Vamos listar os prós e contras juntos"
+   Efeito: Cristiano sentirá que você está apoiando, não freando
+
+⚠️ ALERTA: Lisa sob pressão tende a se recolher
+   Considere: Cristiano, evite interpretar silêncio como rejeição. Pergunte "Precisa de espaço ou quer conversar?"
+   Efeito: Lisa sentirá respeito pelo seu tempo de processamento
 ```
 
 ---
 
-## Estrutura Visual Proposta
+## Alterações Técnicas Necessárias
+
+### Arquivo 1: `supabase/functions/nello-codigo-cruzamento/index.ts`
+- Expandir prompt com instruções de densidade reflexiva
+- Adicionar campos obrigatórios no JSON Schema
+- Incluir exemplos concretos de "Considere fazer X"
+
+### Arquivo 2: `src/lib/pdfCodigoCasal.ts`
+- Adicionar método `renderReflectivePrompts()` para nova formatação
+- Corrigir `renderTranslationTable()` para não ficar vazia
+- Sanitizar "undefined" em todos os campos de texto
+- Adicionar fallbacks usando `coupleSynergyLogic.ts`
+
+### Arquivo 3: `src/lib/coupleSynergy7Pillars.ts`
+- Expandir `generate7PillarSynergy()` com reflexões práticas
+- Adicionar função `generateDailyReflections()` 
+
+---
+
+## Resultado Esperado
+
+Um PDF de 15-20 páginas onde:
+- Cada seção tem pelo menos 2-3 reflexões práticas personalizadas
+- Nenhum campo mostra "undefined" ou fica vazio
+- O casal lê e sente que é um "livro de bordo" com ações claras
+- Tom maduro, sem infantilização, focado em proteção do vínculo
+
+---
+
+## Seções Técnicas (Para Implementação)
+
+### Prompt v2.2 - Adições ao System Prompt
 
 ```text
-┌─────────────────────────────────────────────────────────────────────┐
-│  Dariane dos Santos Martins                          ⏱️ 1/2 Testes  │
-│  Relatório de Avaliação Comportamental                              │
-├─────────────────────────────────────────────────────────────────────┤
-│  📧 email  📞 telefone  💼 cargo  📅 data                          │
-└─────────────────────────────────────────────────────────────────────┘
+═══════════════════════════════════════════════════════════════════════════════
+REGRA CRÍTICA: DENSIDADE REFLEXIVA (LIVRO DE BORDO)
+═══════════════════════════════════════════════════════════════════════════════
 
-┌─────────────────────────────────────────────────────────────────────┐
-│  🎯 Perfil DISC                                    ✅ COMPLETO      │
-├─────────────────────────────────────────────────────────────────────┤
-│  [D] Dominância    [I] Influência   [S] Estabilidade  [C] Conform. │
-│   🟠 Predominante   ⚪ Baixo          ⚪ Moderado       ⚪ Baixo     │
-│                                                                      │
-│  Perfil predominante: D - Dominância                                 │
-│  "Foco em resultados, direto, assertivo..."                          │
-└─────────────────────────────────────────────────────────────────────┘
+Este relatório é um LIVRO DE BORDO PREMIUM. Cada seção DEVE conter:
 
-┌─────────────────────────────────────────────────────────────────────┐
-│  🔥 Temperamentos                                  ⏳ EM ANDAMENTO   │
-├─────────────────────────────────────────────────────────────────────┤
-│  Pergunta 23 de 40                                                  │
-│  [████████████████░░░░░░░░░░░░░░░░░░░░░░░░] 57%                     │
-│                                                                      │
-│  Última atividade: há 2 minutos                                     │
-│  🟢 Candidato ativo agora                                           │
-└─────────────────────────────────────────────────────────────────────┘
+1. PROMPTS REFLEXIVOS (mínimo 2-3 por seção):
+   - Formato: "Considere [AÇÃO] para que [NOME] perceba/sinta [RESULTADO]"
+   - Exemplo: "Lisa, considere verbalizar 'preciso de 10 minutos' antes de se recolher. Cristiano interpretará como comunicação, não rejeição."
 
-┌────────────────────────────────────────────┐
-│  📊 Resumo Executivo                       │
-│  (Disponível quando ambos os testes       │
-│   estiverem completos)                     │
-└────────────────────────────────────────────┘
+2. RITUAIS PRÁTICOS (mínimo 1 por seção):
+   - Formato: "[FREQUÊNCIA], façam [AÇÃO ESPECÍFICA]"
+   - Exemplo: "Toda noite, antes de dormir, cada um diz UMA coisa que apreciou no outro hoje."
+
+3. FRASES-PONTE (em seções de conflito):
+   - Ao invés de: "Você sempre..."
+   - Experimente: "Quando [situação], eu sinto [emoção]. Podemos [proposta]?"
+
+4. NUNCA DEIXAR SEÇÕES VAZIAS:
+   - Se não houver dados específicos, gere conteúdo baseado nos papéis (Sensor/Condutor)
+   - Use fallbacks inteligentes: "Como casal com dinâmica [TIPO], vocês podem..."
 ```
 
----
-
-## Arquivos a Modificar
-
-| Arquivo | Descrição |
-|---------|-----------|
-| `src/apps/business/pages/BusinessHiringResults.tsx` | Adicionar realtime subscription, refatorar layout para mostrar resultados parciais |
-
----
-
-## Benefícios
-
-1. **Visibilidade Imediata**: Ver o resultado do DISC assim que a Dariane terminar, sem esperar o Temperamentos
-2. **Acompanhamento ao Vivo**: Ver em qual pergunta o candidato está durante o teste
-3. **Sem Refresh Manual**: A página atualiza automaticamente via Realtime
-4. **Progressão Visual**: Entender claramente o status de cada teste individualmente
