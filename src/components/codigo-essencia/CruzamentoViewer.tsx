@@ -1661,6 +1661,234 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     );
   };
 
+  // ============== REFLEXÕES PRÁTICAS (Identity v2.2) ==============
+  const renderReflexoesPraticas = () => {
+    const reflexoes = content.reflexoes_praticas;
+    if (!reflexoes || !Array.isArray(reflexoes) || reflexoes.length === 0) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-indigo-500/5 to-purple-500/5 border-indigo-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Lightbulb className="w-5 h-5 text-indigo-500" />
+            <CardTitle className="text-base">
+              {language === 'en' ? 'Practical Reflections' : 'Reflexões Práticas do Casal'}
+            </CardTitle>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {language === 'en' 
+              ? 'Consider doing X so that Y perceives Z' 
+              : 'Orientações do tipo "Considere fazer X para que Y perceba Z"'}
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {reflexoes.map((reflexao: any, i: number) => (
+            <div key={i} className="p-4 rounded-lg bg-indigo-500/5 border border-indigo-500/20">
+              <div className="flex items-start gap-3">
+                <span className="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold flex items-center justify-center text-sm flex-shrink-0">
+                  {i + 1}
+                </span>
+                <div className="flex-1">
+                  {reflexao.para && (
+                    <p className="text-xs font-medium text-indigo-700 dark:text-indigo-400 mb-1">
+                      Para: {reflexao.para}
+                    </p>
+                  )}
+                  <p className="text-sm font-medium text-foreground">
+                    {reflexao.acao}
+                  </p>
+                  {reflexao.efeito && (
+                    <p className="text-sm text-muted-foreground mt-1 italic">
+                      → {reflexao.efeito}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== RITUAIS DO CASAL (Identity v2.2) ==============
+  const renderRituaisCasal = () => {
+    const rituais = content.rituais_casal;
+    if (!rituais) return null;
+
+    const diarios = asArray<string>(rituais.diarios);
+    const semanais = asArray<string>(rituais.semanais);
+    const mensais = asArray<string>(rituais.mensais);
+
+    if (diarios.length === 0 && semanais.length === 0 && mensais.length === 0) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-emerald-500/5 to-teal-500/5 border-emerald-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Heart className="w-5 h-5 text-emerald-500" />
+            <CardTitle className="text-base">
+              {language === 'en' ? 'Couple Rituals' : 'Rituais do Casal'}
+            </CardTitle>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {language === 'en' 
+              ? 'Anchors that keep the couple connected' 
+              : 'Âncoras que mantêm o casal conectado'}
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {diarios.length > 0 && (
+            <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-2 flex items-center gap-2">
+                ☀️ {language === 'en' ? 'Daily' : 'Diário'}
+              </h4>
+              <ul className="space-y-2">
+                {diarios.map((ritual: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <Check className="w-4 h-4 mt-0.5 text-emerald-500 flex-shrink-0" />
+                    <span>{ritual}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {semanais.length > 0 && (
+            <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+              <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-2 flex items-center gap-2">
+                📅 {language === 'en' ? 'Weekly' : 'Semanal'}
+              </h4>
+              <ul className="space-y-2">
+                {semanais.map((ritual: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <Check className="w-4 h-4 mt-0.5 text-blue-500 flex-shrink-0" />
+                    <span>{ritual}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {mensais.length > 0 && (
+            <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
+              <h4 className="font-semibold text-purple-700 dark:text-purple-400 mb-2 flex items-center gap-2">
+                🗓️ {language === 'en' ? 'Monthly' : 'Mensal'}
+              </h4>
+              <ul className="space-y-2">
+                {mensais.map((ritual: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <Check className="w-4 h-4 mt-0.5 text-purple-500 flex-shrink-0" />
+                    <span>{ritual}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== FRASES-PONTE (Identity v2.2) ==============
+  const renderFrasesPonte = () => {
+    const frases = content.frases_ponte;
+    if (!frases || !Array.isArray(frases) || frases.length === 0) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-amber-500/5 to-orange-500/5 border-amber-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <MessageCircle className="w-5 h-5 text-amber-500" />
+            <CardTitle className="text-base">
+              {language === 'en' ? 'Bridge Phrases' : 'Frases que Constroem'}
+            </CardTitle>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {language === 'en' 
+              ? 'Replace reactive communication with proactive words' 
+              : 'Substitua comunicação reativa por palavras proativas'}
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {frases.map((frase: any, i: number) => (
+            <div key={i} className="p-4 rounded-lg bg-muted/50 border space-y-2">
+              <div className="flex items-start gap-2">
+                <span className="text-red-500 font-medium text-sm">❌</span>
+                <div>
+                  <span className="text-xs text-muted-foreground">{language === 'en' ? 'Instead of:' : 'Ao invés de:'}</span>
+                  <p className="text-sm text-foreground/80 line-through">{frase.ao_inves_de}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-emerald-500 font-medium text-sm">✓</span>
+                <div>
+                  <span className="text-xs text-muted-foreground">{language === 'en' ? 'Try:' : 'Experimente:'}</span>
+                  <p className="text-sm font-medium text-foreground">{frase.experimente}</p>
+                </div>
+              </div>
+              {frase.porque_funciona && (
+                <p className="text-xs text-muted-foreground italic pl-6">
+                  💡 {frase.porque_funciona}
+                </p>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== ALERTAS DO DIA-A-DIA (Identity v2.2) ==============
+  const renderAlertasDiaDia = () => {
+    const alertas = content.alertas_dia_a_dia;
+    if (!alertas || !Array.isArray(alertas) || alertas.length === 0) return null;
+
+    return (
+      <Card className="border-amber-500/30">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-amber-500" />
+            <CardTitle className="text-base">
+              {language === 'en' ? 'Daily Alerts' : 'Alertas do Dia-a-Dia'}
+            </CardTitle>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {language === 'en' 
+              ? 'Behaviors under pressure and how to support' 
+              : 'Comportamentos sob pressão e como apoiar'}
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {alertas.map((alerta: any, i: number) => (
+            <div key={i} className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-3">
+              <div className="flex items-start gap-2">
+                <span className="text-lg">⚠️</span>
+                <div>
+                  <p className="font-medium text-amber-700 dark:text-amber-400 text-sm">
+                    {alerta.pessoa} {language === 'en' ? 'under pressure' : 'sob pressão'}
+                  </p>
+                  <p className="text-sm text-foreground/80">{alerta.comportamento}</p>
+                </div>
+              </div>
+              {alerta.considere && (
+                <div className="p-3 rounded bg-emerald-500/10 border border-emerald-500/20">
+                  <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-1">
+                    💡 {language === 'en' ? 'Consider:' : 'Considere:'}
+                  </p>
+                  <p className="text-sm text-foreground/80">{alerta.considere}</p>
+                </div>
+              )}
+              {alerta.efeito && (
+                <p className="text-xs text-muted-foreground italic">
+                  → {language === 'en' ? 'Effect:' : 'Efeito:'} {alerta.efeito}
+                </p>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
   const renderFechamentoV2 = () => {
     const fechamento = content.fechamento;
     if (!fechamento) return null;
@@ -1829,6 +2057,13 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           {renderTabelaTraducaoV2()}
           {renderCrisisCommunication()}
           {renderProtocoloPazV2()}
+          
+          {/* New Identity v2.2 sections - Livro de Bordo Premium */}
+          {renderReflexoesPraticas()}
+          {renderFrasesPonte()}
+          {renderAlertasDiaDia()}
+          {renderRituaisCasal()}
+          
           {renderAcaoPratica()}
           
           {/* Legacy sections for backwards compatibility */}
