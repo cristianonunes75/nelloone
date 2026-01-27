@@ -105,9 +105,9 @@ export const SynergyRadarChart = ({ profileA, profileB, language }: SynergyRadar
   const nameB = profileB.name || "Pessoa B";
 
   return (
-    <div className="w-full h-[350px]">
+    <div className="w-full h-[400px]">
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart cx="50%" cy="50%" outerRadius="65%" data={chartData}>
+        <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
           <PolarGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground)/0.3)" />
           <PolarAngleAxis 
             dataKey="subject" 
