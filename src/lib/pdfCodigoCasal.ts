@@ -625,47 +625,66 @@ class PDFGenerator {
       };
     };
 
-    // Draw Person A polygon (Gold)
-    const valuesA = [discA.D || 50, discA.I || 50, discA.S || 50, discA.C || 50];
+    // Draw Person A polygon (Gold) - with SEMI-TRANSPARENT FILL
+    const valuesA = [discA.D ?? 50, discA.I ?? 50, discA.S ?? 50, discA.C ?? 50];
     const pointsA = valuesA.map((v, i) => getPoint(v, i));
     
+    // Draw filled polygon for A using GState for transparency
+    this.doc.setGState(new (this.doc as any).GState({ opacity: 0.35 }));
     this.doc.setFillColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
+    
+    // Create filled path for Person A
+    this.doc.moveTo(pointsA[0].x, pointsA[0].y);
+    for (let i = 1; i < pointsA.length; i++) {
+      this.doc.lineTo(pointsA[i].x, pointsA[i].y);
+    }
+    this.doc.lineTo(pointsA[0].x, pointsA[0].y);
+    this.doc.fill();
+    
+    // Reset opacity for stroke and draw outline
+    this.doc.setGState(new (this.doc as any).GState({ opacity: 1 }));
     this.doc.setDrawColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
-    this.doc.setLineWidth(2);
-    
-    // Draw filled polygon for A
-    const pathA: number[][] = pointsA.map(p => [p.x, p.y]);
-    pathA.push([pointsA[0].x, pointsA[0].y]); // Close path
-    
-    // Draw lines
+    this.doc.setLineWidth(2.5);
     for (let i = 0; i < pointsA.length; i++) {
       const next = (i + 1) % pointsA.length;
       this.doc.line(pointsA[i].x, pointsA[i].y, pointsA[next].x, pointsA[next].y);
     }
     
-    // Draw points
+    // Draw vertex points for A
     pointsA.forEach(p => {
       this.doc.setFillColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
-      this.doc.circle(p.x, p.y, 2, "F");
+      this.doc.circle(p.x, p.y, 2.5, "F");
     });
 
-    // Draw Person B polygon (Indigo)
-    const valuesB = [discB.D || 50, discB.I || 50, discB.S || 50, discB.C || 50];
+    // Draw Person B polygon (Indigo/Purple) - with SEMI-TRANSPARENT FILL
+    const valuesB = [discB.D ?? 50, discB.I ?? 50, discB.S ?? 50, discB.C ?? 50];
     const pointsB = valuesB.map((v, i) => getPoint(v, i));
     
-    this.doc.setDrawColor(COLORS.indigo.r, COLORS.indigo.g, COLORS.indigo.b);
-    this.doc.setLineWidth(2);
+    // Draw filled polygon for B using GState for transparency
+    this.doc.setGState(new (this.doc as any).GState({ opacity: 0.35 }));
+    this.doc.setFillColor(COLORS.indigo.r, COLORS.indigo.g, COLORS.indigo.b);
     
-    // Draw lines for B
+    // Create filled path for Person B
+    this.doc.moveTo(pointsB[0].x, pointsB[0].y);
+    for (let i = 1; i < pointsB.length; i++) {
+      this.doc.lineTo(pointsB[i].x, pointsB[i].y);
+    }
+    this.doc.lineTo(pointsB[0].x, pointsB[0].y);
+    this.doc.fill();
+    
+    // Reset opacity for stroke and draw outline
+    this.doc.setGState(new (this.doc as any).GState({ opacity: 1 }));
+    this.doc.setDrawColor(COLORS.indigo.r, COLORS.indigo.g, COLORS.indigo.b);
+    this.doc.setLineWidth(2.5);
     for (let i = 0; i < pointsB.length; i++) {
       const next = (i + 1) % pointsB.length;
       this.doc.line(pointsB[i].x, pointsB[i].y, pointsB[next].x, pointsB[next].y);
     }
     
-    // Draw points
+    // Draw vertex points for B
     pointsB.forEach(p => {
       this.doc.setFillColor(COLORS.indigo.r, COLORS.indigo.g, COLORS.indigo.b);
-      this.doc.circle(p.x, p.y, 2, "F");
+      this.doc.circle(p.x, p.y, 2.5, "F");
     });
 
     // Legend
@@ -1453,36 +1472,119 @@ class PDFGenerator {
   // 7 PILLARS - ARCHETYPES (Dinamica de Papeis)
   // ==========================================
   private renderArchetypes(content: any) {
-    const arquetipos = content.dinamica_arquetipos;
+    const arquetipos = content.dinamica_arquetipos || content.dinamica_papeis;
     if (!arquetipos) return;
 
     this.addNewPage();
-    this.renderSectionHeader(arquetipos.titulo || "Dinamica de Papeis Arquetipicos", COLORS.purple);
+    
+    // Premium chapter header
+    this.doc.setFillColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(8);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.text("CAPITULO 7", this.margin + 8, this.currentY + 7);
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text("O MITO DO CASAL", this.margin + 8, this.currentY + 16);
+    this.currentY += 30;
 
-    if (arquetipos.arquetipo_a) {
-      this.currentY = this.writeWrappedText(
-        `${arquetipos.arquetipo_a.nome}: ${arquetipos.arquetipo_a.arquetipos} - ${arquetipos.arquetipo_a.papel_no_casal || ''}`,
-        this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal'
-      );
-      this.currentY += 8;
+    const intro = "Os arquetipos revelam os papeis simbolicos que cada um ocupa naturalmente. Juntos, voces co-criam uma narrativa unica - o Mito do Casal.";
+    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+    this.currentY += 12;
+
+    // Archetype A card
+    const archA = arquetipos.arquetipo_a;
+    if (archA) {
+      this.ensureSpace(50);
+      this.doc.setFillColor(COLORS.purpleLight.r, COLORS.purpleLight.g, COLORS.purpleLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
+      
+      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.purple, 6);
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(12);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(archA.nome || "Pessoa A", this.margin + 24, this.currentY + 14);
+      
+      const primaryArch = archA.primario || archA.arquetipos || '';
+      const secondaryArch = archA.secundario || '';
+      this.doc.setFontSize(14);
+      this.doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+      this.doc.text(`${primaryArch}${secondaryArch ? ' / ' + secondaryArch : ''}`, this.margin + 8, this.currentY + 28);
+      
+      const role = archA.papel_no_casal || archA.sombra ? `Sombra: ${archA.sombra}` : '';
+      if (role) {
+        this.doc.setFontSize(9);
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.setFont("helvetica", "normal");
+        this.doc.text(role, this.margin + 8, this.currentY + 38);
+      }
+      this.currentY += 52;
     }
-    if (arquetipos.arquetipo_b) {
-      this.currentY = this.writeWrappedText(
-        `${arquetipos.arquetipo_b.nome}: ${arquetipos.arquetipo_b.arquetipos} - ${arquetipos.arquetipo_b.papel_no_casal || ''}`,
-        this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal'
-      );
-      this.currentY += 8;
+
+    // Archetype B card
+    const archB = arquetipos.arquetipo_b;
+    if (archB) {
+      this.ensureSpace(50);
+      this.doc.setFillColor(COLORS.amberLight.r, COLORS.amberLight.g, COLORS.amberLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
+      
+      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.amber, 6);
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(12);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(archB.nome || "Pessoa B", this.margin + 24, this.currentY + 14);
+      
+      const primaryArchB = archB.primario || archB.arquetipos || '';
+      const secondaryArchB = archB.secundario || '';
+      this.doc.setFontSize(14);
+      this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+      this.doc.text(`${primaryArchB}${secondaryArchB ? ' / ' + secondaryArchB : ''}`, this.margin + 8, this.currentY + 28);
+      
+      const roleB = archB.papel_no_casal || archB.sombra ? `Sombra: ${archB.sombra}` : '';
+      if (roleB) {
+        this.doc.setFontSize(9);
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.setFont("helvetica", "normal");
+        this.doc.text(roleB, this.margin + 8, this.currentY + 38);
+      }
+      this.currentY += 52;
     }
-    if (arquetipos.interacao) {
-      this.currentY = this.writeWrappedText(arquetipos.interacao, this.margin, this.currentY, this.contentWidth, 10, COLORS.primary, 'bold');
-      this.currentY += 6;
+
+    // Synergy box
+    const mito = arquetipos.mito_conjunto || arquetipos.interacao || '';
+    if (mito) {
+      this.ensureSpace(35);
+      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 30, 4, 4, "F");
+      this.doc.setDrawColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 30, 4, 4, "S");
+      
+      this.drawIconCircle(this.margin + 10, this.currentY + 8, COLORS.green, 4);
+      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+      this.doc.setFontSize(10);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text("O Mito do Casal", this.margin + 18, this.currentY + 10);
+      
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "normal");
+      const mitoLines = this.doc.splitTextToSize(mito, this.contentWidth - 20);
+      this.doc.text(mitoLines, this.margin + 8, this.currentY + 20);
+      this.currentY += 36;
     }
-    if (arquetipos.potencial) {
-      this.currentY = this.writeWrappedText(`Potencial: ${arquetipos.potencial}`, this.margin, this.currentY, this.contentWidth, 10, COLORS.green, 'normal');
-      this.currentY += 4;
-    }
-    if (arquetipos.armadilha) {
-      this.currentY = this.writeWrappedText(`Cuidado: ${arquetipos.armadilha}`, this.margin, this.currentY, this.contentWidth, 10, COLORS.amber, 'normal');
+
+    // Light/shadow dynamic
+    const dinamica = arquetipos.dinamica_luz_sombra || arquetipos.potencial || '';
+    if (dinamica) {
+      this.ensureSpace(20);
+      this.doc.setFillColor(248, 248, 252);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 18, 3, 3, "F");
+      this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "italic");
+      const dynLines = this.doc.splitTextToSize(dinamica, this.contentWidth - 16);
+      this.doc.text(dynLines, this.margin + 8, this.currentY + 11);
     }
   }
 
@@ -1494,33 +1596,101 @@ class PDFGenerator {
     if (!linguagens) return;
 
     this.addNewPage();
-    this.renderSectionHeader(linguagens.titulo || "Linguagens de Conexao Afetiva", COLORS.pink);
+    
+    // Premium chapter header
+    this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(8);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.text("CAPITULO 8", this.margin + 8, this.currentY + 7);
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text("PLANO DE ABASTECIMENTO EMOCIONAL", this.margin + 8, this.currentY + 16);
+    this.currentY += 30;
 
+    const intro = "Cada pessoa tem uma forma preferida de receber e expressar amor. Conhecer as linguagens de conexao evita que um de muito e o outro receba pouco.";
+    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+    this.currentY += 12;
+
+    // Person A connection style card
     if (linguagens.linguagem_a) {
-      this.currentY = this.writeWrappedText(
-        `${linguagens.linguagem_a.nome}: ${linguagens.linguagem_a.estilo_primario}`,
-        this.margin, this.currentY, this.contentWidth, 11, COLORS.text, 'bold'
-      );
+      this.ensureSpace(50);
+      this.doc.setFillColor(255, 240, 245); // Light pink
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
+      
+      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.pink, 6);
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(12);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(linguagens.linguagem_a.nome || "Pessoa A", this.margin + 24, this.currentY + 14);
+      
+      this.doc.setFontSize(14);
+      this.doc.setTextColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
+      const primary = linguagens.linguagem_a.estilo_primario || '';
+      const secondary = linguagens.linguagem_a.estilo_secundario || '';
+      this.doc.text(`${primary}${secondary ? ' / ' + secondary : ''}`, this.margin + 8, this.currentY + 28);
+      
       if (linguagens.linguagem_a.como_se_sente_amado) {
-        this.currentY = this.writeWrappedText(linguagens.linguagem_a.como_se_sente_amado, this.margin, this.currentY + 4, this.contentWidth, 10, COLORS.muted, 'normal');
+        this.doc.setFontSize(9);
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.setFont("helvetica", "normal");
+        const lines = this.doc.splitTextToSize(linguagens.linguagem_a.como_se_sente_amado, this.contentWidth - 20);
+        this.doc.text(lines, this.margin + 8, this.currentY + 38);
       }
-      this.currentY += 10;
+      this.currentY += 52;
     }
+
+    // Person B connection style card
     if (linguagens.linguagem_b) {
-      this.currentY = this.writeWrappedText(
-        `${linguagens.linguagem_b.nome}: ${linguagens.linguagem_b.estilo_primario}`,
-        this.margin, this.currentY, this.contentWidth, 11, COLORS.text, 'bold'
-      );
+      this.ensureSpace(50);
+      this.doc.setFillColor(COLORS.blueLight.r, COLORS.blueLight.g, COLORS.blueLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
+      
+      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.blue, 6);
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(12);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(linguagens.linguagem_b.nome || "Pessoa B", this.margin + 24, this.currentY + 14);
+      
+      this.doc.setFontSize(14);
+      this.doc.setTextColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
+      const primaryB = linguagens.linguagem_b.estilo_primario || '';
+      const secondaryB = linguagens.linguagem_b.estilo_secundario || '';
+      this.doc.text(`${primaryB}${secondaryB ? ' / ' + secondaryB : ''}`, this.margin + 8, this.currentY + 28);
+      
       if (linguagens.linguagem_b.como_se_sente_amado) {
-        this.currentY = this.writeWrappedText(linguagens.linguagem_b.como_se_sente_amado, this.margin, this.currentY + 4, this.contentWidth, 10, COLORS.muted, 'normal');
+        this.doc.setFontSize(9);
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.setFont("helvetica", "normal");
+        const lines = this.doc.splitTextToSize(linguagens.linguagem_b.como_se_sente_amado, this.contentWidth - 20);
+        this.doc.text(lines, this.margin + 8, this.currentY + 38);
       }
-      this.currentY += 10;
+      this.currentY += 52;
     }
+
+    // Micro-acordos box
     if (linguagens.micro_acordos?.length) {
-      this.currentY = this.writeWrappedText("Micro acordos:", this.margin, this.currentY, this.contentWidth, 10, COLORS.green, 'bold');
+      this.ensureSpace(60);
+      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 50, 4, 4, "F");
+      this.doc.setDrawColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 50, 4, 4, "S");
+      
+      this.drawIconCircle(this.margin + 10, this.currentY + 8, COLORS.green, 4);
+      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+      this.doc.setFontSize(10);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text("Micro Acordos de Conexao", this.margin + 18, this.currentY + 10);
+      
+      let innerY = this.currentY + 18;
       linguagens.micro_acordos.forEach((acordo: string) => {
-        this.drawIconCircle(this.margin + 4, this.currentY + 5, COLORS.green, 2);
-        this.currentY = this.writeWrappedText(acordo, this.margin + 10, this.currentY + 4, this.contentWidth - 12, 9, COLORS.text, 'normal');
+        this.drawIconCircle(this.margin + 8, innerY + 2, COLORS.green, 2);
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFontSize(9);
+        this.doc.setFont("helvetica", "normal");
+        this.doc.text(acordo, this.margin + 14, innerY + 4);
+        innerY += 10;
       });
     }
   }
@@ -1533,28 +1703,108 @@ class PDFGenerator {
     if (!proc) return;
 
     this.addNewPage();
-    this.renderSectionHeader(proc.titulo || "Processamento de Decisao", COLORS.primary);
+    
+    // Premium chapter header
+    this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(8);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.text("CAPITULO 9", this.margin + 8, this.currentY + 7);
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text("PROCESSAMENTO DE DECISAO", this.margin + 8, this.currentY + 16);
+    this.currentY += 30;
 
+    const intro = "Cada tipo de personalidade tem uma forma unica de processar informacoes e tomar decisoes. Entender essas diferencas evita frustracoes na hora de decidir juntos.";
+    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+    this.currentY += 12;
+
+    // Person A card
     if (proc.tipo_a) {
-      this.currentY = this.writeWrappedText(
-        `${proc.tipo_a.nome}: ${proc.tipo_a.tipo_nello16} - ${proc.tipo_a.como_decide || ''}`,
-        this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal'
-      );
-      this.currentY += 8;
+      this.ensureSpace(50);
+      this.doc.setFillColor(COLORS.blueLight.r, COLORS.blueLight.g, COLORS.blueLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
+      
+      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.blue, 6);
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(12);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(proc.tipo_a.nome || "Pessoa A", this.margin + 24, this.currentY + 14);
+      
+      const typeA = proc.tipo_a.tipo_nello16 || '';
+      this.doc.setFontSize(16);
+      this.doc.setTextColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
+      this.doc.text(typeA, this.margin + 8, this.currentY + 28);
+      
+      if (proc.tipo_a.como_decide) {
+        this.doc.setFontSize(9);
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.setFont("helvetica", "normal");
+        const lines = this.doc.splitTextToSize(proc.tipo_a.como_decide, this.contentWidth - 20);
+        this.doc.text(lines, this.margin + 8, this.currentY + 38);
+      }
+      this.currentY += 52;
     }
+
+    // Person B card
     if (proc.tipo_b) {
-      this.currentY = this.writeWrappedText(
-        `${proc.tipo_b.nome}: ${proc.tipo_b.tipo_nello16} - ${proc.tipo_b.como_decide || ''}`,
-        this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal'
-      );
-      this.currentY += 8;
+      this.ensureSpace(50);
+      this.doc.setFillColor(COLORS.purpleLight.r, COLORS.purpleLight.g, COLORS.purpleLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
+      
+      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.purple, 6);
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(12);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(proc.tipo_b.nome || "Pessoa B", this.margin + 24, this.currentY + 14);
+      
+      const typeB = proc.tipo_b.tipo_nello16 || '';
+      this.doc.setFontSize(16);
+      this.doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+      this.doc.text(typeB, this.margin + 8, this.currentY + 28);
+      
+      if (proc.tipo_b.como_decide) {
+        this.doc.setFontSize(9);
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.setFont("helvetica", "normal");
+        const lines = this.doc.splitTextToSize(proc.tipo_b.como_decide, this.contentWidth - 20);
+        this.doc.text(lines, this.margin + 8, this.currentY + 38);
+      }
+      this.currentY += 52;
     }
+
+    // Tension box
     if (proc.tensao_potencial) {
-      this.currentY = this.writeWrappedText(`Tensao: ${proc.tensao_potencial}`, this.margin, this.currentY, this.contentWidth, 10, COLORS.amber, 'normal');
-      this.currentY += 4;
+      this.ensureSpace(25);
+      this.doc.setFillColor(COLORS.amberLight.r, COLORS.amberLight.g, COLORS.amberLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 3, 3, "F");
+      this.drawIconCircle(this.margin + 10, this.currentY + 10, COLORS.amber, 3);
+      this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text("Tensao Potencial:", this.margin + 18, this.currentY + 9);
+      this.doc.setFont("helvetica", "normal");
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      const tensionLines = this.doc.splitTextToSize(proc.tensao_potencial, this.contentWidth - 50);
+      this.doc.text(tensionLines, this.margin + 55, this.currentY + 9);
+      this.currentY += 26;
     }
+
+    // Synergy box
     if (proc.sinergia) {
-      this.currentY = this.writeWrappedText(`Sinergia: ${proc.sinergia}`, this.margin, this.currentY, this.contentWidth, 10, COLORS.green, 'bold');
+      this.ensureSpace(25);
+      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 3, 3, "F");
+      this.drawIconCircle(this.margin + 10, this.currentY + 10, COLORS.green, 3);
+      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text("Sinergia:", this.margin + 18, this.currentY + 9);
+      this.doc.setFont("helvetica", "normal");
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      const synLines = this.doc.splitTextToSize(proc.sinergia, this.contentWidth - 40);
+      this.doc.text(synLines, this.margin + 38, this.currentY + 9);
     }
   }
 
@@ -1700,33 +1950,97 @@ class PDFGenerator {
 // ==========================================
 // CONTENT NORMALIZER - Maps Identity v1.0 to PDF expected format
 // ==========================================
+
+// Helper to sanitize undefined values in text
+const sanitizeText = (text: any): string => {
+  if (!text || text === 'undefined' || text === 'null') return '';
+  if (typeof text !== 'string') return String(text || '');
+  // Remove patterns like "undefined: undefined" or "undefined:"
+  return text
+    .replace(/undefined:\s*undefined/gi, '')
+    .replace(/undefined:\s*/gi, '')
+    .replace(/:\s*undefined/gi, '')
+    .replace(/^undefined$/gi, '')
+    .trim();
+};
+
+// Helper to filter out empty/undefined items from arrays
+const sanitizeArray = (arr: any[]): string[] => {
+  if (!Array.isArray(arr)) return [];
+  return arr
+    .map(item => {
+      if (typeof item === 'string') return sanitizeText(item);
+      if (typeof item === 'object' && item) {
+        const aspecto = sanitizeText(item.aspecto);
+        const descricao = sanitizeText(item.descricao);
+        if (aspecto && descricao) return `${aspecto}: ${descricao}`;
+        if (aspecto) return aspecto;
+        if (descricao) return descricao;
+        return '';
+      }
+      return '';
+    })
+    .filter(item => item && item.length > 3); // Remove empty or too short entries
+};
+
 const normalizeContent = (content: any): any => {
   if (!content) return {};
   
   const normalized = { ...content };
   
-  // Map zona_harmonia/zona_sinergia/zona_ajuste/zona_choque to semaforo_relacional if needed
+  // ==========================================
+  // EXTRACT PROFILE DATA FROM MULTIPLE SOURCES
+  // Priority: perfil_a/b > dados_grafico.usuario_a/b > usuario_a/b
+  // ==========================================
+  const dadosGrafico = content.dados_grafico || {};
+  const profileA = content.perfil_a || dadosGrafico.usuario_a || content.usuario_a || {};
+  const profileB = content.perfil_b || dadosGrafico.usuario_b || content.usuario_b || {};
+  
+  // Ensure profiles are available in normalized content for all render methods
+  normalized.perfil_a = profileA;
+  normalized.perfil_b = profileB;
+  
+  // Extract names for profiles
+  const nameA = profileA.nome || content.papeis_identificados?.sensor_direcao?.nome || 'Pessoa A';
+  const nameB = profileB.nome || content.papeis_identificados?.condutor_curso?.nome || 'Pessoa B';
+  
+  // ==========================================
+  // FIX: SEMAFORO RELACIONAL - sanitize undefined values
+  // ==========================================
   if (!normalized.semaforo_relacional && (normalized.zona_harmonia || normalized.zona_sinergia || normalized.zona_ajuste || normalized.zona_choque)) {
     const harmonia = normalized.zona_harmonia || normalized.zona_sinergia;
     normalized.semaforo_relacional = {
       titulo: "Semaforo Relacional",
       verde: harmonia ? {
         titulo: harmonia.titulo || "Zona de Harmonia",
-        descricao: harmonia.descricao,
-        pontos: harmonia.valores_compartilhados || harmonia.sinergias || harmonia.pontos || [],
-        proposito: harmonia.proposito_comum
+        descricao: sanitizeText(harmonia.descricao),
+        pontos: sanitizeArray(harmonia.valores_compartilhados || harmonia.sinergias || harmonia.pontos || []),
+        proposito: sanitizeText(harmonia.proposito_comum)
       } : null,
       amarelo: normalized.zona_ajuste ? {
         titulo: normalized.zona_ajuste.titulo || "Zona de Ajuste",
-        descricao: normalized.zona_ajuste.descricao,
-        pontos: normalized.zona_ajuste.diferencas?.map((d: any) => `${d.aspecto}: ${d.descricao}`) || normalized.zona_ajuste.pontos || []
+        descricao: sanitizeText(normalized.zona_ajuste.descricao),
+        pontos: sanitizeArray(normalized.zona_ajuste.diferencas || normalized.zona_ajuste.pontos || [])
       } : null,
       vermelho: normalized.zona_choque ? {
         titulo: normalized.zona_choque.titulo || "Zona de Choque",
-        descricao: normalized.zona_choque.descricao,
-        pontos: normalized.zona_choque.gatilhos?.map((g: any) => typeof g === 'string' ? g : g.descricao) || normalized.zona_choque.pontos || []
+        descricao: sanitizeText(normalized.zona_choque.descricao),
+        pontos: sanitizeArray(normalized.zona_choque.gatilhos || normalized.zona_choque.pontos || [])
       } : null
     };
+  }
+  
+  // If semaforo already exists, sanitize its pontos arrays
+  if (normalized.semaforo_relacional) {
+    if (normalized.semaforo_relacional.verde?.pontos) {
+      normalized.semaforo_relacional.verde.pontos = sanitizeArray(normalized.semaforo_relacional.verde.pontos);
+    }
+    if (normalized.semaforo_relacional.amarelo?.pontos) {
+      normalized.semaforo_relacional.amarelo.pontos = sanitizeArray(normalized.semaforo_relacional.amarelo.pontos);
+    }
+    if (normalized.semaforo_relacional.vermelho?.pontos) {
+      normalized.semaforo_relacional.vermelho.pontos = sanitizeArray(normalized.semaforo_relacional.vermelho.pontos);
+    }
   }
   
   // Map metafora_central to encontro_essencias if needed
@@ -1750,6 +2064,162 @@ const normalizeContent = (content: any): any => {
     if (sensor && condutor) {
       normalized.encontro_essencias.descricao_usuario_a = `${sensor.nome}: ${sensor.justificativa}`;
       normalized.encontro_essencias.descricao_usuario_b = `${condutor.nome}: ${condutor.justificativa}`;
+    }
+  }
+  
+  // ==========================================
+  // 7 PILLARS: TEMPERAMENTS (Ritmos Biologicos)
+  // ==========================================
+  if (!normalized.ritmos_biologicos) {
+    const tempA = profileA.temperament || profileA.temperamentos;
+    const tempB = profileB.temperament || profileB.temperamentos;
+    
+    if (tempA || tempB) {
+      normalized.ritmos_biologicos = {
+        titulo: "Protocolo de Ritmo do Casal",
+        temperamento_a: tempA ? {
+          nome: nameA,
+          temperamento_primario: tempA.primary || tempA.primario || (typeof tempA === 'string' ? tempA : ''),
+          temperamento_secundario: tempA.secondary || tempA.secundario || '',
+          caracteristicas: tempA.description || tempA.caracteristicas || ''
+        } : null,
+        temperamento_b: tempB ? {
+          nome: nameB,
+          temperamento_primario: tempB.primary || tempB.primario || (typeof tempB === 'string' ? tempB : ''),
+          temperamento_secundario: tempB.secondary || tempB.secundario || '',
+          caracteristicas: tempB.description || tempB.caracteristicas || ''
+        } : null,
+        sinergia: "Os diferentes ritmos biologicos criam uma complementaridade natural que pode ser aproveitada no dia a dia.",
+        ajuste_pratico: "Respeitem os momentos de alta e baixa energia de cada um para evitar atritos desnecessarios."
+      };
+    }
+  }
+  
+  // ==========================================
+  // 7 PILLARS: INTELLIGENCES (Sinergia de Talentos)
+  // ==========================================
+  if (!normalized.sinergia_talentos) {
+    const intA = profileA.intelligences || profileA.inteligencias;
+    const intB = profileB.intelligences || profileB.inteligencias;
+    
+    const getTop3 = (intData: any): string[] => {
+      if (!intData) return [];
+      if (Array.isArray(intData.top3)) return intData.top3;
+      if (Array.isArray(intData)) return intData.slice(0, 3);
+      if (typeof intData === 'object') {
+        return Object.entries(intData)
+          .filter(([key]) => !['top3', 'total'].includes(key))
+          .sort((a: any, b: any) => (b[1] || 0) - (a[1] || 0))
+          .slice(0, 3)
+          .map(([key]) => key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()));
+      }
+      return [];
+    };
+    
+    if (intA || intB) {
+      normalized.sinergia_talentos = {
+        titulo: "Sinergia de Talentos",
+        talentos_a: intA ? {
+          nome: nameA,
+          top_3: getTop3(intA),
+          contribuicao: "Estas inteligencias podem ser usadas para fortalecer a parceria."
+        } : null,
+        talentos_b: intB ? {
+          nome: nameB,
+          top_3: getTop3(intB),
+          contribuicao: "Estas inteligencias complementam as do parceiro(a)."
+        } : null,
+        complementaridade: "Juntos, voces cobrem um espectro amplo de habilidades e talentos.",
+        projetos_sugeridos: "Considerem projetos que combinem criatividade, logica e empatia."
+      };
+    }
+  }
+  
+  // ==========================================
+  // 7 PILLARS: ARCHETYPES (Dinamica de Papeis)
+  // ==========================================
+  if (!normalized.dinamica_papeis) {
+    const archA = profileA.archetypes || profileA.arquetipos;
+    const archB = profileB.archetypes || profileB.arquetipos;
+    
+    if (archA || archB) {
+      normalized.dinamica_papeis = {
+        titulo: "Dinamica de Papeis - O Mito do Casal",
+        arquetipo_a: archA ? {
+          nome: nameA,
+          primario: archA.primary || archA.primario || (typeof archA === 'string' ? archA : ''),
+          secundario: archA.secondary || archA.secundario || '',
+          sombra: archA.shadow || archA.sombra || ''
+        } : null,
+        arquetipo_b: archB ? {
+          nome: nameB,
+          primario: archB.primary || archB.primario || (typeof archB === 'string' ? archB : ''),
+          secundario: archB.secondary || archB.secundario || '',
+          sombra: archB.shadow || archB.sombra || ''
+        } : null,
+        mito_conjunto: "A uniao de seus arquetipos cria uma narrativa unica de co-criacao e evolucao mutua.",
+        dinamica_luz_sombra: "Quando um ativa sua sombra, o outro pode ser o espelho que traz consciencia."
+      };
+    }
+  }
+  
+  // ==========================================
+  // 7 PILLARS: CONNECTION STYLES (Linguagens de Conexao)
+  // ==========================================
+  if (!normalized.linguagens_conexao) {
+    const connA = profileA.connectionStyle || profileA.estiloConexao || profileA.loveLanguage || profileA.linguagem_amor;
+    const connB = profileB.connectionStyle || profileB.estiloConexao || profileB.loveLanguage || profileB.linguagem_amor;
+    
+    if (connA || connB) {
+      normalized.linguagens_conexao = {
+        titulo: "Plano de Abastecimento Emocional",
+        linguagem_a: connA ? {
+          nome: nameA,
+          estilo_primario: connA.primary || connA.primario || (typeof connA === 'string' ? connA : ''),
+          estilo_secundario: connA.secondary || connA.secundario || '',
+          como_se_sente_amado: connA.description || `Sente-se amado(a) atraves de ${connA.primary || connA.primario || 'demonstracoes de afeto'}.`
+        } : null,
+        linguagem_b: connB ? {
+          nome: nameB,
+          estilo_primario: connB.primary || connB.primario || (typeof connB === 'string' ? connB : ''),
+          estilo_secundario: connB.secondary || connB.secundario || '',
+          como_se_sente_amado: connB.description || `Sente-se amado(a) atraves de ${connB.primary || connB.primario || 'demonstracoes de afeto'}.`
+        } : null,
+        micro_acordos: [
+          "Pratiquem a linguagem do outro pelo menos uma vez por dia",
+          "Perguntem diretamente como o parceiro(a) prefere receber carinho",
+          "Celebrem pequenas conquistas na linguagem de cada um"
+        ]
+      };
+    }
+  }
+  
+  // ==========================================
+  // 7 PILLARS: NELLO 16 (Processamento de Decisao)
+  // ==========================================
+  if (!normalized.processamento_decisao) {
+    const n16A = profileA.nello16 || profileA.mbti || profileA.tipo_personalidade;
+    const n16B = profileB.nello16 || profileB.mbti || profileB.tipo_personalidade;
+    
+    if (n16A || n16B) {
+      const typeA = n16A?.type || n16A?.tipo || (typeof n16A === 'string' ? n16A : '');
+      const typeB = n16B?.type || n16B?.tipo || (typeof n16B === 'string' ? n16B : '');
+      
+      normalized.processamento_decisao = {
+        titulo: "Processamento de Decisao",
+        tipo_a: (n16A || typeA) ? {
+          nome: nameA,
+          tipo_nello16: typeA,
+          como_decide: n16A?.decisionStyle || (typeA ? `Tende a processar decisoes de forma ${typeA.includes('T') ? 'logica' : 'emocional'} e ${typeA.includes('J') ? 'estruturada' : 'flexivel'}.` : '')
+        } : null,
+        tipo_b: (n16B || typeB) ? {
+          nome: nameB,
+          tipo_nello16: typeB,
+          como_decide: n16B?.decisionStyle || (typeB ? `Tende a processar decisoes de forma ${typeB.includes('T') ? 'logica' : 'emocional'} e ${typeB.includes('J') ? 'estruturada' : 'flexivel'}.` : '')
+        } : null,
+        tensao_potencial: "Diferentes estilos de decisao podem gerar atrito quando nao compreendidos.",
+        sinergia: "A combinacao de diferentes formas de processar traz equilibrio as decisoes do casal."
+      };
     }
   }
   
