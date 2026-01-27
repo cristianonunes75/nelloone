@@ -1782,12 +1782,13 @@ class PDFGenerator {
       this.doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
       this.doc.text(`${primaryArch}${secondaryArch ? ' / ' + secondaryArch : ''}`, this.margin + 8, this.currentY + 28);
       
-      const role = archA.papel_no_casal || archA.sombra ? `Sombra: ${archA.sombra}` : '';
-      if (role) {
+      // Show papel_no_casal OR sombra only if they have valid content
+      const roleText = archA.papel_no_casal || (archA.sombra && archA.sombra !== 'undefined' ? `Sombra: ${archA.sombra}` : '');
+      if (roleText && !roleText.includes('undefined')) {
         this.doc.setFontSize(9);
         this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
         this.doc.setFont("helvetica", "normal");
-        this.doc.text(role, this.margin + 8, this.currentY + 38);
+        this.doc.text(roleText, this.margin + 8, this.currentY + 38);
       }
       this.currentY += 52;
     }
@@ -1811,12 +1812,13 @@ class PDFGenerator {
       this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
       this.doc.text(`${primaryArchB}${secondaryArchB ? ' / ' + secondaryArchB : ''}`, this.margin + 8, this.currentY + 28);
       
-      const roleB = archB.papel_no_casal || archB.sombra ? `Sombra: ${archB.sombra}` : '';
-      if (roleB) {
+      // Show papel_no_casal OR sombra only if they have valid content
+      const roleBText = archB.papel_no_casal || (archB.sombra && archB.sombra !== 'undefined' ? `Sombra: ${archB.sombra}` : '');
+      if (roleBText && !roleBText.includes('undefined')) {
         this.doc.setFontSize(9);
         this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
         this.doc.setFont("helvetica", "normal");
-        this.doc.text(roleB, this.margin + 8, this.currentY + 38);
+        this.doc.text(roleBText, this.margin + 8, this.currentY + 38);
       }
       this.currentY += 52;
     }
