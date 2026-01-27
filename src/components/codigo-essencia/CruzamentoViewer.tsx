@@ -996,6 +996,301 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     );
   };
 
+  // ============== 7 PILLARS: TEMPERAMENTS (Ritmos Biológicos) ==============
+  const render7PillarsTemperaments = () => {
+    const ritmos = content.ritmos_biologicos;
+    if (!ritmos) return null;
+
+    const tempA = ritmos.temperamento_a;
+    const tempB = ritmos.temperamento_b;
+
+    return (
+      <Card className="bg-gradient-to-br from-orange-500/5 to-amber-500/5 border-orange-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Clock className="w-5 h-5 text-orange-500" />
+            <CardTitle className="text-base">
+              {ritmos.titulo || (language === 'en' ? 'Biological Rhythms' : 'Protocolo de Ritmo do Casal')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            {tempA && (
+              <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                <p className="font-semibold text-sm mb-1">{tempA.nome}</p>
+                <p className="text-lg font-medium text-orange-700 dark:text-orange-400">
+                  {tempA.temperamento_primario}
+                  {tempA.temperamento_secundario && ` / ${tempA.temperamento_secundario}`}
+                </p>
+                {tempA.caracteristicas && (
+                  <p className="text-sm text-muted-foreground mt-2">{tempA.caracteristicas}</p>
+                )}
+              </div>
+            )}
+            {tempB && (
+              <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                <p className="font-semibold text-sm mb-1">{tempB.nome}</p>
+                <p className="text-lg font-medium text-amber-700 dark:text-amber-400">
+                  {tempB.temperamento_primario}
+                  {tempB.temperamento_secundario && ` / ${tempB.temperamento_secundario}`}
+                </p>
+                {tempB.caracteristicas && (
+                  <p className="text-sm text-muted-foreground mt-2">{tempB.caracteristicas}</p>
+                )}
+              </div>
+            )}
+          </div>
+          {ritmos.sinergia && (
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <p className="text-sm text-emerald-700 dark:text-emerald-400">{ritmos.sinergia}</p>
+            </div>
+          )}
+          {ritmos.ajuste_pratico && (
+            <p className="text-sm text-muted-foreground italic">{ritmos.ajuste_pratico}</p>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== 7 PILLARS: INTELLIGENCES (Sinergia de Talentos) ==============
+  const render7PillarsIntelligences = () => {
+    const talentos = content.sinergia_talentos;
+    if (!talentos) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-blue-500/5 to-indigo-500/5 border-blue-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-blue-500" />
+            <CardTitle className="text-base">
+              {talentos.titulo || (language === 'en' ? 'Talent Synergy' : 'Sinergia de Talentos')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            {talentos.talentos_a && (
+              <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                <p className="font-semibold text-sm mb-2">{talentos.talentos_a.nome}</p>
+                <div className="flex flex-wrap gap-1">
+                  {asArray<string>(talentos.talentos_a.top_3).map((talent: string, i: number) => (
+                    <span key={i} className="px-2 py-1 bg-blue-500/20 rounded text-xs text-blue-700 dark:text-blue-300">
+                      {talent}
+                    </span>
+                  ))}
+                </div>
+                {talentos.talentos_a.contribuicao && (
+                  <p className="text-xs text-muted-foreground mt-2">{talentos.talentos_a.contribuicao}</p>
+                )}
+              </div>
+            )}
+            {talentos.talentos_b && (
+              <div className="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+                <p className="font-semibold text-sm mb-2">{talentos.talentos_b.nome}</p>
+                <div className="flex flex-wrap gap-1">
+                  {asArray<string>(talentos.talentos_b.top_3).map((talent: string, i: number) => (
+                    <span key={i} className="px-2 py-1 bg-indigo-500/20 rounded text-xs text-indigo-700 dark:text-indigo-300">
+                      {talent}
+                    </span>
+                  ))}
+                </div>
+                {talentos.talentos_b.contribuicao && (
+                  <p className="text-xs text-muted-foreground mt-2">{talentos.talentos_b.contribuicao}</p>
+                )}
+              </div>
+            )}
+          </div>
+          {talentos.complementaridade && (
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <p className="text-sm text-emerald-700 dark:text-emerald-400">{talentos.complementaridade}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== 7 PILLARS: ARCHETYPES (Dinâmica de Papéis) ==============
+  const render7PillarsArchetypes = () => {
+    const arquetipos = content.dinamica_arquetipos || content.dinamica_papeis;
+    if (!arquetipos) return null;
+
+    const archA = arquetipos.arquetipo_a;
+    const archB = arquetipos.arquetipo_b;
+
+    return (
+      <Card className="bg-gradient-to-br from-purple-500/5 to-pink-500/5 border-purple-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-purple-500" />
+            <CardTitle className="text-base">
+              {arquetipos.titulo || (language === 'en' ? 'The Couple\'s Myth' : 'O Mito do Casal')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            {archA && (
+              <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                <p className="font-semibold text-sm mb-1">{archA.nome}</p>
+                <p className="text-lg font-medium text-purple-700 dark:text-purple-400">
+                  {archA.primario || archA.arquetipos}
+                  {archA.secundario && ` / ${archA.secundario}`}
+                </p>
+                {archA.papel_no_casal && (
+                  <p className="text-xs text-muted-foreground mt-2">{archA.papel_no_casal}</p>
+                )}
+              </div>
+            )}
+            {archB && (
+              <div className="p-4 rounded-lg bg-pink-500/10 border border-pink-500/20">
+                <p className="font-semibold text-sm mb-1">{archB.nome}</p>
+                <p className="text-lg font-medium text-pink-700 dark:text-pink-400">
+                  {archB.primario || archB.arquetipos}
+                  {archB.secundario && ` / ${archB.secundario}`}
+                </p>
+                {archB.papel_no_casal && (
+                  <p className="text-xs text-muted-foreground mt-2">{archB.papel_no_casal}</p>
+                )}
+              </div>
+            )}
+          </div>
+          {arquetipos.mito_conjunto && (
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <p className="text-sm text-emerald-700 dark:text-emerald-400">{arquetipos.mito_conjunto}</p>
+            </div>
+          )}
+          {arquetipos.dinamica_luz_sombra && (
+            <p className="text-sm text-muted-foreground italic">{arquetipos.dinamica_luz_sombra}</p>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== 7 PILLARS: CONNECTION STYLES (Linguagens de Conexão) ==============
+  const render7PillarsConnectionStyles = () => {
+    const linguagens = content.linguagens_conexao;
+    if (!linguagens) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-pink-500/5 to-rose-500/5 border-pink-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Heart className="w-5 h-5 text-pink-500" />
+            <CardTitle className="text-base">
+              {linguagens.titulo || (language === 'en' ? 'Emotional Supply Plan' : 'Plano de Abastecimento Emocional')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            {linguagens.linguagem_a && (
+              <div className="p-4 rounded-lg bg-pink-500/10 border border-pink-500/20">
+                <p className="font-semibold text-sm mb-1">{linguagens.linguagem_a.nome}</p>
+                <p className="text-lg font-medium text-pink-700 dark:text-pink-400">
+                  {linguagens.linguagem_a.estilo_primario}
+                  {linguagens.linguagem_a.estilo_secundario && ` / ${linguagens.linguagem_a.estilo_secundario}`}
+                </p>
+                {linguagens.linguagem_a.como_se_sente_amado && (
+                  <p className="text-xs text-muted-foreground mt-2">{linguagens.linguagem_a.como_se_sente_amado}</p>
+                )}
+              </div>
+            )}
+            {linguagens.linguagem_b && (
+              <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/20">
+                <p className="font-semibold text-sm mb-1">{linguagens.linguagem_b.nome}</p>
+                <p className="text-lg font-medium text-rose-700 dark:text-rose-400">
+                  {linguagens.linguagem_b.estilo_primario}
+                  {linguagens.linguagem_b.estilo_secundario && ` / ${linguagens.linguagem_b.estilo_secundario}`}
+                </p>
+                {linguagens.linguagem_b.como_se_sente_amado && (
+                  <p className="text-xs text-muted-foreground mt-2">{linguagens.linguagem_b.como_se_sente_amado}</p>
+                )}
+              </div>
+            )}
+          </div>
+          {linguagens.micro_acordos && (
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <h4 className="font-semibold text-sm text-emerald-700 dark:text-emerald-400 mb-2">
+                {language === 'en' ? 'Micro Agreements' : 'Micro Acordos'}
+              </h4>
+              <ul className="space-y-1">
+                {asArray<string>(linguagens.micro_acordos).map((acordo: string, i: number) => (
+                  <li key={i} className="text-sm flex items-start gap-2">
+                    <Check className="w-4 h-4 mt-0.5 text-emerald-500" />
+                    <span>{acordo}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== 7 PILLARS: NELLO 16 (Processamento de Decisão) ==============
+  const render7PillarsNello16 = () => {
+    const decisao = content.processamento_decisao;
+    if (!decisao) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-teal-500/5 to-cyan-500/5 border-teal-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Target className="w-5 h-5 text-teal-500" />
+            <CardTitle className="text-base">
+              {decisao.titulo || (language === 'en' ? 'Decision Processing' : 'Processamento de Decisão')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            {decisao.tipo_a && (
+              <div className="p-4 rounded-lg bg-teal-500/10 border border-teal-500/20">
+                <p className="font-semibold text-sm mb-1">{decisao.tipo_a.nome}</p>
+                {decisao.tipo_a.tipo_nello16 && (
+                  <p className="text-xl font-bold text-teal-700 dark:text-teal-400 tracking-wider">
+                    {decisao.tipo_a.tipo_nello16}
+                  </p>
+                )}
+                {decisao.tipo_a.como_decide && (
+                  <p className="text-xs text-muted-foreground mt-2">{decisao.tipo_a.como_decide}</p>
+                )}
+              </div>
+            )}
+            {decisao.tipo_b && (
+              <div className="p-4 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                <p className="font-semibold text-sm mb-1">{decisao.tipo_b.nome}</p>
+                {decisao.tipo_b.tipo_nello16 && (
+                  <p className="text-xl font-bold text-cyan-700 dark:text-cyan-400 tracking-wider">
+                    {decisao.tipo_b.tipo_nello16}
+                  </p>
+                )}
+                {decisao.tipo_b.como_decide && (
+                  <p className="text-xs text-muted-foreground mt-2">{decisao.tipo_b.como_decide}</p>
+                )}
+              </div>
+            )}
+          </div>
+          {decisao.tensao_potencial && (
+            <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <p className="text-sm text-amber-700 dark:text-amber-400">⚠️ {decisao.tensao_potencial}</p>
+            </div>
+          )}
+          {decisao.sinergia && (
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <p className="text-sm text-emerald-700 dark:text-emerald-400">✨ {decisao.sinergia}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
   // ============== CTA ACTIVATION ==============
   const renderCtaActivation = () => {
     const cta = content.cta_ativacao;
@@ -2054,6 +2349,15 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           {renderZonaHarmonia()}
           {renderZonaAjuste()}
           {renderZonaChoque()}
+          
+          {/* 7 PILLARS SECTIONS */}
+          {renderSynergyRadarChart()}
+          {render7PillarsTemperaments()}
+          {render7PillarsIntelligences()}
+          {render7PillarsArchetypes()}
+          {render7PillarsConnectionStyles()}
+          {render7PillarsNello16()}
+          
           {renderTabelaTraducaoV2()}
           {renderCrisisCommunication()}
           {renderProtocoloPazV2()}
@@ -2068,7 +2372,6 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           
           {/* Legacy sections for backwards compatibility */}
           {renderTrafficLight()}
-          {renderSynergyRadarChart()}
           {renderMeetingOfEssences()}
           {renderSantoBate()}
           {renderBichoPega()}
