@@ -375,42 +375,56 @@ function getUserPromptV1(
   const topIntA = getTopIntelligences(personA.intelligences);
   const topIntB = getTopIntelligences(personB.intelligences);
   
+  // Helper to get DISC profile description
+  const getDISCProfile = (disc: { D: number; I: number; S: number; C: number }) => {
+    const dominant = Object.entries(disc).sort((a, b) => b[1] - a[1])[0];
+    return `${dominant[0]}=${dominant[1]}%`;
+  };
+  
+  const discProfileA = getDISCProfile(personA.disc);
+  const discProfileB = getDISCProfile(personB.disc);
+  
   const structure = `{
   "visao_geral": {
     "titulo": "Visão Geral do Casal",
     "descricao": "OBRIGATÓRIO: Como o casal funciona como sistema único. Use metáfora clara (barco, time, jornada). Objetivo: tirar culpa individual e criar senso de 'nós'.",
-    "tipo_casal": "OBRIGATÓRIO: Descrição do tipo de casal baseada nos perfis"
+    "tipo_casal": "OBRIGATÓRIO: Descrição do tipo de casal baseada nos perfis",
+    "metafora": "OBRIGATÓRIO: Uma frase metafórica que resume o casal (ex: 'O Arquiteto e a Ponte')"
   },
   "papeis_naturais": {
     "titulo": "Papéis Naturais no Casal",
     "descricao_explicita": "OBRIGATÓRIO: Declaração explícita. NUNCA deixe implícito.",
     "sensor_direcao": {
       "nome": "${sensorName}",
-      "caracteristicas": "OBRIGATÓRIO: Revela sentido, lê o campo, processa, orienta a direção"
+      "caracteristicas": "OBRIGATÓRIO: Revela sentido, lê o campo, processa, orienta a direção",
+      "origem": "OBRIGATÓRIO: [Origem: DISC ${sensorName === personA.name ? discProfileA : discProfileB}, Temperamento ${sensorName === personA.name ? personA.temperament.primary || 'Melancólico' : personB.temperament.primary || 'Melancólico'}, Arquétipo ${sensorName === personA.name ? personA.archetypes.primary || 'Mago' : personB.archetypes.primary || 'Mago'}]"
     },
     "condutor_curso": {
       "nome": "${conductorName}",
-      "caracteristicas": "OBRIGATÓRIO: Sustenta curso, executa, organiza, mantém estrutura"
+      "caracteristicas": "OBRIGATÓRIO: Sustenta curso, executa, organiza, mantém estrutura",
+      "origem": "OBRIGATÓRIO: [Origem: DISC ${conductorName === personA.name ? discProfileA : discProfileB}, Temperamento ${conductorName === personA.name ? personA.temperament.primary || 'Colérico' : personB.temperament.primary || 'Colérico'}, Arquétipo ${conductorName === personA.name ? personA.archetypes.primary || 'Herói' : personB.archetypes.primary || 'Herói'}]"
     },
     "alternancia": "OBRIGATÓRIO: Explicação de quando/por que os papéis podem alternar"
   },
   "forcas_centrais": {
     "titulo": "Forças Centrais da União",
-    "emocionais": ["OBRIGATÓRIO: Força emocional 1", "Força emocional 2"],
-    "praticas": ["OBRIGATÓRIO: Força prática 1", "Força prática 2"],
-    "visao_proposito": ["OBRIGATÓRIO: Força de visão"],
-    "espirituais_valores": ["OBRIGATÓRIO: Força de valores"],
+    "forcas_emocionais": "OBRIGATÓRIO: Força emocional do casal",
+    "forcas_praticas": "OBRIGATÓRIO: Força prática do casal",
+    "visao_proposito": "OBRIGATÓRIO: Força de visão e propósito",
+    "valores_espiritualidade": "OBRIGATÓRIO: Força de valores e espiritualidade",
     "como_aparecem_dia_a_dia": "OBRIGATÓRIO: Como essas forças se manifestam concretamente"
   },
   "amor_no_casal": {
     "titulo": "❤️ O Amor no Casal",
     "como_expressa_amor_a": {
       "nome": "${personA.name}",
-      "forma_expressao": "OBRIGATÓRIO: Como naturalmente expressa amor"
+      "forma_expressao": "OBRIGATÓRIO: Como naturalmente expressa amor",
+      "origem": "OBRIGATÓRIO: [Origem: Estilo de Conexão ${personA.connectionStyle.primary || 'primário'}, Temperamento ${personA.temperament.primary || ''}]"
     },
     "como_expressa_amor_b": {
       "nome": "${personB.name}",
-      "forma_expressao": "OBRIGATÓRIO: Como naturalmente expressa amor"
+      "forma_expressao": "OBRIGATÓRIO: Como naturalmente expressa amor",
+      "origem": "OBRIGATÓRIO: [Origem: Estilo de Conexão ${personB.connectionStyle.primary || 'primário'}, Temperamento ${personB.temperament.primary || ''}]"
     },
     "como_se_sente_amado_a": "OBRIGATÓRIO: O que faz ${personA.name} se sentir amado(a)",
     "como_se_sente_amado_b": "OBRIGATÓRIO: O que faz ${personB.name} se sentir amado(a)",
@@ -422,20 +436,59 @@ function getUserPromptV1(
     "titulo": "Tensões Naturais do Casal",
     "tensoes": [
       {
-        "area": "OBRIGATÓRIO: Área da tensão",
+        "area": "OBRIGATÓRIO: Área da tensão (ex: Comunicação, Decisões, Tempo)",
         "onde_surge": "OBRIGATÓRIO: Onde surge o atrito",
         "por_que_surge": "OBRIGATÓRIO: Por que surge (ritmo, linguagem, expectativa)",
         "o_que_a_sente": "OBRIGATÓRIO: O que ${personA.name} costuma sentir",
-        "o_que_b_sente": "OBRIGATÓRIO: O que ${personB.name} costuma sentir"
+        "o_que_b_sente": "OBRIGATÓRIO: O que ${personB.name} costuma sentir",
+        "origem": "OBRIGATÓRIO: [Origem: DISC + Temperamentos de ambos]",
+        "exemplo_situacao": "OBRIGATÓRIO: Exemplo de situação cotidiana onde isso acontece"
       }
     ],
     "nota": "Nunca atribuir culpa - traduzir conflito como desencontro de funcionamento"
+  },
+  "cenarios_vida_real": {
+    "titulo": "Navegando a Vida Juntos",
+    "descricao": "Como vocês funcionam em situações reais da vida conjugal",
+    "carreira": {
+      "titulo": "💼 Na Carreira e Trabalho",
+      "como_funciona": "OBRIGATÓRIO: Como o casal lida com decisões de carreira",
+      "papel_sensor": "OBRIGATÓRIO: Como ${sensorName} contribui nestas decisões",
+      "papel_condutor": "OBRIGATÓRIO: Como ${conductorName} contribui nestas decisões",
+      "origem_insight": "OBRIGATÓRIO: [Origem: DISC de ambos + Arquétipos predominantes]",
+      "exemplo_pratico": "OBRIGATÓRIO: Se surgir uma proposta de emprego em outra cidade..."
+    },
+    "financas": {
+      "titulo": "💰 Nas Finanças do Casal",
+      "como_funciona": "OBRIGATÓRIO: Como o casal lida com dinheiro e finanças",
+      "papel_sensor": "OBRIGATÓRIO: Como ${sensorName} contribui nas finanças",
+      "papel_condutor": "OBRIGATÓRIO: Como ${conductorName} contribui nas finanças",
+      "origem_insight": "OBRIGATÓRIO: [Origem: Temperamentos + DISC C de cada um]",
+      "exemplo_pratico": "OBRIGATÓRIO: Na hora de decidir um investimento grande..."
+    },
+    "saude": {
+      "titulo": "🏥 Na Saúde e Bem-Estar",
+      "como_funciona": "OBRIGATÓRIO: Como o casal lida com questões de saúde",
+      "papel_sensor": "OBRIGATÓRIO: Como ${sensorName} contribui na saúde",
+      "papel_condutor": "OBRIGATÓRIO: Como ${conductorName} contribui na saúde",
+      "origem_insight": "OBRIGATÓRIO: [Origem: Inteligências Intrapessoal/Corporal + Temperamentos]",
+      "exemplo_pratico": "OBRIGATÓRIO: Se um dos dois precisar mudar hábitos alimentares..."
+    },
+    "espiritualidade": {
+      "titulo": "🙏 Na Espiritualidade e Propósito",
+      "como_funciona": "OBRIGATÓRIO: Como o casal busca sentido e propósito juntos",
+      "papel_sensor": "OBRIGATÓRIO: Como ${sensorName} contribui na espiritualidade",
+      "papel_condutor": "OBRIGATÓRIO: Como ${conductorName} contribui na espiritualidade",
+      "origem_insight": "OBRIGATÓRIO: [Origem: Eneagrama + Inteligência Existencial + Arquétipos]",
+      "exemplo_pratico": "OBRIGATÓRIO: Ao escolher uma comunidade de fé ou prática espiritual..."
+    }
   },
   "zona_ajuste": {
     "titulo": "Zona de Ajuste do Casal",
     "ponto_principal": "OBRIGATÓRIO: O principal ponto de ajuste identificado",
     "risco_se_nao_ajustar": "OBRIGATÓRIO: O risco relacional se nada for feito",
     "ajuste_proposto": "OBRIGATÓRIO: Ajuste simples, realista e possível",
+    "origem_insight": "OBRIGATÓRIO: [Origem: Análise cruzada dos 7 testes]",
     "micro_acordos": [
       {
         "titulo": "OBRIGATÓRIO: Micro acordo 1",
@@ -453,22 +506,40 @@ function getUserPromptV1(
     "titulo": "Protocolo de Liderança do Casal",
     "decisoes_estrategicas": {
       "responsavel": "${sensorName}",
-      "regra": "OBRIGATÓRIO: Decisões estratégicas e de longo prazo"
+      "regra": "OBRIGATÓRIO: Decisões estratégicas e de longo prazo",
+      "origem": "OBRIGATÓRIO: [Origem: Perfil de análise e visão de ${sensorName}]"
     },
     "execucao_imediata": {
       "responsavel": "${conductorName}",
-      "regra": "OBRIGATÓRIO: Execução, ação imediata e crises práticas"
+      "regra": "OBRIGATÓRIO: Execução, ação imediata e crises práticas",
+      "origem": "OBRIGATÓRIO: [Origem: Perfil de ação de ${conductorName}]"
     },
     "conflitos_emocionais": {
-      "regra": "OBRIGATÓRIO: Pausa consciente - Sensor organiza direção, Condutor sustenta base"
+      "regra": "OBRIGATÓRIO: Pausa consciente - Sensor organiza direção, Condutor sustenta base",
+      "rituais": [
+        "OBRIGATÓRIO: Ritual 1 para conflitos emocionais",
+        "OBRIGATÓRIO: Ritual 2 para conflitos emocionais"
+      ]
     }
   },
   "traducao_dia_a_dia": {
     "titulo": "Tradução para o Dia a Dia",
     "orientacoes": [
-      "OBRIGATÓRIO: Quando X acontecer, façam Y",
-      "OBRIGATÓRIO: Evitem Z nesse tipo de situação",
-      "OBRIGATÓRIO: Se perceberem W, voltem para o acordo base"
+      {
+        "situacao": "OBRIGATÓRIO: Quando X acontecer",
+        "acao": "OBRIGATÓRIO: Façam Y",
+        "origem": "OBRIGATÓRIO: [Origem: DISC/Temperamento relevante]"
+      },
+      {
+        "situacao": "OBRIGATÓRIO: Evitem Z",
+        "acao": "OBRIGATÓRIO: Nesse tipo de situação",
+        "origem": "OBRIGATÓRIO: [Origem: Tensão identificada]"
+      },
+      {
+        "situacao": "OBRIGATÓRIO: Se perceberem W",
+        "acao": "OBRIGATÓRIO: Voltem para o acordo base",
+        "origem": "OBRIGATÓRIO: [Origem: Padrão de conflito do casal]"
+      }
     ]
   },
   "sintese_executiva": {
@@ -477,7 +548,8 @@ function getUserPromptV1(
     "forma_amar": "OBRIGATÓRIO: Forma predominante de amar",
     "forca_principal": "OBRIGATÓRIO: A força principal da união",
     "risco_principal": "OBRIGATÓRIO: O risco principal da convivência",
-    "antidoto_pratico": "OBRIGATÓRIO: Antídoto prático para preservar o amor"
+    "antidoto_pratico": "OBRIGATÓRIO: Antídoto prático para preservar o amor",
+    "origem_sintese": "OBRIGATÓRIO: [Síntese baseada nos 7 pilares: DISC, Eneagrama, Temperamentos, Inteligências, Arquétipos, Estilos de Conexão, Nello 16]"
   },
   "dados_grafico": {
     "usuario_a": {
@@ -487,7 +559,8 @@ function getUserPromptV1(
       "temperamento": "${personA.temperament.primary || 'Equilibrado'}",
       "arquetipo": "${personA.archetypes.primary || 'Integrador'}",
       "nello16": "${personA.nello16.type || 'INFJ'}",
-      "estilo_conexao": "${personA.connectionStyle.primary || 'Tempo de Qualidade'}"
+      "estilo_conexao": "${personA.connectionStyle.primary || 'Tempo de Qualidade'}",
+      "eneagrama": "${personA.enneagram.type || 'não identificado'}"
     },
     "usuario_b": {
       "nome": "${personB.name}",
@@ -496,7 +569,8 @@ function getUserPromptV1(
       "temperamento": "${personB.temperament.primary || 'Equilibrado'}",
       "arquetipo": "${personB.archetypes.primary || 'Integrador'}",
       "nello16": "${personB.nello16.type || 'ENTJ'}",
-      "estilo_conexao": "${personB.connectionStyle.primary || 'Atos de Serviço'}"
+      "estilo_conexao": "${personB.connectionStyle.primary || 'Atos de Serviço'}",
+      "eneagrama": "${personB.enneagram.type || 'não identificado'}"
     }
   },
   "tabela_traducao": {
@@ -504,30 +578,32 @@ function getUserPromptV1(
     "traducoes_sensor": {
       "titulo": "Quando ${sensorName} (Sensor de Direção)...",
       "traducoes": [
-        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO" },
-        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO" },
-        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO" },
-        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO" }
+        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO", "origem": "OBRIGATÓRIO: [Origem: ...]" },
+        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO", "origem": "OBRIGATÓRIO: [Origem: ...]" },
+        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO", "origem": "OBRIGATÓRIO: [Origem: ...]" },
+        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO", "origem": "OBRIGATÓRIO: [Origem: ...]" }
       ]
     },
     "traducoes_condutor": {
       "titulo": "Quando ${conductorName} (Condutor de Curso)...",
       "traducoes": [
-        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO" },
-        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO" },
-        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO" },
-        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO" }
+        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO", "origem": "OBRIGATÓRIO: [Origem: ...]" },
+        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO", "origem": "OBRIGATÓRIO: [Origem: ...]" },
+        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO", "origem": "OBRIGATÓRIO: [Origem: ...]" },
+        { "comportamento": "OBRIGATÓRIO", "significado": "OBRIGATÓRIO", "origem": "OBRIGATÓRIO: [Origem: ...]" }
       ]
     }
   },
   "protocolo_paz": {
     "titulo": "Protocolo de Paz Unificado",
     "tempo_duplo": {
-      "tempo_sensor": "OBRIGATÓRIO: O tempo de ${sensorName}",
-      "tempo_condutor": "OBRIGATÓRIO: O tempo de ${conductorName}"
+      "tempo_sensor": "OBRIGATÓRIO: O tempo de ${sensorName} para processar",
+      "tempo_condutor": "OBRIGATÓRIO: O tempo de ${conductorName} para agir",
+      "origem": "OBRIGATÓRIO: [Origem: Temperamentos + Nello 16 de cada um]"
     },
     "pergunta_recalibracao": "Qual é o resultado que queremos e qual papel cada um cumpre?",
-    "proibicao_inferencia": ["silêncio não é desamor", "pressa não é desrespeito"]
+    "proibicao_inferencia": ["silêncio não é desamor", "pressa não é desrespeito"],
+    "ritual_antes_discussao": "OBRIGATÓRIO: Antes de discutir assuntos sensíveis, o que fazer"
   },
   "acao_pratica_24h": {
     "titulo": "Ação Prática Imediata (24 horas)",
@@ -551,15 +627,28 @@ ATRIBUIÇÃO DE PAPÉIS (DEFINIDA PELO ALGORITMO - RESPEITE)
 🎯 CONDUTOR DE CURSO: ${conductorName}
 
 ═══════════════════════════════════════════════════════════════════════════════
+REGRA DE RASTREABILIDADE (OBRIGATÓRIA)
+═══════════════════════════════════════════════════════════════════════════════
+
+Cada insight DEVE incluir a ORIGEM do dado em um campo "origem":
+- Formato: [Origem: NOME_TESTE + característica específica]
+- Exemplos:
+  - "[Origem: DISC D=${personA.disc.D}% de ${personA.name}]"
+  - "[Origem: Temperamento ${personA.temperament.primary || 'Melancólico'} de ${personA.name}]"
+  - "[Origem: Arquétipo ${personA.archetypes.primary || 'Mago'} + Inteligência Intrapessoal]"
+
+Isso NUNCA deve estar vazio. O usuário PRECISA saber de onde vem cada insight.
+
+═══════════════════════════════════════════════════════════════════════════════
 DADOS DOS 7 TESTES - ${personA.name}
 ═══════════════════════════════════════════════════════════════════════════════
 
 1. DISC: D=${personA.disc.D}%, I=${personA.disc.I}%, S=${personA.disc.S}%, C=${personA.disc.C}%
-2. Eneagrama: Tipo ${personA.enneagram.type || 'não identificado'}
-3. Temperamento: ${personA.temperament.primary || 'Equilibrado'}
+2. Eneagrama: Tipo ${personA.enneagram.type || 'não identificado'}${personA.enneagram.wing ? ` asa ${personA.enneagram.wing}` : ''}
+3. Temperamento: ${personA.temperament.primary || 'Equilibrado'}${personA.temperament.secondary ? ` / ${personA.temperament.secondary}` : ''}
 4. Inteligências Top 3: ${topIntA.join(', ')}
-5. Arquétipos: ${personA.archetypes.primary || 'não identificado'} + ${personA.archetypes.secondary || ''}
-6. Estilo de Conexão: ${personA.connectionStyle.primary || 'não identificado'}
+5. Arquétipos: ${personA.archetypes.primary || 'não identificado'}${personA.archetypes.secondary ? ` + ${personA.archetypes.secondary}` : ''}
+6. Estilo de Conexão: ${personA.connectionStyle.primary || 'não identificado'}${personA.connectionStyle.secondary ? ` / ${personA.connectionStyle.secondary}` : ''}
 7. Nello 16: ${personA.nello16.type || 'não identificado'}
 Sob Pressão: ${personA.underPressure.join(', ') || 'processa internamente'}
 
@@ -568,17 +657,24 @@ DADOS DOS 7 TESTES - ${personB.name}
 ═══════════════════════════════════════════════════════════════════════════════
 
 1. DISC: D=${personB.disc.D}%, I=${personB.disc.I}%, S=${personB.disc.S}%, C=${personB.disc.C}%
-2. Eneagrama: Tipo ${personB.enneagram.type || 'não identificado'}
-3. Temperamento: ${personB.temperament.primary || 'Equilibrado'}
+2. Eneagrama: Tipo ${personB.enneagram.type || 'não identificado'}${personB.enneagram.wing ? ` asa ${personB.enneagram.wing}` : ''}
+3. Temperamento: ${personB.temperament.primary || 'Equilibrado'}${personB.temperament.secondary ? ` / ${personB.temperament.secondary}` : ''}
 4. Inteligências Top 3: ${topIntB.join(', ')}
-5. Arquétipos: ${personB.archetypes.primary || 'não identificado'} + ${personB.archetypes.secondary || ''}
-6. Estilo de Conexão: ${personB.connectionStyle.primary || 'não identificado'}
+5. Arquétipos: ${personB.archetypes.primary || 'não identificado'}${personB.archetypes.secondary ? ` + ${personB.archetypes.secondary}` : ''}
+6. Estilo de Conexão: ${personB.connectionStyle.primary || 'não identificado'}${personB.connectionStyle.secondary ? ` / ${personB.connectionStyle.secondary}` : ''}
 7. Nello 16: ${personB.nello16.type || 'não identificado'}
 Sob Pressão: ${personB.underPressure.join(', ') || 'age rapidamente'}
 
 ═══════════════════════════════════════════════════════════════════════════════
-REGRA CRÍTICA: Se algum teste estiver ausente, infira com base nos padrões.
-NUNCA exponha falhas técnicas. NUNCA use undefined, null, nil, "não informado".
+REGRAS CRÍTICAS
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Se algum teste estiver ausente, infira com base nos padrões.
+2. NUNCA exponha falhas técnicas. NUNCA use undefined, null, nil, "não informado".
+3. TODOS os campos "origem" devem citar explicitamente de qual teste vem a informação.
+4. A seção "cenarios_vida_real" é OBRIGATÓRIA com situações hipotéticas concretas para Carreira, Finanças, Saúde e Espiritualidade.
+5. Cada tensão deve ter um "exemplo_situacao" do cotidiano.
+
 ═══════════════════════════════════════════════════════════════════════════════
 
 ESTRUTURA OBRIGATÓRIA DO JSON (preencha TODOS os campos):
