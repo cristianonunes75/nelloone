@@ -1,237 +1,101 @@
 
-# Plano: Expansão do Identity Couple Premium para "Livro de Bordo Completo"
+# Plano de Correção: React Error #31 no CruzamentoViewer
 
-## Diagnóstico do Estado Atual
+## Diagnóstico
 
-### O que já funciona bem:
-| Seção | Status |
-|-------|--------|
-| Capa e Sumário | ✅ Completo |
-| Metáfora do Barco | ✅ Renderiza |
-| Tabela de Tradução | ✅ Conteúdo bom |
-| Gráfico DISC | ✅ Visível |
-| Processamento de Decisão (Nello 16) | ✅ Com dados |
-| Ativações (Próximos Passos) | ✅ 5 passos práticos |
+O erro **React Error #31** ("Objects are not valid as a React child") ocorre porque:
 
-### O que está vazio ou incompleto:
-| Seção | Problema |
-|-------|----------|
-| Página 3 - Zona de Ajuste | Apenas título, sem conteúdo |
-| Página 8 - Protocolo de Paz + Ação 24h | Completamente vazio |
-| Tela - Papéis Naturais | Card vazio (apenas título) |
-| Tela - Tensões Naturais | Card vazio |
-| Tela - Protocolo de Liderança | Card vazio |
-| Geral - Falta atribuição de origem | Não cita de onde vem cada insight |
-| Geral - Falta cenários de vida real | Carreira, Finanças, Saúde, Espiritualidade |
+1. **O loop de seções legadas não exclui as novas chaves v1.0**
+   - A função `renderLegacySection` filtra apenas chaves antigas
+   - Novas chaves como `visao_geral`, `cenarios_vida_real`, `papeis_naturais` NÃO estão na lista de exclusão
+   - O loop `Object.entries(content).map(...)` passa esses objetos complexos para renderização
 
----
+2. **Objetos complexos sendo renderizados como React children**
+   - Quando `renderLegacySection` recebe `cenarios_vida_real` (um objeto com subobjetos), ele tenta extrair conteúdo
+   - Se encontra um subobjeto (como `carreira`, `financas`, etc.), o código tenta renderizá-lo diretamente
+   - React não aceita objetos como children, gerando o erro #31
 
-## Solução Proposta: 3 Frentes de Expansão
+## Dados do Banco (Confirmados)
 
-### Frente 1: Adicionar Seção "Cenários da Vida Real" (NOVO)
+As novas chaves presentes no JSON após regeneração:
 
-Nova seção obrigatória no JSON que gera conteúdo para 4 áreas críticas da vida conjugal:
+| Chave | Tipo |
+|-------|------|
+| `visao_geral` | Objeto complexo |
+| `papeis_naturais` | Objeto com subobjetos |
+| `forcas_centrais` | Objeto com arrays |
+| `amor_no_casal` | Objeto com subobjetos |
+| `tensoes_naturais` | Objeto |
+| `protocolo_lideranca` | Objeto |
+| `traducao_dia_a_dia` | Objeto com array |
+| `sintese_executiva` | Objeto |
+| `cenarios_vida_real` | Objeto com 4 subobjetos |
+| `_identity_version` | Metadado |
+| `_role_assignment` | Metadado |
 
-**Estrutura proposta:**
-```text
-cenarios_vida_real: {
-  titulo: "Navegando a Vida Juntos",
-  carreira: {
-    titulo: "Na Carreira e Trabalho",
-    como_funciona: "Quando decisões de carreira surgirem...",
-    papel_sensor: "Lisa tende a ponderar impactos de longo prazo...",
-    papel_condutor: "Cristiano executa e implementa as mudanças...",
-    origem: "[Isso vem do D alto de Cristiano combinado com o C alto de Lisa]",
-    exemplo_pratico: "Ex: Se surgir uma proposta de mudança de cidade..."
-  },
-  financas: {
-    titulo: "Nas Finanças do Casal",
-    como_funciona: "Quando o assunto é dinheiro...",
-    papel_sensor: "...",
-    papel_condutor: "...",
-    origem: "[Isso vem do temperamento Melancólico de Lisa + Colérico de Cristiano]",
-    exemplo_pratico: "Ex: Na hora de decidir um investimento grande..."
-  },
-  saude: {
-    titulo: "Na Saúde e Bem-Estar",
-    como_funciona: "Quando questões de saúde aparecem...",
-    exemplo_pratico: "Ex: Se um dos dois precisar mudar hábitos alimentares..."
-  },
-  espiritualidade: {
-    titulo: "Na Espiritualidade e Propósito",
-    como_funciona: "Quando buscam sentido e propósito...",
-    exemplo_pratico: "Ex: Ao escolher uma comunidade de fé ou prática espiritual..."
-  }
-}
+## Solução
+
+### Arquivo: `src/components/codigo-essencia/CruzamentoViewer.tsx`
+
+**Localização:** Linhas 944-954 (array `newFormatKeys`)
+
+**Mudança:** Adicionar TODAS as novas chaves do Prompt Único v1.0 ao array de exclusão:
+
+```typescript
+const newFormatKeys = [
+  // Existing keys
+  'semaforo_relacional', 'encontro_essencias', 'potencializacao', 
+  'tabela_traducao', 'manual_conjuge_a', 'manual_conjuge_b',
+  'alertas_pressao', 'desafio_conexao', 'quando_buscar_ajuda',
+  'cta_ativacao', 'abertura', 'fechamento', 'desafio_conexao_familiar',
+  'tabela_traducao_familiar', 'tabela_traducao_fraternal',
+  'dados_grafico', 'santo_bate', 'bicho_pega', 'protocolo_paz',
+  'metafora_barco', 'zona_harmonia', 'zona_ajuste', 'zona_choque',
+  'acao_pratica_24h',
+  
+  // NEW v1.0 keys (Prompt Único Oficial)
+  'visao_geral',
+  'papeis_naturais',
+  'forcas_centrais',
+  'amor_no_casal',
+  'tensoes_naturais',
+  'protocolo_lideranca',
+  'traducao_dia_a_dia',
+  'sintese_executiva',
+  'cenarios_vida_real',
+  
+  // Metadata keys
+  '_identity_version',
+  '_role_assignment',
+  
+  // 7 Pillars keys
+  'ritmos_biologicos',
+  'sinergia_talentos',
+  'mito_casal',
+  'plano_abastecimento',
+  'processamento_decisao',
+  
+  // v2.2 Livro de Bordo keys
+  'reflexoes_praticas',
+  'frases_ponte',
+  'alertas_dia_a_dia',
+  'rituais_casal',
+  'metafora_central',
+  'papeis_identificados',
+  'tabela_traducao_v2',
+  'protocolo_paz_v2'
+];
 ```
 
-### Frente 2: Adicionar Citações de Origem (Rastreabilidade)
+## Resultado Esperado
 
-Cada insight importante deve incluir uma **tag de origem** explicando de qual teste/pilar vem aquela informação:
-
-**Formato proposto:**
-```text
-"Cristiano tende a acelerar decisões sob pressão."
-→ [Origem: DISC D=65%, Temperamento Colérico, Arquétipo Herói]
-
-"Lisa precisa de tempo para processar antes de responder."
-→ [Origem: DISC C=70%, Temperamento Melancólico, Nello16 ISTJ]
-```
-
-**Implementação técnica:**
-- Adicionar campo `origem` em cada sub-objeto do JSON
-- A IA deve citar explicitamente qual teste (DISC, Temperamento, Arquétipo, etc.) fundamenta cada afirmação
-- Renderizar como badge/tag discreta na interface
-
-### Frente 3: Preencher Seções Vazias com Conteúdo Obrigatório
-
-Instruir a IA a gerar conteúdo **concreto e denso** para:
-
-1. **Papéis Naturais**: Não apenas títulos, mas justificativas com origem
-2. **Tensões Naturais**: Com exemplos de situações cotidianas
-3. **Protocolo de Paz**: Regras específicas com rituais (ex: "Antes de discutir finanças, cada um escreve 3 pontos em papel")
-4. **Ação 24h**: 3 passos imediatos e concretos
-
----
-
-## Alterações Técnicas
-
-### Arquivo 1: `supabase/functions/nello-codigo-cruzamento/index.ts`
-
-**Mudanças no System Prompt:**
-- Adicionar regra obrigatória de citação de origem
-- Incluir estrutura `cenarios_vida_real` com 4 áreas
-
-**Mudanças no JSON Schema:**
-```json
-{
-  "cenarios_vida_real": {
-    "titulo": "Navegando a Vida Juntos",
-    "carreira": {
-      "como_funciona": "OBRIGATÓRIO",
-      "origem_insight": "OBRIGATÓRIO: [De onde vem: DISC X, Temperamento Y]",
-      "exemplo_pratico": "OBRIGATÓRIO: Situação hipotética"
-    },
-    "financas": { ... },
-    "saude": { ... },
-    "espiritualidade": { ... }
-  },
-  "papeis_naturais": {
-    "sensor_direcao": {
-      "nome": "Lisa",
-      "caracteristicas": "OBRIGATÓRIO",
-      "origem": "OBRIGATÓRIO: [Isso vem do...]"
-    },
-    "condutor_curso": {
-      "nome": "Cristiano",
-      "caracteristicas": "OBRIGATÓRIO",
-      "origem": "OBRIGATÓRIO: [Isso vem do...]"
-    }
-  }
-}
-```
-
-**Nova regra no prompt:**
-```text
-═══════════════════════════════════════════════════════════════════════════════
-REGRA DE RASTREABILIDADE (OBRIGATÓRIA)
-═══════════════════════════════════════════════════════════════════════════════
-
-Cada insight DEVE incluir a ORIGEM do dado:
-- Formato: [Origem: NOME_TESTE + característica]
-- Exemplos:
-  - "[Origem: DISC D=65% de Cristiano]"
-  - "[Origem: Temperamento Melancólico de Lisa]"
-  - "[Origem: Arquétipo Mago + Inteligência Intrapessoal]"
-
-Isso NUNCA deve estar vazio. O usuário PRECISA saber de onde vem cada insight.
-═══════════════════════════════════════════════════════════════════════════════
-```
-
-### Arquivo 2: `src/components/codigo-essencia/CruzamentoViewer.tsx`
-
-**Novos renderizadores:**
-- `renderCenariosVidaReal()`: Cards para Carreira, Finanças, Saúde, Espiritualidade
-- `renderOrigemBadge()`: Componente visual para exibir a tag de origem
-
-**Ajustes em renderizadores existentes:**
-- `renderPapeisNaturais()`: Adicionar campo `origem` se existir
-- `renderTensoesNaturais()`: Mostrar exemplos práticos
-- `renderProtocoloLideranca()`: Preencher com regras concretas
-
-### Arquivo 3: `src/lib/pdfCodigoCasal.ts`
-
-**Novos métodos:**
-- `renderCenariosVidaReal()`: Seção de 2-3 páginas com os 4 cenários
-- `renderOrigemTag()`: Texto em itálico/cinza para atribuição
-
-**Ajustes:**
-- Garantir que `papeis_naturais` renderize conteúdo, não apenas título
-- Garantir que `protocolo_paz` e `acao_24h` tenham fallbacks inteligentes
-
----
-
-## Exemplo de Resultado Esperado
-
-### Seção "Carreira e Trabalho" (Nova)
-```text
-┌──────────────────────────────────────────────────────────────┐
-│ 💼 NA CARREIRA E TRABALHO                                    │
-├──────────────────────────────────────────────────────────────┤
-│ Como vocês funcionam:                                        │
-│ Cristiano tende a agir rapidamente em oportunidades          │
-│ profissionais, enquanto Lisa prefere analisar riscos         │
-│ antes de qualquer movimento.                                 │
-│                                                              │
-│ 🧭 Papel do Sensor (Lisa):                                   │
-│ "Espera, vamos pensar nos próximos 3 anos antes de decidir." │
-│ [Origem: DISC C=70%, Temperamento Melancólico]               │
-│                                                              │
-│ ⚓ Papel do Condutor (Cristiano):                             │
-│ "Ok, mas não podemos perder essa oportunidade - vou agir."   │
-│ [Origem: DISC D=65%, Temperamento Colérico]                  │
-│                                                              │
-│ 💡 Exemplo Prático:                                          │
-│ Se surgir uma proposta de emprego em outra cidade:           │
-│ 1. Cristiano, não tome a decisão sozinho no primeiro dia     │
-│ 2. Lisa, dê uma análise em 48h, não 2 semanas                │
-│ 3. Usem a regra: "Decisões de 5+ anos = Sensor lidera"       │
-└──────────────────────────────────────────────────────────────┘
-```
-
-### Seção "Papéis Naturais" (Corrigido)
-```text
-┌──────────────────────────────────────────────────────────────┐
-│ 🧭 SENSOR DE DIREÇÃO: Lisa Marini Ferreira dos Santos        │
-├──────────────────────────────────────────────────────────────┤
-│ Lisa enxerga o caminho antes de caminhar.                    │
-│ Ela processa informações em profundidade e sente as          │
-│ correntes emocionais do relacionamento antes que se          │
-│ tornem tempestades.                                          │
-│                                                              │
-│ [Origem: Inteligência Intrapessoal 85%, DISC C=70%,          │
-│  Arquétipo Mago, Temperamento Melancólico]                   │
-└──────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Resultado Final Esperado
-
-Um relatório de **15-20 páginas** que:
-
-1. **Cobre todas as áreas da vida conjugal**: Carreira, Finanças, Saúde, Espiritualidade
-2. **Cita a origem de cada insight**: O usuário sabe de onde vem cada informação
-3. **Nenhuma seção vazia**: Fallbacks inteligentes baseados nos papéis
-4. **Tom humano e prático**: Situações reais do dia-a-dia, não teoria abstrata
-5. **Base sólida para outros usuários**: Este é o template definitivo
-
----
+- O loop de seções legadas irá **ignorar** todas as novas chaves
+- Cada nova seção será renderizada apenas pelo seu renderizador dedicado
+- O erro React #31 será eliminado
+- A tela renderizará corretamente com todas as informações
 
 ## Arquivos a Editar
 
-| Arquivo | Tipo de Mudança |
-|---------|-----------------|
-| `supabase/functions/nello-codigo-cruzamento/index.ts` | Expandir prompt + JSON schema |
-| `src/components/codigo-essencia/CruzamentoViewer.tsx` | Adicionar renderizadores |
-| `src/lib/pdfCodigoCasal.ts` | Adicionar métodos de renderização |
+| Arquivo | Mudança |
+|---------|---------|
+| `src/components/codigo-essencia/CruzamentoViewer.tsx` | Expandir array `newFormatKeys` (linhas 944-954) |
