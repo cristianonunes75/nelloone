@@ -1,174 +1,237 @@
 
+# Plano: Expansão do Identity Couple Premium para "Livro de Bordo Completo"
 
-# Plano: Transformar o Relatório do Casal em "Livro de Bordo Premium"
+## Diagnóstico do Estado Atual
 
-## Diagnóstico Completo
+### O que já funciona bem:
+| Seção | Status |
+|-------|--------|
+| Capa e Sumário | ✅ Completo |
+| Metáfora do Barco | ✅ Renderiza |
+| Tabela de Tradução | ✅ Conteúdo bom |
+| Gráfico DISC | ✅ Visível |
+| Processamento de Decisão (Nello 16) | ✅ Com dados |
+| Ativações (Próximos Passos) | ✅ 5 passos práticos |
 
-Após análise detalhada do PDF gerado e do código-fonte, identifiquei os seguintes problemas:
-
-### Páginas Vazias / Incompletas
-| Página | Seção | Status Atual |
-|--------|-------|--------------|
-| 3 | Semáforo Relacional / Zona de Ajuste | Vazia - apenas título |
-| 8 | Arquétipos | Mostra "Sombra: undefined" |
-| 9 | Linguagens de Conexão | Micro acordos truncados |
-| 11 | Tabela de Tradução | Completamente vazia |
-| 12 | Protocolo de Paz + Ação 24h | Apenas títulos |
-
-### Problema Principal
-O conteúdo gerado pela IA (edge function) está estruturado, mas:
-1. Não está sendo mapeado corretamente para o gerador de PDF
-2. Falta densidade reflexiva com frases do tipo "Considere fazer X para que Y sinta Z"
-3. O prompt v2.1 não enfatiza geração de conteúdo prático do dia-a-dia
+### O que está vazio ou incompleto:
+| Seção | Problema |
+|-------|----------|
+| Página 3 - Zona de Ajuste | Apenas título, sem conteúdo |
+| Página 8 - Protocolo de Paz + Ação 24h | Completamente vazio |
+| Tela - Papéis Naturais | Card vazio (apenas título) |
+| Tela - Tensões Naturais | Card vazio |
+| Tela - Protocolo de Liderança | Card vazio |
+| Geral - Falta atribuição de origem | Não cita de onde vem cada insight |
+| Geral - Falta cenários de vida real | Carreira, Finanças, Saúde, Espiritualidade |
 
 ---
 
-## Solução Proposta: 3 Frentes
+## Solução Proposta: 3 Frentes de Expansão
 
-### Frente 1: Enriquecer o Prompt da IA (Edge Function)
-Adicionar instruções explícitas para gerar "Prompts Reflexivos" em cada seção:
+### Frente 1: Adicionar Seção "Cenários da Vida Real" (NOVO)
 
+Nova seção obrigatória no JSON que gera conteúdo para 4 áreas críticas da vida conjugal:
+
+**Estrutura proposta:**
 ```text
-REGRA DE DENSIDADE DE CONTEÚDO:
-Para cada seção, inclua pelo menos 2-3 "Prompts Reflexivos" no formato:
-- "Considere [AÇÃO ESPECÍFICA] para que [NOME] perceba [RESULTADO]"
-- "Quando [SITUAÇÃO], experimente [AÇÃO] - isso mostra a [NOME] que [MENSAGEM]"
-- "Evite [COMPORTAMENTO] pois [NOME] pode interpretar como [MAL-ENTENDIDO]"
-
-Exemplos obrigatórios por seção:
-- zona_ajuste: "Cristiano, considere pausar 30 segundos antes de cobrar resposta. Lisa verá isso como respeito pelo tempo dela."
-- linguagens_conexao: "Lisa, quando Cristiano pedir 'tempo juntos', entenda como 'preciso me sentir importante para você'."
-- protocolo_paz: "Antes de discutir finanças, pergunte: 'Qual resultado queremos?' Isso alinha expectativas."
-```
-
-### Frente 2: Expandir a Estrutura JSON do Prompt
-Adicionar campos obrigatórios para conteúdo reflexivo:
-
-```json
-{
-  "zona_ajuste": {
-    "ponto_principal": "...",
-    "risco_se_nao_ajustar": "...",
-    "ajuste_proposto": "...",
-    "reflexoes_praticas": [
-      {
-        "para": "[NOME_A]",
-        "acao": "Considere fazer X",
-        "efeito": "para que [NOME_B] sinta Y"
-      }
-    ],
-    "micro_acordos": [...]
+cenarios_vida_real: {
+  titulo: "Navegando a Vida Juntos",
+  carreira: {
+    titulo: "Na Carreira e Trabalho",
+    como_funciona: "Quando decisões de carreira surgirem...",
+    papel_sensor: "Lisa tende a ponderar impactos de longo prazo...",
+    papel_condutor: "Cristiano executa e implementa as mudanças...",
+    origem: "[Isso vem do D alto de Cristiano combinado com o C alto de Lisa]",
+    exemplo_pratico: "Ex: Se surgir uma proposta de mudança de cidade..."
   },
-  "tabela_traducao": {
-    "traducoes_sensor": [...],
-    "traducoes_condutor": [...],
-    "reflexoes_diarias": [
-      {
-        "situacao": "Quando ele/ela se cala",
-        "considere": "Pergunte 'Você precisa de tempo ou de companhia?' ao invés de pressionar"
-      }
-    ]
+  financas: {
+    titulo: "Nas Finanças do Casal",
+    como_funciona: "Quando o assunto é dinheiro...",
+    papel_sensor: "...",
+    papel_condutor: "...",
+    origem: "[Isso vem do temperamento Melancólico de Lisa + Colérico de Cristiano]",
+    exemplo_pratico: "Ex: Na hora de decidir um investimento grande..."
   },
-  "protocolo_paz": {
-    "regras": [...],
-    "rituais_diarios": [
-      "Todo fim de semana, dediquem 10 minutos para a 'Pergunta do Barco': Como estamos navegando?",
-      "Antes de dormir, compartilhem uma gratidão específica sobre o outro"
-    ]
+  saude: {
+    titulo: "Na Saúde e Bem-Estar",
+    como_funciona: "Quando questões de saúde aparecem...",
+    exemplo_pratico: "Ex: Se um dos dois precisar mudar hábitos alimentares..."
+  },
+  espiritualidade: {
+    titulo: "Na Espiritualidade e Propósito",
+    como_funciona: "Quando buscam sentido e propósito...",
+    exemplo_pratico: "Ex: Ao escolher uma comunidade de fé ou prática espiritual..."
   }
 }
 ```
 
-### Frente 3: Corrigir o Mapeamento no PDF Generator
-1. **Sanitizar "undefined"** - Remover qualquer texto com "undefined"
-2. **Fallbacks inteligentes** - Se `reflexoes_praticas` vier vazio, gerar baseado no DISC
-3. **Preencher seções vazias** - Usar `coupleSynergyLogic.ts` para gerar conteúdo dinâmico
+### Frente 2: Adicionar Citações de Origem (Rastreabilidade)
+
+Cada insight importante deve incluir uma **tag de origem** explicando de qual teste/pilar vem aquela informação:
+
+**Formato proposto:**
+```text
+"Cristiano tende a acelerar decisões sob pressão."
+→ [Origem: DISC D=65%, Temperamento Colérico, Arquétipo Herói]
+
+"Lisa precisa de tempo para processar antes de responder."
+→ [Origem: DISC C=70%, Temperamento Melancólico, Nello16 ISTJ]
+```
+
+**Implementação técnica:**
+- Adicionar campo `origem` em cada sub-objeto do JSON
+- A IA deve citar explicitamente qual teste (DISC, Temperamento, Arquétipo, etc.) fundamenta cada afirmação
+- Renderizar como badge/tag discreta na interface
+
+### Frente 3: Preencher Seções Vazias com Conteúdo Obrigatório
+
+Instruir a IA a gerar conteúdo **concreto e denso** para:
+
+1. **Papéis Naturais**: Não apenas títulos, mas justificativas com origem
+2. **Tensões Naturais**: Com exemplos de situações cotidianas
+3. **Protocolo de Paz**: Regras específicas com rituais (ex: "Antes de discutir finanças, cada um escreve 3 pontos em papel")
+4. **Ação 24h**: 3 passos imediatos e concretos
 
 ---
 
-## Novas Seções de Conteúdo Sugeridas
-
-### 1. "Ritual Semanal do Casal" (Nova seção)
-```
-Toda semana, reservem 15 minutos para o "Check-in do Barco":
-1. Como você se sentiu amado(a) esta semana?
-2. O que poderia ter sido diferente?
-3. Qual é o nosso foco para a próxima semana?
-```
-
-### 2. "Frases que Constroem" (Expandir Tabela de Tradução)
-| Ao invés de... | Experimente dizer... | Por que funciona |
-|----------------|----------------------|------------------|
-| "Você nunca me ouve" | "Sinto que preciso ser mais ouvido(a)" | Evita defensividade |
-| "Sempre faço tudo" | "Gostaria de dividir X com você" | Convite, não acusação |
-
-### 3. "Alertas do Dia-a-Dia" (Enriquecer Alertas de Pressão)
-```
-⚠️ ALERTA: Cristiano sob pressão tende a acelerar decisões
-   Considere: Lisa, se perceber pressa excessiva, sugira "Vamos listar os prós e contras juntos"
-   Efeito: Cristiano sentirá que você está apoiando, não freando
-
-⚠️ ALERTA: Lisa sob pressão tende a se recolher
-   Considere: Cristiano, evite interpretar silêncio como rejeição. Pergunte "Precisa de espaço ou quer conversar?"
-   Efeito: Lisa sentirá respeito pelo seu tempo de processamento
-```
-
----
-
-## Alterações Técnicas Necessárias
+## Alterações Técnicas
 
 ### Arquivo 1: `supabase/functions/nello-codigo-cruzamento/index.ts`
-- Expandir prompt com instruções de densidade reflexiva
-- Adicionar campos obrigatórios no JSON Schema
-- Incluir exemplos concretos de "Considere fazer X"
 
-### Arquivo 2: `src/lib/pdfCodigoCasal.ts`
-- Adicionar método `renderReflectivePrompts()` para nova formatação
-- Corrigir `renderTranslationTable()` para não ficar vazia
-- Sanitizar "undefined" em todos os campos de texto
-- Adicionar fallbacks usando `coupleSynergyLogic.ts`
+**Mudanças no System Prompt:**
+- Adicionar regra obrigatória de citação de origem
+- Incluir estrutura `cenarios_vida_real` com 4 áreas
 
-### Arquivo 3: `src/lib/coupleSynergy7Pillars.ts`
-- Expandir `generate7PillarSynergy()` com reflexões práticas
-- Adicionar função `generateDailyReflections()` 
-
----
-
-## Resultado Esperado
-
-Um PDF de 15-20 páginas onde:
-- Cada seção tem pelo menos 2-3 reflexões práticas personalizadas
-- Nenhum campo mostra "undefined" ou fica vazio
-- O casal lê e sente que é um "livro de bordo" com ações claras
-- Tom maduro, sem infantilização, focado em proteção do vínculo
-
----
-
-## Seções Técnicas (Para Implementação)
-
-### Prompt v2.2 - Adições ao System Prompt
-
-```text
-═══════════════════════════════════════════════════════════════════════════════
-REGRA CRÍTICA: DENSIDADE REFLEXIVA (LIVRO DE BORDO)
-═══════════════════════════════════════════════════════════════════════════════
-
-Este relatório é um LIVRO DE BORDO PREMIUM. Cada seção DEVE conter:
-
-1. PROMPTS REFLEXIVOS (mínimo 2-3 por seção):
-   - Formato: "Considere [AÇÃO] para que [NOME] perceba/sinta [RESULTADO]"
-   - Exemplo: "Lisa, considere verbalizar 'preciso de 10 minutos' antes de se recolher. Cristiano interpretará como comunicação, não rejeição."
-
-2. RITUAIS PRÁTICOS (mínimo 1 por seção):
-   - Formato: "[FREQUÊNCIA], façam [AÇÃO ESPECÍFICA]"
-   - Exemplo: "Toda noite, antes de dormir, cada um diz UMA coisa que apreciou no outro hoje."
-
-3. FRASES-PONTE (em seções de conflito):
-   - Ao invés de: "Você sempre..."
-   - Experimente: "Quando [situação], eu sinto [emoção]. Podemos [proposta]?"
-
-4. NUNCA DEIXAR SEÇÕES VAZIAS:
-   - Se não houver dados específicos, gere conteúdo baseado nos papéis (Sensor/Condutor)
-   - Use fallbacks inteligentes: "Como casal com dinâmica [TIPO], vocês podem..."
+**Mudanças no JSON Schema:**
+```json
+{
+  "cenarios_vida_real": {
+    "titulo": "Navegando a Vida Juntos",
+    "carreira": {
+      "como_funciona": "OBRIGATÓRIO",
+      "origem_insight": "OBRIGATÓRIO: [De onde vem: DISC X, Temperamento Y]",
+      "exemplo_pratico": "OBRIGATÓRIO: Situação hipotética"
+    },
+    "financas": { ... },
+    "saude": { ... },
+    "espiritualidade": { ... }
+  },
+  "papeis_naturais": {
+    "sensor_direcao": {
+      "nome": "Lisa",
+      "caracteristicas": "OBRIGATÓRIO",
+      "origem": "OBRIGATÓRIO: [Isso vem do...]"
+    },
+    "condutor_curso": {
+      "nome": "Cristiano",
+      "caracteristicas": "OBRIGATÓRIO",
+      "origem": "OBRIGATÓRIO: [Isso vem do...]"
+    }
+  }
+}
 ```
 
+**Nova regra no prompt:**
+```text
+═══════════════════════════════════════════════════════════════════════════════
+REGRA DE RASTREABILIDADE (OBRIGATÓRIA)
+═══════════════════════════════════════════════════════════════════════════════
+
+Cada insight DEVE incluir a ORIGEM do dado:
+- Formato: [Origem: NOME_TESTE + característica]
+- Exemplos:
+  - "[Origem: DISC D=65% de Cristiano]"
+  - "[Origem: Temperamento Melancólico de Lisa]"
+  - "[Origem: Arquétipo Mago + Inteligência Intrapessoal]"
+
+Isso NUNCA deve estar vazio. O usuário PRECISA saber de onde vem cada insight.
+═══════════════════════════════════════════════════════════════════════════════
+```
+
+### Arquivo 2: `src/components/codigo-essencia/CruzamentoViewer.tsx`
+
+**Novos renderizadores:**
+- `renderCenariosVidaReal()`: Cards para Carreira, Finanças, Saúde, Espiritualidade
+- `renderOrigemBadge()`: Componente visual para exibir a tag de origem
+
+**Ajustes em renderizadores existentes:**
+- `renderPapeisNaturais()`: Adicionar campo `origem` se existir
+- `renderTensoesNaturais()`: Mostrar exemplos práticos
+- `renderProtocoloLideranca()`: Preencher com regras concretas
+
+### Arquivo 3: `src/lib/pdfCodigoCasal.ts`
+
+**Novos métodos:**
+- `renderCenariosVidaReal()`: Seção de 2-3 páginas com os 4 cenários
+- `renderOrigemTag()`: Texto em itálico/cinza para atribuição
+
+**Ajustes:**
+- Garantir que `papeis_naturais` renderize conteúdo, não apenas título
+- Garantir que `protocolo_paz` e `acao_24h` tenham fallbacks inteligentes
+
+---
+
+## Exemplo de Resultado Esperado
+
+### Seção "Carreira e Trabalho" (Nova)
+```text
+┌──────────────────────────────────────────────────────────────┐
+│ 💼 NA CARREIRA E TRABALHO                                    │
+├──────────────────────────────────────────────────────────────┤
+│ Como vocês funcionam:                                        │
+│ Cristiano tende a agir rapidamente em oportunidades          │
+│ profissionais, enquanto Lisa prefere analisar riscos         │
+│ antes de qualquer movimento.                                 │
+│                                                              │
+│ 🧭 Papel do Sensor (Lisa):                                   │
+│ "Espera, vamos pensar nos próximos 3 anos antes de decidir." │
+│ [Origem: DISC C=70%, Temperamento Melancólico]               │
+│                                                              │
+│ ⚓ Papel do Condutor (Cristiano):                             │
+│ "Ok, mas não podemos perder essa oportunidade - vou agir."   │
+│ [Origem: DISC D=65%, Temperamento Colérico]                  │
+│                                                              │
+│ 💡 Exemplo Prático:                                          │
+│ Se surgir uma proposta de emprego em outra cidade:           │
+│ 1. Cristiano, não tome a decisão sozinho no primeiro dia     │
+│ 2. Lisa, dê uma análise em 48h, não 2 semanas                │
+│ 3. Usem a regra: "Decisões de 5+ anos = Sensor lidera"       │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### Seção "Papéis Naturais" (Corrigido)
+```text
+┌──────────────────────────────────────────────────────────────┐
+│ 🧭 SENSOR DE DIREÇÃO: Lisa Marini Ferreira dos Santos        │
+├──────────────────────────────────────────────────────────────┤
+│ Lisa enxerga o caminho antes de caminhar.                    │
+│ Ela processa informações em profundidade e sente as          │
+│ correntes emocionais do relacionamento antes que se          │
+│ tornem tempestades.                                          │
+│                                                              │
+│ [Origem: Inteligência Intrapessoal 85%, DISC C=70%,          │
+│  Arquétipo Mago, Temperamento Melancólico]                   │
+└──────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Resultado Final Esperado
+
+Um relatório de **15-20 páginas** que:
+
+1. **Cobre todas as áreas da vida conjugal**: Carreira, Finanças, Saúde, Espiritualidade
+2. **Cita a origem de cada insight**: O usuário sabe de onde vem cada informação
+3. **Nenhuma seção vazia**: Fallbacks inteligentes baseados nos papéis
+4. **Tom humano e prático**: Situações reais do dia-a-dia, não teoria abstrata
+5. **Base sólida para outros usuários**: Este é o template definitivo
+
+---
+
+## Arquivos a Editar
+
+| Arquivo | Tipo de Mudança |
+|---------|-----------------|
+| `supabase/functions/nello-codigo-cruzamento/index.ts` | Expandir prompt + JSON schema |
+| `src/components/codigo-essencia/CruzamentoViewer.tsx` | Adicionar renderizadores |
+| `src/lib/pdfCodigoCasal.ts` | Adicionar métodos de renderização |
