@@ -2209,6 +2209,7 @@ class PDFGenerator {
     // NEW: LIVRO DE BORDO PREMIUM SECTIONS
     this.renderReflectivePrompts(content);
     this.renderRituals(content);
+    this.renderCenariosVidaReal(content);  // NEW: Real Life Scenarios
     
     this.renderTranslationTable(content);
     this.renderPeaceProtocol(content);
@@ -2220,6 +2221,122 @@ class PDFGenerator {
     this.renderClosing(content);
 
     return this.doc;
+  }
+
+  // ==========================================
+  // CENÁRIOS DA VIDA REAL (Carreira, Finanças, Saúde, Espiritualidade)
+  // ==========================================
+  private renderCenariosVidaReal(content: any) {
+    const cenarios = content.cenarios_vida_real;
+    if (!cenarios) return;
+
+    this.addNewPage();
+    
+    // Premium chapter header
+    this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(8);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.text("CAPITULO 12", this.margin + 8, this.currentY + 7);
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text(cenarios.titulo || "NAVEGANDO A VIDA JUNTOS", this.margin + 8, this.currentY + 16);
+    this.currentY += 30;
+
+    const intro = cenarios.descricao || "Como voces funcionam em situacoes reais da vida conjugal - carreira, financas, saude e espiritualidade.";
+    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
+    this.currentY += 12;
+
+    const renderCenario = (cenario: any, icon: string, title: string, color: any) => {
+      if (!cenario) return;
+
+      const cardHeight = 80;
+      this.ensureSpace(cardHeight);
+
+      // Card background
+      this.doc.setFillColor(248, 248, 252);
+      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 4, 4, "F");
+      
+      // Colored left border
+      this.doc.setFillColor(color.r, color.g, color.b);
+      this.doc.rect(this.margin, this.currentY, 4, cardHeight, "F");
+
+      // Title
+      this.drawIconCircle(this.margin + 15, this.currentY + 10, color, 5);
+      this.doc.setTextColor(color.r, color.g, color.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(cenario.titulo || title, this.margin + 25, this.currentY + 12);
+
+      let innerY = this.currentY + 20;
+
+      // Como funciona
+      if (cenario.como_funciona) {
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFontSize(9);
+        this.doc.setFont("helvetica", "normal");
+        const funcLines = this.doc.splitTextToSize(cenario.como_funciona, this.contentWidth - 20);
+        this.doc.text(funcLines, this.margin + 8, innerY);
+        innerY += funcLines.length * 4 + 5;
+      }
+
+      // Papel Sensor
+      if (cenario.papel_sensor) {
+        this.doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+        this.doc.setFontSize(8);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text("Sensor:", this.margin + 8, innerY);
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFont("helvetica", "normal");
+        const sensorLines = this.doc.splitTextToSize(cenario.papel_sensor, this.contentWidth - 50);
+        this.doc.text(sensorLines, this.margin + 25, innerY);
+        innerY += sensorLines.length * 4 + 3;
+      }
+
+      // Papel Condutor
+      if (cenario.papel_condutor) {
+        this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+        this.doc.setFontSize(8);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text("Condutor:", this.margin + 8, innerY);
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFont("helvetica", "normal");
+        const condutorLines = this.doc.splitTextToSize(cenario.papel_condutor, this.contentWidth - 50);
+        this.doc.text(condutorLines, this.margin + 30, innerY);
+        innerY += condutorLines.length * 4 + 3;
+      }
+
+      // Origem do insight
+      if (cenario.origem_insight) {
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.setFontSize(7);
+        this.doc.setFont("helvetica", "italic");
+        this.doc.text(cenario.origem_insight, this.margin + 8, innerY);
+        innerY += 5;
+      }
+
+      // Exemplo pratico
+      if (cenario.exemplo_pratico) {
+        this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
+        this.doc.roundedRect(this.margin + 6, innerY, this.contentWidth - 12, 15, 2, 2, "F");
+        this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+        this.doc.setFontSize(8);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text("Exemplo:", this.margin + 10, innerY + 5);
+        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+        this.doc.setFont("helvetica", "italic");
+        const exLines = this.doc.splitTextToSize(cenario.exemplo_pratico, this.contentWidth - 40);
+        this.doc.text(exLines, this.margin + 28, innerY + 5);
+      }
+
+      this.currentY += cardHeight + 10;
+    };
+
+    renderCenario(cenarios.carreira, "briefcase", "Na Carreira e Trabalho", COLORS.blue);
+    renderCenario(cenarios.financas, "dollar", "Nas Financas do Casal", COLORS.green);
+    renderCenario(cenarios.saude, "heart", "Na Saude e Bem-Estar", COLORS.pink);
+    renderCenario(cenarios.espiritualidade, "star", "Na Espiritualidade e Proposito", COLORS.purple);
   }
 }
 

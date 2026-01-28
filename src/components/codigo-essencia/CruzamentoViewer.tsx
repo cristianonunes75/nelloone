@@ -1731,6 +1731,96 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     );
   };
 
+  // ============== HELPER: BADGE DE ORIGEM (Rastreabilidade) ==============
+  const renderOrigemBadge = (origem: string | undefined) => {
+    if (!origem) return null;
+    
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground mt-1">
+        📊 {origem}
+      </span>
+    );
+  };
+
+  // ============== CENÁRIOS DA VIDA REAL (Carreira, Finanças, Saúde, Espiritualidade) ==============
+  const renderCenariosVidaReal = () => {
+    const cenarios = content.cenarios_vida_real;
+    if (!cenarios) return null;
+
+    const renderCenario = (cenario: any, icon: string, colorClass: string) => {
+      if (!cenario) return null;
+      
+      return (
+        <div className={`p-4 rounded-lg ${colorClass} border space-y-3`}>
+          <h4 className="font-semibold text-sm flex items-center gap-2">
+            <span>{icon}</span>
+            {cenario.titulo}
+          </h4>
+          
+          {cenario.como_funciona && (
+            <p className="text-sm text-foreground/80">{cenario.como_funciona}</p>
+          )}
+          
+          <div className="grid gap-3 md:grid-cols-2">
+            {cenario.papel_sensor && (
+              <div className="p-3 rounded bg-purple-500/10 border border-purple-500/20">
+                <p className="text-xs font-medium text-purple-700 dark:text-purple-400 mb-1">
+                  🧭 Papel do Sensor
+                </p>
+                <p className="text-sm text-foreground/80">{cenario.papel_sensor}</p>
+              </div>
+            )}
+            {cenario.papel_condutor && (
+              <div className="p-3 rounded bg-orange-500/10 border border-orange-500/20">
+                <p className="text-xs font-medium text-orange-700 dark:text-orange-400 mb-1">
+                  ⚓ Papel do Condutor
+                </p>
+                <p className="text-sm text-foreground/80">{cenario.papel_condutor}</p>
+              </div>
+            )}
+          </div>
+          
+          {cenario.origem_insight && (
+            <div className="mt-2">
+              {renderOrigemBadge(cenario.origem_insight)}
+            </div>
+          )}
+          
+          {cenario.exemplo_pratico && (
+            <div className="p-3 rounded bg-emerald-500/10 border border-emerald-500/20">
+              <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-1">
+                💡 {language === 'en' ? 'Practical Example' : 'Exemplo Prático'}
+              </p>
+              <p className="text-sm text-foreground/80 italic">{cenario.exemplo_pratico}</p>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Target className="w-5 h-5 text-primary" />
+            <CardTitle className="text-base">
+              {cenarios.titulo || (language === 'en' ? 'Navigating Life Together' : 'Navegando a Vida Juntos')}
+            </CardTitle>
+          </div>
+          {cenarios.descricao && (
+            <p className="text-sm text-muted-foreground mt-1">{cenarios.descricao}</p>
+          )}
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {renderCenario(cenarios.carreira, '💼', 'bg-blue-500/5 border-blue-500/20')}
+          {renderCenario(cenarios.financas, '💰', 'bg-emerald-500/5 border-emerald-500/20')}
+          {renderCenario(cenarios.saude, '🏥', 'bg-pink-500/5 border-pink-500/20')}
+          {renderCenario(cenarios.espiritualidade, '🙏', 'bg-purple-500/5 border-purple-500/20')}
+        </CardContent>
+      </Card>
+    );
+  };
+
   // ============== CTA ACTIVATION ==============
   const renderCtaActivation = () => {
     const cta = content.cta_ativacao;
@@ -2811,6 +2901,9 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           
           {/* 9. Síntese Executiva */}
           {renderSinteseExecutiva()}
+          
+          {/* 10. Cenários da Vida Real (Carreira, Finanças, Saúde, Espiritualidade) */}
+          {renderCenariosVidaReal()}
           
           {/* 7 PILLARS SECTIONS - Visual Charts */}
           {renderSynergyRadarChart()}
