@@ -942,15 +942,32 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     
     // Skip new format sections (they have dedicated renderers)
     const newFormatKeys = [
+      // Original format keys
       'semaforo_relacional', 'encontro_essencias', 'potencializacao', 
       'tabela_traducao', 'manual_conjuge_a', 'manual_conjuge_b',
       'alertas_pressao', 'desafio_conexao', 'quando_buscar_ajuda',
       'cta_ativacao', 'abertura', 'fechamento', 'desafio_conexao_familiar',
       'tabela_traducao_familiar', 'tabela_traducao_fraternal',
       'dados_grafico', 'santo_bate', 'bicho_pega', 'protocolo_paz',
-      // Identity v1.0 new fields
       'metafora_barco', 'zona_harmonia', 'zona_ajuste', 'zona_choque',
-      'acao_pratica_24h'
+      'acao_pratica_24h',
+      
+      // NEW v1.0 keys (Prompt Único Oficial)
+      'visao_geral', 'papeis_naturais', 'forcas_centrais', 'amor_no_casal',
+      'tensoes_naturais', 'protocolo_lideranca', 'traducao_dia_a_dia',
+      'sintese_executiva', 'cenarios_vida_real',
+      
+      // Metadata keys
+      '_identity_version', '_role_assignment',
+      
+      // 7 Pillars keys
+      'ritmos_biologicos', 'sinergia_talentos', 'mito_casal',
+      'plano_abastecimento', 'processamento_decisao',
+      
+      // v2.2 Livro de Bordo keys
+      'reflexoes_praticas', 'frases_ponte', 'alertas_dia_a_dia',
+      'rituais_casal', 'metafora_central', 'papeis_identificados',
+      'tabela_traducao_v2', 'protocolo_paz_v2'
     ];
     
     if (newFormatKeys.includes(key)) return null;
