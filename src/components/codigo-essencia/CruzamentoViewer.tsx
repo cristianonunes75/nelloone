@@ -1291,6 +1291,446 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     );
   };
 
+  // ============== PROMPT ÚNICO v1.0: VISÃO GERAL DO CASAL ==============
+  const renderVisaoGeral = () => {
+    const visao = content.visao_geral;
+    if (!visao) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-primary/5 to-blue-500/5 border-primary/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Ship className="w-5 h-5 text-primary" />
+            <CardTitle className="text-base">
+              {visao.titulo || (language === 'en' ? 'Couple Overview' : 'Visão Geral do Casal')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {visao.metafora && (
+            <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20 text-center">
+              <p className="text-lg font-semibold text-blue-700 dark:text-blue-400 italic">
+                ✨ {visao.metafora} ✨
+              </p>
+            </div>
+          )}
+          {visao.descricao && (
+            <p className="text-foreground/80 whitespace-pre-line leading-relaxed">{visao.descricao}</p>
+          )}
+          {visao.funcionamento_sistema && (
+            <p className="text-sm text-muted-foreground">{visao.funcionamento_sistema}</p>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== PROMPT ÚNICO v1.0: PAPÉIS NATURAIS DO CASAL ==============
+  const renderPapeisNaturais = () => {
+    const papeis = content.papeis_naturais;
+    if (!papeis) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-purple-500/5 to-orange-500/5 border-purple-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Anchor className="w-5 h-5 text-purple-500" />
+            <CardTitle className="text-base">
+              {papeis.titulo || (language === 'en' ? 'Natural Roles' : 'Papéis Naturais no Casal')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            {papeis.sensor && (
+              <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">🧭</span>
+                  <span className="font-semibold text-purple-700 dark:text-purple-400">
+                    {language === 'en' ? 'Direction Sensor' : 'Sensor de Direção'}
+                  </span>
+                </div>
+                <p className="font-medium">{papeis.sensor.nome}</p>
+                {papeis.sensor.justificativa && (
+                  <p className="text-sm text-muted-foreground mt-2">{papeis.sensor.justificativa}</p>
+                )}
+              </div>
+            )}
+            {papeis.condutor && (
+              <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">⚓</span>
+                  <span className="font-semibold text-orange-700 dark:text-orange-400">
+                    {language === 'en' ? 'Builder/Executor' : 'Construtor / Executor'}
+                  </span>
+                </div>
+                <p className="font-medium">{papeis.condutor.nome}</p>
+                {papeis.condutor.justificativa && (
+                  <p className="text-sm text-muted-foreground mt-2">{papeis.condutor.justificativa}</p>
+                )}
+              </div>
+            )}
+          </div>
+          {papeis.dinamica_alternancia && (
+            <div className="p-3 rounded-lg bg-muted/50 border">
+              <p className="text-sm text-muted-foreground italic">{papeis.dinamica_alternancia}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== PROMPT ÚNICO v1.0: FORÇAS CENTRAIS DA UNIÃO ==============
+  const renderForcasCentrais = () => {
+    const forcas = content.forcas_centrais;
+    if (!forcas) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-emerald-500/5 to-teal-500/5 border-emerald-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-emerald-500" />
+            <CardTitle className="text-base">
+              {forcas.titulo || (language === 'en' ? 'Core Strengths' : 'Forças Centrais da União')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {forcas.forcas_emocionais && (
+            <div className="p-4 rounded-lg bg-pink-500/10 border border-pink-500/20">
+              <h4 className="font-semibold text-pink-700 dark:text-pink-400 mb-2 flex items-center gap-2">
+                ❤️ {language === 'en' ? 'Emotional' : 'Emocionais'}
+              </h4>
+              <p className="text-sm text-foreground/80">{forcas.forcas_emocionais}</p>
+            </div>
+          )}
+          {forcas.forcas_praticas && (
+            <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+              <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-2 flex items-center gap-2">
+                🛠️ {language === 'en' ? 'Practical' : 'Práticas'}
+              </h4>
+              <p className="text-sm text-foreground/80">{forcas.forcas_praticas}</p>
+            </div>
+          )}
+          {forcas.visao_proposito && (
+            <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
+              <h4 className="font-semibold text-purple-700 dark:text-purple-400 mb-2 flex items-center gap-2">
+                🎯 {language === 'en' ? 'Vision & Purpose' : 'Visão e Propósito'}
+              </h4>
+              <p className="text-sm text-foreground/80">{forcas.visao_proposito}</p>
+            </div>
+          )}
+          {forcas.valores_espiritualidade && (
+            <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <h4 className="font-semibold text-amber-700 dark:text-amber-400 mb-2 flex items-center gap-2">
+                ✨ {language === 'en' ? 'Values & Spirituality' : 'Valores e Espiritualidade'}
+              </h4>
+              <p className="text-sm text-foreground/80">{forcas.valores_espiritualidade}</p>
+            </div>
+          )}
+          {forcas.como_aparecem_dia_a_dia && (
+            <p className="text-sm text-muted-foreground italic mt-2">{forcas.como_aparecem_dia_a_dia}</p>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== PROMPT ÚNICO v1.0: O AMOR NO CASAL ==============
+  const renderAmorNoCasal = () => {
+    const amor = content.amor_no_casal;
+    if (!amor) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-pink-500/5 via-rose-500/5 to-red-500/5 border-pink-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Heart className="w-5 h-5 text-pink-500" />
+            <CardTitle className="text-base">
+              {amor.titulo || (language === 'en' ? '❤️ Love in the Couple' : '❤️ O Amor no Casal')}
+            </CardTitle>
+          </div>
+          {amor.mensagem_chave && (
+            <p className="text-sm font-medium text-pink-700 dark:text-pink-400 italic mt-1">
+              "{amor.mensagem_chave}"
+            </p>
+          )}
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Como expressa amor */}
+          <div className="grid gap-4 md:grid-cols-2">
+            {amor.como_expressa_amor_a && (
+              <div className="p-4 rounded-lg bg-pink-500/10 border border-pink-500/20">
+                <p className="font-semibold text-sm mb-2">{amor.como_expressa_amor_a.nome}</p>
+                <p className="text-xs text-muted-foreground mb-1">{language === 'en' ? 'Expresses love through:' : 'Expressa amor através de:'}</p>
+                <p className="text-sm text-foreground/80">{amor.como_expressa_amor_a.forma_expressao}</p>
+              </div>
+            )}
+            {amor.como_expressa_amor_b && (
+              <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/20">
+                <p className="font-semibold text-sm mb-2">{amor.como_expressa_amor_b.nome}</p>
+                <p className="text-xs text-muted-foreground mb-1">{language === 'en' ? 'Expresses love through:' : 'Expressa amor através de:'}</p>
+                <p className="text-sm text-foreground/80">{amor.como_expressa_amor_b.forma_expressao}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Como se sente amado */}
+          {(amor.como_se_sente_amado_a || amor.como_se_sente_amado_b) && (
+            <div className="p-4 rounded-lg bg-muted/50 border space-y-3">
+              <h4 className="font-semibold text-sm">{language === 'en' ? 'How Each Feels Loved' : 'Como Cada Um Se Sente Amado'}</h4>
+              {amor.como_se_sente_amado_a && (
+                <p className="text-sm text-foreground/80">💜 {amor.como_se_sente_amado_a}</p>
+              )}
+              {amor.como_se_sente_amado_b && (
+                <p className="text-sm text-foreground/80">🧡 {amor.como_se_sente_amado_b}</p>
+              )}
+            </div>
+          )}
+
+          {/* Onde o amor se perde */}
+          {amor.onde_amor_se_perde && (
+            <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <h4 className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-2">
+                ⚠️ {language === 'en' ? 'Where Love Gets Lost' : 'Onde o Amor se Perde'}
+              </h4>
+              <p className="text-sm text-foreground/80">{amor.onde_amor_se_perde}</p>
+            </div>
+          )}
+
+          {/* Como reativar */}
+          {amor.como_reativar && (
+            <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <h4 className="font-semibold text-sm text-emerald-700 dark:text-emerald-400 mb-2">
+                💡 {language === 'en' ? 'How to Reactivate Love' : 'Como Reativar o Amor'}
+              </h4>
+              <p className="text-sm text-foreground/80">{amor.como_reativar}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== PROMPT ÚNICO v1.0: TENSÕES NATURAIS ==============
+  const renderTensoesNaturais = () => {
+    const tensoes = content.tensoes_naturais;
+    if (!tensoes) return null;
+
+    return (
+      <Card className="border-amber-500/30">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Flame className="w-5 h-5 text-amber-500" />
+            <CardTitle className="text-base">
+              {tensoes.titulo || (language === 'en' ? 'Natural Tensions' : 'Tensões Naturais')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {tensoes.onde_surgem && (
+            <div className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20">
+              <h4 className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-2">
+                {language === 'en' ? 'Where Tensions Arise' : 'Onde Surgem os Atritos'}
+              </h4>
+              <p className="text-sm text-foreground/80">{tensoes.onde_surgem}</p>
+            </div>
+          )}
+          {tensoes.porque_surgem && (
+            <div className="p-4 rounded-lg bg-muted/50 border">
+              <h4 className="font-semibold text-sm mb-2">
+                {language === 'en' ? 'Why They Happen' : 'Por Que Surgem'}
+              </h4>
+              <p className="text-sm text-foreground/80">{tensoes.porque_surgem}</p>
+            </div>
+          )}
+          {tensoes.o_que_cada_um_sente && (
+            <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20">
+              <h4 className="font-semibold text-sm text-blue-700 dark:text-blue-400 mb-2">
+                {language === 'en' ? 'What Each One Feels' : 'O Que Cada Um Sente'}
+              </h4>
+              <p className="text-sm text-foreground/80">{tensoes.o_que_cada_um_sente}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== PROMPT ÚNICO v1.0: ZONA DE AJUSTE ==============
+  const renderZonaDeAjusteV1 = () => {
+    const zona = content.zona_de_ajuste;
+    if (!zona) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-amber-500/5 to-yellow-500/5 border-amber-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Target className="w-5 h-5 text-amber-500" />
+            <CardTitle className="text-base">
+              {zona.titulo || (language === 'en' ? 'Adjustment Zone' : 'Zona de Ajuste')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {zona.principal_ponto && (
+            <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <h4 className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-2">
+                🎯 {language === 'en' ? 'Main Adjustment Point' : 'Principal Ponto de Ajuste'}
+              </h4>
+              <p className="text-sm text-foreground/80">{zona.principal_ponto}</p>
+            </div>
+          )}
+          {zona.risco_se_nao_mudar && (
+            <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+              <h4 className="font-semibold text-sm text-red-700 dark:text-red-400 mb-2">
+                ⚠️ {language === 'en' ? 'Risk if Nothing Changes' : 'Risco se Nada Mudar'}
+              </h4>
+              <p className="text-sm text-foreground/80">{zona.risco_se_nao_mudar}</p>
+            </div>
+          )}
+          {zona.ajuste_simples && (
+            <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <h4 className="font-semibold text-sm text-emerald-700 dark:text-emerald-400 mb-2">
+                ✅ {language === 'en' ? 'Simple Adjustment' : 'Ajuste Simples e Possível'}
+              </h4>
+              <p className="text-sm text-foreground/80">{zona.ajuste_simples}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== PROMPT ÚNICO v1.0: PROTOCOLO DE LIDERANÇA ==============
+  const renderProtocoloLideranca = () => {
+    const protocolo = content.protocolo_lideranca;
+    if (!protocolo) return null;
+
+    const regras = [
+      { icon: '🎯', label: language === 'en' ? 'Strategy & Long-term' : 'Estratégia e Longo Prazo', value: protocolo.estrategia_longo_prazo },
+      { icon: '⚡', label: language === 'en' ? 'Execution & Crisis' : 'Execução e Crise Prática', value: protocolo.execucao_crise },
+      { icon: '💭', label: language === 'en' ? 'Emotional Conflict' : 'Conflito Emocional', value: protocolo.conflito_emocional },
+      { icon: '🧭', label: language === 'en' ? 'Sensor Role' : 'Papel do Sensor', value: protocolo.sensor_organiza },
+      { icon: '⚓', label: language === 'en' ? 'Conductor Role' : 'Papel do Condutor', value: protocolo.condutor_sustenta },
+    ].filter(r => r.value);
+
+    return (
+      <Card className="bg-gradient-to-br from-indigo-500/5 to-blue-500/5 border-indigo-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-indigo-500" />
+            <CardTitle className="text-base">
+              {protocolo.titulo || (language === 'en' ? 'Couple Leadership Protocol' : 'Protocolo de Liderança do Casal')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {regras.map((regra, i) => (
+            <div key={i} className="p-3 rounded-lg bg-indigo-500/5 border border-indigo-500/20">
+              <div className="flex items-start gap-3">
+                <span className="text-lg">{regra.icon}</span>
+                <div>
+                  <p className="font-semibold text-sm text-indigo-700 dark:text-indigo-400">{regra.label}</p>
+                  <p className="text-sm text-foreground/80">{regra.value}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== PROMPT ÚNICO v1.0: TRADUÇÃO DIA A DIA ==============
+  const renderTraducaoDiaADia = () => {
+    const traducao = content.traducao_dia_a_dia;
+    if (!traducao) return null;
+
+    const orientacoes = asArray<string>(traducao.orientacoes);
+
+    return (
+      <Card className="bg-gradient-to-br from-emerald-500/5 to-green-500/5 border-emerald-500/20">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Lightbulb className="w-5 h-5 text-emerald-500" />
+            <CardTitle className="text-base">
+              {traducao.titulo || (language === 'en' ? 'Day-to-Day Translation' : 'Tradução para o Dia a Dia')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {orientacoes.length > 0 ? (
+            orientacoes.map((orientacao: string, i: number) => (
+              <div key={i} className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3">
+                <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold flex items-center justify-center text-xs flex-shrink-0">
+                  {i + 1}
+                </span>
+                <p className="text-sm text-foreground/90">{orientacao}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-foreground/80">{typeof traducao === 'string' ? traducao : traducao.descricao}</p>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ============== PROMPT ÚNICO v1.0: SÍNTESE EXECUTIVA ==============
+  const renderSinteseExecutiva = () => {
+    const sintese = content.sintese_executiva;
+    if (!sintese) return null;
+
+    return (
+      <Card className="bg-gradient-to-br from-primary/10 via-pink-500/10 to-purple-500/10 border-primary/30">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <Zap className="w-5 h-5 text-primary" />
+            <CardTitle className="text-base">
+              {sintese.titulo || (language === 'en' ? 'Executive Summary' : 'Síntese Executiva do Casal')}
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {sintese.tipo_casal && (
+              <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+                <p className="text-xs text-muted-foreground">{language === 'en' ? 'Couple Type' : 'Tipo de Casal'}</p>
+                <p className="font-semibold text-foreground">{sintese.tipo_casal}</p>
+              </div>
+            )}
+            {sintese.forma_amar && (
+              <div className="p-3 rounded-lg bg-pink-500/10 border border-pink-500/20">
+                <p className="text-xs text-muted-foreground">{language === 'en' ? 'Way of Loving' : 'Forma de Amar'}</p>
+                <p className="font-semibold text-foreground">{sintese.forma_amar}</p>
+              </div>
+            )}
+            {sintese.forca_principal && (
+              <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                <p className="text-xs text-muted-foreground">{language === 'en' ? 'Main Strength' : 'Força Principal'}</p>
+                <p className="font-semibold text-emerald-700 dark:text-emerald-400">{sintese.forca_principal}</p>
+              </div>
+            )}
+            {sintese.risco_principal && (
+              <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                <p className="text-xs text-muted-foreground">{language === 'en' ? 'Main Risk' : 'Risco Principal'}</p>
+                <p className="font-semibold text-amber-700 dark:text-amber-400">{sintese.risco_principal}</p>
+              </div>
+            )}
+          </div>
+          {sintese.antidoto_pratico && (
+            <div className="mt-4 p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+              <p className="text-xs text-muted-foreground mb-1">{language === 'en' ? 'Practical Antidote' : 'Antídoto Prático'}</p>
+              <p className="font-medium text-indigo-700 dark:text-indigo-400">{sintese.antidoto_pratico}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
   // ============== CTA ACTIVATION ==============
   const renderCtaActivation = () => {
     const cta = content.cta_ativacao;
@@ -2343,14 +2783,36 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           </Card>
         )}
 
-        {/* NEW FORMAT SECTIONS - Identity v1.0 */}
+        {/* PROMPT ÚNICO v1.0 - 9 Seções Obrigatórias */}
         <div className="space-y-6 mt-6">
-          {/* New Identity v1.0 sections */}
-          {renderZonaHarmonia()}
-          {renderZonaAjuste()}
-          {renderZonaChoque()}
+          {/* 1. Visão Geral do Casal */}
+          {renderVisaoGeral()}
           
-          {/* 7 PILLARS SECTIONS */}
+          {/* 2. Papéis Naturais */}
+          {renderPapeisNaturais()}
+          
+          {/* 3. Forças Centrais */}
+          {renderForcasCentrais()}
+          
+          {/* 4. ❤️ O Amor no Casal (Seção Central) */}
+          {renderAmorNoCasal()}
+          
+          {/* 5. Tensões Naturais */}
+          {renderTensoesNaturais()}
+          
+          {/* 6. Zona de Ajuste */}
+          {renderZonaDeAjusteV1()}
+          
+          {/* 7. Protocolo de Liderança */}
+          {renderProtocoloLideranca()}
+          
+          {/* 8. Tradução para o Dia a Dia */}
+          {renderTraducaoDiaADia()}
+          
+          {/* 9. Síntese Executiva */}
+          {renderSinteseExecutiva()}
+          
+          {/* 7 PILLARS SECTIONS - Visual Charts */}
           {renderSynergyRadarChart()}
           {render7PillarsTemperaments()}
           {render7PillarsIntelligences()}
@@ -2358,11 +2820,15 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           {render7PillarsConnectionStyles()}
           {render7PillarsNello16()}
           
+          {/* Additional v2.0/v2.2 sections */}
+          {renderZonaHarmonia()}
+          {renderZonaAjuste()}
+          {renderZonaChoque()}
           {renderTabelaTraducaoV2()}
           {renderCrisisCommunication()}
           {renderProtocoloPazV2()}
           
-          {/* New Identity v2.2 sections - Livro de Bordo Premium */}
+          {/* Identity v2.2 - Livro de Bordo Premium */}
           {renderReflexoesPraticas()}
           {renderFrasesPonte()}
           {renderAlertasDiaDia()}
