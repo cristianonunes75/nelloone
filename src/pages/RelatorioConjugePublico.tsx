@@ -88,6 +88,63 @@ const RelatorioConjugePublico = () => {
     loadReport();
   }, [token]);
 
+  // ========== SAFE TEXT HELPER ==========
+  // Extracts displayable text from complex objects to prevent React Error #31
+  const extractSafeText = (value: any): string => {
+    if (value == null) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+    
+    if (typeof value === 'object') {
+      // Priority order for extracting text from objects
+      const textValue = 
+        value.texto ?? 
+        value.conteudo ?? 
+        value.acao ?? 
+        value.situacao ?? 
+        value.descricao ?? 
+        value.resumo ?? 
+        value.titulo ?? 
+        value.mensagem;
+      
+      if (typeof textValue === 'string' && textValue.trim().length > 0) {
+        return textValue;
+      }
+      
+      // Fallback: stringify
+      try {
+        return JSON.stringify(value);
+      } catch {
+        return '[objeto]';
+      }
+    }
+    
+    return String(value);
+  };
+
+  // Safely render any value, handling objects with {acao, origem, situacao}
+  const renderSafeItem = (item: any): React.ReactNode => {
+    if (item == null) return null;
+    if (typeof item === 'string') return item;
+    if (typeof item === 'number' || typeof item === 'boolean') return String(item);
+    
+    if (typeof item === 'object') {
+      const text = extractSafeText(item);
+      const origin = item.origem ?? item.origem_insight;
+      
+      return (
+        <span>
+          {text}
+          {typeof origin === 'string' && origin.trim().length > 0 && (
+            <span className="block text-xs text-muted-foreground mt-1 italic">[{origin}]</span>
+          )}
+        </span>
+      );
+    }
+    
+    return String(item);
+  };
+
   const renderContent = (contentItem: any) => {
     if (!contentItem) return null;
     
@@ -122,11 +179,16 @@ const RelatorioConjugePublico = () => {
           {contentItem.map((item, i) => (
             <li key={i} className="flex items-start gap-2">
               <span className="text-primary mt-1">•</span>
-              <span className="text-foreground/80">{typeof item === 'string' ? item : JSON.stringify(item)}</span>
+              <span className="text-foreground/80">{renderSafeItem(item)}</span>
             </li>
           ))}
         </ul>
       );
+    }
+    
+    // NEW: Handle objects that aren't arrays (like {acao, origem, situacao})
+    if (typeof contentItem === 'object') {
+      return <p className="text-foreground/80 whitespace-pre-line">{renderSafeItem(contentItem)}</p>;
     }
     
     return null;
@@ -270,21 +332,21 @@ const RelatorioConjugePublico = () => {
         </CardHeader>
         <CardContent>
           {section.introducao && (
-            <p className="text-sm text-muted-foreground mb-3">{section.introducao}</p>
+            <p className="text-sm text-muted-foreground mb-3">{extractSafeText(section.introducao)}</p>
           )}
           {compromissos && Array.isArray(compromissos) && (
             <ul className="space-y-2 mb-4">
               {compromissos.map((item: any, i: number) => (
                 <li key={i} className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-foreground/80">{typeof item === 'string' ? item : (item.descricao || JSON.stringify(item))}</span>
+                  <span className="text-foreground/80">{renderSafeItem(item)}</span>
                 </li>
               ))}
             </ul>
           )}
           {section.nota_final && (
             <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg p-3">
-              {section.nota_final}
+              {extractSafeText(section.nota_final)}
             </p>
           )}
         </CardContent>
@@ -315,7 +377,7 @@ const RelatorioConjugePublico = () => {
                   <span className="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center text-xs font-medium text-primary flex-shrink-0">
                     {i + 1}
                   </span>
-                  <span className="text-foreground/80">{pergunta}</span>
+                  <span className="text-foreground/80">{renderSafeItem(pergunta)}</span>
                 </li>
               ))}
             </ul>
@@ -342,7 +404,7 @@ const RelatorioConjugePublico = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-foreground/80 italic">{conteudo}</p>
+          <p className="text-foreground/80 italic">{renderSafeItem(conteudo)}</p>
         </CardContent>
       </Card>
     );
