@@ -1639,20 +1639,29 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
 
   // ============== PROMPT ÚNICO v1.0: TENSÕES NATURAIS ==============
   const renderTensoesNaturais = () => {
-    const tensoes = content.tensoes_naturais;
+    // Support multiple key formats
+    const tensoes = content.tensoes_naturais || content.tensoes;
     if (!tensoes) return null;
+
+    // Get tensoes array from different possible formats
+    const tensoesArray = tensoes.tensoes || [];
+    const tensoesNote = tensoes.nota;
 
     return (
       <Card className="border-amber-500/30">
         <CardHeader className="pb-2">
           <div className="flex items-center gap-2">
             <Flame className="w-5 h-5 text-amber-500" />
-            <CardTitle className="text-base">
-              {tensoes.titulo || (language === 'en' ? 'Natural Tensions' : 'Tensões Naturais')}
+            <CardTitle className="text-base text-amber-700 dark:text-amber-400">
+              {renderSafeText(tensoes.titulo) || (language === 'en' ? 'Natural Tensions' : 'Tensões Naturais do Casal')}
             </CardTitle>
           </div>
+          {tensoesNote && (
+            <p className="text-xs text-muted-foreground italic mt-1">💡 {renderSafeText(tensoesNote)}</p>
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Old format support */}
           {tensoes.onde_surgem && (
             <div className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20">
               <h4 className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-2">
@@ -1677,6 +1686,64 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <p className="text-sm text-foreground/80">{renderSafeText(tensoes.o_que_cada_um_sente)}</p>
             </div>
           )}
+          
+          {/* New v2.0 format - tensoes array */}
+          {Array.isArray(tensoesArray) && tensoesArray.length > 0 && tensoesArray.map((tensao: any, i: number) => (
+            <div key={i} className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-3">
+              <h4 className="font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" />
+                {renderSafeText(tensao.area)}
+              </h4>
+              
+              {tensao.onde_surge && (
+                <div className="text-sm">
+                  <strong className="text-foreground/70">{language === 'en' ? 'Where it arises:' : 'Onde surge:'}</strong>
+                  <p className="text-foreground/80 mt-1">{renderSafeText(tensao.onde_surge)}</p>
+                </div>
+              )}
+              
+              {tensao.por_que_surge && (
+                <div className="text-sm">
+                  <strong className="text-foreground/70">{language === 'en' ? 'Why it happens:' : 'Por que surge:'}</strong>
+                  <p className="text-foreground/80 mt-1">{renderSafeText(tensao.por_que_surge)}</p>
+                </div>
+              )}
+              
+              <div className="grid gap-3 md:grid-cols-2">
+                {tensao.o_que_a_sente && (
+                  <div className="p-3 rounded bg-purple-500/10 border border-purple-500/20">
+                    <p className="text-xs font-medium text-purple-700 dark:text-purple-400 mb-1">
+                      {language === 'en' ? 'Person A feels:' : 'O que Pessoa A sente:'}
+                    </p>
+                    <p className="text-xs text-foreground/80">{renderSafeText(tensao.o_que_a_sente)}</p>
+                  </div>
+                )}
+                {tensao.o_que_b_sente && (
+                  <div className="p-3 rounded bg-orange-500/10 border border-orange-500/20">
+                    <p className="text-xs font-medium text-orange-700 dark:text-orange-400 mb-1">
+                      {language === 'en' ? 'Person B feels:' : 'O que Pessoa B sente:'}
+                    </p>
+                    <p className="text-xs text-foreground/80">{renderSafeText(tensao.o_que_b_sente)}</p>
+                  </div>
+                )}
+              </div>
+              
+              {tensao.exemplo_situacao && (
+                <div className="p-3 rounded bg-muted/50 border">
+                  <p className="text-xs font-medium text-muted-foreground mb-1">
+                    💡 {language === 'en' ? 'Example Situation:' : 'Exemplo de Situação:'}
+                  </p>
+                  <p className="text-xs text-foreground/80 italic">{renderSafeText(tensao.exemplo_situacao)}</p>
+                </div>
+              )}
+              
+              {tensao.origem && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+                  📊 {renderSafeText(tensao.origem)}
+                </span>
+              )}
+            </div>
+          ))}
         </CardContent>
       </Card>
     );
@@ -1684,42 +1751,80 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
 
   // ============== PROMPT ÚNICO v1.0: ZONA DE AJUSTE ==============
   const renderZonaDeAjusteV1 = () => {
-    const zona = content.zona_de_ajuste;
+    // Support both key formats: zona_de_ajuste (v1.0) and zona_ajuste (v2.0)
+    const zona = content.zona_de_ajuste || content.zona_ajuste;
     if (!zona) return null;
+
+    // Get fields from both v1.0 and v2.0 formats
+    const pontoPrincipal = zona.principal_ponto || zona.ponto_principal;
+    const riscoSeNaoMudar = zona.risco_se_nao_mudar || zona.risco_se_nao_ajustar;
+    const ajusteSimples = zona.ajuste_simples || zona.ajuste_proposto;
+    const microAcordos = zona.micro_acordos;
+    const origemInsight = zona.origem_insight;
 
     return (
       <Card className="bg-gradient-to-br from-amber-500/5 to-yellow-500/5 border-amber-500/20">
         <CardHeader className="pb-2">
           <div className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-amber-500" />
-            <CardTitle className="text-base">
-              {renderSafeText(zona.titulo) || (language === 'en' ? 'Adjustment Zone' : 'Zona de Ajuste')}
+            <span className="text-xl">🟡</span>
+            <CardTitle className="text-base text-amber-700 dark:text-amber-400">
+              {renderSafeText(zona.titulo) || (language === 'en' ? 'Couple Adjustment Zone' : 'Zona de Ajuste do Casal')}
             </CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {zona.principal_ponto && (
+          {pontoPrincipal && (
             <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
               <h4 className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-2">
                 🎯 {language === 'en' ? 'Main Adjustment Point' : 'Principal Ponto de Ajuste'}
               </h4>
-              <p className="text-sm text-foreground/80">{renderSafeText(zona.principal_ponto)}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(pontoPrincipal)}</p>
             </div>
           )}
-          {zona.risco_se_nao_mudar && (
+          {riscoSeNaoMudar && (
             <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
               <h4 className="font-semibold text-sm text-red-700 dark:text-red-400 mb-2">
                 ⚠️ {language === 'en' ? 'Risk if Nothing Changes' : 'Risco se Nada Mudar'}
               </h4>
-              <p className="text-sm text-foreground/80">{renderSafeText(zona.risco_se_nao_mudar)}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(riscoSeNaoMudar)}</p>
             </div>
           )}
-          {zona.ajuste_simples && (
+          {ajusteSimples && (
             <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <h4 className="font-semibold text-sm text-emerald-700 dark:text-emerald-400 mb-2">
-                ✅ {language === 'en' ? 'Simple Adjustment' : 'Ajuste Simples e Possível'}
+                ✅ {language === 'en' ? 'Proposed Adjustment' : 'Ajuste Proposto'}
               </h4>
-              <p className="text-sm text-foreground/80">{renderSafeText(zona.ajuste_simples)}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(ajusteSimples)}</p>
+            </div>
+          )}
+          {microAcordos && Array.isArray(microAcordos) && microAcordos.length > 0 && (
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm text-indigo-700 dark:text-indigo-400">
+                🤝 {language === 'en' ? 'Micro-Agreements' : 'Micro-Acordos'}
+              </h4>
+              {microAcordos.map((acordo: any, i: number) => (
+                <div key={i} className="p-3 rounded-lg bg-indigo-500/5 border border-indigo-500/20 space-y-2">
+                  <p className="font-medium text-sm">{renderSafeText(acordo.titulo)}</p>
+                  {acordo.descricao && (
+                    <p className="text-sm text-foreground/80">{renderSafeText(acordo.descricao)}</p>
+                  )}
+                  {acordo.como_praticar && (
+                    <div className="p-2 rounded bg-emerald-500/10 border border-emerald-500/20">
+                      <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-1">
+                        💡 {language === 'en' ? 'How to Practice' : 'Como Praticar'}
+                      </p>
+                      <p className="text-xs text-foreground/70">{renderSafeText(acordo.como_praticar)}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          {origemInsight && (
+            <div className="mt-2">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+                📊 {renderSafeText(origemInsight)}
+              </span>
             </div>
           )}
         </CardContent>
@@ -1729,10 +1834,12 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
 
   // ============== PROMPT ÚNICO v1.0: PROTOCOLO DE LIDERANÇA ==============
   const renderProtocoloLideranca = () => {
-    const protocolo = content.protocolo_lideranca;
+    // Support multiple key formats
+    const protocolo = content.protocolo_lideranca || content.protocolo_de_lideranca;
     if (!protocolo) return null;
 
-    const regras = [
+    // Old format support
+    const regrasOld = [
       { icon: '🎯', label: language === 'en' ? 'Strategy & Long-term' : 'Estratégia e Longo Prazo', value: protocolo.estrategia_longo_prazo },
       { icon: '⚡', label: language === 'en' ? 'Execution & Crisis' : 'Execução e Crise Prática', value: protocolo.execucao_crise },
       { icon: '💭', label: language === 'en' ? 'Emotional Conflict' : 'Conflito Emocional', value: protocolo.conflito_emocional },
@@ -1740,18 +1847,82 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
       { icon: '⚓', label: language === 'en' ? 'Conductor Role' : 'Papel do Condutor', value: protocolo.condutor_sustenta },
     ].filter(r => r.value);
 
+    // New format - decisoes_estrategicas, execucao_imediata, conflitos_emocionais
+    const hasNewFormat = protocolo.decisoes_estrategicas || protocolo.execucao_imediata || protocolo.conflitos_emocionais;
+
+    const renderProtocoloSection = (section: any, icon: string, title: string, colorClass: string) => {
+      if (!section) return null;
+      return (
+        <div className={`p-4 rounded-lg ${colorClass} space-y-2`}>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">{icon}</span>
+            <h4 className="font-semibold text-sm">{title}</h4>
+          </div>
+          {section.responsavel && (
+            <p className="text-sm">
+              <strong className="text-foreground/70">{language === 'en' ? 'Lead by:' : 'Responsável:'}</strong>{' '}
+              <span className="font-medium">{renderSafeText(section.responsavel)}</span>
+            </p>
+          )}
+          {section.regra && (
+            <p className="text-sm text-foreground/80">{renderSafeText(section.regra)}</p>
+          )}
+          {section.rituais && Array.isArray(section.rituais) && section.rituais.length > 0 && (
+            <div className="mt-2 space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">
+                🕯️ {language === 'en' ? 'Rituals:' : 'Rituais:'}
+              </p>
+              {section.rituais.map((ritual: string, i: number) => (
+                <p key={i} className="text-xs text-foreground/70 pl-4 border-l-2 border-current/20">{renderSafeText(ritual)}</p>
+              ))}
+            </div>
+          )}
+          {section.origem && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground mt-2">
+              📊 {renderSafeText(section.origem)}
+            </span>
+          )}
+        </div>
+      );
+    };
+
     return (
       <Card className="bg-gradient-to-br from-indigo-500/5 to-blue-500/5 border-indigo-500/20">
         <CardHeader className="pb-2">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-indigo-500" />
-            <CardTitle className="text-base">
-              {protocolo.titulo || (language === 'en' ? 'Couple Leadership Protocol' : 'Protocolo de Liderança do Casal')}
+            <CardTitle className="text-base text-indigo-700 dark:text-indigo-400">
+              {renderSafeText(protocolo.titulo) || (language === 'en' ? 'Couple Leadership Protocol' : 'Protocolo de Liderança do Casal')}
             </CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {regras.map((regra, i) => (
+        <CardContent className="space-y-4">
+          {/* New v2.0 format */}
+          {hasNewFormat && (
+            <>
+              {renderProtocoloSection(
+                protocolo.decisoes_estrategicas, 
+                '🎯', 
+                language === 'en' ? 'Strategic Decisions' : 'Decisões Estratégicas',
+                'bg-purple-500/10 border border-purple-500/20'
+              )}
+              {renderProtocoloSection(
+                protocolo.execucao_imediata, 
+                '⚡', 
+                language === 'en' ? 'Immediate Execution' : 'Execução Imediata',
+                'bg-orange-500/10 border border-orange-500/20'
+              )}
+              {renderProtocoloSection(
+                protocolo.conflitos_emocionais, 
+                '💭', 
+                language === 'en' ? 'Emotional Conflicts' : 'Conflitos Emocionais',
+                'bg-pink-500/10 border border-pink-500/20'
+              )}
+            </>
+          )}
+          
+          {/* Old format support */}
+          {regrasOld.length > 0 && regrasOld.map((regra, i) => (
             <div key={i} className="p-3 rounded-lg bg-indigo-500/5 border border-indigo-500/20">
               <div className="flex items-start gap-3">
                 <span className="text-lg">{regra.icon}</span>
