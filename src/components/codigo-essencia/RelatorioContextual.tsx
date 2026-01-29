@@ -390,6 +390,21 @@ export const RelatorioContextual = ({ reportType, language, hasSavedCodigo }: Re
     }
   };
 
+  // Safe text rendering to prevent React Error #31
+  const renderSafeItem = (item: any): React.ReactNode => {
+    if (item == null) return null;
+    if (typeof item === 'string') return item;
+    if (typeof item === 'number' || typeof item === 'boolean') return String(item);
+    
+    if (typeof item === 'object') {
+      const text = item.texto ?? item.conteudo ?? item.acao ?? item.situacao ?? 
+                   item.descricao ?? item.resumo ?? item.titulo ?? item.mensagem;
+      if (typeof text === 'string' && text.trim().length > 0) return text;
+      try { return JSON.stringify(item); } catch { return '[objeto]'; }
+    }
+    return String(item);
+  };
+
   const renderContent = (content: any) => {
     if (!content) return null;
     
@@ -403,11 +418,16 @@ export const RelatorioContextual = ({ reportType, language, hasSavedCodigo }: Re
           {content.map((item, i) => (
             <li key={i} className="flex items-start gap-2">
               <span className="text-primary mt-1">•</span>
-              <span className="text-foreground/80">{typeof item === 'string' ? item : JSON.stringify(item)}</span>
+              <span className="text-foreground/80">{renderSafeItem(item)}</span>
             </li>
           ))}
         </ul>
       );
+    }
+    
+    // Handle objects that aren't arrays
+    if (typeof content === 'object') {
+      return <p className="text-foreground/80 whitespace-pre-line">{renderSafeItem(content)}</p>;
     }
     
     return null;
@@ -463,10 +483,10 @@ export const RelatorioContextual = ({ reportType, language, hasSavedCodigo }: Re
           
           {hasCommitments && (
             <ul className="space-y-2">
-              {(section.compromissos || section.commitments).map((item: string, i: number) => (
+              {(section.compromissos || section.commitments).map((item: any, i: number) => (
                 <li key={i} className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-foreground/80">{item}</span>
+                  <span className="text-foreground/80">{renderSafeItem(item)}</span>
                 </li>
               ))}
             </ul>
@@ -474,12 +494,12 @@ export const RelatorioContextual = ({ reportType, language, hasSavedCodigo }: Re
           
           {hasQuestions && (
             <ul className="space-y-3">
-              {(section.perguntas || section.questions).map((pergunta: string, i: number) => (
+              {(section.perguntas || section.questions).map((pergunta: any, i: number) => (
                 <li key={i} className="flex items-start gap-3 bg-muted/50 rounded-lg p-3">
                   <span className="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center text-xs font-medium text-primary flex-shrink-0">
                     {i + 1}
                   </span>
-                  <span className="text-foreground/80">{pergunta}</span>
+                  <span className="text-foreground/80">{renderSafeItem(pergunta)}</span>
                 </li>
               ))}
             </ul>
