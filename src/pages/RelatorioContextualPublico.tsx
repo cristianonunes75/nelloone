@@ -7,6 +7,7 @@ import { Loader2, ArrowLeft, Heart, Baby, Users, Briefcase, AlertCircle, FileDow
 import { LogoText } from "@/components/LogoText";
 import { downloadRelatorioContextualPDF, type ReportType as PDFReportType } from "@/lib/pdfRelatorioContextual";
 import { toast } from "sonner";
+import { extractSafeText } from "@/lib/renderSafeText";
 
 type ReportType = 'parceiro' | 'pai_para_filho' | 'filho_para_pai' | 'para_gestor' | 'para_equipe';
 
@@ -156,6 +157,11 @@ const RelatorioContextualPublico = () => {
     feedback_corretivo?: string;
   }
 
+  // Helper to safely render any value (prevents React Error #31)
+  const safeRender = (value: unknown): string => {
+    return extractSafeText(value);
+  };
+
   const renderContent = (content: string | string[] | SectionContent | undefined) => {
     if (!content) return null;
     
@@ -170,11 +176,11 @@ const RelatorioContextualPublico = () => {
         if (Array.isArray(textContent)) {
           elements.push(
             <ul key="content" className="list-disc list-inside space-y-1 mb-3">
-              {textContent.map((item, i) => <li key={i}>{item}</li>)}
+              {textContent.map((item, i) => <li key={i}>{safeRender(item)}</li>)}
             </ul>
           );
         } else {
-          elements.push(<p key="content" className="whitespace-pre-wrap mb-3">{textContent}</p>);
+          elements.push(<p key="content" className="whitespace-pre-wrap mb-3">{safeRender(textContent)}</p>);
         }
       }
       
@@ -185,7 +191,7 @@ const RelatorioContextualPublico = () => {
             <p className="font-medium text-emerald-600 mb-1">
               {lang === 'en' ? 'Positive feedback:' : 'Feedback positivo:'}
             </p>
-            <p className="whitespace-pre-wrap">{obj.feedback_positivo}</p>
+            <p className="whitespace-pre-wrap">{safeRender(obj.feedback_positivo)}</p>
           </div>
         );
       }
@@ -197,7 +203,7 @@ const RelatorioContextualPublico = () => {
             <p className="font-medium text-amber-600 mb-1">
               {lang === 'en' ? 'Corrective feedback:' : 'Feedback corretivo:'}
             </p>
-            <p className="whitespace-pre-wrap">{obj.feedback_corretivo}</p>
+            <p className="whitespace-pre-wrap">{safeRender(obj.feedback_corretivo)}</p>
           </div>
         );
       }
@@ -213,7 +219,7 @@ const RelatorioContextualPublico = () => {
               {obj.compromissos.map((item, i) => (
                 <li key={i} className="flex items-start gap-2">
                   <span className="text-primary">✓</span>
-                  <span>{item}</span>
+                  <span>{safeRender(item)}</span>
                 </li>
               ))}
             </ul>
@@ -230,7 +236,7 @@ const RelatorioContextualPublico = () => {
             </p>
             <ol className="list-decimal list-inside space-y-1">
               {obj.perguntas.map((item, i) => (
-                <li key={i}>{item}</li>
+                <li key={i}>{safeRender(item)}</li>
               ))}
             </ol>
           </div>
@@ -241,7 +247,7 @@ const RelatorioContextualPublico = () => {
       if (obj.nota_final) {
         elements.push(
           <div key="nota" className="bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-3 border border-emerald-200 dark:border-emerald-800">
-            <p className="text-emerald-700 dark:text-emerald-300 italic text-sm">{obj.nota_final}</p>
+            <p className="text-emerald-700 dark:text-emerald-300 italic text-sm">{safeRender(obj.nota_final)}</p>
           </div>
         );
       }
@@ -252,11 +258,11 @@ const RelatorioContextualPublico = () => {
     if (Array.isArray(content)) {
       return (
         <ul className="list-disc list-inside space-y-1">
-          {content.map((item, i) => <li key={i}>{item}</li>)}
+          {content.map((item, i) => <li key={i}>{safeRender(item)}</li>)}
         </ul>
       );
     }
-    return <p className="whitespace-pre-wrap">{content}</p>;
+    return <p className="whitespace-pre-wrap">{safeRender(content)}</p>;
   };
 
   if (isLoading) {
