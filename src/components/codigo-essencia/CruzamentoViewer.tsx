@@ -1043,7 +1043,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
 
     const renderContent = (content: any) => {
       if (typeof content === 'string') {
-        return <p className="text-foreground/80 whitespace-pre-line">{content}</p>;
+        return <p className="text-foreground/80 whitespace-pre-line">{renderSafeText(content)}</p>;
       }
       if (Array.isArray(content)) {
         const renderListItem = (item: any) => {
@@ -1460,7 +1460,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           <div className="flex items-center gap-2">
             <Anchor className="w-5 h-5 text-purple-500" />
             <CardTitle className="text-base">
-              {papeis.titulo || (language === 'en' ? 'Natural Roles' : 'Papéis Naturais no Casal')}
+              {renderSafeText(papeis.titulo) || (language === 'en' ? 'Natural Roles' : 'Papéis Naturais no Casal')}
             </CardTitle>
           </div>
         </CardHeader>
@@ -1474,9 +1474,9 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                     {language === 'en' ? 'Direction Sensor' : 'Sensor de Direção'}
                   </span>
                 </div>
-                <p className="font-medium">{papeis.sensor.nome}</p>
+                <p className="font-medium">{renderSafeText(papeis.sensor.nome)}</p>
                 {papeis.sensor.justificativa && (
-                  <p className="text-sm text-muted-foreground mt-2">{papeis.sensor.justificativa}</p>
+                  <p className="text-sm text-muted-foreground mt-2">{renderSafeText(papeis.sensor.justificativa)}</p>
                 )}
               </div>
             )}
@@ -1488,16 +1488,16 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                     {language === 'en' ? 'Builder/Executor' : 'Construtor / Executor'}
                   </span>
                 </div>
-                <p className="font-medium">{papeis.condutor.nome}</p>
+                <p className="font-medium">{renderSafeText(papeis.condutor.nome)}</p>
                 {papeis.condutor.justificativa && (
-                  <p className="text-sm text-muted-foreground mt-2">{papeis.condutor.justificativa}</p>
+                  <p className="text-sm text-muted-foreground mt-2">{renderSafeText(papeis.condutor.justificativa)}</p>
                 )}
               </div>
             )}
           </div>
           {papeis.dinamica_alternancia && (
             <div className="p-3 rounded-lg bg-muted/50 border">
-              <p className="text-sm text-muted-foreground italic">{papeis.dinamica_alternancia}</p>
+              <p className="text-sm text-muted-foreground italic">{renderSafeText(papeis.dinamica_alternancia)}</p>
             </div>
           )}
         </CardContent>
@@ -1693,7 +1693,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           <div className="flex items-center gap-2">
             <Target className="w-5 h-5 text-amber-500" />
             <CardTitle className="text-base">
-              {zona.titulo || (language === 'en' ? 'Adjustment Zone' : 'Zona de Ajuste')}
+              {renderSafeText(zona.titulo) || (language === 'en' ? 'Adjustment Zone' : 'Zona de Ajuste')}
             </CardTitle>
           </div>
         </CardHeader>
@@ -1703,7 +1703,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <h4 className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-2">
                 🎯 {language === 'en' ? 'Main Adjustment Point' : 'Principal Ponto de Ajuste'}
               </h4>
-              <p className="text-sm text-foreground/80">{zona.principal_ponto}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(zona.principal_ponto)}</p>
             </div>
           )}
           {zona.risco_se_nao_mudar && (
@@ -1711,7 +1711,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <h4 className="font-semibold text-sm text-red-700 dark:text-red-400 mb-2">
                 ⚠️ {language === 'en' ? 'Risk if Nothing Changes' : 'Risco se Nada Mudar'}
               </h4>
-              <p className="text-sm text-foreground/80">{zona.risco_se_nao_mudar}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(zona.risco_se_nao_mudar)}</p>
             </div>
           )}
           {zona.ajuste_simples && (
@@ -1719,7 +1719,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <h4 className="font-semibold text-sm text-emerald-700 dark:text-emerald-400 mb-2">
                 ✅ {language === 'en' ? 'Simple Adjustment' : 'Ajuste Simples e Possível'}
               </h4>
-              <p className="text-sm text-foreground/80">{zona.ajuste_simples}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(zona.ajuste_simples)}</p>
             </div>
           )}
         </CardContent>
@@ -1976,9 +1976,9 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-blue-700 dark:text-blue-400 mb-2">
-                  {metaforaBarco.titulo || (language === 'en' ? 'The Boat Metaphor' : 'A Metáfora do Barco')}
+                  {renderSafeText(metaforaBarco.titulo) || (language === 'en' ? 'The Boat Metaphor' : 'A Metáfora do Barco')}
                 </h3>
-                <p className="text-foreground/80 italic">{metaforaBarco.texto || metaforaBarco.descricao}</p>
+                <p className="text-foreground/80 italic">{renderSafeText(metaforaBarco.texto ?? metaforaBarco.descricao)}</p>
               </div>
             </div>
             
@@ -1993,9 +1993,9 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                         {language === 'en' ? 'Direction Sensor' : 'Sensor de Direção'}
                       </span>
                     </div>
-                    <p className="font-medium text-sm">{papeis.sensor_direcao.nome}</p>
+                    <p className="font-medium text-sm">{renderSafeText(papeis.sensor_direcao.nome)}</p>
                     {papeis.sensor_direcao.justificativa && (
-                      <p className="text-xs text-muted-foreground mt-1">{papeis.sensor_direcao.justificativa}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{renderSafeText(papeis.sensor_direcao.justificativa)}</p>
                     )}
                   </div>
                 )}
@@ -2007,9 +2007,9 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                         {language === 'en' ? 'Course Conductor' : 'Condutor de Curso'}
                       </span>
                     </div>
-                    <p className="font-medium text-sm">{papeis.condutor_curso.nome}</p>
+                    <p className="font-medium text-sm">{renderSafeText(papeis.condutor_curso.nome)}</p>
                     {papeis.condutor_curso.justificativa && (
-                      <p className="text-xs text-muted-foreground mt-1">{papeis.condutor_curso.justificativa}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{renderSafeText(papeis.condutor_curso.justificativa)}</p>
                     )}
                   </div>
                 )}
