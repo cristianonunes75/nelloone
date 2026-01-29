@@ -984,12 +984,57 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         return <p className="text-foreground/80 whitespace-pre-line">{content}</p>;
       }
       if (Array.isArray(content)) {
+        const renderListItem = (item: any) => {
+          if (typeof item === 'string' || typeof item === 'number') {
+            return <span className="text-foreground/80">{String(item)}</span>;
+          }
+
+          // Defensive: legacy arrays sometimes contain objects; React can't render objects as children.
+          if (item && typeof item === 'object') {
+            const text =
+              item.texto ??
+              item.conteudo ??
+              item.resumo ??
+              item.titulo ??
+              item.mensagem ??
+              item.acao ??
+              item.situacao;
+
+            const origin = item.origem ?? item.origem_insight;
+
+            if (typeof text === 'string' && text.trim().length > 0) {
+              return (
+                <span className="text-foreground/80">
+                  {text}
+                  {typeof origin === 'string' && origin.trim().length > 0 && (
+                    <span className="block text-xs text-muted-foreground mt-1">{origin}</span>
+                  )}
+                </span>
+              );
+            }
+
+            // Last resort: stringify (keeps UI alive and prevents crash)
+            try {
+              return (
+                <span className="text-xs text-muted-foreground font-mono break-words">
+                  {JSON.stringify(item)}
+                </span>
+              );
+            } catch {
+              return <span className="text-xs text-muted-foreground">[objeto]</span>;
+            }
+          }
+
+          if (item == null) return null;
+          return <span className="text-foreground/80">{String(item)}</span>;
+        };
+
         return (
           <ul className="space-y-2">
             {content.map((item, i) => (
               <li key={i} className="flex items-start gap-2">
                 <span className="text-primary mt-1">•</span>
-                <span className="text-foreground/80">{item}</span>
+                {renderListItem(item)}
               </li>
             ))}
           </ul>
