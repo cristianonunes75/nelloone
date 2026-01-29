@@ -1451,9 +1451,38 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
 
   // ============== PROMPT ÚNICO v1.0: PAPÉIS NATURAIS DO CASAL ==============
   const renderPapeisNaturais = () => {
-    // Support multiple key formats: papeis_naturais, _role_assignment
+    // Support multiple key formats:
+    // - v1.0: papeis_naturais { sensor, condutor }
+    // - internal: _role_assignment { sensor, conductor }
+    // - some payloads: only dados_grafico.usuario_a/b.papel (sensor|condutor)
     const papeis = content.papeis_naturais || content._role_assignment;
-    if (!papeis) return null;
+
+    const roleFromChart = (() => {
+      const chart = content?.dados_grafico;
+      const a = chart?.usuario_a;
+      const b = chart?.usuario_b;
+      if (!a || !b) return null;
+
+      const pickName = (u: any) => u?.nome ?? u?.name;
+      const roleA = a?.papel;
+      const roleB = b?.papel;
+      const out: { sensor?: { nome?: string }; condutor?: { nome?: string } } = {};
+
+      if (roleA === 'sensor') out.sensor = { nome: pickName(a) };
+      if (roleA === 'condutor') out.condutor = { nome: pickName(a) };
+      if (roleB === 'sensor') out.sensor = { nome: pickName(b) };
+      if (roleB === 'condutor') out.condutor = { nome: pickName(b) };
+
+      // If chart uses different labels, bail out
+      if (!out.sensor && !out.condutor) return null;
+      return out;
+    })();
+
+    const sensor = papeis?.sensor || roleFromChart?.sensor;
+    const condutor = papeis?.condutor || papeis?.conductor || roleFromChart?.condutor;
+
+    // Render only if we have at least one role to show
+    if (!sensor && !condutor) return null;
 
     return (
       <Card className="bg-gradient-to-br from-purple-500/5 to-orange-500/5 border-purple-500/20">
@@ -1467,8 +1496,8 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            {/* Support both key formats: sensor from papeis_naturais OR _role_assignment */}
-            {papeis.sensor && (
+            {/* Sensor */}
+            {sensor && (
               <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xl">🧭</span>
@@ -1476,17 +1505,17 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                     {language === 'en' ? 'Direction Sensor' : 'Sensor de Direção'}
                   </span>
                 </div>
-                <p className="font-medium">{renderSafeText(papeis.sensor.nome || papeis.sensor.name)}</p>
-                {(papeis.sensor.justificativa || papeis.sensor.score !== undefined) && (
+                <p className="font-medium">{renderSafeText(sensor?.nome || sensor?.name)}</p>
+                {(sensor?.justificativa || sensor?.score !== undefined) && (
                   <p className="text-sm text-muted-foreground mt-2">
-                    {renderSafeText(papeis.sensor.justificativa) || 
-                     (papeis.sensor.score !== undefined ? `Pontuação: ${papeis.sensor.score}` : '')}
+                    {renderSafeText(sensor?.justificativa) ||
+                     (sensor?.score !== undefined ? `Pontuação: ${sensor?.score}` : '')}
                   </p>
                 )}
               </div>
             )}
-            {/* Support both key formats: condutor from papeis_naturais OR conductor from _role_assignment */}
-            {(papeis.condutor || papeis.conductor) && (
+            {/* Condutor / Construtor */}
+            {condutor && (
               <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xl">⚓</span>
@@ -1495,18 +1524,18 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                   </span>
                 </div>
                 <p className="font-medium">
-                  {renderSafeText((papeis.condutor || papeis.conductor)?.nome || (papeis.condutor || papeis.conductor)?.name)}
+                  {renderSafeText(condutor?.nome || condutor?.name)}
                 </p>
-                {((papeis.condutor || papeis.conductor)?.justificativa || (papeis.condutor || papeis.conductor)?.score !== undefined) && (
+                {(condutor?.justificativa || condutor?.score !== undefined) && (
                   <p className="text-sm text-muted-foreground mt-2">
-                    {renderSafeText((papeis.condutor || papeis.conductor)?.justificativa) || 
-                     ((papeis.condutor || papeis.conductor)?.score !== undefined ? `Pontuação: ${(papeis.condutor || papeis.conductor)?.score}` : '')}
+                    {renderSafeText(condutor?.justificativa) ||
+                     (condutor?.score !== undefined ? `Pontuação: ${condutor?.score}` : '')}
                   </p>
                 )}
               </div>
             )}
           </div>
-          {papeis.dinamica_alternancia && (
+          {papeis?.dinamica_alternancia && (
             <div className="p-3 rounded-lg bg-muted/50 border">
               <p className="text-sm text-muted-foreground italic">{renderSafeText(papeis.dinamica_alternancia)}</p>
             </div>
