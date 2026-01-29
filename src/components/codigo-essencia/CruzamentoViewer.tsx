@@ -623,12 +623,12 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent className="space-y-4">
           {santo.descricao && (
-            <p className="text-sm text-muted-foreground">{santo.descricao}</p>
+            <p className="text-sm text-muted-foreground">{renderSafeText(santo.descricao)}</p>
           )}
           {santo.areas?.map((area: any, i: number) => (
             <div key={i} className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-              <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-1">✨ {area.titulo}</h4>
-              <p className="text-sm text-foreground/80">{area.descricao}</p>
+              <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-1">✨ {renderSafeText(area.titulo)}</h4>
+              <p className="text-sm text-foreground/80">{renderSafeText(area.descricao)}</p>
             </div>
           ))}
         </CardContent>
@@ -651,17 +651,17 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent className="space-y-4">
           {bicho.descricao && (
-            <p className="text-sm text-muted-foreground">{bicho.descricao}</p>
+            <p className="text-sm text-muted-foreground">{renderSafeText(bicho.descricao)}</p>
           )}
           {bicho.atritios?.map((atrito: any, i: number) => (
             <div key={i} className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-3">
-              <h4 className="font-semibold text-amber-700 dark:text-amber-400">⚡ {atrito.titulo}</h4>
-              <p className="text-sm text-foreground/80">{atrito.descricao}</p>
+              <h4 className="font-semibold text-amber-700 dark:text-amber-400">⚡ {renderSafeText(atrito.titulo)}</h4>
+              <p className="text-sm text-foreground/80">{renderSafeText(atrito.descricao)}</p>
               {atrito.como_lidar && (
                 <div className="p-3 rounded bg-emerald-500/10 border border-emerald-500/20">
                   <p className="text-sm text-emerald-700 dark:text-emerald-400">
                     <span className="font-medium">💡 Como lidar: </span>
-                    {atrito.como_lidar}
+                    {renderSafeText(atrito.como_lidar)}
                   </p>
                 </div>
               )}
@@ -700,7 +700,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent className="space-y-4">
           {protocolo.descricao && (
-            <p className="text-sm text-muted-foreground italic">{protocolo.descricao}</p>
+            <p className="text-sm text-muted-foreground italic">{renderSafeText(protocolo.descricao)}</p>
           )}
           {protocolo.regras?.map((regra: any, i: number) => (
             <div key={i} className="p-4 rounded-lg bg-muted/50 border space-y-2">
@@ -708,10 +708,10 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                 <span className="w-7 h-7 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-sm">
                   {regra.numero || i + 1}
                 </span>
-                <h4 className="font-semibold text-foreground">{regra.regra}</h4>
+                <h4 className="font-semibold text-foreground">{renderSafeText(regra.regra)}</h4>
               </div>
               {regra.porque && (
-                <p className="text-sm text-muted-foreground pl-9">{t.peaceProtocol.why}: {regra.porque}</p>
+                <p className="text-sm text-muted-foreground pl-9">{t.peaceProtocol.why}: {renderSafeText(regra.porque)}</p>
               )}
             </div>
           ))}
@@ -737,11 +737,11 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           {encontro.metafora && (
             <div className="text-center py-4 border-b border-primary/10">
               <p className="text-2xl font-bold bg-gradient-to-r from-primary via-pink-500 to-purple-500 bg-clip-text text-transparent">
-                ✨ {encontro.metafora} ✨
+                ✨ {renderSafeText(encontro.metafora)} ✨
               </p>
             </div>
           )}
-          <p className="text-foreground/80 whitespace-pre-line leading-relaxed">{encontro.descricao}</p>
+          <p className="text-foreground/80 whitespace-pre-line leading-relaxed">{renderSafeText(encontro.descricao)}</p>
         </CardContent>
       </Card>
     );
@@ -761,13 +761,13 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-foreground/80 whitespace-pre-line">{pot.descricao}</p>
+          <p className="text-foreground/80 whitespace-pre-line">{renderSafeText(pot.descricao)}</p>
           {pot.forcas && (
             <ul className="space-y-2 mt-4">
               {asArray<string>(pot.forcas).map((forca: string, i: number) => (
                 <li key={i} className="flex items-start gap-2">
                   <Heart className="w-4 h-4 mt-1 text-pink-500" />
-                  <span className="text-foreground/80">{forca}</span>
+                  <span className="text-foreground/80">{renderSafeText(forca)}</span>
                 </li>
               ))}
             </ul>
@@ -894,7 +894,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <div className="flex flex-wrap gap-2">
                 {asArray<string>(manual.palavras_desarmam).map((palavra: string, i: number) => (
                   <span key={i} className="px-3 py-1 bg-emerald-500/20 rounded-full text-sm text-emerald-700 dark:text-emerald-300">
-                    "{palavra}"
+                    "{renderSafeText(palavra)}"
                   </span>
                 ))}
               </div>
@@ -920,7 +920,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent className="space-y-4">
           {alertas.descricao && (
-            <p className="text-sm text-muted-foreground">{alertas.descricao}</p>
+            <p className="text-sm text-muted-foreground">{renderSafeText(alertas.descricao)}</p>
           )}
           {alertas.gatilhos?.map((gatilho: any, i: number) => (
             <div key={i} className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-2">
@@ -958,7 +958,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent>
           {desafio.descricao && (
-            <p className="text-sm text-muted-foreground mb-3">{desafio.descricao}</p>
+            <p className="text-sm text-muted-foreground mb-3">{renderSafeText(desafio.descricao)}</p>
           )}
           <div className="p-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30">
             <p className="font-medium text-emerald-700 dark:text-emerald-300">{renderSafeText(desafio.acao)}</p>
@@ -983,7 +983,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent className="space-y-3">
           {ajuda.descricao && (
-            <p className="text-sm font-medium text-blue-600 dark:text-blue-400">{ajuda.descricao}</p>
+            <p className="text-sm font-medium text-blue-600 dark:text-blue-400">{renderSafeText(ajuda.descricao)}</p>
           )}
           <ul className="space-y-2">
             {ajuda.sugestoes?.map((sugestao: any, i: number) => (
@@ -1142,36 +1142,36 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           <div className="grid gap-4 md:grid-cols-2">
             {tempA && (
               <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
-                <p className="font-semibold text-sm mb-1">{tempA.nome}</p>
+                <p className="font-semibold text-sm mb-1">{renderSafeText(tempA.nome)}</p>
                 <p className="text-lg font-medium text-orange-700 dark:text-orange-400">
-                  {tempA.temperamento_primario}
-                  {tempA.temperamento_secundario && ` / ${tempA.temperamento_secundario}`}
+                  {renderSafeText(tempA.temperamento_primario)}
+                  {tempA.temperamento_secundario && ` / ${renderSafeText(tempA.temperamento_secundario)}`}
                 </p>
                 {tempA.caracteristicas && (
-                  <p className="text-sm text-muted-foreground mt-2">{tempA.caracteristicas}</p>
+                  <p className="text-sm text-muted-foreground mt-2">{renderSafeText(tempA.caracteristicas)}</p>
                 )}
               </div>
             )}
             {tempB && (
               <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                <p className="font-semibold text-sm mb-1">{tempB.nome}</p>
+                <p className="font-semibold text-sm mb-1">{renderSafeText(tempB.nome)}</p>
                 <p className="text-lg font-medium text-amber-700 dark:text-amber-400">
-                  {tempB.temperamento_primario}
-                  {tempB.temperamento_secundario && ` / ${tempB.temperamento_secundario}`}
+                  {renderSafeText(tempB.temperamento_primario)}
+                  {tempB.temperamento_secundario && ` / ${renderSafeText(tempB.temperamento_secundario)}`}
                 </p>
                 {tempB.caracteristicas && (
-                  <p className="text-sm text-muted-foreground mt-2">{tempB.caracteristicas}</p>
+                  <p className="text-sm text-muted-foreground mt-2">{renderSafeText(tempB.caracteristicas)}</p>
                 )}
               </div>
             )}
           </div>
           {ritmos.sinergia && (
             <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-              <p className="text-sm text-emerald-700 dark:text-emerald-400">{ritmos.sinergia}</p>
+              <p className="text-sm text-emerald-700 dark:text-emerald-400">{renderSafeText(ritmos.sinergia)}</p>
             </div>
           )}
           {ritmos.ajuste_pratico && (
-            <p className="text-sm text-muted-foreground italic">{ritmos.ajuste_pratico}</p>
+            <p className="text-sm text-muted-foreground italic">{renderSafeText(ritmos.ajuste_pratico)}</p>
           )}
         </CardContent>
       </Card>
@@ -1197,38 +1197,38 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           <div className="grid gap-4 md:grid-cols-2">
             {talentos.talentos_a && (
               <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                <p className="font-semibold text-sm mb-2">{talentos.talentos_a.nome}</p>
+                <p className="font-semibold text-sm mb-2">{renderSafeText(talentos.talentos_a.nome)}</p>
                 <div className="flex flex-wrap gap-1">
                   {asArray<string>(talentos.talentos_a.top_3).map((talent: string, i: number) => (
                     <span key={i} className="px-2 py-1 bg-blue-500/20 rounded text-xs text-blue-700 dark:text-blue-300">
-                      {talent}
+                      {renderSafeText(talent)}
                     </span>
                   ))}
                 </div>
                 {talentos.talentos_a.contribuicao && (
-                  <p className="text-xs text-muted-foreground mt-2">{talentos.talentos_a.contribuicao}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{renderSafeText(talentos.talentos_a.contribuicao)}</p>
                 )}
               </div>
             )}
             {talentos.talentos_b && (
               <div className="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
-                <p className="font-semibold text-sm mb-2">{talentos.talentos_b.nome}</p>
+                <p className="font-semibold text-sm mb-2">{renderSafeText(talentos.talentos_b.nome)}</p>
                 <div className="flex flex-wrap gap-1">
                   {asArray<string>(talentos.talentos_b.top_3).map((talent: string, i: number) => (
                     <span key={i} className="px-2 py-1 bg-indigo-500/20 rounded text-xs text-indigo-700 dark:text-indigo-300">
-                      {talent}
+                      {renderSafeText(talent)}
                     </span>
                   ))}
                 </div>
                 {talentos.talentos_b.contribuicao && (
-                  <p className="text-xs text-muted-foreground mt-2">{talentos.talentos_b.contribuicao}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{renderSafeText(talentos.talentos_b.contribuicao)}</p>
                 )}
               </div>
             )}
           </div>
           {talentos.complementaridade && (
             <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-              <p className="text-sm text-emerald-700 dark:text-emerald-400">{talentos.complementaridade}</p>
+              <p className="text-sm text-emerald-700 dark:text-emerald-400">{renderSafeText(talentos.complementaridade)}</p>
             </div>
           )}
         </CardContent>
@@ -1258,36 +1258,36 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           <div className="grid gap-4 md:grid-cols-2">
             {archA && (
               <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                <p className="font-semibold text-sm mb-1">{archA.nome}</p>
+                <p className="font-semibold text-sm mb-1">{renderSafeText(archA.nome)}</p>
                 <p className="text-lg font-medium text-purple-700 dark:text-purple-400">
-                  {archA.primario || archA.arquetipos}
-                  {archA.secundario && ` / ${archA.secundario}`}
+                  {renderSafeText(archA.primario || archA.arquetipos)}
+                  {archA.secundario && ` / ${renderSafeText(archA.secundario)}`}
                 </p>
                 {archA.papel_no_casal && (
-                  <p className="text-xs text-muted-foreground mt-2">{archA.papel_no_casal}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{renderSafeText(archA.papel_no_casal)}</p>
                 )}
               </div>
             )}
             {archB && (
               <div className="p-4 rounded-lg bg-pink-500/10 border border-pink-500/20">
-                <p className="font-semibold text-sm mb-1">{archB.nome}</p>
+                <p className="font-semibold text-sm mb-1">{renderSafeText(archB.nome)}</p>
                 <p className="text-lg font-medium text-pink-700 dark:text-pink-400">
-                  {archB.primario || archB.arquetipos}
-                  {archB.secundario && ` / ${archB.secundario}`}
+                  {renderSafeText(archB.primario || archB.arquetipos)}
+                  {archB.secundario && ` / ${renderSafeText(archB.secundario)}`}
                 </p>
                 {archB.papel_no_casal && (
-                  <p className="text-xs text-muted-foreground mt-2">{archB.papel_no_casal}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{renderSafeText(archB.papel_no_casal)}</p>
                 )}
               </div>
             )}
           </div>
           {arquetipos.mito_conjunto && (
             <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-              <p className="text-sm text-emerald-700 dark:text-emerald-400">{arquetipos.mito_conjunto}</p>
+              <p className="text-sm text-emerald-700 dark:text-emerald-400">{renderSafeText(arquetipos.mito_conjunto)}</p>
             </div>
           )}
           {arquetipos.dinamica_luz_sombra && (
-            <p className="text-sm text-muted-foreground italic">{arquetipos.dinamica_luz_sombra}</p>
+            <p className="text-sm text-muted-foreground italic">{renderSafeText(arquetipos.dinamica_luz_sombra)}</p>
           )}
         </CardContent>
       </Card>
@@ -1313,25 +1313,25 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           <div className="grid gap-4 md:grid-cols-2">
             {linguagens.linguagem_a && (
               <div className="p-4 rounded-lg bg-pink-500/10 border border-pink-500/20">
-                <p className="font-semibold text-sm mb-1">{linguagens.linguagem_a.nome}</p>
+                <p className="font-semibold text-sm mb-1">{renderSafeText(linguagens.linguagem_a.nome)}</p>
                 <p className="text-lg font-medium text-pink-700 dark:text-pink-400">
-                  {linguagens.linguagem_a.estilo_primario}
-                  {linguagens.linguagem_a.estilo_secundario && ` / ${linguagens.linguagem_a.estilo_secundario}`}
+                  {renderSafeText(linguagens.linguagem_a.estilo_primario)}
+                  {linguagens.linguagem_a.estilo_secundario && ` / ${renderSafeText(linguagens.linguagem_a.estilo_secundario)}`}
                 </p>
                 {linguagens.linguagem_a.como_se_sente_amado && (
-                  <p className="text-xs text-muted-foreground mt-2">{linguagens.linguagem_a.como_se_sente_amado}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{renderSafeText(linguagens.linguagem_a.como_se_sente_amado)}</p>
                 )}
               </div>
             )}
             {linguagens.linguagem_b && (
               <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/20">
-                <p className="font-semibold text-sm mb-1">{linguagens.linguagem_b.nome}</p>
+                <p className="font-semibold text-sm mb-1">{renderSafeText(linguagens.linguagem_b.nome)}</p>
                 <p className="text-lg font-medium text-rose-700 dark:text-rose-400">
-                  {linguagens.linguagem_b.estilo_primario}
-                  {linguagens.linguagem_b.estilo_secundario && ` / ${linguagens.linguagem_b.estilo_secundario}`}
+                  {renderSafeText(linguagens.linguagem_b.estilo_primario)}
+                  {linguagens.linguagem_b.estilo_secundario && ` / ${renderSafeText(linguagens.linguagem_b.estilo_secundario)}`}
                 </p>
                 {linguagens.linguagem_b.como_se_sente_amado && (
-                  <p className="text-xs text-muted-foreground mt-2">{linguagens.linguagem_b.como_se_sente_amado}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{renderSafeText(linguagens.linguagem_b.como_se_sente_amado)}</p>
                 )}
               </div>
             )}
@@ -1345,7 +1345,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                 {asArray<string>(linguagens.micro_acordos).map((acordo: string, i: number) => (
                   <li key={i} className="text-sm flex items-start gap-2">
                     <Check className="w-4 h-4 mt-0.5 text-emerald-500" />
-                    <span>{acordo}</span>
+                    <span>{renderSafeText(acordo)}</span>
                   </li>
                 ))}
               </ul>
@@ -1375,39 +1375,39 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           <div className="grid gap-4 md:grid-cols-2">
             {decisao.tipo_a && (
               <div className="p-4 rounded-lg bg-teal-500/10 border border-teal-500/20">
-                <p className="font-semibold text-sm mb-1">{decisao.tipo_a.nome}</p>
+                <p className="font-semibold text-sm mb-1">{renderSafeText(decisao.tipo_a.nome)}</p>
                 {decisao.tipo_a.tipo_nello16 && (
                   <p className="text-xl font-bold text-teal-700 dark:text-teal-400 tracking-wider">
-                    {decisao.tipo_a.tipo_nello16}
+                    {renderSafeText(decisao.tipo_a.tipo_nello16)}
                   </p>
                 )}
                 {decisao.tipo_a.como_decide && (
-                  <p className="text-xs text-muted-foreground mt-2">{decisao.tipo_a.como_decide}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{renderSafeText(decisao.tipo_a.como_decide)}</p>
                 )}
               </div>
             )}
             {decisao.tipo_b && (
               <div className="p-4 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
-                <p className="font-semibold text-sm mb-1">{decisao.tipo_b.nome}</p>
+                <p className="font-semibold text-sm mb-1">{renderSafeText(decisao.tipo_b.nome)}</p>
                 {decisao.tipo_b.tipo_nello16 && (
                   <p className="text-xl font-bold text-cyan-700 dark:text-cyan-400 tracking-wider">
-                    {decisao.tipo_b.tipo_nello16}
+                    {renderSafeText(decisao.tipo_b.tipo_nello16)}
                   </p>
                 )}
                 {decisao.tipo_b.como_decide && (
-                  <p className="text-xs text-muted-foreground mt-2">{decisao.tipo_b.como_decide}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{renderSafeText(decisao.tipo_b.como_decide)}</p>
                 )}
               </div>
             )}
           </div>
           {decisao.tensao_potencial && (
             <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-              <p className="text-sm text-amber-700 dark:text-amber-400">⚠️ {decisao.tensao_potencial}</p>
+              <p className="text-sm text-amber-700 dark:text-amber-400">⚠️ {renderSafeText(decisao.tensao_potencial)}</p>
             </div>
           )}
           {decisao.sinergia && (
             <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-              <p className="text-sm text-emerald-700 dark:text-emerald-400">✨ {decisao.sinergia}</p>
+              <p className="text-sm text-emerald-700 dark:text-emerald-400">✨ {renderSafeText(decisao.sinergia)}</p>
             </div>
           )}
         </CardContent>
@@ -1434,15 +1434,15 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           {visao.metafora && (
             <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20 text-center">
               <p className="text-lg font-semibold text-blue-700 dark:text-blue-400 italic">
-                ✨ {visao.metafora} ✨
+                ✨ {renderSafeText(visao.metafora)} ✨
               </p>
             </div>
           )}
           {visao.descricao && (
-            <p className="text-foreground/80 whitespace-pre-line leading-relaxed">{visao.descricao}</p>
+            <p className="text-foreground/80 whitespace-pre-line leading-relaxed">{renderSafeText(visao.descricao)}</p>
           )}
           {visao.funcionamento_sistema && (
-            <p className="text-sm text-muted-foreground">{visao.funcionamento_sistema}</p>
+            <p className="text-sm text-muted-foreground">{renderSafeText(visao.funcionamento_sistema)}</p>
           )}
         </CardContent>
       </Card>
@@ -1526,7 +1526,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <h4 className="font-semibold text-pink-700 dark:text-pink-400 mb-2 flex items-center gap-2">
                 ❤️ {language === 'en' ? 'Emotional' : 'Emocionais'}
               </h4>
-              <p className="text-sm text-foreground/80">{forcas.forcas_emocionais}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(forcas.forcas_emocionais)}</p>
             </div>
           )}
           {forcas.forcas_praticas && (
@@ -1534,7 +1534,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-2 flex items-center gap-2">
                 🛠️ {language === 'en' ? 'Practical' : 'Práticas'}
               </h4>
-              <p className="text-sm text-foreground/80">{forcas.forcas_praticas}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(forcas.forcas_praticas)}</p>
             </div>
           )}
           {forcas.visao_proposito && (
@@ -1542,7 +1542,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <h4 className="font-semibold text-purple-700 dark:text-purple-400 mb-2 flex items-center gap-2">
                 🎯 {language === 'en' ? 'Vision & Purpose' : 'Visão e Propósito'}
               </h4>
-              <p className="text-sm text-foreground/80">{forcas.visao_proposito}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(forcas.visao_proposito)}</p>
             </div>
           )}
           {forcas.valores_espiritualidade && (
@@ -1550,11 +1550,11 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <h4 className="font-semibold text-amber-700 dark:text-amber-400 mb-2 flex items-center gap-2">
                 ✨ {language === 'en' ? 'Values & Spirituality' : 'Valores e Espiritualidade'}
               </h4>
-              <p className="text-sm text-foreground/80">{forcas.valores_espiritualidade}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(forcas.valores_espiritualidade)}</p>
             </div>
           )}
           {forcas.como_aparecem_dia_a_dia && (
-            <p className="text-sm text-muted-foreground italic mt-2">{forcas.como_aparecem_dia_a_dia}</p>
+            <p className="text-sm text-muted-foreground italic mt-2">{renderSafeText(forcas.como_aparecem_dia_a_dia)}</p>
           )}
         </CardContent>
       </Card>
@@ -1577,7 +1577,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           </div>
           {amor.mensagem_chave && (
             <p className="text-sm font-medium text-pink-700 dark:text-pink-400 italic mt-1">
-              "{amor.mensagem_chave}"
+              "{renderSafeText(amor.mensagem_chave)}"
             </p>
           )}
         </CardHeader>
@@ -1586,16 +1586,16 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           <div className="grid gap-4 md:grid-cols-2">
             {amor.como_expressa_amor_a && (
               <div className="p-4 rounded-lg bg-pink-500/10 border border-pink-500/20">
-                <p className="font-semibold text-sm mb-2">{amor.como_expressa_amor_a.nome}</p>
+                <p className="font-semibold text-sm mb-2">{renderSafeText(amor.como_expressa_amor_a.nome)}</p>
                 <p className="text-xs text-muted-foreground mb-1">{language === 'en' ? 'Expresses love through:' : 'Expressa amor através de:'}</p>
-                <p className="text-sm text-foreground/80">{amor.como_expressa_amor_a.forma_expressao}</p>
+                <p className="text-sm text-foreground/80">{renderSafeText(amor.como_expressa_amor_a.forma_expressao)}</p>
               </div>
             )}
             {amor.como_expressa_amor_b && (
               <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/20">
-                <p className="font-semibold text-sm mb-2">{amor.como_expressa_amor_b.nome}</p>
+                <p className="font-semibold text-sm mb-2">{renderSafeText(amor.como_expressa_amor_b.nome)}</p>
                 <p className="text-xs text-muted-foreground mb-1">{language === 'en' ? 'Expresses love through:' : 'Expressa amor através de:'}</p>
-                <p className="text-sm text-foreground/80">{amor.como_expressa_amor_b.forma_expressao}</p>
+                <p className="text-sm text-foreground/80">{renderSafeText(amor.como_expressa_amor_b.forma_expressao)}</p>
               </div>
             )}
           </div>
@@ -1605,10 +1605,10 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <div className="p-4 rounded-lg bg-muted/50 border space-y-3">
               <h4 className="font-semibold text-sm">{language === 'en' ? 'How Each Feels Loved' : 'Como Cada Um Se Sente Amado'}</h4>
               {amor.como_se_sente_amado_a && (
-                <p className="text-sm text-foreground/80">💜 {amor.como_se_sente_amado_a}</p>
+                <p className="text-sm text-foreground/80">💜 {renderSafeText(amor.como_se_sente_amado_a)}</p>
               )}
               {amor.como_se_sente_amado_b && (
-                <p className="text-sm text-foreground/80">🧡 {amor.como_se_sente_amado_b}</p>
+                <p className="text-sm text-foreground/80">🧡 {renderSafeText(amor.como_se_sente_amado_b)}</p>
               )}
             </div>
           )}
@@ -1619,7 +1619,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <h4 className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-2">
                 ⚠️ {language === 'en' ? 'Where Love Gets Lost' : 'Onde o Amor se Perde'}
               </h4>
-              <p className="text-sm text-foreground/80">{amor.onde_amor_se_perde}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(amor.onde_amor_se_perde)}</p>
             </div>
           )}
 
@@ -1629,7 +1629,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <h4 className="font-semibold text-sm text-emerald-700 dark:text-emerald-400 mb-2">
                 💡 {language === 'en' ? 'How to Reactivate Love' : 'Como Reativar o Amor'}
               </h4>
-              <p className="text-sm text-foreground/80">{amor.como_reativar}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(amor.como_reativar)}</p>
             </div>
           )}
         </CardContent>
@@ -1658,7 +1658,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <h4 className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-2">
                 {language === 'en' ? 'Where Tensions Arise' : 'Onde Surgem os Atritos'}
               </h4>
-              <p className="text-sm text-foreground/80">{tensoes.onde_surgem}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(tensoes.onde_surgem)}</p>
             </div>
           )}
           {tensoes.porque_surgem && (
@@ -1666,7 +1666,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <h4 className="font-semibold text-sm mb-2">
                 {language === 'en' ? 'Why They Happen' : 'Por Que Surgem'}
               </h4>
-              <p className="text-sm text-foreground/80">{tensoes.porque_surgem}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(tensoes.porque_surgem)}</p>
             </div>
           )}
           {tensoes.o_que_cada_um_sente && (
@@ -1674,7 +1674,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <h4 className="font-semibold text-sm text-blue-700 dark:text-blue-400 mb-2">
                 {language === 'en' ? 'What Each One Feels' : 'O Que Cada Um Sente'}
               </h4>
-              <p className="text-sm text-foreground/80">{tensoes.o_que_cada_um_sente}</p>
+              <p className="text-sm text-foreground/80">{renderSafeText(tensoes.o_que_cada_um_sente)}</p>
             </div>
           )}
         </CardContent>
@@ -1756,8 +1756,8 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <div className="flex items-start gap-3">
                 <span className="text-lg">{regra.icon}</span>
                 <div>
-                  <p className="font-semibold text-sm text-indigo-700 dark:text-indigo-400">{regra.label}</p>
-                  <p className="text-sm text-foreground/80">{regra.value}</p>
+                  <p className="font-semibold text-sm text-indigo-700 dark:text-indigo-400">{renderSafeText(regra.label)}</p>
+                  <p className="text-sm text-foreground/80">{renderSafeText(regra.value)}</p>
                 </div>
               </div>
             </div>
@@ -1791,11 +1791,11 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                 <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold flex items-center justify-center text-xs flex-shrink-0">
                   {i + 1}
                 </span>
-                <p className="text-sm text-foreground/90">{orientacao}</p>
+                <p className="text-sm text-foreground/90">{renderSafeText(orientacao)}</p>
               </div>
             ))
           ) : (
-            <p className="text-sm text-foreground/80">{typeof traducao === 'string' ? traducao : traducao.descricao}</p>
+            <p className="text-sm text-foreground/80">{renderSafeText(typeof traducao === 'string' ? traducao : traducao.descricao)}</p>
           )}
         </CardContent>
       </Card>
@@ -1822,32 +1822,32 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             {sintese.tipo_casal && (
               <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
                 <p className="text-xs text-muted-foreground">{language === 'en' ? 'Couple Type' : 'Tipo de Casal'}</p>
-                <p className="font-semibold text-foreground">{sintese.tipo_casal}</p>
+                <p className="font-semibold text-foreground">{renderSafeText(sintese.tipo_casal)}</p>
               </div>
             )}
             {sintese.forma_amar && (
               <div className="p-3 rounded-lg bg-pink-500/10 border border-pink-500/20">
                 <p className="text-xs text-muted-foreground">{language === 'en' ? 'Way of Loving' : 'Forma de Amar'}</p>
-                <p className="font-semibold text-foreground">{sintese.forma_amar}</p>
+                <p className="font-semibold text-foreground">{renderSafeText(sintese.forma_amar)}</p>
               </div>
             )}
             {sintese.forca_principal && (
               <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                 <p className="text-xs text-muted-foreground">{language === 'en' ? 'Main Strength' : 'Força Principal'}</p>
-                <p className="font-semibold text-emerald-700 dark:text-emerald-400">{sintese.forca_principal}</p>
+                <p className="font-semibold text-emerald-700 dark:text-emerald-400">{renderSafeText(sintese.forca_principal)}</p>
               </div>
             )}
             {sintese.risco_principal && (
               <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
                 <p className="text-xs text-muted-foreground">{language === 'en' ? 'Main Risk' : 'Risco Principal'}</p>
-                <p className="font-semibold text-amber-700 dark:text-amber-400">{sintese.risco_principal}</p>
+                <p className="font-semibold text-amber-700 dark:text-amber-400">{renderSafeText(sintese.risco_principal)}</p>
               </div>
             )}
           </div>
           {sintese.antidoto_pratico && (
             <div className="mt-4 p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
               <p className="text-xs text-muted-foreground mb-1">{language === 'en' ? 'Practical Antidote' : 'Antídoto Prático'}</p>
-              <p className="font-medium text-indigo-700 dark:text-indigo-400">{sintese.antidoto_pratico}</p>
+              <p className="font-medium text-indigo-700 dark:text-indigo-400">{renderSafeText(sintese.antidoto_pratico)}</p>
             </div>
           )}
         </CardContent>
@@ -1878,11 +1878,11 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         <div className={`p-4 rounded-lg ${colorClass} border space-y-3`}>
           <h4 className="font-semibold text-sm flex items-center gap-2">
             <span>{icon}</span>
-            {cenario.titulo}
+            {renderSafeText(cenario.titulo)}
           </h4>
           
           {cenario.como_funciona && (
-            <p className="text-sm text-foreground/80">{cenario.como_funciona}</p>
+            <p className="text-sm text-foreground/80">{renderSafeText(cenario.como_funciona)}</p>
           )}
           
           <div className="grid gap-3 md:grid-cols-2">
@@ -1891,7 +1891,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                 <p className="text-xs font-medium text-purple-700 dark:text-purple-400 mb-1">
                   🧭 Papel do Sensor
                 </p>
-                <p className="text-sm text-foreground/80">{cenario.papel_sensor}</p>
+                <p className="text-sm text-foreground/80">{renderSafeText(cenario.papel_sensor)}</p>
               </div>
             )}
             {cenario.papel_condutor && (
@@ -1899,7 +1899,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                 <p className="text-xs font-medium text-orange-700 dark:text-orange-400 mb-1">
                   ⚓ Papel do Condutor
                 </p>
-                <p className="text-sm text-foreground/80">{cenario.papel_condutor}</p>
+                <p className="text-sm text-foreground/80">{renderSafeText(cenario.papel_condutor)}</p>
               </div>
             )}
           </div>
@@ -1915,7 +1915,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-1">
                 💡 {language === 'en' ? 'Practical Example' : 'Exemplo Prático'}
               </p>
-              <p className="text-sm text-foreground/80 italic">{cenario.exemplo_pratico}</p>
+              <p className="text-sm text-foreground/80 italic">{renderSafeText(cenario.exemplo_pratico)}</p>
             </div>
           )}
         </div>
@@ -1953,8 +1953,8 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     return (
       <Card className="bg-gradient-to-br from-primary/10 to-pink-500/10 border-primary/30">
         <CardContent className="pt-6 text-center">
-          <h3 className="font-semibold mb-2">{cta.titulo || t.sections.cta_ativacao}</h3>
-          <p className="text-sm text-muted-foreground">{cta.descricao}</p>
+          <h3 className="font-semibold mb-2">{renderSafeText(cta.titulo) || t.sections.cta_ativacao}</h3>
+          <p className="text-sm text-muted-foreground">{renderSafeText(cta.descricao)}</p>
         </CardContent>
       </Card>
     );
@@ -2072,7 +2072,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent className="space-y-3">
           {zona.descricao && (
-            <p className="text-sm text-muted-foreground">{zona.descricao}</p>
+            <p className="text-sm text-muted-foreground">{renderSafeText(zona.descricao)}</p>
           )}
           {zona.valores_compartilhados && (
             <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
@@ -2083,7 +2083,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                 {asArray<string>(zona.valores_compartilhados).map((valor: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <Check className="w-4 h-4 mt-0.5 text-emerald-500" />
-                    <span>{valor}</span>
+                    <span>{renderSafeText(valor)}</span>
                   </li>
                 ))}
               </ul>
@@ -2094,7 +2094,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <h4 className="font-medium text-emerald-700 dark:text-emerald-400 mb-1 text-sm">
                 {language === 'en' ? 'Common Purpose' : 'Propósito Comum'}
               </h4>
-              <p className="text-sm">{zona.proposito_comum}</p>
+              <p className="text-sm">{renderSafeText(zona.proposito_comum)}</p>
             </div>
           )}
         </CardContent>
@@ -2119,18 +2119,18 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent className="space-y-3">
           {zona.descricao && (
-            <p className="text-sm text-muted-foreground">{zona.descricao}</p>
+            <p className="text-sm text-muted-foreground">{renderSafeText(zona.descricao)}</p>
           )}
           {asArray<any>(zona.diferencas).map((diff: any, i: number) => (
             <div key={i} className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-2">
               {/* Support for both old (aspecto/descricao) and new (pessoa_a_faz/pessoa_b_faz/micro_acordo) formats */}
               {diff.aspecto && (
                 <h4 className="font-medium text-amber-700 dark:text-amber-400 mb-1 text-sm">
-                  ⚡ {diff.aspecto}
+                  ⚡ {renderSafeText(diff.aspecto)}
                 </h4>
               )}
               {diff.descricao && (
-                <p className="text-sm">{diff.descricao}</p>
+                <p className="text-sm">{renderSafeText(diff.descricao)}</p>
               )}
               {/* New Identity v2.0 format */}
               {diff.pessoa_a_faz && (
@@ -2138,7 +2138,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                   <strong className="text-amber-700 dark:text-amber-400">
                     {language === 'en' ? 'Person A tends to:' : 'Pessoa A tende a:'}
                   </strong>
-                  <p className="text-foreground/80 mt-1">{diff.pessoa_a_faz}</p>
+                  <p className="text-foreground/80 mt-1">{renderSafeText(diff.pessoa_a_faz)}</p>
                 </div>
               )}
               {diff.pessoa_b_faz && (
@@ -2146,7 +2146,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                   <strong className="text-amber-700 dark:text-amber-400">
                     {language === 'en' ? 'Person B tends to:' : 'Pessoa B tende a:'}
                   </strong>
-                  <p className="text-foreground/80 mt-1">{diff.pessoa_b_faz}</p>
+                  <p className="text-foreground/80 mt-1">{renderSafeText(diff.pessoa_b_faz)}</p>
                 </div>
               )}
               {diff.micro_acordo && (
@@ -2154,7 +2154,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                   <strong className="text-xs text-emerald-700 dark:text-emerald-400">
                     💡 {language === 'en' ? 'Micro-agreement:' : 'Micro-acordo:'}
                   </strong>
-                  <p className="text-sm text-foreground/80 mt-1">{diff.micro_acordo}</p>
+                  <p className="text-sm text-foreground/80 mt-1">{renderSafeText(diff.micro_acordo)}</p>
                 </div>
               )}
             </div>
@@ -2181,7 +2181,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent className="space-y-4">
           {zona.descricao && (
-            <p className="text-sm text-muted-foreground italic">{zona.descricao}</p>
+            <p className="text-sm text-muted-foreground italic">{renderSafeText(zona.descricao)}</p>
           )}
           
           {/* Shadow Cycle */}
@@ -2193,26 +2193,26 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               </h4>
               {/* Handle object format with gatilho, reacao_sensor, etc. */}
               {typeof zona.ciclo_sombra === 'string' ? (
-                <p className="text-sm">{zona.ciclo_sombra}</p>
+                <p className="text-sm">{renderSafeText(zona.ciclo_sombra)}</p>
               ) : (
                 <div className="space-y-2 text-sm">
                   {zona.ciclo_sombra?.gatilho && (
-                    <p><strong>{language === 'en' ? 'Trigger:' : 'Gatilho:'}</strong> {zona.ciclo_sombra.gatilho}</p>
+                    <p><strong>{language === 'en' ? 'Trigger:' : 'Gatilho:'}</strong> {renderSafeText(zona.ciclo_sombra.gatilho)}</p>
                   )}
                   {zona.ciclo_sombra?.reacao_sensor && (
-                    <p><strong>{language === 'en' ? 'Sensor reaction:' : 'Reação do Sensor:'}</strong> {zona.ciclo_sombra.reacao_sensor}</p>
+                    <p><strong>{language === 'en' ? 'Sensor reaction:' : 'Reação do Sensor:'}</strong> {renderSafeText(zona.ciclo_sombra.reacao_sensor)}</p>
                   )}
                   {zona.ciclo_sombra?.interpretacao_condutor && (
-                    <p><strong>{language === 'en' ? 'Conductor interpretation:' : 'Interpretação do Condutor:'}</strong> {zona.ciclo_sombra.interpretacao_condutor}</p>
+                    <p><strong>{language === 'en' ? 'Conductor interpretation:' : 'Interpretação do Condutor:'}</strong> {renderSafeText(zona.ciclo_sombra.interpretacao_condutor)}</p>
                   )}
                   {zona.ciclo_sombra?.reacao_condutor && (
-                    <p><strong>{language === 'en' ? 'Conductor reaction:' : 'Reação do Condutor:'}</strong> {zona.ciclo_sombra.reacao_condutor}</p>
+                    <p><strong>{language === 'en' ? 'Conductor reaction:' : 'Reação do Condutor:'}</strong> {renderSafeText(zona.ciclo_sombra.reacao_condutor)}</p>
                   )}
                   {zona.ciclo_sombra?.interpretacao_sensor && (
-                    <p><strong>{language === 'en' ? 'Sensor interpretation:' : 'Interpretação do Sensor:'}</strong> {zona.ciclo_sombra.interpretacao_sensor}</p>
+                    <p><strong>{language === 'en' ? 'Sensor interpretation:' : 'Interpretação do Sensor:'}</strong> {renderSafeText(zona.ciclo_sombra.interpretacao_sensor)}</p>
                   )}
                   {zona.ciclo_sombra?.retroalimentacao && (
-                    <p className="text-muted-foreground italic">{zona.ciclo_sombra.retroalimentacao}</p>
+                    <p className="text-muted-foreground italic">{renderSafeText(zona.ciclo_sombra.retroalimentacao)}</p>
                   )}
                 </div>
               )}
