@@ -3869,11 +3869,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin_user: { Args: { _user_id: string }; Returns: boolean }
       is_company_admin: {
         Args: { check_company_id: string; check_user_id: string }
         Returns: boolean
       }
       is_nello_admin: { Args: { check_user_id: string }; Returns: boolean }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       log_audit: {
         Args: {
           p_action: string
