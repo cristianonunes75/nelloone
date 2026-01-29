@@ -516,14 +516,16 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xl">🟢</span>
-                <h4 className="font-semibold text-emerald-700 dark:text-emerald-400">{semaforo.verde?.titulo || t.trafficLight.verde}</h4>
+                <h4 className="font-semibold text-emerald-700 dark:text-emerald-400">
+                  {renderSafeText(semaforo.verde?.titulo) || t.trafficLight.verde}
+                </h4>
               </div>
-              <p className="text-sm text-muted-foreground mb-3">{semaforo.verde?.descricao}</p>
+              <p className="text-sm text-muted-foreground mb-3">{renderSafeText(semaforo.verde?.descricao)}</p>
               <ul className="space-y-1">
-                {asArray<string>(semaforo.verde?.pontos).map((ponto: string, i: number) => (
+                {asArray<any>(semaforo.verde?.pontos).map((ponto: any, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <Check className="w-4 h-4 mt-0.5 text-emerald-500" />
-                    <span>{ponto}</span>
+                    <span>{renderSafeText(ponto)}</span>
                   </li>
                 ))}
               </ul>
@@ -535,14 +537,16 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xl">🟡</span>
-                <h4 className="font-semibold text-amber-700 dark:text-amber-400">{semaforo.amarelo?.titulo || t.trafficLight.amarelo}</h4>
+                <h4 className="font-semibold text-amber-700 dark:text-amber-400">
+                  {renderSafeText(semaforo.amarelo?.titulo) || t.trafficLight.amarelo}
+                </h4>
               </div>
-              <p className="text-sm text-muted-foreground mb-3">{semaforo.amarelo?.descricao}</p>
+              <p className="text-sm text-muted-foreground mb-3">{renderSafeText(semaforo.amarelo?.descricao)}</p>
               <ul className="space-y-1">
-                {asArray<string>(semaforo.amarelo?.pontos).map((ponto: string, i: number) => (
+                {asArray<any>(semaforo.amarelo?.pontos).map((ponto: any, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <AlertTriangle className="w-4 h-4 mt-0.5 text-amber-500" />
-                    <span>{ponto}</span>
+                    <span>{renderSafeText(ponto)}</span>
                   </li>
                 ))}
               </ul>
@@ -554,14 +558,16 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xl">🔴</span>
-                <h4 className="font-semibold text-red-700 dark:text-red-400">{semaforo.vermelho?.titulo || t.trafficLight.vermelho}</h4>
+                <h4 className="font-semibold text-red-700 dark:text-red-400">
+                  {renderSafeText(semaforo.vermelho?.titulo) || t.trafficLight.vermelho}
+                </h4>
               </div>
-              <p className="text-sm text-muted-foreground mb-3">{semaforo.vermelho?.descricao}</p>
+              <p className="text-sm text-muted-foreground mb-3">{renderSafeText(semaforo.vermelho?.descricao)}</p>
               <ul className="space-y-1">
-                {asArray<string>(semaforo.vermelho?.pontos).map((ponto: string, i: number) => (
+                {asArray<any>(semaforo.vermelho?.pontos).map((ponto: any, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <Shield className="w-4 h-4 mt-0.5 text-red-500" />
-                    <span>{ponto}</span>
+                    <span>{renderSafeText(ponto)}</span>
                   </li>
                 ))}
               </ul>
@@ -861,10 +867,10 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <div>
               <h4 className="text-sm font-semibold text-muted-foreground mb-2">{t.manual.orientations}</h4>
               <ul className="space-y-2">
-                {asArray<string>(manual.orientacoes).map((item: string, i: number) => (
+                {asArray<any>(manual.orientacoes).map((item: any, i: number) => (
                   <li key={i} className="flex items-start gap-2">
                     <Target className="w-4 h-4 mt-0.5 text-purple-500" />
-                    <span className="text-sm">{item}</span>
+                    <span className="text-sm">{renderSafeText(item)}</span>
                   </li>
                 ))}
               </ul>
@@ -968,10 +974,10 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <p className="text-sm font-medium text-blue-600 dark:text-blue-400">{ajuda.descricao}</p>
           )}
           <ul className="space-y-2">
-            {ajuda.sugestoes?.map((sugestao: string, i: number) => (
+            {ajuda.sugestoes?.map((sugestao: any, i: number) => (
               <li key={i} className="flex items-start gap-2 text-sm">
                 <ExternalLink className="w-4 h-4 mt-0.5 text-blue-500" />
-                <span>{sugestao}</span>
+                <span>{renderSafeText(sugestao)}</span>
               </li>
             ))}
           </ul>
