@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Enable insert for authenticated users" ON admin_permissions;
