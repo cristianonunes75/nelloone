@@ -1,0 +1,1 @@
+ALTER TABLE admin_permissions ENABLE ROW LEVEL SECURITY;
