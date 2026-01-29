@@ -2229,16 +2229,16 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                   {" "}({language === 'en' ? 'Direction Sensor' : 'Sensor de Direção'})
                 </h4>
                 {(sensor?.comportamento || sensor?.como_reage_sob_estresse) && (
-                  <p className="text-sm mb-2">{sensor.comportamento || sensor.como_reage_sob_estresse}</p>
+                  <p className="text-sm mb-2">{renderSafeText(sensor.comportamento || sensor.como_reage_sob_estresse)}</p>
                 )}
                 {(sensor?.impacto_no_outro || sensor?.como_impacta_outro) && (
                   <p className="text-xs text-muted-foreground">
-                    <strong>{language === 'en' ? 'Impact:' : 'Impacto:'}</strong> {sensor.impacto_no_outro || sensor.como_impacta_outro}
+                    <strong>{language === 'en' ? 'Impact:' : 'Impacto:'}</strong> {renderSafeText(sensor.impacto_no_outro || sensor.como_impacta_outro)}
                   </p>
                 )}
                 {sensor?.o_que_precisa_do_outro && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    <strong>{language === 'en' ? 'Needs:' : 'Precisa:'}</strong> {sensor.o_que_precisa_do_outro}
+                    <strong>{language === 'en' ? 'Needs:' : 'Precisa:'}</strong> {renderSafeText(sensor.o_que_precisa_do_outro)}
                   </p>
                 )}
               </div>
@@ -2255,16 +2255,16 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                   {" "}({language === 'en' ? 'Course Conductor' : 'Condutor de Curso'})
                 </h4>
                 {(condutor?.comportamento || condutor?.como_reage_sob_estresse) && (
-                  <p className="text-sm mb-2">{condutor.comportamento || condutor.como_reage_sob_estresse}</p>
+                  <p className="text-sm mb-2">{renderSafeText(condutor.comportamento || condutor.como_reage_sob_estresse)}</p>
                 )}
                 {(condutor?.impacto_no_outro || condutor?.como_impacta_outro) && (
                   <p className="text-xs text-muted-foreground">
-                    <strong>{language === 'en' ? 'Impact:' : 'Impacto:'}</strong> {condutor.impacto_no_outro || condutor.como_impacta_outro}
+                    <strong>{language === 'en' ? 'Impact:' : 'Impacto:'}</strong> {renderSafeText(condutor.impacto_no_outro || condutor.como_impacta_outro)}
                   </p>
                 )}
                 {condutor?.o_que_precisa_do_outro && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    <strong>{language === 'en' ? 'Needs:' : 'Precisa:'}</strong> {condutor.o_que_precisa_do_outro}
+                    <strong>{language === 'en' ? 'Needs:' : 'Precisa:'}</strong> {renderSafeText(condutor.o_que_precisa_do_outro)}
                   </p>
                 )}
               </div>
@@ -2561,11 +2561,11 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                 </tr>
               </thead>
               <tbody>
-                {crisisTable.map((row, i) => (
+              {crisisTable.map((row, i) => (
                   <tr key={i} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                    <td className="py-3 px-3 font-medium text-foreground">{row.situacao}</td>
-                    <td className="py-3 px-3 text-foreground/80 italic">{row.como_falar}</td>
-                    <td className="py-3 px-3 text-foreground/80 italic">{row.como_ouvir}</td>
+                    <td className="py-3 px-3 font-medium text-foreground">{renderSafeText(row.situacao)}</td>
+                    <td className="py-3 px-3 text-foreground/80 italic">{renderSafeText(row.como_falar)}</td>
+                    <td className="py-3 px-3 text-foreground/80 italic">{renderSafeText(row.como_ouvir)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -2578,16 +2578,16 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               <div key={i} className="p-4 rounded-lg bg-muted/30 border border-border/50 space-y-3">
                 <div className="font-semibold text-foreground flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-orange-500/20 text-orange-700 dark:text-orange-300 flex items-center justify-center text-xs">{i + 1}</span>
-                  {row.situacao}
+                  {renderSafeText(row.situacao)}
                 </div>
                 <div className="pl-8 space-y-2">
                   <div className="p-2 rounded bg-orange-500/10 border border-orange-500/20">
                     <p className="text-xs font-medium text-orange-700 dark:text-orange-400 mb-1">🗣️ {labels.falar}</p>
-                    <p className="text-sm italic text-foreground/80">{row.como_falar}</p>
+                    <p className="text-sm italic text-foreground/80">{renderSafeText(row.como_falar)}</p>
                   </div>
                   <div className="p-2 rounded bg-blue-500/10 border border-blue-500/20">
                     <p className="text-xs font-medium text-blue-700 dark:text-blue-400 mb-1">👂 {labels.ouvir}</p>
-                    <p className="text-sm italic text-foreground/80">{row.como_ouvir}</p>
+                    <p className="text-sm italic text-foreground/80">{renderSafeText(row.como_ouvir)}</p>
                   </div>
                 </div>
               </div>
@@ -2648,7 +2648,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                   </p>
                   {reflexao.efeito && (
                     <p className="text-sm text-muted-foreground mt-1 italic">
-                      → {reflexao.efeito}
+                      → {renderSafeText(reflexao.efeito)}
                     </p>
                   )}
                 </div>
