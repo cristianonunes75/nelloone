@@ -811,15 +811,17 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <div key={i} className="p-4 rounded-lg bg-muted/50 space-y-2">
               <div className="flex items-start gap-2">
                 <span className="text-xs font-medium text-muted-foreground min-w-[100px]">{t.translationTable.whenDoes}:</span>
-                <span className="text-sm">{item.quando_faz || item.quando_diz}</span>
+                <span className="text-sm">{renderSafeText(item.quando_faz ?? item.quando_diz)}</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-xs font-medium text-amber-600 dark:text-amber-400 min-w-[100px]">{t.translationTable.youFeel}:</span>
-                <span className="text-sm">{item.voce_sente || item.outro_ouve || item.filho_ouve || item.pai_ouve}</span>
+                <span className="text-sm">
+                  {renderSafeText(item.voce_sente ?? item.outro_ouve ?? item.filho_ouve ?? item.pai_ouve)}
+                </span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-xs font-medium text-primary min-w-[100px]">{t.translationTable.truthBehind}:</span>
-                <span className="text-sm font-medium">{item.verdade_por_tras || item.intencao_real}</span>
+                <span className="text-sm font-medium">{renderSafeText(item.verdade_por_tras ?? item.intencao_real)}</span>
               </div>
             </div>
           ))}
@@ -839,8 +841,18 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           {tabela.descricao && (
             <p className="text-sm text-muted-foreground italic">{tabela.descricao}</p>
           )}
-          {renderTranslations(tabela.traducoes_usuario_a, tabela.traducoes_usuario_a?.[0]?.quando_diz?.split(' ')?.[2] || 'Pessoa A')}
-          {renderTranslations(tabela.traducoes_usuario_b, tabela.traducoes_usuario_b?.[0]?.quando_diz?.split(' ')?.[2] || 'Pessoa B')}
+          {renderTranslations(
+            tabela.traducoes_usuario_a,
+            typeof tabela.traducoes_usuario_a?.[0]?.quando_diz === 'string'
+              ? tabela.traducoes_usuario_a?.[0]?.quando_diz?.split(' ')?.[2] || 'Pessoa A'
+              : 'Pessoa A'
+          )}
+          {renderTranslations(
+            tabela.traducoes_usuario_b,
+            typeof tabela.traducoes_usuario_b?.[0]?.quando_diz === 'string'
+              ? tabela.traducoes_usuario_b?.[0]?.quando_diz?.split(' ')?.[2] || 'Pessoa B'
+              : 'Pessoa B'
+          )}
           {renderTranslations(tabela.traducoes_pai, 'Pai/Mãe')}
           {renderTranslations(tabela.traducoes_filho, 'Filho(a)')}
           {renderTranslations(tabela.traducoes_a, 'Irmão(ã) A')}
