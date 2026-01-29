@@ -1451,7 +1451,8 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
 
   // ============== PROMPT ÚNICO v1.0: PAPÉIS NATURAIS DO CASAL ==============
   const renderPapeisNaturais = () => {
-    const papeis = content.papeis_naturais;
+    // Support multiple key formats: papeis_naturais, _role_assignment
+    const papeis = content.papeis_naturais || content._role_assignment;
     if (!papeis) return null;
 
     return (
@@ -1466,6 +1467,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
+            {/* Support both key formats: sensor from papeis_naturais OR _role_assignment */}
             {papeis.sensor && (
               <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
                 <div className="flex items-center gap-2 mb-2">
@@ -1474,13 +1476,17 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                     {language === 'en' ? 'Direction Sensor' : 'Sensor de Direção'}
                   </span>
                 </div>
-                <p className="font-medium">{renderSafeText(papeis.sensor.nome)}</p>
-                {papeis.sensor.justificativa && (
-                  <p className="text-sm text-muted-foreground mt-2">{renderSafeText(papeis.sensor.justificativa)}</p>
+                <p className="font-medium">{renderSafeText(papeis.sensor.nome || papeis.sensor.name)}</p>
+                {(papeis.sensor.justificativa || papeis.sensor.score !== undefined) && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {renderSafeText(papeis.sensor.justificativa) || 
+                     (papeis.sensor.score !== undefined ? `Pontuação: ${papeis.sensor.score}` : '')}
+                  </p>
                 )}
               </div>
             )}
-            {papeis.condutor && (
+            {/* Support both key formats: condutor from papeis_naturais OR conductor from _role_assignment */}
+            {(papeis.condutor || papeis.conductor) && (
               <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xl">⚓</span>
@@ -1488,9 +1494,14 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                     {language === 'en' ? 'Builder/Executor' : 'Construtor / Executor'}
                   </span>
                 </div>
-                <p className="font-medium">{renderSafeText(papeis.condutor.nome)}</p>
-                {papeis.condutor.justificativa && (
-                  <p className="text-sm text-muted-foreground mt-2">{renderSafeText(papeis.condutor.justificativa)}</p>
+                <p className="font-medium">
+                  {renderSafeText((papeis.condutor || papeis.conductor)?.nome || (papeis.condutor || papeis.conductor)?.name)}
+                </p>
+                {((papeis.condutor || papeis.conductor)?.justificativa || (papeis.condutor || papeis.conductor)?.score !== undefined) && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {renderSafeText((papeis.condutor || papeis.conductor)?.justificativa) || 
+                     ((papeis.condutor || papeis.conductor)?.score !== undefined ? `Pontuação: ${(papeis.condutor || papeis.conductor)?.score}` : '')}
+                  </p>
                 )}
               </div>
             )}
@@ -3210,7 +3221,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           
           {/* Additional v2.0/v2.2 sections */}
           {renderZonaHarmonia()}
-          {renderZonaAjuste()}
+          {/* renderZonaAjuste removed - already rendered by renderZonaDeAjusteV1 above */}
           {renderZonaChoque()}
           {renderTabelaTraducaoV2()}
           {renderCrisisCommunication()}
