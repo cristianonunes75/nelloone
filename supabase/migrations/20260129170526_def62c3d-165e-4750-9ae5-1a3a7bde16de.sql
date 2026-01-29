@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "admin_permissions_update" ON admin_permissions;
