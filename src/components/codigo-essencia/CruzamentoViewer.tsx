@@ -468,8 +468,27 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [liveCrossing.id, hasReportContent]);
 
-  const handleCopyLink = () => {
-    const link = `${window.location.origin}/cruzamento/${liveCrossing.public_token}`;
+  const handleCopyLink = async () => {
+    // Ensure we have the latest token from the database
+    let tokenToUse = liveCrossing.public_token;
+    
+    try {
+      const { data } = await supabase
+        .from("codigo_cruzamentos")
+        .select("public_token")
+        .eq("id", liveCrossing.id)
+        .maybeSingle();
+      
+      if (data?.public_token) {
+        tokenToUse = data.public_token;
+        // Update local state with fresh token
+        setLiveCrossing((prev) => ({ ...prev, public_token: data.public_token }));
+      }
+    } catch (e) {
+      console.error("Error fetching latest token:", e);
+    }
+    
+    const link = `${window.location.origin}/cruzamento/${tokenToUse}`;
     navigator.clipboard.writeText(link);
     setLinkCopied(true);
     toast.success(t.linkCopied);
