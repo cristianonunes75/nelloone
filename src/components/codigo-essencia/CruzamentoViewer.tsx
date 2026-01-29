@@ -375,6 +375,50 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
 
   const asArray = <T,>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
 
+  // React can't render plain objects as children. Some backend fields may come as
+  // structured objects like { acao, situacao, origem }. This helper normalizes
+  // those cases into safe, readable text.
+  const renderSafeText = (value: any) => {
+    if (value == null) return null;
+    if (typeof value === "string" || typeof value === "number") return String(value);
+
+    if (typeof value === "object") {
+      const text =
+        value.texto ??
+        value.conteudo ??
+        value.resumo ??
+        value.titulo ??
+        value.mensagem ??
+        value.acao ??
+        value.situacao;
+
+      const origin = value.origem ?? value.origem_insight;
+
+      if (typeof text === "string" && text.trim().length > 0) {
+        return (
+          <span>
+            {text}
+            {typeof origin === "string" && origin.trim().length > 0 && (
+              <span className="block text-xs text-muted-foreground mt-1">{origin}</span>
+            )}
+          </span>
+        );
+      }
+
+      try {
+        return (
+          <span className="text-xs text-muted-foreground font-mono break-words">
+            {JSON.stringify(value)}
+          </span>
+        );
+      } catch {
+        return <span className="text-xs text-muted-foreground">[objeto]</span>;
+      }
+    }
+
+    return String(value);
+  };
+
   const isPurchased = liveCrossing.isPurchased !== false; // Default to true for backwards compatibility
 
   const refreshCrossing = async () => {
@@ -899,7 +943,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <p className="text-sm text-muted-foreground mb-3">{desafio.descricao}</p>
           )}
           <div className="p-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30">
-            <p className="font-medium text-emerald-700 dark:text-emerald-300">{desafio.acao}</p>
+            <p className="font-medium text-emerald-700 dark:text-emerald-300">{renderSafeText(desafio.acao)}</p>
           </div>
         </CardContent>
       </Card>
@@ -2435,7 +2479,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
           {/* Fallback for legacy format without steps */}
           {passos.length === 0 && acao.acao && (
             <div className="p-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30">
-              <p className="font-medium text-emerald-700 dark:text-emerald-300">{acao.acao}</p>
+              <p className="font-medium text-emerald-700 dark:text-emerald-300">{renderSafeText(acao.acao)}</p>
             </div>
           )}
         </CardContent>
@@ -2582,7 +2626,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                     </p>
                   )}
                   <p className="text-sm font-medium text-foreground">
-                    {reflexao.acao}
+                    {renderSafeText(reflexao.acao)}
                   </p>
                   {reflexao.efeito && (
                     <p className="text-sm text-muted-foreground mt-1 italic">
