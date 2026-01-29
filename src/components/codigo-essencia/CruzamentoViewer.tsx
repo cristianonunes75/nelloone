@@ -926,15 +926,15 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
             <div key={i} className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-2">
               <div className="flex items-start gap-2">
                 <span className="text-xs font-medium text-amber-600 dark:text-amber-400 min-w-[120px]">{t.pressureAlerts.behavior}:</span>
-                <span className="text-sm">{gatilho.comportamento}</span>
+                <span className="text-sm">{renderSafeText(gatilho.comportamento)}</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-xs font-medium text-red-600 dark:text-red-400 min-w-[120px]">{t.pressureAlerts.autoDefense}:</span>
-                <span className="text-sm">{gatilho.defesa_automatica}</span>
+                <span className="text-sm">{renderSafeText(gatilho.defesa_automatica)}</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-xs font-medium text-muted-foreground min-w-[120px]">{t.pressureAlerts.riskSituation}:</span>
-                <span className="text-sm">{gatilho.situacao_risco}</span>
+                <span className="text-sm">{renderSafeText(gatilho.situacao_risco)}</span>
               </div>
             </div>
           ))}
@@ -2322,9 +2322,9 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               </h4>
               {sensorItems.map((item: any, i: number) => (
                 <div key={i} className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/10 text-sm">
-                  <span className="font-medium">{item.comportamento}</span>
+                  <span className="font-medium">{renderSafeText(item.comportamento)}</span>
                   <span className="text-muted-foreground"> → </span>
-                  <span className="text-purple-700 dark:text-purple-400">{item.significado || item.significa}</span>
+                  <span className="text-purple-700 dark:text-purple-400">{renderSafeText(item.significado ?? item.significa)}</span>
                 </div>
               ))}
             </div>
@@ -2338,9 +2338,9 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
               </h4>
               {condutorItems.map((item: any, i: number) => (
                 <div key={i} className="p-3 rounded-lg bg-orange-500/5 border border-orange-500/10 text-sm">
-                  <span className="font-medium">{item.comportamento}</span>
+                  <span className="font-medium">{renderSafeText(item.comportamento)}</span>
                   <span className="text-muted-foreground"> → </span>
-                  <span className="text-orange-700 dark:text-orange-400">{item.significado || item.significa}</span>
+                  <span className="text-orange-700 dark:text-orange-400">{renderSafeText(item.significado ?? item.significa)}</span>
                 </div>
               ))}
             </div>
@@ -2693,10 +2693,10 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                 ☀️ {language === 'en' ? 'Daily' : 'Diário'}
               </h4>
               <ul className="space-y-2">
-                {diarios.map((ritual: string, i: number) => (
+                {diarios.map((ritual: any, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <Check className="w-4 h-4 mt-0.5 text-emerald-500 flex-shrink-0" />
-                    <span>{ritual}</span>
+                    <span>{renderSafeText(ritual)}</span>
                   </li>
                 ))}
               </ul>
@@ -2708,10 +2708,10 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                 📅 {language === 'en' ? 'Weekly' : 'Semanal'}
               </h4>
               <ul className="space-y-2">
-                {semanais.map((ritual: string, i: number) => (
+                {semanais.map((ritual: any, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <Check className="w-4 h-4 mt-0.5 text-blue-500 flex-shrink-0" />
-                    <span>{ritual}</span>
+                    <span>{renderSafeText(ritual)}</span>
                   </li>
                 ))}
               </ul>
@@ -2723,10 +2723,10 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                 🗓️ {language === 'en' ? 'Monthly' : 'Mensal'}
               </h4>
               <ul className="space-y-2">
-                {mensais.map((ritual: string, i: number) => (
+                {mensais.map((ritual: any, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <Check className="w-4 h-4 mt-0.5 text-purple-500 flex-shrink-0" />
-                    <span>{ritual}</span>
+                    <span>{renderSafeText(ritual)}</span>
                   </li>
                 ))}
               </ul>
@@ -2764,19 +2764,19 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                 <span className="text-red-500 font-medium text-sm">❌</span>
                 <div>
                   <span className="text-xs text-muted-foreground">{language === 'en' ? 'Instead of:' : 'Ao invés de:'}</span>
-                  <p className="text-sm text-foreground/80 line-through">{frase.ao_inves_de}</p>
+                  <p className="text-sm text-foreground/80 line-through">{renderSafeText(frase.ao_inves_de)}</p>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-emerald-500 font-medium text-sm">✓</span>
                 <div>
                   <span className="text-xs text-muted-foreground">{language === 'en' ? 'Try:' : 'Experimente:'}</span>
-                  <p className="text-sm font-medium text-foreground">{frase.experimente}</p>
+                  <p className="text-sm font-medium text-foreground">{renderSafeText(frase.experimente)}</p>
                 </div>
               </div>
               {frase.porque_funciona && (
                 <p className="text-xs text-muted-foreground italic pl-6">
-                  💡 {frase.porque_funciona}
+                  💡 {renderSafeText(frase.porque_funciona)}
                 </p>
               )}
             </div>
@@ -2815,7 +2815,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                   <p className="font-medium text-amber-700 dark:text-amber-400 text-sm">
                     {alerta.pessoa} {language === 'en' ? 'under pressure' : 'sob pressão'}
                   </p>
-                  <p className="text-sm text-foreground/80">{alerta.comportamento}</p>
+                  <p className="text-sm text-foreground/80">{renderSafeText(alerta.comportamento)}</p>
                 </div>
               </div>
               {alerta.considere && (
@@ -2823,12 +2823,12 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
                   <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-1">
                     💡 {language === 'en' ? 'Consider:' : 'Considere:'}
                   </p>
-                  <p className="text-sm text-foreground/80">{alerta.considere}</p>
+                  <p className="text-sm text-foreground/80">{renderSafeText(alerta.considere)}</p>
                 </div>
               )}
               {alerta.efeito && (
                 <p className="text-xs text-muted-foreground italic">
-                  → {language === 'en' ? 'Effect:' : 'Efeito:'} {alerta.efeito}
+                  → {language === 'en' ? 'Effect:' : 'Efeito:'} {renderSafeText(alerta.efeito)}
                 </p>
               )}
             </div>
