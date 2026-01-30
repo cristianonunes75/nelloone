@@ -21,6 +21,7 @@ import { CrossDivider } from "./CrossDivider";
 import { FreePlanBenefits } from "./FreePlanBenefits";
 import { ApprovedTestimonialsSection } from "./ApprovedTestimonialsSection";
 import { StrategicFAQ } from "./StrategicFAQ";
+import { PillarsSection } from "./PillarsSection";
 import { NavSection } from "./NavSection";
 import { NelloGlobalFooter } from "@/components/global/NelloGlobalFooter";
 import heroDawn from "@/assets/hero-dawn.jpg";
@@ -53,26 +54,16 @@ export const NelloOneLanding = () => {
     { number: "07", title: "Viver" },
   ];
 
-  // O que você vai descobrir - usa textos do landing.json com nomes dos testes
-  const improvementsItems = (t.landing as any)?.improvements?.items || [];
-  const discoveryIcons = [Heart, Brain, Flame, Lightbulb, Target];
-  
-  const discoveries = improvementsItems.map((item: string, index: number) => {
-    // Extrai o texto principal e o nome do teste entre parênteses
-    const match = item.match(/^(.+?)\s*\(([^)]+)\)$/);
-    if (match) {
-      return {
-        icon: discoveryIcons[index] || Compass,
-        mainText: match[1].trim(),
-        testName: match[2].trim(),
-      };
-    }
-    return {
-      icon: discoveryIcons[index] || Compass,
-      mainText: item,
-      testName: null,
-    };
-  });
+  // Os 7 pilares da Jornada Identity - lista completa
+  const discoveries = [
+    { icon: Heart, mainText: "Como você reage emocionalmente", testName: "Eneagrama" },
+    { icon: Brain, mainText: "Como toma decisões", testName: "DISC" },
+    { icon: Flame, mainText: "O que te motiva e o que te bloqueia", testName: "Temperamentos" },
+    { icon: Lightbulb, mainText: "Onde estão seus talentos naturais", testName: "Inteligências Múltiplas" },
+    { icon: Target, mainText: "Quais padrões pedem maturidade", testName: "Nello 16" },
+    { icon: Compass, mainText: "Seus padrões arquetípicos inconscientes", testName: "Arquétipos" },
+    { icon: Users, mainText: "Como você se conecta afetivamente", testName: "Estilos de Conexão" },
+  ];
 
   // Para quem é / não é - compacto
   const forWho = [
@@ -373,7 +364,10 @@ export const NelloOneLanding = () => {
         </div>
       </section>
 
-      {/* ========== 7️⃣ FAQ ESTRATÉGICO ========== */}
+      {/* ========== 7️⃣ PILARES DO IDENTITY (SEO BLOG) ========== */}
+      <PillarsSection />
+
+      {/* ========== 8️⃣ FAQ ESTRATÉGICO ========== */}
       <StrategicFAQ />
 
       {/* ========== 8️⃣ CTA FINAL ========== */}
