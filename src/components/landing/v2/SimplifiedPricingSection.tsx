@@ -103,10 +103,6 @@ export const SimplifiedPricingSection = () => {
             </div>
           </div>
           
-          {/* Social proof */}
-          <p className="text-center text-sm text-muted-foreground mt-8">
-            Fase de validação • Vagas limitadas para os primeiros usuários
-          </p>
         </div>
       </div>
     </section>
