@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, User, Settings, LogOut, Compass, Users } from "lucide-react";
+import { Menu, X, User, Settings, LogOut, Compass, Users, Lock } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { getNelloAppUrl, NelloApp, useSubdomain } from "@/hooks/useSubdomain";
@@ -273,12 +273,18 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
                     <Compass className="w-4 h-4 mr-2" />
                     {language === 'en' ? 'My Journey' : 'Minha Jornada'}
                   </DropdownMenuItem>
-                  {profile?.journey_status === 'completed' && (
-                    <DropdownMenuItem onClick={() => navigate('/cliente/cruzamentos')}>
-                      <Users className="w-4 h-4 mr-2" />
-                      {language === 'en' ? 'Code Crossings' : 'Cruzamentos'}
-                    </DropdownMenuItem>
-                  )}
+                  <DropdownMenuItem 
+                    onClick={() => profile?.journey_status === 'completed' && navigate('/cliente/cruzamentos')}
+                    className={cn(
+                      profile?.journey_status !== 'completed' && "opacity-60 cursor-not-allowed"
+                    )}
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    {language === 'en' ? 'Code Crossings' : 'Cruzamentos'}
+                    {profile?.journey_status !== 'completed' && (
+                      <Lock className="w-3 h-3 ml-auto text-muted-foreground" />
+                    )}
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/cliente/configuracoes')}>
                     <Settings className="w-4 h-4 mr-2" />
                     {language === 'en' ? 'Settings' : 'Configurações'}
@@ -384,17 +390,28 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
                           {language === 'en' ? 'My Journey' : 'Minha Jornada'}
                         </span>
                       </button>
-                      {profile?.journey_status === 'completed' && (
-                        <button
-                          onClick={() => { navigate('/cliente/cruzamentos'); setMobileMenuOpen(false); }}
-                          className="flex items-center gap-3 w-full px-3 py-3 rounded-lg transition-colors hover:bg-muted text-left"
-                        >
-                          <Users className="w-5 h-5 text-accent" />
-                          <span className="font-medium">
-                            {language === 'en' ? 'Code Crossings' : 'Cruzamentos'}
-                          </span>
-                        </button>
-                      )}
+                      <button
+                        onClick={() => { 
+                          if (profile?.journey_status === 'completed') {
+                            navigate('/cliente/cruzamentos'); 
+                            setMobileMenuOpen(false); 
+                          }
+                        }}
+                        className={cn(
+                          "flex items-center gap-3 w-full px-3 py-3 rounded-lg transition-colors text-left",
+                          profile?.journey_status === 'completed' 
+                            ? "hover:bg-muted" 
+                            : "opacity-60 cursor-not-allowed"
+                        )}
+                      >
+                        <Users className="w-5 h-5 text-accent" />
+                        <span className="font-medium">
+                          {language === 'en' ? 'Code Crossings' : 'Cruzamentos'}
+                        </span>
+                        {profile?.journey_status !== 'completed' && (
+                          <Lock className="w-4 h-4 ml-auto text-muted-foreground" />
+                        )}
+                      </button>
                     </div>
                   </nav>
 
