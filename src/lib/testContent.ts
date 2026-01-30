@@ -50,7 +50,7 @@ export const testContent: Record<string, TestContentMap> = {
       storytelling: `Antes de qualquer palavra, o mundo já sente quem você é.
 Essa presença é o reflexo do seu arquétipo — a energia que comunica sua verdade antes mesmo que você fale.
 
-No NELLO ONE, esse teste revela as forças simbólicas que movem sua personalidade, sua imagem e sua missão.
+No Identity, esse teste revela as forças simbólicas que movem sua personalidade, sua imagem e sua missão.
 Mais do que marketing, é um mapa espiritual da sua comunicação.`,
       benefits: [
         "Seu arquétipo principal e o complementar",
@@ -83,7 +83,7 @@ Mais do que marketing, é um mapa espiritual da sua comunicação.`,
       storytelling: `Before any words are spoken, the world already senses who you are.
 This presence is a reflection of your archetype — the energy that communicates your truth before you even speak.
 
-In NELLO ONE, this test reveals the symbolic forces that drive your personality, your image and your mission.
+In Identity, this test reveals the symbolic forces that drive your personality, your image and your mission.
 More than marketing, it's a spiritual map of your communication.`,
       benefits: [
         "Your main archetype and complementary one",
@@ -118,7 +118,7 @@ More than marketing, it's a spiritual map of your communication.`,
       },
       storytelling: `Este teste identifica o seu perfil comportamental natural. A metodologia DISC revela como você reage, decide, comunica e contribui em diferentes contextos da vida e do trabalho.
 
-Cada pessoa tem um ritmo único de ação. O DISC mostra como você se expressa, toma decisões e se relaciona. No NELLO ONE, esse teste ajuda você a compreender o que move suas atitudes e como gerar impacto com equilíbrio e autenticidade.`,
+Cada pessoa tem um ritmo único de ação. O DISC mostra como você se expressa, toma decisões e se relaciona. No Identity, esse teste ajuda você a compreender o que move suas atitudes e como gerar impacto com equilíbrio e autenticidade.`,
       benefits: [
         "Seu perfil comportamental predominante (D, I, S ou C)",
         "Como usar sua energia natural sem se sobrecarregar",
@@ -151,7 +151,7 @@ Cada pessoa tem um ritmo único de ação. O DISC mostra como você se expressa,
       },
       storytelling: `This test identifies your natural behavioral profile. The DISC methodology reveals how you react, decide, communicate and contribute in different life and work contexts.
 
-Each person has a unique rhythm of action. DISC shows how you express yourself, make decisions and relate to others. In NELLO ONE, this test helps you understand what drives your attitudes and how to create impact with balance and authenticity.`,
+Each person has a unique rhythm of action. DISC shows how you express yourself, make decisions and relate to others. In Identity, this test helps you understand what drives your attitudes and how to create impact with balance and authenticity.`,
       benefits: [
         "Your predominant behavioral profile (D, I, S or C)",
         "How to use your natural energy without burning out",
@@ -405,7 +405,7 @@ Este teste revela o teu estilo primário de conexão afetiva — e como podes cu
       },
       storytelling: `Por trás de cada atitude, existe uma motivação. O Eneagrama revela o que move seu coração — as virtudes e desafios que moldam seu modo de amar, trabalhar e viver.
 
-No NELLO ONE, ele é uma chave para a liberdade interior.`,
+No Identity, ele é uma chave para a liberdade interior.`,
       benefits: [
         "Seu tipo de personalidade entre os 9 perfis do Eneagrama",
         "Como transformar desafios em virtudes através do autoconhecimento",
@@ -438,7 +438,7 @@ No NELLO ONE, ele é uma chave para a liberdade interior.`,
       },
       storytelling: `Behind every attitude, there is a motivation. The Enneagram reveals what moves your heart — the virtues and challenges that shape how you love, work and live.
 
-In NELLO ONE, it is a key to inner freedom.`,
+In Identity, it is a key to inner freedom.`,
       benefits: [
         "Your personality type among the 9 Enneagram profiles",
         "How to transform challenges into virtues through self-knowledge",
@@ -471,7 +471,7 @@ In NELLO ONE, it is a key to inner freedom.`,
         objective: "Revelar seu tipo psicológico único entre 16 perfis possíveis, mostrando como você percebe o mundo e toma decisões.",
         methodology: "Avalia 4 dimensões: de onde vem sua energia (E/I), como você coleta informações (S/N), como você toma decisões (T/F) e como você organiza sua vida (J/P).",
       },
-      storytelling: `O Nello 16 Personality Map é um sistema exclusivo do Nello One que traduz as teorias de Carl Jung em um modelo moderno de 16 perfis psicológicos.
+      storytelling: `O Nello 16 Personality Map é um sistema exclusivo do Identity que traduz as teorias de Carl Jung em um modelo moderno de 16 perfis psicológicos.
 
 Ele identifica como você percebe o mundo, processa informações, toma decisões e se relaciona com diferentes ambientes.
 
@@ -505,7 +505,7 @@ Em poucos minutos, você descobre seus pontos fortes naturais, seus desafios emo
         objective: "Reveal your unique psychological type among 16 possible profiles, showing how you perceive the world and make decisions.",
         methodology: "Evaluates 4 dimensions: where your energy comes from (E/I), how you gather information (S/N), how you make decisions (T/F) and how you organize your life (J/P).",
       },
-      storytelling: `The Nello 16 Personality Map is a proprietary Nello One system inspired by Carl Jung's psychological type theory and redesigned for the modern world.
+      storytelling: `The Nello 16 Personality Map is an Identity exclusive system inspired by Carl Jung's psychological type theory and redesigned for the modern world.
 
 It helps you understand how you perceive reality, process information, make decisions, and interact with different environments.
 
@@ -539,7 +539,7 @@ In just a few minutes, you'll discover your natural strengths, your emotional ch
         objective: "Revelar o seu tipo psicológico único entre 16 perfis possíveis, mostrando como percebe o mundo e toma decisões.",
         methodology: "Avalia 4 dimensões: de onde vem a sua energia (E/I), como recolhe informações (S/N), como toma decisões (T/F) e como organiza a sua vida (J/P).",
       },
-      storytelling: `O Mapa das 16 Personalidades Nello é um sistema exclusivo do Nello One que transforma as teorias de Carl Jung num modelo moderno composto por 16 perfis psicológicos.
+      storytelling: `O Mapa das 16 Personalidades Nello é um sistema exclusivo do Identity que transforma as teorias de Carl Jung num modelo moderno composto por 16 perfis psicológicos.
 
 Ele identifica a forma como percebe o mundo, processa informação, toma decisões e se adapta a diferentes contextos.
 
