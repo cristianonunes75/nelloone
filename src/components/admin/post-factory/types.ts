@@ -7,6 +7,30 @@ export type CardTheme = "light" | "dark";
 export type CardLanguage = "pt" | "en";
 export type PostStatus = 'draft' | 'scheduled' | 'published' | 'failed';
 
+// Logo variants for posts
+export type CardLogoVariant = 
+  | "none"
+  | "nello-one" 
+  | "nello-dot-one"
+  | "nello"
+  | "nello-one-identity"
+  | "nello-one-life"
+  | "nello-one-flow"
+  | "nello-one-business"
+  | "nello-one-praxis";
+
+export const LOGO_OPTIONS: { value: CardLogoVariant; label: string }[] = [
+  { value: "none", label: "Sem logo" },
+  { value: "nello-one", label: "NELLO ONE" },
+  { value: "nello-dot-one", label: "nello.one" },
+  { value: "nello", label: "NELLO" },
+  { value: "nello-one-identity", label: "NELLO ONE | Identity" },
+  { value: "nello-one-life", label: "NELLO ONE | Life" },
+  { value: "nello-one-flow", label: "NELLO ONE | Flow" },
+  { value: "nello-one-business", label: "NELLO ONE | Business" },
+  { value: "nello-one-praxis", label: "NELLO ONE | Praxis" },
+];
+
 export interface ProductConfig {
   id: NelloProduct;
   name: string;

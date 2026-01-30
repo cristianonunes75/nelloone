@@ -6,6 +6,7 @@ import {
   CardFormat, 
   CardType, 
   CardTheme,
+  CardLogoVariant,
   PRODUCT_CONFIGS,
   FORMAT_DIMENSIONS
 } from "./types";
@@ -24,6 +25,7 @@ interface ProductCardTemplateProps {
   className?: string;
   backgroundImage?: string;
   imageOpacity?: number;
+  logoVariant?: CardLogoVariant;
 }
 
 export const ProductCardTemplate = ({
@@ -39,7 +41,8 @@ export const ProductCardTemplate = ({
   ctaText,
   className,
   backgroundImage,
-  imageOpacity = 0.3
+  imageOpacity = 0.3,
+  logoVariant = "nello-dot-one"
 }: ProductCardTemplateProps) => {
   const dimensions = FORMAT_DIMENSIONS[format];
   const productConfig = PRODUCT_CONFIGS[product];
@@ -57,6 +60,21 @@ export const ProductCardTemplate = ({
   
   const textPrimary = isLight ? "text-[#1C1917]" : "text-white";
   const textSecondary = isLight ? "text-[#57534e]" : "text-white/80";
+
+  // Render the selected logo
+  const renderLogo = (size: "sm" | "md" = "sm") => {
+    if (logoVariant === "none") return null;
+    
+    const colorVariant = isLight ? "dark" : "light";
+    
+    return (
+      <NelloWordmark 
+        variant={logoVariant as any}
+        colorVariant={colorVariant}
+        size={size}
+      />
+    );
+  };
   
   const renderContent = () => {
     switch (type) {
@@ -110,11 +128,7 @@ export const ProductCardTemplate = ({
               </p>
             )}
             <div className="flex items-center justify-between">
-              <NelloWordmark 
-                variant="nello-dot-one" 
-                colorVariant={isLight ? "dark" : "light"}
-                size="sm"
-              />
+              {renderLogo()}
               <div 
                 className="w-6 h-6 rounded-full"
                 style={{ backgroundColor: secondaryColor }}
@@ -154,11 +168,7 @@ export const ProductCardTemplate = ({
               </p>
             )}
             <div className="mt-8">
-              <NelloWordmark 
-                variant="nello-dot-one" 
-                colorVariant={isLight ? "dark" : "light"}
-                size="sm"
-              />
+              {renderLogo()}
             </div>
           </div>
         );
@@ -202,16 +212,11 @@ export const ProductCardTemplate = ({
               )}
             </div>
             <div className="flex justify-center">
-              <NelloWordmark 
-                variant="nello-dot-one" 
-                colorVariant={isLight ? "dark" : "light"}
-                size="sm"
-              />
+              {renderLogo()}
             </div>
           </div>
         );
       
-      case "feature":
         return (
           <div className="flex flex-col h-full p-6">
             <div className="flex items-center gap-2 mb-4">
@@ -219,11 +224,7 @@ export const ProductCardTemplate = ({
                 size={24} 
                 variant={isLight ? "default" : "light"} 
               />
-              <NelloWordmark 
-                variant="nello" 
-                colorVariant={isLight ? "dark" : "light"}
-                size="sm"
-              />
+              {renderLogo()}
             </div>
             <div className="flex-1 flex flex-col justify-center">
               {subtitle && (

@@ -1,4 +1,5 @@
 export * from './types';
+export { LOGO_OPTIONS } from './types';
 export { ProductSelector } from './ProductSelector';
 export { AIGeneratorPanel } from './AIGeneratorPanel';
 export { PostCalendar } from './PostCalendar';
