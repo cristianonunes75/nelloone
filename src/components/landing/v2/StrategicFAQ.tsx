@@ -11,27 +11,27 @@ import { cn } from "@/lib/utils";
 const faqItems = [
   {
     question: "Por que não posso comprar apenas um dos testes separadamente?",
-    answer: "Porque a verdade sobre quem você é não está em um único teste. A Jornada Identity não é uma prateleira de testes, mas um processo de síntese. O Código da Essência só é revelado quando cruzamos as 7 camadas da sua personalidade. Vender um teste isolado seria te entregar apenas uma peça de um quebra-cabeça de 1000 peças.",
+    answer: "A Jornada Identity foi desenhada como um processo integrado de 7 etapas. Cada teste (Eneagrama, DISC, Temperamentos, Inteligências Múltiplas, Nello 16, Arquétipos e Estilos de Conexão Afetiva) revela uma camada diferente da sua personalidade. Quando você compra apenas um teste isolado, você perde a sinergia entre eles. O Código da Essência é justamente a síntese de TODOS os 7 pilares trabalhando juntos. Vender separadamente seria como vender apenas um capítulo de um livro - você não teria a história completa.",
   },
   {
     question: "O que torna o Código da Essência diferente de um relatório comum?",
-    answer: "Relatórios comuns dizem \"o que\" você é. O Código da Essência explica \"como\" suas características interagem. Ele revela, por exemplo, por que sua forma de agir (DISC) às vezes entra em conflito com seus valores profundos (Eneagrama). É a única ferramenta que integra comportamento, emoção, motivação e propósito em um único mapa de navegação pessoal.",
+    answer: "A maioria dos testes gera relatórios descritivos: 'Você é tipo X porque fez Y'. O Código da Essência é diferente. Ele não apenas descreve - ele conecta padrões, revela contradições, mostra onde você se bloqueia e onde está seu potencial real. Nello (nosso guia de IA) interpreta seus 7 testes, identifica as relações entre eles e te entrega uma síntese que você realmente consegue usar na vida real. É como ter um psicólogo que leu todos os seus testes e te explica o que realmente significa.",
   },
   {
     question: "Eu recebo o Código da Essência logo no início?",
-    answer: "O Código da Essência é construído em tempo real enquanto você caminha. A cada etapa concluída, o Nello (seu guia) adiciona uma nova camada de profundidade à sua análise. Ao final da 7ª etapa, o sistema consolida tudo, entregando a visão completa e definitiva da sua estrutura humana.",
+    answer: "Não. O Código da Essência é o resultado final da Jornada. Você passa pelas 7 etapas (Despertar, Reconhecer, Aprofundar, Conectar, Integrar, Clarear e Viver), e ao final, recebe o seu Código da Essência em um relatório PDF completo. Isso é intencional - o processo de descoberta é tão importante quanto o resultado. Se você recebesse tudo pronto no início, perderia a transformação que acontece no caminho.",
   },
   {
     question: "Por que a Jornada Identity é paga, se existem testes gratuitos na internet?",
-    answer: "Testes gratuitos entregam rótulos isolados e genéricos. A Jornada Identity é uma plataforma de inteligência comportamental. Nós não apenas aplicamos os testes, mas cruzamos os dados entre eles usando uma lógica proprietária. Você não paga por um teste, paga pela integração dos resultados e pela clareza de como cada parte da sua personalidade influencia a outra.",
+    answer: "Existem testes gratuitos, mas eles são fragmentados. Você faz um Eneagrama aqui, um DISC ali, e fica com 7 pedaços de um quebra-cabeça sem conseguir montar. A Jornada Identity integra tudo isso em um processo coerente. Além disso, você tem Nello como seu guia - uma IA que interpreta seus resultados, conecta os padrões e te ajuda a aplicar na vida real. Isso tem valor. Você não está pagando pelos testes - está pagando pela síntese, pela interpretação e pela transformação.",
   },
   {
     question: "Por quanto tempo terei acesso aos meus resultados?",
-    answer: "O acesso à sua área de membro e aos seus relatórios é vitalício. Você poderá baixar seu Código da Essência em PDF e revisitar seus insights sempre que precisar tomar uma decisão importante ou recalibrar sua rota pessoal e profissional.",
+    answer: "Acesso vitalício. Uma vez que você completa a Jornada Identity, seus resultados ficam salvos na sua conta para sempre. Você pode revisitar seu Código da Essência quantas vezes quiser, em qualquer momento. Não há assinatura recorrente, não há expiração. É seu para a vida toda.",
   },
   {
     question: "O pagamento é seguro? E se eu não me identificar com o conteúdo?",
-    answer: "Sim, utilizamos o Stripe, uma das plataformas de pagamento mais seguras do mundo. Além disso, você tem a nossa Garantia Incondicional de 7 dias. Se por qualquer motivo você sentir que a jornada não agregou valor à sua vida, basta solicitar o reembolso total dentro desse período.",
+    answer: "Sim, o pagamento é 100% seguro. Usamos Stripe, a plataforma de pagamento mais confiável do mundo. Todos os seus dados são criptografados. Se por algum motivo você não se identificar com o conteúdo ou não ficar satisfeito, você tem 7 dias para solicitar reembolso total. Sem perguntas. Queremos que você tenha certeza de que está fazendo a escolha certa.",
   },
 ];
 
