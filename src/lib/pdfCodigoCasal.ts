@@ -1,26 +1,28 @@
 import jsPDF from "jspdf";
+import { PREMIUM_COLORS, PremiumPDFBuilder, type RGBColor } from "./pdf/pdfPremiumCore";
 
 interface PDFOptions {
   language?: 'pt' | 'pt-pt' | 'en';
 }
 
+// Re-export colors from premium core, adding couple-specific ones
 const COLORS = {
-  primary: { r: 31, g: 46, b: 75 },      // Nello Deep Blue
-  accent: { r: 205, g: 174, b: 103 },    // Nello Gold
-  pink: { r: 236, g: 72, b: 153 },       // Pink for love
-  background: { r: 252, g: 252, b: 252 },
-  text: { r: 50, g: 50, b: 50 },
-  muted: { r: 120, g: 120, b: 120 },
-  green: { r: 16, g: 185, b: 129 },
-  greenLight: { r: 240, g: 253, b: 244 },
-  amber: { r: 245, g: 158, b: 11 },
-  amberLight: { r: 255, g: 251, b: 235 },
-  red: { r: 244, g: 63, b: 94 },
-  redLight: { r: 254, g: 242, b: 242 },
-  blue: { r: 59, g: 130, b: 246 },
-  blueLight: { r: 239, g: 246, b: 255 },
-  purple: { r: 139, g: 92, b: 246 },
-  purpleLight: { r: 250, g: 245, b: 255 },
+  ...PREMIUM_COLORS,
+  // Couple-specific colors
+  accent: PREMIUM_COLORS.gold,
+  pink: PREMIUM_COLORS.pink,
+  background: PREMIUM_COLORS.cardBg,
+  green: PREMIUM_COLORS.green,
+  greenLight: PREMIUM_COLORS.greenLight,
+  amber: PREMIUM_COLORS.amber,
+  amberLight: PREMIUM_COLORS.amberLight,
+  red: PREMIUM_COLORS.red,
+  redLight: PREMIUM_COLORS.redLight,
+  blue: PREMIUM_COLORS.blue,
+  blueLight: PREMIUM_COLORS.blueLight,
+  purple: PREMIUM_COLORS.purple,
+  purpleLight: PREMIUM_COLORS.purpleLight,
+  // Chart-specific colors
   gold: { r: 180, g: 140, b: 50 },       // Person A color for chart
   indigo: { r: 100, g: 80, b: 180 },     // Person B color for chart
 };
@@ -256,107 +258,82 @@ class PDFGenerator {
   }
 
   // ==========================================
-  // PREMIUM BOOK-STYLE COVER PAGE
+  // PREMIUM BOOK-STYLE COVER PAGE (Unified with Código da Essência)
   // ==========================================
   private renderCover(personAName?: string, personBName?: string) {
     this.pageNumber = 1;
     
-    // Full background - Deep Navy
-    this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
+    const centerX = this.pageWidth / 2;
+
+    // Full dark background - Same as Código da Essência
+    this.doc.setFillColor(
+      PREMIUM_COLORS.coverBackground.r,
+      PREMIUM_COLORS.coverBackground.g,
+      PREMIUM_COLORS.coverBackground.b
+    );
     this.doc.rect(0, 0, this.pageWidth, this.pageHeight, "F");
 
-    // Decorative gold accent lines
-    this.doc.setFillColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
-    this.doc.rect(20, 40, this.pageWidth - 40, 1, "F");
-    this.doc.rect(20, this.pageHeight - 50, this.pageWidth - 40, 1, "F");
-    
-    // Decorative corner elements
-    this.doc.setDrawColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
-    this.doc.setLineWidth(0.5);
-    // Top left corner
-    this.doc.line(20, 40, 20, 55);
-    this.doc.line(20, 40, 35, 40);
-    // Top right corner
-    this.doc.line(this.pageWidth - 20, 40, this.pageWidth - 20, 55);
-    this.doc.line(this.pageWidth - 20, 40, this.pageWidth - 35, 40);
-    // Bottom left
-    this.doc.line(20, this.pageHeight - 50, 20, this.pageHeight - 65);
-    this.doc.line(20, this.pageHeight - 50, 35, this.pageHeight - 50);
-    // Bottom right
-    this.doc.line(this.pageWidth - 20, this.pageHeight - 50, this.pageWidth - 20, this.pageHeight - 65);
-    this.doc.line(this.pageWidth - 20, this.pageHeight - 50, this.pageWidth - 35, this.pageHeight - 50);
+    // Gold accent line at 1/3 from top - Same as Código da Essência
+    this.doc.setFillColor(
+      PREMIUM_COLORS.gold.r,
+      PREMIUM_COLORS.gold.g,
+      PREMIUM_COLORS.gold.b
+    );
+    this.doc.rect(0, this.pageHeight / 3 - 1, this.pageWidth, 2, "F");
 
-    // Infinity/Heart symbol using circles
-    const centerX = this.pageWidth / 2;
-    const symbolY = 95;
-    this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
-    this.doc.circle(centerX - 12, symbolY, 15, "S");
-    this.doc.circle(centerX + 12, symbolY, 15, "S");
-    this.doc.setFillColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
-    this.doc.circle(centerX, symbolY, 5, "F");
-
-    // Book Title
+    // Title - Same style as Código da Essência
     this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(11);
-    this.doc.setFont("helvetica", "normal");
-    this.doc.text("IDENTITY COUPLE PREMIUM", centerX, 135, { align: "center" });
-    
-    this.doc.setFontSize(32);
+    this.doc.setFontSize(42);
     this.doc.setFont("helvetica", "bold");
-    this.doc.text("MAPA DEFINITIVO", centerX, 155, { align: "center" });
-    this.doc.text("DO CASAL", centerX, 170, { align: "center" });
+    this.doc.text("CODIGO DO CASAL", centerX, this.pageHeight / 2 - 30, { align: "center" });
 
-    // Couple names if provided
+    // Subtitle - Same style as Código da Essência
+    this.doc.setFontSize(16);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.setTextColor(
+      PREMIUM_COLORS.gold.r,
+      PREMIUM_COLORS.gold.g,
+      PREMIUM_COLORS.gold.b
+    );
+    this.doc.text("Mapa Definitivo do Relacionamento", centerX, this.pageHeight / 2 - 15, { align: "center" });
+
+    // Couple names - Same placement as user name in Essência
     if (personAName && personBName) {
-      this.doc.setFontSize(16);
+      this.doc.setFontSize(20);
       this.doc.setFont("helvetica", "italic");
-      this.doc.setTextColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
-      this.doc.text(`${personAName} & ${personBName}`, centerX, 195, { align: "center" });
+      this.doc.setTextColor(200, 200, 200);
+      this.doc.text(`${personAName} & ${personBName}`, centerX, this.pageHeight / 2 + 15, { align: "center" });
     }
 
-    // Subtitle
+    // Quote - Same style as Código da Essência
     this.doc.setFontSize(12);
+    this.doc.setFont("helvetica", "italic");
+    this.doc.setTextColor(150, 150, 150);
+    const quote = "O amor nao e um porto seguro - e um barco em mar aberto. Este e o mapa para navegarem juntos.";
+    const quoteLines = this.doc.splitTextToSize(`"${quote}"`, this.contentWidth - 40);
+    this.doc.text(quoteLines, centerX, this.pageHeight / 2 + 45, { align: "center" });
+
+    // Brand name - Same as Código da Essência
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.setTextColor(
+      PREMIUM_COLORS.gold.r,
+      PREMIUM_COLORS.gold.g,
+      PREMIUM_COLORS.gold.b
+    );
+    this.doc.text("NELLO ONE", centerX, this.pageHeight - 40, { align: "center" });
+
+    // Date - Same as Código da Essência
+    this.doc.setFontSize(10);
     this.doc.setFont("helvetica", "normal");
-    this.doc.setTextColor(200, 200, 200);
-    this.doc.text("O Livro da Identidade do Seu Relacionamento", centerX, 215, { align: "center" });
-    this.doc.text("7 Pilares de Autoconhecimento Integrado", centerX, 228, { align: "center" });
-
-    // 7 Pillars Icons (small circles in a row)
-    const pillarsY = 250;
-    const pillarsColors = [COLORS.blue, COLORS.purple, COLORS.amber, COLORS.green, COLORS.pink, COLORS.red, COLORS.accent];
-    const pillarsNames = ["DISC", "Eneagrama", "Temperamentos", "Inteligencias", "Arquetipos", "Conexao", "Nello 16"];
-    const startX = 35;
-    const spacing = (this.pageWidth - 70) / 6;
-    
-    pillarsColors.forEach((color, i) => {
-      const x = startX + (i * spacing);
-      this.doc.setFillColor(color.r, color.g, color.b);
-      this.doc.circle(x, pillarsY, 4, "F");
-      this.doc.setFontSize(6);
-      this.doc.setTextColor(180, 180, 180);
-      this.doc.text(pillarsNames[i], x, pillarsY + 10, { align: "center" });
-    });
-
-    // Date
-    const date = new Date().toLocaleDateString(this.t === TRANSLATIONS.en ? 'en-US' : 'pt-BR', {
+    this.doc.setTextColor(150, 150, 150);
+    const dateLocale = this.t === TRANSLATIONS.en ? 'en-US' : 'pt-BR';
+    const date = new Date().toLocaleDateString(dateLocale, {
       day: "2-digit",
       month: "long",
       year: "numeric",
     });
-    this.doc.setFontSize(10);
-    this.doc.setTextColor(150, 150, 150);
-    this.doc.text(date, centerX, this.pageHeight - 75, { align: "center" });
-
-    // Brand footer
-    this.doc.setFontSize(14);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.setTextColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
-    this.doc.text("NELLO ONE", centerX, this.pageHeight - 60, { align: "center" });
-    
-    this.doc.setFontSize(8);
-    this.doc.setFont("helvetica", "normal");
-    this.doc.setTextColor(100, 100, 100);
-    this.doc.text("O Metodo Identity de Autoconhecimento", centerX, this.pageHeight - 55, { align: "center" });
+    this.doc.text(date, centerX, this.pageHeight - 30, { align: "center" });
   }
 
   // ==========================================
@@ -553,18 +530,44 @@ class PDFGenerator {
   }
 
   // ==========================================
-  // SECTION WITH COLORED HEADER
+  // SECTION WITH COLORED HEADER - Unified with Código da Essência style
   // ==========================================
   private renderSectionHeader(title: string, color = COLORS.primary) {
-    this.ensureSpace(20);
+    this.ensureSpace(45);
+
+    // Full-width header bar - Same as Código da Essência
+    this.doc.setFillColor(color.r, color.g, color.b);
+    this.doc.rect(0, this.currentY - 8, this.pageWidth, 35, "F");
+
+    // Title text
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(20);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text(title, this.margin, this.currentY + 10);
+
+    // Footer reference
+    this.doc.setFontSize(8);
+    this.doc.setTextColor(
+      PREMIUM_COLORS.light.r,
+      PREMIUM_COLORS.light.g,
+      PREMIUM_COLORS.light.b
+    );
+    this.doc.text(`NELLO ONE • ${this.t.reportTitle}`, this.margin, this.pageHeight - 10);
+
+    this.currentY += 40;
+  }
+  
+  // Compact header for subsections
+  private renderCompactSectionHeader(title: string, color = COLORS.primary) {
+    this.ensureSpace(18);
     
     this.doc.setFillColor(color.r, color.g, color.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 10, 2, 2, "F");
+    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 12, 2, 2, "F");
     this.doc.setTextColor(255, 255, 255);
     this.doc.setFontSize(11);
     this.doc.setFont("helvetica", "bold");
-    this.doc.text(title, this.margin + 6, this.currentY + 7);
-    this.currentY += 16;
+    this.doc.text(title, this.margin + 6, this.currentY + 8);
+    this.currentY += 18;
   }
 
   // ==========================================
