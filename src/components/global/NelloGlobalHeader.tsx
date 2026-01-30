@@ -273,10 +273,12 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
                     <Compass className="w-4 h-4 mr-2" />
                     {language === 'en' ? 'My Journey' : 'Minha Jornada'}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/cliente/cruzamentos')}>
-                    <Users className="w-4 h-4 mr-2" />
-                    {language === 'en' ? 'Code Crossings' : 'Cruzamentos'}
-                  </DropdownMenuItem>
+                  {profile?.journey_status === 'completed' && (
+                    <DropdownMenuItem onClick={() => navigate('/cliente/cruzamentos')}>
+                      <Users className="w-4 h-4 mr-2" />
+                      {language === 'en' ? 'Code Crossings' : 'Cruzamentos'}
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={() => navigate('/cliente/configuracoes')}>
                     <Settings className="w-4 h-4 mr-2" />
                     {language === 'en' ? 'Settings' : 'Configurações'}
@@ -382,15 +384,17 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
                           {language === 'en' ? 'My Journey' : 'Minha Jornada'}
                         </span>
                       </button>
-                      <button
-                        onClick={() => { navigate('/cliente/cruzamentos'); setMobileMenuOpen(false); }}
-                        className="flex items-center gap-3 w-full px-3 py-3 rounded-lg transition-colors hover:bg-muted text-left"
-                      >
-                        <Users className="w-5 h-5 text-pink-500" />
-                        <span className="font-medium">
-                          {language === 'en' ? 'Code Crossings' : 'Cruzamentos'}
-                        </span>
-                      </button>
+                      {profile?.journey_status === 'completed' && (
+                        <button
+                          onClick={() => { navigate('/cliente/cruzamentos'); setMobileMenuOpen(false); }}
+                          className="flex items-center gap-3 w-full px-3 py-3 rounded-lg transition-colors hover:bg-muted text-left"
+                        >
+                          <Users className="w-5 h-5 text-accent" />
+                          <span className="font-medium">
+                            {language === 'en' ? 'Code Crossings' : 'Cruzamentos'}
+                          </span>
+                        </button>
+                      )}
                     </div>
                   </nav>
 
