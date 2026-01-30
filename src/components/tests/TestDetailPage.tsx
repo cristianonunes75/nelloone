@@ -126,20 +126,6 @@ export const TestDetailPage = () => {
             <p className="text-xl text-muted-foreground italic">
               {content.subtitle}
             </p>
-            
-            {/* Test info badges */}
-            {test && (
-              <div className="flex items-center justify-center gap-4 mt-6">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <HelpCircle className="w-4 h-4" />
-                  <span>{test.questions_count} {labels.questions}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  <span>~{test.estimated_minutes} {labels.minutes}</span>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Storytelling */}
