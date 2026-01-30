@@ -1,172 +1,165 @@
 
+# Plano: Unificar Layout do PDF do Código do Casal com o Código da Essência
 
-# Plano de Correção Definitiva: React Error #31 no CruzamentoViewer
+## Análise das Diferenças Identificadas
 
-## Diagnóstico Confirmado
+Após analisar ambos os PDFs e os arquivos de código fonte, identifiquei as seguintes diferenças fundamentais:
 
-O erro **"Objects are not valid as a React child (found: object with keys {acao, origem, situacao})"** acontece porque vários campos no arquivo `CruzamentoViewer.tsx` ainda renderizam objetos diretamente sem usar a função de sanitização `renderSafeText()`.
+### 1. Arquitetura do Código
 
-### Por que o F5 volta para a página de cruzamentos?
+| Aspecto | Código da Essência | Código do Casal |
+|---------|-------------------|-----------------|
+| Linhas de código | ~1.161 linhas | ~2.657 linhas (2.3x maior) |
+| Estrutura | Função única `buildCodigoEssenciaDoc()` | Classe `PDFGenerator` com múltiplos métodos |
+| Complexidade | Fluxo linear e previsível | Lógica complexa com normalização de dados |
+| Dependência de dados | Dados dos 7 testes padronizados | Dados de IA dinâmicos com múltiplas variações de chaves |
 
-Quando você clica em "Ver Relatório", o componente `CruzamentoCodigos.tsx` define `selectedCrossing` e renderiza o `CruzamentoViewer` dentro de um bloco condicional (não uma rota diferente). O `ErrorBoundary` captura o erro e exibe a mensagem de erro. Quando você atualiza a página, o estado `selectedCrossing` é perdido, voltando para a lista de cruzamentos.
+### 2. Diferenças Visuais
 
----
+| Elemento | Código da Essência | Código do Casal |
+|----------|-------------------|-----------------|
+| Capa | Fundo escuro (#0f0f14), elegante e minimalista | Fundo azul-marinho com elementos decorativos mais elaborados |
+| Headers | Barra colorida simples no topo | Headers com bordas arredondadas |
+| Tipografia | Consistente: títulos 42pt, texto 11pt | Variável: múltiplos tamanhos sem padrão claro |
+| Espaçamento | Generoso e respirado | Compacto para caber mais conteúdo |
+| Cards | Fundo cinza claro com bordas sutis | Múltiplas cores por seção (verde, âmbar, vermelho) |
+| Gráficos | Não possui (os dados vêm dos 7 testes) | Gráfico radar DISC nativo |
 
-## Locais com Problema Identificados
+### 3. Por Que Você Precisa Pedir Configuração Toda Vez
 
-Após análise do código, identifiquei **6 áreas principais** que podem causar o erro:
+O problema principal é que os dois PDFs foram desenvolvidos **em momentos diferentes, com filosofias diferentes**:
 
-### 1. `renderPressureAlerts()` (linhas 908-943)
-```text
-Campos não sanitizados:
-- gatilho.comportamento
-- gatilho.defesa_automatica  
-- gatilho.situacao_risco
-```
+1. **Código da Essência**: Construído com dados **estruturados e previsíveis** (resultados dos 7 testes)
+2. **Código do Casal**: Construído para consumir dados **dinâmicos gerados por IA** com múltiplas variações de chaves
 
-### 2. `renderTabelaTraducaoV2()` (linhas 2278-2351)
-```text
-Campos não sanitizados:
-- item.comportamento
-- item.significado (ou item.significa)
-```
-
-### 3. `renderAlertasDiaDia()` (linhas 2789-2839)
-```text
-Campos não sanitizados:
-- alerta.comportamento
-- alerta.considere
-- alerta.efeito
-```
-
-### 4. `renderFrasesPonte()` (linhas 2740-2787)
-```text
-Campos não sanitizados:
-- frase.ao_inves_de
-- frase.experimente
-- frase.porque_funciona
-```
-
-### 5. `renderRituaisCasal()` (linhas 2663-2738)
-```text
-Arrays tipados como string que podem conter objetos:
-- diarios, semanais, mensais
-```
-
-### 6. `renderLegacySection()` (linhas 1001-1121)
-Já parcialmente corrigido, mas pode haver edge cases.
-
----
+O PDF do Casal precisa de uma camada massiva de normalização de dados (`normalizeContent()` com ~200 linhas) para lidar com:
+- Chaves em português vs inglês
+- Dados ausentes ou em formato diferente
+- Variações de nomes de propriedades (ex: `zona_ajuste` vs `zona_de_ajuste`)
 
 ## Solução Proposta
 
-Aplicar `renderSafeText()` em **todos** os campos dinâmicos das seções identificadas. Isso garante que objetos estruturados sejam convertidos para texto exibível.
+### Fase 1: Criar Biblioteca de Componentes PDF Unificada
 
-### Arquivos a modificar:
-- `src/components/codigo-essencia/CruzamentoViewer.tsx`
+Criar um módulo compartilhado `src/lib/pdf/pdfPremiumCore.ts` com:
 
-### Alterações específicas:
-
-**1. renderPressureAlerts (3 alterações):**
-```typescript
-// Antes:
-<span className="text-sm">{gatilho.comportamento}</span>
-<span className="text-sm">{gatilho.defesa_automatica}</span>
-<span className="text-sm">{gatilho.situacao_risco}</span>
-
-// Depois:
-<span className="text-sm">{renderSafeText(gatilho.comportamento)}</span>
-<span className="text-sm">{renderSafeText(gatilho.defesa_automatica)}</span>
-<span className="text-sm">{renderSafeText(gatilho.situacao_risco)}</span>
+1. **Paleta de Cores Unificada**
+```text
+┌─────────────────────────────────────────┐
+│  CORES PREMIUM                          │
+├─────────────────────────────────────────┤
+│  Primary:  #1f2e4b (Azul Profundo)      │
+│  Gold:     #cdae67 (Dourado Essência)   │
+│  Text:     #323232 (Texto Principal)    │
+│  Muted:    #787878 (Texto Secundário)   │
+│  Background: #0f0f14 (Capa Escura)      │
+└─────────────────────────────────────────┘
 ```
 
-**2. renderTabelaTraducaoV2 (4 alterações):**
-```typescript
-// Antes:
-<span className="font-medium">{item.comportamento}</span>
-<span className="text-purple-700">{item.significado || item.significa}</span>
+2. **Componentes Reutilizáveis**
+   - `renderPremiumCover()` - Capa escura elegante
+   - `renderSectionHeader()` - Headers padronizados
+   - `renderCard()` - Cards com estilo consistente
+   - `renderFooter()` - Rodapé com marca
 
-// Depois:
-<span className="font-medium">{renderSafeText(item.comportamento)}</span>
-<span className="text-purple-700">{renderSafeText(item.significado ?? item.significa)}</span>
+3. **Helpers Compartilhados**
+   - `ensureSpace()` - Quebra de página automática
+   - `writeWrappedText()` - Texto com quebra
+   - `measureTextHeight()` - Cálculo de altura
+
+### Fase 2: Refatorar PDF do Casal
+
+1. **Importar componentes do core**
+2. **Manter lógica de normalização** (necessária para dados da IA)
+3. **Substituir renderização visual** pelos componentes unificados
+4. **Preservar conteúdo específico** (gráfico radar DISC, semáforo relacional)
+
+### Fase 3: Resultado Final Esperado
+
+Ambos os PDFs terão:
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│                    [CAPA PREMIUM UNIFICADA]                     │
+│                    Fundo escuro (#0f0f14)                       │
+│                    Linha dourada decorativa                     │
+│                    Título em branco, nome em cinza              │
+│                    Marca NELLO ONE/IDENTITY                     │
+│                                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  [HEADER DA SEÇÃO]   ████████████████████████████████████       │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  [CARD PADRONIZADO]                                     │    │
+│  │  Fundo: #f8f8f8                                         │    │
+│  │  Borda: #e6e6e6                                         │    │
+│  │  Cantos arredondados: 3px                               │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                 │
+│  ────────────────────────────────────────────────────────────   │
+│  NELLO ONE • Página X de Y                                      │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-**3. renderAlertasDiaDia (3 alterações):**
-```typescript
-// Antes:
-<p className="text-sm">{alerta.comportamento}</p>
-<p className="text-sm">{alerta.considere}</p>
-<p className="text-xs italic">→ ... {alerta.efeito}</p>
+## Detalhes Técnicos da Implementação
 
-// Depois:
-<p className="text-sm">{renderSafeText(alerta.comportamento)}</p>
-<p className="text-sm">{renderSafeText(alerta.considere)}</p>
-<p className="text-xs italic">→ ... {renderSafeText(alerta.efeito)}</p>
-```
+### Arquivos a Criar
 
-**4. renderFrasesPonte (3 alterações):**
-```typescript
-// Antes:
-<p>{frase.ao_inves_de}</p>
-<p>{frase.experimente}</p>
-<p>💡 {frase.porque_funciona}</p>
+1. **`src/lib/pdf/pdfPremiumCore.ts`**
+   - Classe `PremiumPDFBuilder` com métodos reutilizáveis
+   - Constantes de cores, fontes e espaçamentos
+   - Helpers de renderização
 
-// Depois:
-<p>{renderSafeText(frase.ao_inves_de)}</p>
-<p>{renderSafeText(frase.experimente)}</p>
-<p>💡 {renderSafeText(frase.porque_funciona)}</p>
-```
+2. **`src/lib/pdf/pdfPremiumCover.ts`**
+   - Template da capa premium unificada
+   - Suporte a nome individual ou casal
 
-**5. renderRituaisCasal (ajustar tipagem e sanitização):**
-```typescript
-// Antes:
-{diarios.map((ritual: string, i: number) => (
-  <span>{ritual}</span>
+3. **`src/lib/pdf/pdfPremiumStyles.ts`**
+   - Definições de estilos CSS-like para jsPDF
 
-// Depois:
-{diarios.map((ritual: any, i: number) => (
-  <span>{renderSafeText(ritual)}</span>
-```
+### Arquivos a Modificar
 
----
+1. **`src/lib/pdfCodigoCasal.ts`**
+   - Importar componentes do core
+   - Substituir métodos `renderCover()`, `renderSectionHeader()`, etc.
+   - Manter `normalizeContent()` e lógica específica do casal
 
-## Seção Técnica
+2. **`src/lib/pdfCodigoEssencia.ts`**
+   - Refatorar para usar os mesmos componentes do core
+   - Manter estrutura de dados atual
 
-### Função `renderSafeText` existente (linha 381-420)
+### Impacto nas Funcionalidades Existentes
 
-A função já trata corretamente objetos com estas chaves:
-- `texto`, `conteudo`, `resumo`, `titulo`, `mensagem`, `acao`, `situacao`
-- Também renderiza `origem` ou `origem_insight` como metadado
+| Funcionalidade | Impacto |
+|---------------|---------|
+| Download PDF individual | ✅ Mantido, visual atualizado |
+| Download PDF casal | ✅ Mantido, visual unificado |
+| Envio por email | ✅ Mantido |
+| Gráficos DISC casal | ✅ Mantido (renderização nativa) |
+| Semáforo relacional | ✅ Mantido, visual padronizado |
+| Dados de IA | ✅ Mantido (normalização preservada) |
 
-### Por que alguns dados vêm como objetos?
+## Benefícios da Unificação
 
-O backend (AI) às vezes retorna estruturas como:
-```json
-{
-  "acao": "Faça X para Y perceber Z",
-  "origem": "DISC D=65%",
-  "situacao": "Sob pressão"
-}
-```
-
-Quando esses objetos são renderizados diretamente como `{item}`, o React não sabe como exibi-los, gerando o Error #31.
-
----
-
-## Resultado Esperado
-
-Após as correções:
-1. O relatório abrirá normalmente ao clicar em "Ver Relatório"
-2. Não haverá mais erros de React #31
-3. Dados estruturados serão exibidos corretamente como texto
-4. Metadados de origem (quando presentes) aparecerão abaixo do texto principal
-
----
+1. **Consistência Visual**: Ambos os relatórios terão a mesma identidade premium
+2. **Manutenção Simplificada**: Mudanças visuais em um único lugar
+3. **Menos Código Duplicado**: Redução de ~40% no código total
+4. **Qualidade Premium**: O PDF do casal herdará a elegância do Essência
+5. **Fim das Configurações Manuais**: Um padrão = um comportamento
 
 ## Estimativa de Esforço
 
-- **Alterações**: ~20 linhas de código
-- **Arquivos afetados**: 1 arquivo (`CruzamentoViewer.tsx`)
-- **Risco**: Baixo (apenas wrapping de valores existentes)
-- **Tempo para implementar**: ~5 minutos
+- **Criação do core**: ~200 linhas
+- **Refatoração do Casal**: ~400 linhas alteradas
+- **Refatoração do Essência**: ~200 linhas alteradas
+- **Testes e ajustes**: Verificação de ambos os PDFs
 
+## Próximos Passos
+
+Após aprovação, implementarei:
+1. Criar a biblioteca de componentes PDF unificada
+2. Refatorar o PDF do Código do Casal para usar os novos componentes
+3. Ajustar o PDF do Código da Essência para compartilhar o mesmo core
+4. Testar ambos os downloads para garantir consistência
