@@ -22,6 +22,7 @@ import * as Icons from "lucide-react";
 import { getNelloAppUrl } from "@/hooks/useSubdomain";
 import { ProgressiveUpsellSection } from "@/components/monetization/ProgressiveUpsellSection";
 import { useProgressiveFunnel } from "@/hooks/useProgressiveFunnel";
+import { DashboardTestimonialSection } from "./DashboardTestimonialSection";
 
 interface TestResult {
   testType: string;
@@ -405,6 +406,9 @@ export function DashboardStagePotency({
           </div>
         </div>
       </motion.div>
+
+      {/* Testimonial Section */}
+      <DashboardTestimonialSection />
     </motion.div>
   );
 }

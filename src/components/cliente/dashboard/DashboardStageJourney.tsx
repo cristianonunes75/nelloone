@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import type { JourneyStep } from "@/hooks/useJourneyProgress";
 import * as Icons from "lucide-react";
 import { useTestAccess } from "@/hooks/useTestAccessV2";
+import { DashboardTestimonialSection } from "./DashboardTestimonialSection";
 
 interface DashboardStageJourneyProps {
   displayName: string;
@@ -257,6 +258,9 @@ export function DashboardStageJourney({
           );
         })}
       </motion.div>
+
+      {/* Testimonial Section */}
+      <DashboardTestimonialSection />
     </motion.div>
   );
 }
