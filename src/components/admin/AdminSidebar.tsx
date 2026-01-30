@@ -69,8 +69,7 @@ const menuSections = [
       { title: "Landing Page", url: "/admin/landing-page", icon: FileEdit },
       { title: "Código da Essência", url: "/admin/codigo-essencia", icon: Sparkles },
       { title: "Depoimentos", url: "/admin/depoimentos", icon: MessageSquareHeart },
-      { title: "Identidade Visual", url: "/admin/identidade-visual", icon: Palette },
-      { title: "Fábrica de Posts", url: "/admin/post-factory", icon: Send },
+      { title: "Identidade Visual & Posts", url: "/admin/identidade-visual", icon: Palette },
     ]
   },
   {

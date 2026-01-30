@@ -8,10 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Download, Sun, Moon, Upload, Languages, Save, CalendarDays, Copy, Check } from "lucide-react";
+import { Download, Sun, Moon, Upload, Save, CalendarDays, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import { supabase } from "@/integrations/supabase/client";
+import { NelloSymbol, NelloSymbolN, NelloSymbolOne } from "@/components/brand/NelloSymbol";
+import { NelloWordmark } from "@/components/brand/NelloWordmark";
 import {
   ProductSelector,
   AIGeneratorPanel,
@@ -32,6 +34,9 @@ import {
 } from "./post-factory";
 
 export const AdminPostFactory = () => {
+  // Symbol state for brand identity
+  const [activeSymbol, setActiveSymbol] = useState<"portal" | "n" | "one">("one");
+  
   // Product & Card state
   const [product, setProduct] = useState<NelloProduct>("identity");
   const [cardFormat, setCardFormat] = useState<CardFormat>("instagram-feed");
@@ -60,6 +65,15 @@ export const AdminPostFactory = () => {
   
   const cardRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const renderSymbol = (variant: "default" | "light" | "dark" | "gradient", size: number) => {
+    const props = { variant, size };
+    switch (activeSymbol) {
+      case "portal": return <NelloSymbol {...props} />;
+      case "n": return <NelloSymbolN {...props} />;
+      case "one": return <NelloSymbolOne {...props} />;
+    }
+  };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -102,7 +116,6 @@ export const AdminPostFactory = () => {
       link.href = canvas.toDataURL("image/png");
       link.click();
       
-      // Copy caption to clipboard
       if (postCaption) {
         await navigator.clipboard.writeText(postCaption);
         toast.success("Imagem baixada e legenda copiada!");
@@ -189,22 +202,22 @@ export const AdminPostFactory = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-heading text-foreground mb-2">Fábrica de Posts</h2>
-        <p className="text-muted-foreground">Crie conteúdo para todos os produtos Nello em um só lugar</p>
+        <h2 className="text-2xl font-heading text-foreground mb-2">Identidade Visual & Posts</h2>
+        <p className="text-muted-foreground">Logomarcas, símbolos e criação de conteúdo para redes sociais</p>
       </div>
 
-      {/* Product Selector */}
-      <ProductSelector value={product} onChange={setProduct} />
-
-      <Tabs defaultValue="editor" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 max-w-md">
-          <TabsTrigger value="editor">Editor</TabsTrigger>
-          <TabsTrigger value="calendar">Calendário</TabsTrigger>
+      <Tabs defaultValue="posts" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4 max-w-lg">
+          <TabsTrigger value="posts">Posts</TabsTrigger>
+          <TabsTrigger value="logos">Logos</TabsTrigger>
+          <TabsTrigger value="symbols">Símbolos</TabsTrigger>
           <TabsTrigger value="gallery">Galeria</TabsTrigger>
         </TabsList>
 
-        {/* EDITOR TAB */}
-        <TabsContent value="editor" className="space-y-6">
+        {/* POSTS TAB (former Editor + Calendar) */}
+        <TabsContent value="posts" className="space-y-6">
+          <ProductSelector value={product} onChange={setProduct} />
+          
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Editor Panel */}
             <Card className="lg:col-span-1">
@@ -336,14 +349,173 @@ export const AdminPostFactory = () => {
               </Card>
             </div>
           </div>
-        </TabsContent>
 
-        {/* CALENDAR TAB */}
-        <TabsContent value="calendar">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Calendar Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-6 border-t">
             <PostCalendar onPostClick={handleEditPost} />
             <Card><CardContent className="pt-6"><p className="text-sm text-muted-foreground text-center">Selecione uma data no calendário para ver os posts agendados</p></CardContent></Card>
           </div>
+        </TabsContent>
+
+        {/* LOGOS TAB */}
+        <TabsContent value="logos" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-heading">Wordmarks</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              {/* NELLO IDENTITY */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-sans font-medium">NELLO IDENTITY</h4>
+                    <p className="text-sm text-muted-foreground">Institucional, produto, header</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-6 rounded-lg bg-background border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one" colorVariant="dark" size="lg" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-ink-deep flex items-center justify-center">
+                    <NelloWordmark variant="nello-one" colorVariant="light" size="lg" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-white border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one" colorVariant="mono-dark" size="lg" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-black flex items-center justify-center">
+                    <NelloWordmark variant="nello-one" colorVariant="mono-light" size="lg" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Nello Identity Mixed */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-sans font-medium">Nello Identity</h4>
+                  <p className="text-sm text-muted-foreground">Social, apresentações, materiais editoriais</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-6 rounded-lg bg-background border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-mixed" colorVariant="dark" size="lg" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-ink-deep flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-mixed" colorVariant="light" size="lg" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-white border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-mixed" colorVariant="mono-dark" size="lg" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-black flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-mixed" colorVariant="mono-light" size="lg" />
+                  </div>
+                </div>
+              </div>
+
+              {/* NELLO Avatar */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-sans font-medium">NELLO</h4>
+                  <p className="text-sm text-muted-foreground">Avatar, app, favicon</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-6 rounded-lg bg-background border flex items-center justify-center">
+                    <NelloWordmark variant="nello" colorVariant="dark" size="lg" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-ink-deep flex items-center justify-center">
+                    <NelloWordmark variant="nello" colorVariant="light" size="lg" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-white border flex items-center justify-center">
+                    <NelloWordmark variant="nello" colorVariant="mono-dark" size="lg" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-black flex items-center justify-center">
+                    <NelloWordmark variant="nello" colorVariant="mono-light" size="lg" />
+                  </div>
+                </div>
+              </div>
+
+              {/* identity.nello.one */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-sans font-medium">identity.nello.one</h4>
+                  <p className="text-sm text-muted-foreground">Técnico, rodapé, cards informativos</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-6 rounded-lg bg-background border flex items-center justify-center">
+                    <NelloWordmark variant="nello-dot-one" colorVariant="dark" size="lg" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-ink-deep flex items-center justify-center">
+                    <NelloWordmark variant="nello-dot-one" colorVariant="light" size="lg" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-white border flex items-center justify-center">
+                    <NelloWordmark variant="nello-dot-one" colorVariant="mono-dark" size="lg" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-black flex items-center justify-center">
+                    <NelloWordmark variant="nello-dot-one" colorVariant="mono-light" size="lg" />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* SYMBOLS TAB */}
+        <TabsContent value="symbols" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="font-heading">Símbolos da Marca</CardTitle>
+                <Select value={activeSymbol} onValueChange={(v) => setActiveSymbol(v as typeof activeSymbol)}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="portal">Portal</SelectItem>
+                    <SelectItem value="n">N Geométrico</SelectItem>
+                    <SelectItem value="one">Circle One</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="p-8 rounded-xl bg-background border flex items-center justify-center">
+                    {renderSymbol("default", 80)}
+                  </div>
+                  <span className="text-xs text-muted-foreground">Padrão</span>
+                </div>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="p-8 rounded-xl bg-ink-deep flex items-center justify-center">
+                    {renderSymbol("light", 80)}
+                  </div>
+                  <span className="text-xs text-muted-foreground">Claro</span>
+                </div>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="p-8 rounded-xl bg-white border flex items-center justify-center">
+                    {renderSymbol("dark", 80)}
+                  </div>
+                  <span className="text-xs text-muted-foreground">Escuro</span>
+                </div>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="p-8 rounded-xl bg-gradient-to-br from-background to-secondary flex items-center justify-center">
+                    {renderSymbol("gradient", 80)}
+                  </div>
+                  <span className="text-xs text-muted-foreground">Gradiente</span>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-6 border-t">
+                <h4 className="font-sans font-medium mb-4">Tamanhos</h4>
+                <div className="flex items-end gap-6">
+                  {[24, 32, 48, 64, 96].map((size) => (
+                    <div key={size} className="flex flex-col items-center gap-2">
+                      {renderSymbol("default", size)}
+                      <span className="text-xs text-muted-foreground">{size}px</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* GALLERY TAB */}
