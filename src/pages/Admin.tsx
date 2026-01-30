@@ -22,7 +22,7 @@ const AdminLogs = lazy(() => import("@/components/admin/AdminLogs").then(m => ({
 const AdminSettings = lazy(() => import("@/components/admin/AdminSettings").then(m => ({ default: m.AdminSettings })));
 const AffiliatesManagement = lazy(() => import("@/components/admin/AffiliatesManagement").then(m => ({ default: m.AffiliatesManagement })));
 const TestimonialsManagement = lazy(() => import("@/components/admin/TestimonialsManagement").then(m => ({ default: m.TestimonialsManagement })));
-const AdminBrandIdentity = lazy(() => import("@/components/admin/AdminBrandIdentity").then(m => ({ default: m.AdminBrandIdentity })));
+// AdminBrandIdentity removed - consolidated into AdminPostFactory
 const AdminRealtimeVisitors = lazy(() => import("@/components/admin/AdminRealtimeVisitors").then(m => ({ default: m.AdminRealtimeVisitors })));
 const DataCleanupTool = lazy(() => import("@/components/admin/DataCleanupTool").then(m => ({ default: m.DataCleanupTool })));
 const NotificationAutomation = lazy(() => import("@/components/admin/NotificationAutomation").then(m => ({ default: m.NotificationAutomation })));
@@ -90,8 +90,7 @@ const Admin = () => {
                 <Route path="cupons" element={<AdminCoupons />} />
                 <Route path="depoimentos" element={<TestimonialsManagement />} />
                 <Route path="codigo-essencia" element={<AdminCodigoEssencia />} />
-                <Route path="identidade-visual" element={<AdminBrandIdentity />} />
-                <Route path="post-factory" element={<AdminPostFactory />} />
+                <Route path="identidade-visual" element={<AdminPostFactory />} />
                 <Route path="landing-page" element={<AdminLandingPage />} />
                 <Route path="comunicacao" element={<CommunicationManagement />} />
                 <Route path="engajamento" element={<AdminEngagementCenter />} />
