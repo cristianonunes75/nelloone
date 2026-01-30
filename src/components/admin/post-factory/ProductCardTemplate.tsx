@@ -278,10 +278,14 @@ export const ProductCardTemplate = ({
       {backgroundImage && (
         <>
           <div 
-            className="absolute inset-0 bg-cover bg-center"
+            className={cn(
+              "absolute inset-0 bg-cover bg-center",
+              !isLight && "grayscale brightness-50"
+            )}
             style={{
               backgroundImage: `url(${backgroundImage})`,
-              opacity: imageOpacity
+              opacity: imageOpacity,
+              filter: !isLight ? 'grayscale(30%) brightness(0.4)' : undefined
             }}
           />
           <div 
@@ -289,7 +293,7 @@ export const ProductCardTemplate = ({
               "absolute inset-0",
               isLight 
                 ? "bg-gradient-to-br from-[#FAF8F5]/80 to-[#F0EDE8]/70" 
-                : "bg-gradient-to-br from-[#1C1917]/80 to-[#292524]/70"
+                : "bg-gradient-to-br from-[#0a0a0a]/90 to-[#1a1a1a]/85"
             )}
           />
         </>

@@ -32,6 +32,7 @@ import {
   TYPE_LABELS,
   SocialMediaPost,
 } from "./post-factory";
+import { AIImageGenerator } from "./post-factory/AIImageGenerator";
 
 export const AdminPostFactory = () => {
   // Symbol state for brand identity
@@ -338,6 +339,8 @@ export const AdminPostFactory = () => {
             <div className="space-y-4">
               <AIGeneratorPanel product={product} cardType={cardType} format={cardFormat} language={cardLanguage} onSuggestionSelect={handleSuggestionSelect} />
               
+              <AIImageGenerator onImageGenerated={(url) => { setCardImage(url); setUseImage(true); }} />
+              
               <Card>
                 <CardHeader className="pb-3"><CardTitle className="text-sm font-medium">Legenda</CardTitle></CardHeader>
                 <CardContent className="space-y-3">
@@ -357,11 +360,12 @@ export const AdminPostFactory = () => {
           </div>
         </TabsContent>
 
-        {/* LOGOS TAB */}
+        {/* LOGOS TAB - ECOSSISTEMA COMPLETO */}
         <TabsContent value="logos" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="font-heading">Wordmarks</CardTitle>
+              <CardTitle className="font-heading">Wordmarks do Ecossistema</CardTitle>
+              <p className="text-sm text-muted-foreground">Todas as logos dos produtos Nello</p>
             </CardHeader>
             <CardContent className="space-y-8">
               {/* NELLO IDENTITY */}
@@ -369,8 +373,123 @@ export const AdminPostFactory = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-sans font-medium">NELLO IDENTITY</h4>
-                    <p className="text-sm text-muted-foreground">Institucional, produto, header</p>
+                    <p className="text-sm text-muted-foreground">Código da Essência - Marca principal</p>
                   </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-6 rounded-lg bg-background border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-identity" colorVariant="dark" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-ink-deep flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-identity" colorVariant="light" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-white border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-identity" colorVariant="mono-dark" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-black flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-identity" colorVariant="mono-light" size="md" />
+                  </div>
+                </div>
+              </div>
+
+              {/* NELLO LIFE */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-sans font-medium">NELLO LIFE</h4>
+                  <p className="text-sm text-muted-foreground">Jornada de Vida</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-6 rounded-lg bg-background border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-life" colorVariant="dark" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-ink-deep flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-life" colorVariant="light" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-white border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-life" colorVariant="mono-dark" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-black flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-life" colorVariant="mono-light" size="md" />
+                  </div>
+                </div>
+              </div>
+
+              {/* NELLO FLOW */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-sans font-medium">NELLO FLOW</h4>
+                  <p className="text-sm text-muted-foreground">Inteligência Adaptativa</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-6 rounded-lg bg-background border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-flow" colorVariant="dark" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-ink-deep flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-flow" colorVariant="light" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-white border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-flow" colorVariant="mono-dark" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-black flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-flow" colorVariant="mono-light" size="md" />
+                  </div>
+                </div>
+              </div>
+
+              {/* NELLO BUSINESS */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-sans font-medium">NELLO BUSINESS</h4>
+                  <p className="text-sm text-muted-foreground">Inteligência Empresarial</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-6 rounded-lg bg-background border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-business" colorVariant="dark" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-ink-deep flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-business" colorVariant="light" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-white border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-business" colorVariant="mono-dark" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-black flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-business" colorVariant="mono-light" size="md" />
+                  </div>
+                </div>
+              </div>
+
+              {/* NELLO PRAXIS */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-sans font-medium">NELLO PRAXIS</h4>
+                  <p className="text-sm text-muted-foreground">Prática Integrada</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-6 rounded-lg bg-background border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-praxis" colorVariant="dark" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-ink-deep flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-praxis" colorVariant="light" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-white border flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-praxis" colorVariant="mono-dark" size="md" />
+                  </div>
+                  <div className="p-6 rounded-lg bg-black flex items-center justify-center">
+                    <NelloWordmark variant="nello-one-praxis" colorVariant="mono-light" size="md" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Separador */}
+              <div className="border-t pt-8">
+                <h3 className="font-heading text-lg mb-6">Marcas Base</h3>
+              </div>
+
+              {/* NELLO ONE - Marca Mãe */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-sans font-medium">NELLO ONE</h4>
+                  <p className="text-sm text-muted-foreground">Marca mãe institucional</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="p-6 rounded-lg bg-background border flex items-center justify-center">
@@ -388,10 +507,10 @@ export const AdminPostFactory = () => {
                 </div>
               </div>
 
-              {/* Nello Identity Mixed */}
+              {/* Nello One Mixed */}
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-sans font-medium">Nello Identity</h4>
+                  <h4 className="font-sans font-medium">Nello One</h4>
                   <p className="text-sm text-muted-foreground">Social, apresentações, materiais editoriais</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -432,10 +551,10 @@ export const AdminPostFactory = () => {
                 </div>
               </div>
 
-              {/* identity.nello.one */}
+              {/* nello.one */}
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-sans font-medium">identity.nello.one</h4>
+                  <h4 className="font-sans font-medium">nello.one</h4>
                   <p className="text-sm text-muted-foreground">Técnico, rodapé, cards informativos</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
