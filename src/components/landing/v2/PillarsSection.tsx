@@ -80,7 +80,7 @@ const pillarCards = [
 
 export const PillarsSection = () => {
   return (
-    <section className="py-16 md:py-24 px-5 sm:px-6 lg:px-8 bg-background">
+    <section id="pilares" className="py-16 md:py-24 px-5 sm:px-6 lg:px-8 bg-background">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">

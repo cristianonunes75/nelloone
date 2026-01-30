@@ -57,13 +57,7 @@ export const TestDetailPage = () => {
 
   const handleBackClick = () => {
     const basePath = language === 'en' ? '/en' : '';
-    navigate(basePath || '/');
-    setTimeout(() => {
-      const testesSection = document.getElementById("testes");
-      if (testesSection) {
-        testesSection.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 100);
+    navigate(`${basePath || '/'}#pilares`);
   };
 
   const handleStartTest = async () => {
