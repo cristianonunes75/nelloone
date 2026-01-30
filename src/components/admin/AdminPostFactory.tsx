@@ -26,10 +26,12 @@ import {
   CardType,
   CardTheme,
   CardLanguage,
+  CardLogoVariant,
   AICopySuggestion,
   PRODUCT_CONFIGS,
   FORMAT_DIMENSIONS,
   TYPE_LABELS,
+  LOGO_OPTIONS,
   SocialMediaPost,
 } from "./post-factory";
 import { AIImageGenerator } from "./post-factory/AIImageGenerator";
@@ -44,6 +46,7 @@ export const AdminPostFactory = () => {
   const [cardType, setCardType] = useState<CardType>("institutional");
   const [cardTheme, setCardTheme] = useState<CardTheme>("light");
   const [cardLanguage, setCardLanguage] = useState<CardLanguage>("pt");
+  const [cardLogo, setCardLogo] = useState<CardLogoVariant>("nello-one-identity");
   
   // Content state
   const [cardTitle, setCardTitle] = useState("Descubra quem você é");
@@ -271,6 +274,18 @@ export const AdminPostFactory = () => {
                   </div>
                 </div>
 
+                <div>
+                  <Label className="text-xs">Logo</Label>
+                  <Select value={cardLogo} onValueChange={(v) => setCardLogo(v as CardLogoVariant)}>
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {LOGO_OPTIONS.map(option => (
+                        <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label className="text-xs">Imagem de fundo</Label>
@@ -325,6 +340,7 @@ export const AdminPostFactory = () => {
                     ctaText={cardCta}
                     backgroundImage={useImage ? cardImage || undefined : undefined}
                     imageOpacity={imageOpacity}
+                    logoVariant={cardLogo}
                   />
                 </div>
                 <div className="flex gap-2 w-full">
