@@ -535,15 +535,32 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
                       
                       <div className="shrink-0">
                         {crossing.status === 'generated' ? (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => setSelectedCrossing(crossing)}
-                            className="gap-1"
-                          >
-                            <Eye className="w-4 h-4" />
-                            {t.viewReport}
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => setSelectedCrossing(crossing)}
+                              className="gap-1"
+                            >
+                              <Eye className="w-4 h-4" />
+                              {t.viewReport}
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleGenerateReport(crossing.id)}
+                              disabled={isGenerating === crossing.id}
+                              className="gap-1 text-muted-foreground hover:text-primary"
+                              title={language === 'en' ? 'Regenerate with new prompt' : 'Regenerar com novo prompt'}
+                            >
+                              {isGenerating === crossing.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Users className="w-4 h-4" />
+                              )}
+                              {language === 'en' ? 'Regenerate' : 'Regenerar'}
+                            </Button>
+                          </div>
                         ) : canAccept ? (
                           <Button 
                             size="sm"
