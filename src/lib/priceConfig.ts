@@ -120,8 +120,8 @@ export const testPrices: Record<string, TestPrice> = {
     eur: { price: 27, priceId: null },
   },
   // Ativação de Direção Profissional - Career direction upsell
-  ativacao_profissional: {
-    testType: "ativacao_profissional",
+  activation_individual: {
+    testType: "activation_individual",
     brl: { price: 97, priceId: "price_1SvQWhDjhZZxZELMicEbE8sI" },
     usd: { price: 27, priceId: null },
     eur: { price: 27, priceId: null },

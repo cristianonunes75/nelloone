@@ -152,3 +152,12 @@ verify_jwt = true
 
 [functions.nello-post-factory]
 verify_jwt = true
+
+[functions.generate-essence-reading]
+verify_jwt = true
+
+[functions.generate-career-paths]
+verify_jwt = true
+
+[functions.generate-action-plan]
+verify_jwt = true

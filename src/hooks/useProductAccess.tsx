@@ -126,6 +126,7 @@ export function useAllProductAccess() {
         activation_couple: profile?.has_activation_couple ?? false,
         identity_couple_premium: profile?.has_identity_couple_premium ?? false,
         ativacao_codigo: profile?.ativacao_codigo_unlocked ?? false,
+        ativacao_profissional: profile?.has_activation_individual ?? false, // Alias for professional activation
       };
     },
     staleTime: 30 * 1000,
