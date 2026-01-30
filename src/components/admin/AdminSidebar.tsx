@@ -21,6 +21,7 @@ import {
   Target,
   Building2,
   Wrench,
+  FileEdit,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -65,6 +66,7 @@ const menuSections = [
   {
     label: "CONTEÚDO",
     items: [
+      { title: "Landing Page", url: "/admin/landing-page", icon: FileEdit },
       { title: "Código da Essência", url: "/admin/codigo-essencia", icon: Sparkles },
       { title: "Depoimentos", url: "/admin/depoimentos", icon: MessageSquareHeart },
       { title: "Identidade Visual", url: "/admin/identidade-visual", icon: Palette },
