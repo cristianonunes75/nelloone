@@ -33,7 +33,7 @@ export const LandingFooter = () => {
               </p>
               <div className="flex gap-4">
                 <a
-                  href="https://instagram.com/nello.one"
+                  href="https://www.instagram.com/identity.nello?igsh=YzdvaXdzbHp0ZW1k&utm_source=qr"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 flex items-center justify-center transition-colors"
@@ -103,12 +103,12 @@ export const LandingFooter = () => {
                 </li>
                 <li className="pt-2">
                   <a 
-                    href="https://instagram.com/nello.one" 
+                    href="https://www.instagram.com/identity.nello?igsh=YzdvaXdzbHp0ZW1k&utm_source=qr" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="hover:text-gold transition-colors"
                   >
-                    @nello.one
+                    @identity.nello
                   </a>
                 </li>
               </ul>

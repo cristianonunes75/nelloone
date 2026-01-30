@@ -60,7 +60,7 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
 
   // Social links
   const socialLinks = [
-    { name: 'Instagram', icon: Instagram, href: 'https://instagram.com/nello.one' },
+    { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/identity.nello?igsh=YzdvaXdzbHp0ZW1k&utm_source=qr' },
     { name: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com/company/nello-one' },
     { name: 'YouTube', icon: Youtube, href: 'https://youtube.com/@nello-one' },
   ];
