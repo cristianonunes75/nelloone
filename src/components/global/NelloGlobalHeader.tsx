@@ -20,6 +20,9 @@ interface NelloGlobalHeaderProps {
   variant?: 'light' | 'dark';
 }
 
+// Modules visible to all users (add more as they become ready)
+const PUBLIC_MODULES = ['identity'];
+
 // Module definitions with URLs and labels
 const NELLO_MODULES: Array<{
   id: NelloApp | 'praxis';
@@ -65,7 +68,7 @@ const NELLO_MODULES: Array<{
  */
 export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps) => {
   const { language } = useLanguage();
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, userRoles } = useAuth();
   const { app: currentApp } = useSubdomain();
   const navigate = useNavigate();
   const location = useLocation();
@@ -73,6 +76,12 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isDark = variant === 'dark';
+
+  // Filter modules based on user role
+  const isAdmin = userRoles.includes('admin');
+  const visibleModules = isAdmin 
+    ? NELLO_MODULES 
+    : NELLO_MODULES.filter(m => PUBLIC_MODULES.includes(m.id));
 
   // Handle scroll effect
   useEffect(() => {
@@ -175,7 +184,7 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
 
           {/* Center: Module Navigation (Desktop) */}
           <nav className="hidden lg:flex items-center gap-1">
-            {NELLO_MODULES.map((module) => {
+            {visibleModules.map((module) => {
               const isActive = isModuleActive(module.id);
               return (
                 <button
@@ -332,7 +341,7 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 mb-2">
                         {language === 'en' ? 'Ecosystem' : 'Ecossistema'}
                       </p>
-                      {NELLO_MODULES.map((module) => {
+                      {visibleModules.map((module) => {
                         const isActive = isModuleActive(module.id);
                         return (
                           <button
