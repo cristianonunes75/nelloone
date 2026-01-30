@@ -365,6 +365,9 @@ serve(async (req) => {
     // Check for Código do Casal purchase
     const isCodigoCasal = body.productType === "codigo_casal";
     
+    // Check for Activation Individual (Professional Direction) purchase
+    const isActivationIndividual = body.productType === "activation_individual";
+    
     // Check for coupon code
     const couponCode = body.couponCode || null;
     
@@ -402,11 +405,11 @@ serve(async (req) => {
       }
     }
     
-    if (testIds.length === 0 && !isBundle && !isFundadores && !isAtivacaoCodigo && !isCodigoCasal) {
-      throw new Error("At least one test ID is required, or isBundle/isFundadores/isAtivacaoCodigo/isCodigoCasal must be true");
+    if (testIds.length === 0 && !isBundle && !isFundadores && !isAtivacaoCodigo && !isCodigoCasal && !isActivationIndividual) {
+      throw new Error("At least one test ID is required, or isBundle/isFundadores/isAtivacaoCodigo/isCodigoCasal/isActivationIndividual must be true");
     }
     
-    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, isAtivacaoCodigo, isCodigoCasal, language, currency, couponCode });
+    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, isAtivacaoCodigo, isCodigoCasal, isActivationIndividual, language, currency, couponCode });
 
     // Get user (optional - supports guest checkout)
     let user = null;
@@ -505,6 +508,38 @@ serve(async (req) => {
         quantity: 1,
       }];
       logStep("Ativação do Código line item created", { currency, amount: ativacaoAmounts[currency] });
+    } else if (isActivationIndividual) {
+      // Activation Individual (Professional Direction) purchase - Dynamic pricing based on currency
+      const activationAmounts: Record<string, number> = {
+        brl: 9700,  // R$ 97
+        usd: 2700,  // $27
+        eur: 2700,  // €27
+      };
+      
+      const activationNames: Record<string, { name: string; description: string }> = {
+        brl: {
+          name: "Ativação de Direção Profissional – NELLO ONE",
+          description: "Transforme seu Código da Essência em um plano de ação profissional personalizado",
+        },
+        usd: {
+          name: "Professional Direction Activation – NELLO ONE",
+          description: "Transform your Essence Code into a personalized professional action plan",
+        },
+        eur: {
+          name: "Ativação de Direção Profissional – NELLO ONE",
+          description: "Transforme o seu Código da Essência num plano de ação profissional personalizado",
+        },
+      };
+      
+      lineItems = [{
+        price_data: {
+          currency: currency,
+          product_data: activationNames[currency] || activationNames.brl,
+          unit_amount: activationAmounts[currency] || activationAmounts.brl,
+        },
+        quantity: 1,
+      }];
+      logStep("Activation Individual line item created", { currency, amount: activationAmounts[currency] });
     } else if (isFundadores) {
       // Fundadores purchase - R$197 BRL only (or free with 100% coupon)
       const fundadoresPriceId = "price_1ScWglDjhZZxZELM3tQocxgu";
@@ -656,7 +691,8 @@ serve(async (req) => {
         is_fundadores: isFundadores ? "true" : "false",
         is_ativacao_codigo: isAtivacaoCodigo ? "true" : "false",
         is_codigo_casal: isCodigoCasal ? "true" : "false",
-        product_type: isCodigoCasal ? "codigo_casal" : isAtivacaoCodigo ? "ativacao_codigo" : isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
+        is_activation_individual: isActivationIndividual ? "true" : "false",
+        product_type: isActivationIndividual ? "activation_individual" : isCodigoCasal ? "codigo_casal" : isAtivacaoCodigo ? "ativacao_codigo" : isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
         affiliate_code: affiliateCode || "",
         purchase_origin: isCodigoCasal ? "couple_paywall" : "",
       },

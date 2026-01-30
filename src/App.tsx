@@ -30,6 +30,7 @@ import Contact from "./pages/Contact";
 import { TestDetailPage } from "./components/tests/TestDetailPage";
 import CodigoEssencia from "./pages/CodigoEssencia";
 import AtivacaoCodigoPage from "./pages/cliente/AtivacaoCodigoPage";
+import AtivacaoProfissionalPage from "./pages/cliente/AtivacaoProfissionalPage";
 import CruzamentosPage from "./pages/cliente/CruzamentosPage";
 // CodigoEssencia sales pages removed - now included in journey
 import ComprarTeste from "./pages/ComprarTeste";
@@ -419,6 +420,31 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute allowedRoles={["cliente", "admin"]}>
           <AtivacaoCodigoPage />
+        </ProtectedRoute>
+      }
+    />
+    {/* Professional Direction Activation routes */}
+    <Route
+      path="/ativacao-profissional"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <AtivacaoProfissionalPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/en/professional-activation"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <AtivacaoProfissionalPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/pt-pt/ativacao-profissional"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <AtivacaoProfissionalPage />
         </ProtectedRoute>
       }
     />

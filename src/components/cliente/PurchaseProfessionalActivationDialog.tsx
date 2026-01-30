@@ -1,0 +1,200 @@
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Compass, Check, Sparkles } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useLanguage, Language } from "@/contexts/LanguageContext";
+import { getCurrencyForLanguage, testPrices } from "@/lib/priceConfig";
+import { getAffiliateCode } from "@/hooks/useAffiliateTracking";
+import { useState } from "react";
+
+interface PurchaseProfessionalActivationDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+const getActivationPrice = (language: Language) => {
+  const prices = testPrices.activation_individual;
+  if (!prices) return { price: 97, symbol: "R$" };
+  
+  switch (language) {
+    case 'en':
+      return { price: prices.usd.price, symbol: "$" };
+    case 'pt-pt':
+      return { price: prices.eur.price, symbol: "€" };
+    case 'pt':
+    default:
+      return { price: prices.brl.price, symbol: "R$" };
+  }
+};
+
+export const PurchaseProfessionalActivationDialog = ({
+  open,
+  onOpenChange,
+}: PurchaseProfessionalActivationDialogProps) => {
+  const { toast } = useToast();
+  const { language } = useLanguage();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const priceInfo = getActivationPrice(language);
+
+  const handlePurchase = async () => {
+    setIsLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: language === 'en' ? "Login Required" : "Login Necessário",
+          description: language === 'en' 
+            ? "Please log in to purchase." 
+            : "Por favor, faça login para comprar.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const currency = getCurrencyForLanguage(language).toLowerCase();
+      const affiliateCode = getAffiliateCode();
+
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: {
+          productType: "activation_individual",
+          userId: user.id,
+          userEmail: user.email,
+          language: language,
+          currency: currency,
+          affiliateCode: affiliateCode,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.code === "CURRENCY_MISMATCH") {
+        toast({
+          title: language === 'en' ? "Currency Error" : "Erro de Moeda",
+          description: data.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error: any) {
+      console.error("Purchase error:", error);
+      toast({
+        title: language === 'en' ? "Payment Error" : "Erro ao processar pagamento",
+        description: error.message || (language === 'en' ? "Try again shortly." : "Tente novamente em alguns instantes."),
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const content = {
+    pt: {
+      title: "Ativação de Direção Profissional",
+      subtitle: "Saia da dúvida. Ganhe clareza. Comece a agir.",
+      description: "Um processo guiado que transforma seu Código da Essência em um plano de ação profissional claro e personalizado.",
+      benefits: [
+        "Leitura profunda da sua essência profissional",
+        "3 caminhos personalizados (seguro, ambicioso, experimental)",
+        "Plano de ação de 14 dias com passos concretos",
+        "Identificação do seu sabotador principal",
+      ],
+      price: `${priceInfo.symbol} ${priceInfo.price}`,
+      cta: "Desbloquear Ativação",
+      footer: "✅ Acesso imediato após pagamento",
+    },
+    en: {
+      title: "Professional Direction Activation",
+      subtitle: "End the doubt. Gain clarity. Start acting.",
+      description: "A guided process that transforms your Essence Code into a clear, personalized professional action plan.",
+      benefits: [
+        "Deep reading of your professional essence",
+        "3 personalized paths (safe, ambitious, experimental)",
+        "14-day action plan with concrete steps",
+        "Identification of your main saboteur",
+      ],
+      price: `${priceInfo.symbol}${priceInfo.price}`,
+      cta: "Unlock Activation",
+      footer: "✅ Immediate access after payment",
+    },
+    "pt-pt": {
+      title: "Ativação de Direção Profissional",
+      subtitle: "Saia da dúvida. Ganhe clareza. Comece a agir.",
+      description: "Um processo guiado que transforma o seu Código da Essência num plano de ação profissional claro e personalizado.",
+      benefits: [
+        "Leitura profunda da sua essência profissional",
+        "3 caminhos personalizados (seguro, ambicioso, experimental)",
+        "Plano de ação de 14 dias com passos concretos",
+        "Identificação do seu sabotador principal",
+      ],
+      price: `${priceInfo.symbol}${priceInfo.price}`,
+      cta: "Desbloquear Ativação",
+      footer: "✅ Acesso imediato após pagamento",
+    },
+  };
+
+  const t = content[language as keyof typeof content] || content.pt;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader className="text-center">
+          <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center mb-4">
+            <Compass className="w-8 h-8 text-primary" />
+          </div>
+          <DialogTitle className="text-xl">{t.title}</DialogTitle>
+          <DialogDescription className="text-base">
+            {t.subtitle}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          <p className="text-sm text-muted-foreground text-center">
+            {t.description}
+          </p>
+
+          <div className="space-y-2">
+            {t.benefits.map((benefit, index) => (
+              <div key={index} className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <span className="text-sm">{benefit}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center pt-4 border-t">
+            <div className="text-3xl font-bold text-primary mb-2">
+              {t.price}
+            </div>
+            <p className="text-xs text-muted-foreground">{t.footer}</p>
+          </div>
+        </div>
+
+        <Button 
+          onClick={handlePurchase} 
+          className="w-full gap-2"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+          ) : (
+            <Sparkles className="w-4 h-4" />
+          )}
+          {t.cta}
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+};
