@@ -187,15 +187,6 @@ export const TestDetailPage = () => {
             </div>
           </div>
 
-          {/* Audience */}
-          <div className="mb-12">
-            <h3 className="text-xl font-semibold mb-3 text-foreground">
-              {labels.recommendedFor}
-            </h3>
-            <p className="text-foreground/90 leading-relaxed">
-              {content.audience}
-            </p>
-          </div>
 
           {/* Final CTA */}
           <div className="bg-gradient-to-br from-bruma-blue/20 to-lavender/20 rounded-2xl p-8 text-center">

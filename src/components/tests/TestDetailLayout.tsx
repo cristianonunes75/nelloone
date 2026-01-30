@@ -155,15 +155,6 @@ export const TestDetailLayout = ({
             </ul>
           </div>
 
-          {/* Audience */}
-          <div className="mb-12">
-            <h3 className="text-xl font-semibold mb-3 text-foreground">
-              {audienceTitle}
-            </h3>
-            <p className="text-foreground/90 leading-relaxed">
-              {audience}
-            </p>
-          </div>
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
