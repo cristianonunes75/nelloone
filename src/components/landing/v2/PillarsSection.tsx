@@ -71,7 +71,7 @@ const pillarCards = [
     icon: Users,
     title: "Como Você Se Conecta",
     description: "Cada pessoa tem um estilo único de se conectar afetivamente com outros. Conheça o seu e melhore seus relacionamentos.",
-    link: "/testes/linguagens-do-amor",
+    link: "/testes/estilos-conexao-afetiva",
     linkText: "Descobrir seu Estilo",
     color: "text-pink-500",
     bgColor: "bg-pink-500/10",
