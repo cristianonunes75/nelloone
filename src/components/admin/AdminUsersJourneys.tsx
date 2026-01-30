@@ -17,9 +17,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { 
-  Search, Eye, UserCog, Loader2, Map, Download, Ban, CheckCircle, X, RefreshCw, Trash2, Building2, Users
+  Search, Eye, UserCog, Loader2, Map, Download, Ban, CheckCircle, X, RefreshCw, Trash2, Building2, Users, Settings2
 } from "lucide-react";
 import { DeleteUserDialog } from "./DeleteUserDialog";
+import { AdminUserManagementDialog } from "./AdminUserManagementDialog";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Tooltip,
@@ -78,6 +79,8 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
   const [confirmAction, setConfirmAction] = useState<{type: string; user: UserWithDetails} | null>(null);
   const [userToDelete, setUserToDelete] = useState<UserWithDetails | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [userToManage, setUserToManage] = useState<UserWithDetails | null>(null);
+  const [showManageDialog, setShowManageDialog] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -567,28 +570,53 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setShowDetails(true);
-                          }}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleImpersonate(user)}
-                          disabled={impersonating === user.id || user.roles.includes('admin')}
-                        >
-                          {impersonating === user.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <UserCog className="w-4 h-4" />
-                          )}
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setShowDetails(true);
+                              }}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Ver detalhes</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setUserToManage(user);
+                                setShowManageDialog(true);
+                              }}
+                            >
+                              <Settings2 className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Gerenciar acessos</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleImpersonate(user)}
+                              disabled={impersonating === user.id || user.roles.includes('admin')}
+                            >
+                              {impersonating === user.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <UserCog className="w-4 h-4" />
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Simular usuário</TooltipContent>
+                        </Tooltip>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
@@ -656,6 +684,18 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
                   >
                     <Eye className="w-4 h-4 mr-1" />
                     Ver
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => {
+                      setUserToManage(user);
+                      setShowManageDialog(true);
+                    }}
+                  >
+                    <Settings2 className="w-4 h-4 mr-1" />
+                    Gerenciar
                   </Button>
                   <Button
                     variant="outline"
@@ -837,6 +877,13 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
         onOpenChange={setShowDeleteDialog}
         userName={userToDelete?.full_name || ""}
         onConfirm={handleDeleteUser}
+      />
+
+      <AdminUserManagementDialog
+        user={userToManage}
+        open={showManageDialog}
+        onOpenChange={setShowManageDialog}
+        onUpdate={fetchUsers}
       />
     </div>
   );
