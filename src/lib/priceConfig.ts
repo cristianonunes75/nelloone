@@ -115,7 +115,14 @@ export const testPrices: Record<string, TestPrice> = {
   // Ativação do Código da Essência - Premium activation report
   ativacao_codigo: {
     testType: "ativacao_codigo",
-    brl: { price: 97, priceId: null }, // Will be created in Stripe
+    brl: { price: 97, priceId: null },
+    usd: { price: 27, priceId: null },
+    eur: { price: 27, priceId: null },
+  },
+  // Ativação de Direção Profissional - Career direction upsell
+  ativacao_profissional: {
+    testType: "ativacao_profissional",
+    brl: { price: 97, priceId: "price_1SvQWhDjhZZxZELMicEbE8sI" },
     usd: { price: 27, priceId: null },
     eur: { price: 27, priceId: null },
   },

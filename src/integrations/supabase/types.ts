@@ -432,6 +432,96 @@ export type Database = {
         }
         Relationships: []
       }
+      ativacao_profissional: {
+        Row: {
+          action_mode: string | null
+          cannot_tolerate: Json | null
+          change_horizon: string | null
+          chosen_path: string | null
+          completed_at: string | null
+          created_at: string
+          direction_sentence: string | null
+          essence_motor: string | null
+          hours_per_week: number | null
+          id: string
+          language: string
+          life_phase: string | null
+          main_doubt: string | null
+          main_saboteur: string | null
+          needs_at_work: Json | null
+          needs_income_short_term: boolean | null
+          path_a: Json | null
+          path_b: Json | null
+          path_c: Json | null
+          plan_week_1: Json | null
+          plan_week_2: Json | null
+          rewritten_decision: string | null
+          saboteur_to_watch: string | null
+          status: string | null
+          stuck_reason: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_mode?: string | null
+          cannot_tolerate?: Json | null
+          change_horizon?: string | null
+          chosen_path?: string | null
+          completed_at?: string | null
+          created_at?: string
+          direction_sentence?: string | null
+          essence_motor?: string | null
+          hours_per_week?: number | null
+          id?: string
+          language?: string
+          life_phase?: string | null
+          main_doubt?: string | null
+          main_saboteur?: string | null
+          needs_at_work?: Json | null
+          needs_income_short_term?: boolean | null
+          path_a?: Json | null
+          path_b?: Json | null
+          path_c?: Json | null
+          plan_week_1?: Json | null
+          plan_week_2?: Json | null
+          rewritten_decision?: string | null
+          saboteur_to_watch?: string | null
+          status?: string | null
+          stuck_reason?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_mode?: string | null
+          cannot_tolerate?: Json | null
+          change_horizon?: string | null
+          chosen_path?: string | null
+          completed_at?: string | null
+          created_at?: string
+          direction_sentence?: string | null
+          essence_motor?: string | null
+          hours_per_week?: number | null
+          id?: string
+          language?: string
+          life_phase?: string | null
+          main_doubt?: string | null
+          main_saboteur?: string | null
+          needs_at_work?: Json | null
+          needs_income_short_term?: boolean | null
+          path_a?: Json | null
+          path_b?: Json | null
+          path_c?: Json | null
+          plan_week_1?: Json | null
+          plan_week_2?: Json | null
+          rewritten_decision?: string | null
+          saboteur_to_watch?: string | null
+          status?: string | null
+          stuck_reason?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -2915,6 +3005,7 @@ export type Database = {
           full_name: string
           has_activation_couple: boolean | null
           has_activation_individual: boolean | null
+          has_activation_professional: boolean | null
           has_identity_couple_premium: boolean | null
           has_nello_couple: boolean | null
           id: string
@@ -2942,6 +3033,7 @@ export type Database = {
           full_name: string
           has_activation_couple?: boolean | null
           has_activation_individual?: boolean | null
+          has_activation_professional?: boolean | null
           has_identity_couple_premium?: boolean | null
           has_nello_couple?: boolean | null
           id: string
@@ -2969,6 +3061,7 @@ export type Database = {
           full_name?: string
           has_activation_couple?: boolean | null
           has_activation_individual?: boolean | null
+          has_activation_professional?: boolean | null
           has_identity_couple_premium?: boolean | null
           has_nello_couple?: boolean | null
           id?: string
