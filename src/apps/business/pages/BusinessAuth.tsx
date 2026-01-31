@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { PasswordBreachWarning } from '@/components/PasswordBreachWarning';
+import { usePasswordBreachCheck } from '@/hooks/usePasswordBreachCheck';
 
 export default function BusinessAuth() {
   const [searchParams] = useSearchParams();
@@ -20,6 +22,7 @@ export default function BusinessAuth() {
   
   const defaultTab = searchParams.get('mode') === 'register' ? 'register' : 'login';
   const [activeTab, setActiveTab] = useState(defaultTab);
+  const { isBreached, isChecking, breachCount, checkPassword, reset: resetBreachCheck } = usePasswordBreachCheck();
   
   // Login form
   const [loginEmail, setLoginEmail] = useState('');
@@ -30,6 +33,15 @@ export default function BusinessAuth() {
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [companyName, setCompanyName] = useState('');
+
+  // Check password breach when password changes (only in register mode)
+  useEffect(() => {
+    if (activeTab === 'register' && registerPassword) {
+      checkPassword(registerPassword);
+    } else {
+      resetBreachCheck();
+    }
+  }, [registerPassword, activeTab, checkPassword, resetBreachCheck]);
 
   // Check if already logged in and has company
   useEffect(() => {
@@ -393,8 +405,13 @@ export default function BusinessAuth() {
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </Button>
                     </div>
+                    <PasswordBreachWarning 
+                      isBreached={isBreached} 
+                      isChecking={isChecking} 
+                      breachCount={breachCount}
+                    />
                   </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full" disabled={isLoading || isBreached === true}>
                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Criar conta'}
                   </Button>
                   <p className="text-xs text-center text-muted-foreground">

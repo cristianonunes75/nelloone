@@ -161,3 +161,6 @@ verify_jwt = true
 
 [functions.generate-action-plan]
 verify_jwt = true
+
+[functions.check-password-breach]
+verify_jwt = false
