@@ -3979,6 +3979,7 @@ export type Database = {
         }
         Returns: string
       }
+      owns_user_test: { Args: { _user_test_id: string }; Returns: boolean }
       remove_user_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
