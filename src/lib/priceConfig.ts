@@ -115,16 +115,16 @@ export const testPrices: Record<string, TestPrice> = {
   // Ativação do Código da Essência - Premium activation report
   ativacao_codigo: {
     testType: "ativacao_codigo",
-    brl: { price: 97, priceId: null },
-    usd: { price: 27, priceId: null },
-    eur: { price: 27, priceId: null },
+    brl: { price: 97, priceId: "price_1SvQWhDjhZZxZELMicEbE8sI" },
+    usd: { price: 27, priceId: "price_1SvferDjhZZxZELMvUkQXcpI" },
+    eur: { price: 27, priceId: "price_1Svff6DjhZZxZELMegk6lTtn" },
   },
   // Ativação de Direção Profissional - Career direction upsell
   activation_individual: {
     testType: "activation_individual",
     brl: { price: 97, priceId: "price_1SvQWhDjhZZxZELMicEbE8sI" },
-    usd: { price: 27, priceId: null },
-    eur: { price: 27, priceId: null },
+    usd: { price: 27, priceId: "price_1SvferDjhZZxZELMvUkQXcpI" },
+    eur: { price: 27, priceId: "price_1Svff6DjhZZxZELMegk6lTtn" },
   },
   // Identity Couple Premium - Mapa Definitivo do Casal (7 Pilares) HIGH TICKET
   identity_couple_premium: {
@@ -135,11 +135,11 @@ export const testPrices: Record<string, TestPrice> = {
     },
     usd: { 
       price: 297, 
-      priceId: null 
+      priceId: "price_1SvfdXDjhZZxZELMaNDfVXox" 
     },
     eur: { 
       price: 247, 
-      priceId: null 
+      priceId: "price_1SvfdoDjhZZxZELMLaONPhR5" 
     },
   },
 };
@@ -172,7 +172,7 @@ export const identityCouplePremiumPrices = {
     installments: 12,
     installmentPrice: 29,
     originalPrice: 447,
-    priceId: null,
+    priceId: "price_1SvfdXDjhZZxZELMaNDfVXox",
     currency: "USD" as Currency,
     symbol: "$",
   },
@@ -181,7 +181,7 @@ export const identityCouplePremiumPrices = {
     installments: 12,
     installmentPrice: 24,
     originalPrice: 397,
-    priceId: null,
+    priceId: "price_1SvfdoDjhZZxZELMLaONPhR5",
     currency: "EUR" as Currency,
     symbol: "€",
   },
