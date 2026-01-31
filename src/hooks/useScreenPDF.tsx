@@ -79,7 +79,26 @@ export const useScreenPDF = () => {
       );
 
       // Small delay to ensure all styles are applied
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Find all section elements that should not be split
+      const sections = element.querySelectorAll('[class*="rounded"], [class*="Card"], section, article, .bg-gradient-to-br, .bg-gradient-to-r');
+      const sectionBounds: { top: number; bottom: number; height: number }[] = [];
+      
+      const elementRect = element.getBoundingClientRect();
+      sections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        const relativeTop = rect.top - elementRect.top;
+        const relativeBottom = rect.bottom - elementRect.top;
+        // Only track sections with reasonable height (not tiny elements)
+        if (rect.height > 50 && rect.height < 800) {
+          sectionBounds.push({
+            top: relativeTop,
+            bottom: relativeBottom,
+            height: rect.height
+          });
+        }
+      });
 
       // Capture the element with html2canvas
       const canvas = await html2canvas(element, {
@@ -117,7 +136,7 @@ export const useScreenPDF = () => {
       // A4 dimensions in mm
       const pageWidthMM = 210;
       const pageHeightMM = 297;
-      const marginMM = 10; // Margin for footer
+      const marginMM = 15; // Margin for footer
       const usableHeightMM = pageHeightMM - marginMM;
 
       // Create PDF
@@ -127,24 +146,68 @@ export const useScreenPDF = () => {
         format: 'a4'
       });
 
+      // Calculate scale factor between element and canvas
+      const canvasScale = canvas.width / element.scrollWidth;
+      
       // Calculate how much of the canvas fits per page
       const imgWidthMM = pageWidthMM;
       const imgHeightMM = (canvas.height * imgWidthMM) / canvas.width;
       
       // Calculate page height in canvas pixels
-      const pageHeightPx = (usableHeightMM / imgHeightMM) * canvas.height;
+      const basePageHeightPx = (usableHeightMM / imgHeightMM) * canvas.height;
       
-      // Number of pages needed
-      const totalPages = Math.ceil(canvas.height / pageHeightPx);
+      // Convert section bounds to canvas pixels
+      const sectionBoundsInPx = sectionBounds.map(s => ({
+        top: s.top * canvasScale,
+        bottom: s.bottom * canvasScale,
+        height: s.height * canvasScale
+      }));
 
-      for (let pageNum = 0; pageNum < totalPages; pageNum++) {
-        if (pageNum > 0) {
+      // Calculate smart page breaks that don't cut sections
+      const pageBreaks: number[] = [0];
+      let currentY = 0;
+      
+      while (currentY < canvas.height) {
+        let idealBreak = currentY + basePageHeightPx;
+        
+        if (idealBreak >= canvas.height) {
+          break;
+        }
+        
+        // Check if this break would cut through any section
+        let adjustedBreak = idealBreak;
+        
+        for (const section of sectionBoundsInPx) {
+          // If the break is in the middle of a section
+          if (idealBreak > section.top && idealBreak < section.bottom) {
+            // Try to break before the section if it would fit on the next page
+            if (section.height < basePageHeightPx * 0.9) {
+              // Move break to before this section
+              adjustedBreak = Math.max(currentY + basePageHeightPx * 0.5, section.top - 20);
+            }
+            break;
+          }
+        }
+        
+        // Ensure we're making progress
+        if (adjustedBreak <= currentY) {
+          adjustedBreak = idealBreak;
+        }
+        
+        pageBreaks.push(adjustedBreak);
+        currentY = adjustedBreak;
+      }
+      
+      pageBreaks.push(canvas.height);
+
+      // Generate pages
+      for (let i = 0; i < pageBreaks.length - 1; i++) {
+        if (i > 0) {
           pdf.addPage();
         }
 
-        // Calculate the portion of the canvas for this page
-        const sourceY = pageNum * pageHeightPx;
-        const sourceHeight = Math.min(pageHeightPx, canvas.height - sourceY);
+        const sourceY = pageBreaks[i];
+        const sourceHeight = pageBreaks[i + 1] - sourceY;
         
         // Create a temporary canvas for this page slice
         const pageCanvas = document.createElement('canvas');
@@ -160,8 +223,8 @@ export const useScreenPDF = () => {
           // Draw the portion of the main canvas
           ctx.drawImage(
             canvas,
-            0, sourceY, canvas.width, sourceHeight,  // Source rectangle
-            0, 0, canvas.width, sourceHeight          // Destination rectangle
+            0, sourceY, canvas.width, sourceHeight,
+            0, 0, canvas.width, sourceHeight
           );
         }
 
