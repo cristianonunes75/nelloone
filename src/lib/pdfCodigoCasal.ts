@@ -1,171 +1,169 @@
 import jsPDF from "jspdf";
-import { PREMIUM_COLORS, PremiumPDFBuilder, type RGBColor } from "./pdf/pdfPremiumCore";
 
 interface PDFOptions {
   language?: 'pt' | 'pt-pt' | 'en';
 }
 
-// Re-export colors from premium core, adding couple-specific ones
+// ===================================================
+// COLOR PALETTE - Matching screen design (pastel colors)
+// ===================================================
 const COLORS = {
-  ...PREMIUM_COLORS,
-  // Couple-specific colors
-  accent: PREMIUM_COLORS.gold,
-  pink: PREMIUM_COLORS.pink,
-  background: PREMIUM_COLORS.cardBg,
-  green: PREMIUM_COLORS.green,
-  greenLight: PREMIUM_COLORS.greenLight,
-  amber: PREMIUM_COLORS.amber,
-  amberLight: PREMIUM_COLORS.amberLight,
-  red: PREMIUM_COLORS.red,
-  redLight: PREMIUM_COLORS.redLight,
-  blue: PREMIUM_COLORS.blue,
-  blueLight: PREMIUM_COLORS.blueLight,
-  purple: PREMIUM_COLORS.purple,
-  purpleLight: PREMIUM_COLORS.purpleLight,
-  // Chart-specific colors
-  gold: { r: 180, g: 140, b: 50 },       // Person A color for chart
-  indigo: { r: 100, g: 80, b: 180 },     // Person B color for chart
+  // Primary
+  primary: { r: 91, g: 93, b: 172 },        // Indigo primary
+  accent: { r: 205, g: 174, b: 103 },       // Gold accent
+  
+  // Text
+  text: { r: 50, g: 50, b: 50 },
+  muted: { r: 120, g: 120, b: 120 },
+  white: { r: 255, g: 255, b: 255 },
+  
+  // Section Colors (matching screen design)
+  // Pink/Rose for love sections
+  pink: { r: 236, g: 72, b: 153 },
+  pinkLight: { r: 253, g: 242, b: 248 },
+  pinkBorder: { r: 251, g: 207, b: 232 },
+  
+  // Purple for roles/archetypes
+  purple: { r: 139, g: 92, b: 246 },
+  purpleLight: { r: 250, g: 245, b: 255 },
+  purpleBorder: { r: 221, g: 214, b: 254 },
+  
+  // Orange for conductor/executor
+  orange: { r: 249, g: 115, b: 22 },
+  orangeLight: { r: 255, g: 247, b: 237 },
+  orangeBorder: { r: 254, g: 215, b: 170 },
+  
+  // Emerald/Green for synergy
+  green: { r: 16, g: 185, b: 129 },
+  greenLight: { r: 236, g: 253, b: 245 },
+  greenBorder: { r: 167, g: 243, b: 208 },
+  
+  // Amber for attention
+  amber: { r: 245, g: 158, b: 11 },
+  amberLight: { r: 255, g: 251, b: 235 },
+  amberBorder: { r: 253, g: 230, b: 138 },
+  
+  // Red for warning
+  red: { r: 244, g: 63, b: 94 },
+  redLight: { r: 254, g: 242, b: 242 },
+  redBorder: { r: 254, g: 202, b: 202 },
+  
+  // Blue for practical
+  blue: { r: 59, g: 130, b: 246 },
+  blueLight: { r: 239, g: 246, b: 255 },
+  blueBorder: { r: 191, g: 219, b: 254 },
+  
+  // Teal for decisions
+  teal: { r: 20, g: 184, b: 166 },
+  tealLight: { r: 240, g: 253, b: 250 },
+  tealBorder: { r: 153, g: 246, b: 228 },
+  
+  // Card backgrounds
+  cardBg: { r: 250, g: 250, b: 252 },
+  cardBorder: { r: 229, g: 231, b: 235 },
+  
+  // Cover (dark)
+  coverBg: { r: 15, g: 15, b: 20 },
+  gold: { r: 205, g: 174, b: 103 },
 };
 
 const TRANSLATIONS = {
   pt: {
     reportTitle: "Codigo do Casal",
-    subtitle: "Relatorio de Compatibilidade e Sinergia",
-    signature: "por NELLO ONE",
+    subtitle: "Mapa Definitivo do Relacionamento",
     boatTitle: "A Metafora do Barco",
     boatText: "O relacionamento nao e um porto seguro - e um barco em mar aberto. Voces sao os navegadores. Este relatorio e o mapa e a bussola que vao ajuda-los a ajustar as velas quando a tempestade vier.",
-    trafficLight: {
-      title: "Semaforo Relacional",
-      green: "Sinergia Natural",
-      greenDesc: "Onde a conexao flui com leveza",
-      yellow: "Atencao e Ajuste",
-      yellowDesc: "Pontos que exigem dialogo consciente",
-      red: "Zona de Choque",
-      redDesc: "Onde o conflito tende a surgir sob pressao"
-    },
-    sections: {
-      encontro: "O Encontro das Essencias",
-      santoBate: "Onde o Santo Bate",
-      bichoPega: "Onde o Bicho Pega",
-      potencializacao: "Onde Voces se Potencializam",
-      tabelaTraducao: "Tabela de Traducao do Casal",
-      protocoloPaz: "Protocolo de Paz Unificado",
-      manualConjuge: "Manual do Conjuge",
-      alertasPressao: "Alertas de Pressao",
-      desafioConexao: "Desafio de Conexao 24h",
-      quandoBuscar: "Quando Procurar Ajuda",
-      radarComparativo: "Perfil DISC Comparativo"
-    },
-    translationTable: {
-      whenDoes: "Quando faz/diz",
-      youFeel: "Voce sente",
-      truthBehind: "A Verdade por tras"
-    },
-    pressureAlerts: {
-      behavior: "Comportamento",
-      autoDefense: "Defesa automatica",
-      riskSituation: "Situacao de risco"
-    },
-    howToDeal: "Como lidar",
-    disarmWords: "Palavras que desarmam",
-    disclaimer: "Este relatorio e uma ferramenta simbolica de autoconhecimento. Nao substitui terapia ou aconselhamento profissional.",
+    visaoGeral: "Visao Geral do Casal",
+    papeisNaturais: "Papeis Naturais no Casal",
+    sensorDirecao: "Sensor de Direcao",
+    construtorExecutor: "Construtor / Executor",
+    forcasCentrais: "Forcas Centrais da Uniao",
+    emocionais: "Emocionais",
+    praticas: "Praticas",
+    visaoProp: "Visao e Proposito",
+    valoresEsp: "Valores e Espiritualidade",
+    amorNoCasal: "O Amor no Casal",
+    tensoesNaturais: "Tensoes Naturais do Casal",
+    zonaAjuste: "Zona de Ajuste do Casal",
+    protocoloLideranca: "Protocolo de Lideranca",
+    traducaoDia: "Traducao para o Dia a Dia",
+    sinteseExecutiva: "Sintese Executiva",
+    semaforo: "Semaforo Relacional",
+    synergyChart: "Perfil DISC Comparativo",
     footer: "NELLO ONE - Codigo do Casal",
-    why: "Por que",
     personA: "Pessoa A",
     personB: "Pessoa B"
   },
   'pt-pt': {
     reportTitle: "Codigo do Casal",
-    subtitle: "Relatorio de Compatibilidade e Sinergia",
-    signature: "por NELLO ONE",
+    subtitle: "Mapa Definitivo do Relacionamento",
     boatTitle: "A Metafora do Barco",
     boatText: "O relacionamento nao e um porto seguro - e um barco em mar aberto. Voces sao os navegadores. Este relatorio e o mapa e a bussola que vos vao ajudar a ajustar as velas quando a tempestade vier.",
-    trafficLight: {
-      title: "Semaforo Relacional",
-      green: "Sinergia Natural",
-      greenDesc: "Onde a conexao flui com leveza",
-      yellow: "Atencao e Ajuste",
-      yellowDesc: "Pontos que exigem dialogo consciente",
-      red: "Zona de Choque",
-      redDesc: "Onde o conflito tende a surgir sob pressao"
-    },
-    sections: {
-      encontro: "O Encontro das Essencias",
-      santoBate: "Onde o Santo Bate",
-      bichoPega: "Onde o Bicho Pega",
-      potencializacao: "Onde Voces se Potencializam",
-      tabelaTraducao: "Tabela de Traducao do Casal",
-      protocoloPaz: "Protocolo de Paz Unificado",
-      manualConjuge: "Manual do Conjuge",
-      alertasPressao: "Alertas de Pressao",
-      desafioConexao: "Desafio de Conexao 24h",
-      quandoBuscar: "Quando Procurar Ajuda",
-      radarComparativo: "Perfil DISC Comparativo"
-    },
-    translationTable: {
-      whenDoes: "Quando faz/diz",
-      youFeel: "Tu sentes",
-      truthBehind: "A Verdade por tras"
-    },
-    pressureAlerts: {
-      behavior: "Comportamento",
-      autoDefense: "Defesa automatica",
-      riskSituation: "Situacao de risco"
-    },
-    howToDeal: "Como lidar",
-    disarmWords: "Palavras que desarmam",
-    disclaimer: "Este relatorio e uma ferramenta simbolica de autoconhecimento. Nao substitui terapia ou aconselhamento profissional.",
+    visaoGeral: "Visao Geral do Casal",
+    papeisNaturais: "Papeis Naturais no Casal",
+    sensorDirecao: "Sensor de Direcao",
+    construtorExecutor: "Construtor / Executor",
+    forcasCentrais: "Forcas Centrais da Uniao",
+    emocionais: "Emocionais",
+    praticas: "Praticas",
+    visaoProp: "Visao e Proposito",
+    valoresEsp: "Valores e Espiritualidade",
+    amorNoCasal: "O Amor no Casal",
+    tensoesNaturais: "Tensoes Naturais do Casal",
+    zonaAjuste: "Zona de Ajuste do Casal",
+    protocoloLideranca: "Protocolo de Lideranca",
+    traducaoDia: "Traducao para o Dia a Dia",
+    sinteseExecutiva: "Sintese Executiva",
+    semaforo: "Semaforo Relacional",
+    synergyChart: "Perfil DISC Comparativo",
     footer: "NELLO ONE - Codigo do Casal",
-    why: "Porque",
     personA: "Pessoa A",
     personB: "Pessoa B"
   },
   en: {
     reportTitle: "Couple Code",
-    subtitle: "Compatibility and Synergy Report",
-    signature: "by NELLO ONE",
+    subtitle: "Definitive Relationship Map",
     boatTitle: "The Boat Metaphor",
     boatText: "A relationship is not a safe harbor - it is a boat on open water. You are the navigators. This report is the map and compass that will help you adjust the sails when the storm comes.",
-    trafficLight: {
-      title: "Relational Traffic Light",
-      green: "Natural Synergy",
-      greenDesc: "Where connection flows with ease",
-      yellow: "Attention and Adjustment",
-      yellowDesc: "Points that require conscious dialogue",
-      red: "Shock Zone",
-      redDesc: "Where conflict tends to arise under pressure"
-    },
-    sections: {
-      encontro: "The Meeting of Essences",
-      santoBate: "Where You Connect",
-      bichoPega: "Where Friction Happens",
-      potencializacao: "Where You Strengthen Each Other",
-      tabelaTraducao: "Couple Translation Table",
-      protocoloPaz: "Unified Peace Protocol",
-      manualConjuge: "Partner Manual",
-      alertasPressao: "Pressure Alerts",
-      desafioConexao: "24h Connection Challenge",
-      quandoBuscar: "When to Seek Help",
-      radarComparativo: "Comparative DISC Profile"
-    },
-    translationTable: {
-      whenDoes: "When does/says",
-      youFeel: "You feel",
-      truthBehind: "The truth behind"
-    },
-    pressureAlerts: {
-      behavior: "Behavior",
-      autoDefense: "Auto defense",
-      riskSituation: "Risk situation"
-    },
-    howToDeal: "How to deal",
-    disarmWords: "Disarming words",
-    disclaimer: "This report is a symbolic tool for self-knowledge. It does not replace therapy or professional counseling.",
+    visaoGeral: "Couple Overview",
+    papeisNaturais: "Natural Roles",
+    sensorDirecao: "Direction Sensor",
+    construtorExecutor: "Builder / Executor",
+    forcasCentrais: "Core Strengths",
+    emocionais: "Emotional",
+    praticas: "Practical",
+    visaoProp: "Vision & Purpose",
+    valoresEsp: "Values & Spirituality",
+    amorNoCasal: "Love in the Couple",
+    tensoesNaturais: "Natural Tensions",
+    zonaAjuste: "Adjustment Zone",
+    protocoloLideranca: "Leadership Protocol",
+    traducaoDia: "Daily Translation",
+    sinteseExecutiva: "Executive Summary",
+    semaforo: "Relational Traffic Light",
+    synergyChart: "Comparative DISC Profile",
     footer: "NELLO ONE - Couple Code",
-    why: "Why",
     personA: "Person A",
     personB: "Person B"
   }
+};
+
+// Helper to sanitize text (remove objects, undefined, etc)
+const sanitizeText = (value: any): string => {
+  if (value == null) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (typeof value === 'object') {
+    const text = value.texto ?? value.conteudo ?? value.resumo ?? value.titulo ?? value.mensagem ?? value.acao ?? value.situacao;
+    if (typeof text === 'string') return text;
+    try { return JSON.stringify(value); } catch { return ''; }
+  }
+  return String(value);
+};
+
+const sanitizeArray = (arr: any): string[] => {
+  if (!Array.isArray(arr)) return [];
+  return arr.map(item => sanitizeText(item)).filter(Boolean);
 };
 
 class PDFGenerator {
@@ -178,7 +176,6 @@ class PDFGenerator {
   private pageNumber: number;
   private t: typeof TRANSLATIONS['pt'];
   private footerHeight = 15;
-  private lineHeight = 5;
 
   constructor(lang: 'pt' | 'pt-pt' | 'en' = 'pt') {
     this.doc = new jsPDF({
@@ -188,7 +185,7 @@ class PDFGenerator {
     });
     this.pageWidth = this.doc.internal.pageSize.getWidth();
     this.pageHeight = this.doc.internal.pageSize.getHeight();
-    this.margin = 20;
+    this.margin = 15;
     this.contentWidth = this.pageWidth - this.margin * 2;
     this.currentY = this.margin;
     this.pageNumber = 0;
@@ -203,20 +200,14 @@ class PDFGenerator {
   }
 
   private addNewPage() {
-    if (this.pageNumber > 0) {
-      this.addFooter();
-    }
+    if (this.pageNumber > 0) this.addFooter();
     this.doc.addPage();
     this.pageNumber++;
     this.currentY = this.margin;
   }
 
-  private getAvailableHeight(): number {
-    return this.pageHeight - this.currentY - this.footerHeight;
-  }
-
-  private ensureSpace(requiredHeight: number): boolean {
-    if (this.currentY + requiredHeight > this.pageHeight - this.footerHeight) {
+  private ensureSpace(h: number): boolean {
+    if (this.currentY + h > this.pageHeight - this.footerHeight) {
       this.addNewPage();
       return true;
     }
@@ -224,2194 +215,755 @@ class PDFGenerator {
   }
 
   private measureTextHeight(text: string, width: number, fontSize: number): number {
+    if (!text) return 0;
     this.doc.setFontSize(fontSize);
-    const lines = this.doc.splitTextToSize(text, width);
-    return lines.length * (fontSize * 0.4);
+    return this.doc.splitTextToSize(text, width).length * (fontSize * 0.45);
   }
 
-  private writeWrappedText(text: string, x: number, y: number, maxWidth: number, fontSize = 10, color = COLORS.text, fontStyle: 'normal' | 'bold' | 'italic' = 'normal'): number {
-    if (!text) return y;
-    
-    this.doc.setFontSize(fontSize);
-    this.doc.setTextColor(color.r, color.g, color.b);
-    this.doc.setFont("helvetica", fontStyle);
-    
-    const lines = this.doc.splitTextToSize(text, maxWidth);
-    const lineHeight = fontSize * 0.45;
-    
-    lines.forEach((line: string) => {
-      if (y > this.pageHeight - this.footerHeight - 5) {
-        this.addNewPage();
-        y = this.currentY;
-      }
-      this.doc.text(line, x, y);
-      y += lineHeight;
-    });
-    
-    return y;
+  // ===================================================
+  // CARD COMPONENTS - Matching screen design
+  // ===================================================
+
+  // Simple card with pastel background and border
+  private drawCard(x: number, y: number, w: number, h: number, bgColor: any, borderColor: any) {
+    this.doc.setFillColor(bgColor.r, bgColor.g, bgColor.b);
+    this.doc.roundedRect(x, y, w, h, 4, 4, "F");
+    this.doc.setDrawColor(borderColor.r, borderColor.g, borderColor.b);
+    this.doc.setLineWidth(0.5);
+    this.doc.roundedRect(x, y, w, h, 4, 4, "S");
   }
 
-  // Helper to draw a small icon shape instead of emoji
-  private drawIconCircle(x: number, y: number, color: { r: number; g: number; b: number }, radius = 3) {
+  // Icon circle (like lucide icons on screen)
+  private drawIcon(x: number, y: number, color: any, radius = 3) {
     this.doc.setFillColor(color.r, color.g, color.b);
     this.doc.circle(x, y, radius, "F");
   }
 
-  // ==========================================
-  // PREMIUM BOOK-STYLE COVER PAGE (Unified with Código da Essência)
-  // ==========================================
-  private renderCover(personAName?: string, personBName?: string) {
-    this.pageNumber = 1;
+  // Section header with icon (matching screen Card headers)
+  private renderCardHeader(title: string, iconColor: any, emoji?: string) {
+    const iconRadius = 3;
+    const startX = this.margin + 4;
     
-    const centerX = this.pageWidth / 2;
-
-    // Full dark background - Same as Código da Essência
-    this.doc.setFillColor(
-      PREMIUM_COLORS.coverBackground.r,
-      PREMIUM_COLORS.coverBackground.g,
-      PREMIUM_COLORS.coverBackground.b
-    );
-    this.doc.rect(0, 0, this.pageWidth, this.pageHeight, "F");
-
-    // Gold accent line at 1/3 from top - Same as Código da Essência
-    this.doc.setFillColor(
-      PREMIUM_COLORS.gold.r,
-      PREMIUM_COLORS.gold.g,
-      PREMIUM_COLORS.gold.b
-    );
-    this.doc.rect(0, this.pageHeight / 3 - 1, this.pageWidth, 2, "F");
-
-    // Title - Same style as Código da Essência
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(42);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.text("CODIGO DO CASAL", centerX, this.pageHeight / 2 - 30, { align: "center" });
-
-    // Subtitle - Same style as Código da Essência
-    this.doc.setFontSize(16);
-    this.doc.setFont("helvetica", "normal");
-    this.doc.setTextColor(
-      PREMIUM_COLORS.gold.r,
-      PREMIUM_COLORS.gold.g,
-      PREMIUM_COLORS.gold.b
-    );
-    this.doc.text("Mapa Definitivo do Relacionamento", centerX, this.pageHeight / 2 - 15, { align: "center" });
-
-    // Couple names - Same placement as user name in Essência
-    if (personAName && personBName) {
-      this.doc.setFontSize(20);
-      this.doc.setFont("helvetica", "italic");
-      this.doc.setTextColor(200, 200, 200);
-      this.doc.text(`${personAName} & ${personBName}`, centerX, this.pageHeight / 2 + 15, { align: "center" });
-    }
-
-    // Quote - Same style as Código da Essência
-    this.doc.setFontSize(12);
-    this.doc.setFont("helvetica", "italic");
-    this.doc.setTextColor(150, 150, 150);
-    const quote = "O amor nao e um porto seguro - e um barco em mar aberto. Este e o mapa para navegarem juntos.";
-    const quoteLines = this.doc.splitTextToSize(`"${quote}"`, this.contentWidth - 40);
-    this.doc.text(quoteLines, centerX, this.pageHeight / 2 + 45, { align: "center" });
-
-    // Brand name - Same as Código da Essência
-    this.doc.setFontSize(14);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.setTextColor(
-      PREMIUM_COLORS.gold.r,
-      PREMIUM_COLORS.gold.g,
-      PREMIUM_COLORS.gold.b
-    );
-    this.doc.text("NELLO ONE", centerX, this.pageHeight - 40, { align: "center" });
-
-    // Date - Same as Código da Essência
-    this.doc.setFontSize(10);
-    this.doc.setFont("helvetica", "normal");
-    this.doc.setTextColor(150, 150, 150);
-    const dateLocale = this.t === TRANSLATIONS.en ? 'en-US' : 'pt-BR';
-    const date = new Date().toLocaleDateString(dateLocale, {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    });
-    this.doc.text(date, centerX, this.pageHeight - 30, { align: "center" });
-  }
-
-  // ==========================================
-  // TABLE OF CONTENTS (SUMARIO)
-  // ==========================================
-  private renderTableOfContents() {
-    this.addNewPage();
-    
-    const centerX = this.pageWidth / 2;
+    // Icon circle
+    this.drawIcon(startX + iconRadius, this.currentY + iconRadius, iconColor, iconRadius);
     
     // Title
-    this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 15, 3, 3, "F");
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(14);
+    this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+    this.doc.setFontSize(12);
     this.doc.setFont("helvetica", "bold");
-    this.doc.text("SUMARIO", centerX, this.currentY + 10, { align: "center" });
-    this.currentY += 25;
+    const titleText = emoji ? `${emoji} ${title}` : title;
+    this.doc.text(titleText, startX + iconRadius * 2 + 4, this.currentY + iconRadius + 2);
+    
+    this.currentY += 12;
+  }
 
-    const chapters = [
-      { num: "1", title: "A Metafora do Barco", desc: "Seu relacionamento como uma navegacao compartilhada" },
-      { num: "2", title: "Semaforo Relacional", desc: "Zonas de harmonia, ajuste e atencao" },
-      { num: "3", title: "O Encontro das Essencias", desc: "Onde suas identidades se cruzam" },
-      { num: "4", title: "Perfil DISC Comparativo", desc: "Comportamentos e estilos de acao" },
-      { num: "5", title: "Ritmos Biologicos (Temperamentos)", desc: "Protocolo de Ritmo do Casal" },
-      { num: "6", title: "Sinergia de Talentos (Inteligencias)", desc: "Como seus dons se complementam" },
-      { num: "7", title: "Dinamica de Papeis (Arquetipos)", desc: "O Mito do Casal" },
-      { num: "8", title: "Linguagens de Conexao Afetiva", desc: "Plano de Abastecimento Emocional" },
-      { num: "9", title: "Processamento de Decisao (Nello 16)", desc: "Como voces decidem juntos" },
-      { num: "10", title: "Tabela de Traducao do Casal", desc: "Decodificando comportamentos" },
-      { num: "11", title: "Protocolo de Paz Unificado", desc: "Regras para conflitos saudaveis" },
-      { num: "12", title: "Manual do Parceiro(a)", desc: "Guia pratico de convivencia" },
-      { num: "13", title: "Alertas de Pressao", desc: "Gatilhos e defesas automaticas" },
-      { num: "14", title: "Desafio de Conexao 24h", desc: "Acao pratica imediata" },
-      { num: "15", title: "Proximos Passos: Ativacoes", desc: "Continuidade e evolucao" },
-    ];
+  // ===================================================
+  // COVER PAGE - Dark elegant style
+  // ===================================================
+  private renderCover(nameA?: string, nameB?: string) {
+    this.pageNumber = 1;
+    const centerX = this.pageWidth / 2;
 
-    chapters.forEach((chapter, idx) => {
-      const isEven = idx % 2 === 0;
-      if (isEven) {
-        this.doc.setFillColor(248, 248, 252);
-        this.doc.rect(this.margin, this.currentY - 3, this.contentWidth, 14, "F");
-      }
-      
-      // Chapter number circle
-      this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-      this.doc.circle(this.margin + 8, this.currentY + 4, 5, "F");
-      this.doc.setTextColor(255, 255, 255);
-      this.doc.setFontSize(8);
+    // Full dark background
+    this.doc.setFillColor(COLORS.coverBg.r, COLORS.coverBg.g, COLORS.coverBg.b);
+    this.doc.rect(0, 0, this.pageWidth, this.pageHeight, "F");
+
+    // Gold accent line
+    this.doc.setFillColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
+    this.doc.rect(0, this.pageHeight / 3 - 1, this.pageWidth, 2, "F");
+
+    // Title
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(36);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text("CODIGO DO CASAL", centerX, this.pageHeight / 2 - 25, { align: "center" });
+
+    // Subtitle
+    this.doc.setFontSize(14);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.setTextColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
+    this.doc.text(this.t.subtitle, centerX, this.pageHeight / 2 - 10, { align: "center" });
+
+    // Names
+    if (nameA && nameB) {
+      this.doc.setFontSize(18);
+      this.doc.setFont("helvetica", "italic");
+      this.doc.setTextColor(200, 200, 200);
+      this.doc.text(`${nameA} & ${nameB}`, centerX, this.pageHeight / 2 + 15, { align: "center" });
+    }
+
+    // Brand
+    this.doc.setFontSize(12);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.setTextColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
+    this.doc.text("NELLO ONE", centerX, this.pageHeight - 35, { align: "center" });
+
+    // Date
+    this.doc.setFontSize(9);
+    this.doc.setFont("helvetica", "normal");
+    this.doc.setTextColor(150, 150, 150);
+    const date = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+    this.doc.text(date, centerX, this.pageHeight - 25, { align: "center" });
+  }
+
+  // ===================================================
+  // BOAT METAPHOR - Rose/pink card (matching screen)
+  // ===================================================
+  private renderBoatMetaphor() {
+    this.addNewPage();
+
+    const cardH = 50;
+    this.ensureSpace(cardH);
+
+    // Pink card background with border (like screen)
+    this.drawCard(this.margin, this.currentY, this.contentWidth, cardH, COLORS.pinkLight, COLORS.pinkBorder);
+
+    // Icon and title
+    const startX = this.margin + 8;
+    let innerY = this.currentY + 10;
+
+    // Ship icon (circle)
+    this.drawIcon(startX + 3, innerY, COLORS.pink, 4);
+    
+    this.doc.setTextColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
+    this.doc.setFontSize(11);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text(this.t.boatTitle, startX + 12, innerY + 2);
+
+    innerY += 10;
+
+    // Text
+    this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+    this.doc.setFontSize(9);
+    this.doc.setFont("helvetica", "italic");
+    const lines = this.doc.splitTextToSize(this.t.boatText, this.contentWidth - 16);
+    this.doc.text(lines, startX, innerY);
+
+    this.currentY += cardH + 10;
+  }
+
+  // ===================================================
+  // VISÃO GERAL - Blue gradient card
+  // ===================================================
+  private renderVisaoGeral(content: any) {
+    const visao = content.visao_geral;
+    if (!visao) return;
+
+    const metafora = sanitizeText(visao.metafora);
+    const descricao = sanitizeText(visao.descricao);
+
+    // Calculate height
+    const metaH = metafora ? 25 : 0;
+    const descH = this.measureTextHeight(descricao, this.contentWidth - 20, 10) + 15;
+    const cardH = metaH + descH + 25;
+
+    this.ensureSpace(cardH);
+
+    // Card
+    this.drawCard(this.margin, this.currentY, this.contentWidth, cardH, COLORS.blueLight, COLORS.blueBorder);
+
+    let innerY = this.currentY + 8;
+
+    // Header
+    this.drawIcon(this.margin + 10, innerY + 3, COLORS.blue, 3);
+    this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+    this.doc.setFontSize(11);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text(visao.titulo || this.t.visaoGeral, this.margin + 18, innerY + 5);
+    innerY += 12;
+
+    // Metafora highlight
+    if (metafora) {
+      this.doc.setFillColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b, 0.1);
+      this.doc.roundedRect(this.margin + 8, innerY, this.contentWidth - 16, 18, 3, 3, "F");
+      this.doc.setTextColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
+      this.doc.setFontSize(11);
       this.doc.setFont("helvetica", "bold");
-      this.doc.text(chapter.num, this.margin + 8, this.currentY + 6, { align: "center" });
+      this.doc.text(`* ${metafora} *`, this.pageWidth / 2, innerY + 11, { align: "center" });
+      innerY += 22;
+    }
+
+    // Description
+    if (descricao) {
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "normal");
+      const lines = this.doc.splitTextToSize(descricao, this.contentWidth - 20);
+      this.doc.text(lines, this.margin + 10, innerY);
+    }
+
+    this.currentY += cardH + 8;
+  }
+
+  // ===================================================
+  // PAPÉIS NATURAIS - Two side-by-side cards (purple/orange)
+  // ===================================================
+  private renderPapeisNaturais(content: any) {
+    const papeis = content.papeis_naturais || content._role_assignment;
+    if (!papeis) return;
+
+    const sensor = papeis.sensor;
+    const condutor = papeis.condutor || papeis.conductor;
+    if (!sensor && !condutor) return;
+
+    const cardH = 45;
+    this.ensureSpace(cardH + 20);
+
+    // Section header
+    this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+    this.doc.setFontSize(10);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text(papeis.titulo || this.t.papeisNaturais, this.margin, this.currentY);
+    this.currentY += 8;
+
+    const halfW = (this.contentWidth - 5) / 2;
+
+    // Sensor card (purple)
+    if (sensor) {
+      this.drawCard(this.margin, this.currentY, halfW, cardH, COLORS.purpleLight, COLORS.purpleBorder);
+      let y = this.currentY + 10;
       
-      // Title
+      // Emoji and role
+      this.doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(`Sensor de Direcao`, this.margin + 8, y);
+      y += 8;
+      
+      // Name
       this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
       this.doc.setFontSize(10);
       this.doc.setFont("helvetica", "bold");
-      this.doc.text(chapter.title, this.margin + 18, this.currentY + 5);
+      this.doc.text(sanitizeText(sensor.nome || sensor.name), this.margin + 8, y);
+    }
+
+    // Condutor card (orange)
+    if (condutor) {
+      const x = this.margin + halfW + 5;
+      this.drawCard(x, this.currentY, halfW, cardH, COLORS.orangeLight, COLORS.orangeBorder);
+      let y = this.currentY + 10;
       
-      // Description
-      this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-      this.doc.setFontSize(8);
+      // Emoji and role
+      this.doc.setTextColor(COLORS.orange.r, COLORS.orange.g, COLORS.orange.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(`Construtor / Executor`, x + 8, y);
+      y += 8;
+      
+      // Name
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(10);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(sanitizeText(condutor.nome || condutor.name), x + 8, y);
+    }
+
+    this.currentY += cardH + 10;
+  }
+
+  // ===================================================
+  // FORÇAS CENTRAIS - Four colored sub-cards
+  // ===================================================
+  private renderForcasCentrais(content: any) {
+    const forcas = content.forcas_centrais;
+    if (!forcas) return;
+
+    this.addNewPage();
+
+    // Section header
+    this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
+    this.doc.setFontSize(12);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text(forcas.titulo || this.t.forcasCentrais, this.margin, this.currentY);
+    this.currentY += 10;
+
+    const sections = [
+      { key: 'forcas_emocionais', label: this.t.emocionais, emoji: '❤️', color: COLORS.pink, bg: COLORS.pinkLight, border: COLORS.pinkBorder },
+      { key: 'forcas_praticas', label: this.t.praticas, emoji: '🛠️', color: COLORS.blue, bg: COLORS.blueLight, border: COLORS.blueBorder },
+      { key: 'visao_proposito', label: this.t.visaoProp, emoji: '🎯', color: COLORS.purple, bg: COLORS.purpleLight, border: COLORS.purpleBorder },
+      { key: 'valores_espiritualidade', label: this.t.valoresEsp, emoji: '✨', color: COLORS.amber, bg: COLORS.amberLight, border: COLORS.amberBorder },
+    ];
+
+    sections.forEach(sec => {
+      const text = sanitizeText(forcas[sec.key]);
+      if (!text) return;
+
+      const textH = this.measureTextHeight(text, this.contentWidth - 24, 9);
+      const cardH = textH + 22;
+      this.ensureSpace(cardH);
+
+      this.drawCard(this.margin, this.currentY, this.contentWidth, cardH, sec.bg, sec.border);
+
+      let y = this.currentY + 10;
+      
+      // Label with color
+      this.doc.setTextColor(sec.color.r, sec.color.g, sec.color.b);
+      this.doc.setFontSize(10);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(`${sec.emoji} ${sec.label}`, this.margin + 8, y);
+      y += 8;
+
+      // Content
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(9);
       this.doc.setFont("helvetica", "normal");
-      this.doc.text(chapter.desc, this.margin + 18, this.currentY + 11);
-      
-      this.currentY += 16;
+      const lines = this.doc.splitTextToSize(text, this.contentWidth - 20);
+      this.doc.text(lines, this.margin + 8, y);
+
+      this.currentY += cardH + 6;
     });
   }
 
-  // ==========================================
-  // BOAT METAPHOR SECTION
-  // ==========================================
-  private renderBoatMetaphor() {
+  // ===================================================
+  // O AMOR NO CASAL - Pink/Rose gradient
+  // ===================================================
+  private renderAmorNoCasal(content: any) {
+    const amor = content.amor_no_casal;
+    if (!amor) return;
+
     this.addNewPage();
-    
-    const boxHeight = 45;
-    this.ensureSpace(boxHeight);
-    
-    // Blue bordered box
-    this.doc.setFillColor(COLORS.blueLight.r, COLORS.blueLight.g, COLORS.blueLight.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, boxHeight, 4, 4, "F");
-    this.doc.setDrawColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
-    this.doc.setLineWidth(0.5);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, boxHeight, 4, 4, "S");
-    
-    // Icon (blue circle instead of boat emoji) and title
-    this.drawIconCircle(this.margin + 10, this.currentY + 10, COLORS.blue, 4);
-    this.doc.setTextColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
-    this.doc.setFontSize(14);
+
+    // Main card
+    const cardH = 80;
+    this.drawCard(this.margin, this.currentY, this.contentWidth, cardH, COLORS.pinkLight, COLORS.pinkBorder);
+
+    let y = this.currentY + 10;
+
+    // Header
+    this.drawIcon(this.margin + 10, y + 2, COLORS.pink, 4);
+    this.doc.setTextColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
+    this.doc.setFontSize(12);
     this.doc.setFont("helvetica", "bold");
-    this.doc.text(this.t.boatTitle, this.margin + 18, this.currentY + 12);
-    
-    // Description text
-    this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-    this.doc.setFontSize(10);
-    this.doc.setFont("helvetica", "italic");
-    const boatLines = this.doc.splitTextToSize(this.t.boatText, this.contentWidth - 16);
-    this.doc.text(boatLines, this.margin + 8, this.currentY + 22);
-    
-    this.currentY += boxHeight + 12;
+    this.doc.text(amor.titulo || `❤️ ${this.t.amorNoCasal}`, this.margin + 18, y + 5);
+    y += 15;
+
+    // Key message
+    if (amor.mensagem_chave) {
+      this.doc.setTextColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
+      this.doc.setFontSize(10);
+      this.doc.setFont("helvetica", "italic");
+      this.doc.text(`"${sanitizeText(amor.mensagem_chave)}"`, this.margin + 12, y);
+      y += 12;
+    }
+
+    // Two columns for expressions
+    const halfW = (this.contentWidth - 20) / 2;
+    const colY = y;
+
+    if (amor.como_expressa_amor_a) {
+      this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b, 0.1);
+      this.doc.roundedRect(this.margin + 5, colY, halfW, 40, 3, 3, "F");
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(sanitizeText(amor.como_expressa_amor_a.nome), this.margin + 10, colY + 10);
+      this.doc.setFont("helvetica", "normal");
+      const lines = this.doc.splitTextToSize(sanitizeText(amor.como_expressa_amor_a.forma_expressao), halfW - 10);
+      this.doc.text(lines, this.margin + 10, colY + 18);
+    }
+
+    if (amor.como_expressa_amor_b) {
+      const x2 = this.margin + 10 + halfW;
+      this.doc.setFillColor(255, 228, 230);
+      this.doc.roundedRect(x2, colY, halfW, 40, 3, 3, "F");
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(sanitizeText(amor.como_expressa_amor_b.nome), x2 + 5, colY + 10);
+      this.doc.setFont("helvetica", "normal");
+      const lines = this.doc.splitTextToSize(sanitizeText(amor.como_expressa_amor_b.forma_expressao), halfW - 10);
+      this.doc.text(lines, x2 + 5, colY + 18);
+    }
+
+    this.currentY += cardH + 10;
   }
 
-  // ==========================================
-  // TRAFFIC LIGHT SECTION
-  // ==========================================
-  private renderTrafficLight(content: any) {
+  // ===================================================
+  // TRAFFIC LIGHT - Green/Yellow/Red zones
+  // ===================================================
+  private renderSemaforo(content: any) {
     const semaforo = content.semaforo_relacional;
     if (!semaforo) return;
 
-    // Section title
-    this.doc.setTextColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-    this.doc.setFontSize(16);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.text(semaforo.titulo || this.t.trafficLight.title, this.margin, this.currentY);
-    this.currentY += 10;
+    this.addNewPage();
 
-    // Render each zone with colored circles instead of emoji
-    this.renderTrafficZone(semaforo.verde, COLORS.green, COLORS.greenLight, this.t.trafficLight.green, this.t.trafficLight.greenDesc);
-    this.renderTrafficZone(semaforo.amarelo, COLORS.amber, COLORS.amberLight, this.t.trafficLight.yellow, this.t.trafficLight.yellowDesc);
-    this.renderTrafficZone(semaforo.vermelho, COLORS.red, COLORS.redLight, this.t.trafficLight.red, this.t.trafficLight.redDesc);
-  }
-
-  private renderTrafficZone(zone: any, mainColor: any, bgColor: any, title: string, desc: string) {
-    if (!zone) return;
-
-    const points = zone.pontos || [];
-    const textHeight = 25 + (points.length * 8);
-    this.ensureSpace(Math.min(textHeight, 60));
-
-    const startY = this.currentY;
-    
-    // Background box
-    this.doc.setFillColor(bgColor.r, bgColor.g, bgColor.b);
-    
-    // Calculate actual height needed
-    let tempY = startY + 20;
-    if (zone.descricao) {
-      const descLines = this.doc.splitTextToSize(zone.descricao, this.contentWidth - 16);
-      tempY += descLines.length * 4.5;
-    }
-    points.forEach((ponto: string) => {
-      const pointLines = this.doc.splitTextToSize("- " + ponto, this.contentWidth - 20);
-      tempY += pointLines.length * 4.5 + 2;
-    });
-    
-    const boxHeight = Math.max(tempY - startY + 8, 30);
-    
-    // Check if we need a new page for this entire box
-    if (this.currentY + boxHeight > this.pageHeight - this.footerHeight) {
-      this.addNewPage();
-    }
-
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, boxHeight, 3, 3, "F");
-    this.doc.setDrawColor(mainColor.r, mainColor.g, mainColor.b);
-    this.doc.setLineWidth(0.3);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, boxHeight, 3, 3, "S");
-
-    // Title with colored circle icon instead of emoji
-    this.drawIconCircle(this.margin + 10, this.currentY + 8, mainColor, 4);
-    this.doc.setTextColor(mainColor.r, mainColor.g, mainColor.b);
+    // Title
+    this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
     this.doc.setFontSize(12);
     this.doc.setFont("helvetica", "bold");
-    this.doc.text(zone.titulo || title, this.margin + 18, this.currentY + 10);
-    
-    // Subtitle description
-    this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-    this.doc.setFontSize(9);
-    this.doc.setFont("helvetica", "italic");
-    this.doc.text(desc, this.margin + 6, this.currentY + 16);
+    this.doc.text(semaforo.titulo || this.t.semaforo, this.margin, this.currentY);
+    this.currentY += 10;
 
-    let innerY = this.currentY + 22;
+    const zones = [
+      { data: semaforo.verde, emoji: '🟢', title: 'Sinergia Natural', color: COLORS.green, bg: COLORS.greenLight, border: COLORS.greenBorder },
+      { data: semaforo.amarelo, emoji: '🟡', title: 'Atencao e Ajuste', color: COLORS.amber, bg: COLORS.amberLight, border: COLORS.amberBorder },
+      { data: semaforo.vermelho, emoji: '🔴', title: 'Zona de Choque', color: COLORS.red, bg: COLORS.redLight, border: COLORS.redBorder },
+    ];
 
-    // Zone description
-    if (zone.descricao) {
+    zones.forEach(zone => {
+      if (!zone.data) return;
+
+      const pontos = sanitizeArray(zone.data.pontos);
+      const desc = sanitizeText(zone.data.descricao);
+      const pontosH = pontos.length * 8;
+      const descH = this.measureTextHeight(desc, this.contentWidth - 20, 9);
+      const cardH = 20 + descH + pontosH + 10;
+
+      this.ensureSpace(cardH);
+      this.drawCard(this.margin, this.currentY, this.contentWidth, cardH, zone.bg, zone.border);
+
+      let y = this.currentY + 10;
+
+      // Title with emoji
+      this.doc.setTextColor(zone.color.r, zone.color.g, zone.color.b);
+      this.doc.setFontSize(11);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(`${zone.emoji} ${zone.data.titulo || zone.title}`, this.margin + 8, y);
+      y += 8;
+
+      // Description
+      if (desc) {
+        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
+        this.doc.setFontSize(8);
+        this.doc.setFont("helvetica", "italic");
+        const lines = this.doc.splitTextToSize(desc, this.contentWidth - 20);
+        this.doc.text(lines, this.margin + 8, y);
+        y += lines.length * 4 + 4;
+      }
+
+      // Points
       this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
       this.doc.setFontSize(9);
       this.doc.setFont("helvetica", "normal");
-      const descLines = this.doc.splitTextToSize(zone.descricao, this.contentWidth - 16);
-      this.doc.text(descLines, this.margin + 6, innerY);
-      innerY += descLines.length * 4.5 + 4;
-    }
+      pontos.forEach(p => {
+        this.drawIcon(this.margin + 12, y - 1, zone.color, 1.5);
+        this.doc.text(p, this.margin + 18, y);
+        y += 6;
+      });
 
-    // Points with bullet circles
-    points.forEach((ponto: string) => {
-      this.drawIconCircle(this.margin + 8, innerY - 1, mainColor, 1.5);
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(9);
-      this.doc.setFont("helvetica", "normal");
-      const pointLines = this.doc.splitTextToSize(ponto, this.contentWidth - 20);
-      this.doc.text(pointLines, this.margin + 14, innerY);
-      innerY += pointLines.length * 4.5 + 2;
+      this.currentY += cardH + 6;
     });
-
-    this.currentY += boxHeight + 8;
   }
 
-  // ==========================================
-  // SECTION WITH COLORED HEADER - Unified with Código da Essência style
-  // ==========================================
-  private renderSectionHeader(title: string, color = COLORS.primary) {
-    this.ensureSpace(45);
-
-    // Full-width header bar - Same as Código da Essência
-    this.doc.setFillColor(color.r, color.g, color.b);
-    this.doc.rect(0, this.currentY - 8, this.pageWidth, 35, "F");
-
-    // Title text
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(20);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.text(title, this.margin, this.currentY + 10);
-
-    // Footer reference
-    this.doc.setFontSize(8);
-    this.doc.setTextColor(
-      PREMIUM_COLORS.light.r,
-      PREMIUM_COLORS.light.g,
-      PREMIUM_COLORS.light.b
-    );
-    this.doc.text(`NELLO ONE • ${this.t.reportTitle}`, this.margin, this.pageHeight - 10);
-
-    this.currentY += 40;
-  }
-  
-  // Compact header for subsections
-  private renderCompactSectionHeader(title: string, color = COLORS.primary) {
-    this.ensureSpace(18);
-    
-    this.doc.setFillColor(color.r, color.g, color.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 12, 2, 2, "F");
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(11);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.text(title, this.margin + 6, this.currentY + 8);
-    this.currentY += 18;
-  }
-
-  // ==========================================
-  // DISC RADAR CHART (Native jsPDF rendering)
-  // ==========================================
-  private renderDISCRadarChart(content: any) {
-    // Extract DISC data from content
-    const discA = content.perfil_a?.disc || content.usuario_a?.disc || { D: 50, I: 50, S: 50, C: 50 };
-    const discB = content.perfil_b?.disc || content.usuario_b?.disc || { D: 50, I: 50, S: 50, C: 50 };
-    
-    // Only render if we have DISC data
-    if (!discA && !discB) return;
+  // ===================================================
+  // DISC RADAR CHART
+  // ===================================================
+  private renderDISCChart(content: any) {
+    const dados = content.dados_grafico;
+    if (!dados?.usuario_a?.disc || !dados?.usuario_b?.disc) return;
 
     this.addNewPage();
-    this.renderSectionHeader(this.t.sections.radarComparativo, COLORS.purple);
+
+    // Title
+    this.doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+    this.doc.setFontSize(12);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text(this.t.synergyChart, this.margin, this.currentY);
+    this.currentY += 15;
 
     const centerX = this.pageWidth / 2;
-    const centerY = this.currentY + 55;
-    const maxRadius = 45;
-    
-    // Draw background circles (grid)
-    this.doc.setDrawColor(200, 200, 200);
+    const centerY = this.currentY + 50;
+    const maxR = 40;
+
+    // Grid circles
+    this.doc.setDrawColor(220, 220, 220);
     this.doc.setLineWidth(0.2);
     for (let i = 1; i <= 4; i++) {
-      const r = (maxRadius / 4) * i;
-      this.doc.circle(centerX, centerY, r, "S");
+      this.doc.circle(centerX, centerY, (maxR / 4) * i, "S");
     }
 
-    // Draw axis lines
-    const angles = [0, 90, 180, 270]; // D, I, S, C positions
+    // Axes
+    const angles = [0, 90, 180, 270];
     const labels = ["D", "I", "S", "C"];
-    const fullLabels = ["Dominancia", "Influencia", "Estabilidade", "Conformidade"];
-    
-    angles.forEach((angle, idx) => {
-      const rad = (angle - 90) * (Math.PI / 180);
-      const x2 = centerX + maxRadius * Math.cos(rad);
-      const y2 = centerY + maxRadius * Math.sin(rad);
-      
-      this.doc.setDrawColor(180, 180, 180);
+    angles.forEach((a, i) => {
+      const rad = (a - 90) * (Math.PI / 180);
+      const x2 = centerX + maxR * Math.cos(rad);
+      const y2 = centerY + maxR * Math.sin(rad);
       this.doc.line(centerX, centerY, x2, y2);
       
-      // Labels
-      const labelX = centerX + (maxRadius + 8) * Math.cos(rad);
-      const labelY = centerY + (maxRadius + 8) * Math.sin(rad);
+      const lx = centerX + (maxR + 8) * Math.cos(rad);
+      const ly = centerY + (maxR + 8) * Math.sin(rad);
       this.doc.setFontSize(10);
       this.doc.setFont("helvetica", "bold");
       this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.text(labels[idx], labelX, labelY + 3, { align: "center" });
+      this.doc.text(labels[i], lx, ly + 3, { align: "center" });
     });
 
-    // Helper to get point coordinates
-    const getPoint = (value: number, angleIndex: number) => {
-      const rad = (angles[angleIndex] - 90) * (Math.PI / 180);
-      const r = (value / 100) * maxRadius;
-      return {
-        x: centerX + r * Math.cos(rad),
-        y: centerY + r * Math.sin(rad)
-      };
+    // Draw polygons
+    const getPoint = (val: number, idx: number) => {
+      const rad = (angles[idx] - 90) * (Math.PI / 180);
+      const r = (val / 100) * maxR;
+      return { x: centerX + r * Math.cos(rad), y: centerY + r * Math.sin(rad) };
     };
 
-    // Draw Person A polygon (Gold) - with SEMI-TRANSPARENT FILL
+    const discA = dados.usuario_a.disc;
+    const discB = dados.usuario_b.disc;
     const valuesA = [discA.D ?? 50, discA.I ?? 50, discA.S ?? 50, discA.C ?? 50];
+    const valuesB = [discB.D ?? 50, discB.I ?? 50, discB.S ?? 50, discB.C ?? 50];
+
+    // Person A (gold)
     const pointsA = valuesA.map((v, i) => getPoint(v, i));
-    
-    // Draw filled polygon for A using GState for transparency
-    this.doc.setGState(new (this.doc as any).GState({ opacity: 0.35 }));
+    this.doc.setGState(new (this.doc as any).GState({ opacity: 0.3 }));
     this.doc.setFillColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
-    
-    // Create filled path for Person A
     this.doc.moveTo(pointsA[0].x, pointsA[0].y);
-    for (let i = 1; i < pointsA.length; i++) {
-      this.doc.lineTo(pointsA[i].x, pointsA[i].y);
-    }
+    pointsA.slice(1).forEach(p => this.doc.lineTo(p.x, p.y));
     this.doc.lineTo(pointsA[0].x, pointsA[0].y);
     this.doc.fill();
-    
-    // Reset opacity for stroke and draw outline
     this.doc.setGState(new (this.doc as any).GState({ opacity: 1 }));
     this.doc.setDrawColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
-    this.doc.setLineWidth(2.5);
+    this.doc.setLineWidth(2);
     for (let i = 0; i < pointsA.length; i++) {
       const next = (i + 1) % pointsA.length;
       this.doc.line(pointsA[i].x, pointsA[i].y, pointsA[next].x, pointsA[next].y);
     }
-    
-    // Draw vertex points for A
     pointsA.forEach(p => {
       this.doc.setFillColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
-      this.doc.circle(p.x, p.y, 2.5, "F");
+      this.doc.circle(p.x, p.y, 2, "F");
     });
 
-    // Draw Person B polygon (Indigo/Purple) - with SEMI-TRANSPARENT FILL
-    const valuesB = [discB.D ?? 50, discB.I ?? 50, discB.S ?? 50, discB.C ?? 50];
+    // Person B (purple)
     const pointsB = valuesB.map((v, i) => getPoint(v, i));
-    
-    // Draw filled polygon for B using GState for transparency
-    this.doc.setGState(new (this.doc as any).GState({ opacity: 0.35 }));
-    this.doc.setFillColor(COLORS.indigo.r, COLORS.indigo.g, COLORS.indigo.b);
-    
-    // Create filled path for Person B
+    this.doc.setGState(new (this.doc as any).GState({ opacity: 0.3 }));
+    this.doc.setFillColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
     this.doc.moveTo(pointsB[0].x, pointsB[0].y);
-    for (let i = 1; i < pointsB.length; i++) {
-      this.doc.lineTo(pointsB[i].x, pointsB[i].y);
-    }
+    pointsB.slice(1).forEach(p => this.doc.lineTo(p.x, p.y));
     this.doc.lineTo(pointsB[0].x, pointsB[0].y);
     this.doc.fill();
-    
-    // Reset opacity for stroke and draw outline
     this.doc.setGState(new (this.doc as any).GState({ opacity: 1 }));
-    this.doc.setDrawColor(COLORS.indigo.r, COLORS.indigo.g, COLORS.indigo.b);
-    this.doc.setLineWidth(2.5);
+    this.doc.setDrawColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+    this.doc.setLineWidth(2);
     for (let i = 0; i < pointsB.length; i++) {
       const next = (i + 1) % pointsB.length;
       this.doc.line(pointsB[i].x, pointsB[i].y, pointsB[next].x, pointsB[next].y);
     }
-    
-    // Draw vertex points for B
     pointsB.forEach(p => {
-      this.doc.setFillColor(COLORS.indigo.r, COLORS.indigo.g, COLORS.indigo.b);
-      this.doc.circle(p.x, p.y, 2.5, "F");
+      this.doc.setFillColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+      this.doc.circle(p.x, p.y, 2, "F");
     });
 
     // Legend
-    const legendY = centerY + maxRadius + 20;
-    
-    // Person A legend
+    const legendY = centerY + maxR + 15;
     this.doc.setFillColor(COLORS.gold.r, COLORS.gold.g, COLORS.gold.b);
-    this.doc.circle(centerX - 35, legendY, 4, "F");
-    this.doc.setFontSize(10);
-    this.doc.setFont("helvetica", "normal");
+    this.doc.circle(centerX - 30, legendY, 3, "F");
+    this.doc.setFontSize(9);
     this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-    const nameA = content.perfil_a?.nome || content.usuario_a?.nome || this.t.personA;
-    this.doc.text(nameA, centerX - 28, legendY + 3);
-    
-    // Person B legend
-    this.doc.setFillColor(COLORS.indigo.r, COLORS.indigo.g, COLORS.indigo.b);
-    this.doc.circle(centerX + 25, legendY, 4, "F");
-    const nameB = content.perfil_b?.nome || content.usuario_b?.nome || this.t.personB;
-    this.doc.text(nameB, centerX + 32, legendY + 3);
+    this.doc.text(dados.usuario_a.nome || this.t.personA, centerX - 23, legendY + 2);
+
+    this.doc.setFillColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
+    this.doc.circle(centerX + 20, legendY, 3, "F");
+    this.doc.text(dados.usuario_b.nome || this.t.personB, centerX + 27, legendY + 2);
 
     this.currentY = legendY + 15;
   }
 
-  // ==========================================
-  // MEETING OF ESSENCES
-  // ==========================================
-  private renderMeetingOfEssences(content: any) {
-    const encontro = content.encontro_essencias;
-    if (!encontro) return;
-
-    this.addNewPage();
-    this.renderSectionHeader(encontro.titulo || this.t.sections.encontro, COLORS.pink);
-
-    // Metaphor title (centered, highlighted) - no emoji, use accent bar
-    if (encontro.metafora) {
-      this.ensureSpace(18);
-      
-      // Draw accent bar
-      this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
-      this.doc.rect(this.margin, this.currentY - 2, 3, 12, "F");
-      
-      this.doc.setTextColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
-      this.doc.setFontSize(14);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(encontro.metafora, this.margin + 8, this.currentY + 6);
-      this.currentY += 16;
-    }
-
-    // Description text
-    if (encontro.descricao) {
-      this.currentY = this.writeWrappedText(encontro.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal');
-      this.currentY += 6;
-    }
-
-    // Descriptions for each person
-    if (encontro.descricao_usuario_a) {
-      this.currentY = this.writeWrappedText(encontro.descricao_usuario_a, this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal');
-      this.currentY += 6;
-    }
-    if (encontro.descricao_usuario_b) {
-      this.currentY = this.writeWrappedText(encontro.descricao_usuario_b, this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal');
-      this.currentY += 6;
-    }
-  }
-
-  // ==========================================
-  // ONDE O SANTO BATE
-  // ==========================================
-  private renderSantoBate(content: any) {
-    const santo = content.santo_bate;
-    if (!santo) return;
-
-    this.addNewPage();
-    this.renderSectionHeader(santo.titulo || this.t.sections.santoBate, COLORS.green);
-
-    if (santo.descricao) {
-      this.currentY = this.writeWrappedText(santo.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-      this.currentY += 8;
-    }
-
-    // Areas cards
-    santo.areas?.forEach((area: any) => {
-      const areaHeight = this.measureTextHeight(area.descricao || '', this.contentWidth - 20, 10) + 20;
-      this.ensureSpace(areaHeight);
-
-      // Card background
-      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, areaHeight, 3, 3, "F");
-      this.doc.setDrawColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      this.doc.setLineWidth(0.2);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, areaHeight, 3, 3, "S");
-
-      // Title with circle icon instead of sparkle emoji
-      this.drawIconCircle(this.margin + 8, this.currentY + 8, COLORS.green, 3);
-      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      this.doc.setFontSize(11);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(area.titulo, this.margin + 14, this.currentY + 10);
-
-      // Description
-      if (area.descricao) {
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFontSize(10);
-        this.doc.setFont("helvetica", "normal");
-        const lines = this.doc.splitTextToSize(area.descricao, this.contentWidth - 16);
-        this.doc.text(lines, this.margin + 6, this.currentY + 18);
-      }
-
-      this.currentY += areaHeight + 6;
-    });
-  }
-
-  // ==========================================
-  // ONDE O BICHO PEGA
-  // ==========================================
-  private renderBichoPega(content: any) {
-    const bicho = content.bicho_pega;
-    if (!bicho) return;
-
-    this.addNewPage();
-    this.renderSectionHeader(bicho.titulo || this.t.sections.bichoPega, COLORS.amber);
-
-    if (bicho.descricao) {
-      this.currentY = this.writeWrappedText(bicho.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-      this.currentY += 8;
-    }
-
-    // Friction cards
-    bicho.atritios?.forEach((atrito: any) => {
-      const descHeight = this.measureTextHeight(atrito.descricao || '', this.contentWidth - 20, 10);
-      const howToHeight = atrito.como_lidar ? this.measureTextHeight(atrito.como_lidar, this.contentWidth - 30, 9) + 15 : 0;
-      const cardHeight = descHeight + howToHeight + 25;
-      
-      this.ensureSpace(cardHeight);
-
-      // Card background
-      this.doc.setFillColor(COLORS.amberLight.r, COLORS.amberLight.g, COLORS.amberLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "F");
-      this.doc.setDrawColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-      this.doc.setLineWidth(0.2);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "S");
-
-      // Title with amber circle instead of lightning emoji
-      this.drawIconCircle(this.margin + 8, this.currentY + 8, COLORS.amber, 3);
-      this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-      this.doc.setFontSize(11);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(atrito.titulo, this.margin + 14, this.currentY + 10);
-
-      let innerY = this.currentY + 18;
-
-      // Description
-      if (atrito.descricao) {
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFontSize(10);
-        this.doc.setFont("helvetica", "normal");
-        const lines = this.doc.splitTextToSize(atrito.descricao, this.contentWidth - 16);
-        this.doc.text(lines, this.margin + 6, innerY);
-        innerY += lines.length * 4.5 + 6;
-      }
-
-      // How to deal box with green circle icon instead of lightbulb
-      if (atrito.como_lidar) {
-        this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
-        const howToBoxHeight = this.measureTextHeight(atrito.como_lidar, this.contentWidth - 30, 9) + 10;
-        this.doc.roundedRect(this.margin + 6, innerY, this.contentWidth - 12, howToBoxHeight, 2, 2, "F");
-        
-        this.drawIconCircle(this.margin + 12, innerY + 5, COLORS.green, 2.5);
-        this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-        this.doc.setFontSize(9);
-        this.doc.setFont("helvetica", "bold");
-        this.doc.text(this.t.howToDeal + ":", this.margin + 18, innerY + 6);
-        
-        this.doc.setFont("helvetica", "normal");
-        const howLines = this.doc.splitTextToSize(atrito.como_lidar, this.contentWidth - 35);
-        this.doc.text(howLines, this.margin + 10, innerY + 12);
-      }
-
-      this.currentY += cardHeight + 8;
-    });
-  }
-
-  // ==========================================
-  // POTENTIALIZATION
-  // ==========================================
-  private renderPotentialization(content: any) {
-    const pot = content.potencializacao;
-    if (!pot) return;
-
-    this.addNewPage();
-    this.renderSectionHeader(pot.titulo || this.t.sections.potencializacao, COLORS.purple);
-
-    if (pot.descricao) {
-      this.currentY = this.writeWrappedText(pot.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-      this.currentY += 8;
-    }
-
-    // Strengths list with bullet circles
-    pot.forcas?.forEach((forca: string) => {
-      const forceHeight = this.measureTextHeight(forca, this.contentWidth - 16, 10) + 6;
-      this.ensureSpace(forceHeight);
-
-      this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
-      this.doc.circle(this.margin + 4, this.currentY, 2, "F");
-      
-      this.currentY = this.writeWrappedText(forca, this.margin + 10, this.currentY + 2, this.contentWidth - 12, 10, COLORS.text, 'normal');
-      this.currentY += 4;
-    });
-  }
-
-  // ==========================================
-  // TRANSLATION TABLE (with FALLBACKS)
-  // ==========================================
-  private renderTranslationTable(content: any) {
-    const tabela = content.tabela_traducao;
-    
-    // FALLBACK: Generate default translations if empty
-    const sensorName = content.papeis_identificados?.sensor_direcao?.nome || content.perfil_a?.nome || 'Sensor';
-    const condutorName = content.papeis_identificados?.condutor_curso?.nome || content.perfil_b?.nome || 'Condutor';
-    
-    const defaultSensorTranslations = [
-      { quando_faz: "se cala", voce_sente: "pode parecer distanciamento", verdade_por_tras: "esta processando a situacao internamente" },
-      { quando_faz: "questiona repetidamente", voce_sente: "pode parecer inseguranca", verdade_por_tras: "esta refinando a compreensao antes de decidir" },
-      { quando_faz: "demora para decidir", voce_sente: "pode parecer indecisao", verdade_por_tras: "esta protegendo a qualidade da escolha" },
-      { quando_faz: "se afasta", voce_sente: "pode parecer rejeicao", verdade_por_tras: "precisa de espaco interno para reorganizar" },
-    ];
-    
-    const defaultCondutorTranslations = [
-      { quando_faz: "pressiona por resposta", voce_sente: "pode parecer impaciencia", verdade_por_tras: "esta buscando seguranca e avanço" },
-      { quando_faz: "assume o controle", voce_sente: "pode parecer dominio", verdade_por_tras: "esta evitando o caos e protegendo a estrutura" },
-      { quando_faz: "acelera as decisões", voce_sente: "pode parecer pressa", verdade_por_tras: "esta protegendo o progresso do casal" },
-      { quando_faz: "cobra clareza", voce_sente: "pode parecer cobranca", verdade_por_tras: "precisa de direcao para agir com confianca" },
-    ];
-    
-    // Use existing data or fallback
-    const traducoesSensor = tabela?.traducoes_sensor?.traducoes || tabela?.traducoes_usuario_a || defaultSensorTranslations;
-    const traducoesCondutor = tabela?.traducoes_condutor?.traducoes || tabela?.traducoes_usuario_b || defaultCondutorTranslations;
-    
-    this.addNewPage();
-    this.renderSectionHeader(tabela?.titulo || "Tabela de Traducao do Casal", COLORS.blue);
-
-    const descricao = tabela?.descricao || "Esta tabela ajuda a traduzir comportamentos que podem ser mal-interpretados. Quando um age de certa forma, o outro pode sentir algo diferente da intencao real.";
-    this.currentY = this.writeWrappedText(descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-    this.currentY += 10;
-
-    const renderTranslations = (translations: any[], personName: string, role: string) => {
-      if (!translations?.length) return;
-      
-      this.ensureSpace(15);
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(12);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(`Quando ${personName} (${role})...`, this.margin, this.currentY);
-      this.currentY += 8;
-
-      translations.forEach((item: any) => {
-        const whenText = item.quando_faz || item.comportamento || item.quando_diz || "";
-        const feelText = item.voce_sente || item.significado || item.outro_ouve || "";
-        const truthText = item.verdade_por_tras || item.intencao_real || "";
-        
-        // Skip if all empty
-        if (!whenText && !feelText && !truthText) return;
-        
-        const totalHeight = 
-          this.measureTextHeight(whenText, this.contentWidth - 50, 9) +
-          this.measureTextHeight(feelText, this.contentWidth - 50, 9) +
-          this.measureTextHeight(truthText, this.contentWidth - 50, 9) + 20;
-        
-        this.ensureSpace(totalHeight);
-
-        this.doc.setFillColor(245, 245, 248);
-        this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, totalHeight, 3, 3, "F");
-
-        let innerY = this.currentY + 8;
-
-        // When does/says
-        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        this.doc.setFontSize(9);
-        this.doc.setFont("helvetica", "bold");
-        this.doc.text(this.t.translationTable.whenDoes + ":", this.margin + 6, innerY);
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFont("helvetica", "normal");
-        const whenLines = this.doc.splitTextToSize(whenText, this.contentWidth - 50);
-        this.doc.text(whenLines, this.margin + 45, innerY);
-        innerY += whenLines.length * 4 + 5;
-
-        // You feel
-        this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-        this.doc.setFont("helvetica", "bold");
-        this.doc.text(this.t.translationTable.youFeel + ":", this.margin + 6, innerY);
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFont("helvetica", "normal");
-        const feelLines = this.doc.splitTextToSize(feelText, this.contentWidth - 50);
-        this.doc.text(feelLines, this.margin + 45, innerY);
-        innerY += feelLines.length * 4 + 5;
-
-        // Truth behind
-        this.doc.setTextColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-        this.doc.setFont("helvetica", "bold");
-        this.doc.text(this.t.translationTable.truthBehind + ":", this.margin + 6, innerY);
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFont("helvetica", "normal");
-        const truthLines = this.doc.splitTextToSize(truthText, this.contentWidth - 50);
-        this.doc.text(truthLines, this.margin + 45, innerY);
-
-        this.currentY += totalHeight + 6;
-      });
-    };
-
-    renderTranslations(traducoesSensor, sensorName, "Sensor de Direcao");
-    this.currentY += 6;
-    renderTranslations(traducoesCondutor, condutorName, "Condutor de Curso");
-  }
-
-  // ==========================================
-  // REFLECTIVE PROMPTS (NEW - LIVRO DE BORDO PREMIUM)
-  // ==========================================
-  private renderReflectivePrompts(content: any) {
-    const reflexoes = content.reflexoes_praticas;
-    const rituais = content.rituais_casal;
-    const frases = content.frases_ponte;
-    const alertas = content.alertas_dia_a_dia;
-    
-    // Skip if no reflective content
-    if (!reflexoes?.reflexoes?.length && !rituais && !frases?.frases?.length && !alertas) return;
-    
-    this.addNewPage();
-    
-    // Premium chapter header
-    this.doc.setFillColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(8);
-    this.doc.setFont("helvetica", "normal");
-    this.doc.text("CAPITULO 10", this.margin + 8, this.currentY + 7);
-    this.doc.setFontSize(14);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.text("REFLEXOES PRATICAS DO CASAL", this.margin + 8, this.currentY + 16);
-    this.currentY += 30;
-
-    const intro = "Esta secao contem orientacoes praticas do tipo 'Considere fazer X para que Y perceba Z'. Use-as como um livro de bordo para o dia a dia do relacionamento.";
-    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-    this.currentY += 12;
-
-    // Render reflective prompts
-    const reflexoesArr = reflexoes?.reflexoes || reflexoes || [];
-    if (Array.isArray(reflexoesArr) && reflexoesArr.length > 0) {
-      this.ensureSpace(20);
-      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      this.doc.setFontSize(11);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text("Considere fazer...", this.margin, this.currentY);
-      this.currentY += 8;
-      
-      reflexoesArr.slice(0, 6).forEach((ref: any) => {
-        const para = ref.para || "";
-        const acao = ref.acao || "";
-        const efeito = ref.efeito || "";
-        
-        if (!acao) return;
-        
-        const totalText = `${para}: ${acao} - ${efeito}`;
-        const cardHeight = this.measureTextHeight(totalText, this.contentWidth - 20, 9) + 14;
-        
-        this.ensureSpace(cardHeight);
-        
-        this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
-        this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "F");
-        
-        this.drawIconCircle(this.margin + 8, this.currentY + 7, COLORS.green, 3);
-        
-        this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-        this.doc.setFontSize(10);
-        this.doc.setFont("helvetica", "bold");
-        this.doc.text(para, this.margin + 15, this.currentY + 9);
-        
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFontSize(9);
-        this.doc.setFont("helvetica", "normal");
-        const acaoLines = this.doc.splitTextToSize(`${acao} - ${efeito}`, this.contentWidth - 25);
-        this.doc.text(acaoLines, this.margin + 8, this.currentY + 17);
-        
-        this.currentY += cardHeight + 4;
-      });
-    }
-
-    // Render bridge phrases
-    const frasesArr = frases?.frases || frases || [];
-    if (Array.isArray(frasesArr) && frasesArr.length > 0) {
-      this.ensureSpace(25);
-      this.currentY += 8;
-      this.doc.setTextColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
-      this.doc.setFontSize(11);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text("Frases que Constroem", this.margin, this.currentY);
-      this.currentY += 10;
-      
-      frasesArr.slice(0, 4).forEach((frase: any) => {
-        const aoInves = frase.ao_inves_de || "";
-        const experimente = frase.experimente || "";
-        const porque = frase.porque_funciona || "";
-        
-        if (!aoInves || !experimente) return;
-        
-        const cardHeight = 35;
-        this.ensureSpace(cardHeight);
-        
-        this.doc.setFillColor(COLORS.blueLight.r, COLORS.blueLight.g, COLORS.blueLight.b);
-        this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "F");
-        
-        // "Ao invés de" line
-        this.doc.setTextColor(COLORS.red.r, COLORS.red.g, COLORS.red.b);
-        this.doc.setFontSize(8);
-        this.doc.setFont("helvetica", "bold");
-        this.doc.text("Ao inves de:", this.margin + 6, this.currentY + 8);
-        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        this.doc.setFont("helvetica", "normal");
-        this.doc.text(`"${aoInves}"`, this.margin + 35, this.currentY + 8);
-        
-        // "Experimente" line
-        this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-        this.doc.setFont("helvetica", "bold");
-        this.doc.text("Experimente:", this.margin + 6, this.currentY + 18);
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFont("helvetica", "normal");
-        const expLines = this.doc.splitTextToSize(`"${experimente}"`, this.contentWidth - 45);
-        this.doc.text(expLines, this.margin + 35, this.currentY + 18);
-        
-        // "Porque funciona" line
-        if (porque) {
-          this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-          this.doc.setFontSize(7);
-          this.doc.setFont("helvetica", "italic");
-          this.doc.text(`${porque}`, this.margin + 6, this.currentY + 30);
-        }
-        
-        this.currentY += cardHeight + 4;
-      });
-    }
-
-    // Render daily alerts
-    const alertasArr = alertas?.alerta_sensor && alertas?.alerta_condutor ? [alertas.alerta_sensor, alertas.alerta_condutor] : [];
-    if (alertasArr.length > 0) {
-      this.ensureSpace(25);
-      this.currentY += 8;
-      this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-      this.doc.setFontSize(11);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text("Alertas do Dia-a-Dia", this.margin, this.currentY);
-      this.currentY += 10;
-      
-      alertasArr.forEach((alerta: any) => {
-        if (!alerta?.alerta) return;
-        
-        const cardHeight = 40;
-        this.ensureSpace(cardHeight);
-        
-        this.doc.setFillColor(COLORS.amberLight.r, COLORS.amberLight.g, COLORS.amberLight.b);
-        this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "F");
-        this.doc.setDrawColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-        this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "S");
-        
-        // Alert line
-        this.drawIconCircle(this.margin + 8, this.currentY + 8, COLORS.amber, 4);
-        this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-        this.doc.setFontSize(9);
-        this.doc.setFont("helvetica", "bold");
-        this.doc.text("ALERTA:", this.margin + 16, this.currentY + 10);
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFont("helvetica", "normal");
-        const alertaLines = this.doc.splitTextToSize(alerta.alerta, this.contentWidth - 50);
-        this.doc.text(alertaLines, this.margin + 35, this.currentY + 10);
-        
-        // Consider line
-        this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-        this.doc.setFont("helvetica", "bold");
-        this.doc.text("Considere:", this.margin + 6, this.currentY + 22);
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFont("helvetica", "normal");
-        const considereLines = this.doc.splitTextToSize(alerta.considere || '', this.contentWidth - 45);
-        this.doc.text(considereLines, this.margin + 30, this.currentY + 22);
-        
-        // Effect line
-        if (alerta.efeito) {
-          this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-          this.doc.setFontSize(8);
-          this.doc.setFont("helvetica", "italic");
-          this.doc.text(`Efeito: ${alerta.efeito}`, this.margin + 6, this.currentY + 35);
-        }
-        
-        this.currentY += cardHeight + 4;
-      });
-    }
-  }
-
-  // ==========================================
-  // RITUALS OF THE COUPLE (NEW - LIVRO DE BORDO PREMIUM)
-  // ==========================================
-  private renderRituals(content: any) {
-    const rituais = content.rituais_casal;
-    if (!rituais) return;
-    
-    this.addNewPage();
-    
-    // Premium chapter header
-    this.doc.setFillColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(8);
-    this.doc.setFont("helvetica", "normal");
-    this.doc.text("CAPITULO 11", this.margin + 8, this.currentY + 7);
-    this.doc.setFontSize(14);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.text("RITUAIS DO CASAL", this.margin + 8, this.currentY + 16);
-    this.currentY += 30;
-
-    const intro = "Rituais sao ancoras que mantem o casal conectado. Pratiquem regularmente para fortalecer o vinculo.";
-    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-    this.currentY += 12;
-
-    const renderRitual = (ritual: any, color: any) => {
-      if (!ritual) return;
-      
-      const titulo = ritual.titulo || ritual.frequencia || "";
-      const descricao = ritual.descricao || "";
-      const passos = ritual.perguntas || ritual.passos || [];
-      
-      const cardHeight = 30 + (passos.length * 12);
-      this.ensureSpace(cardHeight);
-      
-      this.doc.setFillColor(color.r, color.g, color.b, 0.1);
-      this.doc.setFillColor(248, 248, 252);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 4, 4, "F");
-      this.doc.setDrawColor(color.r, color.g, color.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 4, 4, "S");
-      
-      this.drawIconCircle(this.margin + 10, this.currentY + 10, color, 5);
-      this.doc.setTextColor(color.r, color.g, color.b);
-      this.doc.setFontSize(11);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(titulo, this.margin + 20, this.currentY + 12);
-      
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(9);
-      this.doc.setFont("helvetica", "normal");
-      const descLines = this.doc.splitTextToSize(descricao, this.contentWidth - 25);
-      this.doc.text(descLines, this.margin + 8, this.currentY + 22);
-      
-      let innerY = this.currentY + 22 + (descLines.length * 4);
-      passos.forEach((passo: string, i: number) => {
-        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        this.doc.text(`${i + 1}. ${passo}`, this.margin + 12, innerY + 6);
-        innerY += 10;
-      });
-      
-      this.currentY += cardHeight + 8;
-    };
-    
-    renderRitual(rituais.ritual_diario, COLORS.green);
-    renderRitual(rituais.ritual_semanal, COLORS.blue);
-    renderRitual(rituais.ritual_mensal, COLORS.purple);
-  }
-
-  // ==========================================
-  // PEACE PROTOCOL
-  // ==========================================
-  private renderPeaceProtocol(content: any) {
-    const protocolo = content.protocolo_paz;
-    if (!protocolo) return;
-
-    this.addNewPage();
-    this.renderSectionHeader(protocolo.titulo || this.t.sections.protocoloPaz, COLORS.blue);
-
-    if (protocolo.descricao) {
-      this.currentY = this.writeWrappedText(protocolo.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-      this.currentY += 10;
-    }
-
-    protocolo.regras?.forEach((regra: any, idx: number) => {
-      const regraHeight = this.measureTextHeight(regra.regra || '', this.contentWidth - 30, 11);
-      const porqueHeight = regra.porque ? this.measureTextHeight(regra.porque, this.contentWidth - 30, 9) : 0;
-      const totalHeight = regraHeight + porqueHeight + 20;
-      
-      this.ensureSpace(totalHeight);
-
-      // Number circle
-      this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-      this.doc.circle(this.margin + 6, this.currentY + 5, 6, "F");
-      this.doc.setTextColor(255, 255, 255);
-      this.doc.setFontSize(10);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(String(regra.numero || idx + 1), this.margin + 6, this.currentY + 7, { align: "center" });
-
-      // Rule text
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(11);
-      this.doc.setFont("helvetica", "bold");
-      const regraLines = this.doc.splitTextToSize(regra.regra, this.contentWidth - 25);
-      this.doc.text(regraLines, this.margin + 18, this.currentY + 7);
-      let innerY = this.currentY + 10 + regraLines.length * 5;
-
-      // Why explanation
-      if (regra.porque) {
-        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        this.doc.setFontSize(9);
-        this.doc.setFont("helvetica", "italic");
-        const porqueLines = this.doc.splitTextToSize(this.t.why + ": " + regra.porque, this.contentWidth - 25);
-        this.doc.text(porqueLines, this.margin + 18, innerY);
-        innerY += porqueLines.length * 4 + 4;
-      }
-
-      this.currentY = innerY + 6;
-    });
-  }
-
-  // ==========================================
-  // SPOUSE MANUALS
-  // ==========================================
-  private renderSpouseManuals(content: any) {
-    const manualA = content.manual_conjuge_a;
-    const manualB = content.manual_conjuge_b;
-    
-    if (!manualA && !manualB) return;
+  // ===================================================
+  // TENSÕES NATURAIS - Amber warning cards
+  // ===================================================
+  private renderTensoes(content: any) {
+    const tensoes = content.tensoes_naturais || content.tensoes;
+    if (!tensoes) return;
 
     this.addNewPage();
 
-    const renderManual = (manual: any) => {
-      if (!manual) return;
-      
-      this.renderSectionHeader(manual.titulo || this.t.sections.manualConjuge, COLORS.purple);
-
-      // Orientations
-      if (manual.orientacoes?.length) {
-        manual.orientacoes.forEach((item: string) => {
-          const itemHeight = this.measureTextHeight(item, this.contentWidth - 16, 10) + 6;
-          this.ensureSpace(itemHeight);
-
-          this.doc.setFillColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
-          this.doc.circle(this.margin + 4, this.currentY, 2, "F");
-          
-          this.currentY = this.writeWrappedText(item, this.margin + 10, this.currentY + 2, this.contentWidth - 12, 10, COLORS.text, 'normal');
-          this.currentY += 4;
-        });
-      }
-
-      // Disarming words
-      if (manual.palavras_desarmam?.length) {
-        this.currentY += 6;
-        this.ensureSpace(20);
-        
-        this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
-        this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 2, 2, "F");
-        
-        this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-        this.doc.setFontSize(10);
-        this.doc.setFont("helvetica", "bold");
-        this.doc.text(this.t.disarmWords + ":", this.margin + 6, this.currentY + 8);
-        
-        this.doc.setFont("helvetica", "normal");
-        const wordsText = manual.palavras_desarmam.map((p: string) => `"${p}"`).join(", ");
-        this.doc.text(wordsText, this.margin + 6, this.currentY + 15);
-        
-        this.currentY += 26;
-      }
-    };
-
-    renderManual(manualA);
-    if (manualB) {
-      this.currentY += 10;
-      renderManual(manualB);
-    }
-  }
-
-  // ==========================================
-  // PRESSURE ALERTS
-  // ==========================================
-  private renderPressureAlerts(content: any) {
-    const alertas = content.alertas_pressao;
-    if (!alertas) return;
-
-    this.addNewPage();
-    this.renderSectionHeader(alertas.titulo || this.t.sections.alertasPressao, COLORS.amber);
-
-    if (alertas.descricao) {
-      this.currentY = this.writeWrappedText(alertas.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-      this.currentY += 10;
-    }
-
-    alertas.gatilhos?.forEach((gatilho: any) => {
-      const cardHeight = 35;
-      this.ensureSpace(cardHeight);
-
-      this.doc.setFillColor(COLORS.amberLight.r, COLORS.amberLight.g, COLORS.amberLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 3, 3, "F");
-
-      let innerY = this.currentY + 8;
-
-      // Behavior
-      this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-      this.doc.setFontSize(9);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(this.t.pressureAlerts.behavior + ":", this.margin + 6, innerY);
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFont("helvetica", "normal");
-      this.doc.text(gatilho.comportamento || "", this.margin + 40, innerY);
-      innerY += 8;
-
-      // Auto defense
-      this.doc.setTextColor(COLORS.red.r, COLORS.red.g, COLORS.red.b);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(this.t.pressureAlerts.autoDefense + ":", this.margin + 6, innerY);
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFont("helvetica", "normal");
-      this.doc.text(gatilho.defesa_automatica || "", this.margin + 45, innerY);
-      innerY += 8;
-
-      // Risk situation
-      this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(this.t.pressureAlerts.riskSituation + ":", this.margin + 6, innerY);
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFont("helvetica", "normal");
-      this.doc.text(gatilho.situacao_risco || "", this.margin + 45, innerY);
-
-      this.currentY += cardHeight + 6;
-    });
-  }
-
-  // ==========================================
-  // CONNECTION CHALLENGE
-  // ==========================================
-  private renderConnectionChallenge(content: any) {
-    const desafio = content.desafio_conexao || content.desafio_conexao_familiar;
-    if (!desafio) return;
-
-    this.ensureSpace(60);
-    this.renderSectionHeader(desafio.titulo || this.t.sections.desafioConexao, COLORS.green);
-
-    if (desafio.descricao) {
-      this.currentY = this.writeWrappedText(desafio.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.text, 'normal');
-      this.currentY += 8;
-    }
-
-    if (desafio.acao) {
-      const acaoHeight = this.measureTextHeight(desafio.acao, this.contentWidth - 16, 11) + 15;
-      this.ensureSpace(acaoHeight);
-      
-      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, acaoHeight, 3, 3, "F");
-      this.doc.setDrawColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      this.doc.setLineWidth(0.5);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, acaoHeight, 3, 3, "S");
-      
-      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      this.doc.setFontSize(11);
-      this.doc.setFont("helvetica", "bold");
-      const acaoLines = this.doc.splitTextToSize(desafio.acao, this.contentWidth - 16);
-      this.doc.text(acaoLines, this.margin + 8, this.currentY + 10);
-      
-      this.currentY += acaoHeight + 10;
-    }
-  }
-
-  // ==========================================
-  // WHEN TO SEEK HELP
-  // ==========================================
-  private renderSeekHelp(content: any) {
-    const ajuda = content.quando_buscar_ajuda;
-    if (!ajuda) return;
-
-    this.ensureSpace(40);
-    this.renderSectionHeader(ajuda.titulo || this.t.sections.quandoBuscar, COLORS.blue);
-
-    if (ajuda.descricao) {
-      this.currentY = this.writeWrappedText(ajuda.descricao, this.margin, this.currentY, this.contentWidth, 10, COLORS.blue, 'bold');
-      this.currentY += 6;
-    }
-
-    ajuda.sugestoes?.forEach((sugestao: string) => {
-      const suggestionHeight = this.measureTextHeight(sugestao, this.contentWidth - 16, 10) + 6;
-      this.ensureSpace(suggestionHeight);
-
-      this.doc.setFillColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
-      this.doc.circle(this.margin + 4, this.currentY, 2, "F");
-      
-      this.currentY = this.writeWrappedText(sugestao, this.margin + 10, this.currentY + 2, this.contentWidth - 12, 10, COLORS.text, 'normal');
-      this.currentY += 4;
-    });
-  }
-
-  // ==========================================
-  // CLOSING & DISCLAIMER
-  // ==========================================
-  private renderClosing(content: any) {
-    this.addNewPage();
-
-    // Closing message
-    if (content.fechamento) {
-      const closingHeight = this.measureTextHeight(content.fechamento, this.contentWidth - 20, 11) + 25;
-      this.ensureSpace(closingHeight);
-      
-      this.doc.setFillColor(COLORS.blueLight.r, COLORS.blueLight.g, COLORS.blueLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, closingHeight, 4, 4, "F");
-      
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(11);
-      this.doc.setFont("helvetica", "italic");
-      const closingLines = this.doc.splitTextToSize(content.fechamento, this.contentWidth - 20);
-      this.doc.text(closingLines, this.pageWidth / 2, this.currentY + 15, { align: "center", maxWidth: this.contentWidth - 20 });
-      
-      this.currentY += closingHeight + 30;
-    }
-
-    // Disclaimer at bottom
-    this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-    this.doc.setFontSize(8);
-    this.doc.setFont("helvetica", "normal");
-    const disclaimerLines = this.doc.splitTextToSize(this.t.disclaimer, this.contentWidth);
-    this.doc.text(disclaimerLines, this.pageWidth / 2, this.pageHeight - 45, { align: "center" });
-
-    // Final brand
-    this.doc.setFontSize(14);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.setTextColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-    this.doc.text("NELLO ONE", this.pageWidth / 2, this.pageHeight - 28, { align: "center" });
-
-    this.addFooter();
-  }
-
-  // ==========================================
-  // 7 PILLARS - TEMPERAMENTS (Protocolo de Ritmo do Casal)
-  // ==========================================
-  private renderTemperaments(content: any) {
-    const ritmos = content.ritmos_biologicos;
-    if (!ritmos) return;
-
-    this.addNewPage();
-    
-    // Premium header with chapter number
-    this.doc.setFillColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(8);
-    this.doc.setFont("helvetica", "normal");
-    this.doc.text("CAPITULO 5", this.margin + 8, this.currentY + 7);
-    this.doc.setFontSize(14);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.text("PROTOCOLO DE RITMO DO CASAL", this.margin + 8, this.currentY + 16);
-    this.currentY += 30;
-
-    // Intro text
-    const intro = "Os temperamentos revelam o ritmo biologico de cada um - como voces processam energia, lidam com mudancas e se recuperam do estresse. Entender isso evita conflitos desnecessarios.";
-    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-    this.currentY += 12;
-
-    // Person A temperament card
-    if (ritmos.temperamento_a) {
-      this.ensureSpace(50);
-      this.doc.setFillColor(COLORS.amberLight.r, COLORS.amberLight.g, COLORS.amberLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
-      
-      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.amber, 6);
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(12);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(ritmos.temperamento_a.nome || "Pessoa A", this.margin + 24, this.currentY + 14);
-      
-      this.doc.setFontSize(14);
-      this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-      this.doc.text(ritmos.temperamento_a.temperamento_primario || "", this.margin + 8, this.currentY + 28);
-      
-      if (ritmos.temperamento_a.caracteristicas) {
-        this.doc.setFontSize(9);
-        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        this.doc.setFont("helvetica", "normal");
-        const charLines = this.doc.splitTextToSize(ritmos.temperamento_a.caracteristicas, this.contentWidth - 20);
-        this.doc.text(charLines, this.margin + 8, this.currentY + 38);
-      }
-      this.currentY += 52;
-    }
-
-    // Person B temperament card
-    if (ritmos.temperamento_b) {
-      this.ensureSpace(50);
-      this.doc.setFillColor(COLORS.purpleLight.r, COLORS.purpleLight.g, COLORS.purpleLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
-      
-      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.purple, 6);
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(12);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(ritmos.temperamento_b.nome || "Pessoa B", this.margin + 24, this.currentY + 14);
-      
-      this.doc.setFontSize(14);
-      this.doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
-      this.doc.text(ritmos.temperamento_b.temperamento_primario || "", this.margin + 8, this.currentY + 28);
-      
-      if (ritmos.temperamento_b.caracteristicas) {
-        this.doc.setFontSize(9);
-        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        this.doc.setFont("helvetica", "normal");
-        const charLines = this.doc.splitTextToSize(ritmos.temperamento_b.caracteristicas, this.contentWidth - 20);
-        this.doc.text(charLines, this.margin + 8, this.currentY + 38);
-      }
-      this.currentY += 52;
-    }
-
-    // Synergy box
-    if (ritmos.sinergia) {
-      this.ensureSpace(35);
-      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 30, 4, 4, "F");
-      this.doc.setDrawColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 30, 4, 4, "S");
-      
-      this.drawIconCircle(this.margin + 10, this.currentY + 8, COLORS.green, 4);
-      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      this.doc.setFontSize(10);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text("Sinergia de Ritmos", this.margin + 18, this.currentY + 10);
-      
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(9);
-      this.doc.setFont("helvetica", "normal");
-      const synLines = this.doc.splitTextToSize(ritmos.sinergia, this.contentWidth - 20);
-      this.doc.text(synLines, this.margin + 8, this.currentY + 20);
-      this.currentY += 36;
-    }
-
-    // Practical adjustment
-    if (ritmos.ajuste_pratico) {
-      this.ensureSpace(25);
-      this.doc.setFillColor(248, 248, 252);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 3, 3, "F");
-      this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-      this.doc.setFontSize(9);
-      this.doc.setFont("helvetica", "italic");
-      const adjLines = this.doc.splitTextToSize("Ajuste Pratico: " + ritmos.ajuste_pratico, this.contentWidth - 16);
-      this.doc.text(adjLines, this.margin + 8, this.currentY + 12);
-    }
-  }
-
-  // ==========================================
-  // 7 PILLARS - INTELLIGENCES (Sinergia de Talentos)
-  // ==========================================
-  private renderIntelligences(content: any) {
-    const talentos = content.sinergia_talentos;
-    if (!talentos) return;
-
-    this.addNewPage();
-    
-    // Premium header
-    this.doc.setFillColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(8);
-    this.doc.setFont("helvetica", "normal");
-    this.doc.text("CAPITULO 6", this.margin + 8, this.currentY + 7);
-    this.doc.setFontSize(14);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.text("SINERGIA DE TALENTOS", this.margin + 8, this.currentY + 16);
-    this.currentY += 30;
-
-    const intro = "Cada pessoa possui um mosaico unico de inteligencias. Quando os talentos de um suprem as fraquezas do outro, o casal se torna mais forte que a soma das partes.";
-    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-    this.currentY += 12;
-
-    // Person A talents
-    if (talentos.talentos_a) {
-      this.ensureSpace(55);
-      this.doc.setFillColor(COLORS.blueLight.r, COLORS.blueLight.g, COLORS.blueLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 50, 4, 4, "F");
-      
-      this.doc.setTextColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
-      this.doc.setFontSize(11);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(talentos.talentos_a.nome || "Pessoa A", this.margin + 8, this.currentY + 12);
-      
-      // Top 3 as badges
-      const top3 = talentos.talentos_a.top_3 || [];
-      let badgeX = this.margin + 8;
-      this.doc.setFontSize(8);
-      top3.forEach((talent: string, i: number) => {
-        const textWidth = this.doc.getTextWidth(talent) + 8;
-        this.doc.setFillColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
-        this.doc.roundedRect(badgeX, this.currentY + 16, textWidth, 10, 2, 2, "F");
-        this.doc.setTextColor(255, 255, 255);
-        this.doc.text(talent, badgeX + 4, this.currentY + 23);
-        badgeX += textWidth + 4;
-      });
-
-      if (talentos.talentos_a.contribuicao) {
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFontSize(9);
-        this.doc.setFont("helvetica", "normal");
-        const contLines = this.doc.splitTextToSize(talentos.talentos_a.contribuicao, this.contentWidth - 20);
-        this.doc.text(contLines, this.margin + 8, this.currentY + 38);
-      }
-      this.currentY += 56;
-    }
-
-    // Person B talents
-    if (talentos.talentos_b) {
-      this.ensureSpace(55);
-      this.doc.setFillColor(COLORS.purpleLight.r, COLORS.purpleLight.g, COLORS.purpleLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 50, 4, 4, "F");
-      
-      this.doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
-      this.doc.setFontSize(11);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(talentos.talentos_b.nome || "Pessoa B", this.margin + 8, this.currentY + 12);
-      
-      const top3 = talentos.talentos_b.top_3 || [];
-      let badgeX = this.margin + 8;
-      this.doc.setFontSize(8);
-      top3.forEach((talent: string) => {
-        const textWidth = this.doc.getTextWidth(talent) + 8;
-        this.doc.setFillColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
-        this.doc.roundedRect(badgeX, this.currentY + 16, textWidth, 10, 2, 2, "F");
-        this.doc.setTextColor(255, 255, 255);
-        this.doc.text(talent, badgeX + 4, this.currentY + 23);
-        badgeX += textWidth + 4;
-      });
-
-      if (talentos.talentos_b.contribuicao) {
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFontSize(9);
-        this.doc.setFont("helvetica", "normal");
-        const contLines = this.doc.splitTextToSize(talentos.talentos_b.contribuicao, this.contentWidth - 20);
-        this.doc.text(contLines, this.margin + 8, this.currentY + 38);
-      }
-      this.currentY += 56;
-    }
-
-    // Complementarity
-    if (talentos.complementaridade) {
-      this.ensureSpace(30);
-      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 25, 4, 4, "F");
-      this.drawIconCircle(this.margin + 10, this.currentY + 8, COLORS.green, 4);
-      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      this.doc.setFontSize(10);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text("Complementaridade", this.margin + 18, this.currentY + 10);
-      
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(9);
-      this.doc.setFont("helvetica", "normal");
-      const compLines = this.doc.splitTextToSize(talentos.complementaridade, this.contentWidth - 20);
-      this.doc.text(compLines, this.margin + 8, this.currentY + 18);
-    }
-  }
-
-  // ==========================================
-  // 7 PILLARS - ARCHETYPES (Dinamica de Papeis)
-  // ==========================================
-  private renderArchetypes(content: any) {
-    const arquetipos = content.dinamica_arquetipos || content.dinamica_papeis;
-    if (!arquetipos) return;
-
-    this.addNewPage();
-    
-    // Premium chapter header
-    this.doc.setFillColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(8);
-    this.doc.setFont("helvetica", "normal");
-    this.doc.text("CAPITULO 7", this.margin + 8, this.currentY + 7);
-    this.doc.setFontSize(14);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.text("O MITO DO CASAL", this.margin + 8, this.currentY + 16);
-    this.currentY += 30;
-
-    const intro = "Os arquetipos revelam os papeis simbolicos que cada um ocupa naturalmente. Juntos, voces co-criam uma narrativa unica - o Mito do Casal.";
-    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-    this.currentY += 12;
-
-    // Archetype A card
-    const archA = arquetipos.arquetipo_a;
-    if (archA) {
-      this.ensureSpace(50);
-      this.doc.setFillColor(COLORS.purpleLight.r, COLORS.purpleLight.g, COLORS.purpleLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
-      
-      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.purple, 6);
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(12);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(archA.nome || "Pessoa A", this.margin + 24, this.currentY + 14);
-      
-      const primaryArch = archA.primario || archA.arquetipos || '';
-      const secondaryArch = archA.secundario || '';
-      this.doc.setFontSize(14);
-      this.doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
-      this.doc.text(`${primaryArch}${secondaryArch ? ' / ' + secondaryArch : ''}`, this.margin + 8, this.currentY + 28);
-      
-      // Show papel_no_casal OR sombra only if they have valid content
-      const roleText = archA.papel_no_casal || (archA.sombra && archA.sombra !== 'undefined' ? `Sombra: ${archA.sombra}` : '');
-      if (roleText && !roleText.includes('undefined')) {
-        this.doc.setFontSize(9);
-        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        this.doc.setFont("helvetica", "normal");
-        this.doc.text(roleText, this.margin + 8, this.currentY + 38);
-      }
-      this.currentY += 52;
-    }
-
-    // Archetype B card
-    const archB = arquetipos.arquetipo_b;
-    if (archB) {
-      this.ensureSpace(50);
-      this.doc.setFillColor(COLORS.amberLight.r, COLORS.amberLight.g, COLORS.amberLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
-      
-      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.amber, 6);
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(12);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(archB.nome || "Pessoa B", this.margin + 24, this.currentY + 14);
-      
-      const primaryArchB = archB.primario || archB.arquetipos || '';
-      const secondaryArchB = archB.secundario || '';
-      this.doc.setFontSize(14);
-      this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-      this.doc.text(`${primaryArchB}${secondaryArchB ? ' / ' + secondaryArchB : ''}`, this.margin + 8, this.currentY + 28);
-      
-      // Show papel_no_casal OR sombra only if they have valid content
-      const roleBText = archB.papel_no_casal || (archB.sombra && archB.sombra !== 'undefined' ? `Sombra: ${archB.sombra}` : '');
-      if (roleBText && !roleBText.includes('undefined')) {
-        this.doc.setFontSize(9);
-        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        this.doc.setFont("helvetica", "normal");
-        this.doc.text(roleBText, this.margin + 8, this.currentY + 38);
-      }
-      this.currentY += 52;
-    }
-
-    // Synergy box
-    const mito = arquetipos.mito_conjunto || arquetipos.interacao || '';
-    if (mito) {
-      this.ensureSpace(35);
-      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 30, 4, 4, "F");
-      this.doc.setDrawColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 30, 4, 4, "S");
-      
-      this.drawIconCircle(this.margin + 10, this.currentY + 8, COLORS.green, 4);
-      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      this.doc.setFontSize(10);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text("O Mito do Casal", this.margin + 18, this.currentY + 10);
-      
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(9);
-      this.doc.setFont("helvetica", "normal");
-      const mitoLines = this.doc.splitTextToSize(mito, this.contentWidth - 20);
-      this.doc.text(mitoLines, this.margin + 8, this.currentY + 20);
-      this.currentY += 36;
-    }
-
-    // Light/shadow dynamic
-    const dinamica = arquetipos.dinamica_luz_sombra || arquetipos.potencial || '';
-    if (dinamica) {
-      this.ensureSpace(20);
-      this.doc.setFillColor(248, 248, 252);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 18, 3, 3, "F");
-      this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-      this.doc.setFontSize(9);
-      this.doc.setFont("helvetica", "italic");
-      const dynLines = this.doc.splitTextToSize(dinamica, this.contentWidth - 16);
-      this.doc.text(dynLines, this.margin + 8, this.currentY + 11);
-    }
-  }
-
-  // ==========================================
-  // 7 PILLARS - CONNECTION STYLES (Linguagens de Amor)
-  // ==========================================
-  private renderConnectionStyles(content: any) {
-    const linguagens = content.linguagens_conexao;
-    if (!linguagens) return;
-
-    this.addNewPage();
-    
-    // Premium chapter header
-    this.doc.setFillColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(8);
-    this.doc.setFont("helvetica", "normal");
-    this.doc.text("CAPITULO 8", this.margin + 8, this.currentY + 7);
-    this.doc.setFontSize(14);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.text("PLANO DE ABASTECIMENTO EMOCIONAL", this.margin + 8, this.currentY + 16);
-    this.currentY += 30;
-
-    const intro = "Cada pessoa tem uma forma preferida de receber e expressar amor. Conhecer as linguagens de conexao evita que um de muito e o outro receba pouco.";
-    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-    this.currentY += 12;
-
-    // Person A connection style card
-    if (linguagens.linguagem_a) {
-      this.ensureSpace(50);
-      this.doc.setFillColor(255, 240, 245); // Light pink
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
-      
-      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.pink, 6);
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(12);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(linguagens.linguagem_a.nome || "Pessoa A", this.margin + 24, this.currentY + 14);
-      
-      this.doc.setFontSize(14);
-      this.doc.setTextColor(COLORS.pink.r, COLORS.pink.g, COLORS.pink.b);
-      const primary = linguagens.linguagem_a.estilo_primario || '';
-      const secondary = linguagens.linguagem_a.estilo_secundario || '';
-      this.doc.text(`${primary}${secondary ? ' / ' + secondary : ''}`, this.margin + 8, this.currentY + 28);
-      
-      if (linguagens.linguagem_a.como_se_sente_amado) {
-        this.doc.setFontSize(9);
-        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        this.doc.setFont("helvetica", "normal");
-        const lines = this.doc.splitTextToSize(linguagens.linguagem_a.como_se_sente_amado, this.contentWidth - 20);
-        this.doc.text(lines, this.margin + 8, this.currentY + 38);
-      }
-      this.currentY += 52;
-    }
-
-    // Person B connection style card
-    if (linguagens.linguagem_b) {
-      this.ensureSpace(50);
-      this.doc.setFillColor(COLORS.blueLight.r, COLORS.blueLight.g, COLORS.blueLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
-      
-      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.blue, 6);
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(12);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(linguagens.linguagem_b.nome || "Pessoa B", this.margin + 24, this.currentY + 14);
-      
-      this.doc.setFontSize(14);
-      this.doc.setTextColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
-      const primaryB = linguagens.linguagem_b.estilo_primario || '';
-      const secondaryB = linguagens.linguagem_b.estilo_secundario || '';
-      this.doc.text(`${primaryB}${secondaryB ? ' / ' + secondaryB : ''}`, this.margin + 8, this.currentY + 28);
-      
-      if (linguagens.linguagem_b.como_se_sente_amado) {
-        this.doc.setFontSize(9);
-        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        this.doc.setFont("helvetica", "normal");
-        const lines = this.doc.splitTextToSize(linguagens.linguagem_b.como_se_sente_amado, this.contentWidth - 20);
-        this.doc.text(lines, this.margin + 8, this.currentY + 38);
-      }
-      this.currentY += 52;
-    }
-
-    // Micro-acordos box
-    if (linguagens.micro_acordos?.length) {
-      this.ensureSpace(60);
-      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 50, 4, 4, "F");
-      this.doc.setDrawColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 50, 4, 4, "S");
-      
-      this.drawIconCircle(this.margin + 10, this.currentY + 8, COLORS.green, 4);
-      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      this.doc.setFontSize(10);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text("Micro Acordos de Conexao", this.margin + 18, this.currentY + 10);
-      
-      let innerY = this.currentY + 18;
-      linguagens.micro_acordos.forEach((acordo: string) => {
-        this.drawIconCircle(this.margin + 8, innerY + 2, COLORS.green, 2);
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFontSize(9);
-        this.doc.setFont("helvetica", "normal");
-        this.doc.text(acordo, this.margin + 14, innerY + 4);
-        innerY += 10;
-      });
-    }
-  }
-
-  // ==========================================
-  // 7 PILLARS - NELLO 16 (Processamento de Decisao)
-  // ==========================================
-  private renderNello16(content: any) {
-    const proc = content.processamento_decisao;
-    if (!proc) return;
-
-    this.addNewPage();
-    
-    // Premium chapter header
-    this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(8);
-    this.doc.setFont("helvetica", "normal");
-    this.doc.text("CAPITULO 9", this.margin + 8, this.currentY + 7);
-    this.doc.setFontSize(14);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.text("PROCESSAMENTO DE DECISAO", this.margin + 8, this.currentY + 16);
-    this.currentY += 30;
-
-    const intro = "Cada tipo de personalidade tem uma forma unica de processar informacoes e tomar decisoes. Entender essas diferencas evita frustracoes na hora de decidir juntos.";
-    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-    this.currentY += 12;
-
-    // Person A card
-    if (proc.tipo_a) {
-      this.ensureSpace(50);
-      this.doc.setFillColor(COLORS.blueLight.r, COLORS.blueLight.g, COLORS.blueLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
-      
-      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.blue, 6);
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(12);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(proc.tipo_a.nome || "Pessoa A", this.margin + 24, this.currentY + 14);
-      
-      const typeA = proc.tipo_a.tipo_nello16 || '';
-      this.doc.setFontSize(16);
-      this.doc.setTextColor(COLORS.blue.r, COLORS.blue.g, COLORS.blue.b);
-      this.doc.text(typeA, this.margin + 8, this.currentY + 28);
-      
-      if (proc.tipo_a.como_decide) {
-        this.doc.setFontSize(9);
-        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        this.doc.setFont("helvetica", "normal");
-        const lines = this.doc.splitTextToSize(proc.tipo_a.como_decide, this.contentWidth - 20);
-        this.doc.text(lines, this.margin + 8, this.currentY + 38);
-      }
-      this.currentY += 52;
-    }
-
-    // Person B card
-    if (proc.tipo_b) {
-      this.ensureSpace(50);
-      this.doc.setFillColor(COLORS.purpleLight.r, COLORS.purpleLight.g, COLORS.purpleLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 45, 4, 4, "F");
-      
-      this.drawIconCircle(this.margin + 12, this.currentY + 12, COLORS.purple, 6);
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(12);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(proc.tipo_b.nome || "Pessoa B", this.margin + 24, this.currentY + 14);
-      
-      const typeB = proc.tipo_b.tipo_nello16 || '';
-      this.doc.setFontSize(16);
-      this.doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
-      this.doc.text(typeB, this.margin + 8, this.currentY + 28);
-      
-      if (proc.tipo_b.como_decide) {
-        this.doc.setFontSize(9);
-        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        this.doc.setFont("helvetica", "normal");
-        const lines = this.doc.splitTextToSize(proc.tipo_b.como_decide, this.contentWidth - 20);
-        this.doc.text(lines, this.margin + 8, this.currentY + 38);
-      }
-      this.currentY += 52;
-    }
-
-    // Tension box
-    if (proc.tensao_potencial) {
-      this.ensureSpace(25);
-      this.doc.setFillColor(COLORS.amberLight.r, COLORS.amberLight.g, COLORS.amberLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 3, 3, "F");
-      this.drawIconCircle(this.margin + 10, this.currentY + 10, COLORS.amber, 3);
-      this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-      this.doc.setFontSize(9);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text("Tensao Potencial:", this.margin + 18, this.currentY + 9);
-      this.doc.setFont("helvetica", "normal");
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      const tensionLines = this.doc.splitTextToSize(proc.tensao_potencial, this.contentWidth - 50);
-      this.doc.text(tensionLines, this.margin + 55, this.currentY + 9);
-      this.currentY += 26;
-    }
-
-    // Synergy box
-    if (proc.sinergia) {
-      this.ensureSpace(25);
-      this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 3, 3, "F");
-      this.drawIconCircle(this.margin + 10, this.currentY + 10, COLORS.green, 3);
-      this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-      this.doc.setFontSize(9);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text("Sinergia:", this.margin + 18, this.currentY + 9);
-      this.doc.setFont("helvetica", "normal");
-      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      const synLines = this.doc.splitTextToSize(proc.sinergia, this.contentWidth - 40);
-      this.doc.text(synLines, this.margin + 38, this.currentY + 9);
-    }
-  }
-
-  // ==========================================
-  // NEXT STEPS: ACTIVATIONS (Proximos Passos)
-  // ==========================================
-  private renderNextStepsActivations(content: any) {
-    this.addNewPage();
-    
-    // Premium section header
-    this.doc.setFillColor(COLORS.accent.r, COLORS.accent.g, COLORS.accent.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 15, 3, 3, "F");
-    this.doc.setTextColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
+    // Title
+    this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
     this.doc.setFontSize(12);
     this.doc.setFont("helvetica", "bold");
-    this.doc.text("PROXIMOS PASSOS: ATIVACOES", this.pageWidth / 2, this.currentY + 10, { align: "center" });
-    this.currentY += 25;
+    this.doc.text(tensoes.titulo || this.t.tensoesNaturais, this.margin, this.currentY);
+    this.currentY += 10;
 
-    // Intro text
-    const introText = "Seu Mapa Definitivo e apenas o comeco. A jornada de autoconhecimento do casal continua com acoes praticas e acompanhamento. Aqui estao os proximos passos para transformar esse conhecimento em evolucao real.";
-    this.currentY = this.writeWrappedText(introText, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-    this.currentY += 12;
+    // Simple tension text format
+    const ondeSurgem = sanitizeText(tensoes.onde_surgem);
+    const porqueSurgem = sanitizeText(tensoes.porque_surgem);
+    const oQuesentem = sanitizeText(tensoes.o_que_cada_um_sente);
 
-    const activations = [
-      {
-        title: "Ativacao 1: Semana do Espelho",
-        desc: "Durante 7 dias, cada parceiro pratica uma acao especifica baseada na linguagem de conexao do outro. Ao final, compartilham o que sentiram.",
-        color: COLORS.pink
-      },
-      {
-        title: "Ativacao 2: Conselho do Casal",
-        desc: "Agendem uma 'reuniao mensal' de 30 minutos para revisar o Semaforo Relacional e celebrar progressos na zona verde.",
-        color: COLORS.green
-      },
-      {
-        title: "Ativacao 3: Diario de Traducao",
-        desc: "Usem a Tabela de Traducao sempre que surgirem mal-entendidos. Anotem situacoes reais para expandir seu vocabulario compartilhado.",
-        color: COLORS.blue
-      },
-      {
-        title: "Ativacao 4: Protocolo de Paz em Acao",
-        desc: "Na proxima discussao, apliquem uma das regras do Protocolo de Paz. Depois, avaliem: funcionou? O que ajustar?",
-        color: COLORS.amber
-      },
-      {
-        title: "Ativacao 5: Revisao Trimestral",
-        desc: "A cada 3 meses, releiam o Mapa juntos. Identifiquem o que evoluiu e o que ainda precisa de atencao. Celebrem o crescimento.",
-        color: COLORS.purple
-      }
+    const fields = [
+      { label: 'Onde Surgem os Atritos', text: ondeSurgem },
+      { label: 'Por Que Surgem', text: porqueSurgem },
+      { label: 'O Que Cada Um Sente', text: oQuesentem },
     ];
 
-    activations.forEach((activation, idx) => {
-      const cardHeight = 45;
-      this.ensureSpace(cardHeight);
+    fields.forEach(f => {
+      if (!f.text) return;
+      const textH = this.measureTextHeight(f.text, this.contentWidth - 20, 9);
+      const cardH = textH + 20;
+      this.ensureSpace(cardH);
 
-      // Card background
-      this.doc.setFillColor(248, 248, 252);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 4, 4, "F");
+      this.drawCard(this.margin, this.currentY, this.contentWidth, cardH, COLORS.amberLight, COLORS.amberBorder);
       
-      // Colored left border
-      this.doc.setFillColor(activation.color.r, activation.color.g, activation.color.b);
-      this.doc.rect(this.margin, this.currentY, 4, cardHeight, "F");
-
-      // Number badge
-      this.drawIconCircle(this.margin + 15, this.currentY + 10, activation.color, 6);
-      this.doc.setTextColor(255, 255, 255);
+      let y = this.currentY + 10;
+      this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
       this.doc.setFontSize(10);
       this.doc.setFont("helvetica", "bold");
-      this.doc.text(String(idx + 1), this.margin + 15, this.currentY + 12, { align: "center" });
+      this.doc.text(f.label, this.margin + 8, y);
+      y += 8;
 
-      // Title
       this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-      this.doc.setFontSize(11);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(activation.title, this.margin + 28, this.currentY + 12);
-
-      // Description
-      this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
       this.doc.setFontSize(9);
       this.doc.setFont("helvetica", "normal");
-      const descLines = this.doc.splitTextToSize(activation.desc, this.contentWidth - 35);
-      this.doc.text(descLines, this.margin + 10, this.currentY + 22);
+      const lines = this.doc.splitTextToSize(f.text, this.contentWidth - 20);
+      this.doc.text(lines, this.margin + 8, y);
 
-      this.currentY += cardHeight + 6;
+      this.currentY += cardH + 6;
     });
 
-    // CTA for recurrence
-    this.currentY += 10;
-    this.ensureSpace(40);
-    
-    this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 35, 4, 4, "F");
-    
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(12);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.text("Quer acompanhamento personalizado?", this.pageWidth / 2, this.currentY + 12, { align: "center" });
-    
-    this.doc.setFontSize(10);
-    this.doc.setFont("helvetica", "normal");
-    this.doc.text("Conheca o Programa Identity Couple Mentoria", this.pageWidth / 2, this.currentY + 22, { align: "center" });
-    this.doc.text("nello.one/couple-mentoria", this.pageWidth / 2, this.currentY + 30, { align: "center" });
+    // V2 format - array of tensoes
+    const tensoesArr = tensoes.tensoes;
+    if (Array.isArray(tensoesArr)) {
+      tensoesArr.forEach((t: any) => {
+        const area = sanitizeText(t.area);
+        const ondeSurge = sanitizeText(t.onde_surge);
+        const cardH = 45;
+        this.ensureSpace(cardH);
+
+        this.drawCard(this.margin, this.currentY, this.contentWidth, cardH, COLORS.amberLight, COLORS.amberBorder);
+        let y = this.currentY + 10;
+
+        this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+        this.doc.setFontSize(10);
+        this.doc.setFont("helvetica", "bold");
+        this.doc.text(`⚠️ ${area}`, this.margin + 8, y);
+        y += 10;
+
+        if (ondeSurge) {
+          this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+          this.doc.setFontSize(9);
+          this.doc.setFont("helvetica", "normal");
+          const lines = this.doc.splitTextToSize(ondeSurge, this.contentWidth - 20);
+          this.doc.text(lines, this.margin + 8, y);
+        }
+
+        this.currentY += cardH + 6;
+      });
+    }
   }
 
-  // ==========================================
-  // MAIN GENERATION - PREMIUM 7 PILLARS BOOK (LIVRO DE BORDO)
-  // ==========================================
+  // ===================================================
+  // ZONA DE AJUSTE
+  // ===================================================
+  private renderZonaAjuste(content: any) {
+    const zona = content.zona_de_ajuste || content.zona_ajuste;
+    if (!zona) return;
+
+    const pontoPrincipal = sanitizeText(zona.principal_ponto || zona.ponto_principal);
+    const risco = sanitizeText(zona.risco_se_nao_mudar || zona.risco_se_nao_ajustar);
+    const ajuste = sanitizeText(zona.ajuste_simples || zona.ajuste_proposto);
+
+    if (!pontoPrincipal && !risco && !ajuste) return;
+
+    this.addNewPage();
+
+    // Title
+    this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
+    this.doc.setFontSize(12);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text(`🟡 ${zona.titulo || this.t.zonaAjuste}`, this.margin, this.currentY);
+    this.currentY += 10;
+
+    const items = [
+      { label: '🎯 Principal Ponto de Ajuste', text: pontoPrincipal, bg: COLORS.amberLight, border: COLORS.amberBorder, color: COLORS.amber },
+      { label: '⚠️ Risco se Nada Mudar', text: risco, bg: COLORS.redLight, border: COLORS.redBorder, color: COLORS.red },
+      { label: '✅ Ajuste Proposto', text: ajuste, bg: COLORS.greenLight, border: COLORS.greenBorder, color: COLORS.green },
+    ];
+
+    items.forEach(item => {
+      if (!item.text) return;
+      const textH = this.measureTextHeight(item.text, this.contentWidth - 20, 9);
+      const cardH = textH + 20;
+      this.ensureSpace(cardH);
+
+      this.drawCard(this.margin, this.currentY, this.contentWidth, cardH, item.bg, item.border);
+      let y = this.currentY + 10;
+
+      this.doc.setTextColor(item.color.r, item.color.g, item.color.b);
+      this.doc.setFontSize(10);
+      this.doc.setFont("helvetica", "bold");
+      this.doc.text(item.label, this.margin + 8, y);
+      y += 8;
+
+      this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+      this.doc.setFontSize(9);
+      this.doc.setFont("helvetica", "normal");
+      const lines = this.doc.splitTextToSize(item.text, this.contentWidth - 20);
+      this.doc.text(lines, this.margin + 8, y);
+
+      this.currentY += cardH + 6;
+    });
+  }
+
+  // ===================================================
+  // SÍNTESE EXECUTIVA
+  // ===================================================
+  private renderSintese(content: any) {
+    const sintese = content.sintese_executiva;
+    if (!sintese) return;
+
+    this.addNewPage();
+
+    const cardH = 60;
+    this.drawCard(this.margin, this.currentY, this.contentWidth, cardH, { r: 248, g: 250, b: 252 }, COLORS.cardBorder);
+
+    let y = this.currentY + 10;
+    this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
+    this.doc.setFontSize(12);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.text(sintese.titulo || this.t.sinteseExecutiva, this.margin + 10, y);
+    y += 12;
+
+    if (sintese.resumo) {
+      this.doc.setFontSize(10);
+      this.doc.setFont("helvetica", "normal");
+      const lines = this.doc.splitTextToSize(sanitizeText(sintese.resumo), this.contentWidth - 20);
+      this.doc.text(lines, this.margin + 10, y);
+    }
+
+    this.currentY += cardH + 10;
+  }
+
+  // ===================================================
+  // MAIN GENERATE
+  // ===================================================
   public generate(content: any): jsPDF {
-    // Extract names for cover
-    const personAName = content.perfil_a?.nome || content.usuario_a?.nome || content.papeis_identificados?.sensor_direcao?.nome;
-    const personBName = content.perfil_b?.nome || content.usuario_b?.nome || content.papeis_identificados?.condutor_curso?.nome;
-    
-    this.renderCover(personAName, personBName);
-    this.renderTableOfContents();
+    const nameA = content.dados_grafico?.usuario_a?.nome || content.papeis_naturais?.sensor?.nome;
+    const nameB = content.dados_grafico?.usuario_b?.nome || content.papeis_naturais?.condutor?.nome;
+
+    // Cover
+    this.renderCover(nameA, nameB);
+
+    // Boat Metaphor
     this.renderBoatMetaphor();
-    this.renderTrafficLight(content);
-    this.renderMeetingOfEssences(content);
-    this.renderDISCRadarChart(content);
-    this.renderSantoBate(content);
-    this.renderBichoPega(content);
-    this.renderPotentialization(content);
-    
-    // 7 PILLARS PREMIUM SECTIONS
-    this.renderTemperaments(content);
-    this.renderIntelligences(content);
-    this.renderArchetypes(content);
-    this.renderConnectionStyles(content);
-    this.renderNello16(content);
-    
-    // NEW: LIVRO DE BORDO PREMIUM SECTIONS
-    this.renderReflectivePrompts(content);
-    this.renderRituals(content);
-    this.renderCenariosVidaReal(content);  // NEW: Real Life Scenarios
-    
-    this.renderTranslationTable(content);
-    this.renderPeaceProtocol(content);
-    this.renderSpouseManuals(content);
-    this.renderPressureAlerts(content);
-    this.renderConnectionChallenge(content);
-    this.renderSeekHelp(content);
-    this.renderNextStepsActivations(content);
-    this.renderClosing(content);
+
+    // Main sections (matching screen order)
+    this.renderVisaoGeral(content);
+    this.renderPapeisNaturais(content);
+    this.renderForcasCentrais(content);
+    this.renderAmorNoCasal(content);
+    this.renderSemaforo(content);
+    this.renderDISCChart(content);
+    this.renderTensoes(content);
+    this.renderZonaAjuste(content);
+    this.renderSintese(content);
+
+    // Final footer
+    this.addFooter();
 
     return this.doc;
   }
-
-  // ==========================================
-  // CENÁRIOS DA VIDA REAL (Carreira, Finanças, Saúde, Espiritualidade)
-  // ==========================================
-  private renderCenariosVidaReal(content: any) {
-    const cenarios = content.cenarios_vida_real;
-    if (!cenarios) return;
-
-    this.addNewPage();
-    
-    // Premium chapter header
-    this.doc.setFillColor(COLORS.primary.r, COLORS.primary.g, COLORS.primary.b);
-    this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, 20, 4, 4, "F");
-    this.doc.setTextColor(255, 255, 255);
-    this.doc.setFontSize(8);
-    this.doc.setFont("helvetica", "normal");
-    this.doc.text("CAPITULO 12", this.margin + 8, this.currentY + 7);
-    this.doc.setFontSize(14);
-    this.doc.setFont("helvetica", "bold");
-    this.doc.text(cenarios.titulo || "NAVEGANDO A VIDA JUNTOS", this.margin + 8, this.currentY + 16);
-    this.currentY += 30;
-
-    const intro = cenarios.descricao || "Como voces funcionam em situacoes reais da vida conjugal - carreira, financas, saude e espiritualidade.";
-    this.currentY = this.writeWrappedText(intro, this.margin, this.currentY, this.contentWidth, 10, COLORS.muted, 'italic');
-    this.currentY += 12;
-
-    const renderCenario = (cenario: any, icon: string, title: string, color: any) => {
-      if (!cenario) return;
-
-      const cardHeight = 80;
-      this.ensureSpace(cardHeight);
-
-      // Card background
-      this.doc.setFillColor(248, 248, 252);
-      this.doc.roundedRect(this.margin, this.currentY, this.contentWidth, cardHeight, 4, 4, "F");
-      
-      // Colored left border
-      this.doc.setFillColor(color.r, color.g, color.b);
-      this.doc.rect(this.margin, this.currentY, 4, cardHeight, "F");
-
-      // Title
-      this.drawIconCircle(this.margin + 15, this.currentY + 10, color, 5);
-      this.doc.setTextColor(color.r, color.g, color.b);
-      this.doc.setFontSize(11);
-      this.doc.setFont("helvetica", "bold");
-      this.doc.text(cenario.titulo || title, this.margin + 25, this.currentY + 12);
-
-      let innerY = this.currentY + 20;
-
-      // Como funciona
-      if (cenario.como_funciona) {
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFontSize(9);
-        this.doc.setFont("helvetica", "normal");
-        const funcLines = this.doc.splitTextToSize(cenario.como_funciona, this.contentWidth - 20);
-        this.doc.text(funcLines, this.margin + 8, innerY);
-        innerY += funcLines.length * 4 + 5;
-      }
-
-      // Papel Sensor
-      if (cenario.papel_sensor) {
-        this.doc.setTextColor(COLORS.purple.r, COLORS.purple.g, COLORS.purple.b);
-        this.doc.setFontSize(8);
-        this.doc.setFont("helvetica", "bold");
-        this.doc.text("Sensor:", this.margin + 8, innerY);
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFont("helvetica", "normal");
-        const sensorLines = this.doc.splitTextToSize(cenario.papel_sensor, this.contentWidth - 50);
-        this.doc.text(sensorLines, this.margin + 25, innerY);
-        innerY += sensorLines.length * 4 + 3;
-      }
-
-      // Papel Condutor
-      if (cenario.papel_condutor) {
-        this.doc.setTextColor(COLORS.amber.r, COLORS.amber.g, COLORS.amber.b);
-        this.doc.setFontSize(8);
-        this.doc.setFont("helvetica", "bold");
-        this.doc.text("Condutor:", this.margin + 8, innerY);
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFont("helvetica", "normal");
-        const condutorLines = this.doc.splitTextToSize(cenario.papel_condutor, this.contentWidth - 50);
-        this.doc.text(condutorLines, this.margin + 30, innerY);
-        innerY += condutorLines.length * 4 + 3;
-      }
-
-      // Origem do insight
-      if (cenario.origem_insight) {
-        this.doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b);
-        this.doc.setFontSize(7);
-        this.doc.setFont("helvetica", "italic");
-        this.doc.text(cenario.origem_insight, this.margin + 8, innerY);
-        innerY += 5;
-      }
-
-      // Exemplo pratico
-      if (cenario.exemplo_pratico) {
-        this.doc.setFillColor(COLORS.greenLight.r, COLORS.greenLight.g, COLORS.greenLight.b);
-        this.doc.roundedRect(this.margin + 6, innerY, this.contentWidth - 12, 15, 2, 2, "F");
-        this.doc.setTextColor(COLORS.green.r, COLORS.green.g, COLORS.green.b);
-        this.doc.setFontSize(8);
-        this.doc.setFont("helvetica", "bold");
-        this.doc.text("Exemplo:", this.margin + 10, innerY + 5);
-        this.doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b);
-        this.doc.setFont("helvetica", "italic");
-        const exLines = this.doc.splitTextToSize(cenario.exemplo_pratico, this.contentWidth - 40);
-        this.doc.text(exLines, this.margin + 28, innerY + 5);
-      }
-
-      this.currentY += cardHeight + 10;
-    };
-
-    renderCenario(cenarios.carreira, "briefcase", "Na Carreira e Trabalho", COLORS.blue);
-    renderCenario(cenarios.financas, "dollar", "Nas Financas do Casal", COLORS.green);
-    renderCenario(cenarios.saude, "heart", "Na Saude e Bem-Estar", COLORS.pink);
-    renderCenario(cenarios.espiritualidade, "star", "Na Espiritualidade e Proposito", COLORS.purple);
-  }
 }
 
-// ==========================================
-// CONTENT NORMALIZER - Maps Identity v1.0 to PDF expected format
-// ==========================================
-
-// Helper to sanitize undefined values in text
-const sanitizeText = (text: any): string => {
-  if (!text || text === 'undefined' || text === 'null') return '';
-  if (typeof text !== 'string') return String(text || '');
-  // Remove patterns like "undefined: undefined" or "undefined:"
-  return text
-    .replace(/undefined:\s*undefined/gi, '')
-    .replace(/undefined:\s*/gi, '')
-    .replace(/:\s*undefined/gi, '')
-    .replace(/^undefined$/gi, '')
-    .trim();
-};
-
-// Helper to filter out empty/undefined items from arrays
-const sanitizeArray = (arr: any[]): string[] => {
-  if (!Array.isArray(arr)) return [];
-  return arr
-    .map(item => {
-      if (typeof item === 'string') return sanitizeText(item);
-      if (typeof item === 'object' && item) {
-        const aspecto = sanitizeText(item.aspecto);
-        const descricao = sanitizeText(item.descricao);
-        if (aspecto && descricao) return `${aspecto}: ${descricao}`;
-        if (aspecto) return aspecto;
-        if (descricao) return descricao;
-        return '';
-      }
-      return '';
-    })
-    .filter(item => item && item.length > 3); // Remove empty or too short entries
-};
-
+// Normalize content for consistent data structure
 const normalizeContent = (content: any): any => {
-  if (!content) return {};
+  if (!content || typeof content !== 'object') return {};
   
   const normalized = { ...content };
-  
-  // ==========================================
-  // EXTRACT PROFILE DATA FROM MULTIPLE SOURCES
-  // Priority: perfil_a/b > dados_grafico.usuario_a/b > usuario_a/b
-  // ==========================================
-  const dadosGrafico = content.dados_grafico || {};
-  const profileA = content.perfil_a || dadosGrafico.usuario_a || content.usuario_a || {};
-  const profileB = content.perfil_b || dadosGrafico.usuario_b || content.usuario_b || {};
-  
-  // Ensure profiles are available in normalized content for all render methods
-  normalized.perfil_a = profileA;
-  normalized.perfil_b = profileB;
-  
-  // Extract names for profiles
-  const nameA = profileA.nome || content.papeis_identificados?.sensor_direcao?.nome || 'Pessoa A';
-  const nameB = profileB.nome || content.papeis_identificados?.condutor_curso?.nome || 'Pessoa B';
-  
-  // ==========================================
-  // FIX: SEMAFORO RELACIONAL - sanitize undefined values
-  // ==========================================
-  if (!normalized.semaforo_relacional && (normalized.zona_harmonia || normalized.zona_sinergia || normalized.zona_ajuste || normalized.zona_choque)) {
-    const harmonia = normalized.zona_harmonia || normalized.zona_sinergia;
+
+  // Build semaforo from legacy zones
+  if (!normalized.semaforo_relacional && (normalized.zona_harmonia || normalized.zona_ajuste || normalized.zona_choque)) {
     normalized.semaforo_relacional = {
       titulo: "Semaforo Relacional",
-      verde: harmonia ? {
-        titulo: harmonia.titulo || "Zona de Harmonia",
-        descricao: sanitizeText(harmonia.descricao),
-        pontos: sanitizeArray(harmonia.valores_compartilhados || harmonia.sinergias || harmonia.pontos || []),
-        proposito: sanitizeText(harmonia.proposito_comum)
+      verde: normalized.zona_harmonia ? {
+        titulo: normalized.zona_harmonia.titulo || "Zona de Harmonia",
+        descricao: sanitizeText(normalized.zona_harmonia.descricao),
+        pontos: sanitizeArray(normalized.zona_harmonia.valores_compartilhados || normalized.zona_harmonia.pontos || [])
       } : null,
       amarelo: normalized.zona_ajuste ? {
         titulo: normalized.zona_ajuste.titulo || "Zona de Ajuste",
@@ -2425,217 +977,7 @@ const normalizeContent = (content: any): any => {
       } : null
     };
   }
-  
-  // If semaforo already exists, sanitize its pontos arrays
-  if (normalized.semaforo_relacional) {
-    if (normalized.semaforo_relacional.verde?.pontos) {
-      normalized.semaforo_relacional.verde.pontos = sanitizeArray(normalized.semaforo_relacional.verde.pontos);
-    }
-    if (normalized.semaforo_relacional.amarelo?.pontos) {
-      normalized.semaforo_relacional.amarelo.pontos = sanitizeArray(normalized.semaforo_relacional.amarelo.pontos);
-    }
-    if (normalized.semaforo_relacional.vermelho?.pontos) {
-      normalized.semaforo_relacional.vermelho.pontos = sanitizeArray(normalized.semaforo_relacional.vermelho.pontos);
-    }
-  }
-  
-  // Map metafora_central to encontro_essencias if needed
-  if (!normalized.encontro_essencias && normalized.metafora_central) {
-    normalized.encontro_essencias = {
-      titulo: "O Encontro das Essencias",
-      metafora: normalized.metafora_central.titulo,
-      descricao: normalized.metafora_central.descricao
-    };
-  }
-  
-  // Map papeis_identificados to additional context
-  if (normalized.papeis_identificados) {
-    const sensor = normalized.papeis_identificados.sensor_direcao;
-    const condutor = normalized.papeis_identificados.condutor_curso;
-    
-    if (!normalized.encontro_essencias) {
-      normalized.encontro_essencias = { titulo: "O Encontro das Essencias" };
-    }
-    
-    if (sensor && condutor) {
-      normalized.encontro_essencias.descricao_usuario_a = `${sensor.nome}: ${sensor.justificativa}`;
-      normalized.encontro_essencias.descricao_usuario_b = `${condutor.nome}: ${condutor.justificativa}`;
-    }
-  }
-  
-  // ==========================================
-  // 7 PILLARS: TEMPERAMENTS (Ritmos Biologicos)
-  // ==========================================
-  if (!normalized.ritmos_biologicos) {
-    const tempA = profileA.temperament || profileA.temperamentos;
-    const tempB = profileB.temperament || profileB.temperamentos;
-    
-    if (tempA || tempB) {
-      normalized.ritmos_biologicos = {
-        titulo: "Protocolo de Ritmo do Casal",
-        temperamento_a: tempA ? {
-          nome: nameA,
-          temperamento_primario: tempA.primary || tempA.primario || (typeof tempA === 'string' ? tempA : ''),
-          temperamento_secundario: tempA.secondary || tempA.secundario || '',
-          caracteristicas: tempA.description || tempA.caracteristicas || ''
-        } : null,
-        temperamento_b: tempB ? {
-          nome: nameB,
-          temperamento_primario: tempB.primary || tempB.primario || (typeof tempB === 'string' ? tempB : ''),
-          temperamento_secundario: tempB.secondary || tempB.secundario || '',
-          caracteristicas: tempB.description || tempB.caracteristicas || ''
-        } : null,
-        sinergia: "Os diferentes ritmos biologicos criam uma complementaridade natural que pode ser aproveitada no dia a dia.",
-        ajuste_pratico: "Respeitem os momentos de alta e baixa energia de cada um para evitar atritos desnecessarios."
-      };
-    }
-  }
-  
-  // ==========================================
-  // 7 PILLARS: INTELLIGENCES (Sinergia de Talentos)
-  // ==========================================
-  if (!normalized.sinergia_talentos) {
-    const intA = profileA.intelligences || profileA.inteligencias;
-    const intB = profileB.intelligences || profileB.inteligencias;
-    
-    const getTop3 = (intData: any): string[] => {
-      if (!intData) return [];
-      if (Array.isArray(intData.top3)) return intData.top3;
-      if (Array.isArray(intData)) return intData.slice(0, 3);
-      if (typeof intData === 'object') {
-        return Object.entries(intData)
-          .filter(([key]) => !['top3', 'total'].includes(key))
-          .sort((a: any, b: any) => (b[1] || 0) - (a[1] || 0))
-          .slice(0, 3)
-          .map(([key]) => key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()));
-      }
-      return [];
-    };
-    
-    if (intA || intB) {
-      normalized.sinergia_talentos = {
-        titulo: "Sinergia de Talentos",
-        talentos_a: intA ? {
-          nome: nameA,
-          top_3: getTop3(intA),
-          contribuicao: "Estas inteligencias podem ser usadas para fortalecer a parceria."
-        } : null,
-        talentos_b: intB ? {
-          nome: nameB,
-          top_3: getTop3(intB),
-          contribuicao: "Estas inteligencias complementam as do parceiro(a)."
-        } : null,
-        complementaridade: "Juntos, voces cobrem um espectro amplo de habilidades e talentos.",
-        projetos_sugeridos: "Considerem projetos que combinem criatividade, logica e empatia."
-      };
-    }
-  }
-  
-  // ==========================================
-  // 7 PILLARS: ARCHETYPES (Dinamica de Papeis)
-  // ==========================================
-  if (!normalized.dinamica_papeis) {
-    const archA = profileA.archetypes || profileA.arquetipos;
-    const archB = profileB.archetypes || profileB.arquetipos;
-    
-    if (archA || archB) {
-      normalized.dinamica_papeis = {
-        titulo: "Dinamica de Papeis - O Mito do Casal",
-        arquetipo_a: archA ? {
-          nome: nameA,
-          primario: archA.primary || archA.primario || (typeof archA === 'string' ? archA : ''),
-          secundario: archA.secondary || archA.secundario || '',
-          sombra: archA.shadow || archA.sombra || ''
-        } : null,
-        arquetipo_b: archB ? {
-          nome: nameB,
-          primario: archB.primary || archB.primario || (typeof archB === 'string' ? archB : ''),
-          secundario: archB.secondary || archB.secundario || '',
-          sombra: archB.shadow || archB.sombra || ''
-        } : null,
-        mito_conjunto: "A uniao de seus arquetipos cria uma narrativa unica de co-criacao e evolucao mutua.",
-        dinamica_luz_sombra: "Quando um ativa sua sombra, o outro pode ser o espelho que traz consciencia."
-      };
-    }
-  }
-  
-  // ==========================================
-  // 7 PILLARS: CONNECTION STYLES (Linguagens de Conexao)
-  // ==========================================
-  if (!normalized.linguagens_conexao) {
-    const connA = profileA.connectionStyle || profileA.estiloConexao || profileA.loveLanguage || profileA.linguagem_amor;
-    const connB = profileB.connectionStyle || profileB.estiloConexao || profileB.loveLanguage || profileB.linguagem_amor;
-    
-    if (connA || connB) {
-      normalized.linguagens_conexao = {
-        titulo: "Plano de Abastecimento Emocional",
-        linguagem_a: connA ? {
-          nome: nameA,
-          estilo_primario: connA.primary || connA.primario || (typeof connA === 'string' ? connA : ''),
-          estilo_secundario: connA.secondary || connA.secundario || '',
-          como_se_sente_amado: connA.description || `Sente-se amado(a) atraves de ${connA.primary || connA.primario || 'demonstracoes de afeto'}.`
-        } : null,
-        linguagem_b: connB ? {
-          nome: nameB,
-          estilo_primario: connB.primary || connB.primario || (typeof connB === 'string' ? connB : ''),
-          estilo_secundario: connB.secondary || connB.secundario || '',
-          como_se_sente_amado: connB.description || `Sente-se amado(a) atraves de ${connB.primary || connB.primario || 'demonstracoes de afeto'}.`
-        } : null,
-        micro_acordos: [
-          "Pratiquem a linguagem do outro pelo menos uma vez por dia",
-          "Perguntem diretamente como o parceiro(a) prefere receber carinho",
-          "Celebrem pequenas conquistas na linguagem de cada um"
-        ]
-      };
-    }
-  }
-  
-  // ==========================================
-  // 7 PILLARS: NELLO 16 (Processamento de Decisao)
-  // ==========================================
-  if (!normalized.processamento_decisao) {
-    const n16A = profileA.nello16 || profileA.mbti || profileA.tipo_personalidade;
-    const n16B = profileB.nello16 || profileB.mbti || profileB.tipo_personalidade;
-    
-    if (n16A || n16B) {
-      const typeA = n16A?.type || n16A?.tipo || (typeof n16A === 'string' ? n16A : '');
-      const typeB = n16B?.type || n16B?.tipo || (typeof n16B === 'string' ? n16B : '');
-      
-      normalized.processamento_decisao = {
-        titulo: "Processamento de Decisao",
-        tipo_a: (n16A || typeA) ? {
-          nome: nameA,
-          tipo_nello16: typeA,
-          como_decide: n16A?.decisionStyle || (typeA ? `Tende a processar decisoes de forma ${typeA.includes('T') ? 'logica' : 'emocional'} e ${typeA.includes('J') ? 'estruturada' : 'flexivel'}.` : '')
-        } : null,
-        tipo_b: (n16B || typeB) ? {
-          nome: nameB,
-          tipo_nello16: typeB,
-          como_decide: n16B?.decisionStyle || (typeB ? `Tende a processar decisoes de forma ${typeB.includes('T') ? 'logica' : 'emocional'} e ${typeB.includes('J') ? 'estruturada' : 'flexivel'}.` : '')
-        } : null,
-        tensao_potencial: "Diferentes estilos de decisao podem gerar atrito quando nao compreendidos.",
-        sinergia: "A combinacao de diferentes formas de processar traz equilibrio as decisoes do casal."
-      };
-    }
-  }
-  
-  // Map acao_pratica_24h to desafio_conexao
-  if (!normalized.desafio_conexao && normalized.acao_pratica_24h) {
-    normalized.desafio_conexao = {
-      titulo: normalized.acao_pratica_24h.titulo || "Desafio de Conexao 24h",
-      descricao: normalized.acao_pratica_24h.descricao,
-      acao: normalized.acao_pratica_24h.acao
-    };
-  }
-  
-  // Map fechamento to closing section
-  if (!normalized.mensagem_final && normalized.fechamento) {
-    normalized.mensagem_final = {
-      titulo: normalized.fechamento.titulo,
-      mensagem: normalized.fechamento.mensagem
-    };
-  }
-  
+
   return normalized;
 };
 
@@ -2644,9 +986,9 @@ export const createCodigoCasalPDF = (
   relationshipType: string,
   options?: PDFOptions
 ): jsPDF => {
-  const normalizedContent = normalizeContent(content);
+  const normalized = normalizeContent(content);
   const generator = new PDFGenerator(options?.language || 'pt');
-  return generator.generate(normalizedContent);
+  return generator.generate(normalized);
 };
 
 export const generateCodigoCasalPDF = (
