@@ -1,68 +1,120 @@
 
-# Plano: Ocultar Módulos do Ecossistema para Usuários Comuns
+# Plano: Implementar Verificação de Senhas Vazadas (HaveIBeenPwned)
 
-## Contexto
+## Visão Geral
+Adicionar uma camada de segurança que verifica se a senha escolhida pelo usuário aparece em vazamentos de dados conhecidos, bloqueando o cadastro caso a senha esteja comprometida.
 
-Atualmente, todos os 5 módulos (Identity, Life, Flow, Business, Praxis) aparecem na navegação do header para **qualquer visitante**. Como apenas o Identity está pronto para produção, você quer ocultar os demais para usuários comuns.
+---
 
-## Solução Proposta
+## Como Funciona
 
-Filtrar a lista de módulos exibidos com base no papel do usuário:
-- **Usuários comuns / Visitantes**: Veem apenas **Identity**
-- **Administradores**: Veem todos os módulos (para testes)
+A verificação usa o protocolo **k-Anonymity** da API HaveIBeenPwned:
+1. A senha é convertida em hash SHA-1
+2. Apenas os **5 primeiros caracteres** do hash são enviados à API
+3. A API retorna uma lista de sufixos de hashes comprometidos
+4. A verificação completa acontece localmente (a senha nunca é exposta)
 
-## Mudanças Técnicas
+---
 
-### Arquivo: `src/components/global/NelloGlobalHeader.tsx`
+## Componentes a Implementar
 
-1. **Adicionar lista de módulos públicos**:
-```typescript
-// Módulos visíveis para todos os usuários
-const PUBLIC_MODULES = ['identity'];
+### 1. Backend Function
+Nova Edge Function `check-password-breach` que:
+- Recebe a senha do cliente
+- Gera o hash SHA-1
+- Consulta a API HaveIBeenPwned
+- Retorna se a senha está comprometida
+
+### 2. Hook de Verificação
+Novo hook `usePasswordBreachCheck` que:
+- Debounce da verificação (evita excesso de chamadas)
+- Mostra estado de carregamento
+- Retorna resultado da verificação
+
+### 3. Integração nas Telas de Cadastro
+Atualizar os 5 formulários de cadastro existentes:
+- `src/pages/Auth.tsx` (Nello One principal)
+- `src/apps/flow/pages/FlowAuth.tsx`
+- `src/apps/life/pages/LifeAuth.tsx`
+- `src/apps/business/pages/PraxisAuth.tsx`
+- `src/apps/business/pages/BusinessAuth.tsx`
+
+---
+
+## Experiência do Usuário
+
+```text
+┌─────────────────────────────────────────┐
+│  Senha: ••••••••                   👁   │
+├─────────────────────────────────────────┤
+│  [███████░░░] Média                     │  ← Indicador existente
+│                                         │
+│  ⚠️ Esta senha foi encontrada em um    │  ← Novo aviso
+│     vazamento de dados. Por sua         │
+│     segurança, escolha outra senha.     │
+└─────────────────────────────────────────┘
 ```
 
-2. **Criar lógica de filtragem**:
-```typescript
-// Dentro do componente, após obter o profile
-const isAdmin = profile?.role === 'admin';
-const visibleModules = isAdmin 
-  ? NELLO_MODULES 
-  : NELLO_MODULES.filter(m => PUBLIC_MODULES.includes(m.id));
-```
+- Verificação acontece após ~500ms de digitação
+- Botão de cadastro fica desabilitado se senha comprometida
+- Mensagem clara e amigável em português
 
-3. **Usar `visibleModules` na renderização**:
-   - **Navegação Desktop (linha 178)**: Trocar `NELLO_MODULES.map(...)` por `visibleModules.map(...)`
-   - **Menu Mobile (linha 335)**: Trocar `NELLO_MODULES.map(...)` por `visibleModules.map(...)`
+---
 
-## Resultado Visual
+## Detalhes Técnicos
 
-| Usuário | Navegação Visível |
-|---------|------------------|
-| Visitante (não logado) | Identity |
-| Cliente (usuário comum) | Identity |
-| Admin | Identity, Life, Flow, Business, Praxis |
-
-## Ativação Futura
-
-Quando cada app estiver pronto, basta adicionar ao array:
+### Edge Function: `check-password-breach`
 
 ```typescript
-// Quando Life estiver pronto:
-const PUBLIC_MODULES = ['identity', 'life'];
-
-// Quando todos estiverem prontos:
-const PUBLIC_MODULES = ['identity', 'life', 'flow', 'business', 'praxis'];
+// Fluxo simplificado:
+1. Recebe { password: string }
+2. Gera SHA-1 hash da senha
+3. Extrai prefix (5 chars) e suffix (resto)
+4. GET https://api.pwnedpasswords.com/range/{prefix}
+5. Verifica se suffix está na resposta
+6. Retorna { breached: boolean, count?: number }
 ```
 
-## Impacto
+### Hook: `usePasswordBreachCheck`
 
-- **Usuários comuns**: Veem apenas o link "Identity" na navegação
-- **Rotas protegidas**: Cada app mantém sua própria proteção de rota
-- **Admins**: Continuam com acesso completo para testar os outros módulos
-- **URLs diretas**: Se alguém acessar diretamente (ex: `flow.nello.one`), verá a landing page do app normalmente
+```typescript
+// Uso:
+const { isBreached, isChecking, checkPassword } = usePasswordBreachCheck();
 
-## Arquivos a Modificar
+// Retorna:
+- isBreached: boolean | null
+- isChecking: boolean
+- checkPassword: (password: string) => void
+```
 
-| Arquivo | Alteração |
-|---------|-----------|
-| `src/components/global/NelloGlobalHeader.tsx` | Adicionar filtro de módulos por role |
+### Modificações nos Formulários
+
+1. Importar o novo hook
+2. Chamar `checkPassword(password)` no `onChange`
+3. Exibir aviso quando `isBreached === true`
+4. Desabilitar submit quando senha comprometida
+
+---
+
+## Arquivos a Criar/Modificar
+
+| Arquivo | Ação |
+|---------|------|
+| `supabase/functions/check-password-breach/index.ts` | Criar |
+| `supabase/config.toml` | Adicionar config |
+| `src/hooks/usePasswordBreachCheck.ts` | Criar |
+| `src/components/PasswordBreachWarning.tsx` | Criar |
+| `src/pages/Auth.tsx` | Modificar |
+| `src/apps/flow/pages/FlowAuth.tsx` | Modificar |
+| `src/apps/life/pages/LifeAuth.tsx` | Modificar |
+| `src/apps/business/pages/PraxisAuth.tsx` | Modificar |
+| `src/apps/business/pages/BusinessAuth.tsx` | Modificar |
+
+---
+
+## Considerações de Segurança
+
+- A senha **nunca** é enviada em texto claro à API externa
+- Hash SHA-1 parcial protege a privacidade (k-Anonymity)
+- Verificação server-side evita bypass pelo cliente
+- Rate limiting natural da API (sem necessidade de configurar)
