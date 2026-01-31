@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { SEOHead } from '@/components/SEOHead';
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
+import { PasswordBreachWarning } from '@/components/PasswordBreachWarning';
+import { usePasswordBreachCheck } from '@/hooks/usePasswordBreachCheck';
 
 export default function FlowAuth() {
   const [searchParams] = useSearchParams();
@@ -22,6 +24,16 @@ export default function FlowAuth() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [fullName, setFullName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { isBreached, isChecking, breachCount, checkPassword, reset: resetBreachCheck } = usePasswordBreachCheck();
+
+  // Check password breach when password changes (only in signup mode)
+  useEffect(() => {
+    if (mode === 'signup' && password) {
+      checkPassword(password);
+    } else {
+      resetBreachCheck();
+    }
+  }, [password, mode, checkPassword, resetBreachCheck]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,6 +188,13 @@ export default function FlowAuth() {
                   </button>
                 </div>
                 {mode === 'signup' && <PasswordStrengthIndicator password={password} />}
+                {mode === 'signup' && (
+                  <PasswordBreachWarning 
+                    isBreached={isBreached} 
+                    isChecking={isChecking} 
+                    breachCount={breachCount}
+                  />
+                )}
               </div>
               
               {mode === 'signup' && (
@@ -205,7 +224,7 @@ export default function FlowAuth() {
               
               <Button 
                 type="submit" 
-                disabled={isLoading}
+                disabled={isLoading || (mode === 'signup' && isBreached === true)}
                 className="w-full bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 text-white py-6"
               >
                 {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

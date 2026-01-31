@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,8 @@ import { Heart, Eye, EyeOff, ArrowLeft, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { SEOHead } from '@/components/SEOHead';
+import { PasswordBreachWarning } from '@/components/PasswordBreachWarning';
+import { usePasswordBreachCheck } from '@/hooks/usePasswordBreachCheck';
 
 export default function LifeAuth() {
   const navigate = useNavigate();
@@ -16,6 +18,16 @@ export default function LifeAuth() {
   const [fullName, setFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { isBreached, isChecking, breachCount, checkPassword, reset: resetBreachCheck } = usePasswordBreachCheck();
+
+  // Check password breach when password changes (only in signup mode)
+  useEffect(() => {
+    if (!isLogin && password) {
+      checkPassword(password);
+    } else {
+      resetBreachCheck();
+    }
+  }, [password, isLogin, checkPassword, resetBreachCheck]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,9 +191,17 @@ export default function LifeAuth() {
                 </div>
               </div>
 
+              {!isLogin && (
+                <PasswordBreachWarning 
+                  isBreached={isBreached} 
+                  isChecking={isChecking} 
+                  breachCount={breachCount}
+                />
+              )}
+
               <Button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || (!isLogin && isBreached === true)}
                 className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
               >
                 {isLoading ? (

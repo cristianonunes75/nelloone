@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { Sparkles, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { PasswordBreachWarning } from '@/components/PasswordBreachWarning';
+import { usePasswordBreachCheck } from '@/hooks/usePasswordBreachCheck';
 
 export default function PraxisAuth() {
   const navigate = useNavigate();
@@ -19,8 +21,18 @@ export default function PraxisAuth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const { isBreached, isChecking, breachCount, checkPassword, reset: resetBreachCheck } = usePasswordBreachCheck();
   
   const mode = searchParams.get('mode') === 'register' ? 'register' : 'login';
+
+  // Check password breach when password changes (only in register mode)
+  useEffect(() => {
+    if (mode === 'register' && password) {
+      checkPassword(password);
+    } else {
+      resetBreachCheck();
+    }
+  }, [password, mode, checkPassword, resetBreachCheck]);
 
   // If already logged in, redirect to dashboard or onboarding
   useEffect(() => {
@@ -193,11 +205,16 @@ export default function PraxisAuth() {
                       required
                       minLength={6}
                     />
+                    <PasswordBreachWarning 
+                      isBreached={isBreached} 
+                      isChecking={isChecking} 
+                      breachCount={breachCount}
+                    />
                   </div>
                   <Button 
                     type="submit" 
                     className="w-full bg-gradient-to-r from-amber-500 to-orange-600"
-                    disabled={isLoading}
+                    disabled={isLoading || isBreached === true}
                   >
                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Criar conta grátis'}
                   </Button>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,8 @@ import { z } from "zod";
 import { Info, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PasswordStrengthIndicator } from "@/components/PasswordStrengthIndicator";
+import { PasswordBreachWarning } from "@/components/PasswordBreachWarning";
+import { usePasswordBreachCheck } from "@/hooks/usePasswordBreachCheck";
 import { Separator } from "@/components/ui/separator";
 
 const authSchema = z.object({
@@ -52,6 +54,16 @@ const Auth = () => {
   const { user } = useAuth();
   const { language, t } = useLanguage();
   const [searchParams] = useSearchParams();
+  const { isBreached, isChecking, breachCount, checkPassword, reset: resetBreachCheck } = usePasswordBreachCheck();
+
+  // Check password breach when password changes (only in signup mode)
+  useEffect(() => {
+    if (!isLogin && password) {
+      checkPassword(password);
+    } else {
+      resetBreachCheck();
+    }
+  }, [password, isLogin, checkPassword, resetBreachCheck]);
   
   // Check redirect parameter
   const redirectParam = searchParams.get("redirect");
@@ -384,6 +396,14 @@ const Auth = () => {
               </button>
             </div>
             {!isLogin && <PasswordStrengthIndicator password={password} language={language} />}
+            {!isLogin && (
+              <PasswordBreachWarning 
+                isBreached={isBreached} 
+                isChecking={isChecking} 
+                breachCount={breachCount}
+                language={language}
+              />
+            )}
           </div>
 
           {!isLogin && (
@@ -449,7 +469,7 @@ const Auth = () => {
             type="submit"
             className="w-full"
             size="lg"
-            disabled={isLoading || (!isLogin && !termsAccepted)}
+            disabled={isLoading || (!isLogin && !termsAccepted) || (!isLogin && isBreached === true)}
           >
             {isLoading
               ? texts.loading
