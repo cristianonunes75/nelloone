@@ -7,6 +7,7 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminAppSwitcher } from "@/components/admin/AdminAppSwitcher";
 import { Loader2 } from "lucide-react";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
+import { AdminGuard } from "@/components/admin/AdminGuard";
 
 // Lazy load admin modules
 const AdminDashboard = lazy(() => import("@/components/admin/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
@@ -91,23 +92,74 @@ const Admin = () => {
                 <Route path="pedidos" element={<AdminOrdersPayments />} />
                 <Route path="produtos" element={<AdminProductsTests />} />
                 <Route path="vendas" element={<AdminSalesReport />} />
-                <Route path="precos" element={<AdminPriceManager />} />
                 <Route path="cupons" element={<AdminCoupons />} />
-                <Route path="depoimentos" element={<TestimonialsManagement />} />
-                <Route path="codigo-essencia" element={<AdminCodigoEssencia />} />
-                <Route path="identidade-visual" element={<AdminPostFactory />} />
-                <Route path="landing-page" element={<AdminLandingPage />} />
                 <Route path="comunicacao" element={<CommunicationManagement />} />
                 <Route path="engajamento" element={<AdminEngagementCenter />} />
                 <Route path="enviar-relatorios" element={<AdminSendReports />} />
                 <Route path="notificacoes-historico" element={<AdminNotificationsHistory />} />
-                <Route path="alertas-admin" element={<AdminNotificationSettings />} />
-                <Route path="permissoes" element={<AdminPermissionsManager />} />
-                <Route path="limpeza" element={<DataCleanupTool />} />
                 <Route path="notificacoes" element={<NotificationAutomation />} />
-                <Route path="logs" element={<AdminLogs />} />
-                <Route path="tools" element={<AdminTools />} />
-                <Route path="configuracoes" element={<AdminSettings />} />
+                
+                {/* Protected routes - isSuperAdminOnly */}
+                <Route path="precos" element={
+                  <AdminGuard isSuperAdminOnly fallbackMessage="Gerenciamento de preços é restrito a Super Admins.">
+                    <AdminPriceManager />
+                  </AdminGuard>
+                } />
+                <Route path="permissoes" element={
+                  <AdminGuard isSuperAdminOnly fallbackMessage="Gerenciamento de permissões é restrito a Super Admins.">
+                    <AdminPermissionsManager />
+                  </AdminGuard>
+                } />
+                <Route path="logs" element={
+                  <AdminGuard isSuperAdminOnly fallbackMessage="Logs de auditoria são restritos a Super Admins.">
+                    <AdminLogs />
+                  </AdminGuard>
+                } />
+                <Route path="tools" element={
+                  <AdminGuard isSuperAdminOnly fallbackMessage="Ferramentas de desenvolvimento são restritas a Super Admins.">
+                    <AdminTools />
+                  </AdminGuard>
+                } />
+                <Route path="codigo-essencia" element={
+                  <AdminGuard isSuperAdminOnly fallbackMessage="Gestão do Código da Essência é restrita a Super Admins.">
+                    <AdminCodigoEssencia />
+                  </AdminGuard>
+                } />
+                
+                {/* Protected routes - can_manage_settings */}
+                <Route path="landing-page" element={
+                  <AdminGuard requiredPermission="can_manage_settings" fallbackMessage="Edição da landing page requer permissão de configurações.">
+                    <AdminLandingPage />
+                  </AdminGuard>
+                } />
+                <Route path="depoimentos" element={
+                  <AdminGuard requiredPermission="can_manage_settings" fallbackMessage="Gestão de depoimentos requer permissão de configurações.">
+                    <TestimonialsManagement />
+                  </AdminGuard>
+                } />
+                <Route path="identidade-visual" element={
+                  <AdminGuard requiredPermission="can_manage_settings" fallbackMessage="Identidade visual requer permissão de configurações.">
+                    <AdminPostFactory />
+                  </AdminGuard>
+                } />
+                <Route path="alertas-admin" element={
+                  <AdminGuard requiredPermission="can_manage_settings" fallbackMessage="Configurações de alertas requer permissão de configurações.">
+                    <AdminNotificationSettings />
+                  </AdminGuard>
+                } />
+                <Route path="configuracoes" element={
+                  <AdminGuard requiredPermission="can_manage_settings" fallbackMessage="Configurações do sistema requer permissão específica.">
+                    <AdminSettings />
+                  </AdminGuard>
+                } />
+                
+                {/* Protected routes - can_delete_data */}
+                <Route path="limpeza" element={
+                  <AdminGuard requiredPermission="can_delete_data" fallbackMessage="Limpeza de dados requer permissão de exclusão.">
+                    <DataCleanupTool />
+                  </AdminGuard>
+                } />
+                
                 <Route path="*" element={<AdminDashboard />} />
               </Routes>
             </Suspense>

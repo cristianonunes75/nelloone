@@ -36,6 +36,7 @@ import {
 } from "./post-factory";
 import { AIImageGenerator } from "./post-factory/AIImageGenerator";
 
+// Component protected by AdminGuard at route level - can_manage_settings
 export const AdminPostFactory = () => {
   // Symbol state for brand identity
   const [activeSymbol, setActiveSymbol] = useState<"portal" | "n" | "one">("one");

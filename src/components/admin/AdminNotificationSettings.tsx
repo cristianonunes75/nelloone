@@ -33,6 +33,7 @@ const EVENT_TYPES = [
   { key: "crossing_accepted", label: "Cruzamento Aceito", icon: "💕", priority: "low" },
 ];
 
+// Component protected by AdminGuard at route level - can_manage_settings
 export function AdminNotificationSettings() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
