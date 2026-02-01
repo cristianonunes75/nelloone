@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
-export type AdminPermissionLevel = 'super_admin' | 'suporte' | 'visualizador' | 'growth';
+export type AdminPermissionLevel = 'super_admin' | 'suporte' | 'visualizador' | 'growth' | 'sales';
 
 export interface AdminPermissions {
   id: string;
@@ -16,6 +16,7 @@ export interface AdminPermissions {
   can_send_notifications: boolean;
   can_delete_data: boolean;
   can_impersonate: boolean;
+  can_manage_leads: boolean;
 }
 
 interface UseAdminPermissionsReturn {
@@ -61,6 +62,7 @@ export const useAdminPermissions = (): UseAdminPermissionsReturn => {
           can_send_notifications: true,
           can_delete_data: true,
           can_impersonate: true,
+          can_manage_leads: true,
         });
       } else if (data) {
         setPermissions(data as AdminPermissions);
@@ -78,6 +80,7 @@ export const useAdminPermissions = (): UseAdminPermissionsReturn => {
           can_send_notifications: true,
           can_delete_data: true,
           can_impersonate: true,
+          can_manage_leads: true,
         });
       }
     } catch (error) {
@@ -109,12 +112,12 @@ export const useAdminPermissions = (): UseAdminPermissionsReturn => {
   };
 };
 
-// Permission level labels
 export const permissionLevelLabels: Record<AdminPermissionLevel, string> = {
   super_admin: 'Super Admin',
   suporte: 'Suporte',
   visualizador: 'Visualizador',
   growth: 'Growth',
+  sales: 'Sales (Closer)',
 };
 
 // Permission presets for each level
@@ -128,6 +131,7 @@ export const permissionPresets: Record<AdminPermissionLevel, Omit<AdminPermissio
     can_send_notifications: true,
     can_delete_data: true,
     can_impersonate: true,
+    can_manage_leads: true,
   },
   suporte: {
     can_manage_users: true,
@@ -138,6 +142,7 @@ export const permissionPresets: Record<AdminPermissionLevel, Omit<AdminPermissio
     can_send_notifications: true,
     can_delete_data: false,
     can_impersonate: true,
+    can_manage_leads: true,
   },
   visualizador: {
     can_manage_users: false,
@@ -148,6 +153,7 @@ export const permissionPresets: Record<AdminPermissionLevel, Omit<AdminPermissio
     can_send_notifications: false,
     can_delete_data: false,
     can_impersonate: false,
+    can_manage_leads: false,
   },
   growth: {
     can_manage_users: false,
@@ -158,6 +164,18 @@ export const permissionPresets: Record<AdminPermissionLevel, Omit<AdminPermissio
     can_send_notifications: true,
     can_delete_data: false,
     can_impersonate: false,
+    can_manage_leads: false,
+  },
+  sales: {
+    can_manage_users: false,
+    can_manage_payments: false,
+    can_manage_products: false,
+    can_manage_settings: false,
+    can_view_reports: true,
+    can_send_notifications: false,
+    can_delete_data: false,
+    can_impersonate: false,
+    can_manage_leads: true,
   },
 };
 
@@ -171,4 +189,5 @@ export const permissionDescriptions: Record<string, string> = {
   can_send_notifications: 'Enviar notificações e emails',
   can_delete_data: 'Deletar dados e fazer limpeza',
   can_impersonate: 'Impersonar usuários',
+  can_manage_leads: 'Gerenciar leads e pipeline de vendas',
 };

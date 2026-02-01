@@ -40,6 +40,12 @@ const AdminNotificationSettings = lazy(() => import("@/components/admin/AdminNot
 const AdminSalesReport = lazy(() => import("@/components/admin/AdminSalesReport").then(m => ({ default: m.AdminSalesReport })));
 const AdminPriceManager = lazy(() => import("@/components/admin/AdminPriceManager").then(m => ({ default: m.AdminPriceManager })));
 
+// Mini CRM modules
+const AdminLeads = lazy(() => import("@/components/admin/AdminLeads").then(m => ({ default: m.AdminLeads })));
+const AdminPipeline = lazy(() => import("@/components/admin/AdminPipeline").then(m => ({ default: m.AdminPipeline })));
+const AdminFollowups = lazy(() => import("@/components/admin/AdminFollowups").then(m => ({ default: m.AdminFollowups })));
+const AdminSalesPlaybook = lazy(() => import("@/components/admin/AdminSalesPlaybook").then(m => ({ default: m.AdminSalesPlaybook })));
+
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
     <div className="flex flex-col items-center gap-3">
@@ -98,6 +104,28 @@ const Admin = () => {
                 <Route path="enviar-relatorios" element={<AdminSendReports />} />
                 <Route path="notificacoes-historico" element={<AdminNotificationsHistory />} />
                 <Route path="notificacoes" element={<NotificationAutomation />} />
+                
+                {/* Mini CRM routes */}
+                <Route path="leads" element={
+                  <AdminGuard requiredPermission="can_manage_leads" fallbackMessage="Gerenciamento de leads requer permissão específica.">
+                    <AdminLeads />
+                  </AdminGuard>
+                } />
+                <Route path="pipeline" element={
+                  <AdminGuard requiredPermission="can_manage_leads" fallbackMessage="Pipeline de vendas requer permissão específica.">
+                    <AdminPipeline />
+                  </AdminGuard>
+                } />
+                <Route path="followups" element={
+                  <AdminGuard requiredPermission="can_manage_leads" fallbackMessage="Follow-ups requer permissão específica.">
+                    <AdminFollowups />
+                  </AdminGuard>
+                } />
+                <Route path="vendas-playbook" element={
+                  <AdminGuard requiredPermission="can_manage_leads" fallbackMessage="Playbook de vendas requer permissão específica.">
+                    <AdminSalesPlaybook />
+                  </AdminGuard>
+                } />
                 
                 {/* Protected routes - isSuperAdminOnly */}
                 <Route path="precos" element={

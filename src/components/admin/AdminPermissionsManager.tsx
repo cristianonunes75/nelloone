@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, UserCog, Plus, Loader2, Crown, HeadsetIcon, Eye, TrendingUp } from "lucide-react";
+import { Shield, UserCog, Plus, Loader2, Crown, HeadsetIcon, Eye, TrendingUp, Users } from "lucide-react";
 
 interface AdminUser {
   id: string;
@@ -32,6 +32,7 @@ const levelIcons: Record<AdminPermissionLevel, any> = {
   suporte: HeadsetIcon,
   visualizador: Eye,
   growth: TrendingUp,
+  sales: Users,
 };
 
 const levelColors: Record<AdminPermissionLevel, string> = {
@@ -39,6 +40,7 @@ const levelColors: Record<AdminPermissionLevel, string> = {
   suporte: 'bg-chart-2 text-white',
   visualizador: 'bg-muted text-muted-foreground',
   growth: 'bg-emerald-500 text-white',
+  sales: 'bg-amber-500 text-white',
 };
 
 const levelDescriptions: Record<AdminPermissionLevel, string> = {
@@ -46,6 +48,7 @@ const levelDescriptions: Record<AdminPermissionLevel, string> = {
   suporte: 'Gerencia usuários e atendimento',
   visualizador: 'Apenas visualização de dados',
   growth: 'Métricas, relatórios e campanhas de engajamento',
+  sales: 'Gestão de leads, pipeline e follow-ups',
 };
 
 export const AdminPermissionsManager = () => {
@@ -153,7 +156,7 @@ export const AdminPermissionsManager = () => {
     try {
       const permData = {
         user_id: selectedAdmin.user_id,
-        permission_level: selectedAdmin.permission_level,
+        permission_level: selectedAdmin.permission_level as any,
         can_manage_users: selectedAdmin.can_manage_users,
         can_manage_payments: selectedAdmin.can_manage_payments,
         can_manage_products: selectedAdmin.can_manage_products,
@@ -162,6 +165,7 @@ export const AdminPermissionsManager = () => {
         can_send_notifications: selectedAdmin.can_send_notifications,
         can_delete_data: selectedAdmin.can_delete_data,
         can_impersonate: selectedAdmin.can_impersonate,
+        can_manage_leads: permissionPresets[selectedAdmin.permission_level]?.can_manage_leads ?? false,
       };
 
       if (selectedAdmin.id) {
