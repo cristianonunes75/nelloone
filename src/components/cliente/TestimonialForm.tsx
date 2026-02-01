@@ -26,6 +26,8 @@ export function TestimonialForm({ testId, testSlug, testName }: TestimonialFormP
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const MAX_TESTIMONIAL_LENGTH = 2000;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -166,12 +168,12 @@ export function TestimonialForm({ testId, testSlug, testName }: TestimonialFormP
               placeholder="Conte-nos sobre sua experiência..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              maxLength={500}
-              rows={4}
+              maxLength={MAX_TESTIMONIAL_LENGTH}
+              rows={6}
               className="bg-background resize-none"
             />
             <p className="text-xs text-muted-foreground text-right">
-              {content.length}/500 caracteres
+              {content.length}/{MAX_TESTIMONIAL_LENGTH} caracteres
             </p>
           </div>
 
