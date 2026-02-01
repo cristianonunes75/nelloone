@@ -136,6 +136,7 @@ export const AdminLogs = () => {
     );
   }
 
+  // Component content wrapped by AdminGuard at route level
   return (
     <div className="space-y-4 md:space-y-6 max-w-7xl">
       {/* Header */}

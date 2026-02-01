@@ -52,6 +52,7 @@ interface AuditLog {
   user_id: string | null;
 }
 
+// Component protected by AdminGuard at route level - isSuperAdminOnly
 export const AdminTools = () => {
   const [isAdminTestMode, setIsAdminTestMode] = useState(false);
   const [resetUserId, setResetUserId] = useState("");

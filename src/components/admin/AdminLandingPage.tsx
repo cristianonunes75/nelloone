@@ -105,6 +105,7 @@ const ICON_OPTIONS = [
   "Crown", "Shield", "Globe", "BookOpen", "Compass", "Flame", "Gem", "Sun"
 ];
 
+// Component protected by AdminGuard at route level - can_manage_settings
 export const AdminLandingPage = () => {
   const [sections, setSections] = useState<ContentSection[]>([]);
   const [loading, setLoading] = useState(true);

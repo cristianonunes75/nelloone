@@ -54,6 +54,7 @@ interface Testimonial {
   response_sent_at: string | null;
 }
 
+// Component protected by AdminGuard at route level - can_manage_settings
 export function TestimonialsManagement() {
   const { toast } = useToast();
   const { user } = useAuth();

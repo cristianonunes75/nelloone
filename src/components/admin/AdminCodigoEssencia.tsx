@@ -32,6 +32,7 @@ interface CodigoEssenciaUser {
   locale?: string;
 }
 
+// Component protected by AdminGuard at route level - isSuperAdminOnly
 export const AdminCodigoEssencia = () => {
   const [users, setUsers] = useState<CodigoEssenciaUser[]>([]);
   const [loading, setLoading] = useState(true);
