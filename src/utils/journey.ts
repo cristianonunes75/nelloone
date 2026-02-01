@@ -170,6 +170,47 @@ export async function updateJourneyProgress(
     }
 
     console.log(`Journey progress updated for user ${userId}: ${testSlug} -> ${status}, completed: ${completedCount}/${totalTests}`);
+
+    // If journey just completed, send notification to admin
+    if (completedCount >= totalTests && journeyStatus === 'completed') {
+      try {
+        // Get user profile for notification
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', userId)
+          .single();
+
+        // Get user email
+        const { data: authData } = await supabase.auth.getUser();
+
+        // Calculate journey duration
+        const startDate = new Date(journeyStartedAt || new Date());
+        const endDate = new Date(journeyCompletedAt || new Date());
+        const daysToComplete = Math.ceil(
+          (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
+
+        // Fire-and-forget notification
+        supabase.functions.invoke("notify-admin", {
+          body: {
+            event_type: "journey_completed",
+            data: {
+              user_name: profileData?.full_name || "Usuário",
+              user_email: authData?.user?.email || "N/A",
+              journey_duration: `${daysToComplete} dia(s)`,
+              user_id: userId,
+            }
+          }
+        }).catch(err => console.warn("Failed to notify admin of journey completion:", err));
+
+        console.log(`Journey completion notification triggered for user ${userId}`);
+      } catch (notifyError) {
+        // Don't fail the main operation if notification fails
+        console.warn("Error sending journey completion notification:", notifyError);
+      }
+    }
+
     return { success: true };
   } catch (error) {
     console.error('Unexpected error updating journey progress:', error);

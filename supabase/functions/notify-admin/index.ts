@@ -31,7 +31,8 @@ type EventType =
   | "test_completed"
   | "essence_map_generated"
   | "affiliate_sale"
-  | "crossing_accepted";
+  | "crossing_accepted"
+  | "journey_completed";
 
 interface NotifyAdminRequest {
   event_type: EventType;
@@ -216,6 +217,29 @@ function getEmailContent(eventType: EventType, data: NotifyAdminRequest["data"])
         `,
       };
 
+    case "journey_completed":
+      return {
+        subject: `🎉 Jornada Completa! ${data.user_name || "Usuário"} - NELLO ONE`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #1a1a1a; border-bottom: 2px solid #22c55e; padding-bottom: 10px;">
+              🎉 Jornada NELLO ONE Concluída!
+            </h1>
+            <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <p><strong>👤 Usuário:</strong> ${data.user_name || "Não informado"}</p>
+              <p><strong>📧 Email:</strong> ${data.user_email || "Não informado"}</p>
+              <p><strong>📅 Conclusão:</strong> ${now}</p>
+              <p><strong>⏱️ Duração:</strong> ${data.journey_duration || "N/A"}</p>
+            </div>
+            <p style="color: #666; margin-bottom: 20px;">O usuário completou todos os 7 testes da jornada!</p>
+            <a href="https://nelloone.lovable.app/admin/usuarios" 
+               style="display: inline-block; background: #1a1a1a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
+              Ver no Admin
+            </a>
+          </div>
+        `,
+      };
+
     default:
       return {
         subject: `📢 Notificação NELLO ONE`,
@@ -259,6 +283,9 @@ function getWhatsAppMessage(eventType: EventType, data: NotifyAdminRequest["data
 
     case "crossing_accepted":
       return `💕 *Cruzamento aceito!*\n\n${data.user_name || "Alguém"} aceitou o convite de ${data.partner_name || "parceiro"}`;
+
+    case "journey_completed":
+      return `🎉 *Jornada NELLO ONE completa!*\n\n👤 ${data.user_name || "Usuário"}\n📧 ${data.user_email || "N/A"}\n⏱️ ${data.journey_duration || "N/A"}\n\nO usuário completou todos os 7 testes!\n\n👉 nelloone.lovable.app/admin/usuarios`;
 
     default:
       return `📢 Notificação NELLO ONE: ${eventType}`;
