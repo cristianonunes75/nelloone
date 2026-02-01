@@ -150,6 +150,7 @@ export type Database = {
         Row: {
           can_delete_data: boolean | null
           can_impersonate: boolean | null
+          can_manage_leads: boolean | null
           can_manage_payments: boolean | null
           can_manage_products: boolean | null
           can_manage_settings: boolean | null
@@ -166,6 +167,7 @@ export type Database = {
         Insert: {
           can_delete_data?: boolean | null
           can_impersonate?: boolean | null
+          can_manage_leads?: boolean | null
           can_manage_payments?: boolean | null
           can_manage_products?: boolean | null
           can_manage_settings?: boolean | null
@@ -182,6 +184,7 @@ export type Database = {
         Update: {
           can_delete_data?: boolean | null
           can_impersonate?: boolean | null
+          can_manage_leads?: boolean | null
           can_manage_payments?: boolean | null
           can_manage_products?: boolean | null
           can_manage_settings?: boolean | null
@@ -2597,6 +2600,106 @@ export type Database = {
           },
         ]
       }
+      lead_activities: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          lead_id: string
+          summary: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lead_id: string
+          summary?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lead_id?: string
+          summary?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          associated_purchase_id: string | null
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          instagram_handle: string | null
+          lost_reason: string | null
+          next_action: string | null
+          next_action_date: string | null
+          notes: string | null
+          owner_user_id: string | null
+          phone: string | null
+          source: string
+          status: string
+          updated_at: string
+          value_estimate: number | null
+        }
+        Insert: {
+          associated_purchase_id?: string | null
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          instagram_handle?: string | null
+          lost_reason?: string | null
+          next_action?: string | null
+          next_action_date?: string | null
+          notes?: string | null
+          owner_user_id?: string | null
+          phone?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+          value_estimate?: number | null
+        }
+        Update: {
+          associated_purchase_id?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          instagram_handle?: string | null
+          lost_reason?: string | null
+          next_action?: string | null
+          next_action_date?: string | null
+          notes?: string | null
+          owner_user_id?: string | null
+          phone?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+          value_estimate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_associated_purchase_id_fkey"
+            columns: ["associated_purchase_id"]
+            isOneToOne: false
+            referencedRelation: "test_purchases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mapa_essencia: {
         Row: {
           created_at: string
@@ -3384,6 +3487,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sales_playbook: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          order_index: number | null
+          section_key: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          order_index?: number | null
+          section_key: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          order_index?: number | null
+          section_key?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       site_visitors: {
         Row: {

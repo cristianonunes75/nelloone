@@ -24,6 +24,10 @@ import {
   FileEdit,
   DollarSign,
   PieChart,
+  UserPlus,
+  Kanban,
+  CalendarCheck,
+  BookOpen,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -71,6 +75,15 @@ const menuSections: MenuSection[] = [
     items: [
       { title: "Usuários & Jornadas", url: "/admin/usuarios", icon: Users, permission: 'can_view_reports' },
       { title: "Afiliados", url: "/admin/afiliados", icon: UserCheck, permission: 'can_view_reports' },
+    ]
+  },
+  {
+    label: "CRM",
+    items: [
+      { title: "Leads", url: "/admin/leads", icon: UserPlus, permission: 'can_manage_leads' },
+      { title: "Pipeline", url: "/admin/pipeline", icon: Kanban, permission: 'can_manage_leads' },
+      { title: "Follow-ups", url: "/admin/followups", icon: CalendarCheck, permission: 'can_manage_leads' },
+      { title: "Playbook", url: "/admin/vendas-playbook", icon: BookOpen, permission: 'can_manage_leads' },
     ]
   },
   {
