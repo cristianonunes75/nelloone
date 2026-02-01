@@ -25,6 +25,7 @@ interface NotificationContact {
 
 const EVENT_TYPES = [
   { key: "new_purchase", label: "Nova Compra", icon: "💰", priority: "high" },
+  { key: "journey_completed", label: "Jornada Completa", icon: "🎉", priority: "high" },
   { key: "new_signup", label: "Novo Cadastro", icon: "👤", priority: "medium" },
   { key: "new_testimonial", label: "Novo Depoimento", icon: "💬", priority: "medium" },
   { key: "support_ticket", label: "Ticket de Suporte", icon: "📩", priority: "high" },
