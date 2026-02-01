@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Download, Sun, Moon, Upload, Save, CalendarDays, Copy, Check } from "lucide-react";
+import { Download, Sun, Moon, Upload, Save, CalendarDays, Copy, Check, Shield, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,9 +35,11 @@ import {
   SocialMediaPost,
 } from "./post-factory";
 import { AIImageGenerator } from "./post-factory/AIImageGenerator";
+import { useAdminPermissions } from "@/hooks/useAdminPermissions";
 
 // Component protected by AdminGuard at route level - can_manage_settings
 export const AdminPostFactory = () => {
+  const { hasPermission, isSuperAdmin, isLoading: permLoading } = useAdminPermissions();
   // Symbol state for brand identity
   const [activeSymbol, setActiveSymbol] = useState<"portal" | "n" | "one">("one");
   
@@ -203,6 +205,28 @@ export const AdminPostFactory = () => {
     handleEditPost(post);
     toast.success("Post duplicado - edite e salve como novo");
   };
+
+  // Loading state
+  if (permLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  // Component level guard (after all hooks)
+  if (!hasPermission('can_manage_settings') && !isSuperAdmin) {
+    return (
+      <Card className="p-8 text-center max-w-md mx-auto mt-12">
+        <Shield className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2">Acesso Restrito</h3>
+        <p className="text-muted-foreground text-sm">
+          Identidade visual requer permissão de configurações.
+        </p>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
