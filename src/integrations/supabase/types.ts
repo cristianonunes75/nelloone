@@ -53,6 +53,99 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_notification_contacts: {
+        Row: {
+          admin_user_id: string
+          created_at: string
+          email_override: string | null
+          id: string
+          updated_at: string
+          whatsapp_number: string | null
+        }
+        Insert: {
+          admin_user_id: string
+          created_at?: string
+          email_override?: string | null
+          id?: string
+          updated_at?: string
+          whatsapp_number?: string | null
+        }
+        Update: {
+          admin_user_id?: string
+          created_at?: string
+          email_override?: string | null
+          id?: string
+          updated_at?: string
+          whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
+      admin_notification_logs: {
+        Row: {
+          channel: string
+          created_at: string
+          error_message: string | null
+          event_type: string
+          id: string
+          payload: Json | null
+          recipient: string
+          status: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          error_message?: string | null
+          event_type: string
+          id?: string
+          payload?: Json | null
+          recipient: string
+          status?: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          recipient?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      admin_notification_settings: {
+        Row: {
+          admin_user_id: string
+          created_at: string
+          event_type: string
+          id: string
+          notify_email: boolean
+          notify_push: boolean
+          notify_whatsapp: boolean
+          updated_at: string
+        }
+        Insert: {
+          admin_user_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          notify_email?: boolean
+          notify_push?: boolean
+          notify_whatsapp?: boolean
+          updated_at?: string
+        }
+        Update: {
+          admin_user_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          notify_email?: boolean
+          notify_push?: boolean
+          notify_whatsapp?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_permissions: {
         Row: {
           can_delete_data: boolean | null
