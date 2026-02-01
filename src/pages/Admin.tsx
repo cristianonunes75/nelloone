@@ -35,6 +35,7 @@ const AdminEngagementCenter = lazy(() => import("@/components/admin/AdminEngagem
 const AdminTools = lazy(() => import("@/components/admin/AdminTools").then(m => ({ default: m.AdminTools })));
 const AdminPostFactory = lazy(() => import("@/components/admin/AdminPostFactory").then(m => ({ default: m.AdminPostFactory })));
 const AdminLandingPage = lazy(() => import("@/components/admin/AdminLandingPage").then(m => ({ default: m.AdminLandingPage })));
+const AdminNotificationSettings = lazy(() => import("@/components/admin/AdminNotificationSettings").then(m => ({ default: m.AdminNotificationSettings })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -96,6 +97,7 @@ const Admin = () => {
                 <Route path="engajamento" element={<AdminEngagementCenter />} />
                 <Route path="enviar-relatorios" element={<AdminSendReports />} />
                 <Route path="notificacoes-historico" element={<AdminNotificationsHistory />} />
+                <Route path="alertas-admin" element={<AdminNotificationSettings />} />
                 <Route path="permissoes" element={<AdminPermissionsManager />} />
                 <Route path="limpeza" element={<DataCleanupTool />} />
                 <Route path="notificacoes" element={<NotificationAutomation />} />

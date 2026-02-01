@@ -85,7 +85,8 @@ const menuSections = [
     label: "SISTEMA",
     items: [
       { title: "Permissões", url: "/admin/permissoes", icon: Shield },
-      { title: "Notificações", url: "/admin/notificacoes", icon: Bell },
+      { title: "Alertas Admin", url: "/admin/alertas-admin", icon: Bell },
+      { title: "Notificações Push", url: "/admin/notificacoes", icon: Bell },
       { title: "Limpeza de Dados", url: "/admin/limpeza", icon: Trash2 },
       { title: "Tools", url: "/admin/tools", icon: Wrench },
       { title: "Logs", url: "/admin/logs", icon: Activity },

@@ -37,6 +37,79 @@ async function isAffiliateSystemEnabled(): Promise<boolean> {
   }
 }
 
+// Notify admin about new purchase
+async function notifyAdminNewPurchase(
+  userName: string,
+  userEmail: string,
+  amount: number,
+  currency: string,
+  productType: string,
+  affiliateName?: string,
+  commission?: number
+) {
+  try {
+    const productNames: Record<string, string> = {
+      jornada_completa: "NELLO ONE Completo",
+      test_avulso: "Teste Avulso",
+      codigo_essencia: "Código da Essência",
+      codigo_casal: "Código do Casal",
+      ativacao_codigo: "Ativação do Código",
+      fundadores: "NELLO ONE Completo",
+    };
+    
+    const productName = productNames[productType] || productType;
+    
+    // Call notify-admin edge function
+    const notifyResponse = await fetch(`${supabaseUrl}/functions/v1/notify-admin`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseServiceKey}`,
+      },
+      body: JSON.stringify({
+        event_type: "new_purchase",
+        data: {
+          user_name: userName,
+          user_email: userEmail,
+          amount,
+          currency,
+          product: productName,
+        },
+      }),
+    });
+    
+    if (notifyResponse.ok) {
+      logStep("Admin notified about new purchase", { productName, amount });
+    } else {
+      logStep("Failed to notify admin", { status: notifyResponse.status });
+    }
+    
+    // If affiliate sale, send separate notification
+    if (affiliateName && commission) {
+      await fetch(`${supabaseUrl}/functions/v1/notify-admin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${supabaseServiceKey}`,
+        },
+        body: JSON.stringify({
+          event_type: "affiliate_sale",
+          data: {
+            affiliate_name: affiliateName,
+            amount,
+            commission,
+            currency,
+            product: productName,
+          },
+        }),
+      });
+      logStep("Admin notified about affiliate sale");
+    }
+  } catch (error) {
+    logStep("Error notifying admin", { error: error instanceof Error ? error.message : String(error) });
+  }
+}
+
 // Send notification email to affiliate about new commission
 async function notifyAffiliateNewCommission(
   affiliateUserId: string,
@@ -366,6 +439,26 @@ serve(async (req) => {
           }
         } catch (emailError) {
           logStep("WARN: Failed to send email", { error: emailError });
+        }
+        
+        // Notify admin about new purchase
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", userId)
+            .single();
+          const { data: userAuth } = await supabase.auth.admin.getUserById(userId);
+          const amountPaid = (session.amount_total || 0) / 100;
+          await notifyAdminNewPurchase(
+            profile?.full_name || "Não informado",
+            userAuth?.user?.email || "sem email",
+            amountPaid,
+            session.metadata?.currency?.toUpperCase() || "BRL",
+            "codigo_casal"
+          );
+        } catch (notifyError) {
+          logStep("WARN: Failed to notify admin", { error: notifyError });
         }
 
         return new Response(JSON.stringify({ received: true, product: "codigo_casal" }), {
@@ -833,6 +926,26 @@ serve(async (req) => {
           }
         } catch (emailError) {
           logStep("WARN: Failed to send email", { error: emailError });
+        }
+        
+        // Notify admin about new jornada completa purchase
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", userId)
+            .single();
+          const { data: userAuth } = await supabase.auth.admin.getUserById(userId);
+          const amountPaid = (session.amount_total || 0) / 100;
+          await notifyAdminNewPurchase(
+            profile?.full_name || "Não informado",
+            userAuth?.user?.email || "sem email",
+            amountPaid,
+            session.metadata?.currency?.toUpperCase() || "BRL",
+            "jornada_completa"
+          );
+        } catch (notifyError) {
+          logStep("WARN: Failed to notify admin", { error: notifyError });
         }
 
         return new Response(JSON.stringify({ received: true, product: "jornada_completa", includes_codigo_essencia: true }), {
