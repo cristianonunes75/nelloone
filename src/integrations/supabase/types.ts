@@ -2868,6 +2868,54 @@ export type Database = {
         }
         Relationships: []
       }
+      product_prices: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          price_brl: number
+          price_eur: number
+          price_usd: number
+          product_category: string
+          product_key: string
+          product_name: string
+          stripe_price_id_brl: string | null
+          stripe_price_id_eur: string | null
+          stripe_price_id_usd: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          price_brl: number
+          price_eur: number
+          price_usd: number
+          product_category: string
+          product_key: string
+          product_name: string
+          stripe_price_id_brl?: string | null
+          stripe_price_id_eur?: string | null
+          stripe_price_id_usd?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          price_brl?: number
+          price_eur?: number
+          price_usd?: number
+          product_category?: string
+          product_key?: string
+          product_name?: string
+          stripe_price_id_brl?: string | null
+          stripe_price_id_eur?: string | null
+          stripe_price_id_usd?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       professional_clients: {
         Row: {
           client_user_id: string | null

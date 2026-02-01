@@ -22,6 +22,8 @@ import {
   Building2,
   Wrench,
   FileEdit,
+  DollarSign,
+  PieChart,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -59,7 +61,9 @@ const menuSections = [
     label: "VENDAS",
     items: [
       { title: "Pedidos", url: "/admin/pedidos", icon: CreditCard },
+      { title: "Relatório de Vendas", url: "/admin/vendas", icon: PieChart },
       { title: "Produtos & Testes", url: "/admin/produtos", icon: Package },
+      { title: "Gestão de Preços", url: "/admin/precos", icon: DollarSign },
       { title: "Cupons", url: "/admin/cupons", icon: Ticket },
     ]
   },
