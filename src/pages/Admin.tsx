@@ -28,7 +28,7 @@ const AdminRealtimeVisitors = lazy(() => import("@/components/admin/AdminRealtim
 const DataCleanupTool = lazy(() => import("@/components/admin/DataCleanupTool").then(m => ({ default: m.DataCleanupTool })));
 const NotificationAutomation = lazy(() => import("@/components/admin/NotificationAutomation").then(m => ({ default: m.NotificationAutomation })));
 const AdminPermissionsManager = lazy(() => import("@/components/admin/AdminPermissionsManager").then(m => ({ default: m.AdminPermissionsManager })));
-const ReportsManagement2 = lazy(() => import("@/components/admin/ReportsManagement2").then(m => ({ default: m.ReportsManagement2 })));
+// ReportsManagement2 removed - consolidated into AdminSalesReport
 const CommunicationManagement = lazy(() => import("@/components/admin/CommunicationManagement").then(m => ({ default: m.CommunicationManagement })));
 const AdminNotificationsHistory = lazy(() => import("@/components/admin/AdminNotificationsHistory").then(m => ({ default: m.AdminNotificationsHistory })));
 const AdminSendReports = lazy(() => import("@/components/admin/AdminSendReports").then(m => ({ default: m.AdminSendReports })));
@@ -84,7 +84,7 @@ const Admin = () => {
                 <Route index element={<AdminDashboard />} />
                 <Route path="business" element={<AdminBusinessDashboard />} />
                 <Route path="tempo-real" element={<RealtimeDashboard />} />
-                <Route path="relatorios" element={<ReportsManagement2 />} />
+                <Route path="relatorios" element={<AdminSalesReport />} />
                 <Route path="visitantes" element={<AdminRealtimeVisitors />} />
                 <Route path="jornadas" element={<AdminJourneyDashboard />} />
                 <Route path="afiliados" element={<AffiliatesManagement />} />
