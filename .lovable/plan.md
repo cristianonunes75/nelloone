@@ -1,98 +1,166 @@
 
-# Plano: Implementar Verificação de Senhas Vazadas (HaveIBeenPwned)
+# Plano: Sistema Centralizado de Notificações Administrativas
 
 ## Visão Geral
-Adicionar uma camada de segurança que verifica se a senha escolhida pelo usuário aparece em vazamentos de dados conhecidos, bloqueando o cadastro caso a senha esteja comprometida.
+
+Criar um sistema unificado que notifica você (administrador) por **email** e/ou **WhatsApp** sempre que ocorrerem eventos importantes na plataforma NELLO ONE.
 
 ---
 
-## Como Funciona
+## Eventos para Notificação
 
-A verificação usa o protocolo **k-Anonymity** da API HaveIBeenPwned:
-1. A senha é convertida em hash SHA-1
-2. Apenas os **5 primeiros caracteres** do hash são enviados à API
-3. A API retorna uma lista de sufixos de hashes comprometidos
-4. A verificação completa acontece localmente (a senha nunca é exposta)
+### Já Implementados (parcialmente)
+| Evento | Email | WhatsApp | Status |
+|--------|-------|----------|--------|
+| Novo Depoimento | ✅ | ❌ | Funcionando |
+| Ticket de Suporte | ✅ | ❌ | Funcionando |
+
+### A Implementar
+| Evento | Prioridade | Descrição |
+|--------|------------|-----------|
+| **Nova Compra** | 🔴 Alta | Qualquer compra confirmada (teste, jornada, código) |
+| **Novo Cadastro** | 🟡 Média | Quando um usuário cria conta |
+| **Teste Concluído** | 🟢 Baixa | Quando um usuário finaliza qualquer teste |
+| **Mapa Gerado** | 🟢 Baixa | Quando Código da Essência é gerado |
+| **Primeiro Acesso do Dia** | 🟢 Baixa | Resumo diário de acessos |
+| **Afiliado - Nova Venda** | 🟡 Média | Quando venda via afiliado acontece |
+| **Cruzamento Aceito** | 🟢 Baixa | Quando alguém aceita convite de cruzamento |
+
+---
+
+## Arquitetura da Solução
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                    EVENTOS DO SISTEMA                           │
+├─────────────────────────────────────────────────────────────────┤
+│  Compra │ Cadastro │ Teste │ Depoimento │ Suporte │ Afiliado   │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+              ┌──────────────────────────┐
+              │   notify-admin           │
+              │   (Edge Function)        │
+              └──────────────────────────┘
+                             │
+          ┌──────────────────┼──────────────────┐
+          ▼                  ▼                  ▼
+    ┌──────────┐      ┌──────────┐      ┌──────────┐
+    │  Email   │      │ WhatsApp │      │   Push   │
+    │ (Resend) │      │ (Twilio) │      │ (Existente)│
+    └──────────┘      └──────────┘      └──────────┘
+```
 
 ---
 
 ## Componentes a Implementar
 
-### 1. Backend Function
-Nova Edge Function `check-password-breach` que:
-- Recebe a senha do cliente
-- Gera o hash SHA-1
-- Consulta a API HaveIBeenPwned
-- Retorna se a senha está comprometida
+### 1. Tabela de Configurações de Notificação
+Nova tabela para permitir configurar quais notificações você quer receber e por qual canal.
 
-### 2. Hook de Verificação
-Novo hook `usePasswordBreachCheck` que:
-- Debounce da verificação (evita excesso de chamadas)
-- Mostra estado de carregamento
-- Retorna resultado da verificação
+```sql
+-- admin_notification_settings
+- id, admin_user_id
+- event_type (new_purchase, new_signup, new_testimonial, etc.)
+- notify_email (boolean)
+- notify_whatsapp (boolean)
+- notify_push (boolean)
+```
 
-### 3. Integração nas Telas de Cadastro
-Atualizar os 5 formulários de cadastro existentes:
-- `src/pages/Auth.tsx` (Nello One principal)
-- `src/apps/flow/pages/FlowAuth.tsx`
-- `src/apps/life/pages/LifeAuth.tsx`
-- `src/apps/business/pages/PraxisAuth.tsx`
-- `src/apps/business/pages/BusinessAuth.tsx`
+### 2. Edge Function Centralizada: `notify-admin`
+Uma única função que recebe o evento e dispara as notificações configuradas.
+
+Parâmetros:
+```typescript
+{
+  event_type: "new_purchase" | "new_signup" | "new_testimonial" | ...
+  data: {
+    // Dados específicos do evento
+    user_name?: string
+    user_email?: string
+    amount?: number
+    product?: string
+    message?: string
+    ...
+  }
+}
+```
+
+### 3. Integração com Eventos Existentes
+Modificar os pontos onde eventos acontecem para chamar `notify-admin`:
+
+| Arquivo | Evento |
+|---------|--------|
+| `stripe-webhook/index.ts` | Nova compra |
+| `TestimonialForm.tsx` | Novo depoimento (já existe, melhorar) |
+| `Contact.tsx` | Novo ticket (já existe, melhorar) |
+| Auth handler | Novo cadastro |
+
+### 4. Painel Admin: Configurações de Notificação
+Interface para você configurar:
+- Quais eventos notificar
+- Por qual canal (email, WhatsApp, push)
+- Número de WhatsApp para receber
+- Email alternativo (se diferente do admin)
 
 ---
 
-## Experiência do Usuário
+## Pré-Requisitos para WhatsApp
 
-```text
-┌─────────────────────────────────────────┐
-│  Senha: ••••••••                   👁   │
-├─────────────────────────────────────────┤
-│  [███████░░░] Média                     │  ← Indicador existente
-│                                         │
-│  ⚠️ Esta senha foi encontrada em um    │  ← Novo aviso
-│     vazamento de dados. Por sua         │
-│     segurança, escolha outra senha.     │
-└─────────────────────────────────────────┘
-```
+Para receber notificações via WhatsApp, você precisará configurar o **Twilio**:
 
-- Verificação acontece após ~500ms de digitação
-- Botão de cadastro fica desabilitado se senha comprometida
-- Mensagem clara e amigável em português
+1. Criar conta em [twilio.com](https://twilio.com)
+2. Ativar o WhatsApp Sandbox ou número verificado
+3. Adicionar os secrets:
+   - `TWILIO_ACCOUNT_SID`
+   - `TWILIO_AUTH_TOKEN`
+   - `TWILIO_WHATSAPP_NUMBER`
+
+*Nota: A infraestrutura de WhatsApp já existe no projeto, só precisa das credenciais.*
 
 ---
 
-## Detalhes Técnicos
+## Formatos de Notificação
 
-### Edge Function: `check-password-breach`
+### Email - Nova Compra
+```
+Assunto: 💰 Nova Venda! R$ 149,00 - NELLO ONE
 
-```typescript
-// Fluxo simplificado:
-1. Recebe { password: string }
-2. Gera SHA-1 hash da senha
-3. Extrai prefix (5 chars) e suffix (resto)
-4. GET https://api.pwnedpasswords.com/range/{prefix}
-5. Verifica se suffix está na resposta
-6. Retorna { breached: boolean, count?: number }
+Olá!
+
+Uma nova venda foi realizada:
+
+🛒 Produto: Jornada Completa
+💰 Valor: R$ 149,00
+👤 Cliente: Maria Silva (maria@email.com)
+📅 Data: 01/02/2026 às 14:32
+
+[Ver no Admin]
 ```
 
-### Hook: `usePasswordBreachCheck`
+### WhatsApp - Nova Compra
+```
+💰 Nova venda NELLO ONE!
 
-```typescript
-// Uso:
-const { isBreached, isChecking, checkPassword } = usePasswordBreachCheck();
+Produto: Jornada Completa
+Valor: R$ 149,00
+Cliente: Maria Silva
 
-// Retorna:
-- isBreached: boolean | null
-- isChecking: boolean
-- checkPassword: (password: string) => void
+Ver detalhes: nello.one/admin
 ```
 
-### Modificações nos Formulários
+### Email - Resumo Diário (Opcional)
+```
+Assunto: 📊 Resumo do dia - NELLO ONE
 
-1. Importar o novo hook
-2. Chamar `checkPassword(password)` no `onChange`
-3. Exibir aviso quando `isBreached === true`
-4. Desabilitar submit quando senha comprometida
+Hoje (01/02/2026):
+
+🛒 Vendas: 3 (R$ 347,00)
+👥 Novos cadastros: 12
+✅ Testes concluídos: 28
+💬 Novos depoimentos: 2
+📩 Tickets de suporte: 1
+```
 
 ---
 
@@ -100,21 +168,39 @@ const { isBreached, isChecking, checkPassword } = usePasswordBreachCheck();
 
 | Arquivo | Ação |
 |---------|------|
-| `supabase/functions/check-password-breach/index.ts` | Criar |
+| `supabase/functions/notify-admin/index.ts` | Criar |
 | `supabase/config.toml` | Adicionar config |
-| `src/hooks/usePasswordBreachCheck.ts` | Criar |
-| `src/components/PasswordBreachWarning.tsx` | Criar |
-| `src/pages/Auth.tsx` | Modificar |
-| `src/apps/flow/pages/FlowAuth.tsx` | Modificar |
-| `src/apps/life/pages/LifeAuth.tsx` | Modificar |
-| `src/apps/business/pages/PraxisAuth.tsx` | Modificar |
-| `src/apps/business/pages/BusinessAuth.tsx` | Modificar |
+| SQL Migration: `admin_notification_settings` | Criar |
+| `stripe-webhook/index.ts` | Modificar |
+| `src/components/admin/NotificationSettings.tsx` | Criar |
+| `src/pages/Admin.tsx` | Adicionar seção |
 
 ---
 
-## Considerações de Segurança
+## Fluxo de Implementação
 
-- A senha **nunca** é enviada em texto claro à API externa
-- Hash SHA-1 parcial protege a privacidade (k-Anonymity)
-- Verificação server-side evita bypass pelo cliente
-- Rate limiting natural da API (sem necessidade de configurar)
+1. **Criar tabela** de configurações de notificação
+2. **Criar edge function** `notify-admin` centralizada
+3. **Integrar com compras** no webhook do Stripe
+4. **Integrar com cadastros** no flow de autenticação
+5. **Criar painel admin** para configurar preferências
+6. **Testar** todos os canais
+
+---
+
+## Considerações Técnicas
+
+- **Rate Limiting**: Evitar spam de notificações (agrupar se muitas em curto período)
+- **Fallback**: Se WhatsApp falhar, enviar email automaticamente
+- **Logs**: Registrar todas as notificações enviadas para auditoria
+- **Templates**: Usar templates bonitos e consistentes
+
+---
+
+## Custos Estimados
+
+| Serviço | Custo |
+|---------|-------|
+| Resend (Email) | Gratuito até 100 emails/dia |
+| Twilio WhatsApp | ~$0.005-0.02 por mensagem |
+
