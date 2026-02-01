@@ -1,206 +1,97 @@
 
-# Plano: Sistema Centralizado de Notificações Administrativas
+# Plano: Atualização de Preço da Ativação do Código
 
-## Visão Geral
-
-Criar um sistema unificado que notifica você (administrador) por **email** e/ou **WhatsApp** sempre que ocorrerem eventos importantes na plataforma NELLO ONE.
-
----
-
-## Eventos para Notificação
-
-### Já Implementados (parcialmente)
-| Evento | Email | WhatsApp | Status |
-|--------|-------|----------|--------|
-| Novo Depoimento | ✅ | ❌ | Funcionando |
-| Ticket de Suporte | ✅ | ❌ | Funcionando |
-
-### A Implementar
-| Evento | Prioridade | Descrição |
-|--------|------------|-----------|
-| **Nova Compra** | 🔴 Alta | Qualquer compra confirmada (teste, jornada, código) |
-| **Novo Cadastro** | 🟡 Média | Quando um usuário cria conta |
-| **Teste Concluído** | 🟢 Baixa | Quando um usuário finaliza qualquer teste |
-| **Mapa Gerado** | 🟢 Baixa | Quando Código da Essência é gerado |
-| **Primeiro Acesso do Dia** | 🟢 Baixa | Resumo diário de acessos |
-| **Afiliado - Nova Venda** | 🟡 Média | Quando venda via afiliado acontece |
-| **Cruzamento Aceito** | 🟢 Baixa | Quando alguém aceita convite de cruzamento |
+## Objetivo
+Aumentar o preço da "Ativação do Código da Essência" de R$ 97 para R$ 197 (e proporcionalmente em USD/EUR).
 
 ---
 
-## Arquitetura da Solução
+## Novos Preços
 
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│                    EVENTOS DO SISTEMA                           │
-├─────────────────────────────────────────────────────────────────┤
-│  Compra │ Cadastro │ Teste │ Depoimento │ Suporte │ Afiliado   │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             ▼
-              ┌──────────────────────────┐
-              │   notify-admin           │
-              │   (Edge Function)        │
-              └──────────────────────────┘
-                             │
-          ┌──────────────────┼──────────────────┐
-          ▼                  ▼                  ▼
-    ┌──────────┐      ┌──────────┐      ┌──────────┐
-    │  Email   │      │ WhatsApp │      │   Push   │
-    │ (Resend) │      │ (Twilio) │      │ (Existente)│
-    └──────────┘      └──────────┘      └──────────┘
-```
+| Moeda | Atual | Novo | Stripe Price ID |
+|-------|-------|------|-----------------|
+| BRL | R$ 97 | **R$ 197** | Será criado automaticamente |
+| USD | $27 | **$57** | Será criado automaticamente |
+| EUR | €27 | **€47** | Será criado automaticamente |
 
 ---
 
-## Componentes a Implementar
+## Etapas de Implementação
 
-### 1. Tabela de Configurações de Notificação
-Nova tabela para permitir configurar quais notificações você quer receber e por qual canal.
+### 1. Criar novos preços no Stripe
+Usar a Edge Function `update-stripe-price` para criar 3 novos preços:
+- BRL: R$ 197 → product_id do activation_individual
+- USD: $57 → product_id do activation_individual  
+- EUR: €47 → product_id do activation_individual
 
-```sql
--- admin_notification_settings
-- id, admin_user_id
-- event_type (new_purchase, new_signup, new_testimonial, etc.)
-- notify_email (boolean)
-- notify_whatsapp (boolean)
-- notify_push (boolean)
-```
-
-### 2. Edge Function Centralizada: `notify-admin`
-Uma única função que recebe o evento e dispara as notificações configuradas.
-
-Parâmetros:
+### 2. Atualizar productCatalog.ts
+Modificar o objeto `activation_individual`:
 ```typescript
-{
-  event_type: "new_purchase" | "new_signup" | "new_testimonial" | ...
-  data: {
-    // Dados específicos do evento
-    user_name?: string
-    user_email?: string
-    amount?: number
-    product?: string
-    message?: string
-    ...
-  }
+activation_individual: {
+  // ...existing fields...
+  priceBRL: 197,  // era 97
+  priceUSD: 57,   // era 27
+  priceEUR: 47,   // era 27
+  priceIdBRL: "price_NOVO_BRL",
+  priceIdUSD: "price_NOVO_USD", 
+  priceIdEUR: "price_NOVO_EUR",
 }
 ```
 
-### 3. Integração com Eventos Existentes
-Modificar os pontos onde eventos acontecem para chamar `notify-admin`:
-
-| Arquivo | Evento |
-|---------|--------|
-| `stripe-webhook/index.ts` | Nova compra |
-| `TestimonialForm.tsx` | Novo depoimento (já existe, melhorar) |
-| `Contact.tsx` | Novo ticket (já existe, melhorar) |
-| Auth handler | Novo cadastro |
-
-### 4. Painel Admin: Configurações de Notificação
-Interface para você configurar:
-- Quais eventos notificar
-- Por qual canal (email, WhatsApp, push)
-- Número de WhatsApp para receber
-- Email alternativo (se diferente do admin)
-
----
-
-## Pré-Requisitos para WhatsApp
-
-Para receber notificações via WhatsApp, você precisará configurar o **Twilio**:
-
-1. Criar conta em [twilio.com](https://twilio.com)
-2. Ativar o WhatsApp Sandbox ou número verificado
-3. Adicionar os secrets:
-   - `TWILIO_ACCOUNT_SID`
-   - `TWILIO_AUTH_TOKEN`
-   - `TWILIO_WHATSAPP_NUMBER`
-
-*Nota: A infraestrutura de WhatsApp já existe no projeto, só precisa das credenciais.*
-
----
-
-## Formatos de Notificação
-
-### Email - Nova Compra
-```
-Assunto: 💰 Nova Venda! R$ 149,00 - NELLO ONE
-
-Olá!
-
-Uma nova venda foi realizada:
-
-🛒 Produto: Jornada Completa
-💰 Valor: R$ 149,00
-👤 Cliente: Maria Silva (maria@email.com)
-📅 Data: 01/02/2026 às 14:32
-
-[Ver no Admin]
-```
-
-### WhatsApp - Nova Compra
-```
-💰 Nova venda NELLO ONE!
-
-Produto: Jornada Completa
-Valor: R$ 149,00
-Cliente: Maria Silva
-
-Ver detalhes: nello.one/admin
-```
-
-### Email - Resumo Diário (Opcional)
-```
-Assunto: 📊 Resumo do dia - NELLO ONE
-
-Hoje (01/02/2026):
-
-🛒 Vendas: 3 (R$ 347,00)
-👥 Novos cadastros: 12
-✅ Testes concluídos: 28
-💬 Novos depoimentos: 2
-📩 Tickets de suporte: 1
+### 3. Atualizar priceConfig.ts
+Modificar os objetos `ativacao_codigo` e `activation_individual`:
+```typescript
+ativacao_codigo: {
+  testType: "ativacao_codigo",
+  brl: { price: 197, priceId: "price_NOVO_BRL" },
+  usd: { price: 57, priceId: "price_NOVO_USD" },
+  eur: { price: 47, priceId: "price_NOVO_EUR" },
+},
+activation_individual: {
+  testType: "activation_individual",
+  brl: { price: 197, priceId: "price_NOVO_BRL" },
+  usd: { price: 57, priceId: "price_NOVO_USD" },
+  eur: { price: 47, priceId: "price_NOVO_EUR" },
+},
 ```
 
 ---
 
-## Arquivos a Criar/Modificar
+## Arquivos a Modificar
 
 | Arquivo | Ação |
 |---------|------|
-| `supabase/functions/notify-admin/index.ts` | Criar |
-| `supabase/config.toml` | Adicionar config |
-| SQL Migration: `admin_notification_settings` | Criar |
-| `stripe-webhook/index.ts` | Modificar |
-| `src/components/admin/NotificationSettings.tsx` | Criar |
-| `src/pages/Admin.tsx` | Adicionar seção |
+| `src/components/monetization/productCatalog.ts` | Atualizar preços e Price IDs |
+| `src/lib/priceConfig.ts` | Atualizar preços e Price IDs |
 
 ---
 
-## Fluxo de Implementação
+## Fluxo de Execução
 
-1. **Criar tabela** de configurações de notificação
-2. **Criar edge function** `notify-admin` centralizada
-3. **Integrar com compras** no webhook do Stripe
-4. **Integrar com cadastros** no flow de autenticação
-5. **Criar painel admin** para configurar preferências
-6. **Testar** todos os canais
+1. Obter o Product ID do Stripe para activation_individual
+2. Chamar a ferramenta do Stripe para criar novos preços em cada moeda
+3. Atualizar os arquivos de código com os novos Price IDs
+4. Testar checkout para verificar funcionamento
 
 ---
 
-## Considerações Técnicas
+## Considerações
 
-- **Rate Limiting**: Evitar spam de notificações (agrupar se muitas em curto período)
-- **Fallback**: Se WhatsApp falhar, enviar email automaticamente
-- **Logs**: Registrar todas as notificações enviadas para auditoria
-- **Templates**: Usar templates bonitos e consistentes
+- **Compras anteriores**: Não são afetadas (já processadas)
+- **Cupons**: Continuam funcionando normalmente
+- **Preços antigos**: Serão arquivados no Stripe automaticamente
+- **Rollback**: Possível reativando os preços antigos no Stripe
 
 ---
 
-## Custos Estimados
+## Comparação Final de Produtos
 
-| Serviço | Custo |
-|---------|-------|
-| Resend (Email) | Gratuito até 100 emails/dia |
-| Twilio WhatsApp | ~$0.005-0.02 por mensagem |
+| Produto | BRL | USD | EUR |
+|---------|-----|-----|-----|
+| Teste Individual | R$ 47-197 | $17-57 | €10-53 |
+| **Ativação Individual (novo)** | **R$ 197** | **$57** | **€47** |
+| Ativação do Casal | R$ 197 | $57 | €47 |
+| Código do Casal | R$ 297 | $59 | €55 |
+| Couple Premium | R$ 997 | $297 | €247 |
 
+A Ativação Individual agora está corretamente posicionada no mesmo nível da Ativação do Casal.
