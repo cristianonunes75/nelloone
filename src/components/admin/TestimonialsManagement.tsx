@@ -20,7 +20,8 @@ import {
   RefreshCw,
   Star,
   Mail,
-  Send
+  Send,
+  Pencil
 } from 'lucide-react';
 import {
   Dialog,
@@ -65,6 +66,8 @@ export function TestimonialsManagement() {
   const [replyMessage, setReplyMessage] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [isSendingReply, setIsSendingReply] = useState(false);
+  const [editDialog, setEditDialog] = useState<Testimonial | null>(null);
+  const [editContent, setEditContent] = useState('');
 
   const { data: testimonials, isLoading, refetch } = useQuery({
     queryKey: ['admin-testimonials', statusFilter],
@@ -138,6 +141,33 @@ export function TestimonialsManagement() {
       toast({
         title: "Erro",
         description: "Não foi possível atualizar o destaque.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const updateContentMutation = useMutation({
+    mutationFn: async ({ id, content }: { id: string; content: string }) => {
+      const { error } = await supabase
+        .from('testimonials')
+        .update({ content, updated_at: new Date().toISOString() })
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
+      queryClient.invalidateQueries({ queryKey: ['approved-testimonials-landing'] });
+      toast({
+        title: "Depoimento atualizado",
+        description: "O conteúdo foi salvo com sucesso."
+      });
+      setEditDialog(null);
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o depoimento.",
         variant: "destructive"
       });
     }
@@ -387,6 +417,20 @@ export function TestimonialsManagement() {
                       </Button>
                     )}
 
+                    {/* Edit button */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-primary hover:bg-primary/10"
+                      onClick={() => {
+                        setEditDialog(testimonial);
+                        setEditContent(testimonial.content);
+                      }}
+                      title="Editar conteúdo"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+
                     {/* Reply button */}
                     <Button
                       size="sm"
@@ -533,6 +577,65 @@ export function TestimonialsManagement() {
                 <>
                   <Send className="w-4 h-4 mr-2" />
                   Enviar Resposta
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Content Dialog */}
+      <Dialog open={!!editDialog} onOpenChange={() => setEditDialog(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="w-5 h-5" />
+              Editar Depoimento
+            </DialogTitle>
+            <DialogDescription>
+              Editar o conteúdo do depoimento de {editDialog?.display_name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="editContent">Conteúdo</Label>
+              <Textarea
+                id="editContent"
+                placeholder="Depoimento..."
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                rows={10}
+                className="resize-none"
+              />
+              <p className="text-xs text-muted-foreground text-right">
+                {editContent.length} caracteres
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialog(null)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                if (editDialog) {
+                  updateContentMutation.mutate({
+                    id: editDialog.id,
+                    content: editContent.trim()
+                  });
+                }
+              }}
+              disabled={updateContentMutation.isPending || !editContent.trim()}
+            >
+              {updateContentMutation.isPending ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  Salvar
                 </>
               )}
             </Button>
