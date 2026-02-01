@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAdminPermissions, AdminPermissionLevel, permissionLevelLabels, permissionDescriptions } from "@/hooks/useAdminPermissions";
+import { useAdminPermissions, AdminPermissionLevel, permissionLevelLabels, permissionDescriptions, permissionPresets } from "@/hooks/useAdminPermissions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, UserCog, Plus, Loader2, Crown, HeadsetIcon, Eye } from "lucide-react";
+import { Shield, UserCog, Plus, Loader2, Crown, HeadsetIcon, Eye, TrendingUp } from "lucide-react";
 
 interface AdminUser {
   id: string;
@@ -31,12 +31,21 @@ const levelIcons: Record<AdminPermissionLevel, any> = {
   super_admin: Crown,
   suporte: HeadsetIcon,
   visualizador: Eye,
+  growth: TrendingUp,
 };
 
 const levelColors: Record<AdminPermissionLevel, string> = {
   super_admin: 'bg-primary text-primary-foreground',
   suporte: 'bg-chart-2 text-white',
   visualizador: 'bg-muted text-muted-foreground',
+  growth: 'bg-emerald-500 text-white',
+};
+
+const levelDescriptions: Record<AdminPermissionLevel, string> = {
+  super_admin: 'Acesso total a todas as funcionalidades',
+  suporte: 'Gerencia usuários e atendimento',
+  visualizador: 'Apenas visualização de dados',
+  growth: 'Métricas, relatórios e campanhas de engajamento',
 };
 
 export const AdminPermissionsManager = () => {
@@ -125,44 +134,10 @@ export const AdminPermissionsManager = () => {
   const handleLevelChange = (level: AdminPermissionLevel) => {
     if (!selectedAdmin) return;
     
-    // Pre-configure permissions based on level
-    const presets: Record<AdminPermissionLevel, Partial<AdminUser>> = {
-      super_admin: {
-        can_manage_users: true,
-        can_manage_payments: true,
-        can_manage_products: true,
-        can_manage_settings: true,
-        can_view_reports: true,
-        can_send_notifications: true,
-        can_delete_data: true,
-        can_impersonate: true,
-      },
-      suporte: {
-        can_manage_users: true,
-        can_manage_payments: true,
-        can_manage_products: false,
-        can_manage_settings: false,
-        can_view_reports: true,
-        can_send_notifications: true,
-        can_delete_data: false,
-        can_impersonate: true,
-      },
-      visualizador: {
-        can_manage_users: false,
-        can_manage_payments: false,
-        can_manage_products: false,
-        can_manage_settings: false,
-        can_view_reports: true,
-        can_send_notifications: false,
-        can_delete_data: false,
-        can_impersonate: false,
-      },
-    };
-
     setSelectedAdmin({
       ...selectedAdmin,
       permission_level: level,
-      ...presets[level],
+      ...permissionPresets[level],
     });
   };
 
@@ -253,8 +228,8 @@ export const AdminPermissionsManager = () => {
       </div>
 
       {/* Permission Levels Legend */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {(['super_admin', 'suporte', 'visualizador'] as AdminPermissionLevel[]).map((level) => {
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {(['super_admin', 'suporte', 'visualizador', 'growth'] as AdminPermissionLevel[]).map((level) => {
           const Icon = levelIcons[level];
           return (
             <Card key={level} className="p-4">
@@ -265,9 +240,7 @@ export const AdminPermissionsManager = () => {
                 <span className="font-medium">{permissionLevelLabels[level]}</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                {level === 'super_admin' && 'Acesso total a todas as funcionalidades'}
-                {level === 'suporte' && 'Gerencia usuários e atendimento'}
-                {level === 'visualizador' && 'Apenas visualização de dados'}
+                {levelDescriptions[level]}
               </p>
             </Card>
           );
@@ -345,7 +318,7 @@ export const AdminPermissionsManager = () => {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {(['super_admin', 'suporte', 'visualizador'] as AdminPermissionLevel[]).map((level) => (
+                                  {(['super_admin', 'suporte', 'visualizador', 'growth'] as AdminPermissionLevel[]).map((level) => (
                                     <SelectItem key={level} value={level}>
                                       {permissionLevelLabels[level]}
                                     </SelectItem>

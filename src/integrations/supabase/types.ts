@@ -4130,7 +4130,11 @@ export type Database = {
       }
     }
     Enums: {
-      admin_permission_level: "super_admin" | "suporte" | "visualizador"
+      admin_permission_level:
+        | "super_admin"
+        | "suporte"
+        | "visualizador"
+        | "growth"
       app_role: "admin" | "fotografo" | "cliente"
       business_role: "super_admin" | "company_admin" | "collaborator"
       company_subscription_status:
@@ -4284,7 +4288,12 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      admin_permission_level: ["super_admin", "suporte", "visualizador"],
+      admin_permission_level: [
+        "super_admin",
+        "suporte",
+        "visualizador",
+        "growth",
+      ],
       app_role: ["admin", "fotografo", "cliente"],
       business_role: ["super_admin", "company_admin", "collaborator"],
       company_subscription_status: [

@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Pencil, RefreshCw, Check, AlertCircle } from "lucide-react";
+import { Loader2, Pencil, RefreshCw, Check, AlertCircle, Shield } from "lucide-react";
+import { useAdminPermissions } from "@/hooks/useAdminPermissions";
 
 interface ProductPrice {
   id: string;
@@ -38,6 +39,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 export function AdminPriceManager() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isSuperAdmin, isLoading: permLoading } = useAdminPermissions();
   const [editingProduct, setEditingProduct] = useState<ProductPrice | null>(null);
   const [formData, setFormData] = useState({
     price_brl: "",
@@ -61,6 +63,7 @@ export function AdminPriceManager() {
       if (error) throw error;
       return data as ProductPrice[];
     },
+    enabled: isSuperAdmin && !permLoading,
   });
 
   const updateMutation = useMutation({
@@ -136,6 +139,27 @@ export function AdminPriceManager() {
       });
     },
   });
+
+  // Permission check - only super admins can access
+  if (permLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!isSuperAdmin) {
+    return (
+      <Card className="p-8 text-center max-w-md mx-auto mt-12">
+        <Shield className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2">Acesso Restrito</h3>
+        <p className="text-muted-foreground text-sm">
+          Apenas Super Admins podem gerenciar preços. Esta é uma área sensível que afeta diretamente o faturamento.
+        </p>
+      </Card>
+    );
+  }
 
   const openEditDialog = (product: ProductPrice) => {
     setEditingProduct(product);

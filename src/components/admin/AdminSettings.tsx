@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner";
 import { Loader2, Settings, Shield, Users, AlertTriangle, Server, Sparkles } from "lucide-react";
 import { useAtivacaoCodigoFlag } from "@/hooks/useFeatureFlag";
+import { useAdminPermissions } from "@/hooks/useAdminPermissions";
 
 interface AdminUser {
   id: string;
@@ -33,6 +34,9 @@ export const AdminSettings = () => {
     toggle: toggleAtivacaoCodigo 
   } = useAtivacaoCodigoFlag();
   const [savingAtivacao, setSavingAtivacao] = useState(false);
+  
+  // Permission check
+  const { hasPermission, isSuperAdmin, isLoading: permLoading } = useAdminPermissions();
 
   useEffect(() => {
     fetchData();
@@ -127,11 +131,23 @@ export const AdminSettings = () => {
     }
   };
 
-  if (loading) {
+  if (loading || permLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
+    );
+  }
+
+  if (!hasPermission('can_manage_settings') && !isSuperAdmin) {
+    return (
+      <Card className="p-8 text-center max-w-md mx-auto mt-12">
+        <Shield className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2">Acesso Restrito</h3>
+        <p className="text-muted-foreground text-sm">
+          Você não tem permissão para acessar as configurações do sistema.
+        </p>
+      </Card>
     );
   }
 

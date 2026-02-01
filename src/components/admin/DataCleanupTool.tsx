@@ -20,7 +20,8 @@ import {
   Heart,
   AlertCircle,
   ArrowRight,
-  FileDown
+  FileDown,
+  Shield
 } from "lucide-react";
 import {
   Table,
@@ -46,6 +47,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
+import { useAdminPermissions } from "@/hooks/useAdminPermissions";
 
 interface UserData {
   id: string;
@@ -119,10 +122,38 @@ export const DataCleanupTool = () => {
   const [pendingPurchases, setPendingPurchases] = useState<PendingPurchase[]>([]);
   
   const { toast } = useToast();
+  
+  // Permission check
+  const { hasPermission, isSuperAdmin, isLoading: permLoading } = useAdminPermissions();
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (!permLoading && (hasPermission('can_delete_data') || isSuperAdmin)) {
+      fetchData();
+    } else if (!permLoading) {
+      setLoading(false);
+    }
+  }, [permLoading, isSuperAdmin]);
+
+  // Show permission denied if user doesn't have access
+  if (!permLoading && !hasPermission('can_delete_data') && !isSuperAdmin) {
+    return (
+      <Card className="p-8 text-center max-w-md mx-auto mt-12">
+        <Shield className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2">Acesso Restrito</h3>
+        <p className="text-muted-foreground text-sm">
+          Você não tem permissão para acessar as ferramentas de limpeza de dados.
+        </p>
+      </Card>
+    );
+  }
+
+  if (permLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   const fetchData = async () => {
     setLoading(true);
