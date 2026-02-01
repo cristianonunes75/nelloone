@@ -36,6 +36,8 @@ const AdminTools = lazy(() => import("@/components/admin/AdminTools").then(m => 
 const AdminPostFactory = lazy(() => import("@/components/admin/AdminPostFactory").then(m => ({ default: m.AdminPostFactory })));
 const AdminLandingPage = lazy(() => import("@/components/admin/AdminLandingPage").then(m => ({ default: m.AdminLandingPage })));
 const AdminNotificationSettings = lazy(() => import("@/components/admin/AdminNotificationSettings").then(m => ({ default: m.AdminNotificationSettings })));
+const AdminSalesReport = lazy(() => import("@/components/admin/AdminSalesReport").then(m => ({ default: m.AdminSalesReport })));
+const AdminPriceManager = lazy(() => import("@/components/admin/AdminPriceManager").then(m => ({ default: m.AdminPriceManager })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -88,6 +90,8 @@ const Admin = () => {
                 <Route path="usuarios" element={<AdminUsersUnified />} />
                 <Route path="pedidos" element={<AdminOrdersPayments />} />
                 <Route path="produtos" element={<AdminProductsTests />} />
+                <Route path="vendas" element={<AdminSalesReport />} />
+                <Route path="precos" element={<AdminPriceManager />} />
                 <Route path="cupons" element={<AdminCoupons />} />
                 <Route path="depoimentos" element={<TestimonialsManagement />} />
                 <Route path="codigo-essencia" element={<AdminCodigoEssencia />} />
