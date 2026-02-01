@@ -112,6 +112,17 @@ describe('Price Configuration', () => {
       expect(euPrice?.price).toBe(17.90)
     })
 
+    it('should return correct activation_individual prices', () => {
+      const brPrice = getPriceForLanguage('activation_individual', 'pt')
+      expect(brPrice?.price).toBe(197)
+
+      const usPrice = getPriceForLanguage('activation_individual', 'en')
+      expect(usPrice?.price).toBe(57)
+
+      const euPrice = getPriceForLanguage('activation_individual', 'pt-pt')
+      expect(euPrice?.price).toBe(47)
+    })
+
     it('should return strict price ID for language', () => {
       const brPriceId = getStrictPriceId('disc', 'pt')
       expect(brPriceId).toMatch(/^price_/)
