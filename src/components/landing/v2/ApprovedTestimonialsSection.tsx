@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Quote, User } from "lucide-react";
+import { Quote, User, ChevronDown, ChevronUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 interface Testimonial {
   id: string;
@@ -48,6 +50,70 @@ const getInitials = (name: string): string => {
     .join("")
     .toUpperCase();
 };
+
+// Check if content is long enough to need expansion
+const CHAR_THRESHOLD = 200;
+
+interface TestimonialCardProps {
+  testimonial: Testimonial & { is_featured: boolean };
+}
+
+function TestimonialCard({ testimonial }: TestimonialCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isLongContent = testimonial.content.length > CHAR_THRESHOLD;
+
+  return (
+    <Card 
+      className={`border-border/50 hover:shadow-lg transition-shadow duration-300 ${
+        testimonial.is_featured ? 'ring-2 ring-primary/30 bg-primary/5' : ''
+      }`}
+    >
+      <CardContent className="p-6 space-y-4">
+        <div className="flex items-start gap-3">
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${getAvatarColor(testimonial.display_name)}`}>
+            {getInitials(testimonial.display_name) || <User className="w-5 h-5" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-foreground truncate">
+              {testimonial.display_name}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {getTestName(testimonial.test_slug)}
+            </p>
+          </div>
+          <Quote className="w-5 h-5 text-primary/30 shrink-0" />
+        </div>
+        
+        <div>
+          <p className={`text-foreground/80 text-sm leading-relaxed whitespace-pre-line ${
+            !isExpanded && isLongContent ? 'line-clamp-4' : ''
+          }`}>
+            "{testimonial.content}"
+          </p>
+          
+          {isLongContent && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="mt-2 h-auto p-0 text-primary hover:text-primary/80"
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? (
+                <>
+                  Ver menos <ChevronUp className="w-4 h-4 ml-1" />
+                </>
+              ) : (
+                <>
+                  Ver mais <ChevronDown className="w-4 h-4 ml-1" />
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export function ApprovedTestimonialsSection() {
   const { data: testimonials, isLoading } = useQuery({
@@ -104,33 +170,7 @@ export function ApprovedTestimonialsSection() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((testimonial) => (
-            <Card 
-              key={testimonial.id}
-              className={`border-border/50 hover:shadow-lg transition-shadow duration-300 ${
-                testimonial.is_featured ? 'ring-2 ring-primary/30 bg-primary/5' : ''
-              }`}
-            >
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${getAvatarColor(testimonial.display_name)}`}>
-                    {getInitials(testimonial.display_name) || <User className="w-5 h-5" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground truncate">
-                      {testimonial.display_name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {getTestName(testimonial.test_slug)}
-                    </p>
-                  </div>
-                  <Quote className="w-5 h-5 text-primary/30 shrink-0" />
-                </div>
-                
-                <p className="text-foreground/80 text-sm leading-relaxed line-clamp-4">
-                  "{testimonial.content}"
-                </p>
-              </CardContent>
-            </Card>
+            <TestimonialCard key={testimonial.id} testimonial={testimonial} />
           ))}
         </div>
       </div>
