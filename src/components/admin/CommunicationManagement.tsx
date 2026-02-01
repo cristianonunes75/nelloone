@@ -36,7 +36,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PushNotificationToggle } from "./PushNotificationToggle";
 import { useNewTicketSound } from "@/hooks/useNewTicketSound";
 
 interface Ticket {
@@ -366,7 +365,6 @@ export const CommunicationManagement = () => {
           <p className="text-muted-foreground">Gerencie mensagens de suporte dos usuários</p>
         </div>
         <div className="flex items-center gap-3">
-          <PushNotificationToggle />
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-48">
               <SelectValue placeholder="Filtrar por status" />

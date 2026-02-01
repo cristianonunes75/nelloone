@@ -50,7 +50,6 @@ import { getNello16Results, NELLO_16_PROFILES } from "@/lib/nello16Personality";
 import { calculateEstilosConexaoAfetiva, getStyleData } from "@/lib/estilosConexaoAfetiva";
 import { useSimulation, SimulationLanguage, SIMULATION_LANGUAGES } from "@/contexts/SimulationContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { SimulationLanguageDialog } from "./SimulationLanguageDialog";
 import { SimulatedMapPreview } from "./SimulatedMapPreview";
 
 interface Test {
@@ -1773,12 +1772,47 @@ export const SimulationMode = () => {
 
   return (
     <div className="max-w-4xl">
-      {/* Language Selection Dialog */}
-      <SimulationLanguageDialog
-        open={showLanguageDialog}
-        onOpenChange={setShowLanguageDialog}
-        onSelectLanguage={handleLanguageSelected}
-      />
+      {/* Language Selection Dialog - Inline version */}
+      {showLanguageDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="w-5 h-5" strokeWidth={1.5} />
+                Selecione o idioma da simulação
+              </CardTitle>
+              <CardDescription>
+                Escolha em qual idioma deseja executar a simulação.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {SIMULATION_LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => handleLanguageSelected(lang.code)}
+                  className="w-full flex items-center justify-between p-4 rounded-xl border transition-all hover:border-accent hover:bg-muted/30"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{lang.flag}</span>
+                    <div className="text-left">
+                      <p className="font-medium text-sm">{lang.name}</p>
+                      <p className="text-xs text-muted-foreground uppercase">{lang.code.toUpperCase()}</p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="text-[10px]">
+                    {lang.status === 'public' ? 'Público' : lang.status === 'beta' ? 'Beta' : 'Dev'}
+                  </Badge>
+                </button>
+              ))}
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" onClick={() => setShowLanguageDialog(false)} className="w-full">
+                Cancelar
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      )}
 
       {/* Simulated Map Preview Dialog */}
       <SimulatedMapPreview
