@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
-export type AdminPermissionLevel = 'super_admin' | 'suporte' | 'visualizador';
+export type AdminPermissionLevel = 'super_admin' | 'suporte' | 'visualizador' | 'growth';
 
 export interface AdminPermissions {
   id: string;
@@ -114,6 +114,51 @@ export const permissionLevelLabels: Record<AdminPermissionLevel, string> = {
   super_admin: 'Super Admin',
   suporte: 'Suporte',
   visualizador: 'Visualizador',
+  growth: 'Growth',
+};
+
+// Permission presets for each level
+export const permissionPresets: Record<AdminPermissionLevel, Omit<AdminPermissions, 'id' | 'user_id' | 'permission_level'>> = {
+  super_admin: {
+    can_manage_users: true,
+    can_manage_payments: true,
+    can_manage_products: true,
+    can_manage_settings: true,
+    can_view_reports: true,
+    can_send_notifications: true,
+    can_delete_data: true,
+    can_impersonate: true,
+  },
+  suporte: {
+    can_manage_users: true,
+    can_manage_payments: true,
+    can_manage_products: false,
+    can_manage_settings: false,
+    can_view_reports: true,
+    can_send_notifications: true,
+    can_delete_data: false,
+    can_impersonate: true,
+  },
+  visualizador: {
+    can_manage_users: false,
+    can_manage_payments: false,
+    can_manage_products: false,
+    can_manage_settings: false,
+    can_view_reports: true,
+    can_send_notifications: false,
+    can_delete_data: false,
+    can_impersonate: false,
+  },
+  growth: {
+    can_manage_users: false,
+    can_manage_payments: false,
+    can_manage_products: false,
+    can_manage_settings: false,
+    can_view_reports: true,
+    can_send_notifications: true,
+    can_delete_data: false,
+    can_impersonate: false,
+  },
 };
 
 // Permission descriptions
