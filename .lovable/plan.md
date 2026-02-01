@@ -1,304 +1,218 @@
 
-# Auditoria Completa da Area Admin do Identity
 
-## Resumo Executivo
+# Plano: Notificacao Automatica para Conclusao de Jornada
 
-A area administrativa do NELLO ONE/Identity conta com **28 rotas ativas** e **77 arquivos de componentes** no diretorio admin. Identificamos funcionalidades robustas, mas tambem **significativa divida tecnica** com arquivos duplicados e orfaos.
+## Problema Identificado
+
+Quando a Aline Bicalho completou a jornada (7/7 testes), o sistema:
+- Atualizou corretamente o `journey_status` para `'completed'`
+- **NAO disparou** nenhuma notificacao porque o evento `journey_completed` nao existe no sistema
+
+## Solucao
+
+Implementar notificacao automatica via Email e WhatsApp quando um usuario completa todos os 7 testes da jornada NELLO ONE.
 
 ---
 
-## 1. ESTRUTURA ATUAL
-
-### Rotas Ativas (28 paginas)
+## Arquitetura da Solucao
 
 ```text
-+------------------------------------------------------------------+
-| METRICAS (5 rotas)                                               |
-+------------------------------------------------------------------+
-| /admin              | Dashboard PRO - KPIs, funis, graficos      |
-| /admin/business     | Business Dashboard - Empresas B2B          |
-| /admin/tempo-real   | Dashboard Realtime - Eventos ao vivo       |
-| /admin/relatorios   | Relatorios - Metricas agregadas            |
-| /admin/visitantes   | Visitantes - Tracking em tempo real        |
-+------------------------------------------------------------------+
-
-+------------------------------------------------------------------+
-| USUARIOS (2 rotas)                                               |
-+------------------------------------------------------------------+
-| /admin/usuarios     | Usuarios & Jornadas - Gestao unificada     |
-| /admin/afiliados    | Afiliados - Comissoes e vendas             |
-+------------------------------------------------------------------+
-
-+------------------------------------------------------------------+
-| VENDAS (5 rotas)                                                 |
-+------------------------------------------------------------------+
-| /admin/pedidos      | Pedidos & Pagamentos - Transacoes          |
-| /admin/vendas       | Relatorio de Vendas - Revenue analytics    |
-| /admin/produtos     | Produtos & Testes - Catalogo               |
-| /admin/precos       | Gestao de Precos - Tabela centralizada     |
-| /admin/cupons       | Cupons PRO - Stripe integrado              |
-+------------------------------------------------------------------+
-
-+------------------------------------------------------------------+
-| CONTEUDO (4 rotas)                                               |
-+------------------------------------------------------------------+
-| /admin/landing-page     | CMS da Landing Page                    |
-| /admin/codigo-essencia  | Gestao do Codigo da Essencia           |
-| /admin/depoimentos      | Depoimentos - Gestao de testemunhos    |
-| /admin/identidade-visual| Post Factory - Criacao de posts        |
-+------------------------------------------------------------------+
-
-+------------------------------------------------------------------+
-| COMUNICACAO (5 rotas)                                            |
-+------------------------------------------------------------------+
-| /admin/engajamento          | Central de Engajamento - IA copy   |
-| /admin/comunicacao          | Inbox - Tickets de suporte         |
-| /admin/enviar-relatorios    | Envio de PDFs por email            |
-| /admin/notificacoes-historico| Historico de Push                 |
-| /admin/notificacoes         | Automacao de Notificacoes          |
-+------------------------------------------------------------------+
-
-+------------------------------------------------------------------+
-| SISTEMA (7 rotas)                                                |
-+------------------------------------------------------------------+
-| /admin/permissoes       | Gestao de Permissoes (Super Admin)     |
-| /admin/alertas-admin    | Alertas Admin - Config notificacoes    |
-| /admin/limpeza          | Limpeza de Dados - Exclusao segura     |
-| /admin/tools            | Admin Tools - Ferramentas dev          |
-| /admin/logs             | Logs & Auditoria - Webhook health      |
-| /admin/configuracoes    | Settings - Manutencao, flags           |
-| /admin/jornadas         | Dashboard Jornadas (link direto)       |
-+------------------------------------------------------------------+
+Usuario completa ultimo teste
+         |
+         v
++------------------------+
+| TestExecution.tsx      |
+| updateJourneyProgress()|
++------------------------+
+         |
+         v (se completedCount >= 7)
++------------------------+
+| supabase.functions     |
+| invoke("notify-admin") |
+| event: journey_completed|
++------------------------+
+         |
+         v
++------------------------+
+| Edge Function          |
+| notify-admin           |
+| - Email via Resend     |
+| - WhatsApp via Twilio  |
++------------------------+
+         |
+         v
+CEO recebe Email + WhatsApp
 ```
 
 ---
 
-## 2. O QUE ESTA FUNCIONANDO BEM
+## Alteracoes Necessarias
 
-### Categoria: EXCELENTE (5 estrelas)
+### 1. Edge Function: notify-admin/index.ts
 
-| Modulo | Descricao | Notas |
-|--------|-----------|-------|
-| **AdminGuard** | Protecao dual-layer (rota + componente) | Implementacao solida, reusavel |
-| **AdminDashboard** | KPIs, funil, graficos Recharts | Filtros por periodo, responsivo |
-| **RealtimeDashboard** | Realtime subscriptions | Eventos ao vivo, refresh 30s |
-| **AdminOrdersPayments** | Transacoes, reembolsos, CSV | Filtros por categoria, status |
-| **AdminCoupons** | Integracao Stripe, multi-produto | Business + One, logs audit |
-| **AdminPermissionsManager** | 4 niveis: super_admin, suporte, visualizador, growth | Presets automaticos |
-| **AdminSalesReport** | Revenue por produto/moeda | Charts, filtros, export |
-| **AdminEngagementCenter** | IA copy, campanhas email | Historico, templates personalizados |
+**Adicionar novo evento `journey_completed`**
 
-### Categoria: BOM (4 estrelas)
+Linha 26-34 - Adicionar ao tipo EventType:
+```typescript
+type EventType = 
+  | "new_purchase" 
+  | "new_signup" 
+  | ...
+  | "journey_completed";  // NOVO
+```
 
-| Modulo | Descricao | Pode Melhorar |
-|--------|-----------|---------------|
-| **AdminBusinessDashboard** | Metricas B2B, empresas | Falta filtro por periodo |
-| **AdminUsersUnified** | Tabs usuarios + jornadas | Poderia ter busca global |
-| **AdminLogs** | Webhook health check, fallback alerts | Falta paginacao |
-| **AdminCodigoEssencia** | Regeneracao, mock test | Versao hardcoded (max 2) |
-| **CommunicationManagement** | Tickets suporte, replies | Falta status "aguardando cliente" |
-| **AffiliatesManagement** | Dashboard afiliados | Interface complexa, 1200+ linhas |
-| **AdminLandingPage** | CMS completo | Arquivo muito grande (1200+ linhas) |
+Linha 54 - Adicionar template de email:
+```typescript
+case "journey_completed":
+  return {
+    subject: `🎉 Jornada Completa! ${data.user_name} - NELLO ONE`,
+    html: `
+      <div style="...">
+        <h1>🎉 Jornada NELLO ONE Concluida!</h1>
+        <div>
+          <p><strong>👤 Usuario:</strong> ${data.user_name}</p>
+          <p><strong>📧 Email:</strong> ${data.user_email}</p>
+          <p><strong>📅 Conclusao:</strong> ${now}</p>
+          <p><strong>⏱️ Duracao:</strong> ${data.journey_duration || 'N/A'}</p>
+        </div>
+        <a href="https://nelloone.lovable.app/admin/usuarios">
+          Ver no Admin
+        </a>
+      </div>
+    `,
+  };
+```
 
-### Categoria: FUNCIONAL (3 estrelas)
+Linha 235 - Adicionar mensagem WhatsApp:
+```typescript
+case "journey_completed":
+  return `🎉 *Jornada NELLO ONE completa!*
 
-| Modulo | Descricao | Limitacoes |
-|--------|-----------|------------|
-| **AdminSettings** | Maintenance mode, feature flags | Poucos flags disponiveis |
-| **AdminTools** | Reset testes, modo teste | Criar usuario nao implementado |
-| **DataCleanupTool** | Limpeza usuarios, duplicados | Arquivo enorme (1200 linhas) |
-| **NotificationAutomation** | Email/WhatsApp inativos | Configuracoes espalhadas |
-| **AdminRealtimeVisitors** | Lista visitantes | Design basico vs RealtimeDashboard |
+👤 ${data.user_name || "Usuario"}
+📧 ${data.user_email || "N/A"}
 
----
+O usuario completou todos os 7 testes!
 
-## 3. O QUE NAO ESTA FUNCIONANDO
-
-### Problemas Criticos
-
-| Problema | Impacto | Arquivo |
-|----------|---------|---------|
-| **AdminTools: Criar usuario teste** | Mostra "sera implementado via edge function" | AdminTools.tsx:211 |
-| **AdminNotificationSettings** | Sem guard interno (apenas rota) | AdminNotificationSettings.tsx |
-
-### Problemas Moderados
-
-| Problema | Impacto | Detalhes |
-|----------|---------|----------|
-| **Modo Teste Admin** | Estado local, nao persiste | AdminTools.tsx - variavel de estado |
-| **Webhook Secret check** | Mostra apenas se existe, nao valida | AdminLogs.tsx |
+👉 nelloone.lovable.app/admin/usuarios`;
+```
 
 ---
 
-## 4. ARQUIVOS DUPLICADOS (DIVIDA TECNICA ALTA)
+### 2. Frontend: src/utils/journey.ts
 
-### Componentes com multiplas versoes NAO USADOS
+**Modificar `updateJourneyProgress` para disparar notificacao**
 
-| Arquivo | Status | Acao Recomendada |
-|---------|--------|------------------|
-| `UsersManagement.tsx` | Orfao | Deletar |
-| `UsersManagement2.tsx` | Orfao | Deletar |
-| `UsersManagementV2.tsx` | Orfao | Deletar |
-| `SystemSettings.tsx` | Orfao | Deletar |
-| `SystemSettings2.tsx` | Orfao | Deletar |
-| `PlansAndCoupons.tsx` | Orfao | Deletar |
-| `PlansAndCoupons2.tsx` | Orfao | Deletar |
-| `ReportsManagement.tsx` | Orfao (substituido por ReportsManagement2) | Deletar |
-| `Dashboard2.tsx` | Orfao | Deletar |
-| `AdminBrandIdentity.tsx` | Orfao (consolidado em AdminPostFactory) | Deletar |
-| `TestsJourneysManagement.tsx` | Orfao | Deletar |
-| `TestsJourneysManagement2.tsx` | Orfao | Deletar |
-| `TestsManagement.tsx` | Orfao | Deletar |
-| `TestsQuestionsManagement.tsx` | Orfao | Deletar |
-| `DynamicContentManagement.tsx` | Orfao | Deletar |
-| `FAQContentManagement.tsx` | Orfao | Deletar |
-| `ForWhoContentManagement.tsx` | Orfao | Deletar |
-| `HeroContentManagement.tsx` | Orfao | Deletar |
-| `HomeContentManagement.tsx` | Orfao | Deletar |
-| `LandingContentManagement.tsx` | Orfao | Deletar |
-| `LandingContentManagement2.tsx` | Orfao | Deletar |
-| `LogsSecurityManagement.tsx` | Orfao | Deletar |
-| `MiguelAIManagement.tsx` | Orfao | Deletar |
-| `MiguelAIManagement2.tsx` | Orfao | Deletar |
-| `PaymentsManagement.tsx` | Orfao | Deletar |
-| `PaymentsCouponsManagement.tsx` | Orfao | Deletar |
-| `PricingManagement.tsx` | Orfao | Deletar |
-| `SchedulingManagement.tsx` | Orfao | Deletar |
-| `AuditLogs.tsx` | Orfao (substituido por AdminLogs) | Deletar |
-| `AutomationsManagement.tsx` | Orfao | Deletar |
-| `CouponsManagement.tsx` | Orfao (substituido por AdminCoupons) | Deletar |
-| `TestimonialsContentManagement.tsx` | Orfao | Deletar |
-| `SimulatedMapPreview.tsx` | Verificar uso | Possivel orfao |
-| `SimulationLanguageDialog.tsx` | Verificar uso | Possivel orfao |
-| `SimulationMode.tsx` | Verificar uso | Possivel orfao |
-| `ViewModeSelector.tsx` | Verificar uso | Possivel orfao |
+Apos a linha 172 (apos atualizar o profile com sucesso), adicionar:
 
-**Total estimado de arquivos orfaos: ~35 arquivos**
-**Economia de bundle estimada: 100-200KB**
+```typescript
+// Se a jornada acabou de ser completada, dispara notificacao
+if (completedCount >= totalTests && journeyStatus === 'completed') {
+  // Buscar dados do usuario para a notificacao
+  const { data: profileData } = await supabase
+    .from('profiles')
+    .select('full_name')
+    .eq('id', userId)
+    .single();
+  
+  const { data: authData } = await supabase.auth.getUser();
+  
+  // Calcular duracao da jornada
+  const startDate = new Date(journeyStartedAt || new Date());
+  const endDate = new Date(journeyCompletedAt || new Date());
+  const daysToComplete = Math.ceil(
+    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  
+  // Disparar notificacao (fire-and-forget)
+  supabase.functions.invoke("notify-admin", {
+    body: {
+      event_type: "journey_completed",
+      data: {
+        user_name: profileData?.full_name || "Usuario",
+        user_email: authData?.user?.email || "N/A",
+        journey_duration: `${daysToComplete} dia(s)`,
+        user_id: userId,
+      }
+    }
+  }).catch(err => console.warn("Failed to notify admin:", err));
+}
+```
 
 ---
 
-## 5. O QUE PODE MELHORAR
+### 3. Frontend: src/components/admin/AdminNotificationSettings.tsx
 
-### Arquitetura
+**Adicionar evento na lista de configuracao**
 
-| Area | Problema | Solucao |
-|------|----------|---------|
-| **Arquivos grandes** | AdminLandingPage (1217 linhas), DataCleanupTool (1193 linhas), AffiliatesManagement (1221 linhas) | Componentizar em submodulos |
-| **Falta de tests** | Nenhum teste unitario visivel | Adicionar Vitest para componentes criticos |
-| **Inconsistencia de toast** | Mix de `sonner` e `useToast` | Padronizar em `sonner` |
+Linha 26-35 - Adicionar ao array EVENT_TYPES:
 
-### UX/UI
-
-| Area | Problema | Solucao |
-|------|----------|---------|
-| **Paginacao** | AdminLogs, Pedidos sem paginacao | Implementar infinite scroll ou paginacao |
-| **Busca global** | Nenhuma busca cross-modulo | Adicionar Command Palette (cmdk ja instalado) |
-| **Mobile** | Alguns componentes nao sao responsivos | Audit de mobile em DataCleanupTool, AdminTools |
-| **Loading states** | Inconsistentes (Loader2 vs skeleton) | Padronizar skeleton loaders |
-
-### Funcionalidades
-
-| Area | Faltando | Prioridade |
-|------|----------|------------|
-| **Export** | Pedidos tem CSV, outros nao | Media |
-| **Bulk actions** | Apenas em Engajamento | Media |
-| **Undo/Redo** | Nenhum modulo tem | Baixa |
-| **Historico de alteracoes** | Apenas audit_logs generico | Media |
+```typescript
+const EVENT_TYPES = [
+  { key: "new_purchase", label: "Nova Compra", icon: "💰", priority: "high" },
+  { key: "new_signup", label: "Novo Cadastro", icon: "👤", priority: "medium" },
+  { key: "journey_completed", label: "Jornada Completa", icon: "🎉", priority: "high" }, // NOVO
+  { key: "new_testimonial", label: "Novo Depoimento", icon: "💬", priority: "medium" },
+  // ...resto
+];
+```
 
 ---
 
-## 6. O QUE ESTA REPETIDO (FUNCIONALIDADE SOBREPOSTA)
+## Dados Enviados na Notificacao
 
-### Sobreposicao de Funcionalidades
-
-| Funcionalidade | Modulos Envolvidos | Recomendacao |
-|----------------|-------------------|--------------|
-| **Envio de emails** | AdminEngagementCenter, NotificationAutomation, AdminSendReports | Centralizar em um service |
-| **Stats de usuarios** | AdminDashboard, AdminUsersUnified, RealtimeDashboard | Criar hook useUserStats |
-| **Filtros por periodo** | Varia entre componentes (today/7d/30d/year vs 7d/30d/90d/all) | Padronizar constantes |
-| **Graficos de vendas** | AdminDashboard, ReportsManagement2, AdminSalesReport | Unificar em um so |
-
-### Componentes Similares
-
-| Duplicacao | Detalhes |
-|------------|----------|
-| **ReportsManagement2 vs AdminSalesReport** | Funcionalidades parecidas, charts similares |
-| **AdminRealtimeVisitors vs RealtimeDashboard** | Ambos mostram dados realtime |
-| **NotificationAutomation vs AdminNotificationsHistory** | Poderiam ser unificados |
+| Campo | Descricao | Exemplo |
+|-------|-----------|---------|
+| user_name | Nome completo do usuario | "Aline Bicalho" |
+| user_email | Email do usuario | "aline@email.com" |
+| journey_duration | Tempo para completar | "3 dia(s)" |
+| user_id | UUID do usuario | "abc-123-..." |
 
 ---
 
-## 7. O QUE FALTA
+## Formato da Notificacao
 
-### Funcionalidades Criticas
+### Email
+- **Assunto**: 🎉 Jornada Completa! Aline Bicalho - NELLO ONE
+- **Corpo**: Card estilizado com dados do usuario + link para Admin
 
-| Funcionalidade | Descricao | Prioridade |
-|----------------|-----------|------------|
-| **Dashboard customizavel** | Widgets arrastáveis, layout salvo | Alta |
-| **API de integracao** | Webhooks outgoing, Zapier | Media |
-| **Multi-idioma admin** | Interface em EN/PT | Media |
+### WhatsApp
+```
+🎉 *Jornada NELLO ONE completa!*
 
-### Funcionalidades Desejaveis
+👤 Aline Bicalho
+📧 aline@email.com
 
-| Funcionalidade | Descricao | Prioridade |
-|----------------|-----------|------------|
-| **Relatorios agendados** | PDF semanal automatico | Media |
-| **Modo escuro** | Theme toggle no admin | Baixa |
-| **Favoritos/Atalhos** | Quick access a paginas frequentes | Baixa |
-| **Notificacoes in-app** | Badge de novos tickets, alertas | Media |
-| **Changelog interno** | Registro de alteracoes do sistema | Baixa |
+O usuario completou todos os 7 testes!
 
-### Melhorias de Seguranca
-
-| Area | Status Atual | Recomendacao |
-|------|--------------|--------------|
-| **2FA para admins** | Nao implementado | Implementar TOTP |
-| **Sessao timeout** | Nao implementado | Logout apos inatividade |
-| **IP allowlist** | Nao implementado | Opcional para super_admin |
+👉 nelloone.lovable.app/admin/usuarios
+```
 
 ---
 
-## 8. PLANO DE ACAO RECOMENDADO
+## Arquivos a Modificar
 
-### Fase 1: Limpeza (1-2 dias)
-
-1. Deletar ~35 arquivos orfaos identificados
-2. Verificar imports quebrados
-3. Rodar build para validar
-
-### Fase 2: Consolidacao (3-5 dias)
-
-1. Unificar ReportsManagement2 + AdminSalesReport
-2. Componentizar AdminLandingPage em submodulos
-3. Padronizar toast para sonner em todos os componentes
-
-### Fase 3: Melhorias UX (5-7 dias)
-
-1. Implementar paginacao em AdminLogs e Pedidos
-2. Adicionar Command Palette para busca global
-3. Audit de responsividade mobile
-
-### Fase 4: Features Novas (10+ dias)
-
-1. Dashboard customizavel com drag-and-drop
-2. Notificacoes in-app para tickets
-3. Relatorios agendados
+| Arquivo | Acao |
+|---------|------|
+| `supabase/functions/notify-admin/index.ts` | Adicionar evento journey_completed |
+| `src/utils/journey.ts` | Disparar notificacao ao completar |
+| `src/components/admin/AdminNotificationSettings.tsx` | Adicionar evento na UI |
 
 ---
 
-## RESUMO QUANTITATIVO
+## Validacao Pos-Implementacao
 
-| Metrica | Valor |
-|---------|-------|
-| Rotas ativas | 28 |
-| Componentes no diretorio | 77 |
-| Componentes em uso | ~42 |
-| Arquivos orfaos estimados | ~35 |
-| Linhas de codigo estimadas | ~25.000 |
-| Componentes >500 linhas | 8 |
-| Componentes >1000 linhas | 5 |
-| Guards de permissao implementados | 11 rotas |
-| Funcionalidades duplicadas | 4 areas |
-| Bugs conhecidos | 2 |
+1. Completar jornada com usuario de teste
+2. Verificar logs da Edge Function
+3. Confirmar recebimento de Email
+4. Confirmar recebimento de WhatsApp
+5. Verificar registro em `admin_notification_logs`
+
+---
+
+## Nota Tecnica
+
+A notificacao e disparada no frontend (client-side) via `supabase.functions.invoke` usando padrao fire-and-forget (`.catch()`). Isso garante que:
+- A experiencia do usuario nao e bloqueada
+- Falhas de notificacao nao afetam o fluxo principal
+- Logs sao registrados automaticamente pela Edge Function
 
