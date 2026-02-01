@@ -5,10 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Mail, MessageSquare, Bell, Save, CheckCircle, AlertCircle } from "lucide-react";
+import { Loader2, Mail, MessageSquare, Bell, Save, CheckCircle, AlertCircle, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { useAdminPermissions } from "@/hooks/useAdminPermissions";
 
 interface NotificationSetting {
   event_type: string;
@@ -36,6 +37,7 @@ const EVENT_TYPES = [
 // Component protected by AdminGuard at route level - can_manage_settings
 export function AdminNotificationSettings() {
   const { user } = useAuth();
+  const { hasPermission, isSuperAdmin, isLoading: permLoading } = useAdminPermissions();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<NotificationSetting[]>([]);
@@ -45,10 +47,10 @@ export function AdminNotificationSettings() {
   });
 
   useEffect(() => {
-    if (user) {
+    if (user && !permLoading && (hasPermission('can_manage_settings') || isSuperAdmin)) {
       loadSettings();
     }
-  }, [user]);
+  }, [user, permLoading, isSuperAdmin]);
 
   const loadSettings = async () => {
     if (!user) return;
@@ -172,10 +174,31 @@ export function AdminNotificationSettings() {
     }
   };
 
-  if (loading) {
+  if (loading || permLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  // Permission check - component level guard (after all hooks)
+  if (!hasPermission('can_manage_settings') && !isSuperAdmin) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="max-w-md w-full border-border/50">
+          <CardContent className="pt-8 pb-8 text-center space-y-6">
+            <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+              <Shield className="w-8 h-8 text-destructive" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-semibold text-foreground">Acesso Restrito</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Você não tem permissão para acessar as configurações de notificação.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }

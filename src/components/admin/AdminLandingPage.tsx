@@ -34,8 +34,10 @@ import {
   Share2,
   CreditCard,
   DollarSign,
-  Globe
+  Globe,
+  Shield
 } from "lucide-react";
+import { useAdminPermissions } from "@/hooks/useAdminPermissions";
 
 interface ContentSection {
   id: string;
@@ -107,6 +109,7 @@ const ICON_OPTIONS = [
 
 // Component protected by AdminGuard at route level - can_manage_settings
 export const AdminLandingPage = () => {
+  const { hasPermission, isSuperAdmin, isLoading: permLoading } = useAdminPermissions();
   const [sections, setSections] = useState<ContentSection[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
@@ -114,8 +117,10 @@ export const AdminLandingPage = () => {
   const [updatingStripe, setUpdatingStripe] = useState(false);
 
   useEffect(() => {
-    fetchContent();
-  }, []);
+    if (!permLoading && (hasPermission('can_manage_settings') || isSuperAdmin)) {
+      fetchContent();
+    }
+  }, [permLoading, isSuperAdmin]);
 
   const fetchContent = async () => {
     try {
@@ -1124,11 +1129,24 @@ export const AdminLandingPage = () => {
     }
   };
 
-  if (loading) {
+  if (loading || permLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
+    );
+  }
+
+  // Component level guard (after all hooks)
+  if (!hasPermission('can_manage_settings') && !isSuperAdmin) {
+    return (
+      <Card className="p-8 text-center max-w-md mx-auto mt-12">
+        <Shield className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2">Acesso Restrito</h3>
+        <p className="text-muted-foreground text-sm">
+          Edição da landing page requer permissão de configurações.
+        </p>
+      </Card>
     );
   }
 

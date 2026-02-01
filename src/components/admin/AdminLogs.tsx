@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Loader2, Activity, RefreshCw, Shield, User, CreditCard, FileText, Zap, CheckCircle2, XCircle, Copy, ExternalLink, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useAdminPermissions } from "@/hooks/useAdminPermissions";
 
 interface AuditLog {
   id: string;
@@ -36,6 +37,7 @@ const ACTION_LABELS: Record<string, { label: string; icon: any; color: string }>
 };
 
 export const AdminLogs = () => {
+  const { isSuperAdmin, isLoading: permLoading } = useAdminPermissions();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionFilter, setActionFilter] = useState("all");
@@ -48,8 +50,10 @@ export const AdminLogs = () => {
   const WEBHOOK_URL = "https://hoxcnuzfqwcissykayqa.supabase.co/functions/v1/stripe-webhook";
 
   useEffect(() => {
-    fetchLogs();
-  }, []);
+    if (!permLoading && isSuperAdmin) {
+      fetchLogs();
+    }
+  }, [permLoading, isSuperAdmin]);
 
   const fetchLogs = async () => {
     try {
@@ -128,7 +132,7 @@ export const AdminLogs = () => {
 
   const uniqueActions = [...new Set(logs.map(l => l.action))];
 
-  if (loading) {
+  if (loading || permLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -136,7 +140,19 @@ export const AdminLogs = () => {
     );
   }
 
-  // Component content wrapped by AdminGuard at route level
+  // Component level guard (after all hooks)
+  if (!isSuperAdmin) {
+    return (
+      <Card className="p-8 text-center max-w-md mx-auto mt-12">
+        <Shield className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2">Acesso Restrito</h3>
+        <p className="text-muted-foreground text-sm">
+          Logs de auditoria são restritos a Super Admins.
+        </p>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-4 md:space-y-6 max-w-7xl">
       {/* Header */}

@@ -54,12 +54,8 @@ interface AuditLog {
 
 // Component protected by AdminGuard at route level - isSuperAdminOnly
 export const AdminTools = () => {
-  const [isAdminTestMode, setIsAdminTestMode] = useState(false);
   const [resetUserId, setResetUserId] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
-  const [newUserEmail, setNewUserEmail] = useState("");
-  const [newUserName, setNewUserName] = useState("");
-  const [createLoading, setCreateLoading] = useState(false);
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
   const [myTests, setMyTests] = useState<UserTest[]>([]);
@@ -194,34 +190,6 @@ export const AdminTools = () => {
     }
   };
 
-  const handleCreateTestUser = async () => {
-    if (!newUserEmail.trim() || !newUserName.trim()) {
-      toast.error("Preencha email e nome");
-      return;
-    }
-
-    setCreateLoading(true);
-    try {
-      // This would typically use an admin API or edge function
-      // For now, we'll just show a message
-      toast.info("Funcionalidade de criação de usuário teste será implementada via edge function");
-      
-      // Log the action
-      await supabase.rpc('log_audit', {
-        p_action: 'create_test_user_attempt',
-        p_table_name: 'profiles',
-        p_record_id: crypto.randomUUID(),
-        p_new_data: { email: newUserEmail, name: newUserName }
-      });
-
-    } catch (error) {
-      console.error("Error creating test user:", error);
-      toast.error("Erro ao criar usuário");
-    } finally {
-      setCreateLoading(false);
-    }
-  };
-
   const fetchLogs = async () => {
     setLogsLoading(true);
     try {
@@ -241,17 +209,6 @@ export const AdminTools = () => {
     }
   };
 
-  const toggleAdminTestMode = () => {
-    setIsAdminTestMode(!isAdminTestMode);
-    if (!isAdminTestMode) {
-      toast.success("Modo Teste Admin ativado", {
-        description: "Você pode navegar como cliente sem alterar dados reais"
-      });
-    } else {
-      toast.info("Modo Teste Admin desativado");
-    }
-  };
-
   return (
     <div className="space-y-8 max-w-4xl">
       {/* Header */}
@@ -264,10 +221,8 @@ export const AdminTools = () => {
       </div>
 
       <Tabs defaultValue="mytests" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="mytests" onClick={fetchMyTests}>Meus Testes</TabsTrigger>
-          <TabsTrigger value="modes">Modos</TabsTrigger>
-          <TabsTrigger value="users">Usuários</TabsTrigger>
           <TabsTrigger value="reset">Reset</TabsTrigger>
           <TabsTrigger value="logs" onClick={fetchLogs}>Logs</TabsTrigger>
         </TabsList>
@@ -366,118 +321,6 @@ export const AdminTools = () => {
               Esta ação não pode ser desfeita.
             </AlertDescription>
           </Alert>
-        </TabsContent>
-
-        {/* Modos Tab */}
-        <TabsContent value="modes" className="space-y-4">
-          <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Eye className="w-5 h-5" />
-                Modo Teste Admin
-              </CardTitle>
-              <CardDescription>
-                Navegue pela plataforma como cliente, simulando compras e testes sem alterar dados reais
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  {isAdminTestMode ? (
-                    <div className="p-2 rounded-full bg-emerald-500/10">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                    </div>
-                  ) : (
-                    <div className="p-2 rounded-full bg-muted">
-                      <EyeOff className="w-5 h-5 text-muted-foreground" />
-                    </div>
-                  )}
-                  <div>
-                    <p className="font-medium">Modo Teste</p>
-                    <p className="text-sm text-muted-foreground">
-                      {isAdminTestMode ? "Ativo - navegando como teste" : "Desativado"}
-                    </p>
-                  </div>
-                </div>
-                <Switch checked={isAdminTestMode} onCheckedChange={toggleAdminTestMode} />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <Button 
-                  variant="outline" 
-                  className="gap-2 h-12"
-                  onClick={() => navigate("/cliente")}
-                >
-                  <User className="w-4 h-4" />
-                  Visual Cliente
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="gap-2 h-12"
-                  onClick={() => navigate("/admin")}
-                >
-                  <Shield className="w-4 h-4" />
-                  Visual Admin
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Alert className="bg-amber-500/10 border-amber-500/20">
-            <AlertTriangle className="h-4 w-4 text-amber-600" />
-            <AlertDescription className="text-amber-800">
-              No Modo Teste, você pode simular toda a jornada do cliente incluindo testes e compras.
-              Nenhum dado real será alterado.
-            </AlertDescription>
-          </Alert>
-        </TabsContent>
-
-        {/* Users Tab */}
-        <TabsContent value="users" className="space-y-4">
-          <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <UserPlus className="w-5 h-5" />
-                Criar Usuário de Teste
-              </CardTitle>
-              <CardDescription>
-                Crie contas de teste para validar funcionalidades
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input
-                    type="email"
-                    placeholder="teste@nelloone.com"
-                    value={newUserEmail}
-                    onChange={(e) => setNewUserEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Nome</Label>
-                  <Input
-                    placeholder="Usuário Teste"
-                    value={newUserName}
-                    onChange={(e) => setNewUserName(e.target.value)}
-                  />
-                </div>
-              </div>
-              <Button 
-                onClick={handleCreateTestUser} 
-                disabled={createLoading}
-                className="w-full"
-              >
-                {createLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                ) : (
-                  <UserPlus className="w-4 h-4 mr-2" />
-                )}
-                Criar Usuário de Teste
-              </Button>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* Reset Tab */}
