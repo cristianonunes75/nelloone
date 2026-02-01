@@ -13,6 +13,7 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [hasRestoredPosition, setHasRestoredPosition] = useState(false);
   const { hasPurchased } = useTestAccess();
   const { language } = useLanguage();
   
@@ -24,9 +25,10 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
 
   // IMPORTANT: when navigating between tests (same route, different params), React Router may reuse
-  // the same component instance. Reset internal state so the next test always starts from the beginning.
+  // the same component instance. Reset internal state so position can be restored from saved answers.
   useEffect(() => {
     setCurrentQuestionIndex(0);
+    setHasRestoredPosition(false);
     setPendingAnswer(null);
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current);
@@ -92,6 +94,39 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
       return data;
     },
   });
+
+  // Restore position from saved answers when loading a test in progress
+  // This ensures the user returns to where they left off, not the beginning
+  useEffect(() => {
+    if (hasRestoredPosition || !questions || questions.length === 0 || answersLoading) {
+      return;
+    }
+
+    if (answers && answers.length > 0) {
+      // Find the index of the last answered question
+      const answeredQuestionIds = new Set(answers.map(a => a.question_id));
+      
+      // Find the first unanswered question index
+      let resumeIndex = 0;
+      for (let i = 0; i < questions.length; i++) {
+        if (answeredQuestionIds.has(questions[i].id)) {
+          resumeIndex = i + 1; // Move to the next question after the last answered
+        }
+      }
+      
+      // Cap at the last question if all are answered
+      if (resumeIndex >= questions.length) {
+        resumeIndex = questions.length - 1;
+      }
+      
+      // Only set if we have progress to restore
+      if (resumeIndex > 0) {
+        setCurrentQuestionIndex(resumeIndex);
+      }
+    }
+    
+    setHasRestoredPosition(true);
+  }, [questions, answers, answersLoading, hasRestoredPosition]);
 
   // Auto-save effect: debounce saves with 1.5 second delay
   useEffect(() => {
