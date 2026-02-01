@@ -1,226 +1,234 @@
 
-# Plano: Area para Analista de Growth
+# Plano: Seguranca de Nivel Duplo para Area Growth
 
-## Resumo
+## Resumo do Problema
 
-Vou criar um novo nivel de permissao chamado "growth" com acesso focado em metricas, analises e acoes de marketing, e uma area personalizada com os dashboards e ferramentas relevantes.
+Atualmente, varias paginas do admin estao protegidas apenas por ocultacao no sidebar. Um usuario Growth pode acessar diretamente via URL paginas sensiveis como `/admin/precos`, `/admin/logs`, etc.
+
+### Estado Atual
+
+| Componente | Tem Guard? | Status |
+|------------|-----------|--------|
+| AdminPriceManager | Sim | isSuperAdmin |
+| AdminSettings | Sim | can_manage_settings |
+| DataCleanupTool | Sim | can_delete_data |
+| AdminPermissionsManager | Sim | isSuperAdmin |
+| AdminLogs | **NAO** | Vulneravel |
+| AdminTools | **NAO** | Vulneravel |
+| AdminCodigoEssencia | **NAO** | Vulneravel |
+| AdminLandingPage | **NAO** | Vulneravel |
+| TestimonialsManagement | **NAO** | Vulneravel |
+| AdminPostFactory | **NAO** | Vulneravel |
+| AdminNotificationSettings | **NAO** | Vulneravel |
 
 ---
 
-## O que o Analista de Growth Precisa
+## Solucao: Arquitetura de 2 Niveis
 
-Com base nas funcionalidades existentes, mapeei as paginas do admin em 3 categorias:
+### Nivel 1: Guard Reutilizavel (Componente)
+
+Criar um componente `AdminGuard` que:
+- Recebe props: `isSuperAdminOnly`, `requiredPermission`, `children`
+- Verifica permissoes usando `useAdminPermissions`
+- Bloqueia renderizacao e mostra Card "Acesso Restrito"
+- Previne chamadas de dados antes de mostrar o guard
 
 ```text
-+------------------------------------------------------------------+
-|                    ACESSO COMPLETO (Growth)                       |
-+------------------------------------------------------------------+
-| Dashboard Principal     | KPIs, conversoes, metricas gerais       |
-| Business Dashboard      | Metricas de negocio, LTV, cohorts       |
-| Tempo Real              | Usuarios ativos, eventos ao vivo        |
-| Relatorios              | Geracao e analise de relatorios         |
-| Visitantes              | Tracking de visitantes, origem          |
-| Relatorio de Vendas     | Receita por produto, tendencias         |
-| Afiliados               | Performance de afiliados, conversoes    |
-| Engajamento             | Campanhas, automacoes, triggers         |
-| Historico Push          | Analise de campanhas de push            |
-+------------------------------------------------------------------+
-
-+------------------------------------------------------------------+
-|                    ACESSO LIMITADO (Visualizar)                   |
-+------------------------------------------------------------------+
-| Usuarios & Jornadas     | Ver dados, sem editar ou bloquear       |
-| Pedidos                 | Ver vendas, sem processar reembolsos    |
-| Cupons                  | Ver cupons ativos e uso                 |
-| Produtos & Testes       | Ver catalogo, sem modificar             |
-+------------------------------------------------------------------+
-
-+------------------------------------------------------------------+
-|                    SEM ACESSO                                     |
-+------------------------------------------------------------------+
-| Permissoes              | Gerenciamento de admins                 |
-| Limpeza de Dados        | Exclusao de dados                       |
-| Configuracoes           | Settings do sistema                     |
-| Gestao de Precos        | Alteracao de precos (sensivel)          |
-| Codigo da Essencia      | Regeneracao de relatorios               |
-| Tools                   | Ferramentas de desenvolvimento          |
-| Logs                    | Auditoria do sistema                    |
-+------------------------------------------------------------------+
++-----------------------------------------------------------+
+| AdminGuard                                                |
++-----------------------------------------------------------+
+| Props:                                                    |
+|   - isSuperAdminOnly?: boolean                            |
+|   - requiredPermission?: keyof AdminPermissions           |
+|   - children: ReactNode                                   |
+|   - fallbackMessage?: string                              |
++-----------------------------------------------------------+
+| Logica:                                                   |
+|   1. Carrega permissoes com useAdminPermissions           |
+|   2. Se isSuperAdminOnly e !isSuperAdmin -> bloqueia      |
+|   3. Se requiredPermission e !hasPermission -> bloqueia   |
+|   4. Caso contrario, renderiza children                   |
++-----------------------------------------------------------+
 ```
+
+### Nivel 2: Wrapper de Rota
+
+Envolver paginas sensiveis no nivel de rota em `Admin.tsx` com o guard, impedindo ate o lazy load do componente.
 
 ---
 
-## Implementacao
+## Arquivos a Criar
 
-### 1. Novo Nivel de Permissao no Banco de Dados
-
-Adicionar 'growth' ao enum `admin_permission_level`:
-
-```sql
-ALTER TYPE admin_permission_level ADD VALUE 'growth';
-```
-
-### 2. Atualizar Hook de Permissoes
-
-Modificar `src/hooks/useAdminPermissions.tsx`:
-
-- Adicionar 'growth' ao tipo `AdminPermissionLevel`
-- Adicionar preset de permissoes para growth:
-  - can_view_reports: true
-  - can_send_notifications: true
-  - can_manage_users: false
-  - can_manage_payments: false
-  - can_manage_products: false
-  - can_manage_settings: false
-  - can_delete_data: false
-  - can_impersonate: false
-
-### 3. Criar Sidebar Filtrada
-
-Modificar `src/components/admin/AdminSidebar.tsx` para:
-
-- Usar `useAdminPermissions` para verificar nivel
-- Mostrar/esconder itens baseado nas permissoes
-- Growth ve apenas items relevantes para analise
-
-Mapeamento de permissoes por pagina:
-
-```text
-Pagina                  | Permissao Requerida
-------------------------|---------------------
-Dashboard               | can_view_reports
-Business                | can_view_reports
-Tempo Real              | can_view_reports
-Relatorios              | can_view_reports
-Visitantes              | can_view_reports
-Vendas                  | can_view_reports
-Usuarios                | can_manage_users (ver) ou can_view_reports
-Pedidos                 | can_manage_payments (ver)
-Cupons                  | can_manage_products
-Engajamento             | can_send_notifications
-Notificacoes            | can_send_notifications
-Permissoes              | super_admin only
-Limpeza                 | can_delete_data
-Configuracoes           | can_manage_settings
-Precos                  | super_admin only
-```
-
-### 4. Atualizar Gerenciador de Permissoes
-
-Modificar `src/components/admin/AdminPermissionsManager.tsx`:
-
-- Adicionar card explicativo para nivel "Growth"
-- Incluir growth no seletor de niveis
-- Definir preset de permissoes correto
-
-### 5. Proteger Componentes Sensiveis
-
-Adicionar verificacao de permissao nos componentes que Growth nao deve acessar:
-
-- AdminPriceManager: verificar can_manage_settings ou super_admin
-- AdminSettings: verificar can_manage_settings
-- DataCleanupTool: verificar can_delete_data
-- AdminPermissionsManager: ja protege (super_admin only)
-
----
+| Arquivo | Descricao |
+|---------|-----------|
+| `src/components/admin/AdminGuard.tsx` | Componente guard reutilizavel |
 
 ## Arquivos a Modificar
 
 | Arquivo | Alteracao |
 |---------|-----------|
-| `src/hooks/useAdminPermissions.tsx` | Adicionar 'growth' ao tipo e presets |
-| `src/components/admin/AdminSidebar.tsx` | Filtrar menu por permissoes |
-| `src/components/admin/AdminPermissionsManager.tsx` | Adicionar growth ao seletor |
-| `src/components/admin/AdminPriceManager.tsx` | Adicionar guard de permissao |
-| `src/components/admin/AdminSettings.tsx` | Adicionar guard de permissao |
-| `src/components/admin/DataCleanupTool.tsx` | Adicionar guard de permissao |
-
-## Migracao de Banco de Dados
-
-```sql
--- Adicionar novo nivel de permissao
-ALTER TYPE admin_permission_level ADD VALUE 'growth';
-```
+| `src/pages/Admin.tsx` | Envolver rotas sensiveis com AdminGuard |
+| `src/components/admin/AdminLogs.tsx` | Adicionar guard interno (nivel 2) |
+| `src/components/admin/AdminTools.tsx` | Adicionar guard interno |
+| `src/components/admin/AdminCodigoEssencia.tsx` | Adicionar guard interno |
+| `src/components/admin/AdminLandingPage.tsx` | Adicionar guard interno |
+| `src/components/admin/TestimonialsManagement.tsx` | Adicionar guard interno |
+| `src/components/admin/AdminPostFactory.tsx` | Adicionar guard interno |
+| `src/components/admin/AdminNotificationSettings.tsx` | Adicionar guard interno |
 
 ---
 
 ## Detalhes Tecnicos
 
-### Preset de Permissoes para Growth
+### Componente AdminGuard
 
 ```typescript
-growth: {
-  can_manage_users: false,      // Ver usuarios, sem editar
-  can_manage_payments: false,   // Ver vendas, sem reembolsar
-  can_manage_products: false,   // Ver produtos, sem alterar
-  can_manage_settings: false,   // Sem acesso a configs
-  can_view_reports: true,       // ACESSO TOTAL a metricas
-  can_send_notifications: true, // Pode enviar campanhas
-  can_delete_data: false,       // Sem exclusao
-  can_impersonate: false,       // Sem impersonacao
+interface AdminGuardProps {
+  children: ReactNode;
+  isSuperAdminOnly?: boolean;
+  requiredPermission?: keyof Omit<AdminPermissions, 'id' | 'user_id' | 'permission_level'>;
+  fallbackMessage?: string;
 }
+
+export const AdminGuard = ({ 
+  children, 
+  isSuperAdminOnly, 
+  requiredPermission, 
+  fallbackMessage 
+}: AdminGuardProps) => {
+  const { isSuperAdmin, hasPermission, isLoading } = useAdminPermissions();
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  // Check super admin requirement
+  if (isSuperAdminOnly && !isSuperAdmin) {
+    return <AccessDeniedCard message={fallbackMessage || "Apenas Super Admins"} />;
+  }
+
+  // Check specific permission
+  if (requiredPermission && !hasPermission(requiredPermission) && !isSuperAdmin) {
+    return <AccessDeniedCard message={fallbackMessage || "Permissao insuficiente"} />;
+  }
+
+  return <>{children}</>;
+};
 ```
 
-### Logica de Filtragem do Sidebar
+### Aplicacao nas Rotas (Admin.tsx)
 
 ```typescript
-const menuItemPermissions = {
-  '/admin': 'can_view_reports',
-  '/admin/business': 'can_view_reports',
-  '/admin/tempo-real': 'can_view_reports',
-  // ... etc
+// Componente wrapper para rotas protegidas
+const GuardedRoute = ({ 
+  element, 
+  isSuperAdminOnly, 
+  requiredPermission 
+}: { 
+  element: React.LazyExoticComponent<any>;
+  isSuperAdminOnly?: boolean;
+  requiredPermission?: string;
+}) => {
+  const Element = element;
+  return (
+    <AdminGuard 
+      isSuperAdminOnly={isSuperAdminOnly} 
+      requiredPermission={requiredPermission}
+    >
+      <Element />
+    </AdminGuard>
+  );
 };
 
-// Filtrar baseado em hasPermission()
-const visibleItems = section.items.filter(item => {
-  const required = menuItemPermissions[item.url];
-  return !required || hasPermission(required) || isSuperAdmin;
-});
+// Uso nas rotas
+<Route path="precos" element={
+  <AdminGuard isSuperAdminOnly>
+    <AdminPriceManager />
+  </AdminGuard>
+} />
+
+<Route path="configuracoes" element={
+  <AdminGuard requiredPermission="can_manage_settings">
+    <AdminSettings />
+  </AdminGuard>
+} />
 ```
 
-### Componente de Acesso Restrito
+### Mapeamento Completo de Protecao
 
-Para paginas sensiveis, mostrar mensagem informativa:
+| Rota | Guard Nivel Rota | Guard Nivel Componente | Requisito |
+|------|------------------|------------------------|-----------|
+| /admin/precos | AdminGuard | Ja existe | isSuperAdminOnly |
+| /admin/permissoes | AdminGuard | Ja existe | isSuperAdminOnly |
+| /admin/logs | AdminGuard | A criar | isSuperAdminOnly |
+| /admin/tools | AdminGuard | A criar | isSuperAdminOnly |
+| /admin/codigo-essencia | AdminGuard | A criar | isSuperAdminOnly |
+| /admin/limpeza | AdminGuard | Ja existe | can_delete_data |
+| /admin/configuracoes | AdminGuard | Ja existe | can_manage_settings |
+| /admin/landing-page | AdminGuard | A criar | can_manage_settings |
+| /admin/depoimentos | AdminGuard | A criar | can_manage_settings |
+| /admin/identidade-visual | AdminGuard | A criar | can_manage_settings |
+| /admin/alertas-admin | AdminGuard | A criar | can_manage_settings |
+
+---
+
+## Padrao de Implementacao nos Componentes
+
+Para cada componente que precisa de guard interno:
 
 ```typescript
-if (!hasPermission('can_manage_settings')) {
+import { AdminGuard } from "./AdminGuard";
+
+export const AdminLogs = () => {
   return (
-    <Card className="p-8 text-center">
-      <Shield className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-      <h3>Acesso Restrito</h3>
-      <p>Voce nao tem permissao para acessar esta pagina.</p>
-    </Card>
+    <AdminGuard isSuperAdminOnly fallbackMessage="Logs de auditoria sao restritos a Super Admins">
+      {/* Conteudo existente do componente */}
+    </AdminGuard>
   );
-}
+};
+```
+
+Isso garante dupla protecao:
+1. Guard na rota impede carregamento do bundle
+2. Guard no componente protege se alguem importar diretamente
+
+---
+
+## Card de Acesso Restrito (Design)
+
+```text
++--------------------------------------------------+
+|                                                  |
+|              [Shield Icon]                       |
+|                                                  |
+|            Acesso Restrito                       |
+|                                                  |
+|    Voce nao tem permissao para acessar esta      |
+|    pagina. Entre em contato com um Super Admin   |
+|    se precisar de acesso.                        |
+|                                                  |
+|              [Voltar ao Dashboard]               |
+|                                                  |
++--------------------------------------------------+
 ```
 
 ---
 
-## Fluxo de Uso
+## Beneficios da Arquitetura
 
-1. Voce (super_admin) vai em Admin > Permissoes
-2. Adiciona o email do analista como admin
-3. Seleciona nivel "Growth" para ele
-4. Analista faz login e ve apenas os menus relevantes
-5. Se tentar acessar URL protegida, ve mensagem de acesso restrito
+1. **Defesa em Profundidade**: Dois niveis de protecao
+2. **DRY**: Guard reutilizavel elimina duplicacao
+3. **Lazy Load Seguro**: Guard na rota impede download de codigo nao autorizado
+4. **Consistencia Visual**: Mesmo card de acesso negado em todo admin
+5. **Manutencao Facil**: Adicionar nova pagina protegida requer apenas uma linha
+6. **Tipo Seguro**: TypeScript garante que apenas permissoes validas sao usadas
 
 ---
 
-## Resultado Final
+## Criterios de Aceite
 
-O analista de growth tera acesso a:
-
-- Todos os dashboards de metricas e KPIs
-- Funil de conversao completo
-- Analise de receita e vendas
-- Dados de visitantes e engajamento
-- Envio de campanhas e notificacoes
-- Exportacao de dados (CSV)
-
-E NAO tera acesso a:
-
-- Alteracao de precos
-- Configuracoes do sistema
-- Exclusao de dados
-- Impersonacao de usuarios
-- Gerenciamento de permissoes
+- Usuario Growth acessando `/admin/precos` via URL ve "Acesso Restrito"
+- Usuario Growth acessando `/admin/logs` via URL ve "Acesso Restrito"
+- Nenhuma chamada de API e feita antes do guard bloquear
+- Super Admin acessa todas as paginas normalmente
+- Todos os 11 componentes listados tem protecao dupla
