@@ -23,6 +23,54 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
   const activeApp = currentApp || detectedApp;
   const isDark = variant === 'dark';
   
+  // Brand names per app
+  const appBranding: Record<NelloApp, { name: string; tagline: { pt: string; en: string } }> = {
+    main: {
+      name: 'ONE',
+      tagline: {
+        pt: 'Uma Vida. Um Ecossistema. A solução definitiva para a fragmentação da vida moderna.',
+        en: 'One Life. One Ecosystem. The definitive solution for modern life fragmentation.',
+      },
+    },
+    identity: {
+      name: 'IDENTITY',
+      tagline: {
+        pt: 'Uma Vida. Um Ecossistema. A solução definitiva para a fragmentação da vida moderna.',
+        en: 'One Life. One Ecosystem. The definitive solution for modern life fragmentation.',
+      },
+    },
+    life: {
+      name: 'LIFE',
+      tagline: {
+        pt: 'Fé aplicada. Hábitos que transformam. Uma vida com propósito.',
+        en: 'Applied faith. Transforming habits. A life with purpose.',
+      },
+    },
+    flow: {
+      name: 'FLOW',
+      tagline: {
+        pt: 'Ideias em movimento. Da dispersão à ação focada.',
+        en: 'Ideas in motion. From dispersion to focused action.',
+      },
+    },
+    business: {
+      name: 'HIRING',
+      tagline: {
+        pt: 'Avaliação comportamental para contratações mais assertivas.',
+        en: 'Behavioral assessment for better hiring decisions.',
+      },
+    },
+    praxis: {
+      name: 'PRAXIS',
+      tagline: {
+        pt: 'Ferramentas para profissionais de desenvolvimento humano.',
+        en: 'Tools for human development professionals.',
+      },
+    },
+  };
+
+  const currentBranding = appBranding[activeApp] || appBranding.identity;
+  
   // Module links with proper URLs (Ecosystem column)
   const ecosystemLinks = [
     { name: 'Identity', app: 'identity' as NelloApp, tagline: language === 'en' ? 'Where it all begins' : 'Onde tudo começa' },
@@ -102,11 +150,8 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
             
             {/* Column 1: About (Sobre) */}
             <div className="col-span-2 md:col-span-1">
-              {/* Brand */}
-              <a 
-                href="https://identity.nello.one"
-                className="inline-flex items-center gap-1.5 mb-4"
-              >
+              {/* Brand - Dynamic per app */}
+              <div className="inline-flex items-center gap-1.5 mb-4">
                 <span className={cn(
                   "font-serif text-lg font-bold",
                   isDark ? "text-white" : "text-ink-deep"
@@ -117,18 +162,18 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
                   "font-serif text-lg font-light",
                   isDark ? "text-nello-gold" : "text-nello-gold-deep"
                 )}>
-                  IDENTITY
+                  {currentBranding.name}
                 </span>
-              </a>
+              </div>
               
-              {/* Description */}
+              {/* Description - Dynamic per app */}
               <p className={cn(
                 "text-sm leading-relaxed mb-5",
                 isDark ? "text-white/60" : "text-muted-foreground"
               )}>
                 {language === 'en' 
-                  ? 'One Life. One Ecosystem. The definitive solution for modern life fragmentation.'
-                  : 'Uma Vida. Um Ecossistema. A solução definitiva para a fragmentação da vida moderna.'}
+                  ? currentBranding.tagline.en
+                  : currentBranding.tagline.pt}
               </p>
               
               {/* Social Links */}
