@@ -6,7 +6,7 @@ const ecosystemLinks = [
   { name: 'Identity', url: 'https://identity.nello.one' },
   { name: 'Life', url: 'https://life.nello.one' },
   { name: 'Flow', url: 'https://flow.nello.one' },
-  { name: 'Business', url: 'https://business.nello.one' },
+  { name: 'Hiring', url: 'https://business.nello.one' },
   { name: 'Praxis', url: 'https://business.nello.one/praxis' },
 ];
 

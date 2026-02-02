@@ -80,11 +80,11 @@ const ecosystemModules = [
   },
   {
     id: 'business',
-    name: 'Business',
-    fullName: 'NELLO ONE | Business',
-    tagline: 'A Inteligência',
-    description: 'Autoconhecimento aplicado a equipes, contratações e cultura organizacional.',
-    cta: 'Soluções Corporativas',
+    name: 'Hiring',
+    fullName: 'NELLO ONE | Hiring',
+    tagline: 'A Assertividade',
+    description: 'Avaliação comportamental para contratações mais assertivas. DISC + Temperamentos.',
+    cta: 'Soluções de Recrutamento',
     url: getNelloAppUrl('business'),
     icon: Users,
     accentColor: 'from-blue-500/10 via-cyan-400/5 to-transparent',
@@ -598,7 +598,7 @@ export function InstitutionalLanding() {
                   <li><a href="https://one.nello.one" className="text-sm text-[#1A1A1A]/60 hover:text-[#1A1A1A] transition-colors">NELLO ONE | Identity</a></li>
                   <li><a href="https://life.nello.one" className="text-sm text-[#1A1A1A]/60 hover:text-[#1A1A1A] transition-colors">NELLO ONE | Life</a></li>
                   <li><a href="https://flow.nello.one" className="text-sm text-[#1A1A1A]/60 hover:text-[#1A1A1A] transition-colors">NELLO ONE | Flow</a></li>
-                  <li><a href="https://business.nello.one" className="text-sm text-[#1A1A1A]/60 hover:text-[#1A1A1A] transition-colors">NELLO ONE | Business</a></li>
+                  <li><a href="https://business.nello.one" className="text-sm text-[#1A1A1A]/60 hover:text-[#1A1A1A] transition-colors">NELLO ONE | Hiring</a></li>
                   <li><a href="https://business.nello.one/praxis" className="text-sm text-[#1A1A1A]/60 hover:text-[#1A1A1A] transition-colors">NELLO ONE | Praxis</a></li>
                 </ul>
               </div>

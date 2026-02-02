@@ -16,7 +16,7 @@ const ecosystemModules = [
   { id: 'identity', name: 'Identity', tagline: 'Autoconhecimento', url: 'https://identity.nello.one' },
   { id: 'life', name: 'Life', tagline: 'Fé e Rotina', url: 'https://life.nello.one' },
   { id: 'flow', name: 'Flow', tagline: 'Foco e Execução', url: 'https://flow.nello.one' },
-  { id: 'business', name: 'Business', tagline: 'Gestão e Empresas', url: 'https://business.nello.one' },
+  { id: 'business', name: 'Hiring', tagline: 'Contratação Assertiva', url: 'https://business.nello.one' },
 ];
 
 export const InstitutionalNav = () => {
