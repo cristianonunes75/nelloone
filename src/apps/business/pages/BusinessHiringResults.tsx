@@ -25,6 +25,8 @@ import {
 } from "@/lib/discHiringInsights";
 import { getUnifiedDiscRanking, getDiscDisplayData, type DiscRankingItem } from "@/lib/discRanking";
 import { generateHiringResultsPDF } from "../lib/pdfHiringResults";
+import { SalesMatchResultCard } from "../components/SalesMatchResultCard";
+import { calculateSalesMatch, IdealProfile, CandidateProfile, MatchResult } from "../lib/salesMatchEngine";
 import { toast } from "sonner";
 
 // Total questions for progress calculation
@@ -63,6 +65,7 @@ interface JobApplicationOrigin {
   created_at: string;
   job_title: string | null;
   job_department: string | null;
+  ideal_profile: IdealProfile | null;
 }
 
 interface Assessment {
@@ -168,7 +171,7 @@ export default function BusinessHiringResults() {
           resume_url,
           resume_filename,
           created_at,
-          job_postings(title, department)
+          job_postings(title, department, ideal_profile)
         `)
         .eq("hiring_candidate_id", candidateId)
         .maybeSingle();
@@ -178,6 +181,7 @@ export default function BusinessHiringResults() {
           ...jobAppData,
           job_title: (jobAppData.job_postings as any)?.title || null,
           job_department: (jobAppData.job_postings as any)?.department || null,
+          ideal_profile: (jobAppData.job_postings as any)?.ideal_profile || null,
         });
       }
     } catch (error) {
@@ -525,8 +529,36 @@ export default function BusinessHiringResults() {
               const calculatedDiscPrimary = discDisplay.primaryKey || '';
               const tempPrimary = temperamentAssessment.result_data?.primary?.temperament || '';
               
+              // Calculate sales match if ideal_profile exists
+              let matchResult: MatchResult | null = null;
+              if (jobOrigin?.ideal_profile && discAssessment.result_data?.percentages) {
+                const candidateProfile: CandidateProfile = {
+                  disc: {
+                    D: discAssessment.result_data.percentages.D || 0,
+                    I: discAssessment.result_data.percentages.I || 0,
+                    S: discAssessment.result_data.percentages.S || 0,
+                    C: discAssessment.result_data.percentages.C || 0,
+                    primary: calculatedDiscPrimary,
+                    secondary: discDisplay.secondaryKey || undefined,
+                  },
+                  temperament: {
+                    primary: tempPrimary,
+                    secondary: temperamentAssessment.result_data?.secondary?.temperament,
+                  },
+                };
+                matchResult = calculateSalesMatch(candidateProfile, jobOrigin.ideal_profile);
+              }
+              
               return (
                 <>
+                  {/* Sales Match Card - Only show if ideal profile is configured */}
+                  {matchResult && (
+                    <SalesMatchResultCard 
+                      result={matchResult}
+                      candidateName={candidate.full_name}
+                    />
+                  )}
+
                   {/* 2. Resumo Executivo */}
                   <ExecutiveSummaryCard 
                     discResult={discAssessment.result_data}

@@ -5,6 +5,7 @@ import { useBusinessAuth } from "../hooks/useBusinessAuth";
 import { BusinessLayout } from "../components/BusinessLayout";
 import { ExtractedResumeDetails } from "../components/ExtractedResumeDetails";
 import { BulkResumeUpload } from "../components/BulkResumeUpload";
+import { JobIdealProfileDialog } from "../components/JobIdealProfileDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +50,7 @@ interface JobPosting {
   status: string;
   public_slug: string;
   cultural_affinity_question: string | null;
+  ideal_profile: any | null;
 }
 
 interface ExtractedResumeData {
@@ -645,6 +647,11 @@ export default function BusinessJobDetail() {
             <p className="text-muted-foreground">{job.department}</p>
           </div>
           <div className="flex gap-2">
+            <JobIdealProfileDialog
+              jobId={job.id}
+              currentProfile={job.ideal_profile}
+              onProfileSaved={fetchJobAndApplications}
+            />
             <Button variant="outline" className="gap-2" onClick={() => setBulkUploadDialogOpen(true)}>
               <Upload className="h-4 w-4" />
               Upload em Massa
