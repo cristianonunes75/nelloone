@@ -71,7 +71,15 @@ serve(async (req: Request): Promise<Response> => {
 
     // Check if application already has a hiring_candidate_id
     if (application.hiring_candidate_id) {
-      throw new Error("Este candidato já possui uma avaliação comportamental em andamento");
+      // Check if this candidate already has assessments
+      const { data: existingAssessments } = await supabase
+        .from("hiring_assessments")
+        .select("id, status")
+        .eq("candidate_id", application.hiring_candidate_id);
+      
+      if (existingAssessments && existingAssessments.length > 0) {
+        throw new Error("Este candidato já possui uma avaliação comportamental em andamento");
+      }
     }
 
     // Verify user is from the same company
