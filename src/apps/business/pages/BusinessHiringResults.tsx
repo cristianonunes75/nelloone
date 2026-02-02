@@ -26,6 +26,7 @@ import {
 import { getUnifiedDiscRanking, getDiscDisplayData, type DiscRankingItem } from "@/lib/discRanking";
 import { generateHiringResultsPDF } from "../lib/pdfHiringResults";
 import { SalesMatchResultCard } from "../components/SalesMatchResultCard";
+import { CandidateMatchConfigDialog } from "../components/CandidateMatchConfigDialog";
 import { calculateSalesMatch, IdealProfile, CandidateProfile, MatchResult } from "../lib/salesMatchEngine";
 import { toast } from "sonner";
 
@@ -103,6 +104,7 @@ export default function BusinessHiringResults() {
   const [jobOrigin, setJobOrigin] = useState<JobApplicationOrigin | null>(null);
   const [loading, setLoading] = useState(true);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
+  const [manualIdealProfile, setManualIdealProfile] = useState<IdealProfile | null>(null);
   
   // View mode: 'hr' (default) or 'candidate'
   const viewMode = searchParams.get('view') || 'hr';
@@ -529,9 +531,12 @@ export default function BusinessHiringResults() {
               const calculatedDiscPrimary = discDisplay.primaryKey || '';
               const tempPrimary = temperamentAssessment.result_data?.primary?.temperament || '';
               
+              // Use job origin ideal_profile or manually configured one
+              const activeIdealProfile = jobOrigin?.ideal_profile || manualIdealProfile;
+              
               // Calculate sales match if ideal_profile exists
               let matchResult: MatchResult | null = null;
-              if (jobOrigin?.ideal_profile && discAssessment.result_data?.percentages) {
+              if (activeIdealProfile && discAssessment.result_data?.percentages) {
                 const candidateProfile: CandidateProfile = {
                   disc: {
                     D: discAssessment.result_data.percentages.D || 0,
@@ -546,17 +551,42 @@ export default function BusinessHiringResults() {
                     secondary: temperamentAssessment.result_data?.secondary?.temperament,
                   },
                 };
-                matchResult = calculateSalesMatch(candidateProfile, jobOrigin.ideal_profile);
+                matchResult = calculateSalesMatch(candidateProfile, activeIdealProfile);
               }
               
               return (
                 <>
-                  {/* Sales Match Card - Only show if ideal profile is configured */}
-                  {matchResult && (
-                    <SalesMatchResultCard 
-                      result={matchResult}
-                      candidateName={candidate.full_name}
-                    />
+                  {/* Sales Match Section */}
+                  {matchResult ? (
+                    <div className="space-y-4">
+                      <SalesMatchResultCard 
+                        result={matchResult}
+                        candidateName={candidate.full_name}
+                      />
+                      <div className="flex justify-center">
+                        <CandidateMatchConfigDialog
+                          currentProfile={activeIdealProfile}
+                          onProfileConfigured={setManualIdealProfile}
+                          triggerVariant="compact"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <Card className="border-dashed border-primary/30 bg-primary/5">
+                      <CardContent className="flex flex-col items-center justify-center py-8 gap-4">
+                        <Target className="h-10 w-10 text-primary/50" />
+                        <div className="text-center">
+                          <h3 className="font-semibold mb-1">Match de Compatibilidade</h3>
+                          <p className="text-sm text-muted-foreground max-w-md mb-4">
+                            Configure o perfil ideal da vaga para calcular automaticamente 
+                            a compatibilidade deste candidato com o contexto do seu negócio.
+                          </p>
+                          <CandidateMatchConfigDialog
+                            onProfileConfigured={setManualIdealProfile}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
                   )}
 
                   {/* 2. Resumo Executivo */}
