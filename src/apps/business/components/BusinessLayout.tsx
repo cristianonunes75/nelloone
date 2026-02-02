@@ -25,15 +25,13 @@ interface BusinessLayoutProps {
   children: ReactNode;
 }
 
-// Nello Hiring - Menu focado no módulo Hiring (único vendável)
+// Nello Hiring - Menu simplificado (foco apenas em recrutamento)
 const adminNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/jobs', label: 'Vagas', icon: ClipboardList },
   { href: '/hiring', label: 'Candidatos', icon: Briefcase },
-  { href: '/team', label: 'Equipe', icon: Users },
-  { href: '/invite', label: 'Convidar', icon: UserPlus },
   { href: '/settings', label: 'Configurações', icon: Settings },
-  // REMOVED: /reports - Team Insights not ready for sale
+  // Equipe e Convidar movidos para dentro de Configurações
 ];
 
 const collaboratorNavItems = [

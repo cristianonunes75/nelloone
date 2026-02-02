@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Users, 
-  UserPlus, 
-  Clock, 
-  CheckCircle2,
   ArrowUpRight,
   Briefcase,
   ClipboardList,
@@ -14,7 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
-import { useBusinessEnforcement } from '../hooks/useBusinessEnforcement';
 import { SubscriptionStatusBanner } from '../components/SubscriptionStatusBanner';
 import { SubscriptionStatusCard } from '../components/SubscriptionStatusCard';
 import { BlockedAccessOverlay } from '../components/BlockedAccessOverlay';
@@ -22,18 +17,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { PRODUCT_IDENTITY } from '../config/featureFlags';
 
 interface DashboardStats {
-  totalMembers: number;
-  pendingInvites: number;
   activeJobs: number;
   totalCandidates: number;
 }
 
 export default function BusinessDashboard() {
   const { company, isNelloOneSuperAdmin } = useBusinessAuth();
-  const enforcement = useBusinessEnforcement();
   const [stats, setStats] = useState<DashboardStats>({
-    totalMembers: 0,
-    pendingInvites: 0,
     activeJobs: 0,
     totalCandidates: 0,
   });
@@ -71,20 +61,6 @@ export default function BusinessDashboard() {
     if (!company) return;
     
     try {
-      // Get team members
-      const { count: membersCount } = await supabase
-        .from('company_users')
-        .select('*', { count: 'exact', head: true })
-        .eq('company_id', company.id)
-        .eq('is_active', true);
-      
-      // Get pending invites
-      const { count: invitesCount } = await supabase
-        .from('company_invites')
-        .select('*', { count: 'exact', head: true })
-        .eq('company_id', company.id)
-        .eq('status', 'pending');
-      
       // Get active jobs count
       const { count: jobsCount } = await supabase
         .from('job_postings')
@@ -99,8 +75,6 @@ export default function BusinessDashboard() {
         .eq('company_id', company.id);
       
       setStats({
-        totalMembers: membersCount || 0,
-        pendingInvites: invitesCount || 0,
         activeJobs: jobsCount || 0,
         totalCandidates: candidatesCount || 0,
       });
@@ -181,8 +155,8 @@ export default function BusinessDashboard() {
         </div>
 
         {/* Stats Grid + Subscription Card - HIRING FOCUSED */}
-        <div className="grid gap-6 lg:grid-cols-4">
-          <div className="lg:col-span-3 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2 grid gap-4 md:grid-cols-2">
             {/* Active Jobs */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -211,38 +185,6 @@ export default function BusinessDashboard() {
                 <div className="text-2xl font-bold">{stats.totalCandidates}</div>
                 <p className="text-xs text-muted-foreground mt-1">
                   em avaliação
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Team Members */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Membros da equipe
-                </CardTitle>
-                <Users className="w-4 h-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.totalMembers}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  de {enforcement.maxCollaborators} colaboradores
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Pending Invites */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Convites pendentes
-                </CardTitle>
-                <Clock className="w-4 h-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.pendingInvites}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  aguardando aceite
                 </p>
               </CardContent>
             </Card>
