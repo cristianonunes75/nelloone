@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { BusinessPricingCard } from '../components/BusinessPricingCard';
+import { TeamMembersSection } from '../components/TeamMembersSection';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
 import { useBusinessSubscription, BUSINESS_TIERS } from '../hooks/useBusinessSubscription';
 import { supabase } from '@/integrations/supabase/client';
@@ -110,10 +111,11 @@ export default function BusinessSettings() {
         </div>
 
         <Tabs defaultValue="billing">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="company">Empresa</TabsTrigger>
             <TabsTrigger value="billing">Assinatura</TabsTrigger>
-            <TabsTrigger value="notifications">Notificações</TabsTrigger>
+            <TabsTrigger value="team">Equipe</TabsTrigger>
+            <TabsTrigger value="notifications">Alertas</TabsTrigger>
           </TabsList>
 
           <TabsContent value="company" className="mt-6">
@@ -287,6 +289,10 @@ export default function BusinessSettings() {
                 </p>
               )}
             </div>
+          </TabsContent>
+
+          <TabsContent value="team" className="mt-6">
+            <TeamMembersSection />
           </TabsContent>
 
           <TabsContent value="notifications" className="mt-6">
