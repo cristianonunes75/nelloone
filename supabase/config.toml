@@ -167,3 +167,6 @@ verify_jwt = false
 
 [functions.notify-admin]
 verify_jwt = false
+
+[functions.business-candidate-followup]
+verify_jwt = true
