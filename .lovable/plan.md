@@ -1,218 +1,196 @@
 
+# Plano: Reorganizar Layout + Controle Admin para Business e Praxis
 
-# Plano: Notificacao Automatica para Conclusao de Jornada
-
-## Problema Identificado
-
-Quando a Aline Bicalho completou a jornada (7/7 testes), o sistema:
-- Atualizou corretamente o `journey_status` para `'completed'`
-- **NAO disparou** nenhuma notificacao porque o evento `journey_completed` nao existe no sistema
-
-## Solucao
-
-Implementar notificacao automatica via Email e WhatsApp quando um usuario completa todos os 7 testes da jornada NELLO ONE.
+## Objetivo
+1. Mover os cards "Nello Business" e "Nello Praxis" para o **final da página** do dashboard
+2. Criar **feature flags** no Admin para habilitar/desabilitar esses módulos
+3. Módulos ficam **desabilitados por padrão** (já que ainda não estão completos)
 
 ---
 
-## Arquitetura da Solucao
+## Arquitetura da Solução
 
 ```text
-Usuario completa ultimo teste
-         |
-         v
-+------------------------+
-| TestExecution.tsx      |
-| updateJourneyProgress()|
-+------------------------+
-         |
-         v (se completedCount >= 7)
-+------------------------+
-| supabase.functions     |
-| invoke("notify-admin") |
-| event: journey_completed|
-+------------------------+
-         |
-         v
-+------------------------+
-| Edge Function          |
-| notify-admin           |
-| - Email via Resend     |
-| - WhatsApp via Twilio  |
-+------------------------+
-         |
-         v
-CEO recebe Email + WhatsApp
+Admin Settings
+     |
+     v
++----------------------------+
+| Feature Flags              |
+| - Nello Business: OFF/ON   |
+| - Nello Praxis: OFF/ON     |
++----------------------------+
+     |
+     v (salva em app_settings)
++----------------------------+
+| Dashboard do Cliente       |
+| - Lê feature flags         |
+| - Renderiza condicionalmente|
++----------------------------+
 ```
 
 ---
 
-## Alteracoes Necessarias
+## Alterações Necessárias
 
-### 1. Edge Function: notify-admin/index.ts
+### 1. Hook de Feature Flags (src/hooks/useFeatureFlag.tsx)
 
-**Adicionar novo evento `journey_completed`**
+Adicionar dois hooks específicos para facilitar o uso:
 
-Linha 26-34 - Adicionar ao tipo EventType:
 ```typescript
-type EventType = 
-  | "new_purchase" 
-  | "new_signup" 
-  | ...
-  | "journey_completed";  // NOVO
-```
+// Hook para Nello Business
+export const useNelloBusinessFlag = () => {
+  return useFeatureFlag("feature_nello_business_enabled", false);
+};
 
-Linha 54 - Adicionar template de email:
-```typescript
-case "journey_completed":
-  return {
-    subject: `🎉 Jornada Completa! ${data.user_name} - NELLO ONE`,
-    html: `
-      <div style="...">
-        <h1>🎉 Jornada NELLO ONE Concluida!</h1>
-        <div>
-          <p><strong>👤 Usuario:</strong> ${data.user_name}</p>
-          <p><strong>📧 Email:</strong> ${data.user_email}</p>
-          <p><strong>📅 Conclusao:</strong> ${now}</p>
-          <p><strong>⏱️ Duracao:</strong> ${data.journey_duration || 'N/A'}</p>
-        </div>
-        <a href="https://nelloone.lovable.app/admin/usuarios">
-          Ver no Admin
-        </a>
-      </div>
-    `,
-  };
-```
-
-Linha 235 - Adicionar mensagem WhatsApp:
-```typescript
-case "journey_completed":
-  return `🎉 *Jornada NELLO ONE completa!*
-
-👤 ${data.user_name || "Usuario"}
-📧 ${data.user_email || "N/A"}
-
-O usuario completou todos os 7 testes!
-
-👉 nelloone.lovable.app/admin/usuarios`;
+// Hook para Nello Praxis  
+export const useNelloPraxisFlag = () => {
+  return useFeatureFlag("feature_nello_praxis_enabled", false);
+};
 ```
 
 ---
 
-### 2. Frontend: src/utils/journey.ts
+### 2. Dashboard (src/components/cliente/dashboard/DashboardStagePotency.tsx)
 
-**Modificar `updateJourneyProgress` para disparar notificacao**
+**Alteração de ordem e lógica condicional:**
 
-Apos a linha 172 (apos atualizar o profile com sucesso), adicionar:
+**ANTES (ordem atual):**
+1. Hero Ativação
+2. Código da Essência
+3. Knowledge Base (resultados)
+4. Progressive Upsell
+5. **Business CTA** (linha 360-383)
+6. **Praxis CTA** (linha 385-408)
+7. Testimonial Section
+
+**DEPOIS (nova ordem):**
+1. Hero Ativação
+2. Código da Essência
+3. Knowledge Base (resultados)
+4. Progressive Upsell
+5. Testimonial Section
+6. **Business CTA** (condicional - só se habilitado)
+7. **Praxis CTA** (condicional - só se habilitado)
+
+**Código condicional:**
+```typescript
+// Importar hooks
+import { useNelloBusinessFlag, useNelloPraxisFlag } from "@/hooks/useFeatureFlag";
+
+// Dentro do componente
+const { isEnabled: showBusiness } = useNelloBusinessFlag();
+const { isEnabled: showPraxis } = useNelloPraxisFlag();
+
+// Na renderização (após Testimonial Section)
+{showBusiness && (
+  <motion.div variants={itemVariants}>
+    {/* Business CTA */}
+  </motion.div>
+)}
+
+{showPraxis && (
+  <motion.div variants={itemVariants}>
+    {/* Praxis CTA */}
+  </motion.div>
+)}
+```
+
+---
+
+### 3. Admin Settings (src/components/admin/AdminSettings.tsx)
+
+Adicionar nova seção "Módulos em Desenvolvimento" no card de Funcionalidades:
 
 ```typescript
-// Se a jornada acabou de ser completada, dispara notificacao
-if (completedCount >= totalTests && journeyStatus === 'completed') {
-  // Buscar dados do usuario para a notificacao
-  const { data: profileData } = await supabase
-    .from('profiles')
-    .select('full_name')
-    .eq('id', userId)
-    .single();
-  
-  const { data: authData } = await supabase.auth.getUser();
-  
-  // Calcular duracao da jornada
-  const startDate = new Date(journeyStartedAt || new Date());
-  const endDate = new Date(journeyCompletedAt || new Date());
-  const daysToComplete = Math.ceil(
-    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-  );
-  
-  // Disparar notificacao (fire-and-forget)
-  supabase.functions.invoke("notify-admin", {
-    body: {
-      event_type: "journey_completed",
-      data: {
-        user_name: profileData?.full_name || "Usuario",
-        user_email: authData?.user?.email || "N/A",
-        journey_duration: `${daysToComplete} dia(s)`,
-        user_id: userId,
-      }
-    }
-  }).catch(err => console.warn("Failed to notify admin:", err));
-}
+// Importar hooks
+import { useNelloBusinessFlag, useNelloPraxisFlag } from "@/hooks/useFeatureFlag";
+
+// Dentro do componente
+const { 
+  isEnabled: businessEnabled, 
+  toggle: toggleBusiness, 
+  isLoading: businessLoading 
+} = useNelloBusinessFlag();
+
+const { 
+  isEnabled: praxisEnabled, 
+  toggle: togglePraxis, 
+  isLoading: praxisLoading 
+} = useNelloPraxisFlag();
 ```
 
----
+**Nova UI no card de Funcionalidades:**
 
-### 3. Frontend: src/components/admin/AdminNotificationSettings.tsx
+| Switch | Label | Descrição |
+|--------|-------|-----------|
+| 🏢 | Nello Business | Módulo de inteligência empresarial para equipes (Em desenvolvimento) |
+| 🎓 | Nello Praxis | Área do profissional para mentores e coaches (Em desenvolvimento) |
 
-**Adicionar evento na lista de configuracao**
-
-Linha 26-35 - Adicionar ao array EVENT_TYPES:
-
-```typescript
-const EVENT_TYPES = [
-  { key: "new_purchase", label: "Nova Compra", icon: "💰", priority: "high" },
-  { key: "new_signup", label: "Novo Cadastro", icon: "👤", priority: "medium" },
-  { key: "journey_completed", label: "Jornada Completa", icon: "🎉", priority: "high" }, // NOVO
-  { key: "new_testimonial", label: "Novo Depoimento", icon: "💬", priority: "medium" },
-  // ...resto
-];
-```
-
----
-
-## Dados Enviados na Notificacao
-
-| Campo | Descricao | Exemplo |
-|-------|-----------|---------|
-| user_name | Nome completo do usuario | "Aline Bicalho" |
-| user_email | Email do usuario | "aline@email.com" |
-| journey_duration | Tempo para completar | "3 dia(s)" |
-| user_id | UUID do usuario | "abc-123-..." |
-
----
-
-## Formato da Notificacao
-
-### Email
-- **Assunto**: 🎉 Jornada Completa! Aline Bicalho - NELLO ONE
-- **Corpo**: Card estilizado com dados do usuario + link para Admin
-
-### WhatsApp
-```
-🎉 *Jornada NELLO ONE completa!*
-
-👤 Aline Bicalho
-📧 aline@email.com
-
-O usuario completou todos os 7 testes!
-
-👉 nelloone.lovable.app/admin/usuarios
-```
+Cada switch terá:
+- Badge "Em Desenvolvimento" quando desabilitado
+- Badge "Ativo" quando habilitado
+- Descrição explicativa
 
 ---
 
 ## Arquivos a Modificar
 
-| Arquivo | Acao |
+| Arquivo | Ação |
 |---------|------|
-| `supabase/functions/notify-admin/index.ts` | Adicionar evento journey_completed |
-| `src/utils/journey.ts` | Disparar notificacao ao completar |
-| `src/components/admin/AdminNotificationSettings.tsx` | Adicionar evento na UI |
+| `src/hooks/useFeatureFlag.tsx` | Adicionar hooks useNelloBusinessFlag e useNelloPraxisFlag |
+| `src/components/cliente/dashboard/DashboardStagePotency.tsx` | Reordenar + renderização condicional |
+| `src/components/admin/AdminSettings.tsx` | Adicionar switches para Business e Praxis |
 
 ---
 
-## Validacao Pos-Implementacao
+## Comportamento Esperado
 
-1. Completar jornada com usuario de teste
-2. Verificar logs da Edge Function
-3. Confirmar recebimento de Email
-4. Confirmar recebimento de WhatsApp
-5. Verificar registro em `admin_notification_logs`
+### Estado Inicial (Default)
+- **Nello Business:** Desabilitado (não aparece no dashboard)
+- **Nello Praxis:** Desabilitado (não aparece no dashboard)
+
+### Quando Admin Habilita
+1. Admin vai em Configurações > Funcionalidades
+2. Liga o switch de "Nello Business" ou "Nello Praxis"
+3. O módulo passa a aparecer no dashboard do cliente
+
+### Benefícios
+- Controle centralizado no Admin
+- Não precisa deploy para habilitar/desabilitar
+- Cards ficam no final da página quando habilitados
+- Usuários não veem módulos incompletos
 
 ---
 
-## Nota Tecnica
+## Visual do Admin (Nova Seção)
 
-A notificacao e disparada no frontend (client-side) via `supabase.functions.invoke` usando padrao fire-and-forget (`.catch()`). Isso garante que:
-- A experiencia do usuario nao e bloqueada
-- Falhas de notificacao nao afetam o fluxo principal
-- Logs sao registrados automaticamente pela Edge Function
+```
+┌─────────────────────────────────────────────────────┐
+│ ✨ Funcionalidades                                  │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│ Ativação do Código da Essência        [🔘 Ativo]   │
+│ Módulo de personalização profunda...               │
+│                                                     │
+│ ─────────────────────────────────────────────────  │
+│                                                     │
+│ 🏢 Nello Business                [⚪ Desabilitado]  │
+│ Módulo empresarial (Em desenvolvimento)            │
+│                                                     │
+│ 🎓 Nello Praxis                  [⚪ Desabilitado]  │
+│ Área do profissional (Em desenvolvimento)          │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
 
+---
+
+## Validação Pós-Implementação
+
+1. Acessar dashboard como usuário - Business e Praxis **não aparecem**
+2. Acessar Admin > Configurações
+3. Habilitar Nello Business
+4. Voltar ao dashboard - Business **aparece** no final
+5. Desabilitar Nello Business no Admin
+6. Verificar que Business **some** do dashboard
+7. Repetir teste para Nello Praxis
