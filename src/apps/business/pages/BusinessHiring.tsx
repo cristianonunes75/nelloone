@@ -16,7 +16,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Plus, Users, Search, Mail, Eye, Clock, CheckCircle2, AlertCircle, Trash2, Send, Loader2, UserPlus, ClipboardList, RotateCcw, MoreHorizontal, Download, Sparkles } from "lucide-react";
 import { LiveCandidateMonitor } from "../components/LiveCandidateMonitor";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { CandidateFollowupDialog } from "../components/CandidateFollowupDialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { format, formatDistanceToNow, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import debounce from "lodash/debounce";
@@ -494,6 +495,7 @@ export default function BusinessHiring() {
             <TabsList>
               <TabsTrigger value="all">Todos</TabsTrigger>
               <TabsTrigger value="pending">Pendentes</TabsTrigger>
+              <TabsTrigger value="in_progress">Em Andamento</TabsTrigger>
               <TabsTrigger value="completed">Concluídos</TabsTrigger>
             </TabsList>
           </Tabs>
@@ -586,6 +588,27 @@ export default function BusinessHiring() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="bg-background">
+                            {/* Follow-up option - only show if candidate has incomplete tests */}
+                            {progress.completed < progress.total && (
+                              <>
+                                <CandidateFollowupDialog
+                                  candidateId={candidate.id}
+                                  candidateName={candidate.full_name}
+                                  candidateEmail={candidate.email}
+                                  onSuccess={fetchCandidates}
+                                  trigger={
+                                    <DropdownMenuItem 
+                                      onSelect={(e) => e.preventDefault()}
+                                      className="gap-2"
+                                    >
+                                      <Mail className="h-4 w-4" />
+                                      Enviar Follow-up
+                                    </DropdownMenuItem>
+                                  }
+                                />
+                                <DropdownMenuSeparator />
+                              </>
+                            )}
                             <DropdownMenuItem 
                               onClick={() => handleResendAssessment(candidate.id, candidate.full_name)}
                               disabled={resendingId === candidate.id}

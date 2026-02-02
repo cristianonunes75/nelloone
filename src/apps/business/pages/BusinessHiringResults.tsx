@@ -14,6 +14,7 @@ import { CandidateResultsFeedback } from "../components/CandidateResultsFeedback
 import { HiringAssessmentProgressCard } from "../components/HiringAssessmentProgressCard";
 import { HiringPartialDISCResult } from "../components/HiringPartialDISCResult";
 import { HiringPartialTemperamentResult } from "../components/HiringPartialTemperamentResult";
+import { CandidateFollowupDialog } from "../components/CandidateFollowupDialog";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DISC_PROFILES, type DISCScores } from "@/lib/disc";
@@ -500,6 +501,30 @@ export default function BusinessHiringResults() {
             totalQuestions={TOTAL_QUESTIONS.temperamentos}
           />
         </div>
+
+        {/* Follow-up action for incomplete assessments */}
+        {!bothCompleted && (discAssessment?.status === "in_progress" || temperamentAssessment?.status === "in_progress" || 
+          discAssessment?.status === "pending" || temperamentAssessment?.status === "pending") && (
+          <Card className="border-dashed border-orange-200 bg-orange-50/30">
+            <CardContent className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="h-5 w-5 text-orange-500" />
+                <div>
+                  <p className="font-medium text-sm">Testes incompletos</p>
+                  <p className="text-xs text-muted-foreground">
+                    O candidato ainda não finalizou a avaliação
+                  </p>
+                </div>
+              </div>
+              <CandidateFollowupDialog
+                candidateId={candidate.id}
+                candidateName={candidate.full_name}
+                candidateEmail={candidate.email}
+                onSuccess={fetchCandidateData}
+              />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Partial DISC Result - Show as soon as completed */}
         {discAssessment?.status === "completed" && discAssessment.result_data && (
