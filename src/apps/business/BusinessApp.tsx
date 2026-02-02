@@ -18,8 +18,9 @@ import BusinessJobDetail from './pages/BusinessJobDetail';
 import BusinessJobPublic from './pages/BusinessJobPublic';
 import BusinessApplicationConfirm from './pages/BusinessApplicationConfirm';
 import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
+import { isFeatureEnabled } from './config/featureFlags';
 
-// Praxis imports
+// Praxis imports - DISABLED via feature flag
 import PraxisLanding from './pages/PraxisLanding';
 import PraxisAuth from './pages/PraxisAuth';
 import PraxisOnboarding from './pages/PraxisOnboarding';
@@ -28,17 +29,16 @@ import PraxisClientDetail from './pages/PraxisClientDetail';
 import { PraxisAuthProvider } from './hooks/usePraxisAuth';
 
 /**
- * Nello One Business - B2B Platform for Team Self-Knowledge
+ * Nello Hiring - B2B Platform for Candidate Behavioral Assessment
  * Subdomain: business.nello.one
  * 
- * Enterprise solution for companies to apply self-knowledge tests
- * to their teams with consolidated reports and privacy-first approach.
- * 
- * MODES:
- * - Enterprise: Team/company management (existing)
- * - Professional (Praxis): 1:1 client management for coaches/therapists
+ * STRATEGIC DECISION (Post-Audit):
+ * - Only the HIRING module is commercially viable
+ * - Praxis, Team Insights, and Reports are DISABLED
+ * - Focus: Create jobs → Candidates take DISC/Temperaments → Compare with ideal profile
  */
 export default function BusinessApp() {
+  const praxisEnabled = isFeatureEnabled('PRAXIS_MODULE');
   return (
     <Routes>
       {/* ========== ENTERPRISE MODE (existing) ========== */}
@@ -122,18 +122,26 @@ export default function BusinessApp() {
         </BusinessProtectedRoute>
       } />
 
-      {/* ========== PRAXIS MODE (new) ========== */}
-      <Route path="/praxis" element={<PraxisLanding />} />
-      <Route path="/praxis/auth" element={<PraxisAuth />} />
-      <Route path="/praxis/*" element={
-        <PraxisAuthProvider>
-          <Routes>
-            <Route path="/onboarding" element={<PraxisOnboarding />} />
-            <Route path="/dashboard" element={<PraxisDashboard />} />
-            <Route path="/clients/:clientId" element={<PraxisClientDetail />} />
-          </Routes>
-        </PraxisAuthProvider>
-      } />
+      {/* ========== PRAXIS MODE - DISABLED ========== */}
+      {/* Praxis routes redirect to landing when feature is disabled */}
+      {praxisEnabled ? (
+        <>
+          <Route path="/praxis" element={<PraxisLanding />} />
+          <Route path="/praxis/auth" element={<PraxisAuth />} />
+          <Route path="/praxis/*" element={
+            <PraxisAuthProvider>
+              <Routes>
+                <Route path="/onboarding" element={<PraxisOnboarding />} />
+                <Route path="/dashboard" element={<PraxisDashboard />} />
+                <Route path="/clients/:clientId" element={<PraxisClientDetail />} />
+              </Routes>
+            </PraxisAuthProvider>
+          } />
+        </>
+      ) : (
+        // Praxis disabled - redirect all praxis routes to main landing
+        <Route path="/praxis/*" element={<Navigate to="/" replace />} />
+      )}
       
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

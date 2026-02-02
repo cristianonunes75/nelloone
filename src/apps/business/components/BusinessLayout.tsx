@@ -1,17 +1,16 @@
 import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  Building2, 
   LayoutDashboard, 
   Users, 
   UserPlus, 
-  BarChart3, 
   Settings, 
   LogOut,
   Menu,
   X,
   Briefcase,
-  ClipboardList
+  ClipboardList,
+  Target
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,19 +19,21 @@ import { AdminAppSwitcher } from '@/components/admin/AdminAppSwitcher';
 import { CompanySwitcher } from './CompanySwitcher';
 import { cn } from '@/lib/utils';
 import { NelloGlobalFooter } from '@/components/global/NelloGlobalFooter';
+import { PRODUCT_IDENTITY } from '../config/featureFlags';
 
 interface BusinessLayoutProps {
   children: ReactNode;
 }
 
+// Nello Hiring - Menu focado no módulo Hiring (único vendável)
 const adminNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/jobs', label: 'Vagas', icon: ClipboardList },
+  { href: '/hiring', label: 'Candidatos', icon: Briefcase },
   { href: '/team', label: 'Equipe', icon: Users },
   { href: '/invite', label: 'Convidar', icon: UserPlus },
-  { href: '/jobs', label: 'Vagas', icon: ClipboardList },
-  { href: '/hiring', label: 'Recrutamento', icon: Briefcase },
-  { href: '/reports', label: 'Relatórios', icon: BarChart3 },
   { href: '/settings', label: 'Configurações', icon: Settings },
+  // REMOVED: /reports - Team Insights not ready for sale
 ];
 
 const collaboratorNavItems = [
@@ -62,10 +63,10 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
             {/* Logo */}
             <Link to="/dashboard" className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-primary" />
+                <Target className="w-5 h-5 text-primary" />
               </div>
               <div className="hidden sm:block">
-                <span className="text-lg font-semibold text-foreground">Nello Business</span>
+                <span className="text-lg font-semibold text-foreground">{PRODUCT_IDENTITY.name}</span>
                 {company && (
                   <span className="text-sm text-muted-foreground block -mt-1">{company.name}</span>
                 )}
