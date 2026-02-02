@@ -49,11 +49,21 @@ export default function BusinessAuth() {
     
     const checkCompanyAssociation = async () => {
       if (user) {
-        const { data: companyUser } = await supabase
+        // NOTE: we must not use maybeSingle() without limiting because the user can belong to
+        // multiple companies; in that case PostgREST returns an error and we'd incorrectly
+        // show the "create company" flow.
+        const { data: companyUser, error } = await supabase
           .from('company_users')
           .select('company_id, role')
           .eq('user_id', user.id)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(1)
           .maybeSingle();
+
+        if (error) {
+          console.error('Error checking company association:', error);
+        }
         
         if (companyUser) {
           if (companyUser.role === 'collaborator') {
@@ -83,11 +93,18 @@ export default function BusinessAuth() {
       if (error) throw error;
       
       // Check company association
-      const { data: companyUser } = await supabase
+      const { data: companyUser, error: companyUserError } = await supabase
         .from('company_users')
         .select('company_id, role')
         .eq('user_id', data.user.id)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
+
+      if (companyUserError) {
+        console.error('Error checking company association after login:', companyUserError);
+      }
       
       if (companyUser) {
         toast.success('Login realizado com sucesso!');
