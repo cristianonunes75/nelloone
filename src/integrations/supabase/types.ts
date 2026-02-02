@@ -2550,6 +2550,7 @@ export type Database = {
           department: string
           description: string | null
           id: string
+          ideal_profile: Json | null
           internal_notes: string | null
           public_slug: string
           status: string
@@ -2567,6 +2568,7 @@ export type Database = {
           department: string
           description?: string | null
           id?: string
+          ideal_profile?: Json | null
           internal_notes?: string | null
           public_slug?: string
           status?: string
@@ -2584,6 +2586,7 @@ export type Database = {
           department?: string
           description?: string | null
           id?: string
+          ideal_profile?: Json | null
           internal_notes?: string | null
           public_slug?: string
           status?: string
