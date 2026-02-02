@@ -142,51 +142,44 @@ serve(async (req: Request): Promise<Response> => {
 
     logStep("Hiring candidate created", { hiringCandidateId: hiringCandidate.id });
 
-    // Create DISC assessment
-    const { error: discError } = await supabase
-      .from("hiring_assessments")
-      .insert({
-        candidate_id: hiringCandidate.id,
-        test_type: "disc",
-        status: "pending",
-      });
-
-    if (discError) {
-      logStep("Error creating DISC assessment", { error: discError.message });
-      throw new Error("Failed to create DISC assessment");
-    }
-
-    // Create Temperamentos assessment
-    const { error: tempError } = await supabase
-      .from("hiring_assessments")
-      .insert({
-        candidate_id: hiringCandidate.id,
-        test_type: "temperamentos",
-        status: "pending",
-      });
-
-    if (tempError) {
-      logStep("Error creating temperamentos assessment", { error: tempError.message });
-      throw new Error("Failed to create temperamentos assessment");
-    }
-
-    logStep("Assessments created");
-
-    // Link hiring_candidate to job_application and update pipeline_stage
+    // IMPORTANT: Link the hiring_candidate to the job_application immediately.
+    // This makes the operation idempotent: if anything fails after this point,
+    // retries will see application.hiring_candidate_id and won't create duplicates.
     const { error: linkError } = await supabase
       .from("job_applications")
-      .update({ 
+      .update({
         hiring_candidate_id: hiringCandidate.id,
-        pipeline_stage: "assessment"
+        pipeline_stage: "assessment",
       })
       .eq("id", application_id);
 
     if (linkError) {
       logStep("Error linking candidate", { error: linkError.message });
+      // Best-effort cleanup to avoid leaving orphan candidates
+      await supabase.from("hiring_candidates").delete().eq("id", hiringCandidate.id);
       throw new Error("Failed to link candidate to application");
     }
 
     logStep("Application linked to hiring candidate");
+
+    // NOTE: Assessments are automatically created via DB trigger (create_hiring_assessments)
+    // when a hiring_candidate is inserted. We only verify they exist.
+    const { data: createdAssessments, error: checkAssessmentsError } = await supabase
+      .from("hiring_assessments")
+      .select("id, test_type")
+      .eq("candidate_id", hiringCandidate.id);
+
+    if (checkAssessmentsError) {
+      logStep("Error checking assessments", { error: checkAssessmentsError.message });
+      throw new Error("Failed to verify assessments");
+    }
+
+    if (!createdAssessments || createdAssessments.length === 0) {
+      logStep("No assessments found after candidate insert", { hiringCandidateId: hiringCandidate.id });
+      throw new Error("Assessments were not created");
+    }
+
+    logStep("Assessments verified", { count: createdAssessments.length });
 
     // Get assessment link
     const assessmentUrl = `https://business.nello.one/assessment/${inviteToken}`;
