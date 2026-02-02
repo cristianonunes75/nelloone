@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
-import { Loader2, Save, Target } from "lucide-react";
+import { Check, Loader2, Save, Target } from "lucide-react";
 import { 
   IdealProfile, 
   IDEAL_PROFILE_OPTIONS, 
@@ -18,18 +18,18 @@ interface IdealProfileFormProps {
 }
 
 const DEFAULT_PROFILE: IdealProfile = {
-  business_segment: 'varejo',
-  ticket_size: 'medio',
-  decision_type: 'media',
-  customer_emotional_state: 'indeciso',
-  customer_arrival_mode: 'em_duvida',
-  seller_main_skill: 'argumentar_persuadir',
-  relationship_level: 'medio',
-  operation_rhythm: 'constante',
-  goal_pressure: 'media',
+  business_segment: ['varejo'],
+  ticket_size: ['medio'],
+  decision_type: ['media'],
+  customer_emotional_state: ['indeciso'],
+  customer_arrival_mode: ['em_duvida'],
+  seller_main_skill: ['argumentar_persuadir'],
+  relationship_level: ['medio'],
+  operation_rhythm: ['constante'],
+  goal_pressure: ['media'],
   has_individual_goals: true,
   culture_values: ['performance'],
-  team_preference: 'constancia',
+  team_preference: ['constancia'],
 };
 
 export function IdealProfileForm({ initialData, onSave, saving }: IdealProfileFormProps) {
@@ -38,7 +38,21 @@ export function IdealProfileForm({ initialData, onSave, saving }: IdealProfileFo
     ...initialData,
   });
 
-  const handleChange = (field: keyof IdealProfile, value: any) => {
+  const handleToggle = (field: keyof IdealProfile, value: string) => {
+    setProfile(prev => {
+      const currentValues = prev[field] as string[];
+      if (currentValues.includes(value)) {
+        // Remove if already selected (but keep at least one)
+        const newValues = currentValues.filter(v => v !== value);
+        return { ...prev, [field]: newValues.length > 0 ? newValues : currentValues };
+      } else {
+        // Add new value
+        return { ...prev, [field]: [...currentValues, value] };
+      }
+    });
+  };
+
+  const handleBooleanChange = (field: keyof IdealProfile, value: boolean) => {
     setProfile(prev => ({ ...prev, [field]: value }));
   };
 
@@ -47,9 +61,10 @@ export function IdealProfileForm({ initialData, onSave, saving }: IdealProfileFo
       const current = prev.culture_values || [];
       if (current.includes(value)) {
         return { ...prev, culture_values: current.filter(v => v !== value) };
-      } else {
+      } else if (current.length < 3) {
         return { ...prev, culture_values: [...current, value] };
       }
+      return prev;
     });
   };
 
@@ -67,7 +82,7 @@ export function IdealProfileForm({ initialData, onSave, saving }: IdealProfileFo
           <Label>Existe meta individual?</Label>
           <RadioGroup
             value={profile.has_individual_goals ? 'sim' : 'nao'}
-            onValueChange={(v) => handleChange('has_individual_goals', v === 'sim')}
+            onValueChange={(v) => handleBooleanChange('has_individual_goals', v === 'sim')}
             className="flex gap-4"
           >
             <div className="flex items-center space-x-2">
@@ -134,23 +149,34 @@ export function IdealProfileForm({ initialData, onSave, saving }: IdealProfileFo
       team_preference: 'Preferência de equipe',
     };
 
+    const currentValues = (profile[fieldKey as keyof IdealProfile] as string[]) || [];
+
     return (
       <div className="space-y-2">
-        <Label>{fieldLabels[fieldKey] || fieldKey}</Label>
-        <RadioGroup
-          value={profile[fieldKey as keyof IdealProfile] as string}
-          onValueChange={(v) => handleChange(fieldKey as keyof IdealProfile, v)}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-2"
-        >
-          {options.map((opt: { value: string; label: string }) => (
-            <div key={opt.value} className="flex items-center space-x-2">
-              <RadioGroupItem value={opt.value} id={`${fieldKey}-${opt.value}`} />
-              <Label htmlFor={`${fieldKey}-${opt.value}`} className="cursor-pointer text-sm">
-                {opt.label}
-              </Label>
-            </div>
-          ))}
-        </RadioGroup>
+        <Label>{fieldLabels[fieldKey] || fieldKey} <span className="text-xs text-muted-foreground">(pode selecionar múltiplos)</span></Label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {options.map((opt: { value: string; label: string }) => {
+            const isSelected = currentValues.includes(opt.value);
+            return (
+              <button
+                type="button"
+                key={opt.value}
+                onClick={() => handleToggle(fieldKey as keyof IdealProfile, opt.value)}
+                className={`
+                  flex items-center gap-2 px-3 py-2 rounded-lg text-sm border transition-all text-left
+                  ${isSelected 
+                    ? 'bg-primary/10 border-primary text-foreground' 
+                    : 'bg-background border-border hover:border-primary/50'}
+                `}
+              >
+                <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${isSelected ? 'bg-primary border-primary' : 'border-muted-foreground'}`}>
+                  {isSelected && <Check className="h-3 w-3 text-primary-foreground" />}
+                </span>
+                <span className="truncate">{opt.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     );
   };

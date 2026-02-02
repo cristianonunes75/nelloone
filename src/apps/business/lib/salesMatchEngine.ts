@@ -23,26 +23,26 @@ export type TeamPreference = 'constancia' | 'resultado_rapido';
 
 export interface IdealProfile {
   // Business Context
-  business_segment: BusinessSegment;
-  ticket_size: TicketSize;
-  decision_type: DecisionType;
+  business_segment: BusinessSegment[];
+  ticket_size: TicketSize[];
+  decision_type: DecisionType[];
   
   // Customer Profile
-  customer_emotional_state: CustomerEmotionalState;
-  customer_arrival_mode: CustomerArrivalMode;
+  customer_emotional_state: CustomerEmotionalState[];
+  customer_arrival_mode: CustomerArrivalMode[];
   
   // Sales Profile Required
-  seller_main_skill: SellerMainSkill;
-  relationship_level: RelationshipLevel;
+  seller_main_skill: SellerMainSkill[];
+  relationship_level: RelationshipLevel[];
   
   // Rhythm & Pressure
-  operation_rhythm: OperationRhythm;
-  goal_pressure: GoalPressure;
+  operation_rhythm: OperationRhythm[];
+  goal_pressure: GoalPressure[];
   has_individual_goals: boolean;
   
   // Culture
   culture_values: CultureValue[];
-  team_preference: TeamPreference;
+  team_preference: TeamPreference[];
 }
 
 export interface CandidateProfile {
@@ -250,36 +250,36 @@ function generateStrengths(
   
   // Segment-based strengths
   if (scores.segmentFit >= 70) {
-    if (idealProfile.business_segment === 'varejo' && (discPrimary === 'I' || tempPrimary === 'sanguineo')) {
+    if (idealProfile.business_segment.includes('varejo') && (discPrimary === 'I' || tempPrimary === 'sanguineo')) {
       strengths.push('Energia e carisma naturais para atendimento de varejo');
     }
-    if (idealProfile.business_segment === 'consultiva' && (discPrimary === 'C' || tempPrimary === 'melancolico')) {
+    if (idealProfile.business_segment.includes('consultiva') && (discPrimary === 'C' || tempPrimary === 'melancolico')) {
       strengths.push('Capacidade analítica para vendas consultivas complexas');
     }
-    if (idealProfile.business_segment === 'experiencia' && (discPrimary === 'I' || discPrimary === 'S')) {
+    if (idealProfile.business_segment.includes('experiencia') && (discPrimary === 'I' || discPrimary === 'S')) {
       strengths.push('Habilidade natural para criar experiências memoráveis');
     }
   }
   
   // Customer-based strengths
   if (scores.customerFit >= 70) {
-    if (idealProfile.customer_emotional_state === 'fragilizado' && discPrimary === 'S') {
+    if (idealProfile.customer_emotional_state.includes('fragilizado') && discPrimary === 'S') {
       strengths.push('Empatia e paciência para lidar com clientes fragilizados');
     }
-    if (idealProfile.customer_emotional_state === 'racional' && discPrimary === 'C') {
+    if (idealProfile.customer_emotional_state.includes('racional') && discPrimary === 'C') {
       strengths.push('Precisão e dados para convencer clientes racionais');
     }
-    if (idealProfile.customer_emotional_state === 'indeciso' && discPrimary === 'I') {
+    if (idealProfile.customer_emotional_state.includes('indeciso') && discPrimary === 'I') {
       strengths.push('Capacidade de influenciar e guiar clientes indecisos');
     }
   }
   
   // Rhythm-based strengths
   if (scores.rhythmFit >= 70) {
-    if (idealProfile.operation_rhythm === 'alta_intensidade' && tempPrimary === 'colerico') {
+    if (idealProfile.operation_rhythm.includes('alta_intensidade') && tempPrimary === 'colerico') {
       strengths.push('Energia e drive para ambientes de alta pressão');
     }
-    if (idealProfile.operation_rhythm === 'constante' && tempPrimary === 'fleumatico') {
+    if (idealProfile.operation_rhythm.includes('constante') && tempPrimary === 'fleumatico') {
       strengths.push('Consistência e estabilidade para operações regulares');
     }
   }
@@ -322,36 +322,36 @@ function generateRisks(
   
   // Low segment fit
   if (scores.segmentFit < 50) {
-    if (idealProfile.business_segment === 'varejo' && discPrimary === 'C') {
+    if (idealProfile.business_segment.includes('varejo') && discPrimary === 'C') {
       risks.push('Pode ter dificuldade com ritmo acelerado do varejo');
     }
-    if (idealProfile.business_segment === 'consultiva' && discPrimary === 'D') {
+    if (idealProfile.business_segment.includes('consultiva') && discPrimary === 'D') {
       risks.push('Impaciência com ciclos de venda longos');
     }
   }
   
   // Low customer fit
   if (scores.customerFit < 50) {
-    if (idealProfile.customer_emotional_state === 'fragilizado' && discPrimary === 'D') {
+    if (idealProfile.customer_emotional_state.includes('fragilizado') && discPrimary === 'D') {
       risks.push('Risco de parecer insensível com clientes fragilizados');
     }
-    if (idealProfile.customer_emotional_state === 'racional' && discPrimary === 'I') {
+    if (idealProfile.customer_emotional_state.includes('racional') && discPrimary === 'I') {
       risks.push('Pode ser percebido como superficial por clientes racionais');
     }
   }
   
   // Low rhythm fit
   if (scores.rhythmFit < 50) {
-    if (idealProfile.operation_rhythm === 'alta_intensidade' && (discPrimary === 'S' || discPrimary === 'C')) {
+    if (idealProfile.operation_rhythm.includes('alta_intensidade') && (discPrimary === 'S' || discPrimary === 'C')) {
       risks.push('Pode não acompanhar o ritmo intenso da operação');
     }
-    if (idealProfile.operation_rhythm === 'constante' && discPrimary === 'D') {
+    if (idealProfile.operation_rhythm.includes('constante') && discPrimary === 'D') {
       risks.push('Pode se entediar com rotina constante');
     }
   }
   
   // Goal pressure risk
-  if (idealProfile.goal_pressure === 'alta' && (tempPrimary === 'melancolico' || tempPrimary === 'fleumatico')) {
+  if (idealProfile.goal_pressure.includes('alta') && (tempPrimary === 'melancolico' || tempPrimary === 'fleumatico')) {
     risks.push('Sensibilidade à pressão pode afetar performance');
   }
   
@@ -378,20 +378,45 @@ export function calculateSalesMatch(
   };
   const tempPrimary = candidate.temperament.primary.toLowerCase();
   
-  // Calculate individual fit scores
-  const segmentDiscFit = getWeightedScore(discPercentages, SEGMENT_DISC_FIT[idealProfile.business_segment], discPrimary);
-  const segmentTempFit = SEGMENT_TEMP_FIT[idealProfile.business_segment][tempPrimary] || 50;
-  const segmentFit = segmentDiscFit * 0.6 + segmentTempFit * 0.4;
+  // Calculate individual fit scores - using averages for array fields
+  const segmentDiscFits = idealProfile.business_segment.map(seg => 
+    getWeightedScore(discPercentages, SEGMENT_DISC_FIT[seg], discPrimary)
+  );
+  const segmentTempFits = idealProfile.business_segment.map(seg => 
+    SEGMENT_TEMP_FIT[seg][tempPrimary] || 50
+  );
+  const avgSegmentDiscFit = segmentDiscFits.length > 0 ? segmentDiscFits.reduce((a, b) => a + b, 0) / segmentDiscFits.length : 50;
+  const avgSegmentTempFit = segmentTempFits.length > 0 ? segmentTempFits.reduce((a, b) => a + b, 0) / segmentTempFits.length : 50;
+  const segmentFit = avgSegmentDiscFit * 0.6 + avgSegmentTempFit * 0.4;
   
-  const decisionFit = getWeightedScore(discPercentages, DECISION_DISC_FIT[idealProfile.decision_type], discPrimary);
-  const customerStateFit = getWeightedScore(discPercentages, CUSTOMER_STATE_DISC_FIT[idealProfile.customer_emotional_state], discPrimary);
-  const skillFit = getWeightedScore(discPercentages, SKILL_DISC_FIT[idealProfile.seller_main_skill], discPrimary);
-  const relationshipFit = getWeightedScore(discPercentages, RELATIONSHIP_DISC_FIT[idealProfile.relationship_level], discPrimary);
-  const customerFit = (decisionFit * 0.25 + customerStateFit * 0.25 + skillFit * 0.25 + relationshipFit * 0.25);
+  const decisionFits = idealProfile.decision_type.map(dt => 
+    getWeightedScore(discPercentages, DECISION_DISC_FIT[dt], discPrimary)
+  );
+  const customerStateFits = idealProfile.customer_emotional_state.map(ces => 
+    getWeightedScore(discPercentages, CUSTOMER_STATE_DISC_FIT[ces], discPrimary)
+  );
+  const skillFits = idealProfile.seller_main_skill.map(sk => 
+    getWeightedScore(discPercentages, SKILL_DISC_FIT[sk], discPrimary)
+  );
+  const relationshipFits = idealProfile.relationship_level.map(rl => 
+    getWeightedScore(discPercentages, RELATIONSHIP_DISC_FIT[rl], discPrimary)
+  );
   
-  const rhythmDiscFit = getWeightedScore(discPercentages, RHYTHM_DISC_FIT[idealProfile.operation_rhythm], discPrimary);
-  const pressureTempFit = PRESSURE_TEMP_FIT[idealProfile.goal_pressure][tempPrimary] || 50;
-  const rhythmFit = rhythmDiscFit * 0.5 + pressureTempFit * 0.5;
+  const avgDecisionFit = decisionFits.length > 0 ? decisionFits.reduce((a, b) => a + b, 0) / decisionFits.length : 50;
+  const avgCustomerStateFit = customerStateFits.length > 0 ? customerStateFits.reduce((a, b) => a + b, 0) / customerStateFits.length : 50;
+  const avgSkillFit = skillFits.length > 0 ? skillFits.reduce((a, b) => a + b, 0) / skillFits.length : 50;
+  const avgRelationshipFit = relationshipFits.length > 0 ? relationshipFits.reduce((a, b) => a + b, 0) / relationshipFits.length : 50;
+  const customerFit = (avgDecisionFit * 0.25 + avgCustomerStateFit * 0.25 + avgSkillFit * 0.25 + avgRelationshipFit * 0.25);
+  
+  const rhythmDiscFits = idealProfile.operation_rhythm.map(or => 
+    getWeightedScore(discPercentages, RHYTHM_DISC_FIT[or], discPrimary)
+  );
+  const pressureTempFits = idealProfile.goal_pressure.map(gp => 
+    PRESSURE_TEMP_FIT[gp][tempPrimary] || 50
+  );
+  const avgRhythmDiscFit = rhythmDiscFits.length > 0 ? rhythmDiscFits.reduce((a, b) => a + b, 0) / rhythmDiscFits.length : 50;
+  const avgPressureTempFit = pressureTempFits.length > 0 ? pressureTempFits.reduce((a, b) => a + b, 0) / pressureTempFits.length : 50;
+  const rhythmFit = avgRhythmDiscFit * 0.5 + avgPressureTempFit * 0.5;
   
   // Culture fit (average of all selected values)
   const cultureFits = idealProfile.culture_values.map(
