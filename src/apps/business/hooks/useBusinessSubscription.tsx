@@ -21,19 +21,19 @@ export const BUSINESS_TIERS = {
   },
   starter: {
     name: 'Starter',
-    pricePerMonth: 49,
+    pricePerMonth: 97,
     maxCollaborators: 10,
     features: ['Até 10 colaboradores', 'Insights de equipe', 'Relatórios básicos'],
   },
   growth: {
     name: 'Growth',
-    pricePerMonth: 129,
+    pricePerMonth: 247,
     maxCollaborators: 30,
     features: ['Até 30 colaboradores', 'Insights avançados', 'Relatórios completos', 'Suporte prioritário'],
   },
   enterprise: {
     name: 'Enterprise',
-    pricePerMonth: 299,
+    pricePerMonth: 497,
     maxCollaborators: 100,
     features: ['Até 100 colaboradores', 'Insights ilimitados', 'API de integração', 'Gerente de conta dedicado'],
   },

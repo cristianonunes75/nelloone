@@ -16,24 +16,24 @@ const logStep = (step: string, details?: Record<string, unknown>) => {
 const BUSINESS_TIERS = {
   starter: {
     name: 'Starter',
-    priceId: 'price_1SnzLXDjhZZxZELM2Y150Xki',
-    productId: 'prod_TlWOSYdR3XRj2e',
+    priceId: 'price_1SwNiaDjhZZxZELMWinqktj1',
+    productId: 'prod_TuC6AaDuMIKQZb',
     maxCollaborators: 10,
-    pricePerMonth: 4900, // in cents
+    pricePerMonth: 9700, // in cents
   },
   growth: {
     name: 'Growth',
-    priceId: 'price_1SnzLiDjhZZxZELMX2wvvb5h',
-    productId: 'prod_TlWOSs5LczNGxr',
+    priceId: 'price_1SwNkBDjhZZxZELMbsUVK1c9',
+    productId: 'prod_TuC8R00QFMgo1D',
     maxCollaborators: 30,
-    pricePerMonth: 12900,
+    pricePerMonth: 24700,
   },
   enterprise: {
     name: 'Enterprise',
-    priceId: 'price_1SnzLuDjhZZxZELMG9SfAIul',
-    productId: 'prod_TlWOhSZJpVB1Xe',
+    priceId: 'price_1SwNkYDjhZZxZELMPvkWmk8j',
+    productId: 'prod_TuC8g0iRUOggpb',
     maxCollaborators: 100,
-    pricePerMonth: 29900,
+    pricePerMonth: 49700,
   },
 };
 
