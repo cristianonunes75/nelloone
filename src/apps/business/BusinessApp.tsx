@@ -17,6 +17,7 @@ import BusinessJobs from './pages/BusinessJobs';
 import BusinessJobDetail from './pages/BusinessJobDetail';
 import BusinessJobPublic from './pages/BusinessJobPublic';
 import BusinessApplicationConfirm from './pages/BusinessApplicationConfirm';
+import BusinessCandidates from './pages/BusinessCandidates';
 import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
 import { isFeatureEnabled } from './config/featureFlags';
 
@@ -109,6 +110,13 @@ export default function BusinessApp() {
       <Route path="/jobs/:jobId" element={
         <BusinessProtectedRoute requiredRole="company_admin">
           <BusinessJobDetail />
+        </BusinessProtectedRoute>
+      } />
+      
+      {/* Unified Candidates view */}
+      <Route path="/candidates" element={
+        <BusinessProtectedRoute requiredRole="company_admin">
+          <BusinessCandidates />
         </BusinessProtectedRoute>
       } />
       

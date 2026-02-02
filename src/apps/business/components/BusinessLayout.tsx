@@ -29,9 +29,9 @@ interface BusinessLayoutProps {
 const adminNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/jobs', label: 'Vagas', icon: ClipboardList },
-  { href: '/hiring', label: 'Candidatos', icon: Briefcase },
+  { href: '/candidates', label: 'Candidatos', icon: Users },
+  { href: '/hiring', label: 'Avaliações', icon: Briefcase },
   { href: '/settings', label: 'Configurações', icon: Settings },
-  // Equipe e Convidar movidos para dentro de Configurações
 ];
 
 const collaboratorNavItems = [
