@@ -42,10 +42,19 @@ export function JobIdealProfileDialog({ jobId, currentProfile, onProfileSaved }:
   const getProfileSummary = () => {
     if (!currentProfile) return null;
     
-    const segment = IDEAL_PROFILE_OPTIONS.business_segment.find(o => o.value === currentProfile.business_segment)?.label;
-    const skill = IDEAL_PROFILE_OPTIONS.seller_main_skill.find(o => o.value === currentProfile.seller_main_skill)?.label;
+    const segmentLabels = currentProfile.business_segment
+      .map(s => IDEAL_PROFILE_OPTIONS.business_segment.find(o => o.value === s)?.label)
+      .filter(Boolean)
+      .slice(0, 2);
+    const skillLabels = currentProfile.seller_main_skill
+      .map(s => IDEAL_PROFILE_OPTIONS.seller_main_skill.find(o => o.value === s)?.label)
+      .filter(Boolean)
+      .slice(0, 2);
     
-    return { segment, skill };
+    return { 
+      segment: segmentLabels.join(', ') || 'Não definido', 
+      skill: skillLabels.join(', ') || 'Não definido' 
+    };
   };
 
   const summary = getProfileSummary();
