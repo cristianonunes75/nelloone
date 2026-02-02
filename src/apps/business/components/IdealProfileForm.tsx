@@ -154,8 +154,8 @@ export function IdealProfileForm({ initialData, onSave, saving }: IdealProfileFo
     return (
       <div className="space-y-2">
         <Label>{fieldLabels[fieldKey] || fieldKey} <span className="text-xs text-muted-foreground">(pode selecionar múltiplos)</span></Label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {options.map((opt: { value: string; label: string }) => {
+        <div className="grid grid-cols-1 gap-2">
+          {options.map((opt: { value: string; label: string; description?: string }) => {
             const isSelected = currentValues.includes(opt.value);
             return (
               <button
@@ -163,16 +163,21 @@ export function IdealProfileForm({ initialData, onSave, saving }: IdealProfileFo
                 key={opt.value}
                 onClick={() => handleToggle(fieldKey as keyof IdealProfile, opt.value)}
                 className={`
-                  flex items-center gap-2 px-3 py-2 rounded-lg text-sm border transition-all text-left
+                  flex items-start gap-3 px-3 py-2.5 rounded-lg text-sm border transition-all text-left
                   ${isSelected 
                     ? 'bg-primary/10 border-primary text-foreground' 
                     : 'bg-background border-border hover:border-primary/50'}
                 `}
               >
-                <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${isSelected ? 'bg-primary border-primary' : 'border-muted-foreground'}`}>
+                <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 mt-0.5 ${isSelected ? 'bg-primary border-primary' : 'border-muted-foreground'}`}>
                   {isSelected && <Check className="h-3 w-3 text-primary-foreground" />}
                 </span>
-                <span className="truncate">{opt.label}</span>
+                <div className="flex-1 min-w-0">
+                  <span className="font-medium">{opt.label}</span>
+                  {opt.description && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{opt.description}</p>
+                  )}
+                </div>
               </button>
             );
           })}
