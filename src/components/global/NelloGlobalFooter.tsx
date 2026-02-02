@@ -76,7 +76,7 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
     { name: 'Identity', app: 'identity' as NelloApp, tagline: language === 'en' ? 'Where it all begins' : 'Onde tudo começa' },
     { name: 'Life', app: 'life' as NelloApp, tagline: language === 'en' ? 'Faith and habits' : 'Fé e hábitos' },
     { name: 'Flow', app: 'flow' as NelloApp, tagline: language === 'en' ? 'Ideas and action' : 'Ideias e ação' },
-    { name: 'Business', app: 'business' as NelloApp, tagline: language === 'en' ? 'Culture and management' : 'Cultura e gestão' },
+    { name: 'Hiring', app: 'business' as NelloApp, tagline: language === 'en' ? 'Better hiring decisions' : 'Contratação assertiva' },
     { name: 'Praxis', app: 'business' as NelloApp, href: '/praxis', tagline: language === 'en' ? 'For professionals' : 'Área do profissional' },
   ];
 

@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Loader2, Save, Target } from "lucide-react";
 import { 
   IdealProfile, 
@@ -86,28 +84,34 @@ export function IdealProfileForm({ initialData, onSave, saving }: IdealProfileFo
     }
 
     if (fieldKey === 'culture_values') {
+      const cultureOptions = IDEAL_PROFILE_OPTIONS.culture_values || [];
       return (
         <div className="space-y-2">
           <Label>A cultura valoriza mais (selecione até 3)</Label>
           <div className="flex flex-wrap gap-2">
-            {options.map((opt: { value: string; label: string }) => {
+            {cultureOptions.map((opt) => {
               const isSelected = profile.culture_values?.includes(opt.value as CultureValue);
               const isDisabled = !isSelected && (profile.culture_values?.length || 0) >= 3;
               
               return (
-                <Badge
+                <button
+                  type="button"
                   key={opt.value}
-                  variant={isSelected ? "default" : "outline"}
-                  className={`cursor-pointer transition-all ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary/10'}`}
-                  onClick={() => !isDisabled && handleCultureValueToggle(opt.value as CultureValue)}
+                  disabled={isDisabled}
+                  onClick={() => handleCultureValueToggle(opt.value as CultureValue)}
+                  className={`
+                    inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm border transition-all
+                    ${isSelected 
+                      ? 'bg-primary text-primary-foreground border-primary' 
+                      : 'bg-background border-border hover:border-primary/50'}
+                    ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                  `}
                 >
-                  <Checkbox
-                    checked={isSelected}
-                    disabled={isDisabled}
-                    className="mr-2 h-3 w-3"
-                  />
+                  <span className={`w-3 h-3 rounded-full border flex items-center justify-center ${isSelected ? 'bg-primary-foreground border-primary-foreground' : 'border-muted-foreground'}`}>
+                    {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
+                  </span>
                   {opt.label}
-                </Badge>
+                </button>
               );
             })}
           </div>
