@@ -8,6 +8,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { 
   Users, 
@@ -20,7 +30,8 @@ import {
   FileText,
   Brain,
   Briefcase,
-  Send
+  Send,
+  RefreshCw
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -68,6 +79,12 @@ export default function BusinessCandidates() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [candidates, setCandidates] = useState<UnifiedCandidate[]>([]);
+  const [sendingAssessment, setSendingAssessment] = useState<string | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    candidate: UnifiedCandidate | null;
+    type: "new" | "resend";
+  }>({ open: false, candidate: null, type: "new" });
 
   useEffect(() => {
     if (company?.id) {
@@ -277,6 +294,87 @@ export default function BusinessCandidates() {
     return <Badge variant="outline" className="bg-blue-100 text-blue-700">Avaliação Pendente</Badge>;
   };
 
+  const handleSendAssessment = (candidate: UnifiedCandidate) => {
+    if (!candidate.email) {
+      toast.error("Candidato não possui email cadastrado");
+      return;
+    }
+
+    // Check if already has assessment
+    if (candidate.has_assessment) {
+      setConfirmDialog({ open: true, candidate, type: "resend" });
+    } else if (candidate.source === "job_application") {
+      // New assessment for job application
+      setConfirmDialog({ open: true, candidate, type: "new" });
+    } else {
+      // Direct candidate - just resend
+      setConfirmDialog({ open: true, candidate, type: "resend" });
+    }
+  };
+
+  const executeSendAssessment = async () => {
+    const candidate = confirmDialog.candidate;
+    if (!candidate) return;
+
+    setSendingAssessment(candidate.id);
+    setConfirmDialog({ open: false, candidate: null, type: "new" });
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error("Sessão não encontrada");
+      }
+
+      let response;
+
+      if (confirmDialog.type === "resend" && candidate.hiring_candidate_id) {
+        // Resend existing assessment
+        response = await supabase.functions.invoke("business-resend-assessment", {
+          body: { candidate_id: candidate.hiring_candidate_id }
+        });
+      } else if (confirmDialog.type === "resend" && candidate.source === "direct") {
+        // Resend for direct candidate
+        response = await supabase.functions.invoke("business-resend-assessment", {
+          body: { candidate_id: candidate.id }
+        });
+      } else if (candidate.source === "job_application") {
+        // New assessment for job application
+        response = await supabase.functions.invoke("business-send-job-assessment", {
+          body: { application_id: candidate.id }
+        });
+      }
+
+      if (response?.error) {
+        throw new Error(response.error.message || "Erro ao enviar avaliação");
+      }
+
+      toast.success(
+        confirmDialog.type === "resend" 
+          ? "Avaliação reenviada com sucesso!" 
+          : "Avaliação enviada com sucesso!"
+      );
+      
+      // Refresh candidates list
+      await fetchAllCandidates();
+    } catch (error: any) {
+      console.error("Error sending assessment:", error);
+      toast.error(error.message || "Erro ao enviar avaliação");
+    } finally {
+      setSendingAssessment(null);
+    }
+  };
+
+  const canSendAssessment = (candidate: UnifiedCandidate) => {
+    return !!candidate.email;
+  };
+
+  const getAssessmentButtonLabel = (candidate: UnifiedCandidate) => {
+    if (candidate.has_assessment) {
+      return "Reenviar Avaliação";
+    }
+    return "Enviar Avaliação";
+  };
+
   return (
     <BusinessLayout>
       <div className="space-y-6">
@@ -429,6 +527,24 @@ export default function BusinessCandidates() {
 
                       {/* Actions */}
                       <div className="flex items-center gap-2">
+                        {canSendAssessment(candidate) && (
+                          <Button
+                            variant={candidate.has_assessment ? "outline" : "secondary"}
+                            size="sm"
+                            onClick={() => handleSendAssessment(candidate)}
+                            disabled={sendingAssessment === candidate.id}
+                            className="gap-1"
+                          >
+                            {sendingAssessment === candidate.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : candidate.has_assessment ? (
+                              <RefreshCw className="h-3.5 w-3.5" />
+                            ) : (
+                              <Send className="h-3.5 w-3.5" />
+                            )}
+                            {getAssessmentButtonLabel(candidate)}
+                          </Button>
+                        )}
                         <Button
                           variant="default"
                           size="sm"
@@ -446,6 +562,46 @@ export default function BusinessCandidates() {
             })}
           </div>
         )}
+
+        {/* Confirmation Dialog */}
+        <AlertDialog 
+          open={confirmDialog.open} 
+          onOpenChange={(open) => !open && setConfirmDialog({ open: false, candidate: null, type: "new" })}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {confirmDialog.type === "resend" 
+                  ? "Reenviar Avaliação Comportamental?" 
+                  : "Enviar Avaliação Comportamental?"
+                }
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {confirmDialog.type === "resend" ? (
+                  <>
+                    <strong className="text-amber-600">Atenção:</strong> Este candidato já possui uma avaliação.
+                    Ao reenviar, os testes anteriores serão resetados e o candidato precisará refazê-los.
+                    <br /><br />
+                    Um novo email será enviado para <strong>{confirmDialog.candidate?.email}</strong>.
+                  </>
+                ) : (
+                  <>
+                    Será enviado um email para <strong>{confirmDialog.candidate?.email}</strong> com 
+                    o link para realizar os testes DISC e Temperamentos.
+                    <br /><br />
+                    O candidato terá 7 dias para completar a avaliação.
+                  </>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={executeSendAssessment}>
+                {confirmDialog.type === "resend" ? "Sim, Reenviar" : "Enviar Avaliação"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </BusinessLayout>
   );
