@@ -55,6 +55,9 @@ interface Candidate {
   status: string;
   created_at: string;
   attachments?: Attachment[];
+  match_result?: MatchResult | null;
+  match_ideal_profile?: IdealProfile | null;
+  match_calculated_at?: string | null;
 }
 
 interface JobApplicationOrigin {
@@ -104,7 +107,9 @@ export default function BusinessHiringResults() {
   const [jobOrigin, setJobOrigin] = useState<JobApplicationOrigin | null>(null);
   const [loading, setLoading] = useState(true);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
-  const [manualIdealProfile, setManualIdealProfile] = useState<IdealProfile | null>(null);
+  const [savedMatchResult, setSavedMatchResult] = useState<MatchResult | null>(null);
+  const [savedIdealProfile, setSavedIdealProfile] = useState<IdealProfile | null>(null);
+  const [isSavingMatch, setIsSavingMatch] = useState(false);
   
   // View mode: 'hr' (default) or 'candidate'
   const viewMode = searchParams.get('view') || 'hr';
@@ -129,11 +134,29 @@ export default function BusinessHiringResults() {
       const parsedAttachments: Attachment[] = Array.isArray(rawAttachments) 
         ? (rawAttachments as unknown as Attachment[]) 
         : [];
-      const parsedCandidate = {
-        ...candidateData,
+      const parsedCandidate: Candidate = {
+        id: candidateData.id,
+        full_name: candidateData.full_name,
+        email: candidateData.email,
+        phone: candidateData.phone,
+        position_applied: candidateData.position_applied,
+        notes: candidateData.notes,
+        status: candidateData.status,
+        created_at: candidateData.created_at,
         attachments: parsedAttachments,
+        match_result: candidateData.match_result as unknown as MatchResult | null,
+        match_ideal_profile: candidateData.match_ideal_profile as unknown as IdealProfile | null,
+        match_calculated_at: candidateData.match_calculated_at,
       };
       setCandidate(parsedCandidate);
+      
+      // Load saved match data if exists
+      if (parsedCandidate.match_result) {
+        setSavedMatchResult(parsedCandidate.match_result);
+      }
+      if (parsedCandidate.match_ideal_profile) {
+        setSavedIdealProfile(parsedCandidate.match_ideal_profile);
+      }
 
       const { data: assessmentsData, error: assessmentsError } = await supabase
         .from("hiring_assessments")
@@ -531,12 +554,12 @@ export default function BusinessHiringResults() {
               const calculatedDiscPrimary = discDisplay.primaryKey || '';
               const tempPrimary = temperamentAssessment.result_data?.primary?.temperament || '';
               
-              // Use job origin ideal_profile or manually configured one
-              const activeIdealProfile = jobOrigin?.ideal_profile || manualIdealProfile;
+              // Use job origin ideal_profile, saved profile, or null
+              const activeIdealProfile = jobOrigin?.ideal_profile || savedIdealProfile;
               
-              // Calculate sales match if ideal_profile exists
-              let matchResult: MatchResult | null = null;
-              if (activeIdealProfile && discAssessment.result_data?.percentages) {
+              // Use saved match result or calculate from saved/job profile
+              let matchResult: MatchResult | null = savedMatchResult;
+              if (!matchResult && activeIdealProfile && discAssessment.result_data?.percentages) {
                 const candidateProfile: CandidateProfile = {
                   disc: {
                     D: discAssessment.result_data.percentages.D || 0,
@@ -554,6 +577,52 @@ export default function BusinessHiringResults() {
                 matchResult = calculateSalesMatch(candidateProfile, activeIdealProfile);
               }
               
+              // Handler to save match when profile is configured
+              const handleProfileConfigured = async (profile: IdealProfile) => {
+                if (!candidateId || !discAssessment.result_data?.percentages) return;
+                
+                setIsSavingMatch(true);
+                try {
+                  const candidateProfile: CandidateProfile = {
+                    disc: {
+                      D: discAssessment.result_data.percentages.D || 0,
+                      I: discAssessment.result_data.percentages.I || 0,
+                      S: discAssessment.result_data.percentages.S || 0,
+                      C: discAssessment.result_data.percentages.C || 0,
+                      primary: calculatedDiscPrimary,
+                      secondary: discDisplay.secondaryKey || undefined,
+                    },
+                    temperament: {
+                      primary: tempPrimary,
+                      secondary: temperamentAssessment.result_data?.secondary?.temperament,
+                    },
+                  };
+                  
+                  const newMatchResult = calculateSalesMatch(candidateProfile, profile);
+                  
+                  // Save to database
+                  const { error } = await supabase
+                    .from("hiring_candidates")
+                    .update({
+                      match_result: JSON.parse(JSON.stringify(newMatchResult)),
+                      match_ideal_profile: JSON.parse(JSON.stringify(profile)),
+                      match_calculated_at: new Date().toISOString(),
+                    })
+                    .eq("id", candidateId);
+                  
+                  if (error) throw error;
+                  
+                  setSavedMatchResult(newMatchResult);
+                  setSavedIdealProfile(profile);
+                  toast.success("Match calculado e salvo com sucesso!");
+                } catch (error) {
+                  console.error("Error saving match:", error);
+                  toast.error("Erro ao salvar o match. Tente novamente.");
+                } finally {
+                  setIsSavingMatch(false);
+                }
+              };
+              
               return (
                 <>
                   {/* Sales Match Section */}
@@ -563,12 +632,17 @@ export default function BusinessHiringResults() {
                         result={matchResult}
                         candidateName={candidate.full_name}
                       />
-                      <div className="flex justify-center">
+                      <div className="flex justify-center gap-2">
                         <CandidateMatchConfigDialog
                           currentProfile={activeIdealProfile}
-                          onProfileConfigured={setManualIdealProfile}
+                          onProfileConfigured={handleProfileConfigured}
                           triggerVariant="compact"
                         />
+                        {savedMatchResult && candidate.match_calculated_at && (
+                          <p className="text-xs text-muted-foreground self-center">
+                            Calculado em {format(new Date(candidate.match_calculated_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                          </p>
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -582,7 +656,7 @@ export default function BusinessHiringResults() {
                             a compatibilidade deste candidato com o contexto do seu negócio.
                           </p>
                           <CandidateMatchConfigDialog
-                            onProfileConfigured={setManualIdealProfile}
+                            onProfileConfigured={handleProfileConfigured}
                           />
                         </div>
                       </CardContent>

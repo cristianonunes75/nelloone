@@ -2253,6 +2253,9 @@ export type Database = {
           invite_expires_at: string | null
           invite_sent_at: string | null
           invite_token: string
+          match_calculated_at: string | null
+          match_ideal_profile: Json | null
+          match_result: Json | null
           notes: string | null
           phone: string | null
           position_applied: string | null
@@ -2272,6 +2275,9 @@ export type Database = {
           invite_expires_at?: string | null
           invite_sent_at?: string | null
           invite_token?: string
+          match_calculated_at?: string | null
+          match_ideal_profile?: Json | null
+          match_result?: Json | null
           notes?: string | null
           phone?: string | null
           position_applied?: string | null
@@ -2291,6 +2297,9 @@ export type Database = {
           invite_expires_at?: string | null
           invite_sent_at?: string | null
           invite_token?: string
+          match_calculated_at?: string | null
+          match_ideal_profile?: Json | null
+          match_result?: Json | null
           notes?: string | null
           phone?: string | null
           position_applied?: string | null
