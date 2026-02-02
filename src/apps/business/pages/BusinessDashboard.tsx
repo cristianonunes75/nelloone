@@ -3,16 +3,15 @@ import { Link } from 'react-router-dom';
 import { 
   Users, 
   UserPlus, 
-  BarChart3, 
   Clock, 
   CheckCircle2,
-  AlertCircle,
   ArrowUpRight,
-  TrendingUp
+  Briefcase,
+  ClipboardList,
+  Target
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
 import { useBusinessEnforcement } from '../hooks/useBusinessEnforcement';
@@ -20,12 +19,13 @@ import { SubscriptionStatusBanner } from '../components/SubscriptionStatusBanner
 import { SubscriptionStatusCard } from '../components/SubscriptionStatusCard';
 import { BlockedAccessOverlay } from '../components/BlockedAccessOverlay';
 import { supabase } from '@/integrations/supabase/client';
+import { PRODUCT_IDENTITY } from '../config/featureFlags';
 
 interface DashboardStats {
   totalMembers: number;
   pendingInvites: number;
-  completedAssessments: number;
-  inProgressAssessments: number;
+  activeJobs: number;
+  totalCandidates: number;
 }
 
 export default function BusinessDashboard() {
@@ -34,8 +34,8 @@ export default function BusinessDashboard() {
   const [stats, setStats] = useState<DashboardStats>({
     totalMembers: 0,
     pendingInvites: 0,
-    completedAssessments: 0,
-    inProgressAssessments: 0,
+    activeJobs: 0,
+    totalCandidates: 0,
   });
   const [allCompanies, setAllCompanies] = useState<Array<{ id: string; name: string; slug: string }>>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,7 +44,6 @@ export default function BusinessDashboard() {
     if (company) {
       fetchStats();
     } else if (isNelloOneSuperAdmin) {
-      // Super admin without company - fetch all companies overview
       fetchAllCompanies();
     } else {
       setIsLoading(false);
@@ -86,18 +85,24 @@ export default function BusinessDashboard() {
         .eq('company_id', company.id)
         .eq('status', 'pending');
       
-      // Get team insights
-      const { data: insights } = await supabase
-        .from('company_team_insights')
-        .select('completed_assessments, total_members')
+      // Get active jobs count
+      const { count: jobsCount } = await supabase
+        .from('job_postings')
+        .select('*', { count: 'exact', head: true })
         .eq('company_id', company.id)
-        .single();
+        .eq('status', 'published');
+      
+      // Get total candidates count
+      const { count: candidatesCount } = await supabase
+        .from('hiring_candidates')
+        .select('*', { count: 'exact', head: true })
+        .eq('company_id', company.id);
       
       setStats({
         totalMembers: membersCount || 0,
         pendingInvites: invitesCount || 0,
-        completedAssessments: insights?.completed_assessments || 0,
-        inProgressAssessments: (membersCount || 0) - (insights?.completed_assessments || 0),
+        activeJobs: jobsCount || 0,
+        totalCandidates: candidatesCount || 0,
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -106,19 +111,15 @@ export default function BusinessDashboard() {
     }
   };
 
-  const completionRate = stats.totalMembers > 0 
-    ? Math.round((stats.completedAssessments / stats.totalMembers) * 100) 
-    : 0;
-
   // Super admin without company sees all companies overview
   if (isNelloOneSuperAdmin && !company) {
     return (
       <BusinessLayout>
         <div className="space-y-8">
           <div>
-            <h1 className="text-2xl font-bold">Admin Overview - Nello Business</h1>
+            <h1 className="text-2xl font-bold">Admin Overview - {PRODUCT_IDENTITY.name}</h1>
             <p className="text-muted-foreground">
-              Visão geral de todas as empresas no Nello Business
+              Visão geral de todas as empresas
             </p>
           </div>
 
@@ -168,27 +169,57 @@ export default function BusinessDashboard() {
           <div>
             <h1 className="text-2xl font-bold">Dashboard</h1>
             <p className="text-muted-foreground">
-              Visão geral da sua equipe no Nello Business
+              {PRODUCT_IDENTITY.tagline}
             </p>
           </div>
-          <Link to="/invite">
-            <Button 
-              className="gap-2"
-              disabled={!enforcement.canInviteCollaborators}
-            >
-              <UserPlus className="w-4 h-4" />
-              Convidar colaboradores
+          <Link to="/jobs">
+            <Button className="gap-2">
+              <ClipboardList className="w-4 h-4" />
+              Criar nova vaga
             </Button>
           </Link>
         </div>
 
-        {/* Stats Grid + Subscription Card */}
+        {/* Stats Grid + Subscription Card - HIRING FOCUSED */}
         <div className="grid gap-6 lg:grid-cols-4">
           <div className="lg:col-span-3 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {/* Active Jobs */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total de membros
+                  Vagas ativas
+                </CardTitle>
+                <ClipboardList className="w-4 h-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.activeJobs}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  publicadas
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Total Candidates */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Total de candidatos
+                </CardTitle>
+                <Briefcase className="w-4 h-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalCandidates}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  em avaliação
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Team Members */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Membros da equipe
                 </CardTitle>
                 <Users className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
@@ -200,6 +231,7 @@ export default function BusinessDashboard() {
               </CardContent>
             </Card>
 
+            {/* Pending Invites */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -214,36 +246,6 @@ export default function BusinessDashboard() {
                 </p>
               </CardContent>
             </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Jornadas completas
-                </CardTitle>
-                <CheckCircle2 className="w-4 h-4 text-green-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.completedAssessments}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {completionRate}% de conclusão
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Em andamento
-                </CardTitle>
-                <AlertCircle className="w-4 h-4 text-yellow-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.inProgressAssessments}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  jornadas em progresso
-                </p>
-              </CardContent>
-            </Card>
           </div>
           
           {/* Subscription status card on the side */}
@@ -252,67 +254,59 @@ export default function BusinessDashboard() {
           </div>
         </div>
 
-        {/* Progress Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Progresso da equipe</CardTitle>
-            <CardDescription>
-              Acompanhe quantos colaboradores completaram as avaliações
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Taxa de conclusão</span>
-                <span className="text-sm text-muted-foreground">{completionRate}%</span>
-              </div>
-              <Progress value={completionRate} className="h-2" />
-              <p className="text-sm text-muted-foreground">
-                {stats.completedAssessments} de {stats.totalMembers} colaboradores completaram a jornada
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
+        {/* Quick Actions - HIRING FOCUSED */}
         <div className="grid gap-4 md:grid-cols-2">
-          <Card className={`transition-colors ${enforcement.canViewInsights ? 'hover:border-primary/50 cursor-pointer' : 'opacity-60'}`}>
-            <Link to="/reports" className={enforcement.canViewInsights ? '' : 'pointer-events-none'}>
+          {/* View Jobs */}
+          <Card className="hover:border-primary/50 transition-colors cursor-pointer">
+            <Link to="/jobs">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <BarChart3 className="w-5 h-5 text-primary" />
+                    <ClipboardList className="w-5 h-5 text-primary" />
                   </div>
                   <ArrowUpRight className="w-5 h-5 text-muted-foreground" />
                 </div>
-                <CardTitle className="mt-4">Ver relatórios da equipe</CardTitle>
+                <CardTitle className="mt-4">Gerenciar vagas</CardTitle>
                 <CardDescription>
-                  {enforcement.canViewInsights 
-                    ? 'Acesse insights consolidados sobre os perfis e tendências da sua equipe'
-                    : 'Faça upgrade para acessar os insights da equipe'
-                  }
+                  Crie vagas, defina perfis ideais e compartilhe links com candidatos
                 </CardDescription>
               </CardHeader>
             </Link>
           </Card>
 
+          {/* View Candidates */}
           <Card className="hover:border-primary/50 transition-colors cursor-pointer">
-            <Link to="/team">
+            <Link to="/hiring">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-primary" />
+                    <Briefcase className="w-5 h-5 text-primary" />
                   </div>
                   <ArrowUpRight className="w-5 h-5 text-muted-foreground" />
                 </div>
-                <CardTitle className="mt-4">Gerenciar equipe</CardTitle>
+                <CardTitle className="mt-4">Ver candidatos</CardTitle>
                 <CardDescription>
-                  Veja o status de cada colaborador e acompanhe o progresso individual
+                  Acompanhe avaliações DISC e Temperamentos dos seus candidatos
                 </CardDescription>
               </CardHeader>
             </Link>
           </Card>
         </div>
+
+        {/* Product Info Card */}
+        <Card className="bg-muted/30 border-dashed">
+          <CardContent className="flex items-start gap-4 pt-6">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Target className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h4 className="font-medium mb-1">{PRODUCT_IDENTITY.name}</h4>
+              <p className="text-sm text-muted-foreground">
+                {PRODUCT_IDENTITY.description}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </BusinessLayout>
   );
