@@ -10,8 +10,8 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Loader2, Settings, Shield, Users, AlertTriangle, Server, Sparkles } from "lucide-react";
-import { useAtivacaoCodigoFlag } from "@/hooks/useFeatureFlag";
+import { Loader2, Settings, Shield, Users, AlertTriangle, Server, Sparkles, Building2, GraduationCap } from "lucide-react";
+import { useAtivacaoCodigoFlag, useNelloBusinessFlag, useNelloPraxisFlag } from "@/hooks/useFeatureFlag";
 import { useAdminPermissions } from "@/hooks/useAdminPermissions";
 
 interface AdminUser {
@@ -33,7 +33,21 @@ export const AdminSettings = () => {
     isLoading: ativacaoLoading, 
     toggle: toggleAtivacaoCodigo 
   } = useAtivacaoCodigoFlag();
+  
+  const {
+    isEnabled: businessEnabled,
+    isLoading: businessLoading,
+    toggle: toggleBusiness
+  } = useNelloBusinessFlag();
+  
+  const {
+    isEnabled: praxisEnabled,
+    isLoading: praxisLoading,
+    toggle: togglePraxis
+  } = useNelloPraxisFlag();
   const [savingAtivacao, setSavingAtivacao] = useState(false);
+  const [savingBusiness, setSavingBusiness] = useState(false);
+  const [savingPraxis, setSavingPraxis] = useState(false);
   
   // Permission check
   const { hasPermission, isSuperAdmin, isLoading: permLoading } = useAdminPermissions();
@@ -131,6 +145,40 @@ export const AdminSettings = () => {
     }
   };
 
+  const handleToggleBusiness = async () => {
+    setSavingBusiness(true);
+    try {
+      await toggleBusiness();
+      toast.success(
+        !businessEnabled 
+          ? "Nello Business habilitado no dashboard" 
+          : "Nello Business desabilitado no dashboard"
+      );
+    } catch (error) {
+      console.error("Error toggling Nello Business:", error);
+      toast.error("Erro ao alterar configuração");
+    } finally {
+      setSavingBusiness(false);
+    }
+  };
+
+  const handleTogglePraxis = async () => {
+    setSavingPraxis(true);
+    try {
+      await togglePraxis();
+      toast.success(
+        !praxisEnabled 
+          ? "Nello Praxis habilitado no dashboard" 
+          : "Nello Praxis desabilitado no dashboard"
+      );
+    } catch (error) {
+      console.error("Error toggling Nello Praxis:", error);
+      toast.error("Erro ao alterar configuração");
+    } finally {
+      setSavingPraxis(false);
+    }
+  };
+
   if (loading || permLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -198,6 +246,60 @@ export const AdminSettings = () => {
               checked={ativacaoCodigoEnabled} 
               onCheckedChange={handleToggleAtivacaoCodigo}
               disabled={ativacaoLoading || savingAtivacao}
+            />
+          </div>
+
+          {/* Nello Business */}
+          <div className="flex items-center justify-between py-3 border-b border-border/50">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-blue-500" />
+                <Label className="text-sm font-medium">Nello Business</Label>
+                {businessEnabled ? (
+                  <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs">
+                    Ativo
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="text-xs text-muted-foreground">
+                    Em Desenvolvimento
+                  </Badge>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Módulo de inteligência empresarial para equipes
+              </p>
+            </div>
+            <Switch 
+              checked={businessEnabled} 
+              onCheckedChange={handleToggleBusiness}
+              disabled={businessLoading || savingBusiness}
+            />
+          </div>
+
+          {/* Nello Praxis */}
+          <div className="flex items-center justify-between py-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <GraduationCap className="w-4 h-4 text-amber-500" />
+                <Label className="text-sm font-medium">Nello Praxis</Label>
+                {praxisEnabled ? (
+                  <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs">
+                    Ativo
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="text-xs text-muted-foreground">
+                    Em Desenvolvimento
+                  </Badge>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Área do profissional para mentores e coaches
+              </p>
+            </div>
+            <Switch 
+              checked={praxisEnabled} 
+              onCheckedChange={handleTogglePraxis}
+              disabled={praxisLoading || savingPraxis}
             />
           </div>
         </CardContent>

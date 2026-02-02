@@ -103,3 +103,13 @@ export const useFeatureFlag = (flagKey: string, defaultValue = true): UseFeature
 export const useAtivacaoCodigoFlag = () => {
   return useFeatureFlag("feature_ativacao_codigo_enabled", false);
 };
+
+// Hook for Nello Business module
+export const useNelloBusinessFlag = () => {
+  return useFeatureFlag("feature_nello_business_enabled", false);
+};
+
+// Hook for Nello Praxis module
+export const useNelloPraxisFlag = () => {
+  return useFeatureFlag("feature_nello_praxis_enabled", false);
+};
