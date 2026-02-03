@@ -73,6 +73,7 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
   
   // Module links with proper URLs (Ecosystem column)
   const ecosystemLinks = [
+    { name: language === 'en' ? 'Ecosystem' : 'Ecossistema', app: 'main' as NelloApp, tagline: language === 'en' ? 'The whole ecosystem' : 'Todo o ecossistema', isPortal: true },
     { name: 'Identity', app: 'identity' as NelloApp, tagline: language === 'en' ? 'Where it all begins' : 'Onde tudo começa' },
     { name: 'Life', app: 'life' as NelloApp, tagline: language === 'en' ? 'Faith and habits' : 'Fé e hábitos' },
     { name: 'Flow', app: 'flow' as NelloApp, tagline: language === 'en' ? 'Ideas and action' : 'Ideias e ação' },
