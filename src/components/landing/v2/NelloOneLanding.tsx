@@ -125,9 +125,9 @@ export const NelloOneLanding = () => {
               <Button 
                 onClick={handleCTA}
                 size="lg" 
-                className="text-sm sm:text-base px-6 sm:px-8 w-full min-h-[54px] sm:min-h-[56px] bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold rounded-full transition-all duration-300 hover:scale-[1.02] shadow-xl group whitespace-nowrap"
+                className="text-sm sm:text-base px-5 sm:px-8 w-full min-h-[54px] sm:min-h-[56px] bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold rounded-full transition-all duration-300 hover:scale-[1.02] shadow-xl group"
               >
-                <span className="truncate">Revelar meu Código da Essência</span>
+                <span className="text-center leading-tight">Revelar meu Código da Essência</span>
                 <Sparkles className="ml-2 h-4 w-4 sm:h-5 sm:w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
               </Button>
               <FreePlanBenefits variant="light" />
