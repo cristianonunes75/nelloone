@@ -207,16 +207,41 @@ export const NelloOneLanding = () => {
             </p>
           </div>
           
-          {/* Timeline horizontal */}
-          <div className="flex justify-between items-center overflow-x-auto pb-4 mb-12 gap-2">
-            {journeySteps.map((step, index) => (
-              <div key={index} className="flex flex-col items-center min-w-[70px]">
-                <div className="w-10 h-10 rounded-full bg-nello-gold/10 flex items-center justify-center mb-2">
-                  <span className="text-nello-gold font-display text-sm font-semibold">{step.number}</span>
+          {/* Timeline - Grid responsivo sem scroll horizontal */}
+          <div className="mb-12">
+            {/* Mobile: 2 linhas (4 + 3 centralizados) */}
+            <div className="grid grid-cols-4 gap-3 mb-3 sm:hidden">
+              {journeySteps.slice(0, 4).map((step, index) => (
+                <div key={index} className="flex flex-col items-center">
+                  <div className="w-11 h-11 rounded-full bg-nello-gold/10 flex items-center justify-center mb-2">
+                    <span className="text-nello-gold font-display text-sm font-semibold">{step.number}</span>
+                  </div>
+                  <span className="text-[11px] text-foreground/70 text-center leading-tight">{step.title}</span>
                 </div>
-                <span className="text-xs text-foreground/70 text-center">{step.title}</span>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="flex justify-center gap-6 sm:hidden">
+              {journeySteps.slice(4).map((step, index) => (
+                <div key={index + 4} className="flex flex-col items-center">
+                  <div className="w-11 h-11 rounded-full bg-nello-gold/10 flex items-center justify-center mb-2">
+                    <span className="text-nello-gold font-display text-sm font-semibold">{step.number}</span>
+                  </div>
+                  <span className="text-[11px] text-foreground/70 text-center leading-tight">{step.title}</span>
+                </div>
+              ))}
+            </div>
+            
+            {/* Tablet+: linha única */}
+            <div className="hidden sm:flex justify-between items-center gap-4">
+              {journeySteps.map((step, index) => (
+                <div key={index} className="flex flex-col items-center">
+                  <div className="w-12 h-12 rounded-full bg-nello-gold/10 flex items-center justify-center mb-2">
+                    <span className="text-nello-gold font-display text-sm font-semibold">{step.number}</span>
+                  </div>
+                  <span className="text-xs text-foreground/70 text-center">{step.title}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* O que vai descobrir */}
