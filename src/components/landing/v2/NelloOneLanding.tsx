@@ -92,41 +92,43 @@ export const NelloOneLanding = () => {
       <NavSection />
       
       {/* ========== 1️⃣ HERO ========== */}
-      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[90vh] md:min-h-[85vh] flex items-center justify-center overflow-hidden">
+        {/* Background image - positioned lower on mobile to not interfere with text */}
         <div 
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-[center_80%] md:bg-center"
           style={{ backgroundImage: `url(${heroDawn})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/92 via-background/88 to-background/95" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-transparent to-background/85" />
+        {/* Stronger overlay on mobile for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/92 to-background/80 md:from-background/90 md:via-background/85 md:to-background/90" />
+        <div className="absolute inset-0 bg-background/40 md:bg-transparent" />
         
-        <div className="relative z-10 container px-5 sm:px-6 lg:px-8 py-16 md:py-24">
+        <div className="relative z-10 container px-6 sm:px-8 lg:px-10 py-20 md:py-24">
           <div className="max-w-4xl mx-auto text-center">
-            <p className="text-sm sm:text-base text-nello-gold font-medium tracking-wide mb-6">
+            <p className="text-xs sm:text-sm md:text-base text-nello-gold font-semibold tracking-widest uppercase mb-4 md:mb-6">
               A Jornada Identity em 7 etapas
             </p>
             
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-tight tracking-tight mb-6">
+            <h1 className="font-display text-[2rem] leading-[1.15] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-foreground tracking-tight mb-5 md:mb-6">
               O Identity não te define.<br />
               <span className="text-nello-gold">Ele te liberta.</span>
             </h1>
             
-            <p className="text-xl sm:text-2xl text-foreground/80 font-display leading-relaxed max-w-2xl mx-auto mb-4">
+            <p className="text-lg sm:text-xl md:text-2xl text-foreground font-display leading-relaxed max-w-xl mx-auto mb-3 md:mb-4">
               Pare de tentar se encaixar.
             </p>
             
-            <p className="text-base text-foreground/60 leading-relaxed max-w-2xl mx-auto mb-10">
+            <p className="text-sm md:text-base text-foreground/70 leading-relaxed max-w-lg mx-auto mb-8 md:mb-10 px-2">
               A Jornada Identity é o processo de remoção de tudo o que não é você.
             </p>
             
-            <div className="max-w-md mx-auto space-y-4">
+            <div className="max-w-sm mx-auto space-y-4 px-2">
               <Button 
                 onClick={handleCTA}
                 size="lg" 
-                className="text-base px-10 w-full min-h-[56px] bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-medium rounded-full transition-all duration-300 hover:scale-[1.02] shadow-lg group"
+                className="text-sm sm:text-base px-6 sm:px-8 w-full min-h-[54px] sm:min-h-[56px] bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold rounded-full transition-all duration-300 hover:scale-[1.02] shadow-xl group whitespace-nowrap"
               >
-                Revelar meu Código da Essência
-                <Sparkles className="ml-2 h-5 w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors" strokeWidth={1.5} />
+                <span className="truncate">Revelar meu Código da Essência</span>
+                <Sparkles className="ml-2 h-4 w-4 sm:h-5 sm:w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
               </Button>
               <FreePlanBenefits variant="light" />
             </div>
@@ -218,29 +220,32 @@ export const NelloOneLanding = () => {
           </div>
 
           {/* O que vai descobrir */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6 md:mb-8">
             <h3 className="font-display text-xl sm:text-2xl font-semibold text-foreground mb-2">
               As 7 camadas que o Identity revela
             </h3>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {/* Mobile: Stack vertical / Tablet+: 2 cols / Desktop: 3 cols */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
             {discoveries.map((item: any, index: number) => (
               <div 
                 key={index}
-                className="p-4 bg-muted/30 rounded-xl border border-border/50"
+                className="p-4 md:p-5 bg-card rounded-xl border border-border/50 shadow-sm hover:shadow-md transition-shadow duration-300"
               >
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-nello-gold/10">
-                    <item.icon className="w-4 h-4 text-nello-gold" strokeWidth={1.5} />
+                <div className="flex items-center gap-3 md:gap-4">
+                  <div className="p-2.5 md:p-3 rounded-xl bg-nello-gold/10 flex-shrink-0">
+                    <item.icon className="w-5 h-5 md:w-6 md:h-6 text-nello-gold" strokeWidth={1.5} />
                   </div>
-                  <div>
-                    <p className="text-foreground text-sm leading-relaxed">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-foreground text-sm md:text-base font-medium leading-snug">
                       {item.mainText}
-                      {item.testName && (
-                        <span className="text-foreground/40 text-xs ml-1">({item.testName})</span>
-                      )}
                     </p>
+                    {item.testName && (
+                      <p className="text-foreground/50 text-xs md:text-sm mt-0.5">
+                        {item.testName}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -337,22 +342,22 @@ export const NelloOneLanding = () => {
                 ))}
               </ul>
               
-              <div className="flex flex-col items-center gap-2">
+              <div className="flex flex-col items-center gap-3">
                 <Button 
                   onClick={handleCTA}
                   size="lg" 
-                  className="w-full min-h-[52px] text-base rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-medium group"
+                  className="w-full min-h-[52px] sm:min-h-[56px] text-sm sm:text-base px-4 sm:px-6 rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold group shadow-lg whitespace-nowrap"
                 >
-                  Revelar meu Código da Essência
-                  <Sparkles className="ml-2 w-5 h-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors" strokeWidth={1.5} />
+                  <span className="truncate">Revelar meu Código</span>
+                  <Sparkles className="ml-2 w-4 h-4 sm:w-5 sm:h-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
                 </Button>
-                <p className="text-xs text-muted-foreground/70">
+                <p className="text-xs text-muted-foreground/70 text-center">
                   Acesso vitalício à sua jornada de identidade.
                 </p>
               </div>
               
               <div className="flex items-center justify-center gap-2 mt-4 text-muted-foreground">
-                <Shield className="w-4 h-4" />
+                <Shield className="w-4 h-4 flex-shrink-0" />
                 <span className="text-xs">Pagamento seguro via Stripe</span>
               </div>
             </div>
@@ -384,16 +389,16 @@ export const NelloOneLanding = () => {
             A única coisa que realmente importa: <span className="text-nello-gold">seu Código da Essência</span>.
           </p>
           
-          <div className="max-w-sm mx-auto space-y-3">
+          <div className="max-w-xs sm:max-w-sm mx-auto space-y-3 px-2">
             <Button 
               onClick={handleCTA}
               size="lg" 
-              className="text-base px-8 w-full min-h-[52px] bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-medium rounded-full transition-all duration-300 hover:scale-[1.02] shadow-lg group"
+              className="text-sm sm:text-base px-6 sm:px-8 w-full min-h-[52px] sm:min-h-[56px] bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold rounded-full transition-all duration-300 hover:scale-[1.02] shadow-xl group whitespace-nowrap"
             >
-              Revelar meu Código da Essência
-              <Sparkles className="ml-2 h-5 w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors" strokeWidth={1.5} />
+              <span className="truncate">Revelar meu Código</span>
+              <Sparkles className="ml-2 h-4 w-4 sm:h-5 sm:w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
             </Button>
-            <p className="text-white/50 text-xs">
+            <p className="text-white/50 text-xs text-center">
               Acesso vitalício · Jornada em 7 camadas · Clareza definitiva
             </p>
           </div>
