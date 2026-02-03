@@ -2,7 +2,7 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getNelloAppUrl, NelloApp, useSubdomain } from "@/hooks/useSubdomain";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Instagram, Linkedin, Youtube, MessageCircle } from "lucide-react";
+import { Instagram, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NelloGlobalFooterProps {
@@ -106,11 +106,9 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
     { label: language === 'en' ? 'Privacy Policy' : 'Política de Privacidade', href: '/politica-de-privacidade' },
   ];
 
-  // Social links
+  // Social links (apenas Instagram por enquanto)
   const socialLinks = [
     { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/identity.nello?igsh=YzdvaXdzbHp0ZW1k&utm_source=qr' },
-    { name: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com/company/nello-one' },
-    { name: 'YouTube', icon: Youtube, href: 'https://youtube.com/@nello-one' },
   ];
 
   const getModuleUrl = (link: typeof ecosystemLinks[0]) => {
