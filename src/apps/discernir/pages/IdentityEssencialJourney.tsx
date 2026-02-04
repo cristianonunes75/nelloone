@@ -78,6 +78,8 @@ const RHYTHM_QUESTIONS = {
   },
 };
 
+const RHYTHM_ANSWERS_STORAGE_KEY = 'discernir_rhythm_answers';
+
 export function IdentityEssencialJourney() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -85,8 +87,52 @@ export function IdentityEssencialJourney() {
   const { status, isLoading, isJourneyComplete, getNextStep, saveRhythmDeclaration, refetch } = useIdentityEssencial();
   
   const [currentView, setCurrentView] = useState<'overview' | 'rhythm_form'>('overview');
-  const [rhythmAnswers, setRhythmAnswers] = useState<Partial<RhythmDeclaration>>({});
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Persist rhythm answers in sessionStorage to prevent data loss on page refresh
+  const [rhythmAnswers, setRhythmAnswers] = useState<Partial<RhythmDeclaration>>(() => {
+    try {
+      const stored = sessionStorage.getItem(RHYTHM_ANSWERS_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  // Save answers to sessionStorage whenever they change
+  useEffect(() => {
+    if (Object.keys(rhythmAnswers).length > 0) {
+      sessionStorage.setItem(RHYTHM_ANSWERS_STORAGE_KEY, JSON.stringify(rhythmAnswers));
+    }
+  }, [rhythmAnswers]);
+
+  // Clear stored answers when journey is complete
+  useEffect(() => {
+    if (isJourneyComplete) {
+      sessionStorage.removeItem(RHYTHM_ANSWERS_STORAGE_KEY);
+    }
+  }, [isJourneyComplete]);
+
+  // Prevent accidental page close/refresh while filling form
+  useEffect(() => {
+    const hasUnsavedAnswers = currentView === 'rhythm_form' && Object.keys(rhythmAnswers).length > 0;
+    
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedAnswers && !isSaving) {
+        e.preventDefault();
+        e.returnValue = 'Você tem respostas não salvas. Deseja realmente sair?';
+        return e.returnValue;
+      }
+    };
+
+    if (hasUnsavedAnswers) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [currentView, rhythmAnswers, isSaving]);
 
   // Check if returning from test completion
   useEffect(() => {
@@ -143,6 +189,10 @@ export function IdentityEssencialJourney() {
       const success = await saveRhythmDeclaration(declaration);
       
       if (success) {
+        // Clear stored answers on successful save
+        sessionStorage.removeItem(RHYTHM_ANSWERS_STORAGE_KEY);
+        setRhythmAnswers({});
+        
         toast.success('Respostas salvas!', {
           description: 'Sua jornada Identity Essencial foi concluída.'
         });
