@@ -89,7 +89,7 @@ export function DiscernirDashboard() {
               </div>
               <Link to="/identity-essencial">
                 <Button className="w-full bg-amber-700 hover:bg-amber-800">
-                  Continuar Jornada
+                  {calculateEssencialProgress() > 0 ? 'Continuar Jornada' : 'Iniciar Jornada'}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
