@@ -46,6 +46,15 @@ const AdminPipeline = lazy(() => import("@/components/admin/AdminPipeline").then
 const AdminFollowups = lazy(() => import("@/components/admin/AdminFollowups").then(m => ({ default: m.AdminFollowups })));
 const AdminSalesPlaybook = lazy(() => import("@/components/admin/AdminSalesPlaybook").then(m => ({ default: m.AdminSalesPlaybook })));
 
+// DISCERNIR modules
+const AdminDiscernirDashboard = lazy(() => import("@/components/admin/discernir/AdminDiscernirDashboard"));
+const AdminDiscernirParoquias = lazy(() => import("@/components/admin/discernir/AdminDiscernirParoquias"));
+const AdminDiscernirPadres = lazy(() => import("@/components/admin/discernir/AdminDiscernirPadres"));
+const AdminDiscernirCasais = lazy(() => import("@/components/admin/discernir/AdminDiscernirCasais"));
+const AdminDiscernirConvites = lazy(() => import("@/components/admin/discernir/AdminDiscernirConvites"));
+const AdminDiscernirConsentimentos = lazy(() => import("@/components/admin/discernir/AdminDiscernirConsentimentos"));
+const AdminDiscernirAcessos = lazy(() => import("@/components/admin/discernir/AdminDiscernirAcessos"));
+
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
     <div className="flex flex-col items-center gap-3">
@@ -185,6 +194,43 @@ const Admin = () => {
                 <Route path="limpeza" element={
                   <AdminGuard requiredPermission="can_delete_data" fallbackMessage="Limpeza de dados requer permissão de exclusão.">
                     <DataCleanupTool />
+                  </AdminGuard>
+                } />
+                
+                {/* DISCERNIR routes - Super Admin only */}
+                <Route path="discernir" element={
+                  <AdminGuard isSuperAdminOnly fallbackMessage="O módulo DISCERNIR é restrito a Super Admins.">
+                    <AdminDiscernirDashboard />
+                  </AdminGuard>
+                } />
+                <Route path="discernir/paroquias" element={
+                  <AdminGuard isSuperAdminOnly fallbackMessage="O módulo DISCERNIR é restrito a Super Admins.">
+                    <AdminDiscernirParoquias />
+                  </AdminGuard>
+                } />
+                <Route path="discernir/padres" element={
+                  <AdminGuard isSuperAdminOnly fallbackMessage="O módulo DISCERNIR é restrito a Super Admins.">
+                    <AdminDiscernirPadres />
+                  </AdminGuard>
+                } />
+                <Route path="discernir/casais" element={
+                  <AdminGuard isSuperAdminOnly fallbackMessage="O módulo DISCERNIR é restrito a Super Admins.">
+                    <AdminDiscernirCasais />
+                  </AdminGuard>
+                } />
+                <Route path="discernir/convites" element={
+                  <AdminGuard isSuperAdminOnly fallbackMessage="O módulo DISCERNIR é restrito a Super Admins.">
+                    <AdminDiscernirConvites />
+                  </AdminGuard>
+                } />
+                <Route path="discernir/consentimentos" element={
+                  <AdminGuard isSuperAdminOnly fallbackMessage="O módulo DISCERNIR é restrito a Super Admins.">
+                    <AdminDiscernirConsentimentos />
+                  </AdminGuard>
+                } />
+                <Route path="discernir/acessos" element={
+                  <AdminGuard isSuperAdminOnly fallbackMessage="O módulo DISCERNIR é restrito a Super Admins.">
+                    <AdminDiscernirAcessos />
                   </AdminGuard>
                 } />
                 
