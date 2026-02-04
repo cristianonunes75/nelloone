@@ -131,6 +131,21 @@ export const NelloOneLanding = () => {
                 <Sparkles className="ml-2 h-4 w-4 sm:h-5 sm:w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
               </Button>
               
+              {/* Value proposition badges */}
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 py-3 rounded-full bg-background/80 backdrop-blur-sm">
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-nello-gold" strokeWidth={2.5} />
+                  <span className="text-sm font-medium text-foreground/90">7 pilares integrados</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-nello-gold" strokeWidth={2.5} />
+                  <span className="text-sm font-medium text-foreground/90">Relatório completo</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-nello-gold" strokeWidth={2.5} />
+                  <span className="text-sm font-medium text-foreground/90">Código da Essência</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
