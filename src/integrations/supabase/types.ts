@@ -3019,6 +3019,122 @@ export type Database = {
           },
         ]
       }
+      identity_essencial: {
+        Row: {
+          completed_at: string | null
+          completion_source: string | null
+          created_at: string
+          disc_status: string | null
+          estilos_conexao_status: string | null
+          id: string
+          last_synthesis_at: string | null
+          last_synthesis_state: string | null
+          rhythm_declaration: Json | null
+          rhythm_declaration_at: string | null
+          started_at: string | null
+          status: string
+          temperamentos_status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completion_source?: string | null
+          created_at?: string
+          disc_status?: string | null
+          estilos_conexao_status?: string | null
+          id?: string
+          last_synthesis_at?: string | null
+          last_synthesis_state?: string | null
+          rhythm_declaration?: Json | null
+          rhythm_declaration_at?: string | null
+          started_at?: string | null
+          status?: string
+          temperamentos_status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completion_source?: string | null
+          created_at?: string
+          disc_status?: string | null
+          estilos_conexao_status?: string | null
+          id?: string
+          last_synthesis_at?: string | null
+          last_synthesis_state?: string | null
+          rhythm_declaration?: Json | null
+          rhythm_declaration_at?: string | null
+          started_at?: string | null
+          status?: string
+          temperamentos_status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      identity_essencial_synthesis: {
+        Row: {
+          created_at: string
+          disc_summary: Json | null
+          estilos_conexao_summary: Json | null
+          expires_at: string
+          generated_at: string
+          id: string
+          identity_essencial_id: string | null
+          is_valid: boolean
+          pastoral_message: string
+          pastoral_questions: Json
+          rhythm_declaration_snapshot: Json | null
+          rhythm_state: string
+          temperamento_summary: Json | null
+          user_id: string
+          user_message: string
+        }
+        Insert: {
+          created_at?: string
+          disc_summary?: Json | null
+          estilos_conexao_summary?: Json | null
+          expires_at?: string
+          generated_at?: string
+          id?: string
+          identity_essencial_id?: string | null
+          is_valid?: boolean
+          pastoral_message: string
+          pastoral_questions?: Json
+          rhythm_declaration_snapshot?: Json | null
+          rhythm_state: string
+          temperamento_summary?: Json | null
+          user_id: string
+          user_message: string
+        }
+        Update: {
+          created_at?: string
+          disc_summary?: Json | null
+          estilos_conexao_summary?: Json | null
+          expires_at?: string
+          generated_at?: string
+          id?: string
+          identity_essencial_id?: string | null
+          is_valid?: boolean
+          pastoral_message?: string
+          pastoral_questions?: Json
+          rhythm_declaration_snapshot?: Json | null
+          rhythm_state?: string
+          temperamento_summary?: Json | null
+          user_id?: string
+          user_message?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "identity_essencial_synthesis_identity_essencial_id_fkey"
+            columns: ["identity_essencial_id"]
+            isOneToOne: false
+            referencedRelation: "identity_essencial"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       impersonation_sessions: {
         Row: {
           admin_id: string
@@ -4913,6 +5029,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      check_identity_essencial_completion: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       cleanup_expired_cross_app_tokens: { Args: never; Returns: undefined }
       get_admin_permission_level: {
         Args: { _user_id: string }
@@ -4944,6 +5064,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      init_identity_essencial: { Args: { p_user_id: string }; Returns: Json }
       is_admin_user: { Args: { _user_id: string }; Returns: boolean }
       is_company_admin: {
         Args: { check_company_id: string; check_user_id: string }

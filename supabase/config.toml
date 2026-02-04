@@ -176,3 +176,9 @@ verify_jwt = true
 
 [functions.discernir-generate-cruzamento]
 verify_jwt = true
+
+[functions.identity-essencial-synthesis]
+verify_jwt = true
+
+[functions.identity-essencial-status]
+verify_jwt = true

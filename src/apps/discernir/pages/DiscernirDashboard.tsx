@@ -1,16 +1,20 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useDiscernirAuth } from '../contexts/DiscernirAuthContext';
+import { useIdentityEssencial } from '../hooks/useIdentityEssencial';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { 
   Heart, 
   FileHeart, 
   Users, 
   CheckCircle2, 
   AlertCircle,
-  ArrowRight
+  ArrowRight,
+  Compass,
+  Loader2
 } from 'lucide-react';
 
 export function DiscernirDashboard() {
@@ -21,8 +25,20 @@ export function DiscernirDashboard() {
     hasConjugalConsent, 
     hasPriestAccessConsent 
   } = useDiscernirAuth();
+  const { status: essencialStatus, isLoading: essencialLoading, isJourneyComplete } = useIdentityEssencial();
 
   const userName = user?.user_metadata?.full_name || 'Peregrino';
+
+  // Calculate Identity Essencial progress
+  const calculateEssencialProgress = () => {
+    if (!essencialStatus) return 0;
+    let completed = 0;
+    if (essencialStatus.disc_status === 'completed') completed++;
+    if (essencialStatus.temperamentos_status === 'completed') completed++;
+    if (essencialStatus.estilos_conexao_status === 'completed') completed++;
+    if (essencialStatus.has_rhythm_declaration) completed++;
+    return (completed / 4) * 100;
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -35,6 +51,52 @@ export function DiscernirDashboard() {
           Seja bem vindo à experiência DISCERNIR
         </p>
       </div>
+
+      {/* Identity Essencial Status - NEW */}
+      <Card className="border-amber-300 bg-amber-50/50">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Compass className="h-5 w-5 text-amber-700" />
+            Identity Essencial
+          </CardTitle>
+          <CardDescription className="text-sm">
+            Base humana para a escuta pastoral
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {essencialLoading ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-amber-700" />
+            </div>
+          ) : isJourneyComplete ? (
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              <span className="text-green-700 font-medium">Jornada concluída</span>
+              {essencialStatus?.completion_source === 'reused' && (
+                <Badge variant="outline" className="text-xs bg-blue-50 text-blue-600 border-blue-200">
+                  Dados reaproveitados
+                </Badge>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm text-amber-700">
+                  <span>Progresso</span>
+                  <span>{Math.round(calculateEssencialProgress())}%</span>
+                </div>
+                <Progress value={calculateEssencialProgress()} className="h-2" />
+              </div>
+              <Link to="/identity-essencial">
+                <Button className="w-full bg-amber-700 hover:bg-amber-800">
+                  Continuar Jornada
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Status Cards */}
       <div className="grid md:grid-cols-3 gap-4">
@@ -91,12 +153,17 @@ export function DiscernirDashboard() {
                 variant="outline" 
                 size="sm" 
                 className="w-full mt-4"
-                disabled={!hasIndividualConsent}
+                disabled={!hasIndividualConsent || !isJourneyComplete}
               >
                 Acessar
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
+            {!isJourneyComplete && hasIndividualConsent && (
+              <p className="text-xs text-amber-600 mt-2">
+                Complete o Identity Essencial primeiro
+              </p>
+            )}
           </CardContent>
         </Card>
 
