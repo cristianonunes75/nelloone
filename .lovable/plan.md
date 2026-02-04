@@ -1,55 +1,84 @@
 
-# Plano: Atualização de Preços do Nello Hiring
+# Plano: Atualizar Descrições do Código do Casal (7 Pilares)
 
-## Situação Atual
+## Contexto
 
-Os preços atuais do Nello Hiring são:
-
-| Plano | Preço Atual | Colaboradores |
-|-------|-------------|---------------|
-| **Starter** | R$ 49/mês | Até 10 |
-| **Growth** | R$ 129/mês | Até 30 |
-| **Enterprise** | R$ 299/mês | Até 100 |
+O sistema de cruzamento do casal já gera relatórios com os **7 pilares completos** do método Identity (DISC, Eneagrama, Temperamentos, Inteligências Múltiplas, Arquétipos, Estilos de Conexão e Nello 16), mas as descrições em vários pontos da aplicação mencionam apenas "DISC + Eneagrama", causando confusão na proposta de valor.
 
 ---
 
-## Proposta de Novos Preços
+## Arquivos a Modificar
 
-Considerando que o produto oferece **avaliação comportamental inteligente para recrutamento** com sistema de match automatizado, sugiro os seguintes valores:
+### 1. `src/components/monetization/productCatalog.ts`
 
-| Plano | Preço Atual | **Novo Preço** | Aumento |
-|-------|-------------|----------------|---------|
-| **Starter** | R$ 49/mês | **R$ 97/mês** | +98% |
-| **Growth** | R$ 129/mês | **R$ 247/mês** | +91% |
-| **Enterprise** | R$ 299/mês | **R$ 497/mês** | +66% |
+**Alterações:**
+- Atualizar `nello_couple.description` de "DISC + Eneagrama" para mencionar os 7 pilares
+- Atualizar `nello_couple.descriptionEn` com a mesma correção em inglês
+- Expandir a lista de `benefits` para refletir os 7 pilares do relatório
+- Expandir `benefitsEn` com a tradução
 
-**Justificativa:** Esses valores estão mais alinhados com ferramentas de recrutamento comportamental do mercado brasileiro (Gupy, Kenoby, etc.) e refletem melhor o valor do sistema de match inteligente.
+**Nova descrição PT:**
+> "O Mapa de Sinergia do seu relacionamento. 7 pilares cruzados: DISC, Eneagrama, Temperamentos, Inteligências, Arquétipos, Estilos de Conexão e Personalidade."
 
----
-
-## Implementação Técnica
-
-### 1. Criar Novos Preços no Stripe
-- Criar 3 novos Price IDs com os valores atualizados
-- Arquivar os preços antigos para manter histórico
-
-### 2. Atualizar Frontend
-**Arquivo:** `src/apps/business/hooks/useBusinessSubscription.tsx`
-- Atualizar `BUSINESS_TIERS.starter.pricePerMonth` → 97
-- Atualizar `BUSINESS_TIERS.growth.pricePerMonth` → 247
-- Atualizar `BUSINESS_TIERS.enterprise.pricePerMonth` → 497
-
-### 3. Atualizar Edge Function de Checkout
-**Arquivo:** `supabase/functions/business-checkout/index.ts`
-- Substituir os Price IDs pelos novos
-- Atualizar os valores em centavos (9700, 24700, 49700)
+**Novos benefícios PT:**
+- Dinâmica comportamental do casal (DISC)
+- Motivações profundas e pontos de tensão (Eneagrama)  
+- Protocolo de Ritmo (Temperamentos)
+- Sinergia de Talentos (Inteligências Múltiplas)
+- O Mito do Casal (Arquétipos)
+- Papéis naturais: Sensor de Direção e Construtor
+- Relatório PDF profissional de 15-20 páginas
 
 ---
 
-## Alternativa: Você Define os Preços
+### 2. `src/components/monetization/ProgressiveUpsellSection.tsx`
 
-Se preferir outros valores, me diga quais são e ajusto o plano! Exemplos de estruturas alternativas:
+**Linha ~94-96:** Atualizar a descrição do card `nello_couple` no dashboard
 
-- **Conservador:** R$ 79 / R$ 179 / R$ 399
-- **Premium:** R$ 147 / R$ 347 / R$ 697
-- **Por vagas:** Modelo de preço por quantidade de vagas abertas
+**De:**
+```
+"Descubra o mapa de sinergia do seu relacionamento. DISC + Eneagrama cruzados."
+```
+
+**Para:**
+```
+"O mapa completo de sinergia do seu relacionamento com 7 pilares cruzados."
+```
+
+---
+
+### 3. `src/components/admin/AdminCoupons.tsx`
+
+**Linhas 65 e 78:** Corrigir preços desatualizados nas listas de produtos
+
+**De:**
+```
+"Cruzamento de casal R$147"
+```
+
+**Para:**
+```
+"Código do Casal R$297"
+```
+
+---
+
+## Resumo das Mudanças
+
+| Arquivo | O que muda |
+|---------|------------|
+| `productCatalog.ts` | Descrição + lista de benefícios expandida (7 pilares) |
+| `ProgressiveUpsellSection.tsx` | Texto do card no dashboard |
+| `AdminCoupons.tsx` | Correção de preço (R$147 → R$297) |
+
+---
+
+## Resultado Esperado
+
+Após as alterações, toda a comunicação do produto "Código do Casal" (nello_couple) refletirá corretamente que ele inclui os **7 pilares completos** do método Identity, alinhando a proposta de valor ao que o sistema realmente entrega no relatório gerado pela IA.
+
+---
+
+## Detalhes Técnicos
+
+Nenhuma alteração em banco de dados ou Edge Functions é necessária, pois o sistema de geração de relatórios já processa os 7 pilares corretamente. As alterações são puramente de comunicação/UI.
