@@ -1,21 +1,17 @@
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useDiscernirAuth } from '../contexts/DiscernirAuthContext';
 import { useIdentityEssencial } from '../hooks/useIdentityEssencial';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { 
-  Heart, 
-  FileHeart, 
-  Users, 
-  CheckCircle2, 
-  AlertCircle,
-  ArrowRight,
-  Compass,
-  Loader2
-} from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2 } from 'lucide-react';
+import {
+  PersonalSpaceCard,
+  PhotoUploadWithConsent,
+  FunctionalCards,
+  PersonalSpaceFooter
+} from '../components/EspacoPessoal';
+
+type PastoralStatus = 'em_escuta' | 'aguardando_conversa' | 'caminho_concluido';
 
 export function DiscernirDashboard() {
   const { user } = useAuth();
@@ -23,11 +19,59 @@ export function DiscernirDashboard() {
     couple, 
     hasIndividualConsent, 
     hasConjugalConsent, 
-    hasPriestAccessConsent 
+    hasPriestAccessConsent,
+    isLoading: authLoading 
   } = useDiscernirAuth();
   const { status: essencialStatus, isLoading: essencialLoading, isJourneyComplete } = useIdentityEssencial();
 
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [parishName, setParishName] = useState<string | null>(null);
+  const [isLoadingParish, setIsLoadingParish] = useState(true);
+
   const userName = user?.user_metadata?.full_name || 'Peregrino';
+  const userId = user?.id;
+
+  // Fetch user profile for avatar
+  useEffect(() => {
+    async function fetchProfile() {
+      if (!userId) return;
+      
+      const { data } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', userId)
+        .single();
+      
+      if (data?.avatar_url) {
+        setAvatarUrl(data.avatar_url);
+      }
+    }
+    
+    fetchProfile();
+  }, [userId]);
+
+  // Fetch parish name if user is part of a couple
+  useEffect(() => {
+    async function fetchParish() {
+      if (!couple?.parish_id) {
+        setIsLoadingParish(false);
+        return;
+      }
+      
+      const { data } = await supabase
+        .from('discernir_parishes')
+        .select('name, city')
+        .eq('id', couple.parish_id)
+        .single();
+      
+      if (data) {
+        setParishName(data.city ? `${data.name} - ${data.city}` : data.name);
+      }
+      setIsLoadingParish(false);
+    }
+    
+    fetchParish();
+  }, [couple?.parish_id]);
 
   // Calculate Identity Essencial progress
   const calculateEssencialProgress = () => {
@@ -40,179 +84,78 @@ export function DiscernirDashboard() {
     return (completed / 4) * 100;
   };
 
+  // Determine pastoral status based on journey and consent state
+  const determinePastoralStatus = (): PastoralStatus => {
+    if (isJourneyComplete && hasIndividualConsent && hasPriestAccessConsent) {
+      return 'caminho_concluido';
+    }
+    if (hasIndividualConsent) {
+      return 'em_escuta';
+    }
+    return 'aguardando_conversa';
+  };
+
+  const handleAvatarChange = (newUrl: string | null) => {
+    setAvatarUrl(newUrl);
+  };
+
+  if (authLoading || isLoadingParish) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      {/* Welcome */}
-      <div className="text-center space-y-2">
-        <h1 className="font-serif text-3xl font-semibold text-amber-900">
-          Olá, {userName}
-        </h1>
-        <p className="text-amber-800/70">
-          Seja bem vindo à experiência DISCERNIR
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-amber-50/40">
+      <div className="max-w-xl mx-auto px-4 py-8 space-y-8">
+        {/* Header - Espaço Pessoal */}
+        <div className="text-center space-y-1">
+          <h1 className="font-serif text-2xl font-semibold text-amber-900">
+            Espaço Pessoal
+          </h1>
+          <p className="text-sm text-amber-700/70">
+            Sua área reservada de acompanhamento pastoral
+          </p>
+        </div>
 
-      {/* Identity Essencial Status - NEW */}
-      <Card className="border-amber-300 bg-amber-50/50">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Compass className="h-5 w-5 text-amber-700" />
-            Identity Essencial
-          </CardTitle>
-          <CardDescription className="text-sm">
-            Base humana para a escuta pastoral
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {essencialLoading ? (
-            <div className="flex items-center justify-center py-4">
-              <Loader2 className="h-5 w-5 animate-spin text-amber-700" />
+        {/* Personal Card with Photo */}
+        <div className="space-y-6">
+          <PersonalSpaceCard
+            fullName={userName}
+            avatarUrl={avatarUrl}
+            parishName={parishName}
+            pastoralStatus={determinePastoralStatus()}
+          />
+
+          {/* Photo Upload Section */}
+          {userId && (
+            <div className="flex justify-center">
+              <PhotoUploadWithConsent
+                userId={userId}
+                currentAvatarUrl={avatarUrl}
+                fullName={userName}
+                onAvatarChange={handleAvatarChange}
+              />
             </div>
-          ) : isJourneyComplete ? (
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-              <span className="text-green-700 font-medium">Jornada concluída</span>
-              {essencialStatus?.completion_source === 'reused' && (
-                <Badge variant="outline" className="text-xs bg-blue-50 text-blue-600 border-blue-200">
-                  Dados reaproveitados
-                </Badge>
-              )}
-            </div>
-          ) : (
-            <>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm text-amber-700">
-                  <span>Progresso</span>
-                  <span>{Math.round(calculateEssencialProgress())}%</span>
-                </div>
-                <Progress value={calculateEssencialProgress()} className="h-2" />
-              </div>
-              <Link to="/identity-essencial">
-                <Button className="w-full bg-amber-700 hover:bg-amber-800">
-                  {calculateEssencialProgress() > 0 ? 'Continuar Jornada' : 'Iniciar Jornada'}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </>
           )}
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Status Cards */}
-      <div className="grid md:grid-cols-3 gap-4">
-        {/* Consent Status */}
-        <Card className="border-amber-200/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Heart className="h-5 w-5 text-amber-700" />
-              Consentimento
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              {hasIndividualConsent ? (
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-              ) : (
-                <AlertCircle className="h-4 w-4 text-amber-500" />
-              )}
-              <span>Individual</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              {hasPriestAccessConsent ? (
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-              ) : (
-                <AlertCircle className="h-4 w-4 text-amber-500" />
-              )}
-              <span>Acesso pastoral</span>
-            </div>
-            {!hasIndividualConsent && (
-              <Link to="/consentimento">
-                <Button variant="outline" size="sm" className="w-full mt-2">
-                  Gerenciar
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            )}
-          </CardContent>
-        </Card>
+        {/* Functional Cards */}
+        <FunctionalCards
+          hasIndividualConsent={hasIndividualConsent}
+          isJourneyComplete={isJourneyComplete}
+          essencialLoading={essencialLoading}
+          essencialProgress={calculateEssencialProgress()}
+          essencialCompletionSource={essencialStatus?.completion_source}
+          hasConjugalConsent={hasConjugalConsent}
+          hasPriestAccessConsent={hasPriestAccessConsent}
+        />
 
-        {/* Apoio de Escuta */}
-        <Card className="border-amber-200/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <FileHeart className="h-5 w-5 text-amber-700" />
-              Apoio de Escuta
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CardDescription className="text-sm">
-              Material para apoiar a conversa pastoral sobre seu momento atual
-            </CardDescription>
-            <Link to="/apoio-escuta">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full mt-4"
-                disabled={!hasIndividualConsent || !isJourneyComplete}
-              >
-                Acessar
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            {!isJourneyComplete && hasIndividualConsent && (
-              <p className="text-xs text-amber-600 mt-2">
-                Complete o Identity Essencial primeiro
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Couple Protection */}
-        <Card className="border-amber-200/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Users className="h-5 w-5 text-amber-700" />
-              Proteção do Casal
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {couple ? (
-              <>
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                  Casal vinculado
-                </Badge>
-                <Link to="/cruzamento">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full mt-4"
-                    disabled={!hasConjugalConsent}
-                  >
-                    Acessar
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </>
-            ) : (
-              <CardDescription className="text-sm">
-                Aguardando vínculo com seu cônjuge
-              </CardDescription>
-            )}
-          </CardContent>
-        </Card>
+        {/* LGPD Footer */}
+        <PersonalSpaceFooter />
       </div>
-
-      {/* Info Box */}
-      <Card className="border-amber-200/50 bg-amber-50/30">
-        <CardContent className="pt-6">
-          <p className="text-center text-amber-800 italic">
-            "Este é um tempo que pede escuta, cuidado e discernimento, respeitando o ritmo da vida familiar."
-          </p>
-          <p className="text-center text-xs text-amber-700/60 mt-4">
-            Baseado em Amoris Laetitia e Evangelii Gaudium
-          </p>
-        </CardContent>
-      </Card>
     </div>
   );
 }
