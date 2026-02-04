@@ -16,11 +16,20 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+interface AxisData {
+  observation?: string;
+  attention_points?: string[];
+  suggestion?: string;
+  message?: string;
+  reflection?: string;
+}
+
 interface CruzamentoData {
   id: string;
-  rhythm_axis: any;
-  family_service_axis: any;
-  decision_axis: any;
+  rhythm_axis: AxisData | null;
+  family_service_axis: AxisData | null;
+  decision_axis: AxisData | null;
+  current_moment: string | null;
   generated_at: string;
   expires_at: string;
 }
@@ -39,9 +48,9 @@ export function DiscernirCruzamento() {
     try {
       const { data, error } = await supabase
         .from('discernir_apoio_escuta')
-        .select('id, rhythm_axis, family_service_axis, decision_axis, generated_at, expires_at')
+        .select('id, rhythm_axis, family_service_axis, decision_axis, current_moment, generated_at, expires_at')
         .eq('couple_id', couple.id)
-        .eq('artifact_type', 'couple_protection')
+        .eq('artifact_type', 'conjugal')
         .eq('is_valid', true)
         .gte('expires_at', new Date().toISOString())
         .order('generated_at', { ascending: false })
@@ -49,7 +58,7 @@ export function DiscernirCruzamento() {
         .maybeSingle();
 
       if (error) throw error;
-      setCruzamento(data);
+      setCruzamento(data as CruzamentoData | null);
     } catch (error: any) {
       console.error('Error fetching cruzamento:', error);
     } finally {
@@ -70,11 +79,25 @@ export function DiscernirCruzamento() {
     
     setIsGenerating(true);
     try {
-      toast.info('Funcionalidade em desenvolvimento', {
-        description: 'O Cruzamento será gerado com base nos dados do Identity de ambos'
+      const { data, error } = await supabase.functions.invoke('discernir-generate-cruzamento', {
+        body: {}
       });
+      
+      if (error) throw error;
+      
+      if (data?.success) {
+        toast.success('Cruzamento gerado', {
+          description: 'O cruzamento de proteção foi gerado com sucesso'
+        });
+        await fetchCruzamento();
+      } else {
+        throw new Error(data?.error || 'Erro desconhecido');
+      }
     } catch (error: any) {
-      toast.error('Erro ao gerar Cruzamento', { description: error.message });
+      console.error('Error generating cruzamento:', error);
+      toast.error('Erro ao gerar Cruzamento', { 
+        description: error.message || 'Tente novamente mais tarde' 
+      });
     } finally {
       setIsGenerating(false);
     }
