@@ -351,6 +351,13 @@ export default function BusinessAuth() {
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Entrar'}
                   </Button>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/reset-password')}
+                    className="text-sm text-primary hover:text-primary/80 transition-colors block w-full text-center"
+                  >
+                    Esqueceu sua senha?
+                  </button>
                   <p className="text-xs text-center text-muted-foreground">
                     Já tem conta no Nello One? Use a mesma senha!
                   </p>
