@@ -1,84 +1,170 @@
 
-# Plano: Atualizar Descrições do Código do Casal (7 Pilares)
+# Plano: Melhorar Clareza do Fluxo de Entrada do Identity
 
-## Contexto
+## Problema Identificado
 
-O sistema de cruzamento do casal já gera relatórios com os **7 pilares completos** do método Identity (DISC, Eneagrama, Temperamentos, Inteligências Múltiplas, Arquétipos, Estilos de Conexão e Nello 16), mas as descrições em vários pontos da aplicação mencionam apenas "DISC + Eneagrama", causando confusão na proposta de valor.
+O Wagner Sarkis (e provavelmente outros usuários) teve dificuldade para entender como começar a jornada no Identity. Após análise do código, identifiquei os seguintes problemas de UX:
 
----
+### Diagnóstico
 
-## Arquivos a Modificar
+1. **Fluxo de modais sequenciais confuso**
+   - Após login, o usuário vê dois modais em sequência (Onboarding → EntryPath)
+   - Isso cria uma experiência fragmentada
 
-### 1. `src/components/monetization/productCatalog.ts`
+2. **Nomenclatura desatualizada**
+   - Alguns textos ainda usam "NELLO ONE" em vez de "Identity"
+   - Ex: `Auth.tsx` linha 99: "Comece sua jornada NELLO ONE"
 
-**Alterações:**
-- Atualizar `nello_couple.description` de "DISC + Eneagrama" para mencionar os 7 pilares
-- Atualizar `nello_couple.descriptionEn` com a mesma correção em inglês
-- Expandir a lista de `benefits` para refletir os 7 pilares do relatório
-- Expandir `benefitsEn` com a tradução
+3. **Dashboard inicial sem contexto claro**
+   - Usuário novo vê 0/7 progresso
+   - Não está claro que precisa clicar no botão "Começar agora"
+   - Muitos testes aparecem "bloqueados" (ícone de cadeado)
 
-**Nova descrição PT:**
-> "O Mapa de Sinergia do seu relacionamento. 7 pilares cruzados: DISC, Eneagrama, Temperamentos, Inteligências, Arquétipos, Estilos de Conexão e Personalidade."
-
-**Novos benefícios PT:**
-- Dinâmica comportamental do casal (DISC)
-- Motivações profundas e pontos de tensão (Eneagrama)  
-- Protocolo de Ritmo (Temperamentos)
-- Sinergia de Talentos (Inteligências Múltiplas)
-- O Mito do Casal (Arquétipos)
-- Papéis naturais: Sensor de Direção e Construtor
-- Relatório PDF profissional de 15-20 páginas
+4. **Falta de "primeiro passo" destacado**
+   - O card "Próximo passo" existe, mas pode se perder visualmente
+   - Não há indicação clara de que é só clicar para começar
 
 ---
 
-### 2. `src/components/monetization/ProgressiveUpsellSection.tsx`
+## Soluções Propostas
 
-**Linha ~94-96:** Atualizar a descrição do card `nello_couple` no dashboard
+### 1. Consolidar Modais de Boas-Vindas (Prioridade Alta)
 
-**De:**
-```
-"Descubra o mapa de sinergia do seu relacionamento. DISC + Eneagrama cruzados."
-```
+**Problema**: Dois modais sequenciais (OnboardingModal → EntryPathModal) fragmentam a experiência.
 
-**Para:**
-```
-"O mapa completo de sinergia do seu relacionamento com 7 pilares cruzados."
-```
+**Solução**: Unificar em um único fluxo de boas-vindas com steps internos:
+- Step 1: Boas-vindas + explicação rápida da jornada
+- Step 2: Escolha da porta (Emocional vs Prática)
+- Step 3: CTA direto para iniciar o primeiro teste
 
----
-
-### 3. `src/components/admin/AdminCoupons.tsx`
-
-**Linhas 65 e 78:** Corrigir preços desatualizados nas listas de produtos
-
-**De:**
-```
-"Cruzamento de casal R$147"
-```
-
-**Para:**
-```
-"Código do Casal R$297"
-```
+**Arquivos afetados**:
+- `src/components/cliente/OnboardingModal.tsx` - Refatorar para incluir entrada path
+- `src/components/cliente/EntryPathModal.tsx` - Integrar ao OnboardingModal
+- `src/pages/Cliente.tsx` - Simplificar lógica de exibição de modais
 
 ---
 
-## Resumo das Mudanças
+### 2. Atualizar Nomenclatura (Prioridade Alta)
 
-| Arquivo | O que muda |
-|---------|------------|
-| `productCatalog.ts` | Descrição + lista de benefícios expandida (7 pilares) |
-| `ProgressiveUpsellSection.tsx` | Texto do card no dashboard |
-| `AdminCoupons.tsx` | Correção de preço (R$147 → R$297) |
+**Problema**: Textos ainda usam "NELLO ONE" em vez de "Identity".
+
+**Solução**: Substituir todas as referências:
+- "NELLO ONE" → "Identity" ou "Jornada Identity"
+- "sua jornada NELLO ONE" → "sua Jornada Identity"
+
+**Arquivos afetados**:
+- `src/pages/Auth.tsx` - linhas 99, 102-104
+- `src/components/cliente/OnboardingModal.tsx` - linha 36
+- Verificar outros componentes
 
 ---
 
-## Resultado Esperado
+### 3. Melhorar Card "Primeiro Passo" (Prioridade Média)
 
-Após as alterações, toda a comunicação do produto "Código do Casal" (nello_couple) refletirá corretamente que ele inclui os **7 pilares completos** do método Identity, alinhando a proposta de valor ao que o sistema realmente entrega no relatório gerado pela IA.
+**Problema**: O card de próximo passo pode não estar destacado o suficiente.
+
+**Solução**:
+- Para usuários com 0 testes, usar linguagem específica: "Seu primeiro passo"
+- Adicionar uma pulsação sutil ou animação de atenção
+- Texto mais convidativo: "Comece por aqui" em vez de "Começar agora"
+- Adicionar estimativa de tempo: "Leva apenas 5-10 minutos"
+
+**Arquivos afetados**:
+- `src/components/cliente/dashboard/DashboardStageJourney.tsx`
+
+---
+
+### 4. Melhorar Indicação Visual dos Testes (Prioridade Média)
+
+**Problema**: Testes "bloqueados" (sequenciais) aparecem com cadeado, o que pode parecer que precisam ser comprados.
+
+**Solução**:
+- Mudar ícone de cadeado para algo menos intimidador (ex: número com círculo)
+- Adicionar tooltip explicando: "Complete o teste anterior para desbloquear"
+- Diferenciar visualmente "bloqueado por sequência" vs "bloqueado por pagamento"
+
+**Arquivos afetados**:
+- `src/components/cliente/dashboard/DashboardStageJourney.tsx`
+
+---
+
+### 5. Adicionar Tela de "Primeiro Acesso" (Prioridade Baixa - Opcional)
+
+**Problema**: Usuário novo vai direto para modais sem contexto visual.
+
+**Solução Alternativa**: Em vez de múltiplos modais, criar uma página de boas-vindas dedicada (`/cliente/welcome`) que:
+- Mostra visualmente a jornada de 7 passos
+- Permite escolher a porta
+- Tem um grande CTA "Iniciar minha jornada"
+- Só aparece uma vez (no primeiro acesso)
+
+**Arquivos afetados**:
+- Criar novo: `src/pages/cliente/WelcomePage.tsx`
+- Atualizar: `src/App.tsx` (nova rota)
+- Atualizar: `src/pages/Auth.tsx` (redirecionar novos usuários para /cliente/welcome)
+
+---
+
+## Recomendação de Implementação
+
+**Fase 1 (Crítica - Resolver o problema imediato)**:
+1. Atualizar nomenclatura "NELLO ONE" → "Identity"
+2. Melhorar o OnboardingModal consolidado
+
+**Fase 2 (Melhoria de UX)**:
+3. Melhorar destaque do primeiro passo
+4. Ajustar indicação visual dos testes bloqueados
+
+**Fase 3 (Se necessário)**:
+5. Avaliar se uma página de welcome dedicada é necessária
 
 ---
 
 ## Detalhes Técnicos
 
-Nenhuma alteração em banco de dados ou Edge Functions é necessária, pois o sistema de geração de relatórios já processa os 7 pilares corretamente. As alterações são puramente de comunicação/UI.
+### Alterações no OnboardingModal
+
+```tsx
+// Estrutura proposta - Modal unificado com steps
+const [step, setStep] = useState<'welcome' | 'path' | 'ready'>('welcome');
+
+// Step 1: Boas-vindas
+{step === 'welcome' && (
+  <>
+    <p>Olá, {userName}. Você está prestes a iniciar uma jornada de 7 passos...</p>
+    <Button onClick={() => setStep('path')}>Continuar</Button>
+  </>
+)}
+
+// Step 2: Escolha de porta
+{step === 'path' && (
+  <>
+    <p>Como você prefere começar?</p>
+    {/* Cards de Emocional/Prático */}
+    <Button onClick={() => setStep('ready')}>Escolher</Button>
+  </>
+)}
+
+// Step 3: Pronto para começar
+{step === 'ready' && (
+  <>
+    <p>Tudo pronto! Seu primeiro teste será: [Nome do teste]</p>
+    <Button onClick={handleComplete}>Começar primeiro teste</Button>
+  </>
+)}
+```
+
+### Alterações no Auth.tsx
+
+```tsx
+// Atualizar textos
+const texts = {
+  // ...
+  startJourney: language === 'en' 
+    ? 'Start your Identity journey' 
+    : (language === 'pt-pt' 
+      ? 'Comece a sua Jornada Identity' 
+      : 'Comece sua Jornada Identity'),
+  // ...
+};
+```
