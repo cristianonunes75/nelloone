@@ -53,6 +53,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
     const hostname = window.location.hostname;
     const fullDomain = window.location.host;
     const search = searchOverride ?? window.location.search;
+    const pathname = window.location.pathname;
 
     // For development: allow forcing subdomain via env variable
     if (DEV_FORCE_SUBDOMAIN && (hostname === 'localhost' || hostname === '127.0.0.1')) {
@@ -86,6 +87,24 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
     if (isLovableDomain) {
       const urlParams = new URLSearchParams(search);
       let appParam = urlParams.get('app');
+
+      // In Lovable preview, infer app from pathname when ?app is missing.
+      // This prevents routes like /padre from falling back to Identity.
+      if (!appParam) {
+        const discernirPrefixes = [
+          '/padre',
+          '/dashboard',
+          '/consentimento',
+          '/apoio-escuta',
+          '/cruzamento',
+          '/convite',
+          '/identity-essencial',
+        ];
+
+        if (discernirPrefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+          appParam = 'discernir';
+        }
+      }
       
       // Handle legacy 'one' param
       if (appParam === 'one') {
