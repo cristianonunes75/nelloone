@@ -494,7 +494,7 @@ export const generateArchetypesSynergy = (
 };
 
 // ============================================================================
-// CONNECTION STYLES (LOVE LANGUAGES) SYNERGY
+// CONNECTION STYLES SYNERGY
 // ============================================================================
 
 const CONNECTION_STYLE_NAMES: Record<string, Record<Language, string>> = {
