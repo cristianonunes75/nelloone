@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CrossDivider } from "./CrossDivider";
-import { FreePlanBenefits } from "./FreePlanBenefits";
+
 import { ApprovedTestimonialsSection } from "./ApprovedTestimonialsSection";
 import { StrategicFAQ } from "./StrategicFAQ";
 import { PillarsSection } from "./PillarsSection";
@@ -130,7 +130,7 @@ export const NelloOneLanding = () => {
                 <span className="text-center leading-tight">Revelar meu Código da Essência</span>
                 <Sparkles className="ml-2 h-4 w-4 sm:h-5 sm:w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
               </Button>
-              <FreePlanBenefits variant="light" />
+              
             </div>
           </div>
         </div>
