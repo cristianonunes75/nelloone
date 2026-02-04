@@ -9,6 +9,7 @@ interface NelloAppContextType {
   isLife: boolean;
   isIdentity: boolean;
   isBusiness: boolean;
+  isDiscernir: boolean;
   isMain: boolean;
   domain: string;
   getAppUrl: (app: NelloApp) => string;
@@ -32,6 +33,7 @@ export function NelloAppProvider({ children }: NelloAppProviderProps) {
     isLife: subdomainConfig.isLife,
     isIdentity: subdomainConfig.isIdentity,
     isBusiness: subdomainConfig.app === 'business',
+    isDiscernir: subdomainConfig.isDiscernir,
     isMain: subdomainConfig.isMain,
     domain: subdomainConfig.domain,
     getAppUrl: getNelloAppUrl,

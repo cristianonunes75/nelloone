@@ -67,6 +67,13 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
         en: 'Tools for human development professionals.',
       },
     },
+    discernir: {
+      name: 'DISCERNIR',
+      tagline: {
+        pt: 'Experiência assistida de escuta pastoral.',
+        en: 'Pastoral listening assisted experience.',
+      },
+    },
   };
 
   const currentBranding = appBranding[activeApp] || appBranding.identity;
