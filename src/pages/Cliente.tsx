@@ -18,8 +18,7 @@ import {
 import { LogoText } from "@/components/LogoText";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { ImpersonateBanner } from "@/components/ImpersonateBanner";
-import { OnboardingModal } from "@/components/cliente/OnboardingModal";
-import { EntryPathModal, type EntryPath } from "@/components/cliente/EntryPathModal";
+import { OnboardingModal, type EntryPath } from "@/components/cliente/OnboardingModal";
 import { LogOut, User, Users, ArrowRight } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
@@ -61,7 +60,6 @@ const Cliente = () => {
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [stepToReset, setStepToReset] = useState<any>(null);
   const [ativacaoPurchaseOpen, setAtivacaoPurchaseOpen] = useState(false);
-  const [showEntryPathModal, setShowEntryPathModal] = useState(false);
   
   // Celebration modal state for product purchases
   const [celebrationModalOpen, setCelebrationModalOpen] = useState(false);
@@ -321,15 +319,7 @@ const Cliente = () => {
     }
   }, [searchParams, setSearchParams, toast, queryClient]);
 
-  // Check if we need to show entry path modal on mount (user hasn't selected a path)
-  useEffect(() => {
-    if (completedCount === 0 && needsPathSelection && !localStorage.getItem("nello_onboarding_seen")) {
-      // Don't show yet - wait for onboarding to complete
-    } else if (completedCount === 0 && needsPathSelection && localStorage.getItem("nello_onboarding_seen")) {
-      // Onboarding done but no path selected
-      setShowEntryPathModal(true);
-    }
-  }, [completedCount, needsPathSelection]);
+  // Note: Entry path modal is now integrated into OnboardingModal
 
   // Map test types to their keys in testSlugs
   const testTypeToSlugKey: Record<string, keyof typeof testSlugs> = {
@@ -619,28 +609,19 @@ const Cliente = () => {
     ? impersonatedUserName?.split(" ")[0] || "Usuário"
     : profile?.full_name?.split(" ")[0] || user?.user_metadata?.full_name?.split(" ")[0] || "Viajante";
 
-  const handleOnboardingComplete = () => {
-    // After onboarding, show entry path selection if not already selected
-    if (needsPathSelection) {
-      setShowEntryPathModal(true);
-    } else {
-      // Start the first test after onboarding
+  const handleOnboardingComplete = (path: EntryPath) => {
+    // Invalidate queries to refetch with new journey order
+    queryClient.invalidateQueries({ queryKey: ["user-tests"] });
+    queryClient.invalidateQueries({ queryKey: ["profile"] });
+    
+    // Start the first test after onboarding + path selection
+    // Use a small delay to allow queries to update
+    setTimeout(() => {
       const firstStep = journeySteps[0];
       if (firstStep) {
         handleStartTest(firstStep);
       }
-    }
-  };
-
-  const handleEntryPathComplete = (path: EntryPath) => {
-    setShowEntryPathModal(false);
-    // Invalidate queries to refetch with new journey order
-    queryClient.invalidateQueries({ queryKey: ["user-tests"] });
-    // Start the first test after path selection
-    const firstStep = journeySteps[0];
-    if (firstStep) {
-      handleStartTest(firstStep);
-    }
+    }, 100);
   };
 
   // Get language for translations
@@ -713,22 +694,15 @@ const Cliente = () => {
 
   return (
     <div className={`min-h-screen pb-24 md:pb-0 ${isImpersonating ? 'bg-amber-50/30' : 'bg-background'}`}>
-      {/* Entry Path Modal - shows after onboarding when user needs to select their preferred path */}
+      {/* Consolidated Onboarding Modal - shows only when user hasn't completed any test */}
       {user && (
-        <EntryPathModal
+        <OnboardingModal 
           userId={user.id}
-          userName={displayName}
-          open={showEntryPathModal}
-          onComplete={handleEntryPathComplete}
+          userName={displayName} 
+          onComplete={handleOnboardingComplete}
+          enabled={completedCount === 0}
         />
       )}
-      
-      {/* Onboarding Modal - shows only when user hasn't completed any test */}
-      <OnboardingModal 
-        userName={displayName} 
-        onComplete={handleOnboardingComplete}
-        enabled={completedCount === 0 && !showEntryPathModal}
-      />
       {/* Impersonate Banner */}
       <ImpersonateBanner />
       {/* Header - iOS style with blur */}
