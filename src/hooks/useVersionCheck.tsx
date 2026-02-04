@@ -41,6 +41,19 @@ export const useVersionCheck = () => {
       const storedHash = sessionStorage.getItem('app-main-hash');
       
       if (storedHash && storedHash !== mainScript && lastHash.current !== mainScript) {
+        // Check if user is in the middle of a form - don't reload during critical operations
+        const hasUnsavedFormData = 
+          sessionStorage.getItem('discernir_rhythm_answers') ||
+          sessionStorage.getItem('test_in_progress');
+        
+        if (hasUnsavedFormData) {
+          // Defer the update until user is done
+          console.debug('Version update deferred - user has unsaved form data');
+          lastHash.current = mainScript;
+          sessionStorage.setItem('app-main-hash', mainScript);
+          return;
+        }
+        
         // New version detected - update silently
         hasUpdated.current = true;
         
