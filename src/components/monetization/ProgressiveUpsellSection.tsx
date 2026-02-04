@@ -90,10 +90,10 @@ export function ProgressiveUpsellSection({
     },
     {
       id: "nello_couple",
-      name: isEn ? "Couple's Code" : "Nello Couple",
+      name: isEn ? "Couple's Code" : "Código do Casal",
       description: isEn 
-        ? "Discover the synergy map of your relationship. DISC + Enneagram crossed."
-        : "Descubra o mapa de sinergia do seu relacionamento. DISC + Eneagrama cruzados.",
+        ? "The complete synergy map of your relationship with 7 crossed pillars."
+        : "O mapa completo de sinergia do seu relacionamento com 7 pilares cruzados.",
       icon: Heart,
       gradient: "from-rose-500/20 via-pink-400/10 to-transparent",
       iconBg: "from-rose-500 to-pink-500",
