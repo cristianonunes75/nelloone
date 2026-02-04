@@ -2250,6 +2250,9 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          interview_invite_sent_at: string | null
+          interview_notes: string | null
+          interview_scheduled_at: string | null
           invite_expires_at: string | null
           invite_sent_at: string | null
           invite_token: string
@@ -2272,6 +2275,9 @@ export type Database = {
           email: string
           full_name: string
           id?: string
+          interview_invite_sent_at?: string | null
+          interview_notes?: string | null
+          interview_scheduled_at?: string | null
           invite_expires_at?: string | null
           invite_sent_at?: string | null
           invite_token?: string
@@ -2294,6 +2300,9 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          interview_invite_sent_at?: string | null
+          interview_notes?: string | null
+          interview_scheduled_at?: string | null
           invite_expires_at?: string | null
           invite_sent_at?: string | null
           invite_token?: string

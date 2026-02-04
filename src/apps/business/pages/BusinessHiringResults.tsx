@@ -15,6 +15,8 @@ import { HiringAssessmentProgressCard } from "../components/HiringAssessmentProg
 import { HiringPartialDISCResult } from "../components/HiringPartialDISCResult";
 import { HiringPartialTemperamentResult } from "../components/HiringPartialTemperamentResult";
 import { CandidateFollowupDialog } from "../components/CandidateFollowupDialog";
+import { CandidateInterviewNotesCard } from "../components/CandidateInterviewNotesCard";
+import { CandidateInterviewInviteDialog } from "../components/CandidateInterviewInviteDialog";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DISC_PROFILES, type DISCScores } from "@/lib/disc";
@@ -53,6 +55,9 @@ interface Candidate {
   phone: string | null;
   position_applied: string | null;
   notes: string | null;
+  interview_notes: string | null;
+  interview_invite_sent_at: string | null;
+  interview_scheduled_at: string | null;
   status: string;
   created_at: string;
   attachments?: Attachment[];
@@ -142,6 +147,9 @@ export default function BusinessHiringResults() {
         phone: candidateData.phone,
         position_applied: candidateData.position_applied,
         notes: candidateData.notes,
+        interview_notes: candidateData.interview_notes,
+        interview_invite_sent_at: candidateData.interview_invite_sent_at,
+        interview_scheduled_at: candidateData.interview_scheduled_at,
         status: candidateData.status,
         created_at: candidateData.created_at,
         attachments: parsedAttachments,
@@ -534,6 +542,41 @@ export default function BusinessHiringResults() {
         {/* Partial Temperament Result - Show as soon as completed */}
         {temperamentAssessment?.status === "completed" && temperamentAssessment.result_data && (
           <HiringPartialTemperamentResult result={temperamentAssessment.result_data} />
+        )}
+
+        {/* Interview Notes Card - Always visible for completed assessments */}
+        {bothCompleted && (
+          <>
+            <CandidateInterviewNotesCard
+              candidateId={candidate.id}
+              initialNotes={candidate.interview_notes}
+              onUpdate={fetchCandidateData}
+            />
+            
+            {/* Interview Invite Action */}
+            <Card className="border-dashed border-primary/30 bg-primary/5">
+              <CardContent className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium text-sm">Próximo passo</p>
+                    <p className="text-xs text-muted-foreground">
+                      {candidate.interview_invite_sent_at 
+                        ? `Convite enviado em ${format(new Date(candidate.interview_invite_sent_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`
+                        : "Convide o candidato para uma entrevista"}
+                    </p>
+                  </div>
+                </div>
+                <CandidateInterviewInviteDialog
+                  candidateId={candidate.id}
+                  candidateName={candidate.full_name}
+                  candidateEmail={candidate.email}
+                  positionApplied={candidate.position_applied}
+                  onSuccess={fetchCandidateData}
+                />
+              </CardContent>
+            </Card>
+          </>
         )}
 
         {/* Full Report - Only when both complete */}
