@@ -73,20 +73,25 @@ export function DiscernirApoioEscuta() {
     
     setIsGenerating(true);
     try {
-      // In a real implementation, this would call an edge function
-      // that reads from IDENTITY and generates the Apoio de Escuta
-      // For now, we create a placeholder
-      toast.info('Funcionalidade em desenvolvimento', {
-        description: 'O Apoio de Escuta será gerado com base nos dados do Identity'
+      const { data, error } = await supabase.functions.invoke('discernir-generate-apoio', {
+        body: { artifact_type: 'individual' }
       });
       
-      // Placeholder implementation
-      // const { data, error } = await supabase.functions.invoke('discernir-generate-apoio', {
-      //   body: { user_id: user.id }
-      // });
+      if (error) throw error;
       
+      if (data?.success) {
+        toast.success('Apoio de Escuta gerado', {
+          description: 'O material foi gerado com base nos seus dados do Identity'
+        });
+        await fetchApoioEscuta();
+      } else {
+        throw new Error(data?.error || 'Erro desconhecido');
+      }
     } catch (error: any) {
-      toast.error('Erro ao gerar Apoio de Escuta', { description: error.message });
+      console.error('Error generating apoio escuta:', error);
+      toast.error('Erro ao gerar Apoio de Escuta', { 
+        description: error.message || 'Tente novamente mais tarde' 
+      });
     } finally {
       setIsGenerating(false);
     }

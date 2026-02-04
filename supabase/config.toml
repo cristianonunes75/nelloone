@@ -170,3 +170,9 @@ verify_jwt = false
 
 [functions.business-candidate-followup]
 verify_jwt = true
+
+[functions.discernir-generate-apoio]
+verify_jwt = true
+
+[functions.discernir-generate-cruzamento]
+verify_jwt = true
