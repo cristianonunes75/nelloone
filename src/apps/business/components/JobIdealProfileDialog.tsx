@@ -19,6 +19,7 @@ export function JobIdealProfileDialog({ jobId, currentProfile, onProfileSaved }:
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editingProfile, setEditingProfile] = useState<IdealProfile | null>(null);
+  const [formKey, setFormKey] = useState(0);
 
   const handleSave = async (profile: IdealProfile) => {
     setSaving(true);
@@ -71,7 +72,12 @@ export function JobIdealProfileDialog({ jobId, currentProfile, onProfileSaved }:
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
       setOpen(isOpen);
-      if (!isOpen) setEditingProfile(null);
+      if (!isOpen) {
+        setEditingProfile(null);
+      } else {
+        // Reset form key when opening to ensure IdealProfileForm re-initializes with currentProfile
+        setFormKey(prev => prev + 1);
+      }
     }}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
@@ -119,6 +125,7 @@ export function JobIdealProfileDialog({ jobId, currentProfile, onProfileSaved }:
         )}
 
         <IdealProfileForm 
+          key={formKey}
           initialData={activeProfile}
           onSave={handleSave}
           saving={saving}

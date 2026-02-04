@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -33,10 +33,20 @@ const DEFAULT_PROFILE: IdealProfile = {
 };
 
 export function IdealProfileForm({ initialData, onSave, saving }: IdealProfileFormProps) {
-  const [profile, setProfile] = useState<IdealProfile>({
+  const [profile, setProfile] = useState<IdealProfile>(() => ({
     ...DEFAULT_PROFILE,
     ...initialData,
-  });
+  }));
+
+  // Update profile when initialData changes (e.g., when template is selected or saved profile loaded)
+  useEffect(() => {
+    if (initialData) {
+      setProfile({
+        ...DEFAULT_PROFILE,
+        ...initialData,
+      });
+    }
+  }, [initialData]);
 
   const handleToggle = (field: keyof IdealProfile, value: string) => {
     setProfile(prev => {
