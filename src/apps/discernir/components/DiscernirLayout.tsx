@@ -128,15 +128,23 @@ export function DiscernirLayout({ isPriest = false }: DiscernirLayoutProps) {
         <Outlet />
       </main>
 
-      {/* Footer with Disclaimer */}
+      {/* Institutional Footer */}
       <footer className="border-t bg-amber-50/50 py-6">
-        <div className="container px-4 text-center">
+        <div className="container px-4 text-center space-y-3">
           <p className="text-sm text-amber-800/80 italic max-w-2xl mx-auto">
             "Este apoio não descreve a pessoa. Apenas ajuda a escutar melhor o momento."
           </p>
-          <p className="mt-4 text-xs text-muted-foreground">
-            DISCERNIR · Versão Piloto 0.1 · Pastoral Familiar
-          </p>
+          <div className="text-xs text-amber-700/60 max-w-xl mx-auto space-y-1">
+            <p className="font-medium text-amber-800/70">
+              DISCERNIR — versão piloto pastoral
+            </p>
+            <p>
+              Arquitetura técnica de autoconhecimento desenvolvida no ecossistema Nello Identity.
+            </p>
+            <p>
+              Uso pastoral com consentimento explícito e revogável, em conformidade com a LGPD.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

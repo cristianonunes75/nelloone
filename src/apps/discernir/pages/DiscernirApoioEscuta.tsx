@@ -19,7 +19,8 @@ import {
   ArrowRight,
   Info,
   Sparkles,
-  Users
+  Users,
+  ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -321,6 +322,12 @@ export function DiscernirApoioEscuta() {
           </Button>
         </div>
 
+        {/* Transparency Line */}
+        <p className="text-xs text-amber-600/70 leading-relaxed">
+          Este apoio foi gerado a partir da sua experiência de autoconhecimento no <span className="font-medium">Nello Identity</span>, 
+          utilizada aqui apenas como apoio à escuta pastoral, com seu consentimento.
+        </p>
+
         {/* 1. Pastoral Framing Block - "O que você está vendo aqui" */}
         <Card className="border-amber-200/40 bg-amber-100/40">
           <CardContent className="py-5">
@@ -443,7 +450,30 @@ export function DiscernirApoioEscuta() {
           </CardContent>
         </Card>
 
-        {/* 6. Safety Disclaimers */}
+        {/* 6. Deepen Your Journey Block (Optional UX Bridge) */}
+        <Card className="border-amber-200/50 bg-white/60">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-serif text-base text-amber-900">
+              Deseja aprofundar seu autoconhecimento?
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-amber-700/80 leading-relaxed">
+              Se você quiser compreender melhor seus resultados pessoais e acessar leituras 
+              completas de autoconhecimento, isso pode ser feito diretamente na sua jornada 
+              pessoal no Identity.
+            </p>
+            <Button 
+              variant="outline" 
+              className="w-full border-amber-200 text-amber-700 hover:bg-amber-50"
+              onClick={() => navigate('/cliente')}
+            >
+              Ver meus resultados no Identity
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* 7. Safety Disclaimers */}
         <Card className="border-amber-200/40 bg-amber-50/50">
           <CardContent className="py-5 space-y-3">
             <p className="text-center text-amber-800/70 text-sm leading-relaxed">
