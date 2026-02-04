@@ -489,15 +489,11 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     />
-    {/* Admin view route for viewing any user's codigo */}
-    <Route
-      path="/codigo-da-essencia/view"
-      element={
-        <ProtectedRoute allowedRoles={["admin"]}>
-          <CodigoEssencia />
-        </ProtectedRoute>
-      }
-    />
+    {/* SECURITY FIX: Removed admin view route /codigo-da-essencia/view
+        This route allowed admins to view any user's sensitive psychological report.
+        Admins should NOT have direct access to user's Código da Essência.
+        The impersonation feature (via ImpersonateContext) remains available for
+        legitimate support cases, as it has proper audit logging. */}
     <Route
       path="/essence-code"
       element={

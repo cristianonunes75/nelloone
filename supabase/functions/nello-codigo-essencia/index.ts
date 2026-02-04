@@ -1898,10 +1898,59 @@ serve(async (req) => {
       );
     }
 
-    // Initialize Supabase client
+    // Initialize Supabase clients
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabaseUser = createClient(supabaseUrl, supabaseAnonKey);
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // SECURITY FIX: Validate caller authorization
+    // Only allow generation if:
+    // 1. caller_id == user_id (user generating their own report)
+    // 2. mock mode (for testing without real data)
+    // ═══════════════════════════════════════════════════════════════════════
+    const authHeader = req.headers.get("Authorization");
+    let callerId: string | null = null;
+    
+    if (authHeader) {
+      const token = authHeader.replace("Bearer ", "");
+      const { data: { user: caller }, error: authError } = await supabaseUser.auth.getUser(token);
+      
+      if (!authError && caller) {
+        callerId = caller.id;
+      }
+    }
+
+    // Log the access attempt for audit
+    const clientIp = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
+    const userAgent = req.headers.get("user-agent") || "unknown";
+
+    // SECURITY CHECK: Validate ownership
+    if (!mock && callerId !== user_id) {
+      console.error(`SECURITY: Unauthorized access attempt. Caller: ${callerId}, Target: ${user_id}, IP: ${clientIp}`);
+      
+      // Log the unauthorized attempt
+      await supabase.rpc('log_audit', {
+        p_action: 'unauthorized_codigo_access_attempt',
+        p_table_name: 'mapa_essencia',
+        p_record_id: null,
+        p_new_data: {
+          caller_id: callerId,
+          target_user_id: user_id,
+          ip_address: clientIp,
+          user_agent: userAgent,
+          timestamp: new Date().toISOString(),
+          blocked: true
+        }
+      });
+
+      return new Response(
+        JSON.stringify({ error: "unauthorized", message: "You can only generate your own Código da Essência" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // 1. Get user profile
     const { data: profile, error: profileError } = await supabase

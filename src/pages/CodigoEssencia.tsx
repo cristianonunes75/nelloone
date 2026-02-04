@@ -4,6 +4,7 @@ import { CodigoEssenciaUpsell } from "@/components/monetization";
 import { useAuth } from "@/hooks/useAuth";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
 import { useCodigoEssencia } from "@/hooks/useCodigoEssencia";
+import { useImpersonate } from "@/contexts/ImpersonateContext";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -200,7 +201,22 @@ const TRANSLATIONS = {
 const CodigoEssenciaInner = () => {
   const { profile, user } = useAuth();
   const [searchParams] = useSearchParams();
-  const targetUserId = searchParams.get('user') || undefined;
+  
+  // SECURITY FIX: URL parameter user= is now IGNORED for regular access.
+  // Only impersonation (via ImpersonateContext) can access another user's data,
+  // and it has proper audit logging and session management.
+  // The targetUserId is only passed if we're in a legitimate impersonation session.
+  const urlTargetUserId = searchParams.get('user') || undefined;
+  
+  // Import impersonation context to check if we're in a valid impersonation session
+  const { impersonatedUserId, isImpersonating } = useImpersonate();
+  
+  // Only allow viewing another user's data if:
+  // 1. We're in a valid impersonation session AND
+  // 2. The URL target matches the impersonated user (prevents URL manipulation)
+  const targetUserId = isImpersonating && impersonatedUserId && urlTargetUserId === impersonatedUserId 
+    ? impersonatedUserId 
+    : undefined;
   
   const journeyData = useJourneyProgress(targetUserId);
   const codigoData = useCodigoEssencia(targetUserId);
