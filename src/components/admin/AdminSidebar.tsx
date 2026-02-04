@@ -7,7 +7,6 @@ import {
   Ticket,
   Sparkles,
   Activity,
-  Star,
   UserCheck,
   MessageSquareHeart,
   Palette,
@@ -28,6 +27,11 @@ import {
   Kanban,
   CalendarCheck,
   BookOpen,
+  Church,
+  UserCog,
+  Heart,
+  Mail,
+  ShieldCheck,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -124,6 +128,18 @@ const menuSections: MenuSection[] = [
       { title: "Tools", url: "/admin/tools", icon: Wrench, permission: 'super_admin_only' },
       { title: "Logs", url: "/admin/logs", icon: Activity, permission: 'super_admin_only' },
       { title: "Configurações", url: "/admin/configuracoes", icon: Settings, permission: 'can_manage_settings' },
+    ]
+  },
+  {
+    label: "DISCERNIR",
+    items: [
+      { title: "Piloto", url: "/admin/discernir", icon: Church, exact: true, permission: 'super_admin_only' },
+      { title: "Paróquias", url: "/admin/discernir/paroquias", icon: Building2, permission: 'super_admin_only' },
+      { title: "Padres", url: "/admin/discernir/padres", icon: UserCog, permission: 'super_admin_only' },
+      { title: "Casais", url: "/admin/discernir/casais", icon: Heart, permission: 'super_admin_only' },
+      { title: "Convites", url: "/admin/discernir/convites", icon: Mail, permission: 'super_admin_only' },
+      { title: "Consentimentos", url: "/admin/discernir/consentimentos", icon: ShieldCheck, permission: 'super_admin_only' },
+      { title: "Acessos", url: "/admin/discernir/acessos", icon: Eye, permission: 'super_admin_only' },
     ]
   }
 ];
