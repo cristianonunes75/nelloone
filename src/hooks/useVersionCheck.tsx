@@ -2,14 +2,37 @@ import { useEffect, useCallback, useRef } from 'react';
 
 const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // Check every 30 minutes
 const INITIAL_CHECK_DELAY = 60 * 1000; // Wait 1 minute after page load
+const MIN_TIME_BETWEEN_RELOADS = 5 * 60 * 1000; // Minimum 5 minutes between reloads
+
+// Detect if we're in development/preview mode
+const isDevelopment = () => {
+  const hostname = window.location.hostname;
+  return hostname.includes('localhost') || 
+         hostname.includes('lovableproject.com') || 
+         hostname.includes('lovable.app') ||
+         hostname.includes('preview');
+};
 
 export const useVersionCheck = () => {
   const hasUpdated = useRef(false);
   const lastHash = useRef<string | null>(null);
+  const lastReloadAttempt = useRef<number>(0);
   
   const checkForUpdates = useCallback(async () => {
+    // Skip version check entirely in development/preview environments
+    if (isDevelopment()) {
+      return;
+    }
+    
     // Don't check again if we already triggered an update
     if (hasUpdated.current) return;
+    
+    // Prevent reload storms - minimum 5 minutes between reload attempts
+    const now = Date.now();
+    if (now - lastReloadAttempt.current < MIN_TIME_BETWEEN_RELOADS) {
+      console.debug('Version check skipped - too soon since last attempt');
+      return;
+    }
     
     try {
       // Fetch the current index.html to check for new version
@@ -54,6 +77,9 @@ export const useVersionCheck = () => {
           return;
         }
         
+        // Mark reload attempt time to prevent storms
+        lastReloadAttempt.current = now;
+        
         // New version detected - update silently
         hasUpdated.current = true;
         
@@ -77,6 +103,12 @@ export const useVersionCheck = () => {
   }, []);
 
   useEffect(() => {
+    // Skip entirely in development
+    if (isDevelopment()) {
+      console.debug('Version check disabled in development environment');
+      return;
+    }
+    
     // Initialize hash from session storage
     const stored = sessionStorage.getItem('app-main-hash');
     if (stored) {
