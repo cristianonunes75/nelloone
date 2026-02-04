@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from 'react';
 
-export type NelloApp = 'flow' | 'life' | 'identity' | 'business' | 'main' | 'praxis';
+export type NelloApp = 'flow' | 'life' | 'identity' | 'business' | 'main' | 'praxis' | 'discernir';
 
 interface SubdomainConfig {
   app: NelloApp;
@@ -11,6 +11,7 @@ interface SubdomainConfig {
   isMain: boolean;
   isBusiness: boolean;
   isPraxis: boolean;
+  isDiscernir: boolean;
   domain: string;
 }
 
@@ -21,6 +22,7 @@ const SUBDOMAIN_MAP: Record<string, NelloApp> = {
   'identity': 'identity',
   'business': 'business',
   'praxis': 'praxis',
+  'discernir': 'discernir',
 };
 
 // Legacy subdomain redirects
@@ -65,6 +67,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
         isIdentity: app === 'identity',
         isBusiness: app === 'business',
         isPraxis: app === 'praxis',
+        isDiscernir: app === 'discernir',
         isMain: app === 'main',
         domain: fullDomain,
         shouldRedirect: false,
@@ -99,6 +102,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
           isIdentity: false,
           isBusiness: false,
           isPraxis: false,
+          isDiscernir: false,
           isMain: true,
           domain: fullDomain,
           shouldRedirect: false,
@@ -116,6 +120,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
           isIdentity: app === 'identity',
           isBusiness: app === 'business',
           isPraxis: app === 'praxis',
+          isDiscernir: app === 'discernir',
           isMain: false,
           domain: fullDomain,
           shouldRedirect: false,
@@ -132,6 +137,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
         isIdentity: true,
         isBusiness: false,
         isPraxis: false,
+        isDiscernir: false,
         isMain: false,
         domain: fullDomain,
         shouldRedirect: false,
@@ -153,6 +159,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
           isIdentity: false,
           isBusiness: false,
           isPraxis: false,
+          isDiscernir: false,
           isMain: true,
           domain: fullDomain,
           shouldRedirect: false,
@@ -172,6 +179,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
           isIdentity: true,
           isBusiness: false,
           isPraxis: false,
+          isDiscernir: false,
           isMain: false,
           domain: fullDomain,
           shouldRedirect: true,
@@ -189,6 +197,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
         isIdentity: app === 'identity',
         isBusiness: app === 'business',
         isPraxis: app === 'praxis',
+        isDiscernir: app === 'discernir',
         isMain: app === 'main',
         domain: fullDomain,
         shouldRedirect: false,
@@ -206,6 +215,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
         isIdentity: true,
         isBusiness: false,
         isPraxis: false,
+        isDiscernir: false,
         isMain: false,
         domain: fullDomain,
         shouldRedirect: false,
@@ -222,6 +232,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
       isIdentity: false,
       isBusiness: false,
       isPraxis: false,
+      isDiscernir: false,
       isMain: true,
       domain: fullDomain,
       shouldRedirect: false,
@@ -244,6 +255,7 @@ export function useSubdomain(searchOverride?: string): SubdomainConfig {
     isIdentity: config.isIdentity,
     isBusiness: config.isBusiness,
     isPraxis: config.isPraxis,
+    isDiscernir: config.isDiscernir,
     isMain: config.isMain,
     domain: config.domain,
   };

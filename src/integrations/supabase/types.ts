@@ -1753,6 +1753,577 @@ export type Database = {
         }
         Relationships: []
       }
+      discernir_access_logs: {
+        Row: {
+          action: string
+          apoio_escuta_id: string | null
+          consent_verified: boolean | null
+          couple_id: string | null
+          created_at: string | null
+          id: string
+          ip_address: string | null
+          priest_id: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          apoio_escuta_id?: string | null
+          consent_verified?: boolean | null
+          couple_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          priest_id: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          apoio_escuta_id?: string | null
+          consent_verified?: boolean | null
+          couple_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          priest_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discernir_access_logs_apoio_escuta_id_fkey"
+            columns: ["apoio_escuta_id"]
+            isOneToOne: false
+            referencedRelation: "discernir_apoio_escuta"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_access_logs_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "discernir_couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_access_logs_priest_id_fkey"
+            columns: ["priest_id"]
+            isOneToOne: false
+            referencedRelation: "discernir_priests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_access_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_access_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "discernir_access_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discernir_apoio_escuta: {
+        Row: {
+          artifact_type: string
+          care_pathways: Json | null
+          couple_id: string | null
+          created_at: string | null
+          current_moment: Json | null
+          decision_axis: Json | null
+          expires_at: string | null
+          family_service_axis: Json | null
+          family_situation: Json | null
+          fatigue_signals: Json | null
+          generated_at: string | null
+          id: string
+          identity_data_snapshot_at: string | null
+          is_valid: boolean | null
+          parish_id: string
+          responsibility_relation: Json | null
+          rhythm_axis: Json | null
+          suggested_questions: Json | null
+          user_id: string
+        }
+        Insert: {
+          artifact_type?: string
+          care_pathways?: Json | null
+          couple_id?: string | null
+          created_at?: string | null
+          current_moment?: Json | null
+          decision_axis?: Json | null
+          expires_at?: string | null
+          family_service_axis?: Json | null
+          family_situation?: Json | null
+          fatigue_signals?: Json | null
+          generated_at?: string | null
+          id?: string
+          identity_data_snapshot_at?: string | null
+          is_valid?: boolean | null
+          parish_id: string
+          responsibility_relation?: Json | null
+          rhythm_axis?: Json | null
+          suggested_questions?: Json | null
+          user_id: string
+        }
+        Update: {
+          artifact_type?: string
+          care_pathways?: Json | null
+          couple_id?: string | null
+          created_at?: string | null
+          current_moment?: Json | null
+          decision_axis?: Json | null
+          expires_at?: string | null
+          family_service_axis?: Json | null
+          family_situation?: Json | null
+          fatigue_signals?: Json | null
+          generated_at?: string | null
+          id?: string
+          identity_data_snapshot_at?: string | null
+          is_valid?: boolean | null
+          parish_id?: string
+          responsibility_relation?: Json | null
+          rhythm_axis?: Json | null
+          suggested_questions?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discernir_apoio_escuta_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "discernir_couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_apoio_escuta_parish_id_fkey"
+            columns: ["parish_id"]
+            isOneToOne: false
+            referencedRelation: "discernir_parishes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_apoio_escuta_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_apoio_escuta_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "discernir_apoio_escuta_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discernir_consents: {
+        Row: {
+          consent_text: string
+          consent_type: string
+          consent_version: string
+          couple_id: string | null
+          created_at: string | null
+          granted_at: string | null
+          id: string
+          is_active: boolean | null
+          revocation_reason: string | null
+          revoked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          consent_text: string
+          consent_type: string
+          consent_version?: string
+          couple_id?: string | null
+          created_at?: string | null
+          granted_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          consent_text?: string
+          consent_type?: string
+          consent_version?: string
+          couple_id?: string | null
+          created_at?: string | null
+          granted_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discernir_consents_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "discernir_couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_consents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_consents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "discernir_consents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discernir_couple_invites: {
+        Row: {
+          accepted_at: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          invite_token: string
+          invited_by: string
+          notes: string | null
+          parish_id: string
+          spouse_a_email: string
+          spouse_a_name: string | null
+          spouse_b_email: string
+          spouse_b_name: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          invite_token?: string
+          invited_by: string
+          notes?: string | null
+          parish_id: string
+          spouse_a_email: string
+          spouse_a_name?: string | null
+          spouse_b_email: string
+          spouse_b_name?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          invite_token?: string
+          invited_by?: string
+          notes?: string | null
+          parish_id?: string
+          spouse_a_email?: string
+          spouse_a_name?: string | null
+          spouse_b_email?: string
+          spouse_b_name?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discernir_couple_invites_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "discernir_priests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_couple_invites_parish_id_fkey"
+            columns: ["parish_id"]
+            isOneToOne: false
+            referencedRelation: "discernir_parishes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discernir_couples: {
+        Row: {
+          couple_name: string | null
+          created_at: string | null
+          id: string
+          invite_id: string | null
+          parish_id: string
+          spouse_a_user_id: string | null
+          spouse_b_user_id: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          couple_name?: string | null
+          created_at?: string | null
+          id?: string
+          invite_id?: string | null
+          parish_id: string
+          spouse_a_user_id?: string | null
+          spouse_b_user_id?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          couple_name?: string | null
+          created_at?: string | null
+          id?: string
+          invite_id?: string | null
+          parish_id?: string
+          spouse_a_user_id?: string | null
+          spouse_b_user_id?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discernir_couples_invite_id_fkey"
+            columns: ["invite_id"]
+            isOneToOne: false
+            referencedRelation: "discernir_couple_invites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_couples_parish_id_fkey"
+            columns: ["parish_id"]
+            isOneToOne: false
+            referencedRelation: "discernir_parishes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_couples_spouse_a_user_id_fkey"
+            columns: ["spouse_a_user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_couples_spouse_a_user_id_fkey"
+            columns: ["spouse_a_user_id"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "discernir_couples_spouse_a_user_id_fkey"
+            columns: ["spouse_a_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_couples_spouse_b_user_id_fkey"
+            columns: ["spouse_b_user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_couples_spouse_b_user_id_fkey"
+            columns: ["spouse_b_user_id"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "discernir_couples_spouse_b_user_id_fkey"
+            columns: ["spouse_b_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discernir_feedback: {
+        Row: {
+          additional_notes: string | null
+          couple_id: string
+          created_at: string | null
+          id: string
+          submitted_by: string
+          wants_to_continue: boolean | null
+          was_helpful: boolean | null
+          was_uncomfortable: string | null
+        }
+        Insert: {
+          additional_notes?: string | null
+          couple_id: string
+          created_at?: string | null
+          id?: string
+          submitted_by: string
+          wants_to_continue?: boolean | null
+          was_helpful?: boolean | null
+          was_uncomfortable?: string | null
+        }
+        Update: {
+          additional_notes?: string | null
+          couple_id?: string
+          created_at?: string | null
+          id?: string
+          submitted_by?: string
+          wants_to_continue?: boolean | null
+          was_helpful?: boolean | null
+          was_uncomfortable?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discernir_feedback_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "discernir_couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_feedback_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_feedback_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "discernir_feedback_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discernir_parishes: {
+        Row: {
+          city: string | null
+          created_at: string | null
+          diocese: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          parish_code: string
+          settings: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string | null
+          diocese?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          parish_code?: string
+          settings?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string | null
+          diocese?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          parish_code?: string
+          settings?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      discernir_priests: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          parish_id: string
+          role: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          parish_id: string
+          role?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          parish_id?: string
+          role?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discernir_priests_parish_id_fkey"
+            columns: ["parish_id"]
+            isOneToOne: false
+            referencedRelation: "discernir_parishes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_priests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discernir_priests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "discernir_priests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       engagement_campaigns: {
         Row: {
           body: string
@@ -4362,6 +4933,10 @@ export type Database = {
         Args: { _permission: string; _user_id: string }
         Returns: boolean
       }
+      has_discernir_consent: {
+        Args: { check_consent_type: string; check_user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -4372,6 +4947,10 @@ export type Database = {
       is_admin_user: { Args: { _user_id: string }; Returns: boolean }
       is_company_admin: {
         Args: { check_company_id: string; check_user_id: string }
+        Returns: boolean
+      }
+      is_discernir_priest: {
+        Args: { check_parish_id: string; check_user_id: string }
         Returns: boolean
       }
       is_nello_admin: { Args: { check_user_id: string }; Returns: boolean }

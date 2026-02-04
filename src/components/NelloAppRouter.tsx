@@ -4,6 +4,7 @@ import FlowApp from '@/apps/flow/FlowApp';
 import LifeApp from '@/apps/life/LifeApp';
 import BusinessApp from '@/apps/business/BusinessApp';
 import MainApp from '@/apps/main/MainApp';
+import DiscernirApp from '@/apps/discernir/DiscernirApp';
 import { BusinessAuthProvider } from '@/apps/business/hooks/useBusinessAuth';
 
 interface NelloAppRouterProps {
@@ -19,6 +20,7 @@ interface NelloAppRouterProps {
  * - flow.nello.one → Nello Flow
  * - life.nello.one → Nello Life
  * - business.nello.one → Nello Business
+ * - discernir.nello.one → Nello Discernir (Pastoral)
  */
 export function NelloAppRouter({ children }: NelloAppRouterProps) {
   const { currentApp } = useNelloApp();
@@ -37,6 +39,8 @@ export function NelloAppRouter({ children }: NelloAppRouterProps) {
           <BusinessApp />
         </BusinessAuthProvider>
       );
+    case 'discernir':
+      return <DiscernirApp />;
     case 'identity':
     default:
       // Nello One Identity uses the existing routes passed as children
