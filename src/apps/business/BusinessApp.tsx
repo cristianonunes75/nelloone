@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import BusinessLanding from './pages/BusinessLanding';
 import BusinessAuth from './pages/BusinessAuth';
+import BusinessResetPassword from './pages/BusinessResetPassword';
 import BusinessOnboarding from './pages/BusinessOnboarding';
 import BusinessConsent from './pages/BusinessConsent';
 import BusinessDashboard from './pages/BusinessDashboard';
@@ -46,6 +47,7 @@ export default function BusinessApp() {
       {/* Public routes */}
       <Route path="/" element={<BusinessLanding />} />
       <Route path="/auth" element={<BusinessAuth />} />
+      <Route path="/reset-password" element={<BusinessResetPassword />} />
       <Route path="/invite/:token" element={<BusinessAcceptInvite />} />
       
       {/* Public job routes */}
