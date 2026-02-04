@@ -346,6 +346,28 @@ export function IdentityEssencialJourney() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      {/* Institutional Transparency Card */}
+      <Card className="border-amber-200/40 bg-amber-50/40">
+        <CardContent className="pt-5 pb-5">
+          <h3 className="text-sm font-medium text-amber-800 mb-2">
+            Sobre esta experiência
+          </h3>
+          <div className="space-y-2 text-xs text-amber-700/80 leading-relaxed">
+            <p>
+              Esta etapa de autoconhecimento é oferecida pela plataforma <span className="font-medium">Nello Identity</span>, 
+              especializada em experiências pessoais de reflexão e autoconhecimento humano.
+            </p>
+            <p>
+              O DISCERNIR utiliza apenas partes dessas informações, com seu consentimento, 
+              para apoiar a escuta pastoral.
+            </p>
+            <p className="font-medium text-amber-800/90">
+              Seus dados permanecem sob seu controle.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Header */}
       <div className="text-center space-y-2">
         <h1 className="font-serif text-2xl font-semibold text-amber-900">
