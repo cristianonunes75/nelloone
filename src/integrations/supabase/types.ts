@@ -299,6 +299,13 @@ export type Database = {
             foreignKeyName: "affiliates_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliates_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "nello_user_profile_summary"
             referencedColumns: ["user_id"]
           },
@@ -1086,6 +1093,13 @@ export type Database = {
             foreignKeyName: "codigo_cruzamentos_user_a_id_fkey"
             columns: ["user_a_id"]
             isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "codigo_cruzamentos_user_a_id_fkey"
+            columns: ["user_a_id"]
+            isOneToOne: false
             referencedRelation: "nello_user_profile_summary"
             referencedColumns: ["user_id"]
           },
@@ -1094,6 +1108,13 @@ export type Database = {
             columns: ["user_a_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "codigo_cruzamentos_user_b_id_fkey"
+            columns: ["user_b_id"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
             referencedColumns: ["id"]
           },
           {
@@ -1295,6 +1316,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "company_invites_accepted_by_fkey"
+            columns: ["accepted_by"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "company_invites_accepted_by_fkey"
             columns: ["accepted_by"]
@@ -1600,6 +1628,13 @@ export type Database = {
             foreignKeyName: "company_users_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "nello_user_profile_summary"
             referencedColumns: ["user_id"]
           },
@@ -1656,6 +1691,13 @@ export type Database = {
           times_used?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "coupons_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "coupons_created_by_fkey"
             columns: ["created_by"]
@@ -2088,6 +2130,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "founder_feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "founder_feedback_user_id_fkey"
             columns: ["user_id"]
@@ -4258,6 +4307,22 @@ export type Database = {
       }
     }
     Views: {
+      admin_profiles_view: {
+        Row: {
+          created_at: string | null
+          full_name: string | null
+          has_mapa: boolean | null
+          has_phone: boolean | null
+          id: string | null
+          journey_completed_tests: number | null
+          journey_status: string | null
+          journey_total_tests: number | null
+          mapa_created_at: string | null
+          mapa_updated_at: string | null
+          mapa_version: number | null
+        }
+        Relationships: []
+      }
       nello_user_profile_summary: {
         Row: {
           essence_created_at: string | null

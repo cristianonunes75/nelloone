@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { 
-  Search, Loader2, Sparkles, RefreshCw, FileText, Copy, Eye, FlaskConical, Unlock
+  Search, Loader2, Sparkles, RefreshCw, FileText, FlaskConical, Unlock, CheckCircle2
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -202,11 +202,8 @@ export const AdminCodigoEssencia = () => {
     }
   };
 
-  const copyAccessLink = (userId: string) => {
-    const link = `${window.location.origin}/codigo-da-essencia/view?user=${userId}`;
-    navigator.clipboard.writeText(link);
-    toast.success("Link copiado para a área de transferência");
-  };
+  // REMOVED: copyAccessLink function - security fix to prevent admin data leak
+  // Admin should not have direct access to sensitive user reports
 
   const filteredUsers = users.filter((u) => {
     const matchesSearch = u.full_name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -384,10 +381,11 @@ export const AdminCodigoEssencia = () => {
                   <TableCell>
                     {user.has_mapa ? (
                       <div className="flex items-center gap-1.5">
-                        <Badge className="bg-primary/10 text-primary border-primary/20 text-xs gap-1">
-                          <FileText className="w-3 h-3" />
-                          v{user.mapa_version || 1}
+                        <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Gerado
                         </Badge>
+                        <span className="text-xs text-muted-foreground">v{user.mapa_version || 1}</span>
                         {user.mapa_version === 0 && (
                           <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs">
                             Regen liberada
@@ -400,7 +398,7 @@ export const AdminCodigoEssencia = () => {
                         )}
                       </div>
                     ) : (
-                      <span className="text-xs text-muted-foreground">—</span>
+                      <span className="text-xs text-muted-foreground">Não gerado</span>
                     )}
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
@@ -411,26 +409,9 @@ export const AdminCodigoEssencia = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
-                      {user.codigo_essencia_unlocked && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyAccessLink(user.id)}
-                          title="Copiar link de acesso"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </Button>
-                      )}
-                      {user.has_mapa && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => window.open(`/codigo-da-essencia/view?user=${user.id}`, '_blank')}
-                          title="Ver relatório"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      )}
+                      {/* SECURITY: Removed "Ver" and "Copiar link" buttons
+                          Admin should NOT have access to view sensitive psychological reports.
+                          Only operational actions (regenerate, unlock) remain available. */}
                       {user.codigo_essencia_unlocked && (
                         <Button
                           variant="ghost"
