@@ -43,10 +43,10 @@ serve(async (req) => {
       });
     }
 
-    const { artifact_type = "individual", couple_id } = await req.json();
+    const { artifact_type = "individual", couple_id, parish_id } = await req.json();
     console.log(`Generating Apoio de Escuta for user ${user.id}, type: ${artifact_type}`);
 
-    // 1. Verify consent
+    // 1. Verify consent - for individual, check individual consent; for conjugal, check conjugal
     const { data: consent, error: consentError } = await supabase
       .from("discernir_consents")
       .select("*")
@@ -58,27 +58,72 @@ serve(async (req) => {
 
     if (consentError || !consent) {
       console.error("Consent not found:", consentError);
-      return new Response(JSON.stringify({ error: "Consentimento não encontrado" }), {
+      return new Response(JSON.stringify({ error: "Consentimento não encontrado. Por favor, aceite os termos antes de continuar." }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // 2. Get couple info and parish_id
-    const { data: coupleData, error: coupleError } = await supabase
+    // 2. Try to get couple info - but this is OPTIONAL for individual type
+    let coupleData = null;
+    let resolvedParishId = parish_id || null;
+    
+    const { data: coupleResult } = await supabase
       .from("discernir_couples")
       .select("id, parish_id")
       .or(`spouse_a_user_id.eq.${user.id},spouse_b_user_id.eq.${user.id}`)
       .eq("status", "active")
       .maybeSingle();
 
-    if (coupleError || !coupleData) {
-      console.error("Couple not found:", coupleError);
-      return new Response(JSON.stringify({ error: "Casal não encontrado no DISCERNIR" }), {
+    if (coupleResult) {
+      coupleData = coupleResult;
+      resolvedParishId = coupleResult.parish_id;
+    }
+
+    // For conjugal type, couple is required
+    if (artifact_type === "conjugal" && !coupleData) {
+      console.error("Couple required for conjugal type but not found");
+      return new Response(JSON.stringify({ error: "Casal não encontrado. Para gerar o apoio conjugal, é necessário estar vinculado a um casal." }), {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // If no parish_id found, try to get from priest or use a default
+    if (!resolvedParishId) {
+      // Try to get from any priest that has access
+      const { data: priestAccess } = await supabase
+        .from("discernir_priests")
+        .select("parish_id")
+        .limit(1)
+        .maybeSingle();
+      
+      if (priestAccess?.parish_id) {
+        resolvedParishId = priestAccess.parish_id;
+      }
+    }
+
+    // If still no parish_id, we need to create or find a default parish for the pilot
+    if (!resolvedParishId) {
+      // Check if there's any parish in the system
+      const { data: anyParish } = await supabase
+        .from("discernir_parishes")
+        .select("id")
+        .limit(1)
+        .maybeSingle();
+
+      if (anyParish) {
+        resolvedParishId = anyParish.id;
+      } else {
+        console.error("No parish found in the system");
+        return new Response(JSON.stringify({ error: "Nenhuma paróquia configurada. Entre em contato com o administrador." }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    console.log(`Using parish_id: ${resolvedParishId}, couple_id: ${coupleData?.id || 'none'}`);
 
     // 3. Fetch IDENTITY data - user_tests with result_data
     const { data: userTests, error: testsError } = await supabase
@@ -97,6 +142,17 @@ serve(async (req) => {
       console.error("Error fetching tests:", testsError);
       return new Response(JSON.stringify({ error: "Erro ao buscar dados do Identity" }), {
         status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Check if user has any completed tests
+    if (!userTests || userTests.length === 0) {
+      console.log("User has no completed tests");
+      return new Response(JSON.stringify({ 
+        error: "Você ainda não completou nenhum teste do Identity. Complete pelo menos um teste para gerar o Apoio de Escuta." 
+      }), {
+        status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -147,7 +203,7 @@ serve(async (req) => {
       });
     }
 
-    const systemPrompt = `Você é um assistente pastoral especializado em apoiar a escuta de casais.
+    const systemPrompt = `Você é um assistente pastoral especializado em apoiar a escuta de pessoas e casais.
     
 REGRAS INEGOCIÁVEIS:
 - NUNCA diagnosticar pessoas ou casais
@@ -274,8 +330,8 @@ Retorne APENAS o JSON válido, sem texto adicional.`;
       .from("discernir_apoio_escuta")
       .insert({
         user_id: user.id,
-        couple_id: coupleData.id,
-        parish_id: coupleData.parish_id,
+        couple_id: coupleData?.id || null,
+        parish_id: resolvedParishId,
         artifact_type,
         current_moment: apoioData.current_moment,
         responsibility_relation: apoioData.responsibility_relation,
