@@ -243,7 +243,7 @@ This test reveals the foundation of your personality — and how to harmonize yo
       title: "Mapa dos Estilos de Conexão Afetiva",
       subtitle: "Como você se conecta emocionalmente?",
       about: {
-        origin: "Inspirado no trabalho de Gary Chapman ('As 5 Linguagens do Amor', 1992), adaptado pelo Nello para uma perspectiva mais ampla de conexão emocional.",
+        origin: "Metodologia desenvolvida pelo Nello para mapeamento de estilos de conexão emocional e afetiva.",
         objective: "Descobrir como você expressa e recebe afeto, melhorando a qualidade dos seus relacionamentos pessoais e profissionais.",
         methodology: "Mapeia 5 estilos de conexão: Tempo de Qualidade (presença), Palavras de Afirmação (reconhecimento verbal), Atos de Serviço (ajuda prática), Presentes (gestos simbólicos) e Toque Físico (contato). Identifica seu estilo primário e secundário.",
       },
@@ -274,7 +274,7 @@ Este teste revela seu estilo primário de conexão afetiva — e como você pode
       title: "Affection Connection Styles",
       subtitle: "How do you emotionally connect?",
       about: {
-        origin: "Inspired by Gary Chapman's work ('The 5 Love Languages', 1992), adapted by Nello for a broader perspective on emotional connection.",
+        origin: "Methodology developed by Nello for mapping emotional and affective connection styles.",
         objective: "Discover how you express and receive affection, improving the quality of your personal and professional relationships.",
         methodology: "Maps 5 connection styles: Quality Time (presence), Words of Affirmation (verbal recognition), Acts of Service (practical help), Gifts (symbolic gestures) and Physical Touch (contact). Identifies your primary and secondary style.",
       },
@@ -305,7 +305,7 @@ This test reveals your primary affection connection style — and how you can cu
       title: "Mapa dos Estilos de Conexão Afetiva",
       subtitle: "Como te conectas emocionalmente?",
       about: {
-        origin: "Inspirado no trabalho de Gary Chapman ('As 5 Linguagens do Amor', 1992), adaptado pelo Nello para uma perspetiva mais ampla de conexão emocional.",
+        origin: "Metodologia desenvolvida pelo Nello para mapeamento de estilos de conexão emocional e afetiva.",
         objective: "Descobrir como expressas e recebes afeto, melhorando a qualidade dos teus relacionamentos pessoais e profissionais.",
         methodology: "Mapeia 5 estilos de conexão: Tempo de Qualidade (presença), Palavras de Afirmação (reconhecimento verbal), Atos de Serviço (ajuda prática), Presentes (gestos simbólicos) e Toque Físico (contacto). Identifica o teu estilo primário e secundário.",
       },

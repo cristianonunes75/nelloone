@@ -33,7 +33,7 @@ A plataforma oferece **8 testes** validados, com explicações claras de que sã
 2. **MBTI (Myers-Briggs)** — Tipos psicológicos
 3. **Arquétipos de Marca** — Voltados para imagem e comunicação
 4. **Inteligências Múltiplas** — Howard Gardner
-5. **Linguagens do Amor** — Gary Chapman (viés relacional e afetivo)
+5. **Estilos de Conexão Afetiva** — Mapeamento de conexão emocional (viés relacional e afetivo)
 6. **Temperamentos** — Base tradicional e teológica (São Tomás de Aquino)
 7. **Eneagrama** — Apenas com abordagem psicológica, sem espiritualização
 8. **SOLIS** — Simbologia da Luz Interior e de Estilo (ferramenta autoral de expressão fotográfica e estética, **sem cunho espiritual**)
