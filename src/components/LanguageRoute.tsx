@@ -3,9 +3,9 @@ import { useLocation, Navigate } from 'react-router-dom';
 import { useLanguage, Language } from '@/contexts/LanguageContext';
 
 // Feature flags to control language version availability
-// VALIDATION PHASE: Disabled EN/PT-PT to focus on PT-BR market first
-const ENGLISH_VERSION_ENABLED = false;
-const PT_PT_VERSION_ENABLED = false;
+// International versions enabled for geo-redirection
+const ENGLISH_VERSION_ENABLED = true;
+const PT_PT_VERSION_ENABLED = true;
 
 interface LanguageRouteProps {
   children: React.ReactNode;
@@ -14,6 +14,21 @@ interface LanguageRouteProps {
 export function LanguageRoute({ children }: LanguageRouteProps) {
   const location = useLocation();
   const { language, setLanguage } = useLanguage();
+
+  // Sync language with URL path - must be before any conditional returns
+  useEffect(() => {
+    if (location.pathname.startsWith('/pt-pt') && language !== 'pt-pt') {
+      setLanguage('pt-pt');
+    } else if (location.pathname.startsWith('/en') && language !== 'en') {
+      setLanguage('en');
+    } else if (!location.pathname.startsWith('/en') && !location.pathname.startsWith('/pt-pt') && language !== 'pt') {
+      // Root path or /pt/* routes default to PT-BR
+      // Only set to PT if not already set to PT
+      if (language === 'en' || language === 'pt-pt') {
+        setLanguage('pt');
+      }
+    }
+  }, [location.pathname, language, setLanguage]);
 
   // Redirect /en/* to / if English version is not enabled
   if (!ENGLISH_VERSION_ENABLED && location.pathname.startsWith('/en')) {
@@ -32,21 +47,6 @@ export function LanguageRoute({ children }: LanguageRouteProps) {
       .replace('/pt-pt', '') || '/';
     return <Navigate to={ptPath} replace />;
   }
-
-  useEffect(() => {
-    // Sync language with URL path
-    if (location.pathname.startsWith('/pt-pt') && language !== 'pt-pt') {
-      setLanguage('pt-pt');
-    } else if (location.pathname.startsWith('/en') && language !== 'en') {
-      setLanguage('en');
-    } else if (!location.pathname.startsWith('/en') && !location.pathname.startsWith('/pt-pt') && language !== 'pt') {
-      // Root path or /pt/* routes default to PT-BR
-      // Only set to PT if not already set to PT
-      if (language === 'en' || language === 'pt-pt') {
-        setLanguage('pt');
-      }
-    }
-  }, [location.pathname, language, setLanguage]);
 
   return <>{children}</>;
 }
