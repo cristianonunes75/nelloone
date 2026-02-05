@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LogoText } from "@/components/LogoText";
-import { ArrowLeft, Clock, HelpCircle, Lock, Loader2, CreditCard, Sparkles } from "lucide-react";
+import { ArrowLeft, Clock, HelpCircle, Loader2, CreditCard, Sparkles } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage, Language } from "@/contexts/LanguageContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { getPriceForLanguage, formatPrice, getCurrencyForLanguage } from "@/lib/priceConfig";
 import { getAffiliateCode } from "@/hooks/useAffiliateTracking";
+import { FullJourneyUpsell } from "@/components/monetization/FullJourneyUpsell";
 
 const ComprarTeste = () => {
   const { testId } = useParams<{ testId: string }>();
@@ -251,6 +252,20 @@ const ComprarTeste = () => {
               </p>
             </div>
           </div>
+
+          {/* Full Journey Upsell - Show only if user doesn't have full access */}
+          {!profile?.ativacao_codigo_unlocked && (
+            <div className="mb-8">
+              <div className="text-center mb-4">
+                <p className="text-sm text-muted-foreground">
+                  {language === 'en' 
+                    ? 'Or get access to everything:' 
+                    : 'Ou tenha acesso a tudo:'}
+                </p>
+              </div>
+              <FullJourneyUpsell />
+            </div>
+          )}
 
           {/* Nello AI Message */}
           <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6">
