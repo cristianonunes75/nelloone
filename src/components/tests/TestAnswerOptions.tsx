@@ -204,11 +204,12 @@ const CardsLayout = ({
   return (
     <div className="space-y-4">
       {options.map((option, index) => {
-        const isSelected = selectedAnswer === option.value;
+        const value = String((option as any).value);
+        const isSelected = selectedAnswer === value;
         
         return (
           <motion.div
-            key={option.value}
+            key={value}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
@@ -227,7 +228,7 @@ const CardsLayout = ({
                 : `border-border ${style.hoverBg} hover:shadow-md`
               }
             `}
-            onClick={() => onAnswerChange(option.value)}
+            onClick={() => onAnswerChange(value)}
           >
             {/* Neutral letter indicator instead of predictable icons */}
             <motion.div 
@@ -301,11 +302,12 @@ const GridLayout = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {options.map((option, index) => {
-        const isSelected = selectedAnswer === option.value;
+        const value = String((option as any).value);
+        const isSelected = selectedAnswer === value;
         
         return (
           <motion.div
-            key={option.value}
+            key={value}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ 
@@ -324,7 +326,7 @@ const GridLayout = ({
                 : `border-border ${style.hoverBg} hover:shadow-md`
               }
             `}
-            onClick={() => onAnswerChange(option.value)}
+            onClick={() => onAnswerChange(value)}
           >
             {/* Color accent bar */}
             <motion.div 
@@ -360,8 +362,8 @@ const GridLayout = ({
 
             {/* Radio indicator */}
             <RadioGroupItem 
-              value={option.value} 
-              id={option.value}
+              value={value} 
+              id={value}
               className="absolute top-4 right-4"
             />
           </motion.div>
@@ -385,11 +387,12 @@ const ListLayout = ({
 }) => (
   <div className="space-y-2">
     {options.map((option, index) => {
-      const isSelected = selectedAnswer === option.value;
+      const value = String((option as any).value);
+      const isSelected = selectedAnswer === value;
       
       return (
         <div
-          key={option.value}
+          key={value}
           className={`
             flex items-center gap-4 p-4 border-l-4 cursor-pointer transition-all duration-200
             ${style.borderRadius}
@@ -398,7 +401,7 @@ const ListLayout = ({
               : `bg-transparent border-l-transparent ${style.hoverBg}`
             }
           `}
-          onClick={() => onAnswerChange(option.value)}
+          onClick={() => onAnswerChange(value)}
         >
           {/* Number */}
           <div className={`
@@ -416,7 +419,7 @@ const ListLayout = ({
             {option.label}
           </Label>
 
-          <RadioGroupItem value={option.value} id={option.value} />
+          <RadioGroupItem value={value} id={value} />
         </div>
       );
     })}
@@ -438,11 +441,12 @@ const ButtonsLayout = ({
   return (
     <div className="flex flex-col gap-3">
       {options.map((option, index) => {
-        const isSelected = selectedAnswer === option.value;
+        const value = String((option as any).value);
+        const isSelected = selectedAnswer === value;
         
         return (
           <button
-            key={option.value}
+            key={value}
             type="button"
             className={`
               flex items-center gap-4 px-6 py-4 border-2 text-left
@@ -452,7 +456,7 @@ const ButtonsLayout = ({
                 : `border-border ${style.hoverBg} hover:shadow-md`
               }
             `}
-            onClick={() => onAnswerChange(option.value)}
+            onClick={() => onAnswerChange(value)}
           >
             {/* Neutral letter indicator instead of predictable icons */}
             <div className={`
@@ -502,15 +506,16 @@ const ScaleLayout = ({
         {/* Scale dots */}
         <div className="flex justify-between items-center gap-2 px-4">
           {options.map((option, index) => {
-            const isSelected = selectedAnswer === option.value;
+            const value = String((option as any).value);
+            const isSelected = selectedAnswer === value;
             const distanceFromCenter = Math.abs(index - Math.floor(options.length / 2));
             const baseSize = 48 - distanceFromCenter * 6;
             
             return (
               <button
-                key={option.value}
+                key={value}
                 type="button"
-                onClick={() => onAnswerChange(option.value)}
+                onClick={() => onAnswerChange(value)}
                 className={`
                   rounded-full transition-all duration-300 flex items-center justify-center
                   border-2
@@ -546,11 +551,12 @@ const ScaleLayout = ({
   return (
     <div className="space-y-3">
       {options.map((option, index) => {
-        const isSelected = selectedAnswer === option.value;
+        const value = String((option as any).value);
+        const isSelected = selectedAnswer === value;
         
         return (
           <div
-            key={option.value}
+            key={value}
             className={`
               flex items-center gap-4 p-4 border-2 cursor-pointer transition-all duration-200
               ${style.borderRadius}
@@ -559,7 +565,7 @@ const ScaleLayout = ({
                 : `border-border ${style.hoverBg}`
               }
             `}
-            onClick={() => onAnswerChange(option.value)}
+            onClick={() => onAnswerChange(value)}
           >
             {/* Dot indicator */}
             <div className={`
@@ -571,7 +577,7 @@ const ScaleLayout = ({
               {option.label}
             </Label>
 
-            <RadioGroupItem value={option.value} id={option.value} />
+            <RadioGroupItem value={value} id={value} />
           </div>
         );
       })}

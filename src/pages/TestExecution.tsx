@@ -200,7 +200,9 @@ export default function TestExecution() {
     if (currentQuestion) {
       const existingAnswer = getAnswerForQuestion(currentQuestion.id);
       const answerData = existingAnswer?.answer as { value?: string } | null;
-      setSelectedAnswer(answerData?.value || "");
+      // Defensive: answer value can be number (e.g. 0/1) depending on question options
+      const v = (answerData as any)?.value;
+      setSelectedAnswer(v === null || v === undefined ? "" : String(v));
     }
   }, [currentQuestion, getAnswerForQuestion]);
 
@@ -224,7 +226,9 @@ export default function TestExecution() {
 
   // Handle answer change with auto-advance
   const handleAnswerChange = (value: string) => {
-    setSelectedAnswer(value);
+    // Defensive: guarantee string (avoids stuck state if value is numeric like 0/1)
+    const safeValue = String(value);
+    setSelectedAnswer(safeValue);
     recordActivity(); // Track activity to reset abandonment timer
     
     // Show saved indicator briefly
@@ -243,7 +247,7 @@ export default function TestExecution() {
         // Save the answer
         saveAnswer({
           questionId: currentQuestion.id,
-          answer: { value: isLikertScale ? parseInt(value) : value },
+          answer: { value: isLikertScale ? parseInt(safeValue) : safeValue },
         });
         setNavigationDirection("left");
         nextQuestion();
