@@ -36,6 +36,7 @@ import { useAtivacaoCodigo } from "@/hooks/useAtivacaoCodigo";
 import { useAtivacaoCodigoFlag } from "@/hooks/useFeatureFlag";
 import { useAtivacaoCodigoAccess } from "@/hooks/useAtivacaoCodigoAccess";
 import { PurchaseAtivacaoDialog } from "@/components/cliente/PurchaseAtivacaoDialog";
+import { PurchaseJornadaDialog } from "@/components/cliente/PurchaseJornadaDialog";
 import { 
   DashboardStageJourney,
   DashboardStageRevelation,
@@ -60,6 +61,7 @@ const Cliente = () => {
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [stepToReset, setStepToReset] = useState<any>(null);
   const [ativacaoPurchaseOpen, setAtivacaoPurchaseOpen] = useState(false);
+  const [jornadaPurchaseOpen, setJornadaPurchaseOpen] = useState(false);
   
   // Celebration modal state for product purchases
   const [celebrationModalOpen, setCelebrationModalOpen] = useState(false);
@@ -794,12 +796,12 @@ const Cliente = () => {
                 onContinueTest={handleContinueTest}
                 onViewResult={handleViewResult}
                 onPurchase={(step) => {
-                  console.log("[Cliente] onPurchase called:", {
+                  console.log("[Cliente] onPurchase called - opening Jornada dialog:", {
                     testId: step.testId,
                     testName: step.name,
-                    navigatingTo: `${getBasePath()}/cliente/comprar/${step.testId}`,
                   });
-                  navigate(`${getBasePath()}/cliente/comprar/${step.testId}`);
+                  // Open the Jornada purchase modal instead of navigating to individual purchase page
+                  setJornadaPurchaseOpen(true);
                 }}
               />
             );
@@ -883,6 +885,12 @@ const Cliente = () => {
       <PurchaseAtivacaoDialog 
         open={ativacaoPurchaseOpen} 
         onOpenChange={setAtivacaoPurchaseOpen} 
+      />
+
+      {/* Purchase Jornada Completa dialog */}
+      <PurchaseJornadaDialog 
+        open={jornadaPurchaseOpen} 
+        onOpenChange={setJornadaPurchaseOpen} 
       />
 
       {/* Celebration Modal for product purchases */}
