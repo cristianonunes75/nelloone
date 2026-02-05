@@ -32,23 +32,27 @@ export const TestDetailPage = () => {
 
   // Labels
   const labels = {
-    backToTests: language === 'en' ? 'Back to Tests' : 'Voltar para Testes',
-    discover: language === 'en' ? 'You will discover:' : 'Você vai descobrir:',
+    backToTests: language === 'en' ? 'Back to Maps' : 'Voltar para Mapas',
+    discover: language === 'en' ? 'You will explore:' : 'Você vai explorar:',
     recommendedFor: language === 'en' ? 'Recommended for:' : 'Indicado para:',
     howItWorks: language === 'en' ? 'How it works' : 'Como funciona',
-    whatItHelps: language === 'en' ? 'What this test helps you improve' : 'O que este teste ajuda você a melhorar',
+    whatItHelps: language === 'en' ? 'What this map can support in you' : 'O que este mapa pode apoiar em você',
     step: language === 'en' ? 'Step' : 'Passo',
     questions: language === 'en' ? 'questions' : 'perguntas',
     minutes: language === 'en' ? 'minutes' : 'minutos',
-    startFree: language === 'en' ? 'Start Free Test' : 'Começar Teste Gratuito',
-    start: language === 'en' ? 'Start Test' : 'Começar Teste',
-    purchase: language === 'en' ? '🔒 Purchase Test' : '🔒 Adquirir Teste',
+    startFree: language === 'en' ? 'Start Free Map' : 'Começar Mapa Gratuito',
+    start: language === 'en' ? 'Start Map' : 'Começar Mapa',
+    purchase: language === 'en' ? '🔒 Purchase Map' : '🔒 Adquirir Mapa',
     login: language === 'en' ? 'Login to Start' : 'Fazer Login para Começar',
     seeBundle: language === 'en' ? 'See Full Bundle' : 'Ver Pacote Completo',
     readyToStart: language === 'en' ? 'Ready to start?' : 'Pronto para começar?',
     ctaDescription: language === 'en' 
-      ? 'Begin your self-discovery journey with this test.'
-      : 'Inicie sua jornada de autoconhecimento com este teste.',
+      ? 'Start your self-knowledge journey with this map.'
+      : 'Inicie sua jornada de autoconhecimento com este mapa.',
+    disclaimerTitle: language === 'en' ? 'Responsibility Note' : 'Nota de responsabilidade',
+    disclaimerText: language === 'en' 
+      ? 'Nello Identity is a self-knowledge and personal development tool. This map offers a reflective reading based on widely used models, but it has no diagnostic purpose and does not replace clinical psychological evaluation or professional therapeutic follow-up.'
+      : 'O Nello Identity é uma ferramenta de autoconhecimento e desenvolvimento pessoal. Este mapa oferece uma leitura reflexiva baseada em modelos amplamente utilizados, mas não possui finalidade diagnóstica e não substitui avaliação psicológica clínica ou acompanhamento terapêutico profissional.',
   };
 
   useEffect(() => {
@@ -187,6 +191,11 @@ export const TestDetailPage = () => {
             </div>
           </div>
 
+          {/* Disclaimer */}
+          <div className="bg-muted/30 rounded-lg p-6 mb-12 border border-border/50">
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">{labels.disclaimerTitle}</h3>
+            <p className="text-xs text-muted-foreground/80 leading-relaxed">{labels.disclaimerText}</p>
+          </div>
 
           {/* Final CTA */}
           <div className="bg-gradient-to-br from-bruma-blue/20 to-lavender/20 rounded-2xl p-8 text-center">
