@@ -360,32 +360,36 @@ export const NelloOneLanding = () => {
                   <div className="aspect-[3/4] bg-gradient-to-b from-muted/30 to-muted/10 rounded-lg flex items-center justify-center border border-border/30">
                     <div className="text-center p-6">
                       <FileText className="w-12 h-12 text-nello-gold/40 mx-auto mb-3" strokeWidth={1} />
-                      <p className="text-sm text-foreground/50 font-medium">Relatório PDF Premium</p>
-                      <p className="text-xs text-foreground/40 mt-1">Código da Essência</p>
+                      <p className="text-sm text-foreground/60 font-medium">Seu Código da Essência, em um relatório final</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             
-            <p className="text-sm text-foreground/70 text-center max-w-md mx-auto mt-6">
-              Um relatório premium, com linguagem clara, reflexiva e aplicável à vida real.
-              <span className="block text-xs text-foreground/50 mt-1">
-                Não é diagnóstico psicológico e não substitui acompanhamento profissional.
-              </span>
+            {/* Description text */}
+            <p className="text-base text-foreground/80 text-center max-w-lg mx-auto mt-6">
+              Um relatório completo que integra os 7 mapas da jornada em uma síntese única.
             </p>
             
-            {/* Micro chips */}
-            <div className="flex flex-wrap gap-2 justify-center mt-4">
-              {["Relatório PDF", "Síntese integrada", "Linguagem clara"].map((tag, i) => (
-                <span 
-                  key={i}
-                  className="px-3 py-1.5 bg-nello-gold/10 rounded-full text-nello-gold text-xs font-medium"
-                >
-                  {tag}
-                </span>
+            {/* 3 Bullets */}
+            <div className="max-w-md mx-auto mt-6 space-y-3">
+              {[
+                "Síntese dos seus padrões emocionais e comportamentais",
+                "Integração dos 7 mapas em uma visão unificada",
+                "Orientações reflexivas para aplicar na vida real"
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <Check className="w-4 h-4 text-nello-gold mt-0.5 shrink-0" strokeWidth={2.5} />
+                  <span className="text-sm text-foreground/70">{item}</span>
+                </div>
               ))}
             </div>
+            
+            {/* Institutional disclaimer */}
+            <p className="text-xs text-foreground/50 text-center max-w-md mx-auto mt-6">
+              Ferramenta de autoconhecimento e desenvolvimento pessoal. Não é diagnóstico psicológico e não substitui acompanhamento profissional.
+            </p>
           </div>
         </div>
       </section>
