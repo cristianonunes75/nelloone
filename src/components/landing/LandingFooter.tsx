@@ -121,6 +121,12 @@ export const LandingFooter = () => {
               <p>&copy; 2025 NELLO IDENTITY. {isEn ? 'All rights reserved.' : 'Todos os direitos reservados.'}</p>
               <div className="flex gap-6">
                 <button 
+                  onClick={() => navigate(isEn ? "/en/methodology" : isPtPt ? "/pt-pt/metodologia" : "/metodologia")}
+                  className="hover:text-primary-foreground/80 transition-colors"
+                >
+                  {isEn ? 'Methodology' : 'Metodologia'}
+                </button>
+                <button 
                   onClick={() => navigate(isEn ? "/en/terms" : isPtPt ? "/pt-pt/termos" : "/termos")}
                   className="hover:text-primary-foreground/80 transition-colors"
                 >
