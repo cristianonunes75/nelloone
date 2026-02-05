@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2, Package, FileText, DollarSign, CheckCircle, X } from "lucide-react";
 import { testPrices, bundlePrices } from "@/lib/priceConfig";
+import { AdminLanguageSelector, type AdminLanguage } from "./AdminLanguageSelector";
 
 interface Test {
   id: string;
@@ -18,6 +19,7 @@ interface Test {
   questions_count: number;
   estimated_minutes: number;
   stripe_price_id: string | null;
+  language: string;
 }
 
 interface PricingPlan {
@@ -63,17 +65,20 @@ export const AdminProductsTests = () => {
   const [tests, setTests] = useState<Test[]>([]);
   const [plans, setPlans] = useState<PricingPlan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedLanguage, setSelectedLanguage] = useState<AdminLanguage>("pt");
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [selectedLanguage]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       
+      const languageFilter = selectedLanguage === "pt-pt" ? "pt-pt" : selectedLanguage;
+      
       const [testsRes, plansRes] = await Promise.all([
-        supabase.from("tests").select("*").eq("language", "pt").order("created_at"),
+        supabase.from("tests").select("*").eq("language", languageFilter).order("created_at"),
         supabase.from("pricing_plans").select("id, name, price, active"),
       ]);
 
@@ -110,15 +115,21 @@ export const AdminProductsTests = () => {
   return (
     <div className="space-y-4 md:space-y-6 max-w-6xl">
       {/* Header */}
-      <div className="space-y-1">
-        <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Produtos & Testes</h1>
-        <p className="text-muted-foreground text-xs md:text-sm">Catálogo de produtos e testes do sistema</p>
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Produtos & Testes</h1>
+          <p className="text-muted-foreground text-xs md:text-sm">Catálogo de produtos e testes do sistema</p>
+        </div>
+        <AdminLanguageSelector 
+          value={selectedLanguage} 
+          onChange={setSelectedLanguage}
+        />
       </div>
 
       <Tabs defaultValue="products" className="space-y-4">
         <TabsList>
           <TabsTrigger value="products">Produtos</TabsTrigger>
-          <TabsTrigger value="tests">Testes</TabsTrigger>
+          <TabsTrigger value="tests">Testes ({tests.length})</TabsTrigger>
         </TabsList>
 
         {/* Products Tab */}

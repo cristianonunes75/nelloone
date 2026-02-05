@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { bundlePrices } from "@/lib/priceConfig";
@@ -20,7 +19,6 @@ import {
   Plus,
   Trash2,
   Eye,
-  Upload,
   Image as ImageIcon,
   Home,
   Users,
@@ -38,12 +36,14 @@ import {
   Shield
 } from "lucide-react";
 import { useAdminPermissions } from "@/hooks/useAdminPermissions";
+import { AdminLanguageSelector, type AdminLanguage } from "./AdminLanguageSelector";
 
 interface ContentSection {
   id: string;
   section: string;
   title: string | null;
   content: any;
+  language: string;
 }
 
 const SECTION_CONFIG: Record<string, { 
@@ -115,12 +115,13 @@ export const AdminLandingPage = () => {
   const [saving, setSaving] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("hero");
   const [updatingStripe, setUpdatingStripe] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<AdminLanguage>("pt");
 
   useEffect(() => {
     if (!permLoading && (hasPermission('can_manage_settings') || isSuperAdmin)) {
       fetchContent();
     }
-  }, [permLoading, isSuperAdmin]);
+  }, [permLoading, isSuperAdmin, selectedLanguage]);
 
   const fetchContent = async () => {
     try {
@@ -128,6 +129,7 @@ export const AdminLandingPage = () => {
       const { data, error } = await supabase
         .from("home_content")
         .select("*")
+        .eq("language", selectedLanguage)
         .order("section");
 
       if (error) throw error;
@@ -1152,10 +1154,18 @@ export const AdminLandingPage = () => {
 
   const availableSections = sections.filter(s => SECTION_CONFIG[s.section]);
 
+  const getPreviewUrl = () => {
+    switch (selectedLanguage) {
+      case "en": return "/en";
+      case "pt-pt": return "/pt-pt";
+      default: return "/";
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight flex items-center gap-3">
             <FileEdit className="w-8 h-8" />
@@ -1163,17 +1173,23 @@ export const AdminLandingPage = () => {
           </h2>
           <p className="text-muted-foreground mt-1">Gerencie todo o conteúdo da página inicial do Identity</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={fetchContent}>
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Atualizar
-          </Button>
-          <Button variant="outline" size="sm" asChild>
-            <a href="/" target="_blank" rel="noopener noreferrer">
-              <Eye className="w-4 h-4 mr-2" />
-              Ver Site
-            </a>
-          </Button>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <AdminLanguageSelector 
+            value={selectedLanguage} 
+            onChange={setSelectedLanguage}
+          />
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={fetchContent}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Atualizar
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a href={getPreviewUrl()} target="_blank" rel="noopener noreferrer">
+                <Eye className="w-4 h-4 mr-2" />
+                Ver Site
+              </a>
+            </Button>
+          </div>
         </div>
       </div>
 
