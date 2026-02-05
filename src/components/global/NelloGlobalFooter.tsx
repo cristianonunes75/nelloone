@@ -119,8 +119,8 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
   const legalLinks = [
     { label: language === 'en' ? 'The 7 Maps' : 'Os 7 Mapas', href: mapsHref },
     { label: language === 'en' ? 'For Professionals' : 'Para Profissionais', href: professionalsHref },
-    { label: language === 'en' ? 'Terms of Use' : 'Termos de Uso', href: '/termos-de-servico' },
-    { label: language === 'en' ? 'Privacy Policy' : 'Política de Privacidade', href: '/politica-de-privacidade' },
+    { label: language === 'en' ? 'Terms of Use' : 'Termos de Uso', href: '/termos' },
+    { label: language === 'en' ? 'Privacy & LGPD' : 'Privacidade e LGPD', href: '/privacidade' },
   ];
 
   // Social links (apenas Instagram por enquanto)
