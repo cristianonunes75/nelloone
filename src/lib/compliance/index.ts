@@ -5,3 +5,4 @@
 
 export * from './prohibitedTerms';
 export * from './complianceChecker';
+export * from './testimonialCompliance';

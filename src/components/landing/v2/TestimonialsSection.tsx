@@ -2,12 +2,14 @@ import { Star, Quote } from "lucide-react";
 import { useScrollAnimation, getStaggerDelay } from "@/hooks/useScrollAnimation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
+import { TESTIMONIAL_DISCLAIMER } from "@/lib/compliance/testimonialCompliance";
 
 export const TestimonialsSection = () => {
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
   const { ref: cardsRef, isVisible: cardsVisible } = useScrollAnimation();
   const { ref: benefitsRef, isVisible: benefitsVisible } = useScrollAnimation();
   const { t, language } = useLanguage();
+  const isEn = language === 'en';
 
   const testimonials = language === 'en' ? [
     {
@@ -90,6 +92,15 @@ export const TestimonialsSection = () => {
                 </>
               )}
             </h2>
+            {/* Institutional disclaimer */}
+            <p 
+              className={cn(
+                "text-xs text-muted-foreground/70 max-w-xl mx-auto transition-all duration-500 delay-200",
+                headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              )}
+            >
+              {isEn ? TESTIMONIAL_DISCLAIMER.en : TESTIMONIAL_DISCLAIMER.pt}
+            </p>
           </div>
 
           {/* Testimonials - Horizontal scroll on mobile */}

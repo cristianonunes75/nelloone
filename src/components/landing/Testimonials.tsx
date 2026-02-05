@@ -3,6 +3,7 @@ import { Quote } from "lucide-react";
 import { useHomeContent } from "@/hooks/useHomeContent";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { TESTIMONIAL_DISCLAIMER } from "@/lib/compliance/testimonialCompliance";
 
 export const Testimonials = () => {
   const { content, isLoading } = useHomeContent("testimonials");
@@ -45,6 +46,10 @@ export const Testimonials = () => {
                 (isEn 
                   ? "Real stories from people who discovered their true essence."
                   : "Histórias reais de pessoas que descobriram sua verdadeira essência.")}
+            </p>
+            {/* Institutional disclaimer */}
+            <p className="text-xs text-muted-foreground/70 max-w-2xl mx-auto mt-4">
+              {isEn ? TESTIMONIAL_DISCLAIMER.en : TESTIMONIAL_DISCLAIMER.pt}
             </p>
           </div>
 

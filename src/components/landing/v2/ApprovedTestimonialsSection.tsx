@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Quote, User, ChevronDown, ChevronUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-
+import { useLanguage } from "@/contexts/LanguageContext";
+import { checkTestimonialCompliance, TESTIMONIAL_DISCLAIMER } from "@/lib/compliance/testimonialCompliance";
 interface Testimonial {
   id: string;
   display_name: string;
@@ -116,6 +117,9 @@ function TestimonialCard({ testimonial }: TestimonialCardProps) {
 }
 
 export function ApprovedTestimonialsSection() {
+  const { language } = useLanguage();
+  const isEn = language === 'en';
+  
   const { data: testimonials, isLoading } = useQuery({
     queryKey: ["approved-testimonials-landing"],
     queryFn: async () => {
@@ -128,7 +132,14 @@ export function ApprovedTestimonialsSection() {
         .limit(6);
 
       if (error) throw error;
-      return data as (Testimonial & { is_featured: boolean })[];
+      
+      // Filter out any testimonials with critical compliance issues (extra safety layer)
+      const safeTestimonials = (data || []).filter(t => {
+        const result = checkTestimonialCompliance(t.content);
+        return result.riskLevel !== 'critical';
+      });
+      
+      return safeTestimonials as (Testimonial & { is_featured: boolean })[];
     },
     staleTime: 1000 * 60 * 5 // Cache for 5 minutes
   });
@@ -161,10 +172,16 @@ export function ApprovedTestimonialsSection() {
       <div className="max-w-5xl mx-auto space-y-10">
         <div className="text-center space-y-4">
           <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
-            O que dizem sobre o NELLO ONE
+            {isEn ? 'What people say about NELLO ONE' : 'O que dizem sobre o NELLO ONE'}
           </h2>
           <p className="text-muted-foreground">
-            Experiências reais de pessoas que iniciaram sua jornada de autoconhecimento.
+            {isEn 
+              ? 'Real experiences from people who started their self-knowledge journey.'
+              : 'Experiências reais de pessoas que iniciaram sua jornada de autoconhecimento.'}
+          </p>
+          {/* Institutional disclaimer */}
+          <p className="text-xs text-muted-foreground/70 max-w-2xl mx-auto">
+            {isEn ? TESTIMONIAL_DISCLAIMER.en : TESTIMONIAL_DISCLAIMER.pt}
           </p>
         </div>
 
