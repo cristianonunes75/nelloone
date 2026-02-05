@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { AccountDeletionSection } from "@/components/user/AccountDeletionSection";
 
 // Import user translations
 import enUser from "@/locales/en/user.json";
@@ -516,6 +517,9 @@ const UserArea = () => {
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Account Privacy & Deletion Section */}
+                <AccountDeletionSection />
               </div>
             )}
           </main>
