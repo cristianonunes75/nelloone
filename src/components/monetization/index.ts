@@ -14,3 +14,6 @@ export { IdentityCouplePremiumModal } from "./IdentityCouplePremiumModal";
 // Progressive Sales Funnel
 export { CelebrationModal } from "./CelebrationModal";
 export { ProgressiveUpsellSection } from "./ProgressiveUpsellSection";
+
+// Upsell Components
+export { FullJourneyUpsell } from "./FullJourneyUpsell";
