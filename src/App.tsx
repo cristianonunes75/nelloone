@@ -27,6 +27,7 @@ import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
+import Metodologia from "./pages/Metodologia";
 import { TestDetailPage } from "./components/tests/TestDetailPage";
 import CodigoEssencia from "./pages/CodigoEssencia";
 import AtivacaoCodigoPage from "./pages/cliente/AtivacaoCodigoPage";
@@ -98,6 +99,11 @@ const AppRoutes = () => (
     <Route path="/assinatura" element={<ProtectedRoute allowedRoles={["cliente", "admin"]}><SubscriptionManagement /></ProtectedRoute>} />
     <Route path="/subscription" element={<ProtectedRoute allowedRoles={["cliente", "admin"]}><SubscriptionManagement /></ProtectedRoute>} />
     <Route path="/en/subscription" element={<ProtectedRoute allowedRoles={["cliente", "admin"]}><SubscriptionManagement /></ProtectedRoute>} />
+    
+    {/* Institutional pages */}
+    <Route path="/metodologia" element={<Metodologia />} />
+    <Route path="/en/methodology" element={<Metodologia />} />
+    <Route path="/pt-pt/metodologia" element={<Metodologia />} />
     
     {/* Legal pages - PT */}
     <Route path="/termos" element={<TermsOfService />} />
