@@ -148,7 +148,7 @@ export const LandingFooter = () => {
                   onClick={() => navigate(isEn ? "/en/privacy" : isPtPt ? "/pt-pt/privacidade" : "/privacidade")}
                   className="hover:text-primary-foreground/80 transition-colors"
                 >
-                  {isEn ? 'Privacy Policy' : 'Política de Privacidade'}
+                  {isEn ? 'Privacy & LGPD' : 'Privacidade e LGPD'}
                 </button>
               </div>
             </div>
