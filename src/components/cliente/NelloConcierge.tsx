@@ -16,7 +16,7 @@ export default function NelloConcierge() {
   const [displayMessages, setDisplayMessages] = useState<Array<{ role: string; content: string }>>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { messages, isLoading, isStreaming, sendMessage, createConversation } = useAIChat(conversationId || undefined);
+  const { messages, isLoading, isStreaming, sendMessage, createConversation } = useAIChat({ conversationId: conversationId || undefined });
 
   useEffect(() => {
     if (isOpen && !conversationId && user) {

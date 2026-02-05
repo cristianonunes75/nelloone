@@ -1192,6 +1192,7 @@ function TestResultsInner() {
       <NelloResultsChat
         testType={userTest.tests?.type || ""}
         testName={userTest.tests?.name}
+        userTestId={userTestId}
       />
 
       <PurchaseTestDialog
