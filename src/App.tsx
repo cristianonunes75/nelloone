@@ -46,6 +46,7 @@ import SubscriptionManagement from "./pages/SubscriptionManagement";
 import AcceptCrossingPage from "./pages/AcceptCrossingPage";
 import CruzamentoPublico from "./pages/CruzamentoPublico";
 import WhatsApp from "./pages/WhatsApp";
+import ParaProfissionais from "./pages/ParaProfissionais";
 const queryClient = new QueryClient();
 
 // Component to run version check hook
@@ -110,6 +111,11 @@ const AppRoutes = () => (
     <Route path="/os-7-mapas" element={<Os7Mapas />} />
     <Route path="/en/the-7-maps" element={<Os7Mapas />} />
     <Route path="/pt-pt/os-7-mapas" element={<Os7Mapas />} />
+    
+    {/* Para Profissionais - Institutional page */}
+    <Route path="/para-profissionais" element={<ParaProfissionais />} />
+    <Route path="/en/for-professionals" element={<ParaProfissionais />} />
+    <Route path="/pt-pt/para-profissionais" element={<ParaProfissionais />} />
     
     {/* Legal pages - PT */}
     <Route path="/termos" element={<TermsOfService />} />

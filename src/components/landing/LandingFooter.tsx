@@ -127,6 +127,12 @@ export const LandingFooter = () => {
                   {isEn ? 'The 7 Maps' : 'Os 7 Mapas'}
                 </button>
                 <button 
+                  onClick={() => navigate(isEn ? "/en/for-professionals" : isPtPt ? "/pt-pt/para-profissionais" : "/para-profissionais")}
+                  className="hover:text-primary-foreground/80 transition-colors"
+                >
+                  {isEn ? 'For Professionals' : 'Para Profissionais'}
+                </button>
+                <button 
                   onClick={() => navigate(isEn ? "/en/methodology" : isPtPt ? "/pt-pt/metodologia" : "/metodologia")}
                   className="hover:text-primary-foreground/80 transition-colors"
                 >
