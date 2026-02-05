@@ -105,15 +105,15 @@ export const Pricing = () => {
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               {isEn 
-                ? 'Choose individual tests or get the complete package with savings.'
-                : 'Escolha seus testes individualmente ou garanta o pacote completo com economia.'}
+                ? 'Choose individual maps or get the complete package with savings.'
+                : 'Escolha seus mapas individualmente ou garanta o pacote completo com economia.'}
             </p>
           </div>
 
-          {/* Individual Tests */}
+          {/* Individual Maps */}
           <div className="mt-16 mb-12">
             <h3 className="text-2xl font-bold text-center mb-8">
-              {isEn ? 'Individual Tests' : 'Testes Individuais'}
+              {isEn ? 'Individual Maps' : 'Mapas Individuais'}
             </h3>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {tests.map((test) => (
@@ -172,7 +172,7 @@ export const Pricing = () => {
                   >
                     {test.is_free 
                       ? (isEn ? 'Start Now' : 'Começar Agora') 
-                      : (isEn ? 'Get Test' : 'Adquirir Teste')}
+                      : (isEn ? 'Get Map' : 'Adquirir Mapa')}
                   </Button>
                 </div>
               ))}
@@ -259,8 +259,8 @@ export const Pricing = () => {
             </p>
             <p className="text-sm text-muted-foreground">
               {isEn
-                ? 'After payment confirmation, you receive immediate access to the tests.'
-                : 'Após a confirmação do pagamento, você recebe acesso imediato aos testes.'}
+                ? 'After payment confirmation, you receive immediate access to the maps.'
+                : 'Após a confirmação do pagamento, você recebe acesso imediato aos mapas.'}
             </p>
           </div>
         </div>

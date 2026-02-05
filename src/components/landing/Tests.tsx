@@ -84,34 +84,34 @@ const getTestsData = (language: string) => {
 
 const content = {
   pt: {
-    title: "7 Testes de",
+    title: "7 Mapas de",
     titleHighlight: "Autoconhecimento",
-    subtitle: "Ferramentas validadas de análise de personalidade, talentos e comunicação.",
-    learnMore: "Saiba mais →",
-    footer: "Todos os testes com",
+    subtitle: "Instrumentos para reflexão sobre personalidade, talentos e comunicação.",
+    learnMore: "Explorar →",
+    footer: "Todos os mapas com",
     footerHighlight: "relatórios em PDF personalizados",
     footerSuffix: "e entrega visual profissional.",
-    disclaimer: "Os resultados são simbólicos e servem como ferramentas de autoconhecimento e comunicação. Não substituem oração, discernimento espiritual ou aconselhamento pessoal."
+    disclaimer: "Os resultados são simbólicos e servem como ferramentas de autoconhecimento e comunicação. Não substituem diagnóstico psicológico, avaliação clínica ou aconselhamento profissional."
   },
   'pt-pt': {
-    title: "7 Testes de",
+    title: "7 Mapas de",
     titleHighlight: "Autoconhecimento",
-    subtitle: "Ferramentas validadas de análise de personalidade, talentos e comunicação.",
-    learnMore: "Saiba mais →",
-    footer: "Todos os testes com",
+    subtitle: "Instrumentos para reflexão sobre personalidade, talentos e comunicação.",
+    learnMore: "Explorar →",
+    footer: "Todos os mapas com",
     footerHighlight: "relatórios em PDF personalizados",
     footerSuffix: "e entrega visual profissional.",
-    disclaimer: "Os resultados são simbólicos e servem como ferramentas de autoconhecimento e comunicação. Não substituem oração, discernimento espiritual ou aconselhamento pessoal."
+    disclaimer: "Os resultados são simbólicos e servem como ferramentas de autoconhecimento e comunicação. Não substituem diagnóstico psicológico, avaliação clínica ou aconselhamento profissional."
   },
   en: {
     title: "7",
-    titleHighlight: "Self-Knowledge Tests",
-    subtitle: "Validated tools for personality, talent, and communication analysis.",
-    learnMore: "Learn more →",
-    footer: "All tests include",
+    titleHighlight: "Self-Knowledge Maps",
+    subtitle: "Instruments for reflection on personality, talents, and communication.",
+    learnMore: "Explore →",
+    footer: "All maps include",
     footerHighlight: "personalized PDF reports",
     footerSuffix: "with professional visual delivery.",
-    disclaimer: "Results are symbolic and serve as self-knowledge and communication tools. They do not replace prayer, spiritual discernment, or personal counseling."
+    disclaimer: "Results are symbolic and serve as self-knowledge and communication tools. They do not replace psychological diagnosis, clinical evaluation, or professional counseling."
   }
 };
 

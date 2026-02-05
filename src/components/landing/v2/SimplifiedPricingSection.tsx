@@ -9,10 +9,10 @@ export const SimplifiedPricingSection = () => {
   const { ref: cardRef, isVisible: cardVisible } = useScrollAnimation();
 
   const benefits = [
-    "7 testes comportamentais completos",
-    "Relatórios Premium em PDF de cada teste",
+    "7 mapas integrados de autoconhecimento",
+    "Relatórios Premium em PDF de cada mapa",
     "Código da Essência incluído",
-    "Acesso ao Miguel (guia da jornada)",
+    "Acesso ao Nello (guia da jornada)",
     "Acesso vitalício aos resultados",
     "Suporte via WhatsApp do criador",
   ];
@@ -87,7 +87,7 @@ export const SimplifiedPricingSection = () => {
                   className="w-full h-14 text-base rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg group"
                   onClick={() => navigate("/auth")}
                 >
-                  Revelar meu Código da Essência
+                  Acessar meu Código da Essência
                   <Sparkles className="ml-2 w-5 h-5 text-white/90 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
                 </Button>
                 <p className="text-xs text-muted-foreground/70">

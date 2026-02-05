@@ -18,7 +18,7 @@ export const ProductHeader = ({ userName, language = "pt" }: ProductHeaderProps)
       promiseLine3: "Este não é um diagnóstico, nem define quem você é. É um convite à consciência, ao desenvolvimento e à melhoria contínua.",
       warning: "Aviso: O que você está prestes a ler pode incomodar. Verdade costuma fazer isso.",
       pillars: [
-        { icon: "🎯", label: "Precisão", desc: "7 testes integrados" },
+        { icon: "🎯", label: "Precisão", desc: "7 mapas integrados" },
         { icon: "🔥", label: "Confronto", desc: "Verdades que libertam" },
         { icon: "🗺️", label: "Direção", desc: "Plano de 90 dias" },
       ]
@@ -32,7 +32,7 @@ export const ProductHeader = ({ userName, language = "pt" }: ProductHeaderProps)
       promiseLine3: "Este não é um diagnóstico, nem define quem tu és. É um convite à consciência, ao desenvolvimento e à melhoria contínua.",
       warning: "Aviso: O que estás prestes a ler pode incomodar. A verdade costuma fazer isso.",
       pillars: [
-        { icon: "🎯", label: "Precisão", desc: "7 testes integrados" },
+        { icon: "🎯", label: "Precisão", desc: "7 mapas integrados" },
         { icon: "🔥", label: "Confronto", desc: "Verdades que libertam" },
         { icon: "🗺️", label: "Direção", desc: "Plano de 90 dias" },
       ]
@@ -46,7 +46,7 @@ export const ProductHeader = ({ userName, language = "pt" }: ProductHeaderProps)
       promiseLine3: "This is not a diagnosis, nor does it define who you are. It's an invitation to awareness, development, and continuous improvement.",
       warning: "Warning: What you're about to read may be uncomfortable. Truth often is.",
       pillars: [
-        { icon: "🎯", label: "Precision", desc: "7 integrated tests" },
+        { icon: "🎯", label: "Precision", desc: "7 integrated maps" },
         { icon: "🔥", label: "Confrontation", desc: "Truths that free" },
         { icon: "🗺️", label: "Direction", desc: "90-day plan" },
       ]
