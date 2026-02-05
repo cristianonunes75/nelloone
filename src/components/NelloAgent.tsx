@@ -233,7 +233,7 @@ export function NelloAgent({ location, completedTests = [], currentStep, testRes
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-ink-blue shadow-lg hover:bg-ink-deep hover:scale-105 transition-all duration-300"
+        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-nello-graphite shadow-lg hover:bg-nello-graphite-deep hover:scale-105 transition-all duration-300 text-white"
         size="icon"
       >
         <Sparkles className="h-6 w-6" />
