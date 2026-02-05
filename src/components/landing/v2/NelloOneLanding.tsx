@@ -471,7 +471,114 @@ export const NelloOneLanding = () => {
       {/* ========== 8️⃣ FAQ ESTRATÉGICO ========== */}
       <StrategicFAQ />
 
-      {/* ========== 8️⃣ CTA FINAL ========== */}
+      {/* ========== 9️⃣ PARA PROFISSIONAIS ========== */}
+      <section className="py-16 md:py-24 px-5 sm:px-6 lg:px-8 bg-muted/30">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-nello-gold/10 mb-4">
+              <BookOpen className="w-6 h-6 text-nello-gold" strokeWidth={1.5} />
+            </div>
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-semibold text-foreground mb-4">
+              Para Profissionais que Acompanham Pessoas
+            </h2>
+            <CrossDivider className="mb-6" />
+          </div>
+          
+          <div className="max-w-3xl mx-auto space-y-6">
+            <p className="text-base md:text-lg text-foreground/80 leading-relaxed text-center">
+              Psicólogos, terapeutas, mentores, educadores e profissionais do cuidado lidam todos os dias com algo essencial: <span className="text-foreground font-medium">nem sempre a pessoa consegue nomear o que sente, ou enxergar seus próprios padrões.</span>
+            </p>
+            
+            <p className="text-base md:text-lg text-foreground/80 leading-relaxed text-center">
+              O Nello Identity existe como uma <span className="text-nello-gold font-medium">ferramenta complementar de clareza e linguagem.</span>
+            </p>
+            
+            {/* Main block */}
+            <div className="bg-card rounded-2xl border border-border/50 p-6 md:p-8 shadow-sm">
+              <p className="text-foreground font-medium mb-4 text-center">
+                O Identity não substitui um processo terapêutico.
+              </p>
+              <p className="text-foreground/80 mb-6 text-center">
+                Ele oferece mapas reflexivos que podem ajudar o indivíduo a chegar com mais consciência, repertório e organização interna.
+              </p>
+              
+              <p className="text-sm text-foreground/70 mb-4 text-center">
+                Muitos profissionais utilizam como apoio para:
+              </p>
+              
+              <ul className="space-y-2 max-w-md mx-auto">
+                {[
+                  "Iniciar conversas mais profundas",
+                  "Identificar padrões repetitivos com mais clareza",
+                  "Trabalhar autoconhecimento com linguagem acessível",
+                  "Integrar temas emocionais, comportamentais e relacionais",
+                  "Apoiar jornadas de desenvolvimento pessoal"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-foreground/80">
+                    <Check className="w-4 h-4 text-nello-gold flex-shrink-0" strokeWidth={2} />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <p className="text-sm text-foreground/60 text-center mt-6 italic">
+                Sempre sem caráter clínico ou diagnóstico.
+              </p>
+            </div>
+            
+            {/* Highlight quote */}
+            <div className="relative py-6 px-8 bg-nello-gold/5 rounded-xl border border-nello-gold/20">
+              <p className="text-lg md:text-xl font-display text-center text-foreground font-medium">
+                "É um recurso de reflexão estruturada.<br />
+                <span className="text-nello-gold">A transformação acontece no acompanhamento humano.</span>"
+              </p>
+            </div>
+            
+            {/* CTA */}
+            <div className="text-center pt-4">
+              <Button 
+                variant="outline"
+                onClick={() => navigate(language === 'en' ? '/en/for-professionals' : '/para-profissionais')}
+                className="rounded-full px-6 border-nello-gold/30 hover:bg-nello-gold/5 group"
+              >
+                Conheça o espaço para profissionais
+                <ArrowRight className="ml-2 w-4 h-4 text-nello-gold group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </div>
+            
+            {/* Disclaimer */}
+            <p className="text-xs text-foreground/50 text-center leading-relaxed max-w-lg mx-auto mt-4">
+              O Nello Identity é uma ferramenta de autoconhecimento e desenvolvimento pessoal.
+              Não é instrumento psicológico validado para diagnóstico, nem substitui avaliação clínica ou psicoterapia.
+            </p>
+            
+            {/* Partnership block */}
+            <div className="mt-10 pt-8 border-t border-border/30">
+              <div className="text-center">
+                <h3 className="font-display text-lg font-semibold text-foreground mb-2">
+                  Profissionais Parceiros
+                </h3>
+                <p className="text-sm text-foreground/70 max-w-md mx-auto mb-4">
+                  Se você é profissional e deseja recomendar a jornada aos seus acompanhados ou clientes, existe um programa de parceria com benefícios e acesso facilitado.
+                </p>
+                <p className="text-xs text-foreground/50 mb-4">
+                  Sempre com ética, transparência e responsabilidade.
+                </p>
+                <Button 
+                  variant="ghost"
+                  onClick={() => window.open('https://wa.me/5561992430090?text=Olá! Sou profissional e gostaria de conhecer a parceria com o Nello Identity.', '_blank')}
+                  className="rounded-full px-5 text-nello-gold hover:bg-nello-gold/5"
+                >
+                  Ver parceria profissional
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========== 10️⃣ CTA FINAL ========== */}
       <section className="py-16 md:py-20 px-5 sm:px-6 lg:px-8 bg-nello-graphite">
         <div className="max-w-xl mx-auto text-center">
           <Sparkles className="w-6 h-6 text-nello-gold mx-auto mb-4" strokeWidth={1.5} />
