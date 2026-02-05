@@ -14,6 +14,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { GeoRedirect } from "@/components/GeoRedirect";
 import { CurrencyProtection } from "@/components/CurrencyProtection";
 import { AffiliateTracker } from "@/hooks/useAffiliateTracking";
+import { ConsentGate } from "@/components/ConsentGate";
 import { useVersionCheck } from "@/hooks/useVersionCheck";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
@@ -580,12 +581,15 @@ const App = () => (
                     <AffiliateTracker />
                     {/* Currency Protection: Prevents cross-trade between BRL and USD */}
                     <CurrencyProtection>
-                      <LanguageRoute>
-                        {/* Nello App Router: Routes to Flow, Life, or One based on subdomain */}
-                        <NelloAppRouter>
-                          <AppRoutes />
-                        </NelloAppRouter>
-                      </LanguageRoute>
+                      {/* Consent Gate: Shows mandatory consent modal for users without LGPD consent */}
+                      <ConsentGate>
+                        <LanguageRoute>
+                          {/* Nello App Router: Routes to Flow, Life, or One based on subdomain */}
+                          <NelloAppRouter>
+                            <AppRoutes />
+                          </NelloAppRouter>
+                        </LanguageRoute>
+                      </ConsentGate>
                     </CurrencyProtection>
                   </ImpersonateProvider>
                 </AuthProvider>
