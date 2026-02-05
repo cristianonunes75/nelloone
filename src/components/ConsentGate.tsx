@@ -8,13 +8,27 @@ interface ConsentGateProps {
   children: ReactNode;
 }
 
-// Páginas onde o modal NÃO deve aparecer (legais/públicas)
+// Páginas onde o modal NÃO deve aparecer (públicas/legais)
 const EXCLUDED_PATHS = [
+  // Landing pages
+  '/', '/en', '/pt-pt',
+  // Auth pages
+  '/auth', '/login', '/reset-password',
+  '/en/auth', '/en/login', '/en/reset-password',
+  '/pt-pt/auth', '/pt-pt/login', '/pt-pt/reset-password',
+  // Legal pages
   '/termos', '/termos-de-servico', '/terms', '/terms-of-service',
   '/privacidade', '/politica-de-privacidade', '/privacy', '/privacy-policy',
   '/contato', '/contact',
   '/en/terms', '/en/privacy', '/en/contact',
-  '/pt-pt/termos', '/pt-pt/privacidade', '/pt-pt/contato'
+  '/pt-pt/termos', '/pt-pt/privacidade', '/pt-pt/contato',
+  // Institutional pages
+  '/metodologia', '/en/methodology', '/pt-pt/metodologia',
+  '/os-7-mapas', '/en/the-7-maps', '/pt-pt/os-7-mapas',
+  '/para-profissionais', '/en/for-professionals', '/pt-pt/para-profissionais',
+  '/ajuda', '/en/help', '/pt-pt/ajuda',
+  // WhatsApp redirect
+  '/whatsapp', '/en/whatsapp', '/pt-pt/whatsapp',
 ];
 
 /**
