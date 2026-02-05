@@ -99,14 +99,14 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
       external: false 
     },
     { 
-      label: 'WhatsApp', 
-      href: '/whatsapp',
-      external: false,
+      label: language === 'en' ? 'Talk to support' : 'Falar com suporte', 
+      href: 'https://wa.me/5561992430090',
+      external: true,
       icon: MessageCircle
     },
     { 
       label: language === 'en' ? 'Contact' : 'Contato', 
-      href: 'mailto:contato@nello.one',
+      href: 'mailto:suporte@nello.one',
       external: true 
     },
   ];
@@ -116,16 +116,19 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
   const professionalsHref = language === 'en' ? '/en/for-professionals' : language === 'pt-pt' ? '/pt-pt/para-profissionais' : '/para-profissionais';
 
   // Legal + institutional links
+  const methodologyHref = language === 'en' ? '/en/methodology' : language === 'pt-pt' ? '/pt-pt/metodologia' : '/metodologia';
+  
   const legalLinks = [
     { label: language === 'en' ? 'The 7 Maps' : 'Os 7 Mapas', href: mapsHref },
     { label: language === 'en' ? 'For Professionals' : 'Para Profissionais', href: professionalsHref },
+    { label: language === 'en' ? 'Methodology' : 'Metodologia', href: methodologyHref },
     { label: language === 'en' ? 'Terms of Use' : 'Termos de Uso', href: '/termos' },
     { label: language === 'en' ? 'Privacy & LGPD' : 'Privacidade e LGPD', href: '/privacidade' },
   ];
 
   // Social links (apenas Instagram por enquanto)
   const socialLinks = [
-    { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/identity.nello?igsh=YzdvaXdzbHp0ZW1k&utm_source=qr' },
+    { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/nello.identity' },
   ];
 
   const getModuleUrl = (link: typeof ecosystemLinks[0]) => {
