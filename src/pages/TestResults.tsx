@@ -39,6 +39,7 @@ import { usePDFEmail } from "@/hooks/usePDFEmail";
 import { updateJourneyProgress, getJourneySlugFromTestType } from "@/utils/journey";
 import { TestimonialForm } from "@/components/cliente/TestimonialForm";
 import { ResultsFloatingMenu } from "@/components/cliente/ResultsFloatingMenu";
+import { NelloResultsChat } from "@/components/cliente/NelloResultsChat";
 import { TestResultsSkeleton } from "@/components/tests/TestResultsSkeleton";
 import { DISCResultsSection } from "@/components/tests/DISCResultsSection";
 import { TemperamentosResultsSection } from "@/components/tests/TemperamentosResultsSection";
@@ -1185,6 +1186,12 @@ function TestResultsInner() {
         }}
         onContinue={handleContinueJourney}
         showContinue={!!nextTestInfo}
+      />
+
+      {/* Nello AI Chat Widget */}
+      <NelloResultsChat
+        testType={userTest.tests?.type || ""}
+        testName={userTest.tests?.name}
       />
 
       <PurchaseTestDialog
