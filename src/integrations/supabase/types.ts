@@ -348,21 +348,27 @@ export type Database = {
           conversation_id: string
           created_at: string
           id: string
+          metadata: Json | null
           role: string
+          test_context: string | null
         }
         Insert: {
           content: string
           conversation_id: string
           created_at?: string
           id?: string
+          metadata?: Json | null
           role: string
+          test_context?: string | null
         }
         Update: {
           content?: string
           conversation_id?: string
           created_at?: string
           id?: string
+          metadata?: Json | null
           role?: string
+          test_context?: string | null
         }
         Relationships: [
           {
