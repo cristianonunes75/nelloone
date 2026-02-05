@@ -48,19 +48,24 @@ export const TestDetailLayout = ({
   const isFreeTest = test?.is_free || false;
   const hasAccess = isFreeTest || hasPurchased(test?.id || "");
   
-  const backLabel = language === 'en' ? 'Back to Tests' : 'Voltar para Testes';
-  const discoverTitle = language === 'en' ? 'You will discover:' : 'Você vai descobrir:';
+  const backLabel = language === 'en' ? 'Back to Maps' : 'Voltar para Mapas';
+  const discoverTitle = language === 'en' ? 'You will explore:' : 'Você vai explorar:';
   const audienceTitle = language === 'en' ? 'Recommended for:' : 'Indicado para:';
-  const startFreeText = language === 'en' ? 'Start Free Test' : 'Começar Teste Gratuito';
-  const startText = language === 'en' ? 'Start Test' : 'Começar Teste';
-  const lockedText = language === 'en' ? '🔒 Purchase Test' : '🔒 Adquirir Teste';
+  const startFreeText = language === 'en' ? 'Start Free Map' : 'Começar Mapa Gratuito';
+  const startText = language === 'en' ? 'Start Map' : 'Começar Mapa';
+  const lockedText = language === 'en' ? '🔒 Purchase Map' : '🔒 Adquirir Mapa';
   const loginText = language === 'en' ? 'Login to Start' : 'Fazer Login para Começar';
   const bundleText = language === 'en' ? 'See Full Bundle' : 'Ver Pacote Completo';
-  const aboutTitle = language === 'en' ? 'About this Test' : 'Sobre este Teste';
+  const aboutTitle = language === 'en' ? 'About this Map' : 'Sobre este Mapa';
   const acronymLabel = language === 'en' ? 'What the name means:' : 'O que significa a sigla:';
   const originLabel = language === 'en' ? 'Origin:' : 'Origem:';
   const objectiveLabel = language === 'en' ? 'Objective:' : 'Objetivo:';
   const methodologyLabel = language === 'en' ? 'Methodology:' : 'Metodologia:';
+  const disclaimerTitle = language === 'en' ? 'Responsibility Note' : 'Nota de responsabilidade';
+  const disclaimerText = language === 'en' 
+    ? 'Nello Identity is a self-knowledge and personal development tool. This map offers a reflective reading based on widely used models, but it has no diagnostic purpose and does not replace clinical psychological evaluation or professional therapeutic follow-up.'
+    : 'O Nello Identity é uma ferramenta de autoconhecimento e desenvolvimento pessoal. Este mapa oferece uma leitura reflexiva baseada em modelos amplamente utilizados, mas não possui finalidade diagnóstica e não substitui avaliação psicológica clínica ou acompanhamento terapêutico profissional.';
+  const ctaSubtext = language === 'en' ? 'Start your self-knowledge journey with this map.' : 'Inicie sua jornada de autoconhecimento com este mapa.';
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -155,6 +160,14 @@ export const TestDetailLayout = ({
             </ul>
           </div>
 
+          {/* Disclaimer */}
+          <div className="bg-muted/30 rounded-lg p-6 mb-12 border border-border/50">
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">{disclaimerTitle}</h3>
+            <p className="text-xs text-muted-foreground/80 leading-relaxed">{disclaimerText}</p>
+          </div>
+
+          {/* CTA Subtext */}
+          <p className="text-center text-sm text-muted-foreground mb-4">{ctaSubtext}</p>
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
