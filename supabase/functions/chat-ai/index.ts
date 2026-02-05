@@ -6,6 +6,54 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
+// ═══════════════════════════════════════════════════════════════
+// COMPLIANCE LINGUÍSTICO NELLO - GUARDRAIL AUTOMÁTICO
+// ═══════════════════════════════════════════════════════════════
+
+const PROHIBITED_TERMS = [
+  { term: 'diagnóstico', fix: 'reflexão' },
+  { term: 'diagnostico', fix: 'reflexão' },
+  { term: 'laudo', fix: 'mapa' },
+  { term: 'avaliação psicológica', fix: 'jornada de autoconhecimento' },
+  { term: 'psicométrico', fix: 'instrumento de reflexão' },
+  { term: 'validado cientificamente', fix: 'baseado em modelos de desenvolvimento' },
+  { term: 'cura', fix: 'desenvolvimento' },
+  { term: 'tratamento', fix: 'jornada' },
+  { term: 'transtorno', fix: 'padrão comportamental' },
+  { term: 'você tem TDAH', fix: 'você pode apresentar tendências de atenção diversificada' },
+  { term: 'você tem depressão', fix: 'você pode estar vivenciando um momento difícil' },
+  { term: 'você tem ansiedade', fix: 'você pode perceber uma tendência à preocupação' },
+  { term: 'isso prova que você', fix: 'isso sugere tendências de' },
+  { term: 'perfil definitivo', fix: 'tendências predominantes' },
+  { term: 'personalidade real', fix: 'padrões observados' },
+  { term: 'substitui terapia', fix: 'complementa o autoconhecimento' },
+  { term: 'certeza clínica', fix: 'tendência observada' },
+];
+
+const ESCALATION_TERMS = [
+  'depressão', 'suicídio', 'suicida', 'pensamentos suicidas',
+  'ansiedade severa', 'trauma', 'pânico', 'automutilação', 'sofrimento intenso'
+];
+
+const ESCALATION_RESPONSE = `"Eu te escuto e agradeço por compartilhar isso comigo. O que você está sentindo é importante. Procure um profissional habilitado — psicólogo ou psiquiatra — que possa te acompanhar de perto. O Nello pode apoiar seu autoconhecimento, mas não substitui cuidado especializado."`;
+
+function applyComplianceFilter(text: string): string {
+  let filtered = text;
+  
+  // Apply term replacements
+  for (const { term, fix } of PROHIBITED_TERMS) {
+    const regex = new RegExp(term, 'gi');
+    filtered = filtered.replace(regex, fix);
+  }
+  
+  return filtered;
+}
+
+function checkEscalation(text: string): boolean {
+  const lower = text.toLowerCase();
+  return ESCALATION_TERMS.some(term => lower.includes(term));
+}
+
 // Deep question trigger keywords
 const DEEP_TRIGGERS = [
   "por que eu",
@@ -335,9 +383,22 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || '';
+    let content = data.choices?.[0]?.message?.content || '';
 
-    console.log('[CHAT-AI] Response generated successfully');
+    // ═══════════════════════════════════════════════════════════════
+    // COMPLIANCE FILTER - Aplicar filtro automático na resposta
+    // ═══════════════════════════════════════════════════════════════
+    
+    // Check if user message requires escalation (sensitive topics)
+    if (checkEscalation(message)) {
+      console.log('[CHAT-AI] Escalation triggered - adding care response');
+      content = ESCALATION_RESPONSE;
+    } else {
+      // Apply compliance filter to remove any prohibited terms
+      content = applyComplianceFilter(content);
+    }
+
+    console.log('[CHAT-AI] Response generated and filtered successfully');
 
     // Save assistant message
     await supabase
@@ -350,6 +411,7 @@ serve(async (req) => {
         metadata: {
           was_upsell: false,
           classifier,
+          compliance_filtered: true,
         },
       });
 

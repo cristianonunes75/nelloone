@@ -1653,6 +1653,48 @@ export type Database = {
           },
         ]
       }
+      compliance_audits: {
+        Row: {
+          created_at: string
+          detected_term: string
+          id: string
+          original_text: string | null
+          page_or_component: string
+          resolved_at: string | null
+          resolved_by: string | null
+          risk_level: string
+          status: string
+          suggested_fix: string | null
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string
+          detected_term: string
+          id?: string
+          original_text?: string | null
+          page_or_component: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          risk_level: string
+          status?: string
+          suggested_fix?: string | null
+          timestamp?: string
+        }
+        Update: {
+          created_at?: string
+          detected_term?: string
+          id?: string
+          original_text?: string | null
+          page_or_component?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          risk_level?: string
+          status?: string
+          suggested_fix?: string | null
+          timestamp?: string
+        }
+        Relationships: []
+      }
       coupons: {
         Row: {
           allowed_product_type: string | null
