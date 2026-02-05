@@ -3028,6 +3028,7 @@ export type Database = {
           content: Json
           created_at: string | null
           id: string
+          language: string
           section: string
           title: string | null
           updated_at: string | null
@@ -3037,6 +3038,7 @@ export type Database = {
           content: Json
           created_at?: string | null
           id?: string
+          language?: string
           section: string
           title?: string | null
           updated_at?: string | null
@@ -3046,6 +3048,7 @@ export type Database = {
           content?: Json
           created_at?: string | null
           id?: string
+          language?: string
           section?: string
           title?: string | null
           updated_at?: string | null
