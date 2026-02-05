@@ -10,12 +10,16 @@ import { cn } from "@/lib/utils";
 
 const faqItems = [
   {
-    question: "Por que não posso comprar apenas um dos testes separadamente?",
-    answer: "A Jornada Identity foi desenhada como um processo integrado de 7 etapas. Cada teste (Eneagrama, DISC, Temperamentos, Inteligências Múltiplas, Nello 16, Arquétipos e Estilos de Conexão Afetiva) revela uma camada diferente da sua personalidade. Quando você compra apenas um teste isolado, você perde a sinergia entre eles. O Código da Essência é justamente a síntese de TODOS os 7 pilares trabalhando juntos. Vender separadamente seria como vender apenas um capítulo de um livro - você não teria a história completa.",
+    question: "Isso é um teste psicológico ou diagnóstico clínico?",
+    answer: "Não. O Nello Identity é uma jornada de autoconhecimento baseada em modelos amplamente utilizados no desenvolvimento humano. Ele oferece clareza e reflexão estruturada, mas não possui finalidade clínica e não substitui avaliação psicológica profissional.",
+  },
+  {
+    question: "Por que não posso comprar apenas um dos mapas separadamente?",
+    answer: "A Jornada Identity foi desenhada como um processo integrado de 7 etapas. Cada mapa (Eneagrama, DISC, Temperamentos, Inteligências Múltiplas, Nello 16, Arquétipos e Estilos de Conexão Afetiva) revela uma camada diferente da sua personalidade. Quando você compra apenas um mapa isolado, você perde a sinergia entre eles. O Código da Essência é justamente a síntese de TODOS os 7 pilares trabalhando juntos. Vender separadamente seria como vender apenas um capítulo de um livro - você não teria a história completa.",
   },
   {
     question: "O que torna o Código da Essência diferente de um relatório comum?",
-    answer: "A maioria dos testes gera relatórios descritivos: 'Você é tipo X porque fez Y'. O Código da Essência é diferente. Ele não apenas descreve - ele conecta padrões, revela contradições, mostra onde você se bloqueia e onde está seu potencial real. Nello (nosso guia de IA) interpreta seus 7 testes, identifica as relações entre eles e te entrega uma síntese que você realmente consegue usar na vida real. É como ter um mentor que leu tudo sobre você e finalmente te mostra o mapa completo.",
+    answer: "A maioria dos testes gera relatórios descritivos: 'Você é tipo X porque fez Y'. O Código da Essência é diferente. Ele não apenas descreve - ele conecta padrões, revela contradições, mostra onde você se bloqueia e onde está seu potencial real. Nello (nosso guia de IA) organiza seus 7 mapas, identifica as relações entre eles e te entrega uma síntese que você realmente consegue usar na vida real. É como ter um mentor que leu tudo sobre você e finalmente te mostra o mapa completo.",
   },
   {
     question: "Eu recebo o Código da Essência logo no início?",
@@ -23,7 +27,7 @@ const faqItems = [
   },
   {
     question: "Por que a Jornada Identity é paga, se existem testes gratuitos na internet?",
-    answer: "Existem testes gratuitos, mas eles são fragmentados. Você faz um Eneagrama aqui, um DISC ali, e fica com 7 pedaços de um quebra-cabeça sem conseguir montar. A Jornada Identity integra tudo isso em um processo coerente. Além disso, você tem Nello como seu guia - uma IA que interpreta seus resultados, conecta os padrões e te ajuda a aplicar na vida real. Isso tem valor. Você não está pagando pelos testes - está pagando pela síntese, pela interpretação e pela transformação.",
+    answer: "Existem testes gratuitos, mas eles são fragmentados. Você faz um Eneagrama aqui, um DISC ali, e fica com 7 pedaços de um quebra-cabeça sem conseguir montar. A Jornada Identity integra tudo isso em um processo coerente. Além disso, você tem Nello como seu guia - uma IA que organiza seus resultados, conecta os padrões e te ajuda a aplicar na vida real. Isso tem valor. Você não está pagando pelos mapas - está pagando pela síntese, pela organização e pela transformação.",
   },
   {
     question: "Por quanto tempo terei acesso aos meus resultados?",
