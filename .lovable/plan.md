@@ -1,68 +1,59 @@
 
-# Plano: Excluir Páginas Legais do Modal de Consentimento
+# Plano: Corrigir Botão Cortado no Modal de Consentimento
 
 ## Problema Identificado
 
-O modal de consentimento LGPD está aparecendo em páginas públicas/institucionais como `/privacidade` e `/termos`. Isso cria um loop onde:
+O botão "Aceitar e Continuar" existe no código mas está sendo **cortado visualmente** no modal. O DialogContent está limitando a altura e escondendo o botão.
 
-1. Usuario logado vê o modal de consentimento
-2. Clica em "Termos de Uso" ou "Política de Privacidade" para ler
-3. Abre a página legal, mas o modal aparece novamente ali
-4. Usuario não consegue ler os documentos para poder aceitar
+## Causa Raiz
+
+O componente `DialogContent` pode estar com:
+1. Altura máxima (`max-height`) muito restritiva
+2. `overflow: hidden` cortando o conteúdo
+3. O botão está fora do container com scroll
 
 ## Solução
 
-Modificar o `ConsentGate` para ignorar páginas legais/públicas, permitindo que o usuário as acesse sem bloqueio.
+Ajustar o CSS do `DialogContent` para garantir que todo o conteúdo seja visível, incluindo o botão.
 
 ## Implementação
 
 ### Arquivo a modificar
-`src/components/ConsentGate.tsx`
+`src/components/ConsentModal.tsx`
 
 ### Alteração
 
-Adicionar verificação de rota atual e lista de páginas excluídas:
+Adicionar classes CSS para garantir scroll interno e visibilidade completa:
 
-```typescript
-import { useLocation } from "react-router-dom";
+```tsx
+// Linha 82-86 - Adicionar overflow-y-auto e max-h-[90vh]
+<DialogContent 
+  className="sm:max-w-md [&>button]:hidden max-h-[90vh] overflow-y-auto"
+  onPointerDownOutside={(e) => e.preventDefault()}
+  onEscapeKeyDown={(e) => e.preventDefault()}
+>
+```
 
-// Páginas onde o modal NÃO deve aparecer
-const EXCLUDED_PATHS = [
-  '/termos', '/termos-de-servico', '/terms', '/terms-of-service',
-  '/privacidade', '/politica-de-privacidade', '/privacy', '/privacy-policy',
-  '/contato', '/contact',
-  '/en/terms', '/en/privacy', '/en/contact',
-  '/pt-pt/termos', '/pt-pt/privacidade', '/pt-pt/contato'
-];
+E também envolver o conteúdo em um container com flex para garantir que o botão sempre apareça:
 
-export function ConsentGate({ children }: ConsentGateProps) {
-  const location = useLocation();
+```tsx
+// Estrutura ajustada
+<DialogContent className="sm:max-w-md [&>button]:hidden flex flex-col max-h-[90vh]">
+  <DialogHeader>...</DialogHeader>
   
-  // ... existing hooks ...
+  <div className="flex-1 overflow-y-auto space-y-4 py-4">
+    {/* checkboxes e info text */}
+  </div>
   
-  // Não mostrar modal em páginas legais/públicas
-  const isExcludedPath = EXCLUDED_PATHS.some(path => 
-    location.pathname === path || location.pathname.startsWith(path + '/')
-  );
-  
-  if (isExcludedPath) {
-    return <>{children}</>;
-  }
-  
-  // ... rest of logic ...
-}
+  {/* Botão sempre visível no final */}
+  <div className="pt-4 border-t mt-auto">
+    <Button ... />
+  </div>
+</DialogContent>
 ```
 
 ## Impacto
 
-- Usuários podem acessar `/privacidade` e `/termos` sem bloqueio
-- Podem ler os documentos antes de aceitar
-- Modal continua aparecendo em todas as outras páginas protegidas
-- Conformidade LGPD mantida (usuário ainda precisa aceitar para usar a plataforma)
-
-## Validação
-
-1. Acessar `/privacidade` logado - modal NÃO deve aparecer
-2. Acessar `/termos` logado - modal NÃO deve aparecer
-3. Acessar `/cliente` logado sem consentimento - modal DEVE aparecer
-4. Links no modal abrem as páginas normalmente
+- Botão "Aceitar e Continuar" sempre visível
+- Em telas pequenas, o conteúdo terá scroll mas o botão permanece fixo
+- Usuários conseguem completar o aceite dos termos
