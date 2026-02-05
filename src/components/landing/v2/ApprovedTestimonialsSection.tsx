@@ -17,32 +17,11 @@ interface Testimonial {
   is_featured?: boolean;
 }
 
-// 3 depoimentos fortes e seguros (não clínicos)
-const FEATURED_TESTIMONIALS: Testimonial[] = [
-  {
-    id: "featured-1",
-    display_name: "Ana P.",
-    content: "Eu tive a sensação de que alguém organizou o que eu sempre senti, mas não sabia explicar.",
-    test_slug: null,
-    created_at: new Date().toISOString(),
-    is_featured: true,
-  },
-  {
-    id: "featured-2",
-    display_name: "Carlos M.",
-    content: "Isso é muito eu. Me deu clareza sobre padrões que eu repetia sem perceber.",
-    test_slug: null,
-    created_at: new Date().toISOString(),
-    is_featured: true,
-  },
-  {
-    id: "featured-3",
-    display_name: "Juliana R.",
-    content: "Não é sobre diagnóstico. É sobre consciência. Foi um divisor de águas pra mim.",
-    test_slug: null,
-    created_at: new Date().toISOString(),
-    is_featured: true,
-  },
+// Reações comuns de quem vive a jornada (expressões frequentes, blindado)
+const FEATURED_REACTIONS: { content: string }[] = [
+  { content: "Isso é muito eu." },
+  { content: "Eu finalmente consegui me entender melhor." },
+  { content: "Me deu clareza sobre padrões que eu repetia." },
 ];
 
 const getTestName = (slug: string | null): string => {
@@ -192,40 +171,41 @@ export function ApprovedTestimonialsSection() {
     );
   }
 
-  // Use featured testimonials, fallback to DB testimonials if available
-  const testimonials = FEATURED_TESTIMONIALS.length > 0 
-    ? FEATURED_TESTIMONIALS 
-    : (dbTestimonials || []);
-
-  if (!testimonials || testimonials.length === 0) {
-    return null;
-  }
+  // Use featured reactions (simpler display)
+  const reactions = FEATURED_REACTIONS;
 
   return (
     <section className="py-20 px-6 bg-muted/30">
-      <div className="max-w-5xl mx-auto space-y-10">
+      <div className="max-w-4xl mx-auto space-y-10">
         <div className="text-center space-y-4">
           <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
-            {isEn ? 'What people say about Identity' : 'O que dizem sobre o Identity'}
+            {isEn ? 'Common reactions from those who experience the journey' : 'Reações comuns de quem vive a jornada'}
           </h2>
-          <p className="text-muted-foreground">
-            {isEn 
-              ? 'Real experiences from people who started their self-knowledge journey.'
-              : 'Experiências reais de pessoas que iniciaram sua jornada de autoconhecimento.'}
-          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((testimonial) => (
-            <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+        <div className="grid md:grid-cols-3 gap-6">
+          {reactions.map((reaction, index) => (
+            <Card 
+              key={index}
+              className="border-border/50 hover:shadow-lg transition-shadow duration-300 bg-nello-gold/5"
+            >
+              <CardContent className="p-6 flex items-center justify-center min-h-[120px]">
+                <div className="flex items-start gap-3">
+                  <Quote className="w-5 h-5 text-nello-gold/40 shrink-0 mt-1" />
+                  <p className="text-foreground text-base md:text-lg font-medium leading-relaxed">
+                    "{reaction.content}"
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
         
         {/* Institutional disclaimer */}
         <p className="text-xs text-muted-foreground/60 max-w-2xl mx-auto text-center">
           {isEn 
-            ? 'Personal self-knowledge reports. Results vary from person to person.' 
-            : 'Relatos pessoais de autoconhecimento. Resultados variam de pessoa para pessoa.'}
+            ? 'These are common expressions from users upon completing the journey. Personal testimonials will only be displayed with authorization.' 
+            : 'Essas são expressões frequentes de usuários ao concluir a jornada. Depoimentos pessoais serão exibidos apenas com autorização.'}
         </p>
       </div>
     </section>
