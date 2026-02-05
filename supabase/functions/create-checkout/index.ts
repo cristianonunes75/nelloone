@@ -114,7 +114,8 @@ const USD_PRICES: Record<string, string> = {
   inteligencias_multiplas: "price_1SZNXnDjhZZxZELMuGMkDImQ",
   bundle: "price_1SZNYXDjhZZxZELMoGVJUZRP",
   codigo_da_essencia: "price_1Sc2RfDjhZZxZELMbZP1CvLO", // $97 USD
-  ativacao_codigo: "price_placeholder_usd", // $27 USD - To be created in Stripe
+  ativacao_codigo: "price_1Sw6F6DjhZZxZELMfBW3pn5q", // $57 USD - Ativação do Código da Essência
+  activation_individual: "price_1SxRhuDjhZZxZELMsAYBZqUP", // $57 USD - Ativação de Direção Profissional (UNIQUE)
   codigo_casal: "price_placeholder_codigo_casal_usd", // $9 USD - Couple's Code
   fundadores: "price_1ScWglDjhZZxZELM3tQocxgu", // R$197 (BRL only)
 };
@@ -131,7 +132,8 @@ const BRL_PRICES: Record<string, string> = {
   inteligencias_multiplas: "price_1SZUpxDjhZZxZELMAkQlFX11",
   bundle: "price_1SeL7gDjhZZxZELMKuDFTI5t", // R$297 - NELLO ONE Jornada Completa (VALIDATION PHASE)
   codigo_da_essencia: "price_1Sc2RRDjhZZxZELMPxAnu0I5", // R$397 BRL
-  ativacao_codigo: "price_placeholder_brl", // R$97 BRL - To be created in Stripe
+  ativacao_codigo: "price_1Sw6EEDjhZZxZELMSmPNECig", // R$197 BRL - Ativação do Código da Essência
+  activation_individual: "price_1SxRhHDjhZZxZELMuoj7N1CN", // R$197 BRL - Ativação de Direção Profissional (UNIQUE)
   codigo_casal: "price_placeholder_codigo_casal_brl", // R$47 BRL - Couple's Code
   fundadores: "price_1ScWglDjhZZxZELM3tQocxgu", // R$197 (BRL only)
 };
@@ -148,7 +150,8 @@ const EUR_PRICES: Record<string, string> = {
   inteligencias_multiplas: "price_1SZz0nDjhZZxZELMVagCtoXs",
   bundle: "price_1SZz6vDjhZZxZELMQsZuLKah",
   codigo_da_essencia: "price_1Sc2TRDjhZZxZELMr66uJZZm", // €97 EUR
-  ativacao_codigo: "price_placeholder_eur", // €27 EUR - To be created in Stripe
+  ativacao_codigo: "price_1Sw6FiDjhZZxZELMXDH1ACdx", // €47 EUR - Ativação do Código da Essência
+  activation_individual: "price_1SxRjKDjhZZxZELMAqWHQKbm", // €47 EUR - Ativação de Direção Profissional (UNIQUE)
   codigo_casal: "price_placeholder_codigo_casal_eur", // €12 EUR - Couple's Code
   fundadores: "price_1ScWglDjhZZxZELM3tQocxgu", // R$197 (BRL only - not available in EUR)
 };
