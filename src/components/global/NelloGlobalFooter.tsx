@@ -23,6 +23,9 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
   const activeApp = currentApp || detectedApp;
   const isDark = variant === 'dark';
   
+  // Feature flag to hide ecosystem column (starting with Identity only)
+  const SHOW_ECOSYSTEM_COLUMN = false;
+  
   // Brand names per app
   const appBranding: Record<NelloApp, { name: string; tagline: { pt: string; en: string } }> = {
     main: {
@@ -35,8 +38,8 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
     identity: {
       name: 'IDENTITY',
       tagline: {
-        pt: 'Uma Vida. Um Ecossistema. A solução definitiva para a fragmentação da vida moderna.',
-        en: 'One Life. One Ecosystem. The definitive solution for modern life fragmentation.',
+        pt: 'Descubra quem você é. Uma jornada de autoconhecimento guiada.',
+        en: 'Discover who you are. A guided self-discovery journey.',
       },
     },
     life: {
@@ -206,8 +209,8 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
               <LanguageToggle variant="minimal" />
             </div>
 
-            {/* Column 2: Ecosystem (Ecossistema) */}
-            <div>
+            {/* Column 2: Ecosystem (Ecossistema) - Hidden when starting with Identity only */}
+            {SHOW_ECOSYSTEM_COLUMN && <div>
               <h4 className={cn(
                 "text-xs font-semibold uppercase tracking-widest mb-4",
                 isDark ? "text-white" : "text-foreground"
@@ -234,7 +237,7 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
                   </li>
                 ))}
               </ul>
-            </div>
+            </div>}
 
             {/* Column 3: Support (Suporte) */}
             <div>

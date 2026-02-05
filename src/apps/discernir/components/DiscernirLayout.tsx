@@ -139,9 +139,6 @@ export function DiscernirLayout({ isPriest = false }: DiscernirLayoutProps) {
               DISCERNIR — versão piloto pastoral
             </p>
             <p>
-              Arquitetura técnica de autoconhecimento desenvolvida no ecossistema Nello Identity.
-            </p>
-            <p>
               Uso pastoral com consentimento explícito e revogável, em conformidade com a LGPD.
             </p>
           </div>
