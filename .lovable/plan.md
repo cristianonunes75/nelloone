@@ -1,59 +1,62 @@
 
-# Plano: Corrigir Botão Cortado no Modal de Consentimento
+# Plano: Corrigir Erro CORS nas Edge Functions de Avaliação
 
 ## Problema Identificado
 
-O botão "Aceitar e Continuar" existe no código mas está sendo **cortado visualmente** no modal. O DialogContent está limitando a altura e escondendo o botão.
+O erro **"Failed to send a request to the Edge Function"** ocorre porque os headers CORS nas Edge Functions `business-send-job-assessment` e `business-resend-assessment` estão incompletos.
 
-## Causa Raiz
+O Supabase client JavaScript envia headers adicionais que não estão na lista permitida:
+- `x-supabase-client-platform`
+- `x-supabase-client-platform-version`
+- `x-supabase-client-runtime`
+- `x-supabase-client-runtime-version`
 
-O componente `DialogContent` pode estar com:
-1. Altura máxima (`max-height`) muito restritiva
-2. `overflow: hidden` cortando o conteúdo
-3. O botão está fora do container com scroll
+Quando o navegador faz a requisição preflight (OPTIONS), o servidor recusa esses headers e a requisição principal falha.
 
 ## Solução
 
-Ajustar o CSS do `DialogContent` para garantir que todo o conteúdo seja visível, incluindo o botão.
+Atualizar os `corsHeaders` em ambas as Edge Functions para incluir todos os headers necessários.
 
-## Implementação
+## Arquivos a Modificar
 
-### Arquivo a modificar
-`src/components/ConsentModal.tsx`
+### 1. `supabase/functions/business-send-job-assessment/index.ts`
 
-### Alteração
+**Linha 7-10** - Atualizar corsHeaders:
 
-Adicionar classes CSS para garantir scroll interno e visibilidade completa:
+```typescript
+// DE:
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
 
-```tsx
-// Linha 82-86 - Adicionar overflow-y-auto e max-h-[90vh]
-<DialogContent 
-  className="sm:max-w-md [&>button]:hidden max-h-[90vh] overflow-y-auto"
-  onPointerDownOutside={(e) => e.preventDefault()}
-  onEscapeKeyDown={(e) => e.preventDefault()}
->
+// PARA:
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
 ```
 
-E também envolver o conteúdo em um container com flex para garantir que o botão sempre apareça:
+### 2. `supabase/functions/business-resend-assessment/index.ts`
 
-```tsx
-// Estrutura ajustada
-<DialogContent className="sm:max-w-md [&>button]:hidden flex flex-col max-h-[90vh]">
-  <DialogHeader>...</DialogHeader>
-  
-  <div className="flex-1 overflow-y-auto space-y-4 py-4">
-    {/* checkboxes e info text */}
-  </div>
-  
-  {/* Botão sempre visível no final */}
-  <div className="pt-4 border-t mt-auto">
-    <Button ... />
-  </div>
-</DialogContent>
+**Linha 7-10** - Mesma alteração:
+
+```typescript
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
 ```
 
 ## Impacto
 
-- Botão "Aceitar e Continuar" sempre visível
-- Em telas pequenas, o conteúdo terá scroll mas o botão permanece fixo
-- Usuários conseguem completar o aceite dos termos
+- O botão "Avaliação Comportamental" funcionará normalmente
+- O reenvio de avaliações também funcionará
+- Emails de convite serão enviados aos candidatos
+- Nenhum impacto em outras funcionalidades
+
+## Validação
+
+1. Clicar em "Avaliação Comportamental" em um candidato
+2. Verificar que não aparece erro
+3. Confirmar que candidato recebeu email com link
