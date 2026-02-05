@@ -1,63 +1,68 @@
 
-# Plano: Correção do Erro CORS na Edge Function create-checkout
+# Plano: Excluir Páginas Legais do Modal de Consentimento
 
 ## Problema Identificado
 
-O erro "Failed to send a request to the Edge Function" que a Saula está enfrentando é causado por headers CORS incompletos na Edge Function `create-checkout`.
+O modal de consentimento LGPD está aparecendo em páginas públicas/institucionais como `/privacidade` e `/termos`. Isso cria um loop onde:
 
-## Causa Raiz
-
-O cliente Supabase JS envia headers adicionais que não estão na lista de headers permitidos da Edge Function:
-
-**Atual (linha 7):**
-```javascript
-"Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"
-```
-
-**Headers que o cliente envia mas não estão permitidos:**
-- `x-supabase-client-platform`
-- `x-supabase-client-platform-version`
-- `x-supabase-client-runtime`
-- `x-supabase-client-runtime-version`
-
-Quando o navegador faz a requisição preflight (OPTIONS), o servidor responde sem permitir esses headers, e o navegador bloqueia a requisição.
+1. Usuario logado vê o modal de consentimento
+2. Clica em "Termos de Uso" ou "Política de Privacidade" para ler
+3. Abre a página legal, mas o modal aparece novamente ali
+4. Usuario não consegue ler os documentos para poder aceitar
 
 ## Solução
 
-Atualizar os headers CORS na Edge Function `create-checkout` para incluir todos os headers necessários.
+Modificar o `ConsentGate` para ignorar páginas legais/públicas, permitindo que o usuário as acesse sem bloqueio.
 
 ## Implementação
 
 ### Arquivo a modificar
-`supabase/functions/create-checkout/index.ts`
+`src/components/ConsentGate.tsx`
 
-### Alteração (linhas 5-8)
+### Alteração
 
-**De:**
-```javascript
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
-```
+Adicionar verificação de rota atual e lista de páginas excluídas:
 
-**Para:**
-```javascript
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+```typescript
+import { useLocation } from "react-router-dom";
+
+// Páginas onde o modal NÃO deve aparecer
+const EXCLUDED_PATHS = [
+  '/termos', '/termos-de-servico', '/terms', '/terms-of-service',
+  '/privacidade', '/politica-de-privacidade', '/privacy', '/privacy-policy',
+  '/contato', '/contact',
+  '/en/terms', '/en/privacy', '/en/contact',
+  '/pt-pt/termos', '/pt-pt/privacidade', '/pt-pt/contato'
+];
+
+export function ConsentGate({ children }: ConsentGateProps) {
+  const location = useLocation();
+  
+  // ... existing hooks ...
+  
+  // Não mostrar modal em páginas legais/públicas
+  const isExcludedPath = EXCLUDED_PATHS.some(path => 
+    location.pathname === path || location.pathname.startsWith(path + '/')
+  );
+  
+  if (isExcludedPath) {
+    return <>{children}</>;
+  }
+  
+  // ... rest of logic ...
+}
 ```
 
 ## Impacto
 
-- Correção imediata do erro para todos os usuários
-- Não há breaking changes
-- Compatibilidade total com versões atuais do Supabase JS Client
+- Usuários podem acessar `/privacidade` e `/termos` sem bloqueio
+- Podem ler os documentos antes de aceitar
+- Modal continua aparecendo em todas as outras páginas protegidas
+- Conformidade LGPD mantida (usuário ainda precisa aceitar para usar a plataforma)
 
 ## Validação
 
-Após a correção, a Saula (e outros usuários) poderão:
-1. Clicar em "Desbloquear Jornada Completa"
-2. Ser redirecionados normalmente para o checkout do Stripe
-3. Completar a compra sem erros
+1. Acessar `/privacidade` logado - modal NÃO deve aparecer
+2. Acessar `/termos` logado - modal NÃO deve aparecer
+3. Acessar `/cliente` logado sem consentimento - modal DEVE aparecer
+4. Links no modal abrem as páginas normalmente
