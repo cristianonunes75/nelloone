@@ -47,6 +47,7 @@ import AcceptCrossingPage from "./pages/AcceptCrossingPage";
 import CruzamentoPublico from "./pages/CruzamentoPublico";
 import WhatsApp from "./pages/WhatsApp";
 import ParaProfissionais from "./pages/ParaProfissionais";
+import CentralAjuda from "./pages/CentralAjuda";
 const queryClient = new QueryClient();
 
 // Component to run version check hook
@@ -116,6 +117,11 @@ const AppRoutes = () => (
     <Route path="/para-profissionais" element={<ParaProfissionais />} />
     <Route path="/en/for-professionals" element={<ParaProfissionais />} />
     <Route path="/pt-pt/para-profissionais" element={<ParaProfissionais />} />
+    
+    {/* Central de Ajuda - Help Center */}
+    <Route path="/ajuda" element={<CentralAjuda />} />
+    <Route path="/en/help" element={<CentralAjuda />} />
+    <Route path="/pt-pt/ajuda" element={<CentralAjuda />} />
     
     {/* Legal pages - PT */}
     <Route path="/termos" element={<TermsOfService />} />
