@@ -68,7 +68,8 @@ export const GeoRedirect = () => {
 
     async function detectCountryAndRedirect() {
       try {
-        const response = await fetch("http://ip-api.com/json/?fields=countryCode", {
+        // Use ipapi.co (supports HTTPS) - free tier: 1000 requests/day
+        const response = await fetch("https://ipapi.co/country_code/", {
           signal: AbortSignal.timeout(3000), // 3 second timeout
         });
 
@@ -76,8 +77,8 @@ export const GeoRedirect = () => {
           throw new Error("Failed to fetch geo data");
         }
 
-        const data = await response.json();
-        const countryCode = data.countryCode;
+        // ipapi.co returns just the country code as plain text
+        const countryCode = (await response.text()).trim();
 
         console.log("[GeoRedirect] Detected country:", countryCode);
 
