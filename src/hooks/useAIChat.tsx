@@ -9,10 +9,32 @@ type Message = {
   role: "user" | "assistant" | "system";
   content: string;
   created_at?: string;
+  test_context?: string | null;
+  metadata?: {
+    was_upsell?: boolean;
+    upsell_type?: string | null;
+    cta_url?: string | null;
+    classifier?: string;
+  } | null;
 };
 
-export const useAIChat = (conversationId?: string) => {
-  const { user } = useAuth();
+type ChatResponse = {
+  content: string;
+  was_upsell: boolean;
+  upsell_type?: string | null;
+  cta_url?: string | null;
+  error?: string;
+};
+
+type UseAIChatOptions = {
+  conversationId?: string;
+  sessionId?: string;
+  testContext?: string;
+};
+
+export const useAIChat = (options: UseAIChatOptions = {}) => {
+  const { conversationId, sessionId, testContext } = options;
+  const { user, session } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isStreaming, setIsStreaming] = useState(false);
@@ -60,11 +82,99 @@ export const useAIChat = (conversationId?: string) => {
       conversation_id: conversationId,
       role: message.role,
       content: message.content,
+      test_context: message.test_context,
+      metadata: message.metadata,
     });
 
     if (error) throw error;
   };
 
+  // Send message for results page chat (non-streaming, uses chat-ai edge function)
+  const sendResultsMessage = useCallback(
+    async ({
+      message,
+      onResponse,
+    }: {
+      message: string;
+      onResponse: (response: ChatResponse) => void;
+    }) => {
+      if (!user || !session?.access_token) {
+        toast({
+          title: "Erro",
+          description: "Você precisa estar logado",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!sessionId) {
+        toast({
+          title: "Erro",
+          description: "ID da sessão não encontrado",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setIsStreaming(true);
+
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-ai`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({
+              message,
+              session_id: sessionId,
+              test_context: testContext,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          if (response.status === 429) {
+            throw new Error("Limite de requisições atingido. Tente novamente mais tarde.");
+          }
+          if (response.status === 402) {
+            throw new Error("Créditos insuficientes. Por favor, adicione créditos.");
+          }
+          if (response.status === 401) {
+            throw new Error("Sessão expirada. Faça login novamente.");
+          }
+          throw new Error("Erro ao conectar com o assistente");
+        }
+
+        const data: ChatResponse = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        onResponse(data);
+      } catch (error: any) {
+        console.error("Error sending results message:", error);
+        toast({
+          title: "Erro ao enviar mensagem",
+          description: error.message,
+          variant: "destructive",
+        });
+        // Return error response
+        onResponse({
+          content: "Desculpe, tive um momento de pausa. Pode tentar novamente?",
+          was_upsell: false,
+        });
+      } finally {
+        setIsStreaming(false);
+      }
+    },
+    [user, session, toast, sessionId, testContext]
+  );
+
+  // Original streaming message for concierge chat
   const sendMessage = useCallback(
     async ({
       convId,
@@ -192,6 +302,7 @@ export const useAIChat = (conversationId?: string) => {
     isLoading: messagesLoading,
     isStreaming,
     sendMessage,
+    sendResultsMessage,
     createConversation: createConversation.mutate,
   };
 };

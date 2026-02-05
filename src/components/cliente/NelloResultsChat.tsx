@@ -1,10 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, Send, X, Sparkles, Loader2, ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useAIChat } from "@/hooks/useAIChat";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -12,30 +13,59 @@ import ReactMarkdown from "react-markdown";
 interface Message {
   role: "user" | "assistant";
   content: string;
+  metadata?: {
+    was_upsell?: boolean;
+    upsell_type?: string | null;
+    cta_url?: string | null;
+  } | null;
 }
 
 interface NelloResultsChatProps {
   testType: string;
   testName?: string;
+  userTestId?: string;
   className?: string;
 }
 
 const QUICK_CHIPS = [
-  "O que significa meu resultado?",
+  "O que significa meu resultado nesse teste?",
   "Quais são as forças desse perfil?",
-  "Quais os pontos de atenção?",
-  "Como isso se conecta com outros testes?",
+  "Quais são os pontos de atenção?",
+  "Como isso se conecta com outro teste?",
 ];
 
-export function NelloResultsChat({ testType, testName, className }: NelloResultsChatProps) {
+// Generate or retrieve persistent session ID for this userTestId
+function getOrCreateSessionId(userTestId: string): string {
+  const storageKey = `nello_chat_session_${userTestId}`;
+  let sessionId = localStorage.getItem(storageKey);
+  
+  if (!sessionId) {
+    sessionId = `${userTestId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem(storageKey, sessionId);
+  }
+  
+  return sessionId;
+}
+
+export function NelloResultsChat({ testType, testName, userTestId, className }: NelloResultsChatProps) {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
-  const [upsellUrl, setUpsellUrl] = useState<string | null>(null);
+  const [upsellData, setUpsellData] = useState<{ url: string; type: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Generate persistent session ID based on userTestId
+  const sessionId = useMemo(() => {
+    if (!userTestId) return `temp_${Date.now()}`;
+    return getOrCreateSessionId(userTestId);
+  }, [userTestId]);
+
+  const { sendResultsMessage, isStreaming } = useAIChat({
+    sessionId,
+    testContext: testType,
+  });
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -44,61 +74,36 @@ export function NelloResultsChat({ testType, testName, className }: NelloResults
   }, [messages]);
 
   const sendMessage = async (messageText: string) => {
-    if (!messageText.trim() || isLoading) return;
+    if (!messageText.trim() || isStreaming) return;
 
     const userMessage: Message = { role: "user", content: messageText };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setIsLoading(true);
     setShowUpsell(false);
 
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-ai`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+    await sendResultsMessage({
+      message: messageText,
+      onResponse: (response) => {
+        const assistantMessage: Message = {
+          role: "assistant",
+          content: response.content,
+          metadata: {
+            was_upsell: response.was_upsell,
+            upsell_type: response.upsell_type,
+            cta_url: response.cta_url,
           },
-          body: JSON.stringify({
-            message: messageText,
-            messages: messages.map((m) => ({ role: m.role, content: m.content })),
-            test_context: testType,
-          }),
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+
+        if (response.was_upsell && response.cta_url) {
+          setShowUpsell(true);
+          setUpsellData({
+            url: response.cta_url,
+            type: response.upsell_type || "ativacao_codigo",
+          });
         }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to get response");
-      }
-
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      const assistantMessage: Message = {
-        role: "assistant",
-        content: data.content,
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-
-      if (data.was_upsell) {
-        setShowUpsell(true);
-        setUpsellUrl(data.cta_url);
-      }
-    } catch (error) {
-      console.error("Chat error:", error);
-      const errorMessage: Message = {
-        role: "assistant",
-        content: "Desculpe, tive um momento de pausa. Pode tentar novamente?",
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
+      },
+    });
   };
 
   const handleChipClick = (chip: string) => {
@@ -114,7 +119,7 @@ export function NelloResultsChat({ testType, testName, className }: NelloResults
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button - positioned at right-24 to not conflict with ResultsFloatingMenu at right-6 */}
       <AnimatePresence>
         {!isOpen && (
           <motion.div
@@ -236,7 +241,7 @@ export function NelloResultsChat({ testType, testName, className }: NelloResults
                     ))}
 
                     {/* Loading indicator */}
-                    {isLoading && (
+                    {isStreaming && (
                       <div className="flex justify-start">
                         <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3">
                           <div className="flex gap-1.5">
@@ -252,7 +257,7 @@ export function NelloResultsChat({ testType, testName, className }: NelloResults
 
                 {/* Upsell Card */}
                 <AnimatePresence>
-                  {showUpsell && upsellUrl && (
+                  {showUpsell && upsellData && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -271,7 +276,7 @@ export function NelloResultsChat({ testType, testName, className }: NelloResults
                           <Button
                             size="sm"
                             className="w-full gap-2 h-8"
-                            onClick={() => window.location.href = upsellUrl}
+                            onClick={() => window.location.href = upsellData.url}
                           >
                             Conhecer Ativação
                             <ArrowRight className="h-3 w-3" />
@@ -291,16 +296,16 @@ export function NelloResultsChat({ testType, testName, className }: NelloResults
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Digite sua pergunta..."
-                    disabled={isLoading}
+                    disabled={isStreaming}
                     className="flex-1 h-10"
                   />
                   <Button
                     type="submit"
                     size="icon"
-                    disabled={!input.trim() || isLoading}
+                    disabled={!input.trim() || isStreaming}
                     className="h-10 w-10 rounded-full flex-shrink-0"
                   >
-                    {isLoading ? (
+                    {isStreaming ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <Send className="h-4 w-4" />
