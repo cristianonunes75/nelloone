@@ -12,7 +12,7 @@ const ecosystemModules = [
     id: 'identity',
     name: 'Identity',
     tagline: 'Onde Tudo Começa',
-    description: 'Diagnóstico profundo em 7 etapas. Clareza sobre quem você é, seus padrões, talentos e propósito.',
+    description: 'Jornada de autoconhecimento em 7 etapas. Clareza sobre quem você é, seus padrões, talentos e propósito.',
     cta: 'Explorar Identity',
     url: 'https://identity.nello.one',
     icon: Brain,
