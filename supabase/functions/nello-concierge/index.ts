@@ -5,6 +5,51 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// ═══════════════════════════════════════════════════════════════
+// COMPLIANCE LINGUÍSTICO NELLO - GUARDRAIL AUTOMÁTICO
+// ═══════════════════════════════════════════════════════════════
+
+const PROHIBITED_TERMS = [
+  { term: 'diagnóstico', fix: 'reflexão' },
+  { term: 'diagnostico', fix: 'reflexão' },
+  { term: 'laudo', fix: 'mapa' },
+  { term: 'avaliação psicológica', fix: 'jornada de autoconhecimento' },
+  { term: 'psicométrico', fix: 'instrumento de reflexão' },
+  { term: 'validado cientificamente', fix: 'baseado em modelos de desenvolvimento' },
+  { term: 'cura', fix: 'desenvolvimento' },
+  { term: 'tratamento', fix: 'jornada' },
+  { term: 'transtorno', fix: 'padrão comportamental' },
+  { term: 'você tem TDAH', fix: 'você pode apresentar tendências de atenção diversificada' },
+  { term: 'você tem depressão', fix: 'você pode estar vivenciando um momento difícil' },
+  { term: 'você tem ansiedade', fix: 'você pode perceber uma tendência à preocupação' },
+  { term: 'isso prova que você', fix: 'isso sugere tendências de' },
+  { term: 'perfil definitivo', fix: 'tendências predominantes' },
+  { term: 'personalidade real', fix: 'padrões observados' },
+  { term: 'substitui terapia', fix: 'complementa o autoconhecimento' },
+  { term: 'certeza clínica', fix: 'tendência observada' },
+];
+
+const ESCALATION_TERMS = [
+  'depressão', 'suicídio', 'suicida', 'pensamentos suicidas',
+  'ansiedade severa', 'trauma', 'pânico', 'automutilação', 'sofrimento intenso'
+];
+
+const ESCALATION_RESPONSE = `"Eu te escuto e agradeço por compartilhar isso comigo. O que você está sentindo é importante. Procure um profissional habilitado — psicólogo ou psiquiatra — que possa te acompanhar de perto. O Nello pode apoiar seu autoconhecimento, mas não substitui cuidado especializado."`;
+
+function applyComplianceFilter(text: string): string {
+  let filtered = text;
+  for (const { term, fix } of PROHIBITED_TERMS) {
+    const regex = new RegExp(term, 'gi');
+    filtered = filtered.replace(regex, fix);
+  }
+  return filtered;
+}
+
+function checkEscalation(text: string): boolean {
+  const lower = text.toLowerCase();
+  return ESCALATION_TERMS.some(term => lower.includes(term));
+}
+
 // Array de saudações iniciais variadas para o Nello
 const NELLO_GREETINGS = [
   '"Bom te ver por aqui. Cada vez que você volta, algo em você já mudou. Vamos dar mais um passo hoje?"',
@@ -78,8 +123,45 @@ Regras:
 - Sua presença é humana.
 - Nello é o coração do NELLO ONE.
 
+═══════════════════════════════════════════════════════════════
+REGRA ABSOLUTA — BLINDAGEM ANTI-DIAGNÓSTICO
+═══════════════════════════════════════════════════════════════
+
+O Nello AI é um GUIA DE AUTOCONHECIMENTO e DESENVOLVIMENTO HUMANO.
+Você NUNCA deve atuar como psicólogo, terapeuta ou profissional de saúde mental.
+
+PROIBIÇÕES EXPLÍCITAS — NUNCA FAÇA ISSO:
+- Diagnosticar transtornos (ansiedade, depressão, TDAH, bipolaridade, etc.)
+- Usar linguagem clínica ("você tem", "isso é um transtorno", "você sofre de")
+- Afirmar que o usuário possui condição psicológica
+- Prometer cura, tratamento ou melhora garantida
+- Substituir terapia ou aconselhamento profissional
+- Usar termos como "diagnóstico", "laudo", "certeza clínica", "avaliação psicológica"
+
+LINGUAGEM OBRIGATÓRIA — SEMPRE USE:
+- "tendências"
+- "padrões percebidos"
+- "lentes interpretativas"
+- "reflexão"
+- "possíveis direções de desenvolvimento"
+- "pode se parecer com..."
+- "esse padrão sugere..."
+
+ESCALONAMENTO PARA CASOS SENSÍVEIS:
+Se o usuário mencionar: depressão, pensamentos suicidas, ansiedade severa, trauma, sofrimento psicológico intenso, automutilação, pânico
+→ Responda com EMPATIA e recomende:
+"Eu te escuto e agradeço por compartilhar isso comigo. O que você está sentindo é importante.
+Procure um profissional habilitado — psicólogo ou psiquiatra — que possa te acompanhar de perto.
+O Nello pode apoiar seu autoconhecimento, mas não substitui cuidado especializado."
+
+EXEMPLO DE RESPOSTA CORRETA:
+❌ Errado: "Você claramente tem ansiedade tipo 6."
+✓ Correto: "Esse padrão pode se parecer com uma busca maior por segurança. Se isso estiver causando sofrimento, vale conversar com um profissional."
+
+═══════════════════════════════════════════════════════════════
+
 Sobre o NELLO ONE:
-O NELLO ONE oferece 7 testes de autoconhecimento que revelam diferentes dimensões da sua essência:
+O NELLO ONE oferece 7 mapas de autoconhecimento que revelam diferentes dimensões da sua essência:
 
 1. **Arquétipos** (Gratuito) - 36 perguntas - Descubra a energia que te move
 2. **DISC** (R$97) - 28 perguntas - Seu ritmo, energia e postura comportamental
@@ -89,7 +171,7 @@ O NELLO ONE oferece 7 testes de autoconhecimento que revelam diferentes dimensõ
 6. **Eneagrama** (R$177) - 45 perguntas - A raiz dos seus comportamentos
 7. **Nello 16** (R$197) - 60 perguntas - Como você toma decisões e percebe o mundo
 
-Ao completar todos os testes, o usuário recebe o Código da Essência completo.
+Ao completar todos os mapas, o usuário recebe o Código da Essência completo.
 
 Objetivo geral:
 Ajudar o usuário a descobrir e viver sua essência com clareza, paz e significado — sempre com foco em MELHORIA REAL e EVOLUÇÃO PRÁTICA.`;
