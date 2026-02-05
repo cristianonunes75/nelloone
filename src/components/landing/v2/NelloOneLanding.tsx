@@ -56,13 +56,13 @@ export const NelloOneLanding = () => {
 
   // Os 7 pilares da Jornada Identity - lista completa
   const discoveries = [
-    { icon: Heart, mainText: "Como você reage emocionalmente", testName: "Eneagrama" },
-    { icon: Brain, mainText: "Como toma decisões", testName: "DISC" },
-    { icon: Flame, mainText: "O que te motiva e o que te bloqueia", testName: "Temperamentos" },
-    { icon: Lightbulb, mainText: "Onde estão seus talentos naturais", testName: "Inteligências Múltiplas" },
-    { icon: Target, mainText: "Quais padrões pedem maturidade", testName: "Nello 16" },
-    { icon: Compass, mainText: "Seus padrões arquetípicos inconscientes", testName: "Arquétipos" },
-    { icon: Users, mainText: "Como você se conecta afetivamente", testName: "Estilos de Conexão" },
+    { icon: Heart, mainText: "Explore padrões de reação emocional", testName: "Eneagrama" },
+    { icon: Brain, mainText: "Reconheça seu estilo de tomada de decisão", testName: "DISC" },
+    { icon: Flame, mainText: "Compreenda o que te motiva e te bloqueia", testName: "Temperamentos" },
+    { icon: Lightbulb, mainText: "Reflita sobre seus talentos naturais", testName: "Inteligências Múltiplas" },
+    { icon: Target, mainText: "Organize padrões que pedem maturidade", testName: "Nello 16" },
+    { icon: Compass, mainText: "Reconheça tendências arquetípicas", testName: "Arquétipos" },
+    { icon: Users, mainText: "Compreenda seu estilo de conexão afetiva", testName: "Estilos de Conexão" },
   ];
 
   // Para quem é / não é - compacto
@@ -79,8 +79,8 @@ export const NelloOneLanding = () => {
 
   // Benefícios do preço
   const pricingBenefits = [
-    "7 testes comportamentais completos",
-    "Relatórios Premium em PDF",
+    "7 mapas integrados de autoconhecimento",
+    "Relatórios premium em PDF (desenvolvimento pessoal, não clínicos)",
     "Código da Essência incluído",
     "Nello como guia da jornada",
     "Acesso vitalício aos resultados",
@@ -127,7 +127,7 @@ export const NelloOneLanding = () => {
                 size="lg" 
                 className="text-sm sm:text-base px-5 sm:px-8 w-full min-h-[54px] sm:min-h-[56px] bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold rounded-full transition-all duration-300 hover:scale-[1.02] shadow-xl group"
               >
-                <span className="text-center leading-tight">Revelar meu Código da Essência</span>
+                <span className="text-center leading-tight">Acessar meu Código da Essência</span>
                 <Sparkles className="ml-2 h-4 w-4 sm:h-5 sm:w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
               </Button>
               
@@ -316,7 +316,7 @@ export const NelloOneLanding = () => {
               
               <p className="text-base text-foreground/80 leading-relaxed mb-6">
                 <span className="text-nello-gold font-medium">Nello</span> é seu guia de clareza. 
-                Ele interpreta seus resultados, conecta padrões e te ajuda a aplicar na vida real.
+                Ele organiza seus resultados, conecta padrões de forma estruturada e te ajuda a aplicar isso na vida real, como ferramenta de autoconhecimento e desenvolvimento pessoal.
               </p>
               
               <p className="text-base text-foreground/80 leading-relaxed mb-6">
@@ -388,7 +388,7 @@ export const NelloOneLanding = () => {
                   size="lg" 
                   className="w-full min-h-[52px] sm:min-h-[56px] text-sm sm:text-base px-4 sm:px-6 rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold group shadow-lg whitespace-nowrap"
                 >
-                  <span className="truncate">Revelar meu Código</span>
+                  <span className="truncate">Acessar meu Código</span>
                   <Sparkles className="ml-2 w-4 h-4 sm:w-5 sm:h-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
                 </Button>
                 <p className="text-xs text-muted-foreground/70 text-center">
@@ -435,13 +435,25 @@ export const NelloOneLanding = () => {
               size="lg" 
               className="text-sm sm:text-base px-6 sm:px-8 w-full min-h-[52px] sm:min-h-[56px] bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold rounded-full transition-all duration-300 hover:scale-[1.02] shadow-xl group whitespace-nowrap"
             >
-              <span className="truncate">Revelar meu Código</span>
+              <span className="truncate">Acessar meu Código</span>
               <Sparkles className="ml-2 h-4 w-4 sm:h-5 sm:w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
             </Button>
             <p className="text-white/50 text-xs text-center">
               Acesso vitalício · Jornada em 7 camadas · Clareza definitiva
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* ========== NOTA DE RESPONSABILIDADE ========== */}
+      <section className="py-8 px-5 sm:px-6 lg:px-8 bg-muted/20 border-t border-border/30">
+        <div className="max-w-2xl mx-auto text-center">
+          <p className="text-xs font-medium text-muted-foreground/80 mb-2">
+            Nota de responsabilidade
+          </p>
+          <p className="text-xs text-muted-foreground/60 leading-relaxed">
+            O Nello Identity é uma ferramenta de autoconhecimento e desenvolvimento humano, baseada em modelos amplamente utilizados em contextos educacionais, corporativos e de reflexão pessoal. Ele não substitui diagnóstico psicológico, avaliação clínica ou acompanhamento terapêutico profissional.
+          </p>
         </div>
       </section>
 
