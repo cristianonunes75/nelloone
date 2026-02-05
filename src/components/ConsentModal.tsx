@@ -80,11 +80,11 @@ export function ConsentModal({ isOpen, userId, onConsentGiven }: ConsentModalPro
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent 
-        className="sm:max-w-md [&>button]:hidden"
+        className="sm:max-w-md [&>button]:hidden flex flex-col max-h-[90vh]"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogHeader className="text-center">
+        <DialogHeader className="text-center flex-shrink-0">
           <div className="mx-auto mb-4 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
             <Shield className="w-6 h-6 text-primary" />
           </div>
@@ -94,7 +94,7 @@ export function ConsentModal({ isOpen, userId, onConsentGiven }: ConsentModalPro
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="flex-1 overflow-y-auto space-y-4 py-4">
           {/* Terms checkbox */}
           <div className="flex items-start space-x-3 p-3 bg-muted/50 rounded-lg">
             <Checkbox
@@ -145,21 +145,23 @@ export function ConsentModal({ isOpen, userId, onConsentGiven }: ConsentModalPro
           </p>
         </div>
 
-        <Button
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          className="w-full"
-          size="lg"
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              {t.submitting}
-            </>
-          ) : (
-            t.submitButton
-          )}
-        </Button>
+        <div className="pt-4 border-t mt-auto flex-shrink-0">
+          <Button
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+            className="w-full"
+            size="lg"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                {t.submitting}
+              </>
+            ) : (
+              t.submitButton
+            )}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
