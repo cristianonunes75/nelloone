@@ -15,7 +15,7 @@ const faqItems = [
   },
   {
     question: "O que torna o Código da Essência diferente de um relatório comum?",
-    answer: "A maioria dos testes gera relatórios descritivos: 'Você é tipo X porque fez Y'. O Código da Essência é diferente. Ele não apenas descreve - ele conecta padrões, revela contradições, mostra onde você se bloqueia e onde está seu potencial real. Nello (nosso guia de IA) interpreta seus 7 testes, identifica as relações entre eles e te entrega uma síntese que você realmente consegue usar na vida real. É como ter um psicólogo que leu todos os seus testes e te explica o que realmente significa.",
+    answer: "A maioria dos testes gera relatórios descritivos: 'Você é tipo X porque fez Y'. O Código da Essência é diferente. Ele não apenas descreve - ele conecta padrões, revela contradições, mostra onde você se bloqueia e onde está seu potencial real. Nello (nosso guia de IA) interpreta seus 7 testes, identifica as relações entre eles e te entrega uma síntese que você realmente consegue usar na vida real. É como ter um mentor que leu tudo sobre você e finalmente te mostra o mapa completo.",
   },
   {
     question: "Eu recebo o Código da Essência logo no início?",
