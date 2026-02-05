@@ -30,6 +30,10 @@ const faqItems = [
     answer: "Existem testes gratuitos, mas eles são fragmentados. Você faz um Eneagrama aqui, um DISC ali, e fica com 7 pedaços de um quebra-cabeça sem conseguir montar. A Jornada Identity integra tudo isso em um processo coerente. Além disso, você tem Nello como seu guia - uma IA que organiza seus resultados, conecta os padrões e te ajuda a aplicar na vida real. Isso tem valor. Você não está pagando pelos mapas - está pagando pela síntese, pela organização e pela transformação.",
   },
   {
+    question: "Como vou usar isso na prática depois?",
+    answer: "Você recebe um relatório final integrado com orientações reflexivas e caminhos de aplicação pessoal. Muitas pessoas usam como clareza para decisões, autoconhecimento e conversas mais profundas, inclusive em contextos profissionais, sempre sem caráter clínico.",
+  },
+  {
     question: "Por quanto tempo terei acesso aos meus resultados?",
     answer: "Acesso vitalício. Uma vez que você completa a Jornada Identity, seus resultados ficam salvos na sua conta para sempre. Você pode revisitar seu Código da Essência quantas vezes quiser, em qualquer momento. Não há assinatura recorrente, não há expiração. É seu para a vida toda.",
   },
