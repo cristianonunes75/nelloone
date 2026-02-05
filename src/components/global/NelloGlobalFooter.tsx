@@ -111,8 +111,14 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
     },
   ];
 
-  // Legal links
+  // Institutional links (Identity)
+  const mapsHref = language === 'en' ? '/en/the-7-maps' : language === 'pt-pt' ? '/pt-pt/os-7-mapas' : '/os-7-mapas';
+  const professionalsHref = language === 'en' ? '/en/for-professionals' : language === 'pt-pt' ? '/pt-pt/para-profissionais' : '/para-profissionais';
+
+  // Legal + institutional links
   const legalLinks = [
+    { label: language === 'en' ? 'The 7 Maps' : 'Os 7 Mapas', href: mapsHref },
+    { label: language === 'en' ? 'For Professionals' : 'Para Profissionais', href: professionalsHref },
     { label: language === 'en' ? 'Terms of Use' : 'Termos de Uso', href: '/termos-de-servico' },
     { label: language === 'en' ? 'Privacy Policy' : 'Política de Privacidade', href: '/politica-de-privacidade' },
   ];
