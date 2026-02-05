@@ -140,9 +140,6 @@ export function DiscernirLanding() {
               DISCERNIR – versão piloto pastoral
             </p>
             <p className="text-sm text-[#7A6B5A]">
-              Arquitetura técnica desenvolvida no ecossistema Nello One.
-            </p>
-            <p className="text-sm text-[#7A6B5A]">
               Esta experiência respeita integralmente a LGPD.
             </p>
             <p className="text-sm text-[#7A6B5A]">
