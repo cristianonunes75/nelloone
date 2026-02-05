@@ -20,6 +20,9 @@ interface NelloGlobalHeaderProps {
   variant?: 'light' | 'dark';
 }
 
+// Feature flag to hide ecosystem modules (starting with Identity only)
+const SHOW_ECOSYSTEM_MODULES = false;
+
 // Modules visible to all users (add more as they become ready)
 const PUBLIC_MODULES = ['identity'];
 
@@ -77,11 +80,11 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
 
   const isDark = variant === 'dark';
 
-  // Filter modules based on user role
+  // Filter modules based on user role and feature flag
   const isAdmin = userRoles.includes('admin');
-  const visibleModules = isAdmin 
-    ? NELLO_MODULES 
-    : NELLO_MODULES.filter(m => PUBLIC_MODULES.includes(m.id));
+  const visibleModules = SHOW_ECOSYSTEM_MODULES 
+    ? (isAdmin ? NELLO_MODULES : NELLO_MODULES.filter(m => PUBLIC_MODULES.includes(m.id)))
+    : []; // Hide all ecosystem navigation when flag is off
 
   // Handle scroll effect
   useEffect(() => {
@@ -183,7 +186,7 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
           </a>
 
           {/* Center: Module Navigation (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-1">
+          {visibleModules.length > 0 && <nav className="hidden lg:flex items-center gap-1">
             {visibleModules.map((module) => {
               const isActive = isModuleActive(module.id);
               return (
@@ -218,7 +221,7 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
                 </button>
               );
             })}
-          </nav>
+          </nav>}
 
           {/* Right: Actions */}
           <div className="flex items-center gap-3">
@@ -345,7 +348,7 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
 
                   {/* Mobile Navigation */}
                   <nav className="flex-1 overflow-auto p-4">
-                    <div className="space-y-1">
+                    {visibleModules.length > 0 && <div className="space-y-1">
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 mb-2">
                         {language === 'en' ? 'Ecosystem' : 'Ecossistema'}
                       </p>
@@ -375,9 +378,10 @@ export const NelloGlobalHeader = ({ variant = 'light' }: NelloGlobalHeaderProps)
                         );
                       })}
                     </div>
+                    }
 
                     {/* Quick Actions */}
-                    <div className="mt-6 pt-6 border-t space-y-1">
+                    <div className={cn("space-y-1", visibleModules.length > 0 && "mt-6 pt-6 border-t")}>
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 mb-2">
                         {language === 'en' ? 'Quick Actions' : 'Ações Rápidas'}
                       </p>
