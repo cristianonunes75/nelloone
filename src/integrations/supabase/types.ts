@@ -5142,6 +5142,10 @@ export type Database = {
       }
     }
     Functions: {
+      accept_company_invite_by_token: {
+        Args: { _token: string; _user_id: string }
+        Returns: Json
+      }
       add_user_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -5157,6 +5161,34 @@ export type Database = {
       get_admin_permission_level: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["admin_permission_level"]
+      }
+      get_candidate_by_invite_token: {
+        Args: { _token: string }
+        Returns: {
+          company_id: string
+          company_logo_url: string
+          company_name: string
+          consent_given_at: string
+          email: string
+          full_name: string
+          id: string
+          invite_expires_at: string
+          position_applied: string
+          status: string
+        }[]
+      }
+      get_company_invite_by_token: {
+        Args: { _token: string }
+        Returns: {
+          company_id: string
+          company_logo_url: string
+          company_name: string
+          email: string
+          expires_at: string
+          id: string
+          role: string
+          status: string
+        }[]
       }
       get_contextual_report_by_token: {
         Args: { _token: string }
@@ -5245,6 +5277,10 @@ export type Database = {
           _user_id: string
         }
         Returns: undefined
+      }
+      update_candidate_consent_by_token: {
+        Args: { _token: string }
+        Returns: boolean
       }
     }
     Enums: {

@@ -62,46 +62,30 @@ export default function BusinessAcceptInvite() {
 
   const fetchInvite = async () => {
     try {
+      // Use SECURITY DEFINER function to fetch invite by token (RLS protected)
       const { data, error } = await supabase
-        .from('company_invites')
-        .select(`
-          id,
-          email,
-          role,
-          status,
-          expires_at,
-          companies:company_id (
-            id,
-            name,
-            logo_url
-          )
-        `)
-        .eq('invite_token', token)
-        .single();
+        .rpc('get_company_invite_by_token', { _token: token })
+        .maybeSingle();
       
       if (error) throw error;
       
-      // Check if expired
-      if (new Date(data.expires_at) < new Date()) {
-        setError('Este convite expirou. Solicite um novo convite ao administrador.');
+      if (!data) {
+        setError('Convite não encontrado, expirado ou já aceito.');
         return;
       }
       
-      // Check if already accepted
-      if (data.status === 'accepted') {
-        setError('Este convite já foi aceito.');
-        return;
-      }
-      
-      // Transform data
-      const companyData = Array.isArray(data.companies) ? data.companies[0] : data.companies;
+      // Map RPC result to expected InviteData structure
       setInvite({
         id: data.id,
         email: data.email,
         role: data.role as 'collaborator' | 'company_admin',
         status: data.status,
         expires_at: data.expires_at,
-        company: companyData as { id: string; name: string; logo_url: string | null }
+        company: {
+          id: data.company_id,
+          name: data.company_name,
+          logo_url: data.company_logo_url
+        }
       });
     } catch (err) {
       console.error('Error fetching invite:', err);
@@ -191,15 +175,16 @@ export default function BusinessAcceptInvite() {
         if (linkError) throw linkError;
       }
       
-      // Update invite status
-      await supabase
-        .from('company_invites')
-        .update({
-          status: 'accepted',
-          accepted_at: new Date().toISOString(),
-          accepted_by: userId,
-        })
-        .eq('id', invite.id);
+      // Update invite status using SECURITY DEFINER function
+      const { data: acceptResult, error: acceptError } = await supabase
+        .rpc('accept_company_invite_by_token', { 
+          _token: token!, 
+          _user_id: userId! 
+        });
+      
+      if (acceptError) throw acceptError;
+      const result = acceptResult as { success: boolean; error?: string } | null;
+      if (!result?.success) throw new Error(result?.error || 'Failed to accept invite');
       
       toast.success('Convite aceito! Bem-vindo à equipe.');
       
