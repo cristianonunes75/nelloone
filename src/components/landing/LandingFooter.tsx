@@ -33,11 +33,11 @@ export const LandingFooter = () => {
               </p>
               <div className="flex gap-4">
                 <a
-                  href="https://www.instagram.com/identity.nello?igsh=YzdvaXdzbHp0ZW1k&utm_source=qr"
+                  href="https://www.instagram.com/nello.identity"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 flex items-center justify-center transition-colors"
-                  aria-label="Instagram NELLO IDENTITY"
+                  aria-label="Instagram @nello.identity"
                 >
                   <Instagram className="w-5 h-5" />
                 </a>
@@ -98,17 +98,25 @@ export const LandingFooter = () => {
                     rel="noopener noreferrer" 
                     className="hover:text-gold transition-colors flex items-center gap-2"
                   >
-                    <span>WhatsApp</span>
+                    <span>{isEn ? 'Talk to support' : 'Falar com suporte'}</span>
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="mailto:suporte@nello.one" 
+                    className="hover:text-gold transition-colors"
+                  >
+                    suporte@nello.one
                   </a>
                 </li>
                 <li className="pt-2">
                   <a 
-                    href="https://www.instagram.com/identity.nello?igsh=YzdvaXdzbHp0ZW1k&utm_source=qr" 
+                    href="https://www.instagram.com/nello.identity" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="hover:text-gold transition-colors"
                   >
-                    @identity.nello
+                    @nello.identity
                   </a>
                 </li>
               </ul>
