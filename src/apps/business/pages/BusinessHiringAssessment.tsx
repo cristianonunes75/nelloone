@@ -115,26 +115,32 @@ export default function BusinessHiringAssessment() {
     if (!token) return;
     setLoading(true);
     try {
-      // Fetch candidate by token with company data
-      const { data: candidateData, error: candidateError } = await supabase
-        .from("hiring_candidates")
-        .select(`
-          *,
-          company:companies(id, name, logo_url)
-        `)
-        .eq("invite_token", token)
-        .single();
+      // Fetch candidate by token using SECURITY DEFINER function (RLS protected)
+      const { data: candidateRow, error: candidateError } = await supabase
+        .rpc("get_candidate_by_invite_token", { _token: token })
+        .maybeSingle();
 
-      if (candidateError || !candidateData) {
+      if (candidateError || !candidateRow) {
         toast.error("Link de avaliação inválido ou expirado");
         return;
       }
 
-      // Check expiration
-      if (candidateData.invite_expires_at && new Date(candidateData.invite_expires_at) < new Date()) {
-        toast.error("Este link de avaliação expirou");
-        return;
-      }
+      // Map RPC result to expected Candidate structure
+      const candidateData: Candidate = {
+        id: candidateRow.id,
+        full_name: candidateRow.full_name,
+        email: candidateRow.email,
+        company_id: candidateRow.company_id,
+        status: candidateRow.status,
+        invite_expires_at: candidateRow.invite_expires_at,
+        position_applied: candidateRow.position_applied,
+        consent_given_at: candidateRow.consent_given_at,
+        company: {
+          id: candidateRow.company_id,
+          name: candidateRow.company_name,
+          logo_url: candidateRow.company_logo_url
+        }
+      };
 
       setCandidate(candidateData);
 
@@ -167,18 +173,16 @@ export default function BusinessHiringAssessment() {
   };
 
   const handleConsentSubmit = async () => {
-    if (!candidate || !consentChecked) return;
+    if (!candidate || !consentChecked || !token) return;
     setSavingConsent(true);
     
     try {
-      const { error } = await supabase
-        .from("hiring_candidates")
-        .update({
-          consent_given_at: new Date().toISOString()
-        })
-        .eq("id", candidate.id);
+      // Use SECURITY DEFINER function to update consent via token
+      const { data: updated, error } = await supabase
+        .rpc("update_candidate_consent_by_token", { _token: token });
 
       if (error) throw error;
+      if (!updated) throw new Error("Failed to update consent");
 
       // Update local state
       setCandidate(prev => prev ? { ...prev, consent_given_at: new Date().toISOString() } : null);
