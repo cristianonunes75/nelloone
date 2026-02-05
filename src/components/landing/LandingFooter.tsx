@@ -119,7 +119,13 @@ export const LandingFooter = () => {
           <div className="pt-8 border-t border-primary-foreground/20">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-primary-foreground/60">
               <p>&copy; 2025 NELLO IDENTITY. {isEn ? 'All rights reserved.' : 'Todos os direitos reservados.'}</p>
-              <div className="flex gap-6">
+              <div className="flex flex-wrap gap-6">
+                <button 
+                  onClick={() => navigate(isEn ? "/en/the-7-maps" : isPtPt ? "/pt-pt/os-7-mapas" : "/os-7-mapas")}
+                  className="hover:text-primary-foreground/80 transition-colors"
+                >
+                  {isEn ? 'The 7 Maps' : 'Os 7 Mapas'}
+                </button>
                 <button 
                   onClick={() => navigate(isEn ? "/en/methodology" : isPtPt ? "/pt-pt/metodologia" : "/metodologia")}
                   className="hover:text-primary-foreground/80 transition-colors"

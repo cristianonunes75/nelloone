@@ -28,6 +28,7 @@ import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
 import Metodologia from "./pages/Metodologia";
+import Os7Mapas from "./pages/Os7Mapas";
 import { TestDetailPage } from "./components/tests/TestDetailPage";
 import CodigoEssencia from "./pages/CodigoEssencia";
 import AtivacaoCodigoPage from "./pages/cliente/AtivacaoCodigoPage";
@@ -104,6 +105,11 @@ const AppRoutes = () => (
     <Route path="/metodologia" element={<Metodologia />} />
     <Route path="/en/methodology" element={<Metodologia />} />
     <Route path="/pt-pt/metodologia" element={<Metodologia />} />
+    
+    {/* Os 7 Mapas - Institutional page */}
+    <Route path="/os-7-mapas" element={<Os7Mapas />} />
+    <Route path="/en/the-7-maps" element={<Os7Mapas />} />
+    <Route path="/pt-pt/os-7-mapas" element={<Os7Mapas />} />
     
     {/* Legal pages - PT */}
     <Route path="/termos" element={<TermsOfService />} />
