@@ -95,8 +95,8 @@ export const NelloGlobalFooter = ({ currentApp, variant = 'light' }: NelloGlobal
   const supportLinks = [
     { 
       label: language === 'en' ? 'Help Center' : 'Central de Ajuda', 
-      href: 'https://nello.one/ajuda',
-      external: true 
+      href: language === 'en' ? '/en/help' : language === 'pt-pt' ? '/pt-pt/ajuda' : '/ajuda',
+      external: false 
     },
     { 
       label: 'WhatsApp', 
