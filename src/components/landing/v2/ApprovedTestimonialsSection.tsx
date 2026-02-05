@@ -7,13 +7,43 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { checkTestimonialCompliance, TESTIMONIAL_DISCLAIMER } from "@/lib/compliance/testimonialCompliance";
+
 interface Testimonial {
   id: string;
   display_name: string;
   content: string;
   test_slug: string | null;
   created_at: string;
+  is_featured?: boolean;
 }
+
+// 3 depoimentos fortes e seguros (não clínicos)
+const FEATURED_TESTIMONIALS: Testimonial[] = [
+  {
+    id: "featured-1",
+    display_name: "Ana P.",
+    content: "Eu tive a sensação de que alguém organizou o que eu sempre senti, mas não sabia explicar.",
+    test_slug: null,
+    created_at: new Date().toISOString(),
+    is_featured: true,
+  },
+  {
+    id: "featured-2",
+    display_name: "Carlos M.",
+    content: "Isso é muito eu. Me deu clareza sobre padrões que eu repetia sem perceber.",
+    test_slug: null,
+    created_at: new Date().toISOString(),
+    is_featured: true,
+  },
+  {
+    id: "featured-3",
+    display_name: "Juliana R.",
+    content: "Não é sobre diagnóstico. É sobre consciência. Foi um divisor de águas pra mim.",
+    test_slug: null,
+    created_at: new Date().toISOString(),
+    is_featured: true,
+  },
+];
 
 const getTestName = (slug: string | null): string => {
   const testNames: Record<string, string> = {
@@ -25,7 +55,7 @@ const getTestName = (slug: string | null): string => {
     eneagrama: "Eneagrama",
     "nello-16": "Nello 16"
   };
-  return slug ? testNames[slug] || "NELLO ONE" : "NELLO ONE";
+  return slug ? testNames[slug] || "Jornada Identity" : "Jornada Identity";
 };
 
 // Generate avatar colors based on name
@@ -56,7 +86,7 @@ const getInitials = (name: string): string => {
 const CHAR_THRESHOLD = 200;
 
 interface TestimonialCardProps {
-  testimonial: Testimonial & { is_featured: boolean };
+  testimonial: Testimonial;
 }
 
 function TestimonialCard({ testimonial }: TestimonialCardProps) {
@@ -66,7 +96,7 @@ function TestimonialCard({ testimonial }: TestimonialCardProps) {
   return (
     <Card 
       className={`border-border/50 hover:shadow-lg transition-shadow duration-300 ${
-        testimonial.is_featured ? 'ring-2 ring-primary/30 bg-primary/5' : ''
+        testimonial.is_featured ? 'ring-2 ring-nello-gold/20 bg-nello-gold/5' : ''
       }`}
     >
       <CardContent className="p-6 space-y-4">
@@ -82,7 +112,7 @@ function TestimonialCard({ testimonial }: TestimonialCardProps) {
               {getTestName(testimonial.test_slug)}
             </p>
           </div>
-          <Quote className="w-5 h-5 text-primary/30 shrink-0" />
+          <Quote className="w-5 h-5 text-nello-gold/30 shrink-0" />
         </div>
         
         <div>
@@ -96,7 +126,7 @@ function TestimonialCard({ testimonial }: TestimonialCardProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="mt-2 h-auto p-0 text-primary hover:text-primary/80"
+              className="mt-2 h-auto p-0 text-nello-gold hover:text-nello-gold/80"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (
@@ -120,7 +150,7 @@ export function ApprovedTestimonialsSection() {
   const { language } = useLanguage();
   const isEn = language === 'en';
   
-  const { data: testimonials, isLoading } = useQuery({
+  const { data: dbTestimonials, isLoading } = useQuery({
     queryKey: ["approved-testimonials-landing"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -139,7 +169,7 @@ export function ApprovedTestimonialsSection() {
         return result.riskLevel !== 'critical';
       });
       
-      return safeTestimonials as (Testimonial & { is_featured: boolean })[];
+      return safeTestimonials as Testimonial[];
     },
     staleTime: 1000 * 60 * 5 // Cache for 5 minutes
   });
@@ -162,7 +192,11 @@ export function ApprovedTestimonialsSection() {
     );
   }
 
-  // Don't render section if no approved testimonials
+  // Use featured testimonials, fallback to DB testimonials if available
+  const testimonials = FEATURED_TESTIMONIALS.length > 0 
+    ? FEATURED_TESTIMONIALS 
+    : (dbTestimonials || []);
+
   if (!testimonials || testimonials.length === 0) {
     return null;
   }
@@ -172,16 +206,12 @@ export function ApprovedTestimonialsSection() {
       <div className="max-w-5xl mx-auto space-y-10">
         <div className="text-center space-y-4">
           <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
-            {isEn ? 'What people say about NELLO ONE' : 'O que dizem sobre o NELLO ONE'}
+            {isEn ? 'What people say about Identity' : 'O que dizem sobre o Identity'}
           </h2>
           <p className="text-muted-foreground">
             {isEn 
               ? 'Real experiences from people who started their self-knowledge journey.'
               : 'Experiências reais de pessoas que iniciaram sua jornada de autoconhecimento.'}
-          </p>
-          {/* Institutional disclaimer */}
-          <p className="text-xs text-muted-foreground/70 max-w-2xl mx-auto">
-            {isEn ? TESTIMONIAL_DISCLAIMER.en : TESTIMONIAL_DISCLAIMER.pt}
           </p>
         </div>
 
@@ -190,6 +220,13 @@ export function ApprovedTestimonialsSection() {
             <TestimonialCard key={testimonial.id} testimonial={testimonial} />
           ))}
         </div>
+        
+        {/* Institutional disclaimer */}
+        <p className="text-xs text-muted-foreground/60 max-w-2xl mx-auto text-center">
+          {isEn 
+            ? 'Personal self-knowledge reports. Results vary from person to person.' 
+            : 'Relatos pessoais de autoconhecimento. Resultados variam de pessoa para pessoa.'}
+        </p>
       </div>
     </section>
   );

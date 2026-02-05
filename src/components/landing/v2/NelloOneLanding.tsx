@@ -54,15 +54,15 @@ export const NelloOneLanding = () => {
     { number: "07", title: "Viver" },
   ];
 
-  // Os 7 pilares da Jornada Identity - lista completa
+  // Os 7 pilares da Jornada Identity - linguagem humana e acessível
   const discoveries = [
-    { icon: Heart, mainText: "Explore padrões de reação emocional", testName: "Eneagrama" },
-    { icon: Brain, mainText: "Reconheça seu estilo de tomada de decisão", testName: "DISC" },
-    { icon: Flame, mainText: "Compreenda o que te motiva e te bloqueia", testName: "Temperamentos" },
-    { icon: Lightbulb, mainText: "Reflita sobre seus talentos naturais", testName: "Inteligências Múltiplas" },
-    { icon: Target, mainText: "Organize padrões que pedem maturidade", testName: "Nello 16" },
-    { icon: Compass, mainText: "Reconheça tendências arquetípicas", testName: "Arquétipos" },
-    { icon: Users, mainText: "Compreenda seu estilo de conexão afetiva", testName: "Estilos de Conexão" },
+    { icon: Heart, mainText: "Como você reage emocionalmente", testName: "Eneagrama" },
+    { icon: Brain, mainText: "Como você toma decisões e se comunica", testName: "DISC" },
+    { icon: Flame, mainText: "O que te motiva e o que te bloqueia", testName: "Temperamentos" },
+    { icon: Lightbulb, mainText: "Onde estão seus talentos naturais", testName: "Inteligências Múltiplas" },
+    { icon: Target, mainText: "Padrões que pedem maturidade", testName: "Nello 16" },
+    { icon: Compass, mainText: "Tendências simbólicas inconscientes", testName: "Arquétipos" },
+    { icon: Users, mainText: "Como você se conecta afetivamente", testName: "Estilos de Conexão" },
   ];
 
   // Para quem é / não é - compacto
@@ -113,12 +113,13 @@ export const NelloOneLanding = () => {
               <span className="text-nello-gold">Ele te liberta.</span>
             </h1>
             
-            <p className="text-lg sm:text-xl md:text-2xl text-foreground font-display leading-relaxed max-w-xl mx-auto mb-3 md:mb-4">
-              Pare de tentar se encaixar.
+            <p className="text-base sm:text-lg md:text-xl text-foreground/90 font-display leading-relaxed max-w-2xl mx-auto mb-3 md:mb-4">
+              Uma jornada guiada com 7 mapas integrados de autoconhecimento e um relatório final em PDF com seu <span className="text-nello-gold font-semibold">Código da Essência</span>.
             </p>
             
             <p className="text-sm md:text-base text-foreground/70 leading-relaxed max-w-lg mx-auto mb-8 md:mb-10 px-2">
-              A Jornada Identity é o processo de remoção de tudo o que não é você.
+              Não é sobre respostas rápidas. É sobre clareza.<br />
+              Você percorre cada etapa no seu ritmo, com profundidade e intenção.
             </p>
             
             <div className="max-w-sm mx-auto space-y-4 px-2">
@@ -264,6 +265,9 @@ export const NelloOneLanding = () => {
             <h3 className="font-display text-xl sm:text-2xl font-semibold text-foreground mb-2">
               As 7 camadas que o Identity revela
             </h3>
+            <p className="text-sm text-foreground/60 max-w-xl mx-auto">
+              Não são rótulos. São mapas de clareza para você se compreender melhor.
+            </p>
           </div>
           
           {/* Mobile: Stack vertical / Tablet+: 2 cols / Desktop: 3 cols */}
@@ -336,6 +340,53 @@ export const NelloOneLanding = () => {
               </div>
             </div>
           </div>
+          
+          {/* Visual Proof - PDF Mockup */}
+          <div className="mt-16 pt-12 border-t border-border/30">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-nello-gold/10 mb-3">
+                <FileText className="w-5 h-5 text-nello-gold" strokeWidth={1.5} />
+              </div>
+              <h3 className="font-display text-xl sm:text-2xl font-semibold text-foreground mb-2">
+                Veja como é o seu Código da Essência
+              </h3>
+            </div>
+            
+            {/* Mockup placeholder */}
+            <div className="max-w-lg mx-auto">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-nello-gold/5 to-nello-gold/10 rounded-2xl blur-xl" />
+                <div className="relative bg-card rounded-2xl border border-border/50 p-6 shadow-lg">
+                  <div className="aspect-[3/4] bg-gradient-to-b from-muted/30 to-muted/10 rounded-lg flex items-center justify-center border border-border/30">
+                    <div className="text-center p-6">
+                      <FileText className="w-12 h-12 text-nello-gold/40 mx-auto mb-3" strokeWidth={1} />
+                      <p className="text-sm text-foreground/50 font-medium">Relatório PDF Premium</p>
+                      <p className="text-xs text-foreground/40 mt-1">Código da Essência</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-sm text-foreground/70 text-center max-w-md mx-auto mt-6">
+              Um relatório premium, com linguagem clara, reflexiva e aplicável à vida real.
+              <span className="block text-xs text-foreground/50 mt-1">
+                Não é diagnóstico psicológico e não substitui acompanhamento profissional.
+              </span>
+            </p>
+            
+            {/* Micro chips */}
+            <div className="flex flex-wrap gap-2 justify-center mt-4">
+              {["Relatório PDF", "Síntese integrada", "Linguagem clara"].map((tag, i) => (
+                <span 
+                  key={i}
+                  className="px-3 py-1.5 bg-nello-gold/10 rounded-full text-nello-gold text-xs font-medium"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -350,6 +401,9 @@ export const NelloOneLanding = () => {
               Inicie a Jornada Identity
             </h2>
             <CrossDivider className="mb-4" />
+            <p className="text-sm text-foreground/70 max-w-sm mx-auto">
+              Uma jornada feita para ser vivida com calma, profundidade e clareza.
+            </p>
           </div>
 
           {/* Pricing card */}
@@ -388,11 +442,11 @@ export const NelloOneLanding = () => {
                   size="lg" 
                   className="w-full min-h-[52px] sm:min-h-[56px] text-sm sm:text-base px-4 sm:px-6 rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold group shadow-lg whitespace-nowrap"
                 >
-                  <span className="truncate">Acessar meu Código</span>
+                  <span className="truncate">Acessar meu Código da Essência</span>
                   <Sparkles className="ml-2 w-4 h-4 sm:w-5 sm:h-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
                 </Button>
                 <p className="text-xs text-muted-foreground/70 text-center">
-                  Acesso vitalício à sua jornada de identidade.
+                  Acesso vitalício • Jornada reflexiva • Desenvolvimento pessoal, não clínico
                 </p>
               </div>
               
@@ -403,8 +457,10 @@ export const NelloOneLanding = () => {
             </div>
           </div>
           
-          <p className="text-center text-xs text-muted-foreground mt-6">
-            Fase de validação • Vagas limitadas
+          {/* Institutional disclaimer */}
+          <p className="text-center text-xs text-muted-foreground/70 mt-6 max-w-sm mx-auto leading-relaxed">
+            O Nello Identity é uma ferramenta de desenvolvimento pessoal e reflexão estruturada.
+            Não substitui diagnóstico psicológico, avaliação clínica ou psicoterapia.
           </p>
         </div>
       </section>
@@ -421,12 +477,15 @@ export const NelloOneLanding = () => {
           <Sparkles className="w-6 h-6 text-nello-gold mx-auto mb-4" strokeWidth={1.5} />
           
           <h2 className="font-display text-2xl sm:text-3xl font-semibold text-white mb-4">
-            O Identity não adiciona nada novo.
+            O Identity não cria uma nova versão de você.
           </h2>
           
-          <p className="text-white/70 text-base mb-6">
-            Ele apenas decodifica o que sempre esteve aí.<br />
-            A única coisa que realmente importa: <span className="text-nello-gold">seu Código da Essência</span>.
+          <p className="text-white/70 text-base mb-2">
+            Ele revela com clareza aquilo que já estava aí, mas estava confuso.
+          </p>
+          
+          <p className="text-white/60 text-sm mb-8">
+            Seu <span className="text-nello-gold font-medium">Código da Essência</span> é uma síntese prática da sua jornada, para aplicar na vida real com mais consciência.
           </p>
           
           <div className="max-w-xs sm:max-w-sm mx-auto space-y-3 px-2">
@@ -435,11 +494,11 @@ export const NelloOneLanding = () => {
               size="lg" 
               className="text-sm sm:text-base px-6 sm:px-8 w-full min-h-[52px] sm:min-h-[56px] bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold rounded-full transition-all duration-300 hover:scale-[1.02] shadow-xl group whitespace-nowrap"
             >
-              <span className="truncate">Acessar meu Código</span>
+              <span className="truncate">Acessar meu Código da Essência</span>
               <Sparkles className="ml-2 h-4 w-4 sm:h-5 sm:w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
             </Button>
             <p className="text-white/50 text-xs text-center">
-              Acesso vitalício · Jornada em 7 camadas · Clareza definitiva
+              Acesso vitalício • Jornada reflexiva • Desenvolvimento pessoal, não clínico
             </p>
           </div>
         </div>
