@@ -1,9 +1,32 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
+
+// Deep question trigger keywords
+const DEEP_TRIGGERS = [
+  "por que eu",
+  "porque eu",
+  "sabot",
+  "travado",
+  "bloqueio",
+  "o que devo fazer",
+  "proximos passos",
+  "próximos passos",
+  "plano",
+  "carreira ideal",
+  "profissao certa",
+  "profissão certa",
+  "relacionamento",
+  "casamento",
+  "todos os testes",
+  "integrar",
+  "sintese",
+  "síntese",
+];
 
 // Test type display names for context
 const TEST_DISPLAY_NAMES: Record<string, string> = {
@@ -15,32 +38,6 @@ const TEST_DISPLAY_NAMES: Record<string, string> = {
   linguagens_amor: "Estilos de Conexão Afetiva",
   mbti: "Nello 16",
 };
-
-// Upsell trigger keywords
-const UPSELL_TRIGGERS = [
-  "como aplicar",
-  "aplicar na prática",
-  "na vida real",
-  "coaching",
-  "profissional",
-  "mentoria",
-  "acompanhamento",
-  "ajuda profissional",
-  "próximo passo",
-  "aprofundar",
-  "ir além",
-  "desenvolver",
-  "melhorar",
-  "transformar",
-  "mudar",
-  "evoluir",
-  "crescer",
-  "trabalhar",
-  "carreira",
-  "relacionamentos",
-  "ativação",
-  "ativar",
-];
 
 const systemPrompt = `Identidade:
 Você é Nello, o guia do NELLO ONE.
@@ -56,10 +53,9 @@ Seu papel é:
 2. Destacar pontos fortes do perfil
 3. Alertar gentilmente sobre pontos de atenção
 4. Conectar com outros testes quando relevante
-5. NUNCA dar orientação profunda de aplicação prática - isso é reservado para a Ativação do Código
 
 FORMATO DAS MENSAGENS:
-- Mantenha respostas concisas (máximo 3 parágrafos curtos)
+- Mantenha respostas concisas (máximo 150 palavras)
 - Use linguagem simples e acolhedora
 - Evite jargões técnicos
 - Seja específico sobre o perfil quando tiver contexto
@@ -67,10 +63,6 @@ FORMATO DAS MENSAGENS:
 Tom de voz:
 Simples, acolhedor, humano, direto, sem linguagem técnica.
 Nunca julga. Nunca pressiona. Nunca dá respostas frias.
-
-LIMITES:
-- Para perguntas sobre "como aplicar na prática", "coaching", "próximos passos profundos", responda de forma breve e indique que a Ativação do Código é o caminho ideal para isso.
-- Você pode dar dicas básicas, mas o aprofundamento real é feito na Ativação.
 
 Regras:
 - Sempre fale como uma pessoa real
@@ -81,9 +73,22 @@ Regras:
 - Sua presença é humana
 - Nello é o coração do NELLO ONE`;
 
-function detectUpsell(message: string): boolean {
+const UPSELL_RESPONSE = {
+  content: `Essa é uma pergunta profunda — e eu adoro quando você vai além da superfície.
+
+Para te ajudar de verdade com isso, a gente precisa olhar pro seu Código completo, cruzar seus resultados e entender como tudo se conecta na sua vida real.
+
+É exatamente isso que a Ativação do Código faz: uma jornada guiada comigo pra você entender não só "o quê", mas "o porquê" — e principalmente, "o que fazer agora".
+
+Se quiser dar esse passo, estou aqui.`,
+  was_upsell: true,
+  upsell_type: 'ativacao_codigo',
+  cta_url: '/cliente?tab=ativacao',
+};
+
+function classifyMessage(message: string): 'basic' | 'deep' {
   const lowerMessage = message.toLowerCase();
-  return UPSELL_TRIGGERS.some(trigger => lowerMessage.includes(trigger));
+  return DEEP_TRIGGERS.some(trigger => lowerMessage.includes(trigger)) ? 'deep' : 'basic';
 }
 
 serve(async (req) => {
@@ -92,35 +97,159 @@ serve(async (req) => {
   }
 
   try {
-    const { message, messages = [], test_context, session_id } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    // Validate JWT
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.error('[CHAT-AI] Missing or invalid Authorization header');
+      return new Response(
+        JSON.stringify({ error: 'Não autorizado' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     
+    // Create client with user's token for RLS
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    // Validate user
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabase.auth.getUser(token);
+    
+    if (claimsError || !claimsData?.user) {
+      console.error('[CHAT-AI] Invalid token:', claimsError?.message);
+      return new Response(
+        JSON.stringify({ error: 'Token inválido' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const userId = claimsData.user.id;
+    console.log('[CHAT-AI] Authenticated user:', userId);
+
+    // Parse request body
+    const { message, session_id, test_context } = await req.json();
+    
+    if (!message || !session_id) {
+      return new Response(
+        JSON.stringify({ error: 'message e session_id são obrigatórios' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check if user has ativacao_codigo_unlocked
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('ativacao_codigo_unlocked')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) {
+      console.error('[CHAT-AI] Error fetching profile:', profileError.message);
+    }
+
+    const hasActivation = profile?.ativacao_codigo_unlocked === true;
+    const classifier = classifyMessage(message);
+    
+    console.log(`[CHAT-AI] User: ${userId}, Classifier: ${classifier}, HasActivation: ${hasActivation}`);
+
+    // Get or create conversation for this session
+    let conversationId: string;
+    
+    const { data: existingConv } = await supabase
+      .from('ai_conversations')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('title', `session:${session_id}`)
+      .single();
+
+    if (existingConv) {
+      conversationId = existingConv.id;
+    } else {
+      const { data: newConv, error: convError } = await supabase
+        .from('ai_conversations')
+        .insert({
+          user_id: userId,
+          title: `session:${session_id}`,
+        })
+        .select('id')
+        .single();
+
+      if (convError || !newConv) {
+        console.error('[CHAT-AI] Error creating conversation:', convError?.message);
+        throw new Error('Erro ao criar conversa');
+      }
+      conversationId = newConv.id;
+    }
+
+    // Save user message
+    const { error: userMsgError } = await supabase
+      .from('ai_messages')
+      .insert({
+        conversation_id: conversationId,
+        role: 'user',
+        content: message,
+        test_context: test_context || null,
+        metadata: { classifier },
+      });
+
+    if (userMsgError) {
+      console.error('[CHAT-AI] Error saving user message:', userMsgError.message);
+    }
+
+    // If deep question and no activation, return upsell
+    if (classifier === 'deep' && !hasActivation) {
+      console.log('[CHAT-AI] Returning upsell response');
+      
+      // Save assistant upsell message
+      await supabase
+        .from('ai_messages')
+        .insert({
+          conversation_id: conversationId,
+          role: 'assistant',
+          content: UPSELL_RESPONSE.content,
+          test_context: test_context || null,
+          metadata: {
+            was_upsell: true,
+            upsell_type: UPSELL_RESPONSE.upsell_type,
+            cta_url: UPSELL_RESPONSE.cta_url,
+            classifier,
+          },
+        });
+
+      return new Response(
+        JSON.stringify(UPSELL_RESPONSE),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Get conversation history for context
+    const { data: history } = await supabase
+      .from('ai_messages')
+      .select('role, content')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: true })
+      .limit(10);
+
+    const messages = history?.map(msg => ({
+      role: msg.role as 'user' | 'assistant',
+      content: msg.content,
+    })) || [{ role: 'user' as const, content: message }];
+
+    // Build context-aware system prompt
+    const testDisplayName = test_context ? TEST_DISPLAY_NAMES[test_context] || test_context : "teste";
+    const contextPrompt = `${systemPrompt}\n\nTESTE ATUAL: ${testDisplayName}`;
+
+    // Call Lovable AI Gateway
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const testDisplayName = test_context ? TEST_DISPLAY_NAMES[test_context] || test_context : "teste";
-    
-    // Detect if this message should trigger upsell
-    const currentMessage = message || messages[messages.length - 1]?.content || "";
-    const wasUpsell = detectUpsell(currentMessage);
-
-    // Build context-aware system prompt
-    const contextPrompt = `${systemPrompt}
-
-TESTE ATUAL: ${testDisplayName}
-${wasUpsell ? `
-IMPORTANTE: O usuário está perguntando sobre aplicação prática ou desenvolvimento profundo.
-Responda de forma breve e gentil, e no final da sua resposta, mencione que para ir além e aplicar isso na vida com acompanhamento, a "Ativação do Código" é o caminho ideal.
-NÃO force a venda - apenas mencione como uma possibilidade natural.
-` : ''}`;
-
-    // Build messages array
-    const allMessages = message 
-      ? [...messages, { role: 'user', content: message }]
-      : messages;
-
-    console.log(`[CHAT-AI] Processing request for test: ${testDisplayName}, upsell: ${wasUpsell}`);
+    console.log('[CHAT-AI] Calling AI Gateway');
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -132,10 +261,10 @@ NÃO force a venda - apenas mencione como uma possibilidade natural.
         model: 'google/gemini-3-flash-preview',
         messages: [
           { role: 'system', content: contextPrompt },
-          ...allMessages
+          ...messages
         ],
         stream: false,
-        max_tokens: 500,
+        max_tokens: 300,
       }),
     });
 
@@ -172,12 +301,24 @@ NÃO force a venda - apenas mencione como uma possibilidade natural.
 
     console.log('[CHAT-AI] Response generated successfully');
 
+    // Save assistant message
+    await supabase
+      .from('ai_messages')
+      .insert({
+        conversation_id: conversationId,
+        role: 'assistant',
+        content,
+        test_context: test_context || null,
+        metadata: {
+          was_upsell: false,
+          classifier,
+        },
+      });
+
     return new Response(
       JSON.stringify({
         content,
-        was_upsell: wasUpsell,
-        upsell_type: wasUpsell ? 'ativacao_codigo' : null,
-        cta_url: wasUpsell ? '/cliente?tab=ativacao' : null,
+        was_upsell: false,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
