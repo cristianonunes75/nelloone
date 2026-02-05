@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { LogoText } from "@/components/LogoText";
@@ -16,6 +15,8 @@ import { PasswordStrengthIndicator } from "@/components/PasswordStrengthIndicato
 import { PasswordBreachWarning } from "@/components/PasswordBreachWarning";
 import { usePasswordBreachCheck } from "@/hooks/usePasswordBreachCheck";
 import { Separator } from "@/components/ui/separator";
+import { ConsentCheckbox, ConsentError } from "@/components/consent/ConsentCheckbox";
+import { recordConsent } from "@/hooks/useConsentRecord";
 
 const authSchema = z.object({
   email: z.string().email({ message: "Email inválido" }),
@@ -46,6 +47,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [consentError, setConsentError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { toast } = useToast();
@@ -114,14 +116,12 @@ const Auth = () => {
     noAccount: language === 'en' ? "Don't have an account? Sign up" : (language === 'pt-pt' ? 'Não tem conta? Registe-se' : 'Não tem conta? Cadastre-se'),
     hasAccount: language === 'en' ? 'Already have an account? Sign in' : (language === 'pt-pt' ? 'Já tem conta? Faça login' : 'Já tem conta? Faça login'),
     backToSite: language === 'en' ? '← Back to site' : '← Voltar para o site',
-    termsText: language === 'en' 
-      ? 'By proceeding, you agree to the use of your data for personality analysis and storage of your test results.' 
-      : (language === 'pt-pt' 
-        ? 'Ao prosseguir, concorda com o uso dos seus dados para análise de personalidade e armazenamento dos seus resultados.'
-        : 'Ao prosseguir, você concorda com o uso de seus dados para análise de personalidade e armazenamento dos seus resultados.'),
-    termsOfUse: language === 'en' ? 'Terms of Use' : 'Termos de Uso',
-    privacyPolicy: language === 'en' ? 'Privacy Policy' : 'Política de Privacidade',
-    purchaseRedirectLogin: language === 'en' 
+    consentRequired: language === 'en'
+      ? 'You must accept the Terms and Privacy Policy to continue.'
+      : language === 'pt-pt'
+        ? 'Tem de aceitar os Termos e a Política de Privacidade para continuar.'
+        : 'Você precisa aceitar os Termos e a Política de Privacidade para continuar.',
+    purchaseRedirectLogin: language === 'en'
       ? 'To complete your purchase, please sign in or create an account.'
       : (language === 'pt-pt'
         ? 'Para concluir a sua compra, faça login ou crie uma conta.'
@@ -150,6 +150,19 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setConsentError(false);
+    
+    // Check consent for signup
+    if (!isLogin && !termsAccepted) {
+      setConsentError(true);
+      toast({
+        title: texts.validationError,
+        description: texts.consentRequired,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
@@ -233,14 +246,23 @@ const Auth = () => {
           throw error;
         }
 
-        // Register user for Nello One Identity app
+        // Register user for Nello One Identity app and record consent
         if (data.user) {
+          // Record app registration
           await supabase
             .from('user_app_registrations')
             .insert({
               user_id: data.user.id,
               app_name: 'identity',
             });
+          
+          // Record LGPD consent
+          await recordConsent({
+            userId: data.user.id,
+            consentType: 'signup',
+            acceptedTerms: true,
+            acceptedPrivacy: true,
+          });
         }
 
         toast({
@@ -431,37 +453,17 @@ const Auth = () => {
           )}
 
           {!isLogin && (
-            <div className="flex items-start space-x-3 p-4 bg-accent/10 rounded-lg border border-border">
-              <Checkbox
-                id="terms"
+            <div className="space-y-1">
+              <ConsentCheckbox
                 checked={termsAccepted}
-                onCheckedChange={(checked) => setTermsAccepted(checked === true)}
-                className="mt-1"
+                onCheckedChange={(checked) => {
+                  setTermsAccepted(checked);
+                  if (checked) setConsentError(false);
+                }}
+                variant="signup"
+                error={consentError}
               />
-              <div className="flex-1">
-                <label
-                  htmlFor="terms"
-                  className="text-sm leading-relaxed cursor-pointer"
-                >
-                  {texts.termsText}{" "}
-                  <button
-                    type="button"
-                    onClick={() => window.open(getLocalizedPath("/termos"), "_blank")}
-                    className="text-gold hover:underline font-semibold"
-                  >
-                    {texts.termsOfUse}
-                  </button>
-                  {" "}{language === 'en' ? 'and' : 'e'}{" "}
-                  <button
-                    type="button"
-                    onClick={() => window.open(getLocalizedPath("/privacidade"), "_blank")}
-                    className="text-gold hover:underline font-semibold"
-                  >
-                    {texts.privacyPolicy}
-                  </button>
-                  .
-                </label>
-              </div>
+              {consentError && <ConsentError language={language} />}
             </div>
           )}
 

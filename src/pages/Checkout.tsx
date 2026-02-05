@@ -25,6 +25,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { ConsentCheckbox, ConsentError } from "@/components/consent/ConsentCheckbox";
+import { recordConsent } from "@/hooks/useConsentRecord";
 
 const Checkout = () => {
   const { user, isLoading: authLoading } = useAuth();
@@ -42,6 +44,8 @@ const Checkout = () => {
     type: "percentual" | "fixed";
   } | null>(null);
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+  const [checkoutConsent, setCheckoutConsent] = useState(false);
+  const [consentError, setConsentError] = useState(false);
 
   // Pre-fill coupon from URL
   useEffect(() => {
@@ -77,6 +81,11 @@ const Checkout = () => {
     invalidCoupon: language === 'en' ? 'Invalid or expired coupon' : (language === 'pt-pt' ? 'Cupão inválido ou expirado' : 'Cupom inválido ou expirado'),
     couponApplied: language === 'en' ? 'Coupon applied!' : (language === 'pt-pt' ? 'Cupão aplicado!' : 'Cupom aplicado!'),
     validatingCoupon: language === 'en' ? 'Validating...' : 'Validando...',
+    consentRequired: language === 'en' 
+      ? 'You must accept the Terms and Privacy Policy to continue.'
+      : language === 'pt-pt'
+        ? 'Tem de aceitar os Termos e a Política de Privacidade para continuar.'
+        : 'Você precisa aceitar os Termos e a Política de Privacidade para continuar.',
   };
 
   // What's included
@@ -331,6 +340,17 @@ const Checkout = () => {
   const handleCheckout = async () => {
    console.log("=== HANDLECHECKOUT STARTED ===");
    
+   // STEP 0: Check consent
+   if (!checkoutConsent) {
+     setConsentError(true);
+     toast({
+       title: language === 'en' ? "Consent required" : "Consentimento necessário",
+       description: texts.consentRequired,
+       variant: "destructive",
+     });
+     return;
+   }
+   
    // STEP 1: Check if user is logged in
     if (!user) {
      console.log("No user found, showing login toast");
@@ -342,6 +362,14 @@ const Checkout = () => {
     }
     
     setIsProcessing(true);
+    
+    // Record consent for checkout
+    await recordConsent({
+      userId: user.id,
+      consentType: 'checkout',
+      acceptedTerms: true,
+      acceptedPrivacy: true,
+    });
     
    // STEP 2: Calculate final price FIRST
    const finalPriceValue = calculateFinalPrice();
@@ -598,11 +626,25 @@ const Checkout = () => {
                   </div>
                 </div>
 
+                {/* Consent Checkbox - Required before payment */}
+                <div className="space-y-1">
+                  <ConsentCheckbox
+                    checked={checkoutConsent}
+                    onCheckedChange={(checked) => {
+                      setCheckoutConsent(checked);
+                      if (checked) setConsentError(false);
+                    }}
+                    variant="checkout"
+                    error={consentError}
+                  />
+                  {consentError && <ConsentError language={language} />}
+                </div>
+
                 {/* Pay Button */}
                 <Button
                   className="w-full h-12 text-lg"
                   onClick={handleCheckout}
-                  disabled={isProcessing}
+                  disabled={isProcessing || !checkoutConsent}
                 >
                   {isProcessing ? (
                     <>
