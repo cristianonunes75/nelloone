@@ -5158,6 +5158,38 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["admin_permission_level"]
       }
+      get_contextual_report_by_token: {
+        Args: { _token: string }
+        Returns: {
+          content: Json
+          created_at: string
+          id: string
+          recipient_name: string
+          report_type: string
+          user_id: string
+        }[]
+      }
+      get_crossing_by_token: {
+        Args: { _token: string }
+        Returns: {
+          content: Json
+          created_at: string
+          id: string
+          relationship_type: string
+          status: string
+          user_a_id: string
+          user_b_id: string
+        }[]
+      }
+      get_spouse_report_by_token: {
+        Args: { _token: string }
+        Returns: {
+          content: Json
+          created_at: string
+          id: string
+          user_id: string
+        }[]
+      }
       get_user_company_id: { Args: { check_user_id: string }; Returns: string }
       get_user_role: {
         Args: { _user_id: string }
