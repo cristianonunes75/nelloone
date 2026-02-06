@@ -5222,6 +5222,14 @@ export type Database = {
           user_b_id: string
         }[]
       }
+      get_hiring_answers_by_token: {
+        Args: { _assessment_id: string; _token: string }
+        Returns: {
+          answer: Json
+          id: string
+          question_number: number
+        }[]
+      }
       get_hiring_assessments_by_token: {
         Args: { _token: string }
         Returns: {
@@ -5231,6 +5239,15 @@ export type Database = {
           started_at: string
           status: string
           test_type: string
+        }[]
+      }
+      get_hiring_test_questions: {
+        Args: { _test_type: string }
+        Returns: {
+          id: string
+          options: Json
+          question_number: number
+          question_text: string
         }[]
       }
       get_spouse_report_by_token: {
