@@ -1,187 +1,116 @@
 
-# Plano: Corrigir Perda de Progresso de Testes (Caso Saula)
+# Plano: Corrigir Conteúdo PT-PT nos Testes Brasileiros
 
 ## Problema Identificado
 
-A usuária Saula completou 5 testes, mas quando retomou a jornada, 3 testes apareceram como "não iniciados".
+A Saula está vendo português de Portugal (ex: "académica", "a passar", "reages") porque **os testes ativos para `language: pt` estão com conteúdo de PT-PT**, não de PT-BR.
 
-### Diagnóstico Técnico
+### Causa Raiz
 
-**Dados encontrados no banco:**
+Quando os testes multilíngues foram configurados, as perguntas de Portugal foram copiadas para os testes ativos em vez das brasileiras. O teste `pt-legacy` (inativo) contém o conteúdo brasileiro correto.
 
-| Teste | Registro | Status | Respostas | Language | Created |
-|-------|----------|--------|-----------|----------|---------|
-| Arquétipos | Original | ✅ completed | 36 | pt-legacy | 05/02 19:07 |
-| Arquétipos | **DUPLICADO** | ⚠️ in_progress | 0 | pt | 06/02 16:50 |
+### Evidência
 
-**Causa Raiz (3 problemas encadeados):**
+| Teste | ID Ativo (PT-PT errado) | ID Legacy (PT-BR correto) |
+|-------|-------------------------|---------------------------|
+| Estilos de Conexão | `12aaa9e6-cabe-4f77-aae2-5bf478dec76a` | `2a1fea19-0633-4ea9-a165-92c33b92ad5a` |
 
-1. **Teste legacy ativo**: Saula fez Arquétipos com test_id de `pt-legacy`
-2. **Constraint errada**: `UNIQUE(user_id, test_id)` permite duplicados por **tipo** de teste
-3. **Falta de ORDER BY**: Query em `useTests.tsx` sem ordenação - `.find()` pegou registro errado
-4. **startTest sem validação**: Não verifica se já existe teste do mesmo **tipo** antes de criar
-
-### Fluxo do Bug
-
-```text
-Saula acessa jornada → 
-Sistema busca test_id de pt (novo) → 
-startTest faz upsert → 
-Constraint não encontra conflito (pt-legacy ≠ pt) → 
-Cria novo registro vazio → 
-Query sem ORDER BY pega o registro errado → 
-Dashboard mostra "não iniciado"
-```
+**Exemplos do erro:**
+| # | Ativo (PT-PT ❌) | Correto (PT-BR ✅) |
+|---|------------------|-------------------|
+| 1 | "O que mais **o(a)** ajudaria?" | "O que mais **te** ajudaria?" |
+| 6 | "está **a passar** por luto" | "está **passando** por luto" |
+| 10 | "conquista **académica**" | "conquista **acadêmica**" |
+| 13 | "mais **ligado(a)**" | "mais **conectado(a)**" |
 
 ---
 
 ## Solução Proposta
 
-### Parte 1: Correção Imediata dos Dados
+### Opção A: Trocar Perguntas (Recomendada)
 
-Deletar o registro duplicado vazio da Saula:
+Copiar o `question_text` do teste legacy (`pt-legacy`) para o teste ativo (`pt`) em **Estilos de Conexão**.
 
 ```sql
--- Remover o registro duplicado de arquetipos
-DELETE FROM user_tests 
-WHERE id = 'abad7563-9bca-41ac-8bd2-8ea6fde81a4c';
--- Este é o registro vazio criado hoje às 16:50
+-- Para cada pergunta do teste ativo, copiar o texto do legacy
+UPDATE test_questions tq_active
+SET question_text = tq_legacy.question_text
+FROM test_questions tq_legacy
+WHERE tq_active.test_id = '12aaa9e6-cabe-4f77-aae2-5bf478dec76a'  -- Ativo (errado)
+  AND tq_legacy.test_id = '2a1fea19-0633-4ea9-a165-92c33b92ad5a'  -- Legacy (correto)
+  AND tq_active.question_number = tq_legacy.question_number;
 ```
 
-### Parte 2: Adicionar ORDER BY nas Queries
+### Opção B: Ativar o Teste Legacy
 
-**Arquivo**: `src/hooks/useTests.tsx`
-
-Modificar a query para priorizar registros completados e mais recentes:
-
-```typescript
-// Linha 53-56: Adicionar ordenação
-const { data, error } = await supabase
-  .from("user_tests")
-  .select("*, tests(*)")
-  .eq("user_id", effectiveUserId!)
-  .order("status", { ascending: true }) // 'completed' vem primeiro alfabeticamente
-  .order("completed_at", { ascending: false, nullsFirst: false }); // Mais recente primeiro
-```
-
-**Arquivo**: `src/hooks/useJourneyProgress.tsx`
-
-Mesma correção para a query de target user:
-
-```typescript
-// Linha 69-72: Adicionar ordenação
-const { data, error } = await supabase
-  .from("user_tests")
-  .select("*, tests(*)")
-  .eq("user_id", effectiveUserId!)
-  .order("status", { ascending: true })
-  .order("completed_at", { ascending: false, nullsFirst: false });
-```
-
-### Parte 3: Prevenir Duplicações Futuras
-
-**Arquivo**: `src/hooks/useTests.tsx`
-
-Modificar `startTest` para verificar se já existe teste do mesmo TIPO antes de criar:
-
-```typescript
-// Antes do upsert, verificar se já existe um test do mesmo tipo
-startTest = useMutation({
-  mutationFn: async (testId: string) => {
-    if (!user) throw new Error("User not authenticated");
-    
-    // Buscar o tipo do teste solicitado
-    const { data: targetTest } = await supabase
-      .from("tests")
-      .select("type")
-      .eq("id", testId)
-      .single();
-    
-    if (!targetTest) throw new Error("Test not found");
-    
-    // Verificar se já existe user_test do mesmo tipo
-    const { data: existingTests } = await supabase
-      .from("user_tests")
-      .select("id, test_id, status, tests!inner(type)")
-      .eq("user_id", user.id)
-      .eq("tests.type", targetTest.type);
-    
-    // Se já existe um registro para este tipo, atualizar em vez de criar novo
-    if (existingTests && existingTests.length > 0) {
-      // Priorizar o registro completado ou mais recente
-      const existingRecord = existingTests.find(t => t.status === 'completed') 
-                          || existingTests[0];
-      
-      // Atualizar o registro existente para apontar ao novo test_id
-      const { data, error } = await supabase
-        .from("user_tests")
-        .update({
-          test_id: testId,
-          status: existingRecord.status === 'completed' ? 'completed' : 'in_progress',
-          started_at: existingRecord.status === 'completed' 
-            ? undefined // Manter o started_at original
-            : new Date().toISOString(),
-        })
-        .eq("id", existingRecord.id)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    }
-    
-    // Se não existe, criar novo (comportamento original)
-    const { data, error } = await supabase
-      .from("user_tests")
-      .insert({
-        user_id: user.id,
-        test_id: testId,
-        status: "in_progress",
-        started_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-  // ... resto igual
-});
-```
+Desativar o teste atual e ativar o legacy. Porém, isso pode quebrar registros de `user_tests` existentes que referenciam o ID atual.
 
 ---
 
-## Arquivos a Modificar
+## Escopo da Correção
 
-| Arquivo | Tipo | Mudança |
-|---------|------|---------|
-| Manual SQL | Database | Deletar registro duplicado da Saula |
-| `src/hooks/useTests.tsx` | Frontend | Adicionar ORDER BY + validar tipo antes de criar |
-| `src/hooks/useJourneyProgress.tsx` | Frontend | Adicionar ORDER BY na query de admin |
+**Testes afetados** (precisam revisão):
+
+| Teste | Status |
+|-------|--------|
+| Estilos de Conexão | ❌ Todo em PT-PT - **CRÍTICO** |
+| DISC | ⚠️ Parcialmente PT-PT (ex: Q6 "reages") |
+| Temperamentos | ⚠️ Parcialmente PT-PT (ex: "as minhas") |
+| Arquétipos | 🔍 A verificar |
+| Inteligências | 🔍 A verificar |
+| Nello 16 | 🔍 A verificar |
+| Eneagrama | 🔍 A verificar |
 
 ---
 
-## Resultado Esperado
+## Plano de Execução
 
-| Cenário | Antes | Depois |
-|---------|-------|--------|
-| Saula acessa jornada | Vê Arquétipos como "não iniciado" | Vê como "concluído" |
-| Usuário com teste pt-legacy | Pode criar duplicado | Atualiza registro existente |
-| Query de progresso | Pega primeiro registro (aleatório) | Pega registro completado primeiro |
+### Fase 1: Correção Urgente - Estilos de Conexão
+
+1. Executar SQL para copiar textos do legacy para o ativo (30 perguntas)
+2. Verificar se a Saula vê o conteúdo correto
+
+### Fase 2: Auditoria Completa
+
+1. Comparar todos os 7 testes ativos com seus equivalentes legacy
+2. Identificar padrões PT-PT (usar regex para "o(a)", "a passar", "reages", etc.)
+3. Aplicar correções necessárias
+
+### Fase 3: Prevenção
+
+1. Adicionar validação no Admin para detectar padrões PT-PT em testes marcados como `pt`
+2. Documentar o processo de criação de testes multilíngues
 
 ---
 
 ## Seção Técnica
 
-### Por que `ORDER BY status ASC` funciona?
+### Arquivos
 
-Em ordem alfabética:
-- `completed` (c) vem antes de `in_progress` (i) vem antes de `not_started` (n)
+Nenhuma mudança de código necessária - apenas correção de dados no banco.
 
-Então `ORDER BY status ASC` garante que registros `completed` apareçam primeiro.
+### Queries a Executar
 
-### Por que não usar constraint `UNIQUE(user_id, test_type)`?
+```sql
+-- 1. Corrigir Estilos de Conexão (copiar textos do legacy)
+UPDATE test_questions tq_active
+SET question_text = tq_legacy.question_text
+FROM test_questions tq_legacy
+WHERE tq_active.test_id = '12aaa9e6-cabe-4f77-aae2-5bf478dec76a'
+  AND tq_legacy.test_id = '2a1fea19-0633-4ea9-a165-92c33b92ad5a'
+  AND tq_active.question_number = tq_legacy.question_number;
 
-Não existe coluna `test_type` em `user_tests` - ela está em `tests`. 
-Criar uma constraint cross-table é complexo e pode quebrar funcionalidades existentes.
-A solução via código é mais segura e flexível.
+-- 2. Verificar resultado
+SELECT tq.question_number, LEFT(tq.question_text, 60) as texto
+FROM test_questions tq
+WHERE tq.test_id = '12aaa9e6-cabe-4f77-aae2-5bf478dec76a'
+ORDER BY tq.question_number;
+```
+
+### Resultado Esperado
+
+| Antes | Depois |
+|-------|--------|
+| "Numa conquista **académica**" | "Em uma conquista **acadêmica**" |
+| "O que mais **o(a)** ajudaria?" | "O que mais **te** ajudaria?" |
+| "está **a passar** por luto" | "está **passando** por luto" |
