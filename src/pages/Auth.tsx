@@ -103,7 +103,16 @@ const Auth = () => {
     loginSuccess: language === 'en' ? 'Login successful!' : 'Login realizado!',
     welcomeBack: language === 'en' ? 'Welcome back to Identity.' : (language === 'pt-pt' ? 'Bem-vindo de volta ao Identity.' : 'Bem-vindo de volta ao Identity.'),
     accountCreated: language === 'en' ? 'Account created!' : 'Conta criada!',
-    welcomeNew: language === 'en' ? 'Welcome to Identity. You can now sign in.' : (language === 'pt-pt' ? 'Bem-vindo ao Identity. Já pode fazer login.' : 'Bem-vindo ao Identity. Você já pode fazer login.'),
+    welcomeNew: language === 'en' 
+      ? 'Check your inbox and click the confirmation link to activate your account.' 
+      : (language === 'pt-pt' 
+        ? 'Verifique a sua caixa de entrada e clique no link de confirmação para ativar a conta.' 
+        : 'Verifique sua caixa de entrada e clique no link de confirmação para ativar sua conta.'),
+    emailNotConfirmed: language === 'en'
+      ? 'Email not confirmed yet. Check your inbox and click the confirmation link.'
+      : (language === 'pt-pt'
+        ? 'Email ainda não confirmado. Verifique a sua caixa de entrada e clique no link de confirmação.'
+        : 'Email ainda não confirmado. Verifique sua caixa de entrada e clique no link de confirmação.'),
     invalidCredentials: language === 'en' ? 'Invalid email or password' : 'Email ou senha incorretos',
     alreadyRegistered: language === 'en' ? 'This email is already registered. Please sign in.' : (language === 'pt-pt' ? 'Este email já está registado. Faça login.' : 'Este email já está cadastrado. Faça login.'),
     error: language === 'en' ? 'Error' : 'Erro',
@@ -196,6 +205,9 @@ const Auth = () => {
           if (error.message.includes("Invalid login credentials")) {
             throw new Error(texts.invalidCredentials);
           }
+          if (error.message.includes("Email not confirmed")) {
+            throw new Error(texts.emailNotConfirmed);
+          }
           throw error;
         }
 
@@ -268,40 +280,17 @@ const Auth = () => {
         toast({
           title: texts.accountCreated,
           description: texts.welcomeNew,
+          duration: 8000, // Longer duration for important message
         });
 
-        // Auto login after signup
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (signInError) {
-          console.error("Error auto-signing in:", signInError);
-        } else {
-          // Wait for roles to be fetched before redirecting
-          setTimeout(async () => {
-            // If coming from Fundadores, redirect there with autoCheckout
-            if (redirectToFundadores) {
-              navigate("/fundadores?autoCheckout=true");
-              return;
-            }
-            
-            const { data: rolesData } = await supabase
-              .from("user_roles")
-              .select("role")
-              .eq("user_id", (await supabase.auth.getUser()).data.user?.id);
-            
-            const roles = (rolesData || []).map((r: any) => r.role);
-            const primaryRole = roles.find((r: string) => r === "admin") || "cliente";
-            
-            if (primaryRole === "admin") {
-              navigate("/admin");
-            } else {
-              navigate(getLocalizedPath("/cliente"));
-            }
-          }, 500);
-        }
+        // Switch to login mode so user can sign in after confirming email
+        setIsLogin(true);
+        // Clear form but keep email for convenience
+        setPassword("");
+        setConfirmPassword("");
+        setFullName("");
+        setPhone("");
+        setTermsAccepted(false);
       }
     } catch (error: any) {
       console.error("Auth error:", error);
