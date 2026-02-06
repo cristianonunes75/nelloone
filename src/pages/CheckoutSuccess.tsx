@@ -94,7 +94,7 @@ export default function CheckoutSuccess() {
 
   const getTestPath = () => {
     if (hasPendingTest) {
-      return `${getBasePath()}/test/${pendingTestId}/${pendingUserTestId}`;
+      return `${getBasePath()}/cliente/test-execution/${pendingTestId}/${pendingUserTestId}`;
     }
     return getDashboardPath();
   };

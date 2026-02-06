@@ -116,7 +116,10 @@ const CruzamentosPage = () => {
               <p className="text-muted-foreground max-w-md mx-auto mb-6">
                 {t.locked.description}
               </p>
-              <Button onClick={() => navigate('/cliente/jornada')}>
+              <Button onClick={() => {
+                const basePath = lang === 'en' ? '/en' : lang === 'pt-pt' ? '/pt-pt' : '';
+                navigate(`${basePath}/cliente`);
+              }}>
                 {t.locked.cta}
               </Button>
             </motion.div>
