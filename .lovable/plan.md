@@ -1,133 +1,163 @@
 
+# Plano: Completar Proteção RLS do Fluxo de Hiring
 
-# Plano: Corrigir Fluxo de Avaliação do Nello Business
+## Contexto
 
-## Problema Identificado
+As correções de segurança RLS quebraram partes do fluxo de avaliação para candidatos anônimos. Algumas partes já foram corrigidas (assessments na linha 148), mas restam 5 pontos vulneráveis.
 
-A candidata Suzanne está vendo a tela de upsell "Quer ir além?" (2 de 7 testes concluídos) mesmo sem ter preenchido nada.
+## Problemas Identificados
 
-### Causa Raiz
+| Local | Tabela | Problema | Impacto |
+|-------|--------|----------|---------|
+| Linha 209-224 | `tests`, `test_questions` | Query direta | Candidato não vê perguntas |
+| Linha 240-244 | `hiring_answers` | Query direta | Progresso não restaura |
+| Linha 393-396 | `hiring_answers` | Query direta | Fallback local pode falhar |
+| Linha 492-495 | `hiring_assessments` | Query direta (não usa RPC) | Mesmo bug da Suzanne |
+| Linha 500 | Lógica JS | `[].every()` sem proteção | Pula para "completed" |
 
-A migration de segurança (`20260205200004`) removeu políticas públicas das tabelas de hiring para proteger dados sensíveis. No entanto:
+## Solução
 
-1. **A query `hiring_assessments` retorna array vazio** para usuários anônimos (candidatos sem login)
-2. **O código JavaScript faz `[].every(a => a.status === "completed")`** que retorna `true` para array vazio
-3. **O sistema pula para `phase = "completed"`** e mostra o upsell do Nello One
+### Parte 1: Nova Função RPC para Perguntas
 
-### Dados no Banco (Confirmados)
-
-| Campo | Valor |
-|-------|-------|
-| Candidato | Suzanne Landim Xavier de Araujo |
-| Status | `pending` |
-| Testes | DISC (pending), Temperamentos (pending) |
-| Respostas | 0 |
-
----
-
-## Solução Técnica
-
-### Parte 1: Criar Função RPC para Buscar Assessments
-
-Nova função SECURITY DEFINER que permite buscar assessments via token do convite:
+Criar `get_hiring_test_questions` que retorna perguntas baseado no tipo de teste:
 
 ```sql
-CREATE OR REPLACE FUNCTION public.get_hiring_assessments_by_token(_token text)
+CREATE OR REPLACE FUNCTION public.get_hiring_test_questions(_test_type text)
 RETURNS TABLE (
   id uuid,
-  test_type text,
-  status text,
-  started_at timestamptz,
-  completed_at timestamptz,
-  result_data jsonb
+  question_number int,
+  question_text text,
+  options jsonb
 )
 LANGUAGE sql
 STABLE
 SECURITY DEFINER
 SET search_path = public
 AS $$
-  SELECT 
-    ha.id,
-    ha.test_type,
-    ha.status,
-    ha.started_at,
-    ha.completed_at,
-    ha.result_data
-  FROM public.hiring_assessments ha
-  JOIN public.hiring_candidates hc ON hc.id = ha.candidate_id
-  WHERE hc.invite_token = _token
-  AND (hc.invite_expires_at IS NULL OR hc.invite_expires_at > now());
+  SELECT tq.id, tq.question_number, tq.question_text, tq.options
+  FROM test_questions tq
+  JOIN tests t ON t.id = tq.test_id
+  WHERE t.type = _test_type::test_type
+  AND t.active = true
+  AND t.language = 'pt'
+  ORDER BY tq.question_number;
 $$;
 ```
 
-### Parte 2: Atualizar Frontend
+### Parte 2: Nova Função RPC para Respostas do Candidato
 
-Modificar `BusinessHiringAssessment.tsx` para usar a nova RPC:
+Criar `get_hiring_answers_by_token` para restaurar progresso e calcular resultados:
 
-**Antes (linha ~148):**
-```typescript
-const { data: assessmentsData } = await supabase
-  .from("hiring_assessments")
-  .select("*")
-  .eq("candidate_id", candidateData.id);
+```sql
+CREATE OR REPLACE FUNCTION public.get_hiring_answers_by_token(
+  _token text,
+  _assessment_id uuid
+)
+RETURNS TABLE (
+  id uuid,
+  question_number int,
+  answer jsonb
+)
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT ha.id, ha.question_number, ha.answer
+  FROM hiring_answers ha
+  JOIN hiring_assessments hass ON hass.id = ha.assessment_id
+  JOIN hiring_candidates hc ON hc.id = hass.candidate_id
+  WHERE ha.assessment_id = _assessment_id
+  AND hc.invite_token = _token
+  AND (hc.invite_expires_at IS NULL OR hc.invite_expires_at > now())
+  ORDER BY ha.question_number;
+$$;
 ```
 
-**Depois:**
+### Parte 3: Atualizar Frontend
+
+**Arquivo:** `src/apps/business/pages/BusinessHiringAssessment.tsx`
+
+#### 3.1 - Substituir busca de perguntas (linhas 209-228)
+
 ```typescript
-const { data: assessmentsData } = await supabase
+// Antes: queries diretas em tests e test_questions
+const { data: questionsData, error: questionsError } = await supabase
+  .rpc("get_hiring_test_questions", { _test_type: testType });
+
+if (questionsError) throw questionsError;
+
+const mappedQuestions = (questionsData || []).map(q => ({ 
+  ...q, 
+  question: q.question_text 
+}));
+```
+
+#### 3.2 - Substituir restauração de progresso (linhas 240-244)
+
+```typescript
+// Usar nova RPC com token
+const { data: existingAnswers, error: answersError } = await supabase
+  .rpc("get_hiring_answers_by_token", { 
+    _token: token, 
+    _assessment_id: assessment.id 
+  });
+```
+
+#### 3.3 - Substituir busca para cálculo de resultados (linhas 393-396)
+
+```typescript
+// Usar mesma RPC para cálculo
+const { data: answersData, error: fetchError } = await supabase
+  .rpc("get_hiring_answers_by_token", { 
+    _token: token, 
+    _assessment_id: currentAssessment.id 
+  });
+```
+
+#### 3.4 - Corrigir refresh de assessments (linhas 492-495)
+
+```typescript
+// Usar RPC existente em vez de query direta
+const { data: updatedAssessments } = await supabase
   .rpc("get_hiring_assessments_by_token", { _token: token });
+
+setAssessments(updatedAssessments || []);
+
+// IMPORTANTE: Proteção contra array vazio
+const allCompleted = updatedAssessments && 
+                     updatedAssessments.length > 0 && 
+                     updatedAssessments.every(a => a.status === "completed");
 ```
-
-### Parte 3: Corrigir Lógica de Array Vazio
-
-Adicionar verificação de segurança para evitar que array vazio seja tratado como "todos concluídos":
-
-```typescript
-// Determine initial phase
-const allCompleted = assessmentsData && 
-                     assessmentsData.length > 0 && 
-                     assessmentsData.every(a => a.status === "completed");
-```
-
----
 
 ## Arquivos a Modificar
 
 | Arquivo | Tipo | Mudança |
 |---------|------|---------|
-| Nova migration SQL | Database | Criar função `get_hiring_assessments_by_token` |
-| `src/apps/business/pages/BusinessHiringAssessment.tsx` | Frontend | Usar RPC + corrigir lógica de array vazio |
-
----
+| Nova migration SQL | Database | Criar 2 funções RPC |
+| `BusinessHiringAssessment.tsx` | Frontend | Usar RPCs em 4 locais |
 
 ## Resultado Esperado
 
 | Cenário | Antes | Depois |
 |---------|-------|--------|
-| Candidato acessa link | Vê upsell imediatamente | Vê tela de consentimento |
-| Assessments carregam | Query retorna [] (bloqueada) | Query retorna dados via RPC |
-| Array vazio de assessments | Tratado como "completed" | Tratado como erro |
-| Suzanne tenta de novo | Mesma tela de upsell | Consegue fazer os testes |
-
----
+| Candidato inicia teste | Pode falhar ao carregar perguntas | Carrega via RPC seguro |
+| Candidato atualiza página | Perde progresso | Restaura via RPC |
+| Candidato completa 1º teste | Pode ir para "completed" | Vai para próximo teste |
+| Suzanne tenta novamente | Vê upsell errado | Vê testes pendentes |
 
 ## Seção Técnica
 
-### Por que `[].every()` retorna `true`?
+### Por que criar novas RPCs?
 
-Em JavaScript, `Array.prototype.every()` com um array vazio retorna `true` porque a condição é "vacuamente verdadeira" - não há elementos que violem a condição.
+O padrão SECURITY DEFINER permite que funções executem com privilégios elevados, bypassando RLS de forma controlada. Cada função valida o token do candidato antes de retornar dados, garantindo:
 
-```javascript
-[].every(x => x === "completed")  // true (nenhum elemento para falhar)
-[{status: "pending"}].every(x => x.status === "completed")  // false
-```
+1. **Segurança**: Candidatos só acessam seus próprios dados
+2. **Funcionalidade**: Fluxo funciona sem login
+3. **Consistência**: Mesmo padrão das 5 RPCs já existentes
 
-### Padrão de Funções SECURITY DEFINER
+### Alternativa Considerada (Descartada)
 
-Este padrão já está sendo usado no projeto:
-- `get_candidate_by_invite_token` - busca candidato
-- `update_candidate_consent_by_token` - atualiza consentimento
-- `accept_company_invite_by_token` - aceita convite
-
-A nova função segue o mesmo padrão de segurança.
-
+Criar políticas RLS mais permissivas para `hiring_answers` e `test_questions`:
+- **Problema**: Exporia dados sensíveis de outros candidatos
+- **Decisão**: Manter RLS restrito + usar RPCs específicas
