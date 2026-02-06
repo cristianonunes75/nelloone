@@ -50,10 +50,13 @@ export const useTests = () => {
       if (!languageTests) return [];
 
       // Get user tests for the effective user (current or impersonated)
+      // ORDER BY ensures completed tests are prioritized over duplicates
       const { data, error } = await supabase
         .from("user_tests")
         .select("*, tests(*)")
-        .eq("user_id", effectiveUserId!);
+        .eq("user_id", effectiveUserId!)
+        .order("status", { ascending: true }) // 'completed' comes before 'in_progress' alphabetically
+        .order("completed_at", { ascending: false, nullsFirst: false }); // Most recent first
 
       if (error) throw error;
 
@@ -69,23 +72,63 @@ export const useTests = () => {
   });
 
   // Start a new test
+  // Prevents duplicates by checking if same TEST TYPE already exists (regardless of test_id)
   const startTest = useMutation({
     mutationFn: async (testId: string) => {
       if (!user) throw new Error("User not authenticated");
 
+      // Fetch the type of the target test
+      const { data: targetTest } = await supabase
+        .from("tests")
+        .select("type")
+        .eq("id", testId)
+        .single();
+      
+      if (!targetTest) throw new Error("Test not found");
+      
+      // Check if user_test already exists for this TEST TYPE (not just test_id)
+      // This prevents duplicates when test versions change (e.g., pt-legacy → pt)
+      const { data: existingTests } = await supabase
+        .from("user_tests")
+        .select("id, test_id, status, started_at, tests!inner(type)")
+        .eq("user_id", user.id)
+        .eq("tests.type", targetTest.type);
+      
+      // If a record exists for this type, update it instead of creating new
+      if (existingTests && existingTests.length > 0) {
+        // Prioritize completed record, or take the first one
+        const existingRecord = existingTests.find(t => t.status === 'completed') 
+                            || existingTests[0];
+        
+        // Update existing record to point to new test_id (preserving status if completed)
+        const { data, error } = await supabase
+          .from("user_tests")
+          .update({
+            test_id: testId,
+            // Keep completed status if already completed; otherwise mark in_progress
+            status: existingRecord.status === 'completed' ? 'completed' : 'in_progress',
+            // Only update started_at if not completed
+            ...(existingRecord.status !== 'completed' && {
+              started_at: existingRecord.started_at || new Date().toISOString(),
+            }),
+          })
+          .eq("id", existingRecord.id)
+          .select()
+          .single();
+        
+        if (error) throw error;
+        return data;
+      }
+      
+      // No existing record for this type - create new
       const { data, error } = await supabase
         .from("user_tests")
-        .upsert(
-          {
-            user_id: user.id,
-            test_id: testId,
-            status: "in_progress",
-            started_at: new Date().toISOString(),
-          },
-          {
-            onConflict: "user_id,test_id",
-          }
-        )
+        .insert({
+          user_id: user.id,
+          test_id: testId,
+          status: "in_progress",
+          started_at: new Date().toISOString(),
+        })
         .select()
         .single();
 

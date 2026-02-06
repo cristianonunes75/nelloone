@@ -66,10 +66,13 @@ export function useJourneyProgress(targetUserId?: string) {
     queryKey: ["target-user-tests", effectiveUserId],
     enabled: isViewingOther && !!effectiveUserId,
     queryFn: async () => {
+      // ORDER BY ensures completed tests are prioritized over duplicates
       const { data, error } = await supabase
         .from("user_tests")
         .select("*, tests(*)")
-        .eq("user_id", effectiveUserId!);
+        .eq("user_id", effectiveUserId!)
+        .order("status", { ascending: true }) // 'completed' comes before 'in_progress' alphabetically
+        .order("completed_at", { ascending: false, nullsFirst: false }); // Most recent first
       if (error) throw error;
       return data || [];
     },
