@@ -261,31 +261,34 @@ export default function BusinessHiringAssessment() {
           toast.success(`Progresso restaurado! Continuando da pergunta ${startIndex + 1}.`);
         }
         
-        // Update assessment status
-        const isNewStart = Object.keys(restoredAnswers).length === 0;
-        await supabase
-          .from("hiring_assessments")
-          .update({ 
-            status: "in_progress", 
-            started_at: isNewStart ? new Date().toISOString() : (assessment as any).started_at || new Date().toISOString(),
-            last_activity_at: new Date().toISOString()
-          })
-          .eq("id", assessment.id);
+        // Update assessment status using SECURITY DEFINER RPC (works for anonymous users)
+        const { data: startSuccess, error: startError } = await supabase.rpc("start_hiring_assessment", {
+          _invite_token: token,
+          _assessment_id: assessment.id
+        });
         
+        if (startError) {
+          console.error("Error starting assessment via RPC:", startError);
+          toast.error("Erro ao iniciar avaliação. Tente novamente.");
+          setSaving(false);
+          return;
+        }
+        
+        if (!startSuccess) {
+          console.error("RPC start_hiring_assessment returned false");
+          toast.error("Link de avaliação inválido ou expirado.");
+          setSaving(false);
+          return;
+        }
+        
+        console.log("✓ Assessment started successfully via RPC");
         setCurrentAssessment(assessment);
       }
 
       setAnswers(restoredAnswers);
       setCurrentIndex(startIndex);
 
-      // Update candidate status
-      if (candidate.status === "pending" || candidate.status === "invited") {
-        await supabase
-          .from("hiring_candidates")
-          .update({ status: "in_progress" })
-          .eq("id", candidate.id);
-      }
-
+      // Status is now updated by the RPC function
       setPhase(testType);
     } catch (error) {
       console.error("Error starting test:", error);
@@ -303,7 +306,7 @@ export default function BusinessHiringAssessment() {
   };
 
   const saveCurrentAnswer = async (retryCount = 0): Promise<boolean> => {
-    if (!currentAssessment) return false;
+    if (!currentAssessment || !token) return false;
     
     const question = questions[currentIndex];
     const answer = answers[question.id];
@@ -314,60 +317,26 @@ export default function BusinessHiringAssessment() {
     const retryDelay = Math.pow(2, retryCount) * 500; // Exponential backoff: 500ms, 1s, 2s
     
     try {
-      // First check if answer exists
-      const { data: existing, error: selectError } = await supabase
-        .from("hiring_answers")
-        .select("id")
-        .eq("assessment_id", currentAssessment.id)
-        .eq("question_number", question.question_number)
-        .maybeSingle();
-
-      if (selectError) {
-        console.error("Error checking existing answer:", selectError);
-        throw selectError;
+      // Use SECURITY DEFINER RPC to save answer (works for anonymous users)
+      const { data: success, error: rpcError } = await supabase.rpc("save_hiring_answer", {
+        _invite_token: token,
+        _assessment_id: currentAssessment.id,
+        _question_id: question.id,
+        _question_number: question.question_number,
+        _answer: { value: answer, options: question.options }
+      });
+      
+      if (rpcError) {
+        console.error("RPC error saving answer:", rpcError);
+        throw rpcError;
       }
       
-      if (existing) {
-        // Update existing answer
-        const { error } = await supabase
-          .from("hiring_answers")
-          .update({
-            question_id: question.id,
-            answer: { value: answer, options: question.options }
-          })
-          .eq("id", existing.id);
-        
-        if (error) {
-          console.error("Error updating answer:", error);
-          throw error;
-        }
-      } else {
-        // Insert new answer
-        const { error } = await supabase
-          .from("hiring_answers")
-          .insert({
-            assessment_id: currentAssessment.id,
-            question_id: question.id,
-            question_number: question.question_number,
-            answer: { value: answer, options: question.options }
-          });
-        
-        if (error) {
-          console.error("Error inserting answer:", error);
-          throw error;
-        }
+      if (!success) {
+        console.error("save_hiring_answer returned false - token may be invalid");
+        throw new Error("Failed to save answer - invalid token");
       }
       
-      // Update assessment progress for real-time monitoring
-      await supabase
-        .from("hiring_assessments")
-        .update({
-          current_question_number: question.question_number,
-          last_activity_at: new Date().toISOString()
-        })
-        .eq("id", currentAssessment.id);
-      
-      console.log(`✓ Answer saved: Q${question.question_number} = ${answer}`);
+      console.log(`✓ Answer saved via RPC: Q${question.question_number} = ${answer}`);
       return true;
     } catch (error: any) {
       console.error(`Error saving answer (attempt ${retryCount + 1}):`, error);
@@ -411,30 +380,52 @@ export default function BusinessHiringAssessment() {
   };
 
   const completeCurrentTest = async () => {
-    if (!currentAssessment || !candidate) return;
+    if (!currentAssessment || !candidate || !token) return;
     setSaving(true);
     
     try {
-      // Fetch all answers
-      const { data: answersData } = await supabase
+      // We need to calculate results based on stored answers
+      // Since we saved via RPC, we fetch answers for calculation
+      const { data: answersData, error: fetchError } = await supabase
         .from("hiring_answers")
         .select("*")
         .eq("assessment_id", currentAssessment.id);
 
+      if (fetchError) {
+        console.error("Error fetching answers for calculation:", fetchError);
+        // If we can't fetch, calculate from local state
+      }
+
       // Calculate results based on test type
       let resultData: any;
       
-      // Create answers with question metadata for calculation
-      const answersWithMetadata = (answersData || []).map(a => {
-        const answerJson = a.answer as Record<string, any> | null;
-        return {
-          answer: answerJson?.value || a.answer,
-          test_questions: {
-            options: answerJson?.options || {},
-            question_number: a.question_number
-          }
-        };
-      });
+      // Use local answers if DB fetch failed, otherwise use DB data
+      let answersWithMetadata: any[];
+      
+      if (answersData && answersData.length > 0) {
+        answersWithMetadata = answersData.map(a => {
+          const answerJson = a.answer as Record<string, any> | null;
+          return {
+            answer: answerJson?.value || a.answer,
+            test_questions: {
+              options: answerJson?.options || {},
+              question_number: a.question_number
+            }
+          };
+        });
+      } else {
+        // Fallback to local state
+        answersWithMetadata = questions.map(q => {
+          const answer = answers[q.id];
+          return {
+            answer: answer,
+            test_questions: {
+              options: q.options || {},
+              question_number: q.question_number
+            }
+          };
+        }).filter(a => a.answer !== undefined);
+      }
 
       if (phase === "disc") {
         // DISC calculation - each answer is a letter (D, I, S, C)
@@ -465,31 +456,35 @@ export default function BusinessHiringAssessment() {
         resultData = calculateTemperamentos(answersWithMetadata);
       }
 
-      // Update assessment with explicit error handling
-      const { error: updateError } = await supabase
-        .from("hiring_assessments")
-        .update({
-          status: "completed",
-          completed_at: new Date().toISOString(),
-          result_data: resultData,
-          algorithm_version: resultData?.algorithm_version || null
-        })
-        .eq("id", currentAssessment.id);
+      // Use SECURITY DEFINER RPC to complete assessment (works for anonymous users)
+      const { data: completeSuccess, error: completeError } = await supabase.rpc("complete_hiring_assessment", {
+        _invite_token: token,
+        _assessment_id: currentAssessment.id,
+        _result_data: resultData,
+        _algorithm_version: resultData?.algorithm_version || null
+      });
 
-      if (updateError) {
-        console.error("CRITICAL: Failed to save assessment results:", updateError);
+      if (completeError) {
+        console.error("CRITICAL: Failed to save assessment results via RPC:", completeError);
         toast.error("Erro crítico ao salvar resultados. Por favor, tente novamente.");
         setSaving(false);
         return;
       }
 
-      console.log("Assessment saved successfully:", {
+      if (!completeSuccess) {
+        console.error("complete_hiring_assessment returned false - token may be invalid");
+        toast.error("Erro ao salvar resultados. Link pode estar expirado.");
+        setSaving(false);
+        return;
+      }
+
+      console.log("✓ Assessment completed successfully via RPC:", {
         assessmentId: currentAssessment.id,
         testType: phase,
         resultData
       });
 
-      // Refresh assessments
+      // Refresh assessments to check if all are done
       const { data: updatedAssessments } = await supabase
         .from("hiring_assessments")
         .select("*")
@@ -497,23 +492,11 @@ export default function BusinessHiringAssessment() {
 
       setAssessments(updatedAssessments || []);
 
-      // Check if all tests are done
+      // Check if all tests are done (RPC already updates candidate status if so)
       const allCompleted = updatedAssessments?.every(a => a.status === "completed");
       
       if (allCompleted) {
-        // Update candidate status with error handling
-        const { error: statusError } = await supabase
-          .from("hiring_candidates")
-          .update({ status: "completed", updated_at: new Date().toISOString() })
-          .eq("id", candidate.id);
-        
-        if (statusError) {
-          console.error("Error updating candidate status:", statusError);
-          toast.error("Erro ao atualizar status, mas seus resultados foram salvos.");
-        } else {
-          console.log("Candidate status updated to completed:", candidate.id);
-        }
-        
+        console.log("All assessments completed! Candidate status already updated by RPC.");
         setPhase("completed");
       } else {
         // Go to next test

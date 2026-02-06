@@ -184,6 +184,23 @@ export default function BusinessHiring() {
         toast.success("Candidato adicionado com sucesso!");
       }
 
+      // ALWAYS send invite email after creating candidate
+      try {
+        const emailResponse = await supabase.functions.invoke("business-resend-assessment", {
+          body: { candidate_id: data.id },
+        });
+        
+        if (emailResponse.error) {
+          console.error("Error sending invite email:", emailResponse.error);
+          toast.warning("Candidato criado, mas não foi possível enviar o e-mail. Use 'Reenviar' depois.");
+        } else {
+          console.log("Invite email sent successfully to:", newCandidate.email);
+        }
+      } catch (emailError) {
+        console.error("Error invoking email function:", emailError);
+        toast.warning("Candidato criado, mas não foi possível enviar o e-mail. Use 'Reenviar' depois.");
+      }
+
       setDialogOpen(false);
       setNewCandidate({ full_name: "", email: "", phone: "", position_applied: "", notes: "" });
       setEmailCheckResult(null);
