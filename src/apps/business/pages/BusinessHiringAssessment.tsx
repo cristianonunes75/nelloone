@@ -205,25 +205,15 @@ export default function BusinessHiringAssessment() {
     setSaving(true);
     
     try {
-      // Fetch questions for this test type - order by created_at to get the original test
-      const { data: testsData, error: testsError } = await supabase
-        .from("tests")
-        .select("id")
-        .eq("type", testType)
-        .eq("active", true)
-        .order("created_at", { ascending: true })
-        .limit(1)
-        .single();
-
-      if (testsError) throw testsError;
-
+      // Fetch questions via SECURITY DEFINER RPC (works for anonymous candidates)
       const { data: questionsData, error: questionsError } = await supabase
-        .from("test_questions")
-        .select("id, question_number, question_text, options")
-        .eq("test_id", testsData.id)
-        .order("question_number");
+        .rpc("get_hiring_test_questions", { _test_type: testType });
 
       if (questionsError) throw questionsError;
+      
+      if (!questionsData || questionsData.length === 0) {
+        throw new Error("Não foi possível carregar as perguntas do teste");
+      }
 
       const mappedQuestions = (questionsData || []).map(q => ({ ...q, question: q.question_text }));
       setQuestions(mappedQuestions);
@@ -236,12 +226,12 @@ export default function BusinessHiringAssessment() {
       let startIndex = 0;
       
       if (assessment) {
-        // Fetch existing answers for this assessment
+        // Fetch existing answers via SECURITY DEFINER RPC (works for anonymous candidates)
         const { data: existingAnswers, error: answersError } = await supabase
-          .from("hiring_answers")
-          .select("question_number, answer")
-          .eq("assessment_id", assessment.id)
-          .order("question_number");
+          .rpc("get_hiring_answers_by_token", { 
+            _token: token, 
+            _assessment_id: assessment.id 
+          });
         
         if (!answersError && existingAnswers && existingAnswers.length > 0) {
           console.log(`📥 Restoring ${existingAnswers.length} saved answers`);
@@ -388,12 +378,12 @@ export default function BusinessHiringAssessment() {
     setSaving(true);
     
     try {
-      // We need to calculate results based on stored answers
-      // Since we saved via RPC, we fetch answers for calculation
+      // Fetch answers via SECURITY DEFINER RPC for result calculation
       const { data: answersData, error: fetchError } = await supabase
-        .from("hiring_answers")
-        .select("*")
-        .eq("assessment_id", currentAssessment.id);
+        .rpc("get_hiring_answers_by_token", { 
+          _token: token, 
+          _assessment_id: currentAssessment.id 
+        });
 
       if (fetchError) {
         console.error("Error fetching answers for calculation:", fetchError);
@@ -488,16 +478,17 @@ export default function BusinessHiringAssessment() {
         resultData
       });
 
-      // Refresh assessments to check if all are done
+      // Refresh assessments via RPC to check if all are done
       const { data: updatedAssessments } = await supabase
-        .from("hiring_assessments")
-        .select("*")
-        .eq("candidate_id", candidate.id);
+        .rpc("get_hiring_assessments_by_token", { _token: token });
 
       setAssessments(updatedAssessments || []);
 
       // Check if all tests are done (RPC already updates candidate status if so)
-      const allCompleted = updatedAssessments?.every(a => a.status === "completed");
+      // IMPORTANT: Check length > 0 to avoid [].every() returning true for empty arrays
+      const allCompleted = updatedAssessments && 
+                           updatedAssessments.length > 0 && 
+                           updatedAssessments.every(a => a.status === "completed");
       
       if (allCompleted) {
         console.log("All assessments completed! Candidate status already updated by RPC.");
