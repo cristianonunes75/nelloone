@@ -1,54 +1,133 @@
 
 
-# Implementação: Corrigir Idiomas dos Testes
+# Plano: Corrigir Fluxo de Avaliação do Nello Business
 
-## O Problema
-Os testes ativos estão configurados com idioma `pt-pt` (Portugal) ao invés de `pt` (Brasil), fazendo com que usuários brasileiros não consigam ver/acessar os testes corretamente.
+## Problema Identificado
 
-## Ações a Executar
+A candidata Suzanne está vendo a tela de upsell "Quer ir além?" (2 de 7 testes concluídos) mesmo sem ter preenchido nada.
 
-### 1. Migration SQL - Corrigir Idioma dos Testes
+### Causa Raiz
 
-Atualizar os 5 testes que estão incorretamente marcados:
+A migration de segurança (`20260205200004`) removeu políticas públicas das tabelas de hiring para proteger dados sensíveis. No entanto:
+
+1. **A query `hiring_assessments` retorna array vazio** para usuários anônimos (candidatos sem login)
+2. **O código JavaScript faz `[].every(a => a.status === "completed")`** que retorna `true` para array vazio
+3. **O sistema pula para `phase = "completed"`** e mostra o upsell do Nello One
+
+### Dados no Banco (Confirmados)
+
+| Campo | Valor |
+|-------|-------|
+| Candidato | Suzanne Landim Xavier de Araujo |
+| Status | `pending` |
+| Testes | DISC (pending), Temperamentos (pending) |
+| Respostas | 0 |
+
+---
+
+## Solução Técnica
+
+### Parte 1: Criar Função RPC para Buscar Assessments
+
+Nova função SECURITY DEFINER que permite buscar assessments via token do convite:
 
 ```sql
-UPDATE tests
-SET language = 'pt'
-WHERE id IN (
-  'bdd55908-87a6-46de-9d1d-e5b37c24cf58',  -- DISC
-  '8de61499-2e46-45ad-8f1c-87523ac5d339',  -- Nello 16
-  '12aaa9e6-cabe-4f77-aae2-5bf478dec76a',  -- Conexão Afetiva
-  'b9be06b8-1692-4d05-aa06-baa21704118e',  -- Temperamentos
-  'd843395e-8b1e-4d80-8fa8-8a5a0c555491'   -- Arquétipos
+CREATE OR REPLACE FUNCTION public.get_hiring_assessments_by_token(_token text)
+RETURNS TABLE (
+  id uuid,
+  test_type text,
+  status text,
+  started_at timestamptz,
+  completed_at timestamptz,
+  result_data jsonb
 )
-AND language = 'pt-pt';
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT 
+    ha.id,
+    ha.test_type,
+    ha.status,
+    ha.started_at,
+    ha.completed_at,
+    ha.result_data
+  FROM public.hiring_assessments ha
+  JOIN public.hiring_candidates hc ON hc.id = ha.candidate_id
+  WHERE hc.invite_token = _token
+  AND (hc.invite_expires_at IS NULL OR hc.invite_expires_at > now());
+$$;
 ```
 
-### 2. Corrigir Registro da Suami
+### Parte 2: Atualizar Frontend
 
-Atualizar o `user_test` existente para apontar ao teste correto:
+Modificar `BusinessHiringAssessment.tsx` para usar a nova RPC:
 
-```sql
-UPDATE user_tests
-SET test_id = 'd843395e-8b1e-4d80-8fa8-8a5a0c555491'
-WHERE id = 'fe3a05bf-c392-488d-91b0-31011113ab4e'
-AND test_id = 'e1a3511e-7b93-4dec-87f1-b5ef87d7f8a3';
+**Antes (linha ~148):**
+```typescript
+const { data: assessmentsData } = await supabase
+  .from("hiring_assessments")
+  .select("*")
+  .eq("candidate_id", candidateData.id);
 ```
+
+**Depois:**
+```typescript
+const { data: assessmentsData } = await supabase
+  .rpc("get_hiring_assessments_by_token", { _token: token });
+```
+
+### Parte 3: Corrigir Lógica de Array Vazio
+
+Adicionar verificação de segurança para evitar que array vazio seja tratado como "todos concluídos":
+
+```typescript
+// Determine initial phase
+const allCompleted = assessmentsData && 
+                     assessmentsData.length > 0 && 
+                     assessmentsData.every(a => a.status === "completed");
+```
+
+---
+
+## Arquivos a Modificar
+
+| Arquivo | Tipo | Mudança |
+|---------|------|---------|
+| Nova migration SQL | Database | Criar função `get_hiring_assessments_by_token` |
+| `src/apps/business/pages/BusinessHiringAssessment.tsx` | Frontend | Usar RPC + corrigir lógica de array vazio |
+
+---
 
 ## Resultado Esperado
 
-| Teste | Antes | Depois |
-|-------|-------|--------|
-| DISC | Invisível para BR | Visível |
-| Nello 16 | Invisível para BR | Visível |
-| Conexão Afetiva | Invisível para BR | Visível |
-| Temperamentos | Invisível para BR | Visível |
-| Arquétipos | Invisível para BR | Visível |
-| Suami - Arquétipos | Teste inativo | Teste correto |
+| Cenário | Antes | Depois |
+|---------|-------|--------|
+| Candidato acessa link | Vê upsell imediatamente | Vê tela de consentimento |
+| Assessments carregam | Query retorna [] (bloqueada) | Query retorna dados via RPC |
+| Array vazio de assessments | Tratado como "completed" | Tratado como erro |
+| Suzanne tenta de novo | Mesma tela de upsell | Consegue fazer os testes |
 
-## Impacto
+---
 
-- Todos os usuários brasileiros voltam a ver a jornada completa (7 testes)
-- Suami consegue continuar o teste de Arquétipos normalmente
-- Nenhum impacto em usuários de Portugal (se existirem, precisarão de testes próprios)
+## Seção Técnica
+
+### Por que `[].every()` retorna `true`?
+
+Em JavaScript, `Array.prototype.every()` com um array vazio retorna `true` porque a condição é "vacuamente verdadeira" - não há elementos que violem a condição.
+
+```javascript
+[].every(x => x === "completed")  // true (nenhum elemento para falhar)
+[{status: "pending"}].every(x => x.status === "completed")  // false
+```
+
+### Padrão de Funções SECURITY DEFINER
+
+Este padrão já está sendo usado no projeto:
+- `get_candidate_by_invite_token` - busca candidato
+- `update_candidate_consent_by_token` - atualiza consentimento
+- `accept_company_invite_by_token` - aceita convite
+
+A nova função segue o mesmo padrão de segurança.
 
