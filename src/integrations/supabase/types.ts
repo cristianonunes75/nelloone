@@ -5158,6 +5158,15 @@ export type Database = {
         Returns: Json
       }
       cleanup_expired_cross_app_tokens: { Args: never; Returns: undefined }
+      complete_hiring_assessment: {
+        Args: {
+          _algorithm_version?: string
+          _assessment_id: string
+          _invite_token: string
+          _result_data: Json
+        }
+        Returns: boolean
+      }
       get_admin_permission_level: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["admin_permission_level"]
@@ -5277,6 +5286,20 @@ export type Database = {
           _user_id: string
         }
         Returns: undefined
+      }
+      save_hiring_answer: {
+        Args: {
+          _answer: Json
+          _assessment_id: string
+          _invite_token: string
+          _question_id: string
+          _question_number: number
+        }
+        Returns: boolean
+      }
+      start_hiring_assessment: {
+        Args: { _assessment_id: string; _invite_token: string }
+        Returns: boolean
       }
       update_candidate_consent_by_token: {
         Args: { _token: string }
