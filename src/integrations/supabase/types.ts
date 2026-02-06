@@ -5222,6 +5222,17 @@ export type Database = {
           user_b_id: string
         }[]
       }
+      get_hiring_assessments_by_token: {
+        Args: { _token: string }
+        Returns: {
+          completed_at: string
+          id: string
+          result_data: Json
+          started_at: string
+          status: string
+          test_type: string
+        }[]
+      }
       get_spouse_report_by_token: {
         Args: { _token: string }
         Returns: {

@@ -144,17 +144,21 @@ export default function BusinessHiringAssessment() {
 
       setCandidate(candidateData);
 
-      // Fetch assessments
+      // Fetch assessments via SECURITY DEFINER RPC (works for anonymous candidates)
       const { data: assessmentsData, error: assessmentsError } = await supabase
-        .from("hiring_assessments")
-        .select("*")
-        .eq("candidate_id", candidateData.id);
+        .rpc("get_hiring_assessments_by_token", { _token: token });
 
-      if (assessmentsError) throw assessmentsError;
+      if (assessmentsError) {
+        console.error("Error fetching assessments:", assessmentsError);
+        throw assessmentsError;
+      }
       setAssessments(assessmentsData || []);
 
       // Determine initial phase
-      const allCompleted = assessmentsData?.every(a => a.status === "completed");
+      // IMPORTANT: Check length > 0 to avoid [].every() returning true for empty arrays
+      const allCompleted = assessmentsData && 
+                           assessmentsData.length > 0 && 
+                           assessmentsData.every(a => a.status === "completed");
       if (allCompleted) {
         setPhase("completed");
       } else if (candidateData.consent_given_at) {
