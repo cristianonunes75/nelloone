@@ -48,6 +48,14 @@ export const GeoRedirect = () => {
     // Only run once per session
     if (hasChecked) return;
 
+    // CRITICAL: Never redirect if URL has hash (authentication callbacks like email confirmation, password reset)
+    // The hash contains auth tokens that would be lost on redirect
+    if (location.hash) {
+      console.log("[GeoRedirect] Hash detected, skipping redirect to preserve auth tokens");
+      setHasChecked(true);
+      return;
+    }
+
     // Only redirect on exact root path - don't interfere with deep links
     if (location.pathname !== "/") {
       setHasChecked(true);
@@ -86,15 +94,23 @@ export const GeoRedirect = () => {
         localStorage.setItem(GEO_REDIRECT_KEY, "true");
 
         if (ENGLISH_COUNTRIES.includes(countryCode)) {
-          // English-speaking country → redirect to /en
+          // English-speaking country → redirect to /en (preserve search and hash)
           localStorage.setItem(LANGUAGE_KEY, "en");
           console.log("[GeoRedirect] Redirecting to /en");
-          navigate("/en", { replace: true });
+          navigate({
+            pathname: "/en",
+            search: location.search,
+            hash: location.hash
+          }, { replace: true });
         } else if (EUROPEAN_COUNTRIES.includes(countryCode)) {
-          // European country → redirect to /pt-pt
+          // European country → redirect to /pt-pt (preserve search and hash)
           localStorage.setItem(LANGUAGE_KEY, "pt-pt");
           console.log("[GeoRedirect] Redirecting to /pt-pt");
-          navigate("/pt-pt", { replace: true });
+          navigate({
+            pathname: "/pt-pt",
+            search: location.search,
+            hash: location.hash
+          }, { replace: true });
         } else {
           // Brazil or other → stay at / (PT-BR)
           localStorage.setItem(LANGUAGE_KEY, "pt");
@@ -119,11 +135,19 @@ export const GeoRedirect = () => {
       if (browserLang.startsWith("en")) {
         localStorage.setItem(LANGUAGE_KEY, "en");
         console.log("[GeoRedirect] Browser fallback: redirecting to /en");
-        navigate("/en", { replace: true });
+        navigate({
+          pathname: "/en",
+          search: location.search,
+          hash: location.hash
+        }, { replace: true });
       } else if (browserLang === "pt-pt" || browserLang === "pt_pt") {
         localStorage.setItem(LANGUAGE_KEY, "pt-pt");
         console.log("[GeoRedirect] Browser fallback: redirecting to /pt-pt");
-        navigate("/pt-pt", { replace: true });
+        navigate({
+          pathname: "/pt-pt",
+          search: location.search,
+          hash: location.hash
+        }, { replace: true });
       } else {
         // Default to PT-BR
         localStorage.setItem(LANGUAGE_KEY, "pt");

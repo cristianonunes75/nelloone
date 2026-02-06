@@ -29,6 +29,9 @@ const EXCLUDED_PATHS = [
   '/ajuda', '/en/help', '/pt-pt/ajuda',
   // WhatsApp redirect
   '/whatsapp', '/en/whatsapp', '/pt-pt/whatsapp',
+  // Business public pages (hiring assessments, invites)
+  '/business/avaliacao',
+  '/business/aceitar-convite',
 ];
 
 /**
