@@ -7,8 +7,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-const faqItems = [
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+const DEFAULT_FAQ_ITEMS: FAQItem[] = [
   {
     question: "Isso é um teste psicológico ou diagnóstico clínico?",
     answer: "Não. O Nello Identity é uma jornada de autoconhecimento baseada em modelos amplamente utilizados no desenvolvimento humano. Ele oferece clareza e reflexão estruturada, mas não possui finalidade clínica e não substitui avaliação psicológica profissional.",
@@ -44,6 +50,14 @@ const faqItems = [
 ];
 
 export const StrategicFAQ = () => {
+  const { t } = useLanguage();
+  
+  // Get translated FAQ items or use defaults
+  const faqSection = t.landing.faq_strategic || {};
+  const faqItems: FAQItem[] = faqSection.items || DEFAULT_FAQ_ITEMS;
+  const title = faqSection.title || "Perguntas Frequentes";
+  const subtitle = faqSection.subtitle || "Entenda por que a Jornada Identity é diferente de qualquer outro teste";
+
   return (
     <section className="py-16 md:py-24 px-5 sm:px-6 lg:px-8 bg-muted/30">
       <div className="max-w-3xl mx-auto">
@@ -53,11 +67,11 @@ export const StrategicFAQ = () => {
             <HelpCircle className="w-6 h-6 text-nello-gold" strokeWidth={1.5} />
           </div>
           <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-semibold text-foreground mb-3">
-            Perguntas Frequentes
+            {title}
           </h2>
           <CrossDivider className="mb-4" />
           <p className="text-base text-foreground/70 max-w-xl mx-auto">
-            Entenda por que a Jornada Identity é diferente de qualquer outro teste
+            {subtitle}
           </p>
         </div>
 

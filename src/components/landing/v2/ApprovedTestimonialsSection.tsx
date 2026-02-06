@@ -6,7 +6,7 @@ import { Quote, User, ChevronDown, ChevronUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { checkTestimonialCompliance, TESTIMONIAL_DISCLAIMER } from "@/lib/compliance/testimonialCompliance";
+import { checkTestimonialCompliance } from "@/lib/compliance/testimonialCompliance";
 
 interface Testimonial {
   id: string;
@@ -17,12 +17,28 @@ interface Testimonial {
   is_featured?: boolean;
 }
 
-// Reações comuns de quem vive a jornada (expressões frequentes, blindado)
-const FEATURED_REACTIONS: { content: string }[] = [
-  { content: "Isso é muito eu." },
-  { content: "Eu finalmente consegui me entender melhor." },
-  { content: "Me deu clareza sobre padrões que eu repetia." },
-];
+interface Reaction {
+  content: string;
+}
+
+// Default reactions per language
+const DEFAULT_REACTIONS: Record<string, Reaction[]> = {
+  en: [
+    { content: "This is so me." },
+    { content: "I finally managed to understand myself better." },
+    { content: "It gave me clarity about patterns I was repeating." },
+  ],
+  pt: [
+    { content: "Isso é muito eu." },
+    { content: "Eu finalmente consegui me entender melhor." },
+    { content: "Me deu clareza sobre padrões que eu repetia." },
+  ],
+  "pt-pt": [
+    { content: "Isto é muito eu." },
+    { content: "Finalmente consegui compreender-me melhor." },
+    { content: "Deu-me clareza sobre padrões que eu repetia." },
+  ],
+};
 
 const getTestName = (slug: string | null): string => {
   const testNames: Record<string, string> = {
@@ -37,7 +53,6 @@ const getTestName = (slug: string | null): string => {
   return slug ? testNames[slug] || "Jornada Identity" : "Jornada Identity";
 };
 
-// Generate avatar colors based on name
 const getAvatarColor = (name: string): string => {
   const colors = [
     "bg-primary/20 text-primary",
@@ -61,7 +76,6 @@ const getInitials = (name: string): string => {
     .toUpperCase();
 };
 
-// Check if content is long enough to need expansion
 const CHAR_THRESHOLD = 200;
 
 interface TestimonialCardProps {
@@ -126,8 +140,19 @@ function TestimonialCard({ testimonial }: TestimonialCardProps) {
 }
 
 export function ApprovedTestimonialsSection() {
-  const { language } = useLanguage();
-  const isEn = language === 'en';
+  const { t, language } = useLanguage();
+  
+  // Get translated content
+  const testimonialsSection = t.landing.testimonials || {};
+  const title = testimonialsSection.title || (language === 'en' 
+    ? 'Common reactions from those who experience the journey' 
+    : 'Reações comuns de quem vive a jornada');
+  const disclaimer = testimonialsSection.disclaimer || (language === 'en' 
+    ? 'These are common expressions from users upon completing the journey. Personal testimonials will only be displayed with authorization.' 
+    : 'Essas são expressões frequentes de usuários ao concluir a jornada. Depoimentos pessoais serão exibidos apenas com autorização.');
+  
+  // Get reactions from translations or use defaults
+  const reactions: Reaction[] = testimonialsSection.reactions || DEFAULT_REACTIONS[language] || DEFAULT_REACTIONS.pt;
   
   const { data: dbTestimonials, isLoading } = useQuery({
     queryKey: ["approved-testimonials-landing"],
@@ -142,7 +167,6 @@ export function ApprovedTestimonialsSection() {
 
       if (error) throw error;
       
-      // Filter out any testimonials with critical compliance issues (extra safety layer)
       const safeTestimonials = (data || []).filter(t => {
         const result = checkTestimonialCompliance(t.content);
         return result.riskLevel !== 'critical';
@@ -150,7 +174,7 @@ export function ApprovedTestimonialsSection() {
       
       return safeTestimonials as Testimonial[];
     },
-    staleTime: 1000 * 60 * 5 // Cache for 5 minutes
+    staleTime: 1000 * 60 * 5
   });
 
   if (isLoading) {
@@ -171,15 +195,12 @@ export function ApprovedTestimonialsSection() {
     );
   }
 
-  // Use featured reactions (simpler display)
-  const reactions = FEATURED_REACTIONS;
-
   return (
     <section className="py-20 px-6 bg-muted/30">
       <div className="max-w-4xl mx-auto space-y-10">
         <div className="text-center space-y-4">
           <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
-            {isEn ? 'Common reactions from those who experience the journey' : 'Reações comuns de quem vive a jornada'}
+            {title}
           </h2>
         </div>
 
@@ -201,11 +222,8 @@ export function ApprovedTestimonialsSection() {
           ))}
         </div>
         
-        {/* Institutional disclaimer */}
         <p className="text-xs text-muted-foreground/60 max-w-2xl mx-auto text-center">
-          {isEn 
-            ? 'These are common expressions from users upon completing the journey. Personal testimonials will only be displayed with authorization.' 
-            : 'Essas são expressões frequentes de usuários ao concluir a jornada. Depoimentos pessoais serão exibidos apenas com autorização.'}
+          {disclaimer}
         </p>
       </div>
     </section>

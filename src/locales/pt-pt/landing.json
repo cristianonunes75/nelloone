@@ -364,5 +364,206 @@
     "back_to_tests": "Voltar aos Testes",
     "back_to_dashboard": "Voltar ao Painel",
     "next_step": "Próximo Passo"
+  },
+  "identity_journey": {
+    "tagline": "A Jornada Identity em 7 etapas",
+    "hero_title_1": "O Identity não te define.",
+    "hero_title_2": "Liberta-te.",
+    "hero_subtitle": "Uma jornada guiada com 7 mapas integrados de autoconhecimento e um relatório final em PDF com o teu",
+    "hero_subtitle_highlight": "Código da Essência",
+    "hero_description_1": "Não é sobre respostas rápidas. É sobre clareza.",
+    "hero_description_2": "Percorres cada etapa ao teu ritmo, com profundidade e intenção.",
+    "cta_primary": "Aceder ao meu Código da Essência",
+    "section_pains_title": "Se te reconheces aqui...",
+    "pains": [
+      "Sentes que repetes os mesmos padrões, mesmo querendo mudar.",
+      "Já fizeste vários testes, mas nenhum te mostrou realmente o todo.",
+      "Queres conhecer-te de verdade, sem rótulos ou promessas vazias."
+    ],
+    "for_you_title": "É para ti se...",
+    "for_you": [
+      "Procuras clareza sobre ti mesmo",
+      "Queres tomar decisões mais alinhadas",
+      "Valorizas profundidade, não pressa"
+    ],
+    "not_for_you_title": "Pode não ser para ti se...",
+    "not_for_you": [
+      "Procuras respostas rápidas e superficiais",
+      "Esperas soluções mágicas ou diagnósticos"
+    ],
+    "journey_title": "A Jornada Identity em 7 etapas",
+    "journey_subtitle": "O mundo passou anos a tentar \"formatar-te\". O Identity faz o caminho inverso — descodificando o que sempre esteve aí, mas foi abafado.",
+    "steps": [
+      { "number": "01", "title": "Despertar" },
+      { "number": "02", "title": "Reconhecer" },
+      { "number": "03", "title": "Aprofundar" },
+      { "number": "04", "title": "Conectar" },
+      { "number": "05", "title": "Integrar" },
+      { "number": "06", "title": "Clarear" },
+      { "number": "07", "title": "Viver" }
+    ],
+    "layers_title": "As 7 camadas que o Identity revela",
+    "layers_subtitle": "Não são rótulos. São mapas de clareza para te compreenderes melhor.",
+    "discoveries": [
+      { "mainText": "Como reages emocionalmente", "testName": "Eneagrama" },
+      { "mainText": "Como tomas decisões e comunicas", "testName": "DISC" },
+      { "mainText": "O que te motiva e o que te bloqueia", "testName": "Temperamentos" },
+      { "mainText": "Onde estão os teus talentos naturais", "testName": "Inteligências Múltiplas" },
+      { "mainText": "Padrões que pedem maturidade", "testName": "Nello 16" },
+      { "mainText": "Tendências simbólicas inconscientes", "testName": "Arquétipos" },
+      { "mainText": "Como te conectas afetivamente", "testName": "Estilos de Conexão" }
+    ],
+    "nello_title": "Não caminhas sozinho",
+    "nello_description_1": "é o teu guia de clareza. Organiza os teus resultados, conecta padrões de forma estruturada e ajuda-te a aplicar isto na vida real, como ferramenta de autoconhecimento e desenvolvimento pessoal.",
+    "nello_description_2": "No final, recebes o",
+    "nello_description_3": ": uma síntese de tudo o que descobriste.",
+    "nello_tags": ["Relatório PDF", "Resultados integrados", "Linguagem clara"],
+    "essence_code_title": "Vê como é o teu Código da Essência",
+    "essence_code_description": "O teu Código da Essência, num relatório final",
+    "essence_code_full_description": "Um relatório completo que integra os 7 mapas da jornada numa síntese única.",
+    "essence_code_bullets": [
+      "Síntese dos teus padrões emocionais e comportamentais",
+      "Integração dos 7 mapas numa visão unificada",
+      "Orientações reflexivas para aplicar na vida real"
+    ],
+    "essence_code_disclaimer": "Ferramenta de autoconhecimento e desenvolvimento pessoal. Não é diagnóstico psicológico e não substitui acompanhamento profissional.",
+    "pricing_title": "Inicia a Jornada Identity",
+    "pricing_subtitle": "Uma jornada feita para ser vivida com calma, profundidade e clareza.",
+    "pricing_label": "Jornada Identity Completa",
+    "pricing_from": "De",
+    "pricing_for": "por",
+    "pricing_unique": "Pagamento único • Acesso vitalício",
+    "pricing_benefits": [
+      "7 mapas integrados de autoconhecimento",
+      "Relatórios premium em PDF (desenvolvimento pessoal, não clínicos)",
+      "Código da Essência incluído",
+      "Nello como guia da jornada",
+      "Acesso vitalício aos resultados"
+    ],
+    "pricing_disclaimer": "O Nello Identity é uma ferramenta de desenvolvimento pessoal e reflexão estruturada. Não substitui diagnóstico psicológico, avaliação clínica ou psicoterapia.",
+    "professionals_title": "Para Profissionais que Acompanham Pessoas",
+    "professionals_intro_1": "Psicólogos, terapeutas, mentores, educadores e profissionais do cuidado lidam todos os dias com algo essencial:",
+    "professionals_intro_highlight": "nem sempre a pessoa consegue nomear o que sente, ou ver os seus próprios padrões.",
+    "professionals_intro_2": "O Nello Identity existe como uma",
+    "professionals_intro_highlight_2": "ferramenta complementar de clareza e linguagem.",
+    "professionals_main_title": "O Identity não substitui um processo terapêutico.",
+    "professionals_main_description": "Oferece mapas reflexivos que podem ajudar o indivíduo a chegar com mais consciência, repertório e organização interna.",
+    "professionals_use_cases_intro": "Muitos profissionais utilizam como apoio para:",
+    "professionals_use_cases": [
+      "Iniciar conversas mais profundas",
+      "Identificar padrões repetitivos com mais clareza",
+      "Trabalhar autoconhecimento com linguagem acessível",
+      "Integrar temas emocionais, comportamentais e relacionais",
+      "Apoiar jornadas de desenvolvimento pessoal"
+    ],
+    "professionals_clinical_note": "Sempre sem carácter clínico ou diagnóstico.",
+    "professionals_quote_1": "É um recurso de reflexão estruturada.",
+    "professionals_quote_2": "A transformação acontece no acompanhamento humano.",
+    "professionals_cta": "Conhece o espaço para profissionais",
+    "professionals_disclaimer": "O Nello Identity é uma ferramenta de autoconhecimento e desenvolvimento pessoal. Não é instrumento psicológico validado para diagnóstico, nem substitui avaliação clínica ou psicoterapia.",
+    "professionals_partners_title": "Profissionais Parceiros",
+    "professionals_partners_description": "Se és profissional e desejas recomendar a jornada aos teus acompanhados ou clientes, existe um programa de parceria com benefícios e acesso facilitado.",
+    "professionals_partners_note": "Sempre com ética, transparência e responsabilidade.",
+    "professionals_partners_cta": "Ver parceria profissional",
+    "final_cta_title": "O Identity não cria uma nova versão de ti.",
+    "final_cta_description_1": "Revela com clareza aquilo que já estava aí, mas estava confuso.",
+    "final_cta_description_2": "O teu",
+    "final_cta_description_3": "é uma síntese prática da tua jornada, para aplicar na vida real com mais consciência.",
+    "final_cta_microcopy": "Acesso vitalício • Jornada reflexiva • Desenvolvimento pessoal, não clínico",
+    "responsibility_note_title": "Nota de responsabilidade",
+    "responsibility_note": "O Nello Identity é uma ferramenta de autoconhecimento e desenvolvimento humano, baseada em modelos amplamente utilizados em contextos educacionais, corporativos e de reflexão pessoal. Não substitui diagnóstico psicológico, avaliação clínica ou acompanhamento terapêutico profissional.",
+    "value_badges": {
+      "pillars": "7 pilares integrados",
+      "report": "Relatório completo",
+      "essence": "Código da Essência"
+    }
+  },
+  "faq_strategic": {
+    "title": "Perguntas Frequentes",
+    "subtitle": "Compreende por que a Jornada Identity é diferente de qualquer outro teste",
+    "items": [
+      {
+        "question": "Isto é um teste psicológico ou diagnóstico clínico?",
+        "answer": "Não. O Nello Identity é uma jornada de autoconhecimento baseada em modelos amplamente utilizados no desenvolvimento humano. Oferece clareza e reflexão estruturada, mas não tem finalidade clínica e não substitui avaliação psicológica profissional."
+      },
+      {
+        "question": "Por que não posso comprar apenas um dos mapas separadamente?",
+        "answer": "A Jornada Identity foi desenhada como um processo integrado de 7 etapas. Cada mapa (Eneagrama, DISC, Temperamentos, Inteligências Múltiplas, Nello 16, Arquétipos e Estilos de Conexão Afetiva) revela uma camada diferente da tua personalidade. Quando compras apenas um mapa isolado, perdes a sinergia entre eles. O Código da Essência é precisamente a síntese de TODOS os 7 pilares a trabalhar juntos. Vender separadamente seria como vender apenas um capítulo de um livro - não terias a história completa."
+      },
+      {
+        "question": "O que torna o Código da Essência diferente de um relatório comum?",
+        "answer": "A maioria dos testes gera relatórios descritivos: 'És tipo X porque fizeste Y'. O Código da Essência é diferente. Não apenas descreve - conecta padrões, revela contradições, mostra onde te bloqueias e onde está o teu potencial real. O Nello (o nosso guia de IA) organiza os teus 7 mapas, identifica as relações entre eles e entrega-te uma síntese que realmente consegues usar na vida real. É como ter um mentor que leu tudo sobre ti e finalmente te mostra o mapa completo."
+      },
+      {
+        "question": "Recebo o Código da Essência logo no início?",
+        "answer": "Não. O Código da Essência é o resultado final da Jornada. Passas pelas 7 etapas (Despertar, Reconhecer, Aprofundar, Conectar, Integrar, Clarear e Viver), e no final, recebes o teu Código da Essência num relatório PDF completo. Isto é intencional - o processo de descoberta é tão importante quanto o resultado. Se recebesses tudo pronto no início, perderias a transformação que acontece no caminho."
+      },
+      {
+        "question": "Por que a Jornada Identity é paga, se existem testes gratuitos na internet?",
+        "answer": "Existem testes gratuitos, mas são fragmentados. Fazes um Eneagrama aqui, um DISC ali, e ficas com 7 peças de um puzzle sem conseguir montar. A Jornada Identity integra tudo isto num processo coerente. Além disso, tens o Nello como teu guia - uma IA que organiza os teus resultados, conecta os padrões e te ajuda a aplicar na vida real. Isto tem valor. Não estás a pagar pelos mapas - estás a pagar pela síntese, pela organização e pela transformação."
+      },
+      {
+        "question": "Como vou usar isto na prática depois?",
+        "answer": "Recebes um relatório final integrado com orientações reflexivas e caminhos de aplicação pessoal. Muitas pessoas usam como clareza para decisões, autoconhecimento e conversas mais profundas, inclusive em contextos profissionais, sempre sem carácter clínico."
+      },
+      {
+        "question": "Por quanto tempo terei acesso aos meus resultados?",
+        "answer": "Acesso vitalício. Uma vez que completas a Jornada Identity, os teus resultados ficam guardados na tua conta para sempre. Podes revisitar o teu Código da Essência quantas vezes quiseres, em qualquer momento. Não há assinatura recorrente, não há expiração. É teu para a vida toda."
+      },
+      {
+        "question": "O pagamento é seguro? E se não me identificar com o conteúdo?",
+        "answer": "Sim, o pagamento é 100% seguro. Usamos Stripe, a plataforma de pagamento mais confiável do mundo. Todos os teus dados são encriptados. Se por algum motivo não te identificares com o conteúdo ou não ficares satisfeito, tens 7 dias para solicitar reembolso total. Sem perguntas. Queremos que tenhas a certeza de que estás a fazer a escolha certa."
+      }
+    ]
+  },
+  "pillars": {
+    "title": "Compreende os 7 Pilares",
+    "subtitle": "Aprofunda o teu conhecimento sobre cada camada da Jornada Identity",
+    "items": [
+      {
+        "title": "Os 9 Tipos do Eneagrama",
+        "description": "Descobre qual dos 9 tipos de personalidade és. O Eneagrama revela como reages emocionalmente, os teus medos, desejos e como te comportas sob pressão.",
+        "linkText": "Compreender o Eneagrama"
+      },
+      {
+        "title": "O Teu Perfil DISC",
+        "description": "Compreende como tomas decisões. O DISC revela se és Dominante, Influente, Estável ou Consciente. Cada perfil tem forças e desafios únicos.",
+        "linkText": "Explorar DISC"
+      },
+      {
+        "title": "Os 4 Temperamentos",
+        "description": "Identifica o teu temperamento natural (Sanguíneo, Colérico, Melancólico ou Fleumático). Cada um tem motivações e bloqueios diferentes.",
+        "linkText": "Conhecer os Temperamentos"
+      },
+      {
+        "title": "As Tuas Inteligências Naturais",
+        "description": "Tens talentos que talvez nunca tenhas reconhecido. As 8 inteligências múltiplas revelam onde estão os teus pontos fortes naturais.",
+        "linkText": "Descobrir as tuas Inteligências"
+      },
+      {
+        "title": "Os 16 Padrões de Maturidade",
+        "description": "Alguns padrões em ti pedem maturidade. O Nello 16 identifica exatamente quais são e como trabalhar neles.",
+        "linkText": "Explorar os Padrões"
+      },
+      {
+        "title": "Os Teus Arquétipos Inconscientes",
+        "description": "Existem padrões arquetípicos universais que vivem em ti. Descobre quais são e como influenciam as tuas escolhas.",
+        "linkText": "Compreender os Arquétipos"
+      },
+      {
+        "title": "Como Te Conectas",
+        "description": "Cada pessoa tem um estilo único de se conectar afetivamente com outros. Conhece o teu e melhora os teus relacionamentos.",
+        "linkText": "Descobrir o teu Estilo"
+      }
+    ]
+  },
+  "testimonials": {
+    "title": "Reações comuns de quem vive a jornada",
+    "reactions": [
+      { "content": "Isto é muito eu." },
+      { "content": "Finalmente consegui compreender-me melhor." },
+      { "content": "Deu-me clareza sobre padrões que eu repetia." }
+    ],
+    "disclaimer": "Estas são expressões frequentes de utilizadores ao concluir a jornada. Testemunhos pessoais serão exibidos apenas com autorização."
   }
 }

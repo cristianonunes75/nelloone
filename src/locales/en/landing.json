@@ -364,5 +364,206 @@
     "back_to_tests": "Back to Tests",
     "back_to_dashboard": "Back to Dashboard",
     "next_step": "Next Step"
+  },
+  "identity_journey": {
+    "tagline": "The Identity Journey in 7 steps",
+    "hero_title_1": "Identity doesn't define you.",
+    "hero_title_2": "It sets you free.",
+    "hero_subtitle": "A guided journey with 7 integrated self-knowledge maps and a final PDF report with your",
+    "hero_subtitle_highlight": "Essence Code",
+    "hero_description_1": "It's not about quick answers. It's about clarity.",
+    "hero_description_2": "You go through each step at your own pace, with depth and intention.",
+    "cta_primary": "Access my Essence Code",
+    "section_pains_title": "If you recognize yourself here...",
+    "pains": [
+      "You feel like you repeat the same patterns, even when you want to change.",
+      "You've taken many tests, but none really showed you the whole picture.",
+      "You want true self-knowledge, without labels or empty promises."
+    ],
+    "for_you_title": "This is for you if...",
+    "for_you": [
+      "You seek clarity about yourself",
+      "You want to make more aligned decisions",
+      "You value depth, not rush"
+    ],
+    "not_for_you_title": "This may not be for you if...",
+    "not_for_you": [
+      "You seek quick and superficial answers",
+      "You expect magic solutions or diagnoses"
+    ],
+    "journey_title": "The Identity Journey in 7 steps",
+    "journey_subtitle": "The world spent years trying to \"format\" you. Identity does the reverse — decoding what was always there, but was muffled.",
+    "steps": [
+      { "number": "01", "title": "Awaken" },
+      { "number": "02", "title": "Recognize" },
+      { "number": "03", "title": "Deepen" },
+      { "number": "04", "title": "Connect" },
+      { "number": "05", "title": "Integrate" },
+      { "number": "06", "title": "Clarify" },
+      { "number": "07", "title": "Live" }
+    ],
+    "layers_title": "The 7 layers Identity reveals",
+    "layers_subtitle": "These are not labels. They are maps of clarity for you to understand yourself better.",
+    "discoveries": [
+      { "mainText": "How you react emotionally", "testName": "Enneagram" },
+      { "mainText": "How you make decisions and communicate", "testName": "DISC" },
+      { "mainText": "What motivates and blocks you", "testName": "Temperaments" },
+      { "mainText": "Where your natural talents are", "testName": "Multiple Intelligences" },
+      { "mainText": "Patterns that need maturity", "testName": "Nello 16" },
+      { "mainText": "Unconscious symbolic tendencies", "testName": "Archetypes" },
+      { "mainText": "How you connect affectively", "testName": "Connection Styles" }
+    ],
+    "nello_title": "You don't walk alone",
+    "nello_description_1": "is your clarity guide. It organizes your results, connects patterns in a structured way and helps you apply this in real life, as a tool for self-knowledge and personal development.",
+    "nello_description_2": "At the end, you receive the",
+    "nello_description_3": ": a synthesis of everything you discovered.",
+    "nello_tags": ["PDF Report", "Integrated results", "Clear language"],
+    "essence_code_title": "See how your Essence Code looks",
+    "essence_code_description": "Your Essence Code, in a final report",
+    "essence_code_full_description": "A complete report that integrates the 7 journey maps into a unique synthesis.",
+    "essence_code_bullets": [
+      "Synthesis of your emotional and behavioral patterns",
+      "Integration of the 7 maps into a unified view",
+      "Reflective guidance to apply in real life"
+    ],
+    "essence_code_disclaimer": "Self-knowledge and personal development tool. Not a psychological diagnosis and does not replace professional support.",
+    "pricing_title": "Start the Identity Journey",
+    "pricing_subtitle": "A journey made to be lived with calm, depth and clarity.",
+    "pricing_label": "Complete Identity Journey",
+    "pricing_from": "From",
+    "pricing_for": "for",
+    "pricing_unique": "One-time payment • Lifetime access",
+    "pricing_benefits": [
+      "7 integrated self-knowledge maps",
+      "Premium PDF reports (personal development, not clinical)",
+      "Essence Code included",
+      "Nello as journey guide",
+      "Lifetime access to results"
+    ],
+    "pricing_disclaimer": "Nello Identity is a personal development and structured reflection tool. It does not replace psychological diagnosis, clinical evaluation or psychotherapy.",
+    "professionals_title": "For Professionals Who Accompany People",
+    "professionals_intro_1": "Psychologists, therapists, mentors, educators and care professionals deal every day with something essential:",
+    "professionals_intro_highlight": "not always the person can name what they feel, or see their own patterns.",
+    "professionals_intro_2": "Nello Identity exists as a",
+    "professionals_intro_highlight_2": "complementary tool for clarity and language.",
+    "professionals_main_title": "Identity does not replace a therapeutic process.",
+    "professionals_main_description": "It offers reflective maps that can help the individual arrive with more awareness, repertoire and internal organization.",
+    "professionals_use_cases_intro": "Many professionals use it as support to:",
+    "professionals_use_cases": [
+      "Start deeper conversations",
+      "Identify repetitive patterns more clearly",
+      "Work on self-knowledge with accessible language",
+      "Integrate emotional, behavioral and relational themes",
+      "Support personal development journeys"
+    ],
+    "professionals_clinical_note": "Always without clinical or diagnostic character.",
+    "professionals_quote_1": "It's a structured reflection resource.",
+    "professionals_quote_2": "Transformation happens through human accompaniment.",
+    "professionals_cta": "Learn about the space for professionals",
+    "professionals_disclaimer": "Nello Identity is a self-knowledge and personal development tool. It is not a validated psychological instrument for diagnosis, nor does it replace clinical evaluation or psychotherapy.",
+    "professionals_partners_title": "Partner Professionals",
+    "professionals_partners_description": "If you are a professional and want to recommend the journey to your clients, there is a partnership program with benefits and facilitated access.",
+    "professionals_partners_note": "Always with ethics, transparency and responsibility.",
+    "professionals_partners_cta": "See professional partnership",
+    "final_cta_title": "Identity doesn't create a new version of you.",
+    "final_cta_description_1": "It clearly reveals what was already there, but was confused.",
+    "final_cta_description_2": "Your",
+    "final_cta_description_3": "is a practical synthesis of your journey, to apply in real life with more awareness.",
+    "final_cta_microcopy": "Lifetime access • Reflective journey • Personal development, not clinical",
+    "responsibility_note_title": "Responsibility note",
+    "responsibility_note": "Nello Identity is a self-knowledge and human development tool, based on models widely used in educational, corporate and personal reflection contexts. It does not replace psychological diagnosis, clinical evaluation or professional therapeutic support.",
+    "value_badges": {
+      "pillars": "7 integrated pillars",
+      "report": "Complete report",
+      "essence": "Essence Code"
+    }
+  },
+  "faq_strategic": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Understand why the Identity Journey is different from any other test",
+    "items": [
+      {
+        "question": "Is this a psychological test or clinical diagnosis?",
+        "answer": "No. Nello Identity is a self-knowledge journey based on models widely used in human development. It offers clarity and structured reflection, but has no clinical purpose and does not replace professional psychological evaluation."
+      },
+      {
+        "question": "Why can't I buy just one of the maps separately?",
+        "answer": "The Identity Journey was designed as an integrated 7-step process. Each map (Enneagram, DISC, Temperaments, Multiple Intelligences, Nello 16, Archetypes and Affective Connection Styles) reveals a different layer of your personality. When you buy just one isolated map, you lose the synergy between them. The Essence Code is precisely the synthesis of ALL 7 pillars working together. Selling separately would be like selling just one chapter of a book - you wouldn't have the complete story."
+      },
+      {
+        "question": "What makes the Essence Code different from a common report?",
+        "answer": "Most tests generate descriptive reports: 'You are type X because you did Y'. The Essence Code is different. It doesn't just describe - it connects patterns, reveals contradictions, shows where you block yourself and where your real potential is. Nello (our AI guide) organizes your 7 maps, identifies the relationships between them and delivers a synthesis you can actually use in real life. It's like having a mentor who read everything about you and finally shows you the complete map."
+      },
+      {
+        "question": "Do I receive the Essence Code right at the beginning?",
+        "answer": "No. The Essence Code is the final result of the Journey. You go through the 7 stages (Awaken, Recognize, Deepen, Connect, Integrate, Clarify and Live), and at the end, you receive your Essence Code in a complete PDF report. This is intentional - the discovery process is as important as the result. If you received everything ready at the beginning, you would lose the transformation that happens along the way."
+      },
+      {
+        "question": "Why is the Identity Journey paid, if there are free tests on the internet?",
+        "answer": "There are free tests, but they are fragmented. You take an Enneagram here, a DISC there, and you're left with 7 pieces of a puzzle you can't put together. The Identity Journey integrates all of this into a coherent process. Plus, you have Nello as your guide - an AI that organizes your results, connects the patterns and helps you apply in real life. This has value. You're not paying for the maps - you're paying for the synthesis, the organization and the transformation."
+      },
+      {
+        "question": "How will I use this in practice afterwards?",
+        "answer": "You receive a final integrated report with reflective guidance and paths for personal application. Many people use it for decision clarity, self-knowledge and deeper conversations, including in professional contexts, always without clinical character."
+      },
+      {
+        "question": "How long will I have access to my results?",
+        "answer": "Lifetime access. Once you complete the Identity Journey, your results are saved in your account forever. You can revisit your Essence Code as many times as you want, at any time. There is no recurring subscription, no expiration. It's yours for life."
+      },
+      {
+        "question": "Is the payment secure? What if I don't identify with the content?",
+        "answer": "Yes, the payment is 100% secure. We use Stripe, the world's most trusted payment platform. All your data is encrypted. If for any reason you don't identify with the content or are not satisfied, you have 7 days to request a full refund. No questions asked. We want you to be sure you're making the right choice."
+      }
+    ]
+  },
+  "pillars": {
+    "title": "Understand the 7 Pillars",
+    "subtitle": "Deepen your knowledge about each layer of the Identity Journey",
+    "items": [
+      {
+        "title": "The 9 Enneagram Types",
+        "description": "Discover which of the 9 personality types you are. The Enneagram reveals how you react emotionally, your fears, desires and how you behave under pressure.",
+        "linkText": "Understand the Enneagram"
+      },
+      {
+        "title": "Your DISC Profile",
+        "description": "Understand how you make decisions. DISC reveals if you are Dominant, Influential, Steady or Conscientious. Each profile has unique strengths and challenges.",
+        "linkText": "Explore DISC"
+      },
+      {
+        "title": "The 4 Temperaments",
+        "description": "Identify your natural temperament (Sanguine, Choleric, Melancholic or Phlegmatic). Each has different motivations and blocks.",
+        "linkText": "Know the Temperaments"
+      },
+      {
+        "title": "Your Natural Intelligences",
+        "description": "You have talents you may have never recognized. The 8 multiple intelligences reveal where your natural strengths are.",
+        "linkText": "Discover your Intelligences"
+      },
+      {
+        "title": "The 16 Maturity Patterns",
+        "description": "Some patterns in you ask for maturity. Nello 16 identifies exactly which ones and how to work on them.",
+        "linkText": "Explore the Patterns"
+      },
+      {
+        "title": "Your Unconscious Archetypes",
+        "description": "There are universal archetypal patterns that live in you. Discover which ones and how they influence your choices.",
+        "linkText": "Understand the Archetypes"
+      },
+      {
+        "title": "How You Connect",
+        "description": "Each person has a unique style of connecting affectively with others. Know yours and improve your relationships.",
+        "linkText": "Discover your Style"
+      }
+    ]
+  },
+  "testimonials": {
+    "title": "Common reactions from those who experience the journey",
+    "reactions": [
+      { "content": "This is so me." },
+      { "content": "I finally managed to understand myself better." },
+      { "content": "It gave me clarity about patterns I was repeating." }
+    ],
+    "disclaimer": "These are common expressions from users upon completing the journey. Personal testimonials will only be displayed with authorization."
   }
 }
