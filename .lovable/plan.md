@@ -1,100 +1,81 @@
 
-# Plano: Corrigir Erro "Email not confirmed" e Atualizar CORS
+# Plano: Corrigir Fluxo de Signup com Verificação de Email
 
-## Problema Principal Identificado
+## Problema Identificado
 
-A usuária (Suami Lins) clicou no link de confirmação de e-mail, mas o **e-mail nunca foi confirmado** no banco de dados (`email_confirmed_at = null`).
+A mensagem de sucesso após o cadastro diz **"Você já pode fazer login"**, mas na verdade o usuário precisa **confirmar o email primeiro**. Isso confunde os usuários e causa a experiência "Email not confirmed".
 
-**Causa raiz:** O `GeoRedirect` está redirecionando para `/en` **sem preservar o hash da URL** que contém o token de autenticação.
+### Diagnóstico
+- **Suami Lins**: `email_confirmed_at = null`, `last_sign_in_at = null`
+- O email de confirmação foi enviado, mas a usuária não clicou no link
+- A mensagem do toast é enganosa
 
-Quando o usuário clica no link de confirmação, o Supabase envia para:
-```
-https://identity.nello.one/#access_token=xxxxx&type=signup&token_hash=xxxxx
-```
-
-Mas o `GeoRedirect` detecta que a usuária está nos EUA e faz:
-```javascript
-navigate("/en", { replace: true });  // ❌ PERDE O HASH!
-```
-
-O token de confirmação é perdido e o e-mail nunca é verificado.
+### Não está relacionado ao sistema de idiomas
+O GeoRedirect só afeta usuários fora do Brasil. A Suami está no Brasil, então o problema é exclusivamente a **UX do fluxo de confirmação de email**.
 
 ---
 
 ## Solução
 
-### Parte 1: Preservar Hash nos Redirecionamentos
+### Parte 1: Corrigir Mensagens de Sucesso
 
-Modificar `src/components/GeoRedirect.tsx` para:
+Atualizar as mensagens em `src/pages/Auth.tsx` para informar sobre a necessidade de confirmar o email:
 
-1. **Não redirecionar se houver hash na URL** (indica callback de autenticação)
-2. **Se redirecionar, preservar search e hash** usando o objeto de navegação completo
-
-Mudança específica (linhas 88-97 e 119-126):
+**De:**
 ```typescript
-// ANTES:
-navigate("/en", { replace: true });
-
-// DEPOIS:
-navigate({
-  pathname: "/en",
-  search: location.search,
-  hash: location.hash
-}, { replace: true });
+welcomeNew: language === 'en' 
+  ? 'Welcome to Identity. You can now sign in.' 
+  : 'Bem-vindo ao Identity. Você já pode fazer login.'
 ```
 
-E adicionar verificação no início:
+**Para:**
 ```typescript
-// NÃO redirecionar se URL tem hash (callback de autenticação)
-if (location.hash) {
-  setHasChecked(true);
-  return;
-}
+welcomeNew: language === 'en' 
+  ? 'Check your inbox and click the confirmation link to activate your account.' 
+  : language === 'pt-pt'
+    ? 'Verifique a sua caixa de entrada e clique no link de confirmação para ativar a conta.'
+    : 'Verifique sua caixa de entrada e clique no link de confirmação para ativar sua conta.'
 ```
 
----
+### Parte 2: Remover Auto-Login Após Signup
 
-### Parte 2: Atualizar CORS nas Edge Functions Críticas
+O código atual tenta fazer login automático após o signup (linhas 274-304), mas isso falha porque o email não foi confirmado. Devemos:
 
-As seguintes funções ainda têm headers CORS desatualizados e podem falhar com clientes Supabase modernos:
+1. **Remover a tentativa de auto-login**
+2. **Redirecionar para uma página de "verifique seu email"** ou manter na tela de login com a mensagem correta
 
-| Função | Status CORS |
-|--------|-------------|
-| `verify-checkout` | ❌ Desatualizado |
-| `send-email` | ❌ Desatualizado |
-| `nello-agent` | ❌ Desatualizado |
-| `create-checkout` | Verificar |
-| `check-password-breach` | ✅ Atualizado |
+### Parte 3: Melhorar Tratamento do Erro "Email not confirmed"
 
-Cada função precisará ter os headers atualizados para:
-```typescript
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+Quando o usuário tentar fazer login sem ter confirmado o email, mostrar uma mensagem amigável:
+
+**De:**
+```
+"Email not confirmed"
 ```
 
----
-
-### Parte 3: Correção Imediata para Usuária
-
-Após as correções serem implementadas, será necessário:
-1. **Reenviar o e-mail de confirmação** para `suamilins@gmail.com`
-2. Ou **confirmar manualmente** o e-mail no banco de dados
+**Para:**
+```
+"Seu email ainda não foi confirmado. Verifique sua caixa de entrada e clique no link de confirmação. Deseja reenviar o email?"
+```
 
 ---
 
 ## Arquivos a Modificar
 
-### 1. `src/components/GeoRedirect.tsx`
-- Adicionar verificação de hash no início
-- Preservar hash/search em todos os `navigate()`
+| Arquivo | Mudanças |
+|---------|----------|
+| `src/pages/Auth.tsx` | Atualizar mensagens, remover auto-login, tratar erro de email não confirmado |
 
-### 2. Edge Functions com CORS desatualizado:
-- `supabase/functions/verify-checkout/index.ts`
-- `supabase/functions/send-email/index.ts`
-- `supabase/functions/nello-agent/index.ts`
-- `supabase/functions/create-checkout/index.ts` (verificar)
+---
+
+## Correção Imediata para Suami
+
+Para a Suami poder entrar agora, tenho duas opções:
+
+1. **Confirmar manualmente** o email no banco (ela entra imediatamente)
+2. **Reenviar o email de confirmação** (ela precisa clicar no link)
+
+Recomendo a opção 1 para resolver o caso urgente e depois implementar as correções no fluxo.
 
 ---
 
@@ -102,22 +83,6 @@ Após as correções serem implementadas, será necessário:
 
 | Cenário | Antes | Depois |
 |---------|-------|--------|
-| Confirmação de e-mail (EUA) | Token perdido, e-mail não confirmado | Token preservado, e-mail confirmado ✅ |
-| Recuperação de senha (EUA) | Redirect falha | Funciona normalmente ✅ |
-| Login com Google (Europa) | Pode perder tokens | Tokens preservados ✅ |
-| Novas funções do cliente | CORS bloqueado | Requisições bem-sucedidas ✅ |
-
----
-
-## Correção Manual Necessária
-
-Para a usuária Suami Lins que já está afetada, após implementar as correções:
-
-1. Opção A: Reenviar link de confirmação (ela precisará clicar novamente)
-2. Opção B: Confirmar e-mail manualmente via SQL (mais rápido)
-
-```sql
-UPDATE auth.users 
-SET email_confirmed_at = now() 
-WHERE email = 'suamilins@gmail.com';
-```
+| Mensagem após cadastro | "Você já pode fazer login" (falso) | "Verifique seu email e clique no link de confirmação" (verdadeiro) |
+| Login sem confirmar email | "Email not confirmed" (confuso) | Mensagem amigável + opção de reenviar |
+| Auto-login após signup | Tenta e falha silenciosamente | Não tenta, aguarda confirmação |
