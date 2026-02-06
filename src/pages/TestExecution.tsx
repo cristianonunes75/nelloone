@@ -493,18 +493,63 @@ export default function TestExecution() {
   }
 
   if (!currentQuestion) {
+    // If we have no questions, it's likely because RLS is blocking access (user hasn't purchased)
+    // Show a clear CTA to unlock the journey instead of a confusing error message
+    const testName = testDetails?.name || (language === 'en' ? 'Test' : 'Teste');
+    const isLikelyAccessIssue = allQuestions?.length === 0 && !isLoading;
+    
     return (
-      <div className="container mx-auto p-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">
-              Nenhuma pergunta encontrada para este teste.
-            </p>
-            <div className="flex justify-center mt-4">
-              <Button onClick={() => navigate(`${basePath}/cliente`)}>
-                Voltar para Dashboard
-              </Button>
+      <div className="container mx-auto p-6 max-w-lg">
+        <Card className="border-primary/20 bg-gradient-to-b from-primary/5 to-background">
+          <CardHeader className="text-center pb-4">
+            <div className="mx-auto mb-4 p-4 rounded-full bg-primary/10">
+              <Sparkles className="h-8 w-8 text-primary" />
             </div>
+            <CardTitle className="text-xl">
+              {isLikelyAccessIssue 
+                ? (language === 'en' 
+                  ? `Unlock Access to ${testName}` 
+                  : `Desbloqueie Acesso ao ${testName}`)
+                : (language === 'en' 
+                  ? 'No questions found' 
+                  : 'Nenhuma pergunta encontrada')}
+            </CardTitle>
+            <CardDescription className="text-base">
+              {isLikelyAccessIssue 
+                ? (language === 'en' 
+                  ? 'Get full access to this test and 6 more with the Complete Self-Discovery Journey.' 
+                  : 'Tenha acesso completo a este teste e mais 6 com a Jornada Completa de Autoconhecimento.')
+                : (language === 'en' 
+                  ? 'There was an issue loading this test. Please try again.' 
+                  : 'Houve um problema ao carregar este teste. Tente novamente.')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            {isLikelyAccessIssue && (
+              <Button 
+                size="lg" 
+                className="w-full gap-2"
+                onClick={handlePurchaseJourney}
+                disabled={isProcessingPurchase}
+              >
+                {isProcessingPurchase ? (
+                  <>Processando...</>
+                ) : (
+                  <>
+                    <CreditCard className="h-4 w-4" />
+                    {language === 'en' 
+                      ? `Unlock for ${bundlePrice}` 
+                      : `Desbloquear por ${bundlePrice}`}
+                  </>
+                )}
+              </Button>
+            )}
+            <Button 
+              variant="outline" 
+              onClick={() => navigate(`${basePath}/cliente`)}
+            >
+              {language === 'en' ? 'Back to Dashboard' : 'Voltar para Dashboard'}
+            </Button>
           </CardContent>
         </Card>
       </div>
