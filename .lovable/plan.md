@@ -1,81 +1,80 @@
 
-# Plano: Corrigir Fluxo de Signup com Verificação de Email
+# Plano: Correções do Identity (Nello One)
 
-## Problema Identificado
+## Falhas a Corrigir
 
-A mensagem de sucesso após o cadastro diz **"Você já pode fazer login"**, mas na verdade o usuário precisa **confirmar o email primeiro**. Isso confunde os usuários e causa a experiência "Email not confirmed".
+### 1. CheckoutSuccess - Rota de teste incorreta
+**Arquivo**: `src/pages/CheckoutSuccess.tsx` (linha 97)
 
-### Diagnóstico
-- **Suami Lins**: `email_confirmed_at = null`, `last_sign_in_at = null`
-- O email de confirmação foi enviado, mas a usuária não clicou no link
-- A mensagem do toast é enganosa
+**Problema**: Quando o usuário compra durante um teste, é redirecionado para `/test/` que não existe. A rota correta é `/cliente/test-execution/`.
 
-### Não está relacionado ao sistema de idiomas
-O GeoRedirect só afeta usuários fora do Brasil. A Suami está no Brasil, então o problema é exclusivamente a **UX do fluxo de confirmação de email**.
-
----
-
-## Solução
-
-### Parte 1: Corrigir Mensagens de Sucesso
-
-Atualizar as mensagens em `src/pages/Auth.tsx` para informar sobre a necessidade de confirmar o email:
-
-**De:**
+**Correção**:
 ```typescript
-welcomeNew: language === 'en' 
-  ? 'Welcome to Identity. You can now sign in.' 
-  : 'Bem-vindo ao Identity. Você já pode fazer login.'
+// Linha 97 - DE:
+return `${getBasePath()}/test/${pendingTestId}/${pendingUserTestId}`;
+
+// PARA:
+return `${getBasePath()}/cliente/test-execution/${pendingTestId}/${pendingUserTestId}`;
 ```
 
-**Para:**
+---
+
+### 2. CruzamentosPage - Redirecionamento para rota inexistente
+**Arquivo**: `src/pages/cliente/CruzamentosPage.tsx` (linha 119)
+
+**Problema**: O botão "Continuar Jornada" redireciona para `/cliente/jornada` que não existe no App.tsx. A rota correta é `/cliente`.
+
+**Correção**:
 ```typescript
-welcomeNew: language === 'en' 
-  ? 'Check your inbox and click the confirmation link to activate your account.' 
-  : language === 'pt-pt'
-    ? 'Verifique a sua caixa de entrada e clique no link de confirmação para ativar a conta.'
-    : 'Verifique sua caixa de entrada e clique no link de confirmação para ativar sua conta.'
-```
+// Linha 119 - DE:
+<Button onClick={() => navigate('/cliente/jornada')}>
 
-### Parte 2: Remover Auto-Login Após Signup
-
-O código atual tenta fazer login automático após o signup (linhas 274-304), mas isso falha porque o email não foi confirmado. Devemos:
-
-1. **Remover a tentativa de auto-login**
-2. **Redirecionar para uma página de "verifique seu email"** ou manter na tela de login com a mensagem correta
-
-### Parte 3: Melhorar Tratamento do Erro "Email not confirmed"
-
-Quando o usuário tentar fazer login sem ter confirmado o email, mostrar uma mensagem amigável:
-
-**De:**
-```
-"Email not confirmed"
-```
-
-**Para:**
-```
-"Seu email ainda não foi confirmado. Verifique sua caixa de entrada e clique no link de confirmação. Deseja reenviar o email?"
+// PARA:
+<Button onClick={() => {
+  const basePath = lang === 'en' ? '/en' : lang === 'pt-pt' ? '/pt-pt' : '';
+  navigate(`${basePath}/cliente`);
+}}>
 ```
 
 ---
 
-## Arquivos a Modificar
+### 3. Testes duplicados no banco de dados
+**Problema**: Existem múltiplas versões ativas de cada teste (DISC, Temperamentos, MBTI, etc.), o que pode causar inconsistências.
 
-| Arquivo | Mudanças |
-|---------|----------|
-| `src/pages/Auth.tsx` | Atualizar mensagens, remover auto-login, tratar erro de email não confirmado |
+**Correção via SQL**: Desativar testes duplicados, mantendo apenas a versão mais completa (com mais perguntas):
+```sql
+-- Identificar e desativar duplicatas, mantendo o teste com mais perguntas de cada tipo
+WITH ranked_tests AS (
+  SELECT 
+    t.id,
+    t.type,
+    t.active,
+    COUNT(tq.id) as question_count,
+    ROW_NUMBER() OVER (
+      PARTITION BY t.type 
+      ORDER BY COUNT(tq.id) DESC, t.created_at DESC
+    ) as rn
+  FROM tests t
+  LEFT JOIN test_questions tq ON tq.test_id = t.id
+  WHERE t.active = true
+  GROUP BY t.id, t.type, t.active
+)
+UPDATE tests 
+SET active = false 
+WHERE id IN (
+  SELECT id FROM ranked_tests WHERE rn > 1
+);
+```
 
 ---
 
-## Correção Imediata para Suami
+## Resumo das Mudanças
 
-Para a Suami poder entrar agora, tenho duas opções:
-
-1. **Confirmar manualmente** o email no banco (ela entra imediatamente)
-2. **Reenviar o email de confirmação** (ela precisa clicar no link)
-
-Recomendo a opção 1 para resolver o caso urgente e depois implementar as correções no fluxo.
+| Arquivo | Tipo | Descrição |
+|---------|------|-----------|
+| `src/pages/CheckoutSuccess.tsx` | Código | Corrigir path `/test/` para `/cliente/test-execution/` |
+| `src/pages/cliente/CruzamentosPage.tsx` | Código | Corrigir navigate para usar path localizado |
+| Banco de dados | SQL | Desativar testes duplicados |
 
 ---
 
@@ -83,6 +82,6 @@ Recomendo a opção 1 para resolver o caso urgente e depois implementar as corre
 
 | Cenário | Antes | Depois |
 |---------|-------|--------|
-| Mensagem após cadastro | "Você já pode fazer login" (falso) | "Verifique seu email e clique no link de confirmação" (verdadeiro) |
-| Login sem confirmar email | "Email not confirmed" (confuso) | Mensagem amigável + opção de reenviar |
-| Auto-login após signup | Tenta e falha silenciosamente | Não tenta, aguarda confirmação |
+| Compra durante teste | Redireciona para 404 | Continua o teste normalmente |
+| Clicar "Continuar Jornada" em Cruzamentos | Página 404 | Vai para dashboard `/cliente` |
+| Hook useJourneyProgress | Pode pegar teste errado | Sempre pega o teste correto |
