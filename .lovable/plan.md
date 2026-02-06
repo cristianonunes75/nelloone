@@ -1,163 +1,187 @@
 
-# Plano: Completar Proteção RLS do Fluxo de Hiring
+# Plano: Corrigir Perda de Progresso de Testes (Caso Saula)
 
-## Contexto
+## Problema Identificado
 
-As correções de segurança RLS quebraram partes do fluxo de avaliação para candidatos anônimos. Algumas partes já foram corrigidas (assessments na linha 148), mas restam 5 pontos vulneráveis.
+A usuária Saula completou 5 testes, mas quando retomou a jornada, 3 testes apareceram como "não iniciados".
 
-## Problemas Identificados
+### Diagnóstico Técnico
 
-| Local | Tabela | Problema | Impacto |
-|-------|--------|----------|---------|
-| Linha 209-224 | `tests`, `test_questions` | Query direta | Candidato não vê perguntas |
-| Linha 240-244 | `hiring_answers` | Query direta | Progresso não restaura |
-| Linha 393-396 | `hiring_answers` | Query direta | Fallback local pode falhar |
-| Linha 492-495 | `hiring_assessments` | Query direta (não usa RPC) | Mesmo bug da Suzanne |
-| Linha 500 | Lógica JS | `[].every()` sem proteção | Pula para "completed" |
+**Dados encontrados no banco:**
 
-## Solução
+| Teste | Registro | Status | Respostas | Language | Created |
+|-------|----------|--------|-----------|----------|---------|
+| Arquétipos | Original | ✅ completed | 36 | pt-legacy | 05/02 19:07 |
+| Arquétipos | **DUPLICADO** | ⚠️ in_progress | 0 | pt | 06/02 16:50 |
 
-### Parte 1: Nova Função RPC para Perguntas
+**Causa Raiz (3 problemas encadeados):**
 
-Criar `get_hiring_test_questions` que retorna perguntas baseado no tipo de teste:
+1. **Teste legacy ativo**: Saula fez Arquétipos com test_id de `pt-legacy`
+2. **Constraint errada**: `UNIQUE(user_id, test_id)` permite duplicados por **tipo** de teste
+3. **Falta de ORDER BY**: Query em `useTests.tsx` sem ordenação - `.find()` pegou registro errado
+4. **startTest sem validação**: Não verifica se já existe teste do mesmo **tipo** antes de criar
+
+### Fluxo do Bug
+
+```text
+Saula acessa jornada → 
+Sistema busca test_id de pt (novo) → 
+startTest faz upsert → 
+Constraint não encontra conflito (pt-legacy ≠ pt) → 
+Cria novo registro vazio → 
+Query sem ORDER BY pega o registro errado → 
+Dashboard mostra "não iniciado"
+```
+
+---
+
+## Solução Proposta
+
+### Parte 1: Correção Imediata dos Dados
+
+Deletar o registro duplicado vazio da Saula:
 
 ```sql
-CREATE OR REPLACE FUNCTION public.get_hiring_test_questions(_test_type text)
-RETURNS TABLE (
-  id uuid,
-  question_number int,
-  question_text text,
-  options jsonb
-)
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path = public
-AS $$
-  SELECT tq.id, tq.question_number, tq.question_text, tq.options
-  FROM test_questions tq
-  JOIN tests t ON t.id = tq.test_id
-  WHERE t.type = _test_type::test_type
-  AND t.active = true
-  AND t.language = 'pt'
-  ORDER BY tq.question_number;
-$$;
+-- Remover o registro duplicado de arquetipos
+DELETE FROM user_tests 
+WHERE id = 'abad7563-9bca-41ac-8bd2-8ea6fde81a4c';
+-- Este é o registro vazio criado hoje às 16:50
 ```
 
-### Parte 2: Nova Função RPC para Respostas do Candidato
+### Parte 2: Adicionar ORDER BY nas Queries
 
-Criar `get_hiring_answers_by_token` para restaurar progresso e calcular resultados:
+**Arquivo**: `src/hooks/useTests.tsx`
 
-```sql
-CREATE OR REPLACE FUNCTION public.get_hiring_answers_by_token(
-  _token text,
-  _assessment_id uuid
-)
-RETURNS TABLE (
-  id uuid,
-  question_number int,
-  answer jsonb
-)
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path = public
-AS $$
-  SELECT ha.id, ha.question_number, ha.answer
-  FROM hiring_answers ha
-  JOIN hiring_assessments hass ON hass.id = ha.assessment_id
-  JOIN hiring_candidates hc ON hc.id = hass.candidate_id
-  WHERE ha.assessment_id = _assessment_id
-  AND hc.invite_token = _token
-  AND (hc.invite_expires_at IS NULL OR hc.invite_expires_at > now())
-  ORDER BY ha.question_number;
-$$;
-```
-
-### Parte 3: Atualizar Frontend
-
-**Arquivo:** `src/apps/business/pages/BusinessHiringAssessment.tsx`
-
-#### 3.1 - Substituir busca de perguntas (linhas 209-228)
+Modificar a query para priorizar registros completados e mais recentes:
 
 ```typescript
-// Antes: queries diretas em tests e test_questions
-const { data: questionsData, error: questionsError } = await supabase
-  .rpc("get_hiring_test_questions", { _test_type: testType });
-
-if (questionsError) throw questionsError;
-
-const mappedQuestions = (questionsData || []).map(q => ({ 
-  ...q, 
-  question: q.question_text 
-}));
+// Linha 53-56: Adicionar ordenação
+const { data, error } = await supabase
+  .from("user_tests")
+  .select("*, tests(*)")
+  .eq("user_id", effectiveUserId!)
+  .order("status", { ascending: true }) // 'completed' vem primeiro alfabeticamente
+  .order("completed_at", { ascending: false, nullsFirst: false }); // Mais recente primeiro
 ```
 
-#### 3.2 - Substituir restauração de progresso (linhas 240-244)
+**Arquivo**: `src/hooks/useJourneyProgress.tsx`
+
+Mesma correção para a query de target user:
 
 ```typescript
-// Usar nova RPC com token
-const { data: existingAnswers, error: answersError } = await supabase
-  .rpc("get_hiring_answers_by_token", { 
-    _token: token, 
-    _assessment_id: assessment.id 
-  });
+// Linha 69-72: Adicionar ordenação
+const { data, error } = await supabase
+  .from("user_tests")
+  .select("*, tests(*)")
+  .eq("user_id", effectiveUserId!)
+  .order("status", { ascending: true })
+  .order("completed_at", { ascending: false, nullsFirst: false });
 ```
 
-#### 3.3 - Substituir busca para cálculo de resultados (linhas 393-396)
+### Parte 3: Prevenir Duplicações Futuras
+
+**Arquivo**: `src/hooks/useTests.tsx`
+
+Modificar `startTest` para verificar se já existe teste do mesmo TIPO antes de criar:
 
 ```typescript
-// Usar mesma RPC para cálculo
-const { data: answersData, error: fetchError } = await supabase
-  .rpc("get_hiring_answers_by_token", { 
-    _token: token, 
-    _assessment_id: currentAssessment.id 
-  });
+// Antes do upsert, verificar se já existe um test do mesmo tipo
+startTest = useMutation({
+  mutationFn: async (testId: string) => {
+    if (!user) throw new Error("User not authenticated");
+    
+    // Buscar o tipo do teste solicitado
+    const { data: targetTest } = await supabase
+      .from("tests")
+      .select("type")
+      .eq("id", testId)
+      .single();
+    
+    if (!targetTest) throw new Error("Test not found");
+    
+    // Verificar se já existe user_test do mesmo tipo
+    const { data: existingTests } = await supabase
+      .from("user_tests")
+      .select("id, test_id, status, tests!inner(type)")
+      .eq("user_id", user.id)
+      .eq("tests.type", targetTest.type);
+    
+    // Se já existe um registro para este tipo, atualizar em vez de criar novo
+    if (existingTests && existingTests.length > 0) {
+      // Priorizar o registro completado ou mais recente
+      const existingRecord = existingTests.find(t => t.status === 'completed') 
+                          || existingTests[0];
+      
+      // Atualizar o registro existente para apontar ao novo test_id
+      const { data, error } = await supabase
+        .from("user_tests")
+        .update({
+          test_id: testId,
+          status: existingRecord.status === 'completed' ? 'completed' : 'in_progress',
+          started_at: existingRecord.status === 'completed' 
+            ? undefined // Manter o started_at original
+            : new Date().toISOString(),
+        })
+        .eq("id", existingRecord.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    }
+    
+    // Se não existe, criar novo (comportamento original)
+    const { data, error } = await supabase
+      .from("user_tests")
+      .insert({
+        user_id: user.id,
+        test_id: testId,
+        status: "in_progress",
+        started_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+  // ... resto igual
+});
 ```
 
-#### 3.4 - Corrigir refresh de assessments (linhas 492-495)
-
-```typescript
-// Usar RPC existente em vez de query direta
-const { data: updatedAssessments } = await supabase
-  .rpc("get_hiring_assessments_by_token", { _token: token });
-
-setAssessments(updatedAssessments || []);
-
-// IMPORTANTE: Proteção contra array vazio
-const allCompleted = updatedAssessments && 
-                     updatedAssessments.length > 0 && 
-                     updatedAssessments.every(a => a.status === "completed");
-```
+---
 
 ## Arquivos a Modificar
 
 | Arquivo | Tipo | Mudança |
 |---------|------|---------|
-| Nova migration SQL | Database | Criar 2 funções RPC |
-| `BusinessHiringAssessment.tsx` | Frontend | Usar RPCs em 4 locais |
+| Manual SQL | Database | Deletar registro duplicado da Saula |
+| `src/hooks/useTests.tsx` | Frontend | Adicionar ORDER BY + validar tipo antes de criar |
+| `src/hooks/useJourneyProgress.tsx` | Frontend | Adicionar ORDER BY na query de admin |
+
+---
 
 ## Resultado Esperado
 
 | Cenário | Antes | Depois |
 |---------|-------|--------|
-| Candidato inicia teste | Pode falhar ao carregar perguntas | Carrega via RPC seguro |
-| Candidato atualiza página | Perde progresso | Restaura via RPC |
-| Candidato completa 1º teste | Pode ir para "completed" | Vai para próximo teste |
-| Suzanne tenta novamente | Vê upsell errado | Vê testes pendentes |
+| Saula acessa jornada | Vê Arquétipos como "não iniciado" | Vê como "concluído" |
+| Usuário com teste pt-legacy | Pode criar duplicado | Atualiza registro existente |
+| Query de progresso | Pega primeiro registro (aleatório) | Pega registro completado primeiro |
+
+---
 
 ## Seção Técnica
 
-### Por que criar novas RPCs?
+### Por que `ORDER BY status ASC` funciona?
 
-O padrão SECURITY DEFINER permite que funções executem com privilégios elevados, bypassando RLS de forma controlada. Cada função valida o token do candidato antes de retornar dados, garantindo:
+Em ordem alfabética:
+- `completed` (c) vem antes de `in_progress` (i) vem antes de `not_started` (n)
 
-1. **Segurança**: Candidatos só acessam seus próprios dados
-2. **Funcionalidade**: Fluxo funciona sem login
-3. **Consistência**: Mesmo padrão das 5 RPCs já existentes
+Então `ORDER BY status ASC` garante que registros `completed` apareçam primeiro.
 
-### Alternativa Considerada (Descartada)
+### Por que não usar constraint `UNIQUE(user_id, test_type)`?
 
-Criar políticas RLS mais permissivas para `hiring_answers` e `test_questions`:
-- **Problema**: Exporia dados sensíveis de outros candidatos
-- **Decisão**: Manter RLS restrito + usar RPCs específicas
+Não existe coluna `test_type` em `user_tests` - ela está em `tests`. 
+Criar uma constraint cross-table é complexo e pode quebrar funcionalidades existentes.
+A solução via código é mais segura e flexível.
