@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { CheckoutTrustBlock } from "@/components/checkout";
 
 export interface ProductInfo {
   id: string;
@@ -240,12 +241,8 @@ export function ProductPaywallModal({
           )}
         </Button>
 
-        <p className="text-xs text-center text-muted-foreground">
-          {isEn 
-            ? "Secure payment processed by Stripe. Instant access after payment."
-            : "Pagamento seguro processado pela Stripe. Acesso instantâneo após o pagamento."
-          }
-        </p>
+        {/* Premium Trust Block */}
+        <CheckoutTrustBlock variant="compact" />
       </DialogContent>
     </Dialog>
   );
