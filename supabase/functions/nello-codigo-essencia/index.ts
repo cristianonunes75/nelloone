@@ -904,20 +904,33 @@ Section: "rotina_diaria"
 Personalized to profile. NOT generic.
 
 ═══════════════════════════════════════════
-SECTION 8: HONEST CONVERSATION
+SECTION 8: FINAL MESSAGE (REFLECTIVE AND WARM CLOSING)
 ═══════════════════════════════════════════
 
 Section: "conversa_final"
 
+NEW STRUCTURE (Couple Code Style - NO direct statements about who the person is):
 {
-  "paragraphs": [
-    "Before anything, ${firstName}, this needs to be clear: [validation of what you saw]",
-    "[Reference specific results: Your DISC shows... Your Enneagram reveals...]",
-    "[This is a mirror, not a label. The invitation is consciousness.]"
-  ]
+  "final_message": "[Single, reflective and warm message. Does NOT define who the person is. Does NOT state traits as facts. Uses invitation language, possibilities and reflection. Maximum 3-4 sentences.]",
+  "next_step": {
+    "action": "[ONE concrete, specific, measurable action for the next 7 days]",
+    "ritual_name": "[Nello ritual name for this action - e.g.: 'First Week Challenge']",
+    "why": "[Why this action specifically for THIS profile - 1 sentence]"
+  }
 }
 
-Max 3 short paragraphs. Human, direct, encouraging.
+⚠️ CRITICAL LEGAL SHIELDING RULES:
+- ❌ DO NOT use "you ARE" → ✅ use "you TEND to", "it may be that", "there's an inclination towards"
+- ❌ DO NOT state identity as fact → ✅ suggest as possibility
+- ❌ DO NOT mention test names in the final message
+- ❌ DO NOT use diagnostic or affirmative language
+- ✅ Use language of garden, path, journey, discovery
+- ✅ Focus on encouragement and next steps
+
+EXAMPLE FINAL_MESSAGE:
+"${firstName}, this report is not an end point. It's just the beginning of a conversation with yourself. What you saw here are tendencies, inclinations, possibilities — not labels. Take what resonated, leave what didn't make sense, and remember: self-knowledge is not destiny, it's direction."
+
+Maximum 4 sentences. Warm and reflective tone. NO definitive statements about identity.
 
 ═══════════════════════════════════════════
 FINAL JSON STRUCTURE
@@ -989,8 +1002,9 @@ FINAL JSON STRUCTURE
     },
     {
       "id": "conversa_final",
-      "title": "An Honest Conversation",
-      "paragraphs": [...]
+      "title": "Final Message",
+      "final_message": "[Single reflective and warm message - no identity statements]",
+      "next_step": { "action": "...", "ritual_name": "...", "why": "..." }
     }
   ]
 }
@@ -1406,19 +1420,14 @@ Seção: "rotina_diaria"
 Personalizado ao perfil. NÃO genérico.
 
 ═══════════════════════════════════════════
-SEÇÃO 17: CONVERSA HONESTA + PRÓXIMO PASSO (FECHAMENTO QUE EXIGE DECISÃO)
+SEÇÃO 17: MENSAGEM FINAL (FECHAMENTO REFLEXIVO E ACOLHEDOR)
 ═══════════════════════════════════════════
 
 Seção: "conversa_final"
 
-ESTRUTURA OBRIGATÓRIA (Fechamento que Exige Decisão):
+NOVA ESTRUTURA (Estilo Código do Casal - SEM afirmações diretas sobre quem a pessoa é):
 {
-  "who_you_are": "[1 frase reafirmando quem a pessoa é baseado nos dados - validação poderosa]",
-  "risk_of_not_living": "[1 frase sobre o custo REAL de não viver alinhado - dor real]",
-  "invitation": "[Pergunta que EXIGE escolha + provocação direta]",
-  "paragraphs": [
-    "[Contexto breve citando 1-2 scores específicos]"
-  ],
+  "final_message": "[Mensagem única, reflexiva e acolhedora. NÃO define quem a pessoa é. NÃO afirma traços como fatos. Usa linguagem de convite, possibilidade e reflexão. Máximo 3-4 frases.]",
   "next_step": {
     "action": "[UMA ação concreta, específica, mensurável para os próximos 7 dias]",
     "ritual_name": "[Nome do ritual Nello para essa ação - ex: 'Desafio da Primeira Semana']",
@@ -1426,10 +1435,18 @@ ESTRUTURA OBRIGATÓRIA (Fechamento que Exige Decisão):
   }
 }
 
-FORMATO DO FECHAMENTO:
-"${firstName}, você já entendeu seu Código. Agora a pergunta é: [PERGUNTA QUE FORÇA DECISÃO]? Porque continuar como está também é uma decisão."
+⚠️ REGRAS CRÍTICAS DE BLINDAGEM JURÍDICA:
+- ❌ NÃO usar "você É" → ✅ usar "você TENDE a", "pode ser que", "há uma inclinação para"
+- ❌ NÃO afirmar identidade como fato → ✅ sugerir como possibilidade
+- ❌ NÃO mencionar nomes de testes na mensagem final
+- ❌ NÃO usar linguagem diagnóstica ou afirmativa
+- ✅ Usar linguagem de jardim, caminho, jornada, descoberta
+- ✅ Focar em encorajamento e próximos passos
 
-Máximo 1 parágrafo de contexto. Fechamento com ação concreta e nome de ritual obrigatório.
+EXEMPLO DE FINAL_MESSAGE:
+"${firstName}, este relatório não é um ponto final. É apenas o começo de uma conversa consigo mesmo. O que você viu aqui são tendências, inclinações, possibilidades — não rótulos. Leve o que ressoou, deixe o que não fez sentido, e lembre-se: autoconhecimento não é destino, é direção."
+
+Máximo 4 frases. Tom acolhedor e reflexivo. NENHUMA afirmação definitiva sobre identidade.
 
 ═══════════════════════════════════════════
 ESTRUTURA JSON FINAL
@@ -1591,11 +1608,8 @@ ESTRUTURA JSON FINAL
     },
     {
       "id": "conversa_final",
-      "title": "Uma Conversa Honesta",
-      "who_you_are": "[1 frase reafirmando identidade]",
-      "risk_of_not_living": "[1 frase sobre custo real]",
-      "invitation": "[Pergunta que exige decisão]",
-      "paragraphs": [...],
+      "title": "Mensagem Final",
+      "final_message": "[Mensagem única reflexiva e acolhedora - sem afirmações sobre identidade]",
       "next_step": { "action": "...", "ritual_name": "...", "why": "..." }
     }
   ]
@@ -1668,7 +1682,7 @@ REGRAS CRÍTICAS - LAPIDAÇÃO V7:
 - paz_pressao é OBRIGATÓRIO - descreva comportamentos específicos com 3 itens em cada lista
 - raridade_perfil é OBRIGATÓRIO - estime a raridade entre 1-25%
 - referencias_simbolicas é OBRIGATÓRIO - máximo 1 santo + 2 personalidades, linguagem neutra
-- conversa_final DEVE ter who_you_are, risk_of_not_living, invitation (fechamento que exige decisão)
+- conversa_final DEVE ter final_message (mensagem reflexiva única, sem afirmações sobre identidade) e next_step
 - next_step DEVE ter ritual_name (Método Nello)
 - Frases curtas e impactantes apenas
 - NENHUMA afirmação genérica
@@ -1869,14 +1883,14 @@ const MOCK_SECTIONS = (userName: string, locale: string) => {
     },
     {
       id: "conversa_final",
-      title: isEnglish ? "An Honest Conversation" : "Uma Conversa Honesta",
-      paragraphs: [
-        isEnglish ? `${firstName}, your DISC D at 72% combined with Enneagram 3w4 creates a profile that achieves at high speed but rarely stops to feel the wins.` : `${firstName}, seu DISC D em 72% combinado com Eneagrama 3w4 cria um perfil que conquista em alta velocidade mas raramente para pra sentir as vitórias.`,
-        isEnglish ? "The uncomfortable truth: your independence is as much protection as strength. You've learned to not need anyone - but that's not the same as not wanting anyone." : "A verdade desconfortável: sua independência é tanta proteção quanto força. Você aprendeu a não precisar de ninguém - mas isso não é o mesmo que não querer ninguém."
-      ],
+      title: isEnglish ? "Final Message" : "Mensagem Final",
+      final_message: isEnglish 
+        ? `${firstName}, this report is not an end point. It's just the beginning of a conversation with yourself. What you saw here are tendencies, inclinations, possibilities — not labels. Take what resonated, leave what didn't make sense, and remember: self-knowledge is not destiny, it's direction. May this clarity serve your journey, your relationships, and your growth.`
+        : `${firstName}, este relatório não é um ponto final. É apenas o começo de uma conversa consigo mesmo. O que você viu aqui são tendências, inclinações, possibilidades — não rótulos. Leve o que ressoou, deixe o que não fez sentido, e lembre-se: autoconhecimento não é destino, é direção. Que essa clareza sirva sua jornada, seus relacionamentos e seu crescimento.`,
       next_step: {
         action: isEnglish ? "This week: share one struggle with someone before you've solved it." : "Esta semana: compartilhe uma dificuldade com alguém antes de ter resolvido.",
-        why: isEnglish ? "Your Enneagram 3 hides struggles to protect image. This breaks the pattern." : "Seu Eneagrama 3 esconde dificuldades para proteger imagem. Isso quebra o padrão."
+        ritual_name: isEnglish ? "First Week Challenge" : "Desafio da Primeira Semana",
+        why: isEnglish ? "Sharing before solving breaks the pattern of isolation that your profile tends to create." : "Compartilhar antes de resolver quebra o padrão de isolamento que seu perfil tende a criar."
       }
     }
   ];
