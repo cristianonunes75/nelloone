@@ -1,62 +1,85 @@
 
-# Plano: Checkout de Confiança Premium (Apple Style)
+# Plano: Corrigir Exibição dos Scores de Temperamento
 
-## Objetivo
+## Problema Identificado
 
-Transformar a experiência de pagamento do Nello One em um checkout premium com sensação de confiança máxima, eliminando dúvidas sobre preenchimento automático de cartões pelo iPhone/navegador.
+Na seção "Mapas Detalhados" do Código da Essência, o componente **Temperamentos** mostra:
+- **Primário**: Colérico ✅
+- **Secundário**: Melancólico ✅
+- **Scores**: 0% para todos ❌
+
+### Screenshot do Bug
+O usuário vê "Colérico" e "Melancólico" identificados corretamente como primário/secundário, mas as porcentagens aparecem como **0%** para ambos.
 
 ---
 
-## Componentes a Criar
+## Diagnóstico Técnico
 
-### 1. `CheckoutTrustBlock.tsx` (Novo Componente Reutilizável)
+### Causa Raiz 1: Edge Function não extrai scores
 
-Bloco minimalista que aparece abaixo do botão de pagamento com:
+A função `extractKeyResults` para temperamentos (linha 2365-2375 de `nello-codigo-essencia/index.ts`) **não extrai os `scores`** do resultado do teste:
 
-**Estrutura Visual:**
-```text
-┌─────────────────────────────────────────────────┐
-│  🔒  Pagamento 100% seguro via Stripe           │
-│                                                 │
-│  O Nello One nunca armazena ou acessa dados    │
-│  do seu cartão. Seu pagamento é processado      │
-│  diretamente pela Stripe, com padrão bancário   │
-│  internacional.                                 │
-│                                                 │
-│  ─────────────────────────────────────────────  │
-│                                                 │
-│  📱 Seu dispositivo pode sugerir               │
-│     automaticamente um cartão já salvo.        │
-│     [Por que isso acontece?]                    │
-│                                                 │
-│  ─────────────────────────────────────────────  │
-│                                                 │
-│  Privacidade protegida por padrão PCI DSS.     │
-└─────────────────────────────────────────────────┘
+```typescript
+// ATUAL - INCOMPLETO
+case 'temperamentos':
+  return {
+    dominantTemperament: primaryTemp,
+    secondaryTemperament: secondaryTemp,
+    description: ...,
+    // ❌ FALTA: scores não são extraídos!
+  };
 ```
 
-**Estilo Apple:**
-- Fonte pequena e sofisticada (text-xs/text-sm)
-- Cinza suave (text-muted-foreground)
-- Espaçamento elegante (space-y-3)
-- Ícone de cadeado discreto
-- Fundo sutil (bg-muted/30)
+Enquanto os dados no banco têm os scores completos:
+```json
+{
+  "scores": { "colerico": 26, "fleumatico": 35, "melancolico": 37, "sanguineo": 19 }
+}
+```
+
+### Causa Raiz 2: Frontend depende de dados da IA
+
+O `chartData.temperament` em `CodigoEssencia.tsx` está construído assim:
+
+```typescript
+temperament: {
+  primary: testResults?.temperamentos?.primary,      // ✅ OK
+  secondary: testResults?.temperamentos?.secondary,  // ✅ OK
+  scores: visualData?.temperament?.scores,           // ❌ Depende da IA!
+}
+```
+
+O problema é que `visualData` vem do `retrato_essencial.visual_data`, que é gerado pela IA. Como a IA não recebe os scores reais (por causa do problema 1), ela pode estar gerando estrutura vazia ou incorreta.
 
 ---
 
-### 2. `AutofillExplainerModal.tsx` (Modal Explicativo)
+## Solução Proposta
 
-Modal clean que abre ao clicar em "Por que isso acontece?":
+### Correção 1: Edge Function - Extrair scores de temperamento
 
-**Conteúdo:**
+Adicionar `scores` na função `extractKeyResults`:
 
-| Seção | Texto |
-|-------|-------|
-| Título | Cartão preenchido automaticamente |
-| Explicação | Isso é um recurso do iPhone e do navegador, chamado Preenchimento Automático. Ele pode sugerir cartões já salvos no Safari ou no Apple Pay. |
-| Reforço | O Nello One **não vê, não salva e não tem acesso** a essas informações. |
-| Onde verificar | Ajustes → Safari → Preenchimento Automático → Cartões Salvos / Ajustes → Wallet e Apple Pay |
-| Botão | Entendi |
+```typescript
+case 'temperamentos':
+  return {
+    dominantTemperament: primaryTemp,
+    secondaryTemperament: secondaryTemp,
+    scores: resultData.scores || resultData.pontuacoes, // ✅ ADICIONAR
+    description: ...,
+  };
+```
+
+### Correção 2: Frontend - Preferir dados do teste
+
+Alterar a construção de `chartData.temperament` para priorizar os scores do teste real:
+
+```typescript
+temperament: {
+  primary: pickTemperament(testResults?.temperamentos?.primary),
+  secondary: pickTemperament(testResults?.temperamentos?.secondary),
+  scores: testResults?.temperamentos?.scores || visualData?.temperament?.scores, // ✅ Priorizar teste
+}
+```
 
 ---
 
@@ -64,229 +87,64 @@ Modal clean que abre ao clicar em "Por que isso acontece?":
 
 | Arquivo | Mudança |
 |---------|---------|
-| `src/components/checkout/CheckoutTrustBlock.tsx` | **CRIAR** - Componente reutilizável premium |
-| `src/components/checkout/AutofillExplainerModal.tsx` | **CRIAR** - Modal explicativo sobre preenchimento automático |
-| `src/pages/Checkout.tsx` | Adicionar `<CheckoutTrustBlock />` abaixo do botão de pagamento |
-| `src/components/monetization/ProductPaywallModal.tsx` | Adicionar `<CheckoutTrustBlock />` após o botão CTA |
+| `supabase/functions/nello-codigo-essencia/index.ts` | Adicionar `scores` em `extractKeyResults` para temperamentos |
+| `src/pages/CodigoEssencia.tsx` | Priorizar `testResults?.temperamentos?.scores` sobre `visualData` |
 
 ---
 
-## Traduções (i18n)
+## Impacto
 
-### Português (PT-BR)
-```typescript
-const trustTexts = {
-  secure: "Pagamento 100% seguro via Stripe",
-  noStorage: "O Nello One nunca armazena ou acessa dados do seu cartão. Seu pagamento é processado diretamente pela Stripe, com padrão bancário internacional.",
-  autofillHint: "Seu dispositivo pode sugerir automaticamente um cartão já salvo.",
-  whyLink: "Por que isso acontece?",
-  pciCompliance: "Privacidade protegida por padrão internacional (PCI DSS).",
-  
-  // Modal
-  modalTitle: "Cartão preenchido automaticamente",
-  modalExplanation: "Isso é um recurso do iPhone e do navegador, chamado Preenchimento Automático. Ele pode sugerir cartões já salvos no Safari ou no Apple Pay.",
-  modalReinforce: "O Nello One não vê, não salva e não tem acesso a essas informações.",
-  modalSettings: "Onde verificar no iPhone:",
-  modalPath1: "Ajustes → Safari → Preenchimento Automático → Cartões Salvos",
-  modalPath2: "Ajustes → Wallet e Apple Pay",
-  modalButton: "Entendi",
-};
-```
+### Para novos códigos gerados
+- A IA receberá os scores corretos e poderá usá-los no `visual_data`
+- Os gráficos exibirão as porcentagens reais
 
-### Inglês (EN)
-```typescript
-const trustTexts = {
-  secure: "100% secure payment via Stripe",
-  noStorage: "Nello One never stores or accesses your card data. Your payment is processed directly by Stripe, with international banking standards.",
-  autofillHint: "Your device may automatically suggest a saved card.",
-  whyLink: "Why did this happen?",
-  pciCompliance: "Privacy protected by international standard (PCI DSS).",
-  
-  // Modal
-  modalTitle: "Card filled automatically",
-  modalExplanation: "This is a feature of your iPhone and browser called Autofill. It can suggest cards already saved in Safari or Apple Pay.",
-  modalReinforce: "Nello One does not see, store, or have access to this information.",
-  modalSettings: "Where to check on iPhone:",
-  modalPath1: "Settings → Safari → AutoFill → Saved Cards",
-  modalPath2: "Settings → Wallet & Apple Pay",
-  modalButton: "Got it",
-};
-```
-
-### Português Europeu (PT-PT)
-```typescript
-const trustTexts = {
-  secure: "Pagamento 100% seguro via Stripe",
-  noStorage: "O Nello One nunca armazena ou acede aos dados do seu cartão. O seu pagamento é processado diretamente pela Stripe, com padrão bancário internacional.",
-  autofillHint: "O seu dispositivo pode sugerir automaticamente um cartão já guardado.",
-  whyLink: "Porque é que isto acontece?",
-  pciCompliance: "Privacidade protegida por padrão internacional (PCI DSS).",
-  
-  // Modal
-  modalTitle: "Cartão preenchido automaticamente",
-  modalExplanation: "Isto é uma funcionalidade do iPhone e do navegador, chamada Preenchimento Automático. Pode sugerir cartões já guardados no Safari ou no Apple Pay.",
-  modalReinforce: "O Nello One não vê, não guarda e não tem acesso a estas informações.",
-  modalSettings: "Onde verificar no iPhone:",
-  modalPath1: "Definições → Safari → Preenchimento Automático → Cartões Guardados",
-  modalPath2: "Definições → Wallet e Apple Pay",
-  modalButton: "Percebi",
-};
-```
-
----
-
-## Implementação Visual
-
-### CheckoutTrustBlock
-
-```tsx
-// Estrutura do componente
-<div className="mt-6 space-y-4">
-  {/* Bloco Principal de Confiança */}
-  <div className="bg-muted/30 rounded-xl p-4 space-y-3">
-    {/* Linha principal */}
-    <div className="flex items-center gap-2">
-      <Lock className="h-4 w-4 text-muted-foreground" />
-      <span className="text-sm font-medium">{texts.secure}</span>
-    </div>
-    
-    {/* Texto secundário */}
-    <p className="text-xs text-muted-foreground leading-relaxed">
-      {texts.noStorage}
-    </p>
-  </div>
-
-  {/* Dica sobre Preenchimento Automático */}
-  <div className="flex items-start gap-2 px-1">
-    <Smartphone className="h-4 w-4 text-muted-foreground mt-0.5" />
-    <div className="space-y-1">
-      <p className="text-xs text-muted-foreground">
-        {texts.autofillHint}
-      </p>
-      <button 
-        onClick={() => setShowModal(true)}
-        className="text-xs text-primary hover:underline"
-      >
-        {texts.whyLink}
-      </button>
-    </div>
-  </div>
-
-  {/* Rodapé PCI */}
-  <p className="text-[10px] text-muted-foreground/60 text-center">
-    {texts.pciCompliance}
-  </p>
-</div>
-```
-
-### AutofillExplainerModal
-
-```tsx
-<Dialog open={open} onOpenChange={onOpenChange}>
-  <DialogContent className="sm:max-w-md">
-    <DialogHeader>
-      <div className="flex items-center gap-3 mb-2">
-        <div className="p-2 rounded-full bg-blue-50 dark:bg-blue-950">
-          <CreditCard className="h-5 w-5 text-blue-600" />
-        </div>
-        <DialogTitle>{texts.modalTitle}</DialogTitle>
-      </div>
-    </DialogHeader>
-    
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        {texts.modalExplanation}
-      </p>
-      
-      {/* Reforço com destaque */}
-      <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-3 border border-emerald-200 dark:border-emerald-800">
-        <p className="text-sm text-emerald-800 dark:text-emerald-200 font-medium">
-          {texts.modalReinforce}
-        </p>
-      </div>
-      
-      {/* Onde verificar */}
-      <div className="space-y-2">
-        <p className="text-xs font-medium text-muted-foreground">
-          {texts.modalSettings}
-        </p>
-        <div className="bg-muted/50 rounded-lg p-3 space-y-1 font-mono text-xs">
-          <p>{texts.modalPath1}</p>
-          <p>{texts.modalPath2}</p>
-        </div>
-      </div>
-    </div>
-    
-    <Button onClick={() => onOpenChange(false)} className="w-full">
-      {texts.modalButton}
-    </Button>
-  </DialogContent>
-</Dialog>
-```
-
----
-
-## Garantia de Segurança Técnica
-
-| Requisito | Status |
-|-----------|--------|
-| Nenhum dado de cartão no Supabase | Garantido - Stripe Checkout é externo |
-| Stripe como único processador | Garantido - `create-checkout` redireciona |
-| PCI DSS compliance | Automático via Stripe |
-| Frontend não registra dados sensíveis | Garantido - apenas IDs de sessão |
-
----
-
-## Resultado Esperado
-
-**Antes:**
-- Usuário vê cartão aparecer automaticamente
-- Pensa: "Como eles têm meu cartão?"
-- Desconfiança e abandono
-
-**Depois:**
-- Usuário vê cartão aparecer automaticamente
-- Lê: "Seu dispositivo pode sugerir..."
-- Clica em "Por que isso acontece?"
-- Entende que é recurso do iPhone
-- Sente confiança e finaliza compra
+### Para códigos já gerados
+- O frontend buscará os scores diretamente do `testResults` (que já existe no banco)
+- Correção imediata sem necessidade de regenerar o código
 
 ---
 
 ## Seção Técnica
 
-### Estrutura de Arquivos
-
-```text
-src/
-└── components/
-    └── checkout/
-        ├── CheckoutTrustBlock.tsx      # Novo
-        ├── AutofillExplainerModal.tsx  # Novo
-        └── index.ts                     # Exports
-```
-
-### Props do CheckoutTrustBlock
+### Mudança no Edge Function
 
 ```typescript
-interface CheckoutTrustBlockProps {
-  variant?: 'default' | 'compact'; // compact para modais
-  showAutofillHint?: boolean;      // default true
-  className?: string;
-}
+// supabase/functions/nello-codigo-essencia/index.ts - linha ~2365
+case 'temperamentos':
+  const primaryTemp = resultData.primary?.name || resultData.primary?.temperament || resultData.dominant || resultData.dominante;
+  const secondaryTemp = resultData.secondary?.name || resultData.secondary?.temperament || resultData.secondary || resultData.secundario;
+  return {
+    dominantTemperament: primaryTemp,
+    secondaryTemperament: secondaryTemp,
+    scores: resultData.scores || resultData.pontuacoes || {}, // NOVO
+    description: resultData.description || resultData.interpretation || resultData.descricao,
+    strengths: resultData.strengths || resultData.forcas,
+    challenges: resultData.challenges || resultData.desafios,
+  };
 ```
 
-### Uso
+### Mudança no Frontend
 
-```tsx
-// Em Checkout.tsx
-import { CheckoutTrustBlock } from "@/components/checkout/CheckoutTrustBlock";
-
-// Após o botão de pagamento
-<Button>Pagar Agora</Button>
-<CheckoutTrustBlock />
-
-// Em ProductPaywallModal.tsx
-<Button>Pagar com Stripe</Button>
-<CheckoutTrustBlock variant="compact" />
+```typescript
+// src/pages/CodigoEssencia.tsx - linha ~344
+temperament: {
+  primary: pickTemperament(testResults?.temperamentos?.primary),
+  secondary: pickTemperament(testResults?.temperamentos?.secondary),
+  scores: testResults?.temperamentos?.scores || visualData?.temperament?.scores || {},
+},
 ```
+
+---
+
+## Resultado Esperado
+
+| Antes | Depois |
+|-------|--------|
+| Colérico 0%, Melancólico 0% | Colérico 22%, Melancólico 26%, etc. |
+| Scores dependem da IA | Scores vêm do teste real |
+
+---
+
+## Risco
+
+**Baixo** - Apenas ajusta a origem dos dados. Não afeta funcionalidade existente.
