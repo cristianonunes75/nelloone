@@ -6,6 +6,7 @@ import { Users, ShoppingCart, FileCheck, TrendingUp, Activity, Clock, Zap } from
 import { format, subMinutes, subHours, startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, BarChart, Bar } from "recharts";
+import { LiveTestMonitor } from "./LiveTestMonitor";
 
 interface RealtimeStats {
   activeUsers15min: number;
@@ -338,6 +339,9 @@ export const RealtimeDashboard = () => {
           </div>
         </Card>
       </div>
+
+      {/* Live Test Monitor */}
+      <LiveTestMonitor />
 
       {/* Live Events Feed */}
       <Card className="p-4">
