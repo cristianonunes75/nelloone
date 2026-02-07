@@ -1,156 +1,62 @@
 
-# Plano: Internacionalizar a Landing Page Identity
+# Plano: Checkout de Confiança Premium (Apple Style)
 
-## Problema Identificado
+## Objetivo
 
-O usuário selecionou **EN (inglês)** no seletor de idioma, mas toda a landing page continua exibindo conteúdo em português brasileiro.
-
-### Screenshot do Bug
-Como mostrado: o badge "EN" está selecionado, mas o Hero exibe:
-- "A JORNADA IDENTITY EM 7 ETAPAS"
-- "O Identity não te define. Ele te liberta."
-- "Acessar meu Código da Essência"
-
-### Diagnóstico Técnico
-
-**Causa raiz**: O componente `NelloOneLanding.tsx` e seus subcomponentes têm **todo o texto hardcoded em português**, ignorando completamente o sistema de tradução `t` do `LanguageContext`.
-
-**Arquivos afetados com conteúdo hardcoded:**
-
-| Arquivo | Seções PT-BR Hardcoded |
-|---------|------------------------|
-| `NelloOneLanding.tsx` | Hero, Dores (pains), Etapas da jornada, Descobertas, "Para quem é/não é", Pricing, CTAs |
-| `StrategicFAQ.tsx` | Todas as 8 perguntas e respostas do FAQ |
-| `PillarsSection.tsx` | Títulos e descrições dos 7 pilares |
-| `ApprovedTestimonialsSection.tsx` | Reações em português (parcialmente traduzido) |
-
-**O que já existe de correto:**
-- Arquivo `src/locales/en/landing.json` com 368 linhas de traduções completas para inglês
-- `LanguageContext` funcionando e detectando corretamente a mudança de idioma
-- `NavSection` parcialmente traduzido (usa `t.landing.nav`)
+Transformar a experiência de pagamento do Nello One em um checkout premium com sensação de confiança máxima, eliminando dúvidas sobre preenchimento automático de cartões pelo iPhone/navegador.
 
 ---
 
-## Solução Proposta
+## Componentes a Criar
 
-### Fase 1: Refatorar `NelloOneLanding.tsx`
+### 1. `CheckoutTrustBlock.tsx` (Novo Componente Reutilizável)
 
-Substituir todos os textos hardcoded pelo objeto de tradução `t.landing`:
+Bloco minimalista que aparece abaixo do botão de pagamento com:
 
-```typescript
-// ANTES (hardcoded)
-const mainPains = [
-  "Você sente que repete os mesmos padrões...",
-  "Já fez vários testes, mas nenhum...",
-];
-
-// DEPOIS (i18n)
-const { t, language } = useLanguage();
-const mainPains = t.landing.mirror.items;
+**Estrutura Visual:**
+```text
+┌─────────────────────────────────────────────────┐
+│  🔒  Pagamento 100% seguro via Stripe           │
+│                                                 │
+│  O Nello One nunca armazena ou acessa dados    │
+│  do seu cartão. Seu pagamento é processado      │
+│  diretamente pela Stripe, com padrão bancário   │
+│  internacional.                                 │
+│                                                 │
+│  ─────────────────────────────────────────────  │
+│                                                 │
+│  📱 Seu dispositivo pode sugerir               │
+│     automaticamente um cartão já salvo.        │
+│     [Por que isso acontece?]                    │
+│                                                 │
+│  ─────────────────────────────────────────────  │
+│                                                 │
+│  Privacidade protegida por padrão PCI DSS.     │
+└─────────────────────────────────────────────────┘
 ```
 
-**Mapeamento de seções → traduções:**
-
-| Seção em NelloOneLanding | Chave em landing.json |
-|--------------------------|----------------------|
-| Hero title | `t.landing.hero.title` |
-| Hero subtitle | `t.landing.hero.subtitle` |
-| Hero CTA | `t.landing.pricing.cta` |
-| Dores (pains) | `t.landing.mirror.items` |
-| Etapas (steps) | `t.landing.transformation.steps` |
-| Descobertas | `t.landing.improvements.items` |
-| Para quem é | `t.landing.not_for_you.items_for` |
-| Para quem não é | `t.landing.not_for_you.items_not` |
-| Pricing | `t.landing.pricing.*` |
-
-### Fase 2: Refatorar `StrategicFAQ.tsx`
-
-```typescript
-// ANTES
-const faqItems = [
-  { question: "Isso é um teste psicológico?", answer: "Não. O Nello..." },
-];
-
-// DEPOIS
-const { t } = useLanguage();
-const faqItems = t.landing.faq.items;
-```
-
-### Fase 3: Refatorar `PillarsSection.tsx`
-
-Adicionar traduções para os 7 pilares em `landing.json` e consumir via `t.landing`.
-
-### Fase 4: Atualizar `ApprovedTestimonialsSection.tsx`
-
-As "reações comuns" hardcoded também precisam ser traduzidas:
-
-```typescript
-// ANTES
-const FEATURED_REACTIONS = [
-  { content: "Isso é muito eu." },
-];
-
-// DEPOIS
-const reactions = language === 'en' 
-  ? [{ content: "This is so me." }, ...]
-  : FEATURED_REACTIONS;
-```
+**Estilo Apple:**
+- Fonte pequena e sofisticada (text-xs/text-sm)
+- Cinza suave (text-muted-foreground)
+- Espaçamento elegante (space-y-3)
+- Ícone de cadeado discreto
+- Fundo sutil (bg-muted/30)
 
 ---
 
-## Novas Traduções Necessárias
+### 2. `AutofillExplainerModal.tsx` (Modal Explicativo)
 
-Algumas seções da Landing v2 não existem no `landing.json` atual e precisam ser adicionadas:
+Modal clean que abre ao clicar em "Por que isso acontece?":
 
-```json
-// Adicionar em src/locales/en/landing.json
-{
-  "identity_journey": {
-    "pains": [
-      "You feel like you repeat patterns, even when wanting to change.",
-      "You've taken many tests, but none showed you the whole picture.",
-      "You want true self-knowledge, without labels or empty promises."
-    ],
-    "steps": [
-      { "number": "01", "title": "Awaken" },
-      { "number": "02", "title": "Recognize" },
-      { "number": "03", "title": "Deepen" },
-      { "number": "04", "title": "Connect" },
-      { "number": "05", "title": "Integrate" },
-      { "number": "06", "title": "Clarify" },
-      { "number": "07", "title": "Live" }
-    ],
-    "discoveries": [
-      { "mainText": "How you react emotionally", "testName": "Enneagram" },
-      { "mainText": "How you make decisions and communicate", "testName": "DISC" },
-      // ...
-    ]
-  },
-  "faq_strategic": {
-    "title": "Frequently Asked Questions",
-    "subtitle": "Understand why the Identity Journey is different from any other test",
-    "items": [
-      {
-        "question": "Is this a psychological test or clinical diagnosis?",
-        "answer": "No. Nello Identity is a self-knowledge journey based on widely used models in human development..."
-      }
-      // ... remaining 7 items
-    ]
-  },
-  "pillars": {
-    "title": "Understand the 7 Pillars",
-    "subtitle": "Deepen your knowledge about each layer of the Identity Journey",
-    "items": [
-      {
-        "title": "The 9 Enneagram Types",
-        "description": "Discover which of the 9 personality types you are...",
-        "linkText": "Understand the Enneagram"
-      }
-      // ... remaining 6 items
-    ]
-  }
-}
-```
+**Conteúdo:**
+
+| Seção | Texto |
+|-------|-------|
+| Título | Cartão preenchido automaticamente |
+| Explicação | Isso é um recurso do iPhone e do navegador, chamado Preenchimento Automático. Ele pode sugerir cartões já salvos no Safari ou no Apple Pay. |
+| Reforço | O Nello One **não vê, não salva e não tem acesso** a essas informações. |
+| Onde verificar | Ajustes → Safari → Preenchimento Automático → Cartões Salvos / Ajustes → Wallet e Apple Pay |
+| Botão | Entendi |
 
 ---
 
@@ -158,67 +64,229 @@ Algumas seções da Landing v2 não existem no `landing.json` atual e precisam s
 
 | Arquivo | Mudança |
 |---------|---------|
-| `src/locales/en/landing.json` | Adicionar novas seções: `identity_journey`, `faq_strategic`, `pillars` |
-| `src/locales/pt/landing.json` | Adicionar mesmas seções em português (mover hardcoded) |
-| `src/locales/pt-pt/landing.json` | Adicionar versão PT-PT das novas seções |
-| `src/components/landing/v2/NelloOneLanding.tsx` | Substituir textos hardcoded por `t.landing.*` |
-| `src/components/landing/v2/StrategicFAQ.tsx` | Usar `t.landing.faq_strategic.items` |
-| `src/components/landing/v2/PillarsSection.tsx` | Usar `t.landing.pillars.items` |
-| `src/components/landing/v2/ApprovedTestimonialsSection.tsx` | Traduzir reações hardcoded |
+| `src/components/checkout/CheckoutTrustBlock.tsx` | **CRIAR** - Componente reutilizável premium |
+| `src/components/checkout/AutofillExplainerModal.tsx` | **CRIAR** - Modal explicativo sobre preenchimento automático |
+| `src/pages/Checkout.tsx` | Adicionar `<CheckoutTrustBlock />` abaixo do botão de pagamento |
+| `src/components/monetization/ProductPaywallModal.tsx` | Adicionar `<CheckoutTrustBlock />` após o botão CTA |
+
+---
+
+## Traduções (i18n)
+
+### Português (PT-BR)
+```typescript
+const trustTexts = {
+  secure: "Pagamento 100% seguro via Stripe",
+  noStorage: "O Nello One nunca armazena ou acessa dados do seu cartão. Seu pagamento é processado diretamente pela Stripe, com padrão bancário internacional.",
+  autofillHint: "Seu dispositivo pode sugerir automaticamente um cartão já salvo.",
+  whyLink: "Por que isso acontece?",
+  pciCompliance: "Privacidade protegida por padrão internacional (PCI DSS).",
+  
+  // Modal
+  modalTitle: "Cartão preenchido automaticamente",
+  modalExplanation: "Isso é um recurso do iPhone e do navegador, chamado Preenchimento Automático. Ele pode sugerir cartões já salvos no Safari ou no Apple Pay.",
+  modalReinforce: "O Nello One não vê, não salva e não tem acesso a essas informações.",
+  modalSettings: "Onde verificar no iPhone:",
+  modalPath1: "Ajustes → Safari → Preenchimento Automático → Cartões Salvos",
+  modalPath2: "Ajustes → Wallet e Apple Pay",
+  modalButton: "Entendi",
+};
+```
+
+### Inglês (EN)
+```typescript
+const trustTexts = {
+  secure: "100% secure payment via Stripe",
+  noStorage: "Nello One never stores or accesses your card data. Your payment is processed directly by Stripe, with international banking standards.",
+  autofillHint: "Your device may automatically suggest a saved card.",
+  whyLink: "Why did this happen?",
+  pciCompliance: "Privacy protected by international standard (PCI DSS).",
+  
+  // Modal
+  modalTitle: "Card filled automatically",
+  modalExplanation: "This is a feature of your iPhone and browser called Autofill. It can suggest cards already saved in Safari or Apple Pay.",
+  modalReinforce: "Nello One does not see, store, or have access to this information.",
+  modalSettings: "Where to check on iPhone:",
+  modalPath1: "Settings → Safari → AutoFill → Saved Cards",
+  modalPath2: "Settings → Wallet & Apple Pay",
+  modalButton: "Got it",
+};
+```
+
+### Português Europeu (PT-PT)
+```typescript
+const trustTexts = {
+  secure: "Pagamento 100% seguro via Stripe",
+  noStorage: "O Nello One nunca armazena ou acede aos dados do seu cartão. O seu pagamento é processado diretamente pela Stripe, com padrão bancário internacional.",
+  autofillHint: "O seu dispositivo pode sugerir automaticamente um cartão já guardado.",
+  whyLink: "Porque é que isto acontece?",
+  pciCompliance: "Privacidade protegida por padrão internacional (PCI DSS).",
+  
+  // Modal
+  modalTitle: "Cartão preenchido automaticamente",
+  modalExplanation: "Isto é uma funcionalidade do iPhone e do navegador, chamada Preenchimento Automático. Pode sugerir cartões já guardados no Safari ou no Apple Pay.",
+  modalReinforce: "O Nello One não vê, não guarda e não tem acesso a estas informações.",
+  modalSettings: "Onde verificar no iPhone:",
+  modalPath1: "Definições → Safari → Preenchimento Automático → Cartões Guardados",
+  modalPath2: "Definições → Wallet e Apple Pay",
+  modalButton: "Percebi",
+};
+```
+
+---
+
+## Implementação Visual
+
+### CheckoutTrustBlock
+
+```tsx
+// Estrutura do componente
+<div className="mt-6 space-y-4">
+  {/* Bloco Principal de Confiança */}
+  <div className="bg-muted/30 rounded-xl p-4 space-y-3">
+    {/* Linha principal */}
+    <div className="flex items-center gap-2">
+      <Lock className="h-4 w-4 text-muted-foreground" />
+      <span className="text-sm font-medium">{texts.secure}</span>
+    </div>
+    
+    {/* Texto secundário */}
+    <p className="text-xs text-muted-foreground leading-relaxed">
+      {texts.noStorage}
+    </p>
+  </div>
+
+  {/* Dica sobre Preenchimento Automático */}
+  <div className="flex items-start gap-2 px-1">
+    <Smartphone className="h-4 w-4 text-muted-foreground mt-0.5" />
+    <div className="space-y-1">
+      <p className="text-xs text-muted-foreground">
+        {texts.autofillHint}
+      </p>
+      <button 
+        onClick={() => setShowModal(true)}
+        className="text-xs text-primary hover:underline"
+      >
+        {texts.whyLink}
+      </button>
+    </div>
+  </div>
+
+  {/* Rodapé PCI */}
+  <p className="text-[10px] text-muted-foreground/60 text-center">
+    {texts.pciCompliance}
+  </p>
+</div>
+```
+
+### AutofillExplainerModal
+
+```tsx
+<Dialog open={open} onOpenChange={onOpenChange}>
+  <DialogContent className="sm:max-w-md">
+    <DialogHeader>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="p-2 rounded-full bg-blue-50 dark:bg-blue-950">
+          <CreditCard className="h-5 w-5 text-blue-600" />
+        </div>
+        <DialogTitle>{texts.modalTitle}</DialogTitle>
+      </div>
+    </DialogHeader>
+    
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        {texts.modalExplanation}
+      </p>
+      
+      {/* Reforço com destaque */}
+      <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-3 border border-emerald-200 dark:border-emerald-800">
+        <p className="text-sm text-emerald-800 dark:text-emerald-200 font-medium">
+          {texts.modalReinforce}
+        </p>
+      </div>
+      
+      {/* Onde verificar */}
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-muted-foreground">
+          {texts.modalSettings}
+        </p>
+        <div className="bg-muted/50 rounded-lg p-3 space-y-1 font-mono text-xs">
+          <p>{texts.modalPath1}</p>
+          <p>{texts.modalPath2}</p>
+        </div>
+      </div>
+    </div>
+    
+    <Button onClick={() => onOpenChange(false)} className="w-full">
+      {texts.modalButton}
+    </Button>
+  </DialogContent>
+</Dialog>
+```
+
+---
+
+## Garantia de Segurança Técnica
+
+| Requisito | Status |
+|-----------|--------|
+| Nenhum dado de cartão no Supabase | Garantido - Stripe Checkout é externo |
+| Stripe como único processador | Garantido - `create-checkout` redireciona |
+| PCI DSS compliance | Automático via Stripe |
+| Frontend não registra dados sensíveis | Garantido - apenas IDs de sessão |
 
 ---
 
 ## Resultado Esperado
 
-| Idioma Selecionado | Antes | Depois |
-|--------------------|-------|--------|
-| 🇺🇸 EN | Página em português | Página em inglês |
-| 🇧🇷 PT | Página em português | Página em português (inalterado) |
-| 🇵🇹 PT-PT | Página em português | Página em português europeu |
+**Antes:**
+- Usuário vê cartão aparecer automaticamente
+- Pensa: "Como eles têm meu cartão?"
+- Desconfiança e abandono
+
+**Depois:**
+- Usuário vê cartão aparecer automaticamente
+- Lê: "Seu dispositivo pode sugerir..."
+- Clica em "Por que isso acontece?"
+- Entende que é recurso do iPhone
+- Sente confiança e finaliza compra
 
 ---
 
 ## Seção Técnica
 
-### Padrão de Implementação
+### Estrutura de Arquivos
 
-```tsx
-// Exemplo de refatoração do Hero
-export const NelloOneLanding = () => {
-  const { t, language } = useLanguage();
-  
-  // Mapear traduções estruturadas
-  const heroContent = {
-    tagline: t.landing.identity_journey?.tagline || "The Identity Journey in 7 steps",
-    title: t.landing.hero.title,
-    subtitle: t.landing.hero.subtitle,
-    cta: t.landing.pricing.cta,
-  };
-  
-  return (
-    <section>
-      <p>{heroContent.tagline}</p>
-      <h1>{heroContent.title}</h1>
-      <p>{heroContent.subtitle}</p>
-      <Button>{heroContent.cta}</Button>
-    </section>
-  );
-};
+```text
+src/
+└── components/
+    └── checkout/
+        ├── CheckoutTrustBlock.tsx      # Novo
+        ├── AutofillExplainerModal.tsx  # Novo
+        └── index.ts                     # Exports
 ```
 
-### Fallback Pattern
+### Props do CheckoutTrustBlock
 
-Para evitar erros durante a migração, usar fallback:
-
-```tsx
-const pains = t.landing.identity_journey?.pains || [
-  "You feel like you repeat patterns...",
-  // fallback em inglês
-];
+```typescript
+interface CheckoutTrustBlockProps {
+  variant?: 'default' | 'compact'; // compact para modais
+  showAutofillHint?: boolean;      // default true
+  className?: string;
+}
 ```
 
-### Estimativa de Esforço
+### Uso
 
-- **Linhas de código**: ~200-300 linhas de modificação
-- **Linhas de tradução**: ~150 novas linhas em cada arquivo de locale
-- **Risco**: Baixo (não afeta funcionalidade, apenas texto)
+```tsx
+// Em Checkout.tsx
+import { CheckoutTrustBlock } from "@/components/checkout/CheckoutTrustBlock";
+
+// Após o botão de pagamento
+<Button>Pagar Agora</Button>
+<CheckoutTrustBlock />
+
+// Em ProductPaywallModal.tsx
+<Button>Pagar com Stripe</Button>
+<CheckoutTrustBlock variant="compact" />
+```
