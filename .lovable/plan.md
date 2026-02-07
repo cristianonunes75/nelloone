@@ -1,84 +1,58 @@
 
-# Plano: Corrigir Exibição dos Scores de Temperamento
+# Plano: Corrigir Modal de Onboarding Travado em Mobile
 
 ## Problema Identificado
 
-Na seção "Mapas Detalhados" do Código da Essência, o componente **Temperamentos** mostra:
-- **Primário**: Colérico ✅
-- **Secundário**: Melancólico ✅
-- **Scores**: 0% para todos ❌
+A usuária Janaína está presa na tela de onboarding porque o **botão "Continuar"** está fora da área visível da tela.
 
-### Screenshot do Bug
-O usuário vê "Colérico" e "Melancólico" identificados corretamente como primário/secundário, mas as porcentagens aparecem como **0%** para ambos.
+### Causa Raiz
 
----
+O `DialogContent` do Radix UI usa posicionamento fixo centralizado SEM suporte a scroll interno:
 
-## Diagnóstico Técnico
-
-### Causa Raiz 1: Edge Function não extrai scores
-
-A função `extractKeyResults` para temperamentos (linha 2365-2375 de `nello-codigo-essencia/index.ts`) **não extrai os `scores`** do resultado do teste:
-
-```typescript
-// ATUAL - INCOMPLETO
-case 'temperamentos':
-  return {
-    dominantTemperament: primaryTemp,
-    secondaryTemperament: secondaryTemp,
-    description: ...,
-    // ❌ FALTA: scores não são extraídos!
-  };
+```tsx
+// dialog.tsx - linha 39
+"fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] ..."
+// ❌ Falta: max-h-[...] overflow-y-auto
 ```
 
-Enquanto os dados no banco têm os scores completos:
-```json
-{
-  "scores": { "colerico": 26, "fleumatico": 35, "melancolico": 37, "sanguineo": 19 }
-}
-```
+Quando o conteúdo do modal excede a altura da viewport (comum em celulares), o usuário não consegue fazer scroll para ver o botão.
 
-### Causa Raiz 2: Frontend depende de dados da IA
+### Evidência Visual
 
-O `chartData.temperament` em `CodigoEssencia.tsx` está construído assim:
-
-```typescript
-temperament: {
-  primary: testResults?.temperamentos?.primary,      // ✅ OK
-  secondary: testResults?.temperamentos?.secondary,  // ✅ OK
-  scores: visualData?.temperament?.scores,           // ❌ Depende da IA!
-}
-```
-
-O problema é que `visualData` vem do `retrato_essencial.visual_data`, que é gerado pela IA. Como a IA não recebe os scores reais (por causa do problema 1), ela pode estar gerando estrutura vazia ou incorreta.
+Na screenshot da Janaína, vemos:
+- Título "Bem-vindo à Jornada Identity"
+- Saudação personalizada
+- 3 blocos de informação
+- Texto "Você não precisa fazer tudo hoje..."
+- **AUSENTE**: Botão "Continuar" (está abaixo da viewport)
 
 ---
 
 ## Solução Proposta
 
-### Correção 1: Edge Function - Extrair scores de temperamento
+Adicionar suporte a scroll no modal de onboarding para garantir que o botão seja sempre acessível.
 
-Adicionar `scores` na função `extractKeyResults`:
+### Mudança 1: OnboardingModal.tsx
 
-```typescript
-case 'temperamentos':
-  return {
-    dominantTemperament: primaryTemp,
-    secondaryTemperament: secondaryTemp,
-    scores: resultData.scores || resultData.pontuacoes, // ✅ ADICIONAR
-    description: ...,
-  };
+Adicionar classes de scroll ao DialogContent e reorganizar o layout:
+
+```tsx
+<DialogContent 
+  className="sm:max-w-xl max-h-[90vh] overflow-y-auto flex flex-col" 
+  onInteractOutside={(e) => e.preventDefault()}
+>
 ```
 
-### Correção 2: Frontend - Preferir dados do teste
+### Mudança 2 (Alternativa Global): dialog.tsx
 
-Alterar a construção de `chartData.temperament` para priorizar os scores do teste real:
+Se quisermos corrigir todos os modais do sistema, podemos adicionar as classes no componente base:
 
-```typescript
-temperament: {
-  primary: pickTemperament(testResults?.temperamentos?.primary),
-  secondary: pickTemperament(testResults?.temperamentos?.secondary),
-  scores: testResults?.temperamentos?.scores || visualData?.temperament?.scores, // ✅ Priorizar teste
-}
+```tsx
+// dialog.tsx - DialogContent
+className={cn(
+  "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg max-h-[90vh] overflow-y-auto translate-x-[-50%] translate-y-[-50%] ...",
+  className,
+)}
 ```
 
 ---
@@ -87,64 +61,57 @@ temperament: {
 
 | Arquivo | Mudança |
 |---------|---------|
-| `supabase/functions/nello-codigo-essencia/index.ts` | Adicionar `scores` em `extractKeyResults` para temperamentos |
-| `src/pages/CodigoEssencia.tsx` | Priorizar `testResults?.temperamentos?.scores` sobre `visualData` |
+| `src/components/cliente/OnboardingModal.tsx` | Adicionar `max-h-[90vh] overflow-y-auto` ao DialogContent |
 
 ---
 
-## Impacto
+## Implementação Detalhada
 
-### Para novos códigos gerados
-- A IA receberá os scores corretos e poderá usá-los no `visual_data`
-- Os gráficos exibirão as porcentagens reais
+### OnboardingModal.tsx - Linha 111
 
-### Para códigos já gerados
-- O frontend buscará os scores diretamente do `testResults` (que já existe no banco)
-- Correção imediata sem necessidade de regenerar o código
+**Antes:**
+```tsx
+<DialogContent className="sm:max-w-xl" onInteractOutside={(e) => e.preventDefault()}>
+```
+
+**Depois:**
+```tsx
+<DialogContent 
+  className="sm:max-w-xl max-h-[90vh] overflow-y-auto" 
+  onInteractOutside={(e) => e.preventDefault()}
+>
+```
 
 ---
 
 ## Seção Técnica
 
-### Mudança no Edge Function
+### Comportamento Esperado Após Correção
 
-```typescript
-// supabase/functions/nello-codigo-essencia/index.ts - linha ~2365
-case 'temperamentos':
-  const primaryTemp = resultData.primary?.name || resultData.primary?.temperament || resultData.dominant || resultData.dominante;
-  const secondaryTemp = resultData.secondary?.name || resultData.secondary?.temperament || resultData.secondary || resultData.secundario;
-  return {
-    dominantTemperament: primaryTemp,
-    secondaryTemperament: secondaryTemp,
-    scores: resultData.scores || resultData.pontuacoes || {}, // NOVO
-    description: resultData.description || resultData.interpretation || resultData.descricao,
-    strengths: resultData.strengths || resultData.forcas,
-    challenges: resultData.challenges || resultData.desafios,
-  };
-```
+| Situação | Antes | Depois |
+|----------|-------|--------|
+| Celular pequeno (ex: 360x640) | Botão cortado, sem scroll | Scroll vertical funciona |
+| Celular médio (ex: 375x812) | Botão parcialmente visível | Scroll se necessário |
+| Desktop | Funciona normalmente | Sem mudança |
 
-### Mudança no Frontend
+### CSS Aplicado
 
-```typescript
-// src/pages/CodigoEssencia.tsx - linha ~344
-temperament: {
-  primary: pickTemperament(testResults?.temperamentos?.primary),
-  secondary: pickTemperament(testResults?.temperamentos?.secondary),
-  scores: testResults?.temperamentos?.scores || visualData?.temperament?.scores || {},
-},
+```css
+max-h-[90vh]    /* Limita altura a 90% da viewport */
+overflow-y-auto /* Permite scroll vertical quando necessário */
 ```
 
 ---
 
 ## Resultado Esperado
 
-| Antes | Depois |
-|-------|--------|
-| Colérico 0%, Melancólico 0% | Colérico 22%, Melancólico 26%, etc. |
-| Scores dependem da IA | Scores vêm do teste real |
+Após a correção:
+1. Janaína poderá fazer scroll para ver o botão "Continuar"
+2. O modal nunca excederá 90% da altura da tela
+3. Usuários em qualquer tamanho de tela conseguirão completar o onboarding
 
 ---
 
 ## Risco
 
-**Baixo** - Apenas ajusta a origem dos dados. Não afeta funcionalidade existente.
+**Muito baixo** - Apenas adiciona scroll onde necessário. Não afeta aparência em telas grandes.
