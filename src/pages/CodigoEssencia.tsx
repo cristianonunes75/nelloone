@@ -344,7 +344,7 @@ const CodigoEssenciaInner = () => {
       temperament: {
         primary: pickTemperament(testResults?.temperamentos?.primary),
         secondary: pickTemperament(testResults?.temperamentos?.secondary),
-        scores: visualData?.temperament?.scores,
+        scores: testResults?.temperamentos?.scores || visualData?.temperament?.scores || {},
       },
       intelligences: {
         scores: testResults?.inteligencias_multiplas?.scores || visualData?.intelligences?.scores,

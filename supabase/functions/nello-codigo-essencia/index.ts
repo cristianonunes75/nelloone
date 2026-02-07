@@ -2369,6 +2369,7 @@ function extractKeyResults(testType: string, resultData: any): any {
       return {
         dominantTemperament: primaryTemp,
         secondaryTemperament: secondaryTemp,
+        scores: resultData.scores || resultData.pontuacoes || {},
         description: resultData.description || resultData.interpretation || resultData.descricao,
         strengths: resultData.strengths || resultData.forcas,
         challenges: resultData.challenges || resultData.desafios,
