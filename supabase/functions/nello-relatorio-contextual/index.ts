@@ -15,7 +15,132 @@ type ReportType = 'parceiro' | 'pai_para_filho' | 'filho_para_pai' | 'para_gesto
 interface ReportConfig {
   title: Record<string, string>;
   systemPrompt: Record<string, string>;
-  userPromptTemplate: (locale: string, userName: string, recipientName: string, codigoSummary: string) => string;
+  userPromptTemplate: (locale: string, userName: string, recipientName: string, codigoSummary: string, contextNote?: string) => string;
+}
+
+interface ReportContext {
+  user_age?: number;
+  other_person_age?: number;
+  relationship_stage?: string;
+  special_context?: string;
+}
+
+// ===========================================
+// CONTEXT BUILDER
+// ===========================================
+
+function buildContextNote(reportType: ReportType, context: ReportContext | null, locale: string): string {
+  if (!context) return '';
+  
+  const parts: string[] = [];
+  const isEn = locale === 'en';
+  
+  switch (reportType) {
+    case 'parceiro':
+      if (context.relationship_stage) {
+        const stages: Record<string, Record<string, string>> = {
+          namoro: { pt: 'namorando', en: 'dating' },
+          noivos: { pt: 'noivos', en: 'engaged' },
+          casados: { pt: 'casados', en: 'married' },
+        };
+        parts.push(isEn 
+          ? `Relationship status: ${stages[context.relationship_stage]?.en || context.relationship_stage}`
+          : `Estágio: ${stages[context.relationship_stage]?.pt || context.relationship_stage}`
+        );
+      }
+      if (context.special_context) {
+        const phases: Record<string, Record<string, string>> = {
+          bem: { pt: 'relação está bem', en: 'relationship is good' },
+          ajustes: { pt: 'passando por ajustes', en: 'going through adjustments' },
+          crise: { pt: 'em crise leve', en: 'in mild crisis' },
+        };
+        parts.push(isEn
+          ? `Current phase: ${phases[context.special_context]?.en || context.special_context}`
+          : `Fase atual: ${phases[context.special_context]?.pt || context.special_context}`
+        );
+      }
+      break;
+      
+    case 'pai_para_filho':
+      if (context.other_person_age) {
+        parts.push(isEn
+          ? `Child is ${context.other_person_age} years old`
+          : `Filho(a) tem ${context.other_person_age} anos`
+        );
+      }
+      if (context.special_context) {
+        parts.push(isEn
+          ? `Living situation: ${context.special_context === 'mora_junto' ? 'lives together' : 'lives separately'}`
+          : `Moradia: ${context.special_context === 'mora_junto' ? 'moram juntos' : 'moram separados'}`
+        );
+      }
+      break;
+      
+    case 'filho_para_pai':
+      if (context.user_age) {
+        parts.push(isEn
+          ? `User is ${context.user_age} years old`
+          : `Usuário tem ${context.user_age} anos`
+        );
+      }
+      if (context.other_person_age) {
+        parts.push(isEn
+          ? `Parent is ${context.other_person_age} years old`
+          : `Pai/mãe tem ${context.other_person_age} anos`
+        );
+      }
+      if (context.special_context) {
+        // Handle deceased parent
+        if (context.special_context.includes('mãe falecida') || context.special_context.includes('mother deceased')) {
+          parts.push(isEn ? 'Mother has passed away' : 'Mãe já faleceu');
+        }
+        if (context.special_context.includes('pai falecido') || context.special_context.includes('father deceased')) {
+          parts.push(isEn ? 'Father has passed away' : 'Pai já faleceu');
+        }
+      }
+      break;
+      
+    case 'para_gestor':
+      if (context.relationship_stage) {
+        parts.push(isEn
+          ? `Role: ${context.relationship_stage === 'lider' ? 'is a leader/manager' : 'is a direct report'}`
+          : `Papel: ${context.relationship_stage === 'lider' ? 'é líder/gestor' : 'é liderado'}`
+        );
+      }
+      if (context.special_context) {
+        const types: Record<string, Record<string, string>> = {
+          direto: { pt: 'gestor direto', en: 'direct manager' },
+          rh: { pt: 'RH/People', en: 'HR/People' },
+          mentor: { pt: 'mentor', en: 'mentor' },
+        };
+        parts.push(isEn
+          ? `Manager type: ${types[context.special_context]?.en || context.special_context}`
+          : `Tipo de gestor: ${types[context.special_context]?.pt || context.special_context}`
+        );
+      }
+      break;
+      
+    case 'para_equipe':
+      if (context.relationship_stage) {
+        parts.push(isEn
+          ? `Position: ${context.relationship_stage === 'lider' ? 'team leader' : 'team member'}`
+          : `Posição: ${context.relationship_stage === 'lider' ? 'líder da equipe' : 'membro da equipe'}`
+        );
+      }
+      if (context.special_context) {
+        parts.push(isEn
+          ? `Team size: ${context.special_context === 'pequena' ? 'small (1-5)' : 'large (6+)'}`
+          : `Tamanho: equipe ${context.special_context === 'pequena' ? 'pequena (1-5)' : 'grande (6+)'}`
+        );
+      }
+      break;
+  }
+  
+  if (parts.length === 0) return '';
+  
+  return isEn
+    ? `\n\n📋 RELATIONSHIP CONTEXT:\n${parts.join('\n')}\n\nUse this context to make the report more realistic and personalized.`
+    : `\n\n📋 CONTEXTO DA RELAÇÃO:\n${parts.join('\n')}\n\nUse este contexto para tornar o relatório mais realista e personalizado.`;
 }
 
 const REPORT_CONFIGS: Record<ReportType, ReportConfig> = {
@@ -100,16 +225,17 @@ Tone: human, respectful, direct, without technical language or acronyms.
 
 Respond ONLY in valid JSON with the specified structure. No text outside JSON.`
     },
-    userPromptTemplate: (locale, userName, recipientName, codigoSummary) => {
+    userPromptTemplate: (locale, userName, recipientName, codigoSummary, contextNote) => {
       const firstName = userName.split(' ')[0];
       const recipient = recipientName || (locale === 'en' ? 'Dear partner' : 'Querido(a)');
+      const ctxBlock = contextNote || '';
       
       if (locale === 'en') {
         return `PERSON: ${firstName}
 PARTNER NAME: ${recipient}
 
 ESSENCE CODE SUMMARY:
-${codigoSummary}
+${codigoSummary}${ctxBlock}
 
 Generate the PARTNER REPORT with this EXACT JSON structure:
 
@@ -169,7 +295,7 @@ Generate the PARTNER REPORT with this EXACT JSON structure:
 NOME DO PARCEIRO(A): ${recipient}
 
 RESUMO DO CÓDIGO DA ESSÊNCIA:
-${codigoSummary}
+${codigoSummary}${ctxBlock}
 
 Gere o RELATÓRIO PARA O PARCEIRO(A) com esta estrutura JSON EXATA:
 
@@ -270,16 +396,17 @@ Tone: loving, respectful, focused on personal responsibility.
 
 Respond ONLY in valid JSON. No text outside JSON.`
     },
-    userPromptTemplate: (locale, userName, recipientName, codigoSummary) => {
+    userPromptTemplate: (locale, userName, recipientName, codigoSummary, contextNote) => {
       const firstName = userName.split(' ')[0];
       const childName = recipientName || (locale === 'en' ? 'My child' : 'Meu(minha) filho(a)');
+      const ctxBlock = contextNote || '';
       
       if (locale === 'en') {
         return `PARENT: ${firstName}
 CHILD NAME: ${childName}
 
 ESSENCE CODE SUMMARY:
-${codigoSummary}
+${codigoSummary}${ctxBlock}
 
 Generate the PARENT-TO-CHILD REPORT with this EXACT JSON structure:
 
@@ -331,7 +458,7 @@ Generate the PARENT-TO-CHILD REPORT with this EXACT JSON structure:
 NOME DO FILHO(A): ${childName}
 
 RESUMO DO CÓDIGO DA ESSÊNCIA:
-${codigoSummary}
+${codigoSummary}${ctxBlock}
 
 Gere o RELATÓRIO DE PAI/MÃE PARA FILHO(A) com esta estrutura JSON EXATA:
 
@@ -406,14 +533,15 @@ Responde APENAS em JSON válido.`,
       en: `You are a family mentor. Generate a Child-to-Parents Report.
 Respond ONLY in valid JSON.`
     },
-    userPromptTemplate: (locale, userName, recipientName, codigoSummary) => {
+    userPromptTemplate: (locale, userName, recipientName, codigoSummary, contextNote) => {
       const firstName = userName.split(' ')[0];
+      const ctxBlock = contextNote || '';
       
       if (locale === 'en') {
         return `ADULT CHILD: ${firstName}
 
 ESSENCE CODE SUMMARY:
-${codigoSummary}
+${codigoSummary}${ctxBlock}
 
 Generate the CHILD-TO-PARENTS REPORT with this EXACT JSON structure:
 
@@ -464,7 +592,7 @@ Generate the CHILD-TO-PARENTS REPORT with this EXACT JSON structure:
       return `FILHO(A) ADULTO: ${firstName}
 
 RESUMO DO CÓDIGO DA ESSÊNCIA:
-${codigoSummary}
+${codigoSummary}${ctxBlock}
 
 Gere o RELATÓRIO DE FILHO(A) PARA PAIS com esta estrutura JSON EXATA:
 
@@ -539,14 +667,15 @@ Responde APENAS em JSON válido.`,
       en: `You are an HR consultant. Generate a Manager's Manual.
 Respond ONLY in valid JSON.`
     },
-    userPromptTemplate: (locale, userName, recipientName, codigoSummary) => {
+    userPromptTemplate: (locale, userName, recipientName, codigoSummary, contextNote) => {
       const firstName = userName.split(' ')[0];
+      const ctxBlock = contextNote || '';
       
       if (locale === 'en') {
         return `COLLABORATOR: ${firstName}
 
 ESSENCE CODE SUMMARY:
-${codigoSummary}
+${codigoSummary}${ctxBlock}
 
 Generate the MANAGER'S MANUAL with this EXACT JSON structure:
 
@@ -598,7 +727,7 @@ Generate the MANAGER'S MANUAL with this EXACT JSON structure:
       return `COLABORADOR: ${firstName}
 
 RESUMO DO CÓDIGO DA ESSÊNCIA:
-${codigoSummary}
+${codigoSummary}${ctxBlock}
 
 Gere o MANUAL PARA O GESTOR com esta estrutura JSON EXATA:
 
@@ -674,14 +803,15 @@ Responde APENAS em JSON válido.`,
       en: `You are an executive coach. Generate a "My Leadership Style" document.
 Respond ONLY in valid JSON.`
     },
-    userPromptTemplate: (locale, userName, recipientName, codigoSummary) => {
+    userPromptTemplate: (locale, userName, recipientName, codigoSummary, contextNote) => {
       const firstName = userName.split(' ')[0];
+      const ctxBlock = contextNote || '';
       
       if (locale === 'en') {
         return `LEADER: ${firstName}
 
 ESSENCE CODE SUMMARY:
-${codigoSummary}
+${codigoSummary}${ctxBlock}
 
 Generate the LEADERSHIP STYLE document with this EXACT JSON structure:
 
@@ -732,7 +862,7 @@ Generate the LEADERSHIP STYLE document with this EXACT JSON structure:
       return `LÍDER: ${firstName}
 
 RESUMO DO CÓDIGO DA ESSÊNCIA:
-${codigoSummary}
+${codigoSummary}${ctxBlock}
 
 Gere o documento MEU ESTILO DE LIDERANÇA com esta estrutura JSON EXATA:
 
@@ -792,7 +922,7 @@ serve(async (req) => {
   }
 
   try {
-    const { userId, reportType, locale = 'pt', recipientName = '' } = await req.json();
+    const { userId, reportType, locale = 'pt', recipientName = '', context: providedContext } = await req.json();
     
     if (!userId) {
       throw new Error("userId is required");
@@ -836,10 +966,33 @@ serve(async (req) => {
       throw new Error("Código da Essência não encontrado. Gere o Código primeiro.");
     }
 
+    // Fetch report context (optional)
+    let reportContext: ReportContext | null = null;
+    if (providedContext) {
+      reportContext = providedContext;
+    } else {
+      const { data: savedContext } = await supabase
+        .from("report_context")
+        .select("user_age, other_person_age, relationship_stage, special_context")
+        .eq("user_id", userId)
+        .eq("report_type", reportType)
+        .maybeSingle();
+      
+      if (savedContext) {
+        reportContext = savedContext;
+      }
+    }
+
+    console.log("[relatorio-contextual] Report context:", reportContext);
+
+    // Build context note for prompt
+    const contextNote = buildContextNote(reportType as ReportType, reportContext, effectiveLocale);
+    console.log("[relatorio-contextual] Context note:", contextNote);
+
     const userName = profile.full_name || "Usuário";
     const systemPrompt = config.systemPrompt[effectiveLocale] || config.systemPrompt.pt;
     const codigoSummary = JSON.stringify(mapaEssencia.sections, null, 2);
-    const userPrompt = config.userPromptTemplate(effectiveLocale, userName, recipientName, codigoSummary);
+    const userPrompt = config.userPromptTemplate(effectiveLocale, userName, recipientName, codigoSummary, contextNote);
 
     console.log("[relatorio-contextual] Calling AI API...");
 

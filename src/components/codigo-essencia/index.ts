@@ -35,6 +35,7 @@ export { PersonalitiesReferenceSection } from "./PersonalitiesReferenceSection";
 export { SymbolicReferencesSection } from "./SymbolicReferencesSection";
 export { RelatorioContextual } from "./RelatorioContextual";
 export { RelatorioSelector } from "./RelatorioSelector";
+export { ReportContextModal } from "./ReportContextModal";
 export { CruzamentoCodigos } from "./CruzamentoCodigos";
 export { CruzamentoViewer } from "./CruzamentoViewer";
 export { AtivacaoCodigoForm } from "./AtivacaoCodigoForm";
