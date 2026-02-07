@@ -108,7 +108,7 @@ export const OnboardingModal = ({ userId, userName, onComplete, enabled = true }
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-xl" onInteractOutside={(e) => e.preventDefault()}>
+      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto" onInteractOutside={(e) => e.preventDefault()}>
         {/* Progress indicator */}
         <div className="absolute top-0 left-0 right-0 h-1">
           <Progress value={progressValue} className="h-1 rounded-none" />
