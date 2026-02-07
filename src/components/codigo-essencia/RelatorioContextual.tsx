@@ -39,6 +39,12 @@ interface RelatorioContextualProps {
   reportType: ReportType;
   language: 'pt' | 'pt-pt' | 'en';
   hasSavedCodigo: boolean;
+  context?: {
+    user_age?: number;
+    other_person_age?: number;
+    relationship_stage?: string;
+    special_context?: string;
+  } | null;
 }
 
 interface ReportConfig {
@@ -288,7 +294,7 @@ const SECTION_ICONS: Record<string, React.ReactNode> = {
 // COMPONENT
 // ===========================================
 
-export const RelatorioContextual = ({ reportType, language, hasSavedCodigo }: RelatorioContextualProps) => {
+export const RelatorioContextual = ({ reportType, language, hasSavedCodigo, context }: RelatorioContextualProps) => {
   const { user, profile } = useAuth();
   const [isGenerating, setIsGenerating] = useState(false);
   const [report, setReport] = useState<any>(null);
@@ -339,7 +345,8 @@ export const RelatorioContextual = ({ reportType, language, hasSavedCodigo }: Re
           userId: user.id, 
           reportType,
           locale: language,
-          recipientName: recipientName.trim() || undefined
+          recipientName: recipientName.trim() || undefined,
+          context: context || undefined
         }
       });
 

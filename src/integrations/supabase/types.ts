@@ -4370,6 +4370,42 @@ export type Database = {
           },
         ]
       }
+      report_context: {
+        Row: {
+          created_at: string
+          id: string
+          other_person_age: number | null
+          relationship_stage: string | null
+          report_type: string
+          special_context: string | null
+          updated_at: string
+          user_age: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          other_person_age?: number | null
+          relationship_stage?: string | null
+          report_type: string
+          special_context?: string | null
+          updated_at?: string
+          user_age?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          other_person_age?: number | null
+          relationship_stage?: string | null
+          report_type?: string
+          special_context?: string | null
+          updated_at?: string
+          user_age?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       sales_playbook: {
         Row: {
           content: string

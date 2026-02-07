@@ -12,6 +12,7 @@ import {
   FileText,
 } from "lucide-react";
 import { RelatorioContextual, type ReportType } from "./RelatorioContextual";
+import { ReportContextModal, type ReportContext } from "./ReportContextModal";
 
 interface RelatorioSelectorProps {
   language: 'pt' | 'pt-pt' | 'en';
@@ -130,7 +131,35 @@ const TRANSLATIONS = {
 
 export const RelatorioSelector = ({ language, hasSavedCodigo }: RelatorioSelectorProps) => {
   const [selectedType, setSelectedType] = useState<ReportType | null>(null);
+  const [pendingType, setPendingType] = useState<ReportType | null>(null);
+  const [showContextModal, setShowContextModal] = useState(false);
+  const [reportContext, setReportContext] = useState<ReportContext | null>(null);
   const t = TRANSLATIONS[language];
+
+  const handleCardClick = (type: ReportType) => {
+    if (!hasSavedCodigo) return;
+    setPendingType(type);
+    setShowContextModal(true);
+  };
+
+  const handleContextSubmit = (context: ReportContext) => {
+    setReportContext(context);
+    setShowContextModal(false);
+    setSelectedType(pendingType);
+    setPendingType(null);
+  };
+
+  const handleContextSkip = () => {
+    setReportContext(null);
+    setShowContextModal(false);
+    setSelectedType(pendingType);
+    setPendingType(null);
+  };
+
+  const handleCloseSheet = () => {
+    setSelectedType(null);
+    setReportContext(null);
+  };
 
   return (
     <>
@@ -154,7 +183,7 @@ export const RelatorioSelector = ({ language, hasSavedCodigo }: RelatorioSelecto
               className={`cursor-pointer hover:border-primary/50 transition-all hover:shadow-md ${
                 !hasSavedCodigo ? 'opacity-50 cursor-not-allowed' : ''
               }`}
-              onClick={() => hasSavedCodigo && setSelectedType(option.type)}
+              onClick={() => handleCardClick(option.type)}
             >
               <CardContent className="p-4 text-center">
                 <div className={`w-12 h-12 ${option.bgColor} rounded-full flex items-center justify-center mx-auto mb-2`}>
@@ -169,14 +198,26 @@ export const RelatorioSelector = ({ language, hasSavedCodigo }: RelatorioSelecto
         </div>
       </div>
 
+      {/* Context Modal */}
+      {pendingType && (
+        <ReportContextModal
+          open={showContextModal}
+          onOpenChange={setShowContextModal}
+          reportType={pendingType}
+          language={language}
+          onSubmit={handleContextSubmit}
+          onSkip={handleContextSkip}
+        />
+      )}
+
       {/* Sheet for selected report */}
-      <Sheet open={selectedType !== null} onOpenChange={(open) => !open && setSelectedType(null)}>
+      <Sheet open={selectedType !== null} onOpenChange={(open) => !open && handleCloseSheet()}>
         <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
           <SheetHeader className="mb-6">
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={() => setSelectedType(null)}
+              onClick={handleCloseSheet}
               className="w-fit -ml-2 mb-2"
             >
               ← {t.backToList}
@@ -191,6 +232,7 @@ export const RelatorioSelector = ({ language, hasSavedCodigo }: RelatorioSelecto
               reportType={selectedType}
               language={language}
               hasSavedCodigo={hasSavedCodigo}
+              context={reportContext}
             />
           )}
         </SheetContent>
