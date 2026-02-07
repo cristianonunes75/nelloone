@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LogoText } from "@/components/LogoText";
 import { useToast } from "@/hooks/use-toast";
+import { CheckoutTrustBlock } from "@/components/checkout";
 import { bundlePrices, formatPrice, getCurrencyForLanguage } from "@/lib/priceConfig";
 import { getAffiliateCode } from "@/hooks/useAffiliateTracking";
 import { 
@@ -658,6 +659,9 @@ const Checkout = () => {
                     </>
                   )}
                 </Button>
+
+                {/* Premium Trust Block */}
+                <CheckoutTrustBlock />
 
                 {/* Payment Methods */}
                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
