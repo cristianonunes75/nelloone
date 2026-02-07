@@ -1,58 +1,150 @@
 
-# Plano: Corrigir Modal de Onboarding Travado em Mobile
+# Plano: Padronização de Compatibilidade Mobile
 
 ## Problema Identificado
 
-A usuária Janaína está presa na tela de onboarding porque o **botão "Continuar"** está fora da área visível da tela.
+Vários bugs estão surgindo em navegadores móveis (como o da Janaína onde o botão ficou cortado) devido a **padrões inconsistentes** no código:
 
-### Causa Raiz
-
-O `DialogContent` do Radix UI usa posicionamento fixo centralizado SEM suporte a scroll interno:
-
-```tsx
-// dialog.tsx - linha 39
-"fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] ..."
-// ❌ Falta: max-h-[...] overflow-y-auto
-```
-
-Quando o conteúdo do modal excede a altura da viewport (comum em celulares), o usuário não consegue fazer scroll para ver o botão.
-
-### Evidência Visual
-
-Na screenshot da Janaína, vemos:
-- Título "Bem-vindo à Jornada Identity"
-- Saudação personalizada
-- 3 blocos de informação
-- Texto "Você não precisa fazer tudo hoje..."
-- **AUSENTE**: Botão "Continuar" (está abaixo da viewport)
+1. **Modais sem scroll**: `DialogContent` e `AlertDialogContent` não têm `max-h` nem `overflow-y-auto` por padrão
+2. **Altura de viewport inconsistente**: Uso de `100vh` que não funciona bem em mobile (barra de navegação do browser ocupa espaço)
+3. **Falta de estilos de touch**: Sem otimizações CSS para touch em dispositivos móveis
+4. **72+ arquivos** usam modais potencialmente problemáticos
 
 ---
 
 ## Solução Proposta
 
-Adicionar suporte a scroll no modal de onboarding para garantir que o botão seja sempre acessível.
+### Abordagem: Correção nos Componentes Base
 
-### Mudança 1: OnboardingModal.tsx
+Em vez de corrigir cada componente individualmente, vamos adicionar padrões mobile-safe nos componentes UI base.
 
-Adicionar classes de scroll ao DialogContent e reorganizar o layout:
+---
 
-```tsx
-<DialogContent 
-  className="sm:max-w-xl max-h-[90vh] overflow-y-auto flex flex-col" 
-  onInteractOutside={(e) => e.preventDefault()}
->
-```
+## Mudanças Propostas
 
-### Mudança 2 (Alternativa Global): dialog.tsx
+### 1. Componente Dialog Base
 
-Se quisermos corrigir todos os modais do sistema, podemos adicionar as classes no componente base:
+Adicionar scroll automático quando necessário:
 
 ```tsx
-// dialog.tsx - DialogContent
+// src/components/ui/dialog.tsx - DialogContent
 className={cn(
-  "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg max-h-[90vh] overflow-y-auto translate-x-[-50%] translate-y-[-50%] ...",
+  "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg max-h-[85vh] overflow-y-auto translate-x-[-50%] translate-y-[-50%] ...",
   className,
 )}
+```
+
+### 2. Componente AlertDialog Base
+
+Mesma correção:
+
+```tsx
+// src/components/ui/alert-dialog.tsx - AlertDialogContent
+className={cn(
+  "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg max-h-[85vh] overflow-y-auto translate-x-[-50%] translate-y-[-50%] ...",
+  className,
+)}
+```
+
+### 3. Estilos Globais Mobile-First
+
+Adicionar ao `index.css`:
+
+```css
+@layer base {
+  /* Mobile viewport fix - Evita problemas com barra de navegação */
+  html {
+    height: -webkit-fill-available;
+  }
+  
+  body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  /* Melhor scroll em iOS */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Remove tap highlight em mobile */
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Previne zoom indesejado em inputs no iOS */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+@layer utilities {
+  /* Safe viewport height que respeita barras de navegação */
+  .h-safe-screen {
+    height: 100vh;
+    height: 100dvh;
+  }
+  
+  .min-h-safe-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+}
+```
+
+### 4. Hook `use-mobile` Aprimorado
+
+Adicionar detecção de touch e orientação:
+
+```tsx
+// src/hooks/use-mobile.tsx
+const MOBILE_BREAKPOINT = 768;
+
+export function useIsMobile() {
+  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined);
+
+  React.useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+    const onChange = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    };
+    mql.addEventListener("change", onChange);
+    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+
+  return !!isMobile;
+}
+
+// Novo: detecta se é dispositivo touch
+export function useIsTouchDevice() {
+  const [isTouch, setIsTouch] = React.useState(false);
+  
+  React.useEffect(() => {
+    setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
+  
+  return isTouch;
+}
+
+// Novo: viewport seguro que atualiza com resize
+export function useSafeViewportHeight() {
+  const [height, setHeight] = React.useState<number>(
+    typeof window !== 'undefined' ? window.innerHeight : 0
+  );
+  
+  React.useEffect(() => {
+    const updateHeight = () => setHeight(window.innerHeight);
+    window.addEventListener('resize', updateHeight);
+    window.visualViewport?.addEventListener('resize', updateHeight);
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+      window.visualViewport?.removeEventListener('resize', updateHeight);
+    };
+  }, []);
+  
+  return height;
+}
 ```
 
 ---
@@ -61,57 +153,76 @@ className={cn(
 
 | Arquivo | Mudança |
 |---------|---------|
-| `src/components/cliente/OnboardingModal.tsx` | Adicionar `max-h-[90vh] overflow-y-auto` ao DialogContent |
-
----
-
-## Implementação Detalhada
-
-### OnboardingModal.tsx - Linha 111
-
-**Antes:**
-```tsx
-<DialogContent className="sm:max-w-xl" onInteractOutside={(e) => e.preventDefault()}>
-```
-
-**Depois:**
-```tsx
-<DialogContent 
-  className="sm:max-w-xl max-h-[90vh] overflow-y-auto" 
-  onInteractOutside={(e) => e.preventDefault()}
->
-```
+| `src/components/ui/dialog.tsx` | Adicionar `max-h-[85vh] overflow-y-auto` |
+| `src/components/ui/alert-dialog.tsx` | Adicionar `max-h-[85vh] overflow-y-auto` |
+| `src/index.css` | Adicionar estilos mobile-first globais |
+| `src/hooks/use-mobile.tsx` | Adicionar hooks auxiliares |
 
 ---
 
 ## Seção Técnica
 
-### Comportamento Esperado Após Correção
+### Por que 85vh e não 90vh ou 100vh?
 
-| Situação | Antes | Depois |
-|----------|-------|--------|
-| Celular pequeno (ex: 360x640) | Botão cortado, sem scroll | Scroll vertical funciona |
-| Celular médio (ex: 375x812) | Botão parcialmente visível | Scroll se necessário |
-| Desktop | Funciona normalmente | Sem mudança |
+| Valor | Problema |
+|-------|----------|
+| `100vh` | Em mobile, inclui a barra de navegação do browser, causando scroll indesejado |
+| `90vh` | Funciona na maioria, mas pode cortar em telas muito pequenas (320px) |
+| `85vh` | Margem segura que funciona em todos os dispositivos, deixando espaço para barras do sistema |
 
-### CSS Aplicado
+### Por que `dvh` (dynamic viewport height)?
 
 ```css
-max-h-[90vh]    /* Limita altura a 90% da viewport */
-overflow-y-auto /* Permite scroll vertical quando necessário */
+height: 100dvh; /* Novo padrão CSS que atualiza quando a barra do browser some/aparece */
+```
+
+O `dvh` é suportado em browsers modernos e resolve o problema histórico do `100vh` em mobile.
+
+### Compatibilidade de Browsers
+
+| Browser | `dvh` suportado |
+|---------|-----------------|
+| Chrome/Android | 108+ |
+| Safari/iOS | 15.4+ |
+| Samsung Internet | 19+ |
+| Firefox | 101+ |
+
+Para browsers antigos, usamos fallback:
+
+```css
+min-height: 100vh;          /* Fallback */
+min-height: 100dvh;         /* Browsers modernos */
 ```
 
 ---
 
-## Resultado Esperado
+## Impacto
 
-Após a correção:
-1. Janaína poderá fazer scroll para ver o botão "Continuar"
-2. O modal nunca excederá 90% da altura da tela
-3. Usuários em qualquer tamanho de tela conseguirão completar o onboarding
+### Correções Automáticas
+
+Todos os 72+ componentes que usam `Dialog` ou `AlertDialog` passarão a ter scroll automático quando o conteúdo exceder 85% da viewport.
+
+### Comportamento Esperado
+
+| Situação | Antes | Depois |
+|----------|-------|--------|
+| Modal com muito conteúdo em mobile | Botão cortado, sem scroll | Scroll vertical funciona |
+| Teclado virtual aberto | Layout quebra | Layout se adapta |
+| Orientação landscape em celular | Conteúdo cortado | Scroll disponível |
 
 ---
 
 ## Risco
 
-**Muito baixo** - Apenas adiciona scroll onde necessário. Não afeta aparência em telas grandes.
+**Baixo** - São melhorias aditivas que não quebram funcionalidade existente. O comportamento em desktop permanece inalterado.
+
+---
+
+## Próximos Passos (Opcionais)
+
+Após implementar estas correções base, podemos considerar:
+
+1. **Drawer Mobile-First**: Usar `Drawer` (vaul) em vez de `Dialog` automaticamente em mobile para melhor UX
+2. **Auditoria de `min-h-screen`**: Substituir por `min-h-safe-screen` nos 73 arquivos identificados
+3. **Testes em dispositivos reais**: Validar em Samsung Internet, Safari iOS, Chrome Android
+
