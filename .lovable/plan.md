@@ -1,228 +1,196 @@
 
-# Plano: Padronização de Compatibilidade Mobile
 
-## Problema Identificado
+# Plano: Monitoramento ao Vivo para Nello Identity
 
-Vários bugs estão surgindo em navegadores móveis (como o da Janaína onde o botão ficou cortado) devido a **padrões inconsistentes** no código:
+## Visão Geral
 
-1. **Modais sem scroll**: `DialogContent` e `AlertDialogContent` não têm `max-h` nem `overflow-y-auto` por padrão
-2. **Altura de viewport inconsistente**: Uso de `100vh` que não funciona bem em mobile (barra de navegação do browser ocupa espaço)
-3. **Falta de estilos de touch**: Sem otimizações CSS para touch em dispositivos móveis
-4. **72+ arquivos** usam modais potencialmente problemáticos
+Ampliar a funcionalidade de monitoramento em tempo real (já existente no Hiring) para o Nello Identity, permitindo ver quem está fazendo testes neste momento, com progresso e indicador de atividade.
 
 ---
 
-## Solução Proposta
+## O que será criado
 
-### Abordagem: Correção nos Componentes Base
+Um novo componente **LiveTestMonitor** que mostrará:
 
-Em vez de corrigir cada componente individualmente, vamos adicionar padrões mobile-safe nos componentes UI base.
+- Lista de usuários com testes em andamento
+- Qual teste cada pessoa está fazendo (DISC, Eneagrama, Arquétipos, etc.)
+- Barra de progresso (ex: 31/36 perguntas)
+- Indicador visual de atividade:
+  - 🟢 Verde pulsante = ativo nos últimos 2 min
+  - 🟡 Amarelo = ativo nos últimos 10 min
+  - ⚪ Cinza = inativo
 
 ---
 
-## Mudanças Propostas
+## Onde ficará
 
-### 1. Componente Dialog Base
+O monitor será adicionado em **duas localizações**:
 
-Adicionar scroll automático quando necessário:
+1. **Dashboard Admin Principal** (`/admin`) - Card compacto no topo
+2. **Dashboard Tempo Real** (`/admin/tempo-real`) - Versão expandida
 
-```tsx
-// src/components/ui/dialog.tsx - DialogContent
-className={cn(
-  "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg max-h-[85vh] overflow-y-auto translate-x-[-50%] translate-y-[-50%] ...",
-  className,
-)}
-```
+---
 
-### 2. Componente AlertDialog Base
+## Arquitetura
 
-Mesma correção:
-
-```tsx
-// src/components/ui/alert-dialog.tsx - AlertDialogContent
-className={cn(
-  "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg max-h-[85vh] overflow-y-auto translate-x-[-50%] translate-y-[-50%] ...",
-  className,
-)}
-```
-
-### 3. Estilos Globais Mobile-First
-
-Adicionar ao `index.css`:
-
-```css
-@layer base {
-  /* Mobile viewport fix - Evita problemas com barra de navegação */
-  html {
-    height: -webkit-fill-available;
-  }
-  
-  body {
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-  }
-  
-  /* Melhor scroll em iOS */
-  * {
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* Remove tap highlight em mobile */
-  button, a, [role="button"] {
-    -webkit-tap-highlight-color: transparent;
-  }
-  
-  /* Previne zoom indesejado em inputs no iOS */
-  input, select, textarea {
-    font-size: 16px !important;
-  }
-}
-
-@layer utilities {
-  /* Safe viewport height que respeita barras de navegação */
-  .h-safe-screen {
-    height: 100vh;
-    height: 100dvh;
-  }
-  
-  .min-h-safe-screen {
-    min-height: 100vh;
-    min-height: 100dvh;
-  }
-}
-```
-
-### 4. Hook `use-mobile` Aprimorado
-
-Adicionar detecção de touch e orientação:
-
-```tsx
-// src/hooks/use-mobile.tsx
-const MOBILE_BREAKPOINT = 768;
-
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined);
-
-  React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-    };
-    mql.addEventListener("change", onChange);
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-    return () => mql.removeEventListener("change", onChange);
-  }, []);
-
-  return !!isMobile;
-}
-
-// Novo: detecta se é dispositivo touch
-export function useIsTouchDevice() {
-  const [isTouch, setIsTouch] = React.useState(false);
-  
-  React.useEffect(() => {
-    setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
-  }, []);
-  
-  return isTouch;
-}
-
-// Novo: viewport seguro que atualiza com resize
-export function useSafeViewportHeight() {
-  const [height, setHeight] = React.useState<number>(
-    typeof window !== 'undefined' ? window.innerHeight : 0
-  );
-  
-  React.useEffect(() => {
-    const updateHeight = () => setHeight(window.innerHeight);
-    window.addEventListener('resize', updateHeight);
-    window.visualViewport?.addEventListener('resize', updateHeight);
-    return () => {
-      window.removeEventListener('resize', updateHeight);
-      window.visualViewport?.removeEventListener('resize', updateHeight);
-    };
-  }, []);
-  
-  return height;
-}
+```text
+┌─────────────────────────────────────────────────────────┐
+│                    LiveTestMonitor                       │
+├─────────────────────────────────────────────────────────┤
+│  Dados:                                                  │
+│  - user_tests (status = 'in_progress')                  │
+│  - test_answers (count por user_test_id)                │
+│  - test_questions (count por test_id)                   │
+│  - profiles (nome do usuário)                           │
+│  - tests (nome do teste)                                │
+├─────────────────────────────────────────────────────────┤
+│  Realtime:                                               │
+│  - Subscribe em user_tests (UPDATE)                     │
+│  - Subscribe em test_answers (INSERT)                   │
+│  - Fallback: refresh a cada 30s                         │
+└─────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Arquivos a Modificar
+## Dados Atuais (prova de conceito)
 
-| Arquivo | Mudança |
-|---------|---------|
-| `src/components/ui/dialog.tsx` | Adicionar `max-h-[85vh] overflow-y-auto` |
-| `src/components/ui/alert-dialog.tsx` | Adicionar `max-h-[85vh] overflow-y-auto` |
-| `src/index.css` | Adicionar estilos mobile-first globais |
-| `src/hooks/use-mobile.tsx` | Adicionar hooks auxiliares |
+Usuários com testes em andamento agora:
+
+| Usuário | Teste | Progresso |
+|---------|-------|-----------|
+| Janaina Megda | Arquétipos | 31/36 (86%) |
+| Teste | DISC | ?/28 |
+| Suami Albuquerque | Eneagrama | ?/114 |
+| Saula Sabrina | Estilos de Conexão | ?/30 |
+
+---
+
+## Implementação
+
+### Passo 1: Migração SQL
+
+Habilitar realtime nas tabelas necessárias:
+
+```sql
+-- Habilitar realtime para test_answers (rastrear progresso)
+ALTER PUBLICATION supabase_realtime ADD TABLE public.test_answers;
+
+-- user_tests provavelmente já está habilitado (verificar)
+```
+
+### Passo 2: Criar componente LiveTestMonitor
+
+**Arquivo:** `src/components/admin/LiveTestMonitor.tsx`
+
+Funcionalidades:
+- Buscar `user_tests` com status `in_progress`
+- JOIN com `profiles` (nome), `tests` (nome do teste)
+- Contar respostas em `test_answers` vs total em `test_questions`
+- Calcular progresso percentual
+- Indicador de atividade baseado em `user_tests.updated_at`
+- Subscriptions realtime em `user_tests` e `test_answers`
+
+### Passo 3: Integrar no RealtimeDashboard
+
+Adicionar o componente abaixo dos gráficos existentes na página `/admin/tempo-real`.
+
+### Passo 4: Adicionar versão compacta no AdminDashboard
+
+Card menor no dashboard principal para visibilidade rápida.
+
+---
+
+## Arquivos a Criar/Modificar
+
+| Arquivo | Ação |
+|---------|------|
+| `supabase/migrations/...` | Habilitar realtime em `test_answers` |
+| `src/components/admin/LiveTestMonitor.tsx` | **CRIAR** - Componente principal |
+| `src/components/admin/RealtimeDashboard.tsx` | Adicionar LiveTestMonitor |
+| `src/components/admin/AdminDashboard.tsx` | Adicionar versão compacta (opcional) |
 
 ---
 
 ## Seção Técnica
 
-### Por que 85vh e não 90vh ou 100vh?
+### Query Principal
 
-| Valor | Problema |
-|-------|----------|
-| `100vh` | Em mobile, inclui a barra de navegação do browser, causando scroll indesejado |
-| `90vh` | Funciona na maioria, mas pode cortar em telas muito pequenas (320px) |
-| `85vh` | Margem segura que funciona em todos os dispositivos, deixando espaço para barras do sistema |
-
-### Por que `dvh` (dynamic viewport height)?
-
-```css
-height: 100dvh; /* Novo padrão CSS que atualiza quando a barra do browser some/aparece */
+```sql
+SELECT 
+  ut.id,
+  ut.user_id,
+  ut.test_id,
+  ut.status,
+  ut.updated_at,
+  p.full_name,
+  t.name as test_name,
+  (SELECT COUNT(*) FROM test_questions tq WHERE tq.test_id = ut.test_id) as total_questions,
+  (SELECT COUNT(*) FROM test_answers ta WHERE ta.user_test_id = ut.id) as answered_questions
+FROM user_tests ut
+JOIN profiles p ON p.id = ut.user_id
+JOIN tests t ON t.id = ut.test_id
+WHERE ut.status = 'in_progress'
+ORDER BY ut.updated_at DESC
+LIMIT 10
 ```
 
-O `dvh` é suportado em browsers modernos e resolve o problema histórico do `100vh` em mobile.
+### Realtime Subscriptions
 
-### Compatibilidade de Browsers
+```typescript
+// Subscribe to user_tests changes
+const userTestsChannel = supabase
+  .channel("live-user-tests")
+  .on(
+    "postgres_changes",
+    { event: "*", schema: "public", table: "user_tests" },
+    () => fetchActiveTests()
+  )
+  .subscribe();
 
-| Browser | `dvh` suportado |
-|---------|-----------------|
-| Chrome/Android | 108+ |
-| Safari/iOS | 15.4+ |
-| Samsung Internet | 19+ |
-| Firefox | 101+ |
+// Subscribe to test_answers (new answers)
+const answersChannel = supabase
+  .channel("live-test-answers")
+  .on(
+    "postgres_changes",
+    { event: "INSERT", schema: "public", table: "test_answers" },
+    () => fetchActiveTests()
+  )
+  .subscribe();
+```
 
-Para browsers antigos, usamos fallback:
+### Indicador de Atividade
 
-```css
-min-height: 100vh;          /* Fallback */
-min-height: 100dvh;         /* Browsers modernos */
+```typescript
+const getActivityIndicator = (updatedAt: string) => {
+  const minutesAgo = (Date.now() - new Date(updatedAt).getTime()) / 60000;
+  
+  if (minutesAgo < 2) {
+    // Verde pulsante - ativo agora
+    return <span className="animate-ping bg-green-500..." />;
+  } else if (minutesAgo < 10) {
+    // Amarelo - ativo recentemente
+    return <span className="bg-yellow-500..." />;
+  }
+  // Cinza - inativo
+  return <span className="bg-gray-300..." />;
+};
 ```
 
 ---
 
-## Impacto
+## Resultado Esperado
 
-### Correções Automáticas
+Após implementação, o admin poderá:
 
-Todos os 72+ componentes que usam `Dialog` ou `AlertDialog` passarão a ter scroll automático quando o conteúdo exceder 85% da viewport.
-
-### Comportamento Esperado
-
-| Situação | Antes | Depois |
-|----------|-------|--------|
-| Modal com muito conteúdo em mobile | Botão cortado, sem scroll | Scroll vertical funciona |
-| Teclado virtual aberto | Layout quebra | Layout se adapta |
-| Orientação landscape em celular | Conteúdo cortado | Scroll disponível |
+1. Ver em tempo real quem está fazendo testes
+2. Acompanhar o progresso de cada pessoa (ex: "Pergunta 31/36")
+3. Identificar quem está ativo agora vs quem abandonou
+4. Receber atualizações automáticas sem refresh
 
 ---
 
 ## Risco
 
-**Baixo** - São melhorias aditivas que não quebram funcionalidade existente. O comportamento em desktop permanece inalterado.
-
----
-
-## Próximos Passos (Opcionais)
-
-Após implementar estas correções base, podemos considerar:
-
-1. **Drawer Mobile-First**: Usar `Drawer` (vaul) em vez de `Dialog` automaticamente em mobile para melhor UX
-2. **Auditoria de `min-h-screen`**: Substituir por `min-h-safe-screen` nos 73 arquivos identificados
-3. **Testes em dispositivos reais**: Validar em Samsung Internet, Safari iOS, Chrome Android
+**Baixo** - Funcionalidade aditiva que não afeta o fluxo dos testes. Usa padrões já existentes no Hiring.
 
