@@ -929,6 +929,7 @@ const CodigoEssenciaInner = () => {
                     <>
                       <SectionDivider variant="wave" />
                       <ProvocativeClosing 
+                        finalMessage={conversaSection.final_message}
                         whoYouAre={conversaSection.who_you_are}
                         riskOfNotLiving={conversaSection.risk_of_not_living}
                         invitation={conversaSection.invitation}
