@@ -55,11 +55,12 @@ export default function BusinessResetPassword() {
     try {
       const redirectUrl = `${window.location.origin}/reset-password`;
       
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl,
+      const { data, error } = await supabase.functions.invoke('send-password-reset', {
+        body: { email, redirectUrl, language: 'pt' },
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       setEmailSent(true);
       toast.success("Email enviado! Verifique sua caixa de entrada.");
