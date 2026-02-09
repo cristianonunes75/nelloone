@@ -1,24 +1,39 @@
 
 
-# Deletar Usuarios Permanentemente no Admin
+## Bug: Caminho Prático seleciona DISC mas abre Arquétipos
 
-## Problema
-Quando voce clica em "Deletar usuario" no painel admin, o sistema faz um **soft delete** (marca `is_deleted = true` no perfil), mas o registro continua aparecendo na lista porque a consulta nao filtra usuarios deletados.
+### Problema Encontrado
 
-## Solucao
-Duas correcoes simples:
+Quando voce seleciona o caminho "Prático" no modal de entrada, o app diz que vai começar pelo DISC, mas na verdade abre a pagina de Arquétipos.
 
-### 1. Edge Function: deletar o perfil de verdade
-Na funcao `admin-delete-user`, em vez de apenas marcar o perfil como deletado (soft delete), **remover a linha da tabela `profiles`** completamente. O registro de auditoria ja esta sendo salvo antes, entao nao ha perda de rastreabilidade.
+### Causa Raiz
 
-### 2. Consulta do Admin: filtrar usuarios deletados (seguranca extra)
-Na tela `AdminUsersJourneys.tsx`, adicionar um filtro `.eq("is_deleted", false)` (ou `.is("is_deleted", null)`) na consulta de perfis. Isso serve como camada extra de seguranca caso algum perfil antigo ainda esteja marcado como deletado.
+Na funcao `handleOnboardingComplete` (Cliente.tsx), apos salvar a preferencia:
 
-## Resultado
-Ao clicar em "Deletar usuario" e confirmar, o usuario sera removido permanentemente do banco de dados e da autenticacao, e nao aparecera mais na lista.
+1. O sistema invalida as queries do perfil (`queryClient.invalidateQueries`)
+2. Mas imediatamente (com apenas 100ms de delay) le `journeySteps[0]` -- que ainda esta com a ordem ANTIGA (default = Arquétipos primeiro)
+3. A nova ordem (Prático = DISC primeiro) so estaria disponivel apos o perfil ser re-buscado do banco, o que leva mais que 100ms
 
-## Detalhes tecnicos
+Resultado: navega para Arquétipos em vez de DISC.
 
-- **Arquivo**: `supabase/functions/admin-delete-user/index.ts` -- trocar o `update` (soft delete) por `delete` na tabela `profiles`
-- **Arquivo**: `src/components/admin/AdminUsersJourneys.tsx` -- adicionar filtro na query para excluir perfis com `is_deleted = true`
-- Tambem deletar registros de tabelas adicionais que podem existir (como `identity_essencial`, `codigo_essencia`, `relatorios_contextuais`, `relatorio_conjuge`, `crossing_invites`, `user_crossings`, etc.) para limpeza completa
+### Solucao
+
+Em vez de depender do `journeySteps` (que esta stale), usar a ordem do caminho selecionado diretamente no callback:
+
+1. **Receber o path selecionado** no `handleOnboardingComplete` (ja recebe como parametro `EntryPath`)
+2. **Calcular o primeiro teste correto** baseado no path selecionado (ex: "pratico" -> DISC, "emocional" -> Temperamentos)
+3. **Encontrar o step correspondente** diretamente nos testes disponíveis, sem depender do `journeySteps` reativo
+4. **Aguardar a invalidacao das queries** antes de navegar, usando `await queryClient.invalidateQueries()`
+
+### Detalhes Tecnicos
+
+**Arquivo:** `src/pages/Cliente.tsx` (funcao `handleOnboardingComplete`, linhas 614-627)
+
+**Mudanca:**
+- Importar as ordens de jornada diretamente (`EMOTIONAL_JOURNEY_ORDER`, `PRACTICAL_JOURNEY_ORDER`) do hook `useEntryPath`
+- No `handleOnboardingComplete`, determinar o primeiro slug baseado no `path` recebido como parametro
+- Buscar o teste correspondente em `journeySteps` pelo `testType` em vez de pelo indice `[0]`
+- Usar `await` nas invalidacoes antes de navegar
+
+Isso garante que, independente do estado reativo, o teste correto sera aberto.
+
