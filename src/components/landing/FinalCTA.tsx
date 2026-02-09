@@ -43,7 +43,7 @@ export const FinalCTA = () => {
               <Sparkles className="w-5 h-5 ml-2 text-white/90 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
             </Button>
             <p className="text-xs text-muted-foreground/60">
-              Código da Essência + Código do Casal + Ativação incluída
+              Código da Essência + Ativação incluída
             </p>
           </div>
 

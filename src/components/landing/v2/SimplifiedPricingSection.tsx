@@ -17,6 +17,8 @@ export const SimplifiedPricingSection = () => {
     "Acesso contínuo à sua área pessoal e resultados",
   ];
 
+  const coupleExtra = "Extra disponível para casais: Código do Casal — gerado quando ambos completam a jornada";
+
   return (
     <section id="precos" className="py-16 md:py-24 lg:py-32 bg-accent/5">
       <div className="container px-4 md:px-6">
@@ -85,6 +87,14 @@ export const SimplifiedPricingSection = () => {
                 ))}
               </ul>
               
+              <div className="bg-muted/20 rounded-lg px-4 py-3 mb-4 text-center">
+                <p className="text-xs text-muted-foreground">{coupleExtra}</p>
+              </div>
+              
+              <p className="text-xs text-muted-foreground text-center mb-6 leading-relaxed">
+                Condição válida apenas nesta fase inicial. Depois, o valor retorna para R$ 1.297.
+              </p>
+              
               {/* CTA */}
               <div className="flex flex-col items-center gap-3">
                 <Button 
@@ -96,7 +106,7 @@ export const SimplifiedPricingSection = () => {
                   <Sparkles className="ml-2 w-5 h-5 text-white/90 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
                 </Button>
                 <p className="text-xs text-muted-foreground/60">
-                  Código da Essência + Código do Casal + Ativação incluída
+                  Código da Essência + Ativação incluída
                 </p>
               </div>
               
