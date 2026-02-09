@@ -1,24 +1,38 @@
 
+# Impedir que usuarios refaçam testes ja concluidos
 
-# Desabilitar Ingles e Portugues de Portugal Temporariamente
+## Problema identificado
+
+As paginas publicas dos testes (`TestDetailPage.tsx` e `TestDetailLayout.tsx`) mostram o botao "Comecar Teste" sem verificar se o usuario ja completou aquele teste. Isso fez a Danielle refazer o "Estilos de Conexao Afetiva" sem perceber que ja tinha concluido.
+
+No dashboard (`DashboardStageJourney.tsx`), o comportamento esta correto -- testes concluidos mostram "Concluido" e clicam para ver resultado. Mas o problema esta nas paginas de detalhe dos testes, acessiveis pela landing page ou links diretos.
 
 ## O que sera feito
 
-Alterar duas flags no arquivo `src/components/LanguageRoute.tsx` de `true` para `false`. O sistema ja possui essa logica implementada -- quando desabilitadas, qualquer acesso a rotas `/en/*` ou `/pt-pt/*` e automaticamente redirecionado para a versao PT-BR (`/`).
+### 1. `src/components/tests/TestDetailPage.tsx`
+- Verificar o status do teste usando `useTests().getTestStatus(test.id)`
+- Se o teste ja estiver **completed**:
+  - Trocar o botao de "Comecar Teste" para **"Ver Meu Resultado"**
+  - Adicionar um badge/aviso visual: **"Voce ja concluiu este teste"**
+  - Ao clicar, navegar para a pagina de resultados (`/cliente/test-results/{userTestId}`) em vez de re-iniciar
+- Se o teste estiver **in_progress**:
+  - Trocar o texto para **"Continuar Teste"**
 
-Alem disso, desabilitar o GeoRedirect para que visitantes internacionais nao sejam redirecionados para rotas que serao bloqueadas.
+### 2. `src/components/tests/TestDetailLayout.tsx`
+- Mesma logica: receber o status do teste como prop e ajustar botao/texto
+- Mostrar badge de "Ja concluido" quando aplicavel
 
-## Arquivos a modificar
+### 3. Buscar o `userTestId` correto
+- Para navegar ao resultado, precisamos do `userTestId` do teste concluido
+- Usar o array `userTests` de `useTests()` para encontrar o registro concluido correspondente
 
-### 1. `src/components/LanguageRoute.tsx`
-- Linha 7: `ENGLISH_VERSION_ENABLED = true` para `false`
-- Linha 8: `PT_PT_VERSION_ENABLED = true` para `false`
+## Resultado esperado
+- Usuario que ja fez um teste vera "Voce ja concluiu este teste" + botao "Ver Meu Resultado"
+- Nenhuma chance de refazer um teste por engano
+- Admins ainda poderao resetar testes pelo dashboard se necessario
 
-### 2. `src/components/GeoRedirect.tsx`
-- Adicionar um retorno antecipado (`return null`) no inicio do componente, para que nenhum visitante seja redirecionado para `/en` ou `/pt-pt` enquanto essas versoes estiverem desabilitadas.
+## Detalhes tecnicos
 
-### Resultado
-- Qualquer URL com `/en/` ou `/pt-pt/` redireciona automaticamente para a versao brasileira
-- Visitantes internacionais permanecem na versao PT-BR
-- Para reativar no futuro, basta voltar as flags para `true` e remover o retorno antecipado do GeoRedirect
-
+Arquivos a modificar:
+- `src/components/tests/TestDetailPage.tsx` -- adicionar verificacao de status e userTestId
+- `src/components/tests/TestDetailLayout.tsx` -- adicionar prop de status e ajustar CTA
