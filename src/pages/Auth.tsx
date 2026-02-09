@@ -17,6 +17,7 @@ import { usePasswordBreachCheck } from "@/hooks/usePasswordBreachCheck";
 import { Separator } from "@/components/ui/separator";
 import { ConsentCheckbox, ConsentError } from "@/components/consent/ConsentCheckbox";
 import { recordConsent } from "@/hooks/useConsentRecord";
+import { createLovableAuth } from "@lovable.dev/cloud-auth-js";
 import { lovable } from "@/integrations/lovable/index";
 
 const authSchema = z.object({
@@ -308,11 +309,26 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     try {
-      const { error } = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: `${window.location.origin}/auth`,
-      });
-
-      if (error) throw error;
+      // On custom domains, the ~oauth route doesn't exist, so we need to
+      // use the lovable.app domain as the OAuth broker
+      const isCustomDomain = !window.location.hostname.endsWith('.lovable.app');
+      
+      if (isCustomDomain) {
+        const lovableAuth = createLovableAuth({
+          oauthBrokerUrl: "https://nelloone.lovable.app/~oauth/initiate",
+        });
+        const result = await lovableAuth.signInWithOAuth("google", {
+          redirect_uri: `${window.location.origin}/auth`,
+        });
+        if (result.redirected) return;
+        if (result.error) throw result.error;
+        await supabase.auth.setSession(result.tokens);
+      } else {
+        const { error } = await lovable.auth.signInWithOAuth("google", {
+          redirect_uri: `${window.location.origin}/auth`,
+        });
+        if (error) throw error;
+      }
     } catch (error: any) {
       console.error("Google auth error:", error);
       toast({
