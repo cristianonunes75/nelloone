@@ -31,18 +31,15 @@ export const MobileStickyCtA = () => {
       )}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-semibold text-destructive">🔥 Lançamento 50% OFF</span>
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-xs text-muted-foreground line-through">R$ 1.297</span>
-          <span className="text-sm font-bold text-foreground">R$ 648,50</span>
-        </div>
+        <span className="text-xs font-semibold text-nello-gold">Primeira Edição • Condição de Estreia</span>
+        <span className="text-sm font-bold text-foreground">R$ 648,50</span>
       </div>
       <Button
         size="lg"
         className="w-full h-12 text-base rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg group"
         onClick={() => navigate(language === "en" ? "/en/auth" : "/auth")}
       >
-        Acessar meu Código + Ativação
+        Acessar meus Códigos
         <Sparkles className="ml-2 w-5 h-5 text-white/90 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
       </Button>
     </div>
