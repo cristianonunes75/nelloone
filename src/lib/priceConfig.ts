@@ -229,7 +229,7 @@ export const bundlePrices = {
   usd: {
     original: 597,
     price: 397,
-    priceId: "price_1SZNYXDjhZZxZELMoGVJUZRP", // TODO: Create USD price for new bundle
+    priceId: "price_1Syy0ZDjhZZxZELMo8MD90aY",
     currency: "USD" as Currency,
     symbol: "$",
     includesCodigoEssencia: true,
@@ -238,7 +238,7 @@ export const bundlePrices = {
   eur: {
     original: 447,
     price: 297,
-    priceId: "price_1SZz6vDjhZZxZELMQsZuLKah", // TODO: Create EUR price for new bundle
+    priceId: "price_1Syy1CDjhZZxZELMz4OWUNgy",
     currency: "EUR" as Currency,
     symbol: "€",
     includesCodigoEssencia: true,
