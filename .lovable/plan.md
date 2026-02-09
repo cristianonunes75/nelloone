@@ -1,31 +1,24 @@
 
 
-# Recuperacao de Senha via Resend
+# Deletar Usuarios Permanentemente no Admin
 
 ## Problema
-Os emails de recuperacao de senha usam o sistema de email nativo do backend, que tem limitacoes de entrega. O Resend ja esta configurado no projeto com o dominio `nello.one` verificado, mas nao esta sendo usado para este fluxo.
+Quando voce clica em "Deletar usuario" no painel admin, o sistema faz um **soft delete** (marca `is_deleted = true` no perfil), mas o registro continua aparecendo na lista porque a consulta nao filtra usuarios deletados.
 
 ## Solucao
-Criar uma edge function que envia o email de recuperacao de senha via Resend, e atualizar a tela de "Esqueci minha senha" para usar essa funcao em vez do metodo nativo.
+Duas correcoes simples:
 
-## O que muda para o usuario
-- O email de recuperacao chega de `noreply@nello.one` (mesmo remetente dos outros emails do sistema)
-- Entrega muito mais confiavel via Resend
-- Visual do email padronizado com a marca NELLO ONE
+### 1. Edge Function: deletar o perfil de verdade
+Na funcao `admin-delete-user`, em vez de apenas marcar o perfil como deletado (soft delete), **remover a linha da tabela `profiles`** completamente. O registro de auditoria ja esta sendo salvo antes, entao nao ha perda de rastreabilidade.
 
-## Etapas tecnicas
+### 2. Consulta do Admin: filtrar usuarios deletados (seguranca extra)
+Na tela `AdminUsersJourneys.tsx`, adicionar um filtro `.eq("is_deleted", false)` (ou `.is("is_deleted", null)`) na consulta de perfis. Isso serve como camada extra de seguranca caso algum perfil antigo ainda esteja marcado como deletado.
 
-### 1. Criar edge function `send-password-reset`
-- Recebe o email do usuario
-- Usa a Admin API do backend para gerar o link de recuperacao (via `generateLink`)
-- Envia o email com o link via Resend, usando o template visual da marca
-- Remetente: `NELLO ONE <noreply@nello.one>`
+## Resultado
+Ao clicar em "Deletar usuario" e confirmar, o usuario sera removido permanentemente do banco de dados e da autenticacao, e nao aparecera mais na lista.
 
-### 2. Atualizar a tela de recuperacao de senha
-- Arquivo: `src/pages/ResetPassword.tsx`
-- Em vez de chamar `supabase.auth.resetPasswordForEmail()`, chamar a edge function `send-password-reset`
-- Manter toda a interface visual atual (indicador de forca de senha, etc.)
+## Detalhes tecnicos
 
-### 3. Nenhuma alteracao no banco de dados
-- Nao precisa de migracao, tudo ja esta configurado
-
+- **Arquivo**: `supabase/functions/admin-delete-user/index.ts` -- trocar o `update` (soft delete) por `delete` na tabela `profiles`
+- **Arquivo**: `src/components/admin/AdminUsersJourneys.tsx` -- adicionar filtro na query para excluir perfis com `is_deleted = true`
+- Tambem deletar registros de tabelas adicionais que podem existir (como `identity_essencial`, `codigo_essencia`, `relatorios_contextuais`, `relatorio_conjuge`, `crossing_invites`, `user_crossings`, etc.) para limpeza completa
