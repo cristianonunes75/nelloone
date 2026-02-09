@@ -93,6 +93,7 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("*")
+        .or("is_deleted.eq.false,is_deleted.is.null")
         .order("created_at", { ascending: false });
 
       if (profilesError) throw profilesError;

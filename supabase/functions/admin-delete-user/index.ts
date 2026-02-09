@@ -207,24 +207,47 @@ serve(async (req) => {
     if (rolesError) console.error("Error deleting user_roles:", rolesError);
     else console.log("Deleted user_roles");
 
-    // 11. Soft delete: Update profiles table
-    const { error: updateError } = await supabaseAdmin
+    // 11. Delete additional tables for complete cleanup
+    const additionalTables = [
+      "identity_essencial",
+      "codigo_essencia",
+      "relatorios_contextuais",
+      "relatorio_conjuge",
+      "ativacao_codigo",
+      "ativacao_profissional",
+    ];
+
+    for (const table of additionalTables) {
+      const { error } = await supabaseAdmin
+        .from(table)
+        .delete()
+        .eq("user_id", target_user_id);
+      if (error) console.error(`Error deleting ${table}:`, error.message);
+      else console.log(`Deleted ${table}`);
+    }
+
+    // 12. Delete codigo_cruzamentos (user can be user_a or user_b)
+    const { error: cruzamentosError } = await supabaseAdmin
+      .from("codigo_cruzamentos")
+      .delete()
+      .or(`user_a_id.eq.${target_user_id},user_b_id.eq.${target_user_id}`);
+    if (cruzamentosError) console.error("Error deleting codigo_cruzamentos:", cruzamentosError);
+    else console.log("Deleted codigo_cruzamentos");
+
+    // 13. Hard delete profile (permanent removal)
+    const { error: deleteProfileError } = await supabaseAdmin
       .from("profiles")
-      .update({
-        is_deleted: true,
-        deleted_at: new Date().toISOString(),
-        deleted_by: adminUser.id,
-        is_blocked: true,
-      })
+      .delete()
       .eq("id", target_user_id);
 
-    if (updateError) {
-      console.error("Update error:", updateError);
+    if (deleteProfileError) {
+      console.error("Delete profile error:", deleteProfileError);
       return new Response(
-        JSON.stringify({ error: "Failed to mark user as deleted" }),
+        JSON.stringify({ error: "Failed to delete user profile" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    console.log("Deleted profile permanently");
 
     // 12. Delete user from auth (hard delete from authentication)
     const { error: deleteAuthError } = await supabaseAdmin.auth.admin.deleteUser(target_user_id);
@@ -248,7 +271,7 @@ serve(async (req) => {
         target_user_name: targetProfile?.full_name || "Unknown",
         deleted_by: adminUser.id,
         deleted_at: new Date().toISOString(),
-        deleted_data: ["test_answers", "user_tests", "test_purchases", "ai_messages", "ai_conversations", "mapa_essencia", "founder_feedback", "photo_sessions", "user_roles"]
+        deleted_data: ["test_answers", "user_tests", "test_purchases", "ai_messages", "ai_conversations", "mapa_essencia", "founder_feedback", "photo_sessions", "user_roles", "identity_essencial", "codigo_essencia", "relatorios_contextuais", "relatorio_conjuge", "ativacao_codigo", "ativacao_profissional", "codigo_cruzamentos", "profiles"]
       },
     });
 
