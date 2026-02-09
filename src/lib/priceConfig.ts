@@ -214,32 +214,35 @@ export const fundadoresPrices = {
   },
 };
 
-// Bundle prices - FULL JOURNEY (VALIDATION PHASE: R$297 includes everything)
-// Includes: 7 tests + Premium PDFs + Código da Essência
+// Bundle prices - JORNADA IDENTITY COMPLETA + 1 ATIVAÇÃO DO CÓDIGO
+// Includes: 7 tests + Premium PDFs + Código da Essência + 1 Ativação do Código
 export const bundlePrices = {
   brl: {
-    original: 597,
-    price: 297,
-    priceId: "price_1SeL7gDjhZZxZELMKuDFTI5t", // NELLO ONE Jornada Completa - R$297
+    original: 1897,
+    price: 1297,
+    priceId: "price_1SyxwqDjhZZxZELM5b6l6Ug4", // Jornada Identity Completa + Ativação - R$1.297
     currency: "BRL" as Currency,
     symbol: "R$",
     includesCodigoEssencia: true,
+    includesAtivacaoCodigo: true,
   },
   usd: {
-    original: 147,
-    price: 97,
-    priceId: "price_1SZNYXDjhZZxZELMoGVJUZRP",
+    original: 597,
+    price: 397,
+    priceId: "price_1SZNYXDjhZZxZELMoGVJUZRP", // TODO: Create USD price for new bundle
     currency: "USD" as Currency,
     symbol: "$",
     includesCodigoEssencia: true,
+    includesAtivacaoCodigo: true,
   },
   eur: {
-    original: 184,
-    price: 89,
-    priceId: "price_1SZz6vDjhZZxZELMQsZuLKah",
+    original: 447,
+    price: 297,
+    priceId: "price_1SZz6vDjhZZxZELMQsZuLKah", // TODO: Create EUR price for new bundle
     currency: "EUR" as Currency,
     symbol: "€",
     includesCodigoEssencia: true,
+    includesAtivacaoCodigo: true,
   },
 };
 

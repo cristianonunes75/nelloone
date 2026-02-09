@@ -10,11 +10,11 @@ export const SimplifiedPricingSection = () => {
 
   const benefits = [
     "7 mapas integrados de autoconhecimento",
-    "Relatórios Premium em PDF de cada mapa",
-    "Código da Essência incluído",
-    "Acesso ao Nello (guia da jornada)",
-    "Acesso vitalício aos resultados",
-    "Suporte via WhatsApp do criador",
+    "Relatórios premium em PDF (desenvolvimento pessoal, não clínicos)",
+    "Código da Essência completo e vitalício",
+    "1 Ativação do Código incluída (Relatório de Aplicação Prática)",
+    "Decisão guiada para os próximos 7 dias",
+    "Acesso contínuo à sua área pessoal e resultados",
   ];
 
   return (
@@ -53,17 +53,16 @@ export const SimplifiedPricingSection = () => {
               
               {/* Price */}
               <div className="text-center mb-8">
-                <p className="text-sm text-muted-foreground line-through mb-1">
-                  De R$ 597
-                </p>
                 <div className="flex items-baseline justify-center gap-2">
-                  <span className="text-sm text-muted-foreground">por apenas</span>
                   <span className="font-display text-5xl md:text-6xl text-foreground">
-                    R$ 297
+                    R$ 1.297
                   </span>
                 </div>
                 <p className="text-sm text-ink-blue mt-2 font-medium">
                   Pagamento único • Acesso vitalício
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  ou em até 12x de R$ 129,70 no cartão
                 </p>
               </div>
               
@@ -87,11 +86,11 @@ export const SimplifiedPricingSection = () => {
                   className="w-full h-14 text-base rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg group"
                   onClick={() => navigate("/auth")}
                 >
-                  Acessar meu Código da Essência
+                  Acessar meu Código + 1 Ativação Incluída
                   <Sparkles className="ml-2 w-5 h-5 text-white/90 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
                 </Button>
                 <p className="text-xs text-muted-foreground/70">
-                  Acesso vitalício à sua jornada de identidade.
+                  Produto premium • Clareza • Direção prática
                 </p>
               </div>
               

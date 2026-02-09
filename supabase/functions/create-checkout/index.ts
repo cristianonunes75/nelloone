@@ -130,7 +130,7 @@ const BRL_PRICES: Record<string, string> = {
   temperamentos: "price_1SZUnqDjhZZxZELMtU9tUMFm",
   linguagens_amor: "price_1SZUoWDjhZZxZELMxEJJKhDn",
   inteligencias_multiplas: "price_1SZUpxDjhZZxZELMAkQlFX11",
-  bundle: "price_1SeL7gDjhZZxZELMKuDFTI5t", // R$297 - NELLO ONE Jornada Completa (VALIDATION PHASE)
+  bundle: "price_1SyxwqDjhZZxZELM5b6l6Ug4", // R$1.297 - Jornada Identity Completa + 1 Ativação do Código
   codigo_da_essencia: "price_1Sc2RRDjhZZxZELMPxAnu0I5", // R$397 BRL
   ativacao_codigo: "price_1Sw6EEDjhZZxZELMSmPNECig", // R$197 BRL - Ativação do Código da Essência
   activation_individual: "price_1SxRhHDjhZZxZELMuoj7N1CN", // R$197 BRL - Ativação de Direção Profissional (UNIQUE)
@@ -565,9 +565,9 @@ serve(async (req) => {
       } else {
         // Fallback: create price_data for bundle - ALWAYS use NELLO ONE branding
         const bundleAmounts: Record<string, number> = {
-          brl: 59700, // R$ 597
-          usd: 14700, // $147
-          eur: 8900,  // €89
+          brl: 129700, // R$ 1.297
+          usd: 39700,  // $397
+          eur: 29700,  // €297
         };
         
         const bundleNames: Record<string, { name: string; description: string }> = {

@@ -84,9 +84,10 @@ export const NelloOneLanding = () => {
   const pricingBenefits = ij.pricing_benefits || [
     "7 mapas integrados de autoconhecimento",
     "Relatórios premium em PDF (desenvolvimento pessoal, não clínicos)",
-    "Código da Essência incluído",
-    "Nello como guia da jornada",
-    "Acesso vitalício aos resultados",
+    "Código da Essência completo e vitalício",
+    "1 Ativação do Código incluída (Relatório de Aplicação Prática)",
+    "Decisão guiada para os próximos 7 dias",
+    "Acesso contínuo à sua área pessoal e resultados",
   ];
 
   const nelloTags = ij.nello_tags || ["Relatório PDF", "Resultados integrados", "Linguagem clara"];
@@ -113,10 +114,10 @@ export const NelloOneLanding = () => {
 
   // Pricing based on language
   const pricing = language === 'en' 
-    ? { from: "$147", price: "$97", currency: "$" }
+    ? { price: "$397", currency: "$", installment: "or up to 12x $39.70" }
     : language === 'pt-pt'
-    ? { from: "€184", price: "€89", currency: "€" }
-    : { from: "R$ 597", price: "R$ 297", currency: "R$" };
+    ? { price: "€297", currency: "€", installment: "ou em até 12x de €29,70" }
+    : { price: "R$ 1.297", currency: "R$", installment: "ou em até 12x de R$ 129,70 no cartão" };
 
   return (
     <div className="flex flex-col bg-background">
@@ -431,13 +432,14 @@ export const NelloOneLanding = () => {
               </div>
               
               <div className="text-center mb-6">
-                <p className="text-sm text-muted-foreground line-through mb-1">{ij.pricing_from || "De"} {pricing.from}</p>
                 <div className="flex items-baseline justify-center gap-2">
-                  <span className="text-sm text-muted-foreground">{ij.pricing_for || "por"}</span>
                   <span className="font-display text-4xl md:text-5xl text-foreground">{pricing.price}</span>
                 </div>
                 <p className="text-sm text-nello-gold mt-2 font-medium">
                   {ij.pricing_unique || "Pagamento único • Acesso vitalício"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {pricing.installment}
                 </p>
               </div>
               
@@ -450,17 +452,51 @@ export const NelloOneLanding = () => {
                 ))}
               </ul>
               
+              {/* Activation explainer */}
+              <div className="bg-muted/30 rounded-xl p-4 mb-6 border border-border/30">
+                <p className="text-sm font-semibold text-foreground mb-2">
+                  {language === 'en' ? "What is the Code Activation?" : "O que é a Ativação do Código?"}
+                </p>
+                <p className="text-xs text-foreground/70 leading-relaxed mb-2">
+                  {language === 'en' 
+                    ? "The Activation is the practical step after the Essence Code. You answer 4 simple questions and receive a practical report with:"
+                    : "A Ativação é o passo seguinte ao Código da Essência. Você responde 4 perguntas simples e recebe um relatório prático, com:"}
+                </p>
+                <ul className="space-y-1 text-xs text-foreground/60">
+                  <li className="flex items-center gap-1.5">
+                    <Check className="w-3 h-3 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
+                    <span>{language === 'en' ? "Where there is coherence" : "Onde há coerência"}</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <Check className="w-3 h-3 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
+                    <span>{language === 'en' ? "Where there is tension" : "Onde há tensão"}</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <Check className="w-3 h-3 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
+                    <span>{language === 'en' ? "An attitude adjustment" : "Um ajuste de atitude"}</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <Check className="w-3 h-3 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
+                    <span>{language === 'en' ? "A concrete decision for the next 7 days" : "Uma decisão concreta para os próximos 7 dias"}</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <Check className="w-3 h-3 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
+                    <span>{language === 'en' ? "A personal activation declaration" : "Uma declaração pessoal de ativação"}</span>
+                  </li>
+                </ul>
+              </div>
+
               <div className="flex flex-col items-center gap-3">
                 <Button 
                   onClick={handleCTA}
                   size="lg" 
-                  className="w-full min-h-[52px] sm:min-h-[56px] text-sm sm:text-base px-4 sm:px-6 rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold group shadow-lg whitespace-nowrap"
+                  className="w-full min-h-[52px] sm:min-h-[56px] text-sm sm:text-base px-4 sm:px-6 rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold group shadow-lg whitespace-normal text-center"
                 >
-                  <span className="truncate">{ij.cta_primary || "Acessar meu Código da Essência"}</span>
+                  <span>{language === 'en' ? "Access my Code + 1 Activation Included" : "Acessar meu Código + 1 Ativação Incluída"}</span>
                   <Sparkles className="ml-2 w-4 h-4 sm:w-5 sm:h-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
                 </Button>
                 <p className="text-xs text-muted-foreground/70 text-center">
-                  {ij.final_cta_microcopy || "Acesso vitalício • Jornada reflexiva • Desenvolvimento pessoal, não clínico"}
+                  {language === 'en' ? "Premium product • Clarity • Practical direction" : "Produto premium • Clareza • Direção prática"}
                 </p>
               </div>
               
@@ -470,9 +506,26 @@ export const NelloOneLanding = () => {
               </div>
             </div>
           </div>
-          
-          <p className="text-center text-xs text-muted-foreground/70 mt-6 max-w-sm mx-auto leading-relaxed">
-            {ij.pricing_disclaimer || "O Nello Identity é uma ferramenta de desenvolvimento pessoal e reflexão estruturada. Não substitui diagnóstico psicológico, avaliação clínica ou psicoterapia."}
+
+          {/* Ethical disclaimer */}
+          <div className="mt-6 max-w-sm mx-auto text-center space-y-2">
+            <p className="text-xs text-muted-foreground/70 leading-relaxed">
+              {language === 'en'
+                ? "Nello Identity is a self-knowledge and personal development tool. It does not replace psychological diagnosis, clinical evaluation, or psychotherapy."
+                : "O Nello Identity é uma ferramenta de autoconhecimento e desenvolvimento pessoal. Não substitui diagnóstico psicológico, avaliação clínica ou psicoterapia."}
+            </p>
+            <p className="text-xs text-muted-foreground/60 leading-relaxed">
+              {language === 'en'
+                ? "The Essence Code and the Activation can be excellent complements to conversations with psychologists, mentors, coaches, and spiritual directors."
+                : "O Código da Essência e a Ativação podem ser excelentes complementos para conversas com psicólogos, mentores, coaches e diretores espirituais."}
+            </p>
+          </div>
+
+          {/* Premium positioning */}
+          <p className="text-center text-sm text-foreground/60 mt-8 max-w-md mx-auto leading-relaxed italic">
+            {language === 'en'
+              ? "The Essence Code is not a single test. It's an integrated synthesis with practical direction and real activation. A material you return to for a lifetime."
+              : "O Código da Essência não é um teste avulso. É uma síntese integrada, com direção prática e ativação real. Um material que você volta para a vida inteira."}
           </p>
         </div>
       </section>
