@@ -214,6 +214,26 @@ export const fundadoresPrices = {
   },
 };
 
+// Launch pricing (50% off) - FASE DE LANÇAMENTO
+export const LAUNCH_DISCOUNT_PERCENT = 50;
+export const LAUNCH_COUPON_CODE = "LANCAMENTO50";
+
+export const launchPrices = {
+  brl: { original: 1297, price: 648.50, installments: 12, installmentPrice: 64.85, symbol: "R$" },
+  usd: { original: 397, price: 198.50, symbol: "$" },
+  eur: { original: 297, price: 148.50, symbol: "€" },
+};
+
+// Helper to get launch price based on language
+export const getLaunchPriceForLanguage = (language: Language) => {
+  switch (language) {
+    case 'en': return launchPrices.usd;
+    case 'pt-pt': return launchPrices.eur;
+    case 'pt':
+    default: return launchPrices.brl;
+  }
+};
+
 // Bundle prices - JORNADA IDENTITY COMPLETA + 1 ATIVAÇÃO DO CÓDIGO
 // Includes: 7 tests + Premium PDFs + Código da Essência + 1 Ativação do Código
 export const bundlePrices = {
