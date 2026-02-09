@@ -1,31 +1,31 @@
 
 
-# Login com Google no Identity
+# Recuperacao de Senha via Resend
 
-## Resumo
-Adicionar o botao "Entrar com Google" apenas na tela de autenticacao do Identity (a tela principal de login em `src/pages/Auth.tsx`). O Discernir mantem apenas email/senha.
+## Problema
+Os emails de recuperacao de senha usam o sistema de email nativo do backend, que tem limitacoes de entrega. O Resend ja esta configurado no projeto com o dominio `nello.one` verificado, mas nao esta sendo usado para este fluxo.
 
-## O que muda
-- Na tela de login do Identity, aparece um botao "Entrar com Google"
-- Separador visual "ou" entre Google e email/senha
-- Usuario clica, escolhe conta Google, entra direto
-- Primeira vez: conta criada automaticamente com perfil e role "cliente"
+## Solucao
+Criar uma edge function que envia o email de recuperacao de senha via Resend, e atualizar a tela de "Esqueci minha senha" para usar essa funcao em vez do metodo nativo.
+
+## O que muda para o usuario
+- O email de recuperacao chega de `noreply@nello.one` (mesmo remetente dos outros emails do sistema)
+- Entrega muito mais confiavel via Resend
+- Visual do email padronizado com a marca NELLO ONE
 
 ## Etapas tecnicas
 
-### 1. Configurar modulo de autenticacao social
-- Usar a ferramenta do Lovable Cloud para gerar o modulo Google OAuth em `src/integrations/lovable/`
+### 1. Criar edge function `send-password-reset`
+- Recebe o email do usuario
+- Usa a Admin API do backend para gerar o link de recuperacao (via `generateLink`)
+- Envia o email com o link via Resend, usando o template visual da marca
+- Remetente: `NELLO ONE <noreply@nello.one>`
 
-### 2. Atualizar `src/pages/Auth.tsx`
-- Importar `lovable` do modulo gerado
-- Adicionar botao "Entrar com Google" com icone
-- Chamar `lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin })`
-- Separador visual "ou" entre as opcoes
-- Manter o design atual da pagina
+### 2. Atualizar a tela de recuperacao de senha
+- Arquivo: `src/pages/ResetPassword.tsx`
+- Em vez de chamar `supabase.auth.resetPasswordForEmail()`, chamar a edge function `send-password-reset`
+- Manter toda a interface visual atual (indicador de forca de senha, etc.)
 
-### 3. Nenhuma alteracao no Discernir
-- `DiscernirAuth.tsx` permanece como esta (apenas email/senha)
-
-### 4. Nenhuma alteracao no banco
-- O trigger `handle_new_user` ja cria perfil e role automaticamente
+### 3. Nenhuma alteracao no banco de dados
+- Nao precisa de migracao, tudo ja esta configurado
 
