@@ -1,38 +1,31 @@
 
-# Impedir que usuarios refaçam testes ja concluidos
 
-## Problema identificado
+# Login com Google no Identity
 
-As paginas publicas dos testes (`TestDetailPage.tsx` e `TestDetailLayout.tsx`) mostram o botao "Comecar Teste" sem verificar se o usuario ja completou aquele teste. Isso fez a Danielle refazer o "Estilos de Conexao Afetiva" sem perceber que ja tinha concluido.
+## Resumo
+Adicionar o botao "Entrar com Google" apenas na tela de autenticacao do Identity (a tela principal de login em `src/pages/Auth.tsx`). O Discernir mantem apenas email/senha.
 
-No dashboard (`DashboardStageJourney.tsx`), o comportamento esta correto -- testes concluidos mostram "Concluido" e clicam para ver resultado. Mas o problema esta nas paginas de detalhe dos testes, acessiveis pela landing page ou links diretos.
+## O que muda
+- Na tela de login do Identity, aparece um botao "Entrar com Google"
+- Separador visual "ou" entre Google e email/senha
+- Usuario clica, escolhe conta Google, entra direto
+- Primeira vez: conta criada automaticamente com perfil e role "cliente"
 
-## O que sera feito
+## Etapas tecnicas
 
-### 1. `src/components/tests/TestDetailPage.tsx`
-- Verificar o status do teste usando `useTests().getTestStatus(test.id)`
-- Se o teste ja estiver **completed**:
-  - Trocar o botao de "Comecar Teste" para **"Ver Meu Resultado"**
-  - Adicionar um badge/aviso visual: **"Voce ja concluiu este teste"**
-  - Ao clicar, navegar para a pagina de resultados (`/cliente/test-results/{userTestId}`) em vez de re-iniciar
-- Se o teste estiver **in_progress**:
-  - Trocar o texto para **"Continuar Teste"**
+### 1. Configurar modulo de autenticacao social
+- Usar a ferramenta do Lovable Cloud para gerar o modulo Google OAuth em `src/integrations/lovable/`
 
-### 2. `src/components/tests/TestDetailLayout.tsx`
-- Mesma logica: receber o status do teste como prop e ajustar botao/texto
-- Mostrar badge de "Ja concluido" quando aplicavel
+### 2. Atualizar `src/pages/Auth.tsx`
+- Importar `lovable` do modulo gerado
+- Adicionar botao "Entrar com Google" com icone
+- Chamar `lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin })`
+- Separador visual "ou" entre as opcoes
+- Manter o design atual da pagina
 
-### 3. Buscar o `userTestId` correto
-- Para navegar ao resultado, precisamos do `userTestId` do teste concluido
-- Usar o array `userTests` de `useTests()` para encontrar o registro concluido correspondente
+### 3. Nenhuma alteracao no Discernir
+- `DiscernirAuth.tsx` permanece como esta (apenas email/senha)
 
-## Resultado esperado
-- Usuario que ja fez um teste vera "Voce ja concluiu este teste" + botao "Ver Meu Resultado"
-- Nenhuma chance de refazer um teste por engano
-- Admins ainda poderao resetar testes pelo dashboard se necessario
+### 4. Nenhuma alteracao no banco
+- O trigger `handle_new_user` ja cria perfil e role automaticamente
 
-## Detalhes tecnicos
-
-Arquivos a modificar:
-- `src/components/tests/TestDetailPage.tsx` -- adicionar verificacao de status e userTestId
-- `src/components/tests/TestDetailLayout.tsx` -- adicionar prop de status e ajustar CTA
