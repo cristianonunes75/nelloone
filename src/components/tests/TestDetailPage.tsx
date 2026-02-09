@@ -11,13 +11,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { TestImprovementsCard } from "@/components/growth/TestImprovementsCard";
 import { testContent, getTestTypeFromSlug } from "@/lib/testContent";
-import { Check, ArrowRight, Clock, HelpCircle } from "lucide-react";
+import { Check, ArrowRight, Clock, HelpCircle, CheckCircle2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export const TestDetailPage = () => {
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
-  const { tests, startTestAsync } = useTests();
+  const { tests, userTests, startTestAsync, getTestStatus } = useTests();
   const { hasPurchased } = useTestAccess();
   const { toast } = useToast();
   const { language } = useLanguage();
@@ -29,6 +30,13 @@ export const TestDetailPage = () => {
   const test = tests?.find(t => t.type === testType);
   const isFreeTest = test?.is_free || false;
   const hasAccess = isFreeTest || hasPurchased(test?.id || "");
+
+  // Test status check
+  const testStatus = test ? getTestStatus(test.id) : 'not_started';
+  const isCompleted = testStatus === 'completed';
+  const isInProgress = testStatus === 'in_progress';
+  const completedUserTest = userTests?.find(ut => ut.test_id === test?.id && ut.status === 'completed');
+  const inProgressUserTest = userTests?.find(ut => ut.test_id === test?.id && ut.status === 'in_progress');
 
   // Labels
   const labels = {
@@ -42,6 +50,9 @@ export const TestDetailPage = () => {
     minutes: language === 'en' ? 'minutes' : 'minutos',
     startFree: language === 'en' ? 'Start Free Map' : 'Começar Mapa Gratuito',
     start: language === 'en' ? 'Start Map' : 'Começar Mapa',
+    continueTest: language === 'en' ? 'Continue Map' : 'Continuar Mapa',
+    viewResult: language === 'en' ? 'View My Result' : 'Ver Meu Resultado',
+    alreadyCompleted: language === 'en' ? '✅ You have already completed this map' : '✅ Você já concluiu este mapa',
     purchase: language === 'en' ? '🔒 Purchase Map' : '🔒 Adquirir Mapa',
     login: language === 'en' ? 'Login to Start' : 'Fazer Login para Começar',
     seeBundle: language === 'en' ? 'See Full Bundle' : 'Ver Pacote Completo',
@@ -66,6 +77,21 @@ export const TestDetailPage = () => {
 
   const handleStartTest = async () => {
     if (!test) return;
+    
+    // If completed, navigate to results
+    if (isCompleted && completedUserTest) {
+      const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
+      navigate(`${basePath}/cliente/test-results/${completedUserTest.id}`);
+      return;
+    }
+    
+    // If in progress, navigate to execution
+    if (isInProgress && inProgressUserTest) {
+      const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
+      navigate(`${basePath}/cliente/test-execution/${test.id}/${inProgressUserTest.id}`);
+      return;
+    }
+    
     try {
       const userTest = await startTestAsync(test.id);
       const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
@@ -199,11 +225,23 @@ export const TestDetailPage = () => {
 
           {/* Final CTA */}
           <div className="bg-gradient-to-br from-bruma-blue/20 to-lavender/20 rounded-2xl p-8 text-center">
+            {/* Completed badge */}
+            {isCompleted && user && (
+              <div className="mb-4">
+                <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-sm px-4 py-1.5">
+                  <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                  {labels.alreadyCompleted}
+                </Badge>
+              </div>
+            )}
+
             <h3 className="text-2xl font-semibold mb-2 text-foreground">
-              {labels.readyToStart}
+              {isCompleted ? (language === 'en' ? 'Want to review your results?' : 'Quer rever seus resultados?') : labels.readyToStart}
             </h3>
             <p className="text-muted-foreground mb-6">
-              {labels.ctaDescription}
+              {isCompleted 
+                ? (language === 'en' ? 'Access your personalized report below.' : 'Acesse seu relatório personalizado abaixo.')
+                : labels.ctaDescription}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -214,7 +252,11 @@ export const TestDetailPage = () => {
                     className="group h-12 px-6 rounded-full bg-ink-blue hover:bg-ink-deep text-primary-foreground"
                     onClick={handleStartTest}
                   >
-                    {isFreeTest ? labels.startFree : labels.start}
+                    {isCompleted 
+                      ? labels.viewResult 
+                      : isInProgress 
+                        ? labels.continueTest
+                        : isFreeTest ? labels.startFree : labels.start}
                     <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 ) : (
