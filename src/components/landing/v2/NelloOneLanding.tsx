@@ -426,32 +426,45 @@ export const NelloOneLanding = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-nello-gold/10 to-nello-gold/5 rounded-2xl blur-xl" />
             <div className="relative bg-card rounded-2xl border-2 border-nello-gold/30 p-6 md:p-8 shadow-lg">
               
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Flame className="w-4 h-4 text-destructive" strokeWidth={1.5} />
-                <span className="text-sm font-semibold text-destructive">{language === 'en' ? "Launch • 50% OFF" : "Lançamento • 50% OFF"}</span>
+              <div className="text-center mb-2">
+                <span className="inline-block text-xs font-semibold tracking-widest uppercase text-nello-gold/80 mb-1">
+                  {language === 'en' ? "First Edition" : "Primeira Edição"}
+                </span>
+                <h3 className="font-display text-lg md:text-xl text-foreground font-semibold">
+                  {language === 'en' ? "Debut Condition" : "Condição de Estreia"}
+                </h3>
               </div>
               
               <div className="text-center mb-6">
-                <div className="flex items-baseline justify-center gap-3">
-                  <span className="text-lg md:text-xl text-muted-foreground line-through">{pricing.original}</span>
-                  <span className="font-display text-4xl md:text-5xl text-foreground">{pricing.price}</span>
-                </div>
-                <p className="text-sm text-nello-gold mt-2 font-medium">
-                  {ij.pricing_unique || "Pagamento único • Acesso vitalício"}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
+                <span className="font-display text-4xl md:text-5xl text-foreground">{pricing.price}</span>
+                <p className="text-xs text-muted-foreground mt-2">
                   {pricing.installment}
+                </p>
+                <p className="text-sm text-nello-gold mt-3 font-medium">
+                  {ij.pricing_unique || "Pagamento único • Acesso vitalício"}
                 </p>
               </div>
               
-              <ul className="space-y-2 mb-6">
-                {pricingBenefits.map((benefit: string, index: number) => (
-                  <li key={index} className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-nello-gold flex-shrink-0" strokeWidth={2} />
-                    <span className="text-foreground text-sm">{benefit}</span>
-                  </li>
-                ))}
+              <ul className="space-y-2.5 mb-6">
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
+                  <span className="text-foreground text-sm font-medium">{language === 'en' ? "Essence Code" : "Código da Essência"}</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
+                  <span className="text-foreground text-sm font-medium">{language === 'en' ? "Couple Code" : "Código do Casal"}</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
+                  <span className="text-foreground text-sm font-medium">{language === 'en' ? "1 Practical Activation included" : "1 Ativação prática incluída"}</span>
+                </li>
               </ul>
+              
+              <p className="text-xs text-muted-foreground text-center mb-6 leading-relaxed">
+                {language === 'en' 
+                  ? "Condition valid only during this initial phase. After that, the price returns to $397."
+                  : "Condição válida apenas nesta fase inicial. Depois, o valor retorna para R$ 1.297."}
+              </p>
               
               {/* Activation explainer */}
               <div className="bg-muted/30 rounded-xl p-4 mb-6 border border-border/30">
@@ -493,11 +506,11 @@ export const NelloOneLanding = () => {
                   size="lg" 
                   className="w-full min-h-[52px] sm:min-h-[56px] text-sm sm:text-base px-4 sm:px-6 rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold group shadow-lg whitespace-normal text-center"
                 >
-                  <span>{language === 'en' ? "Access my Code + 1 Activation Included" : "Acessar meu Código + 1 Ativação Incluída"}</span>
+                  <span>{language === 'en' ? "Access my Codes" : "Acessar meus Códigos"}</span>
                   <Sparkles className="ml-2 w-4 h-4 sm:w-5 sm:h-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
                 </Button>
-                <p className="text-xs text-muted-foreground/70 text-center">
-                  {language === 'en' ? "Launch coupon auto-applied at checkout" : "Cupom de lançamento aplicado automaticamente no checkout"}
+                <p className="text-xs text-muted-foreground/60 text-center">
+                  {language === 'en' ? "Essence Code + Couple Code + Activation included" : "Código da Essência + Código do Casal + Ativação incluída"}
                 </p>
               </div>
               
@@ -505,6 +518,12 @@ export const NelloOneLanding = () => {
                 <Shield className="w-4 h-4 flex-shrink-0" />
                 <span className="text-xs">{language === 'en' ? "Secure payment via Stripe" : "Pagamento seguro via Stripe"}</span>
               </div>
+              
+              <p className="text-[10px] text-muted-foreground/50 text-center mt-4 leading-relaxed max-w-xs mx-auto">
+                {language === 'en' 
+                  ? "Identity Nello One is a self-knowledge and personal development tool. It does not replace psychological diagnosis or therapeutic support."
+                  : "O Identity Nello One é uma ferramenta de autoconhecimento e desenvolvimento pessoal. Não substitui diagnóstico psicológico ou acompanhamento terapêutico."}
+              </p>
             </div>
           </div>
 

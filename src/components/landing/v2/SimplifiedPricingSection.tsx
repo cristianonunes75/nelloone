@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Check, Sparkles, Shield, Flame } from "lucide-react";
+import { Check, Sparkles, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
@@ -23,12 +23,11 @@ export const SimplifiedPricingSection = () => {
         <div className="max-w-2xl mx-auto">
           {/* Section header */}
           <div className="text-center mb-10">
-            <span className="inline-flex items-center gap-1.5 bg-destructive/10 text-destructive font-semibold text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4 px-3 py-1 rounded-full">
-              <Flame className="w-3.5 h-3.5" />
-              Preço de Lançamento
+            <span className="inline-block text-xs font-semibold tracking-widest uppercase text-nello-gold/80 mb-3 md:mb-4 px-3 py-1">
+              Primeira Edição
             </span>
-            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-foreground mb-4">
-              Jornada Identity Completa
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-foreground mb-2">
+              Condição de Estreia
             </h2>
             <p className="text-base md:text-lg text-muted-foreground">
               Tudo que você precisa para se libertar do que não é você
@@ -47,28 +46,31 @@ export const SimplifiedPricingSection = () => {
             <div className="relative bg-card rounded-2xl md:rounded-3xl border-2 border-ink-blue/30 p-6 md:p-10 shadow-soft">
               
               {/* Badge */}
-              <div className="flex items-center justify-center gap-2 mb-6">
-                <Flame className="w-4 h-4 text-destructive" strokeWidth={1.5} />
-                <span className="text-sm font-semibold text-destructive">Lançamento • 50% OFF</span>
+              <div className="text-center mb-6">
+                <span className="inline-block text-xs font-semibold tracking-widest uppercase text-nello-gold/80 mb-1">
+                  Primeira Edição
+                </span>
+                <h3 className="font-display text-lg md:text-xl text-foreground font-semibold">
+                  Condição de Estreia
+                </h3>
               </div>
               
               {/* Price */}
-              <div className="text-center mb-8">
-                <div className="flex items-baseline justify-center gap-3">
-                  <span className="text-xl md:text-2xl text-muted-foreground line-through">
-                    R$ 1.297
-                  </span>
-                  <span className="font-display text-5xl md:text-6xl text-foreground">
-                    R$ 648<span className="text-3xl md:text-4xl">,50</span>
-                  </span>
-                </div>
-                <p className="text-sm text-ink-blue mt-2 font-medium">
-                  Pagamento único • Acesso vitalício
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
+              <div className="text-center mb-6">
+                <span className="font-display text-5xl md:text-6xl text-foreground">
+                  R$ 648<span className="text-3xl md:text-4xl">,50</span>
+                </span>
+                <p className="text-xs text-muted-foreground mt-2">
                   ou em até 12x de R$ 64,85 no cartão
                 </p>
+                <p className="text-sm text-ink-blue mt-3 font-medium">
+                  Pagamento único • Acesso vitalício
+                </p>
               </div>
+              
+              <p className="text-xs text-muted-foreground text-center mb-6 leading-relaxed">
+                Condição válida apenas nesta fase inicial. Depois, o valor retorna para R$ 1.297.
+              </p>
               
               {/* Benefits */}
               <ul className="space-y-3 mb-8">
@@ -90,11 +92,11 @@ export const SimplifiedPricingSection = () => {
                   className="w-full h-14 text-base rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg group"
                   onClick={() => navigate("/auth")}
                 >
-                  Acessar meu Código + 1 Ativação Incluída
+                  Acessar meus Códigos
                   <Sparkles className="ml-2 w-5 h-5 text-white/90 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
                 </Button>
-                <p className="text-xs text-muted-foreground/70">
-                  Cupom de lançamento aplicado automaticamente no checkout
+                <p className="text-xs text-muted-foreground/60">
+                  Código da Essência + Código do Casal + Ativação incluída
                 </p>
               </div>
               
