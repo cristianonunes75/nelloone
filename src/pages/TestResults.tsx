@@ -753,26 +753,63 @@ function TestResultsInner() {
     const currentType = userTest.tests.type;
     const currentIndex = JOURNEY_ORDER.indexOf(currentType as typeof JOURNEY_ORDER[number]);
     
-    if (currentIndex === -1 || currentIndex === JOURNEY_ORDER.length - 1) {
-      // Last test or not in journey - show Código da Essência CTA
+    if (currentIndex === -1) return null;
+
+    // Count how many tests are actually completed
+    const completedCount = JOURNEY_ORDER.filter(type => {
+      const test = tests?.find(t => t.type === type);
+      if (!test) return false;
+      return userTests?.some(ut => ut.test_id === test.id && ut.status === 'completed');
+    }).length;
+
+    // Find the next uncompleted test after current position
+    let nextUncompleted: { type: string; index: number } | null = null;
+    for (let i = currentIndex + 1; i < JOURNEY_ORDER.length; i++) {
+      const type = JOURNEY_ORDER[i];
+      const test = tests?.find(t => t.type === type);
+      if (!test) continue;
+      const ut = userTests?.find(u => u.test_id === test.id && u.status === 'completed');
+      if (!ut) {
+        nextUncompleted = { type, index: i };
+        break;
+      }
+    }
+
+    // All tests completed
+    if (completedCount >= JOURNEY_ORDER.length) {
       return { isLastTest: true };
     }
-    
-    const nextType = JOURNEY_ORDER[currentIndex + 1];
-    const nextTest = tests?.find(t => t.type === nextType);
-    
-    if (!nextTest) return null;
-    
-    // Check if next test is already completed
+
+    // No more uncompleted tests after current one (but some before might be missing)
+    if (!nextUncompleted) {
+      // Check if there are uncompleted tests before current position
+      for (let i = 0; i < currentIndex; i++) {
+        const type = JOURNEY_ORDER[i];
+        const test = tests?.find(t => t.type === type);
+        if (!test) continue;
+        const ut = userTests?.find(u => u.test_id === test.id && u.status === 'completed');
+        if (!ut) {
+          nextUncompleted = { type, index: i };
+          break;
+        }
+      }
+      // If still nothing uncompleted, all done
+      if (!nextUncompleted) {
+        return { isLastTest: true };
+      }
+    }
+
+    const nextTest = tests?.find(t => t.type === nextUncompleted!.type);
+    if (!nextTest) return { isLastTest: true };
+
     const nextUserTest = userTests?.find(ut => ut.test_id === nextTest.id);
-    const isCompleted = nextUserTest?.status === 'completed';
     
     return {
       isLastTest: false,
       test: nextTest,
-      isCompleted,
+      isCompleted: false,
       userTestId: nextUserTest?.id,
-      position: currentIndex + 2, // 1-indexed position
+      position: completedCount + 1,
       totalTests: JOURNEY_ORDER.length
     };
   }, [userTest?.tests?.type, tests, userTests]);
@@ -1042,47 +1079,14 @@ function TestResultsInner() {
       )}
 
       <div className="flex flex-col sm:flex-row gap-4">
-        {isInteligenciasTest && inteligenciasResults && inteligenciasResults.ranking?.length > 0 ? (
-          <Button onClick={handleDownloadInteligenciasPDF} className="flex-1">
+        <Button onClick={handleUnifiedPDFDownload} disabled={isDownloadingPDF} className="flex-1">
+          {isDownloadingPDF ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
             <FileText className="mr-2 h-4 w-4" />
-            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
-          </Button>
-        ) : isArchetyposTest && dominantArchetypes ? (
-          <Button onClick={handleDownloadArquetiposPDF} className="flex-1">
-            <FileText className="mr-2 h-4 w-4" />
-            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
-          </Button>
-        ) : isDISCTest && discResults ? (
-          <Button onClick={handleDownloadDISCPDF} className="flex-1">
-            <FileText className="mr-2 h-4 w-4" />
-            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
-          </Button>
-        ) : isEnneagramTest && enneagramResultData?.primaryType ? (
-          <Button onClick={handleDownloadEneagramaPDF} className="flex-1">
-            <FileText className="mr-2 h-4 w-4" />
-            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
-          </Button>
-        ) : isTemperamentosTest && temperamentosResultData ? (
-          <Button onClick={handleDownloadTemperamentosPDF} className="flex-1">
-            <FileText className="mr-2 h-4 w-4" />
-            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
-          </Button>
-        ) : isMBTITest && mbtiResultData?.type ? (
-          <Button onClick={handleDownloadNello16PDF} className="flex-1">
-            <FileText className="mr-2 h-4 w-4" />
-            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
-          </Button>
-        ) : isLinguagensAmorTest && (estilosConexaoResults || linguagensAmorResultData) ? (
-          <Button onClick={handleDownloadEstilosConexaoPDF} className="flex-1">
-            <FileText className="mr-2 h-4 w-4" />
-            {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
-          </Button>
-        ) : (
-          <Button onClick={handleDownloadPDF} className="flex-1">
-            <Download className="mr-2 h-4 w-4" />
-            {lang === 'en' ? 'Download PDF' : 'Baixar PDF'}
-          </Button>
-        )}
+          )}
+          {lang === 'en' ? 'Download Premium Report' : 'Baixar Relatório Premium'}
+        </Button>
         
         {/* Send by Email Button */}
         <Button 
