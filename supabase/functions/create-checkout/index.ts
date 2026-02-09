@@ -850,7 +850,60 @@ serve(async (req) => {
           }
         }
       }
-    } else if (discountPercentage > 0) {
+    }
+    
+    // AUTO-APPLY LAUNCH COUPON for bundle purchases without a user coupon
+    if (isBundle && !couponCode && (!sessionParams.discounts || sessionParams.discounts.length === 0)) {
+      const supabaseAdmin2 = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      );
+      
+      const { data: launchCoupon } = await supabaseAdmin2
+        .from("coupons")
+        .select("*")
+        .eq("code", "LANCAMENTO50")
+        .eq("is_active", true)
+        .single();
+      
+      if (launchCoupon) {
+        const isNotExpired = !launchCoupon.expires_at || new Date(launchCoupon.expires_at) > new Date();
+        const hasUsesLeft = !launchCoupon.max_uses || launchCoupon.times_used < launchCoupon.max_uses;
+        
+        if (isNotExpired && hasUsesLeft) {
+          let stripeCouponId = launchCoupon.stripe_coupon_id;
+          
+          if (!stripeCouponId) {
+            const stripeCoupon = await stripe.coupons.create({
+              percent_off: 50,
+              duration: "once",
+              name: "LANCAMENTO50 - 50% OFF",
+            });
+            stripeCouponId = stripeCoupon.id;
+            await supabaseAdmin2.from("coupons").update({ stripe_coupon_id: stripeCouponId }).eq("id", launchCoupon.id);
+          }
+          
+          try {
+            const promoCode = await stripe.promotionCodes.create({
+              coupon: stripeCouponId,
+              code: `LANCAMENTO50_${Date.now()}`,
+              max_redemptions: 1,
+            });
+            sessionParams.discounts = [{ promotion_code: promoCode.id }];
+            logStep("Auto-applied launch coupon LANCAMENTO50", { promoCodeId: promoCode.id });
+          } catch (promoError) {
+            // Fallback: apply coupon directly
+            sessionParams.discounts = [{ coupon: stripeCouponId }];
+            logStep("Auto-applied launch coupon via direct coupon", { stripeCouponId });
+          }
+          
+          await supabaseAdmin2.from("coupons").update({ times_used: (launchCoupon.times_used || 0) + 1 }).eq("id", launchCoupon.id);
+          logStep("Launch coupon usage incremented");
+        }
+      }
+    }
+    
+    if (!couponCode && discountPercentage > 0) {
       // Add quantity-based discount if applicable (only for individual tests without coupon)
       const couponNames: Record<string, string> = {
         pt: `Desconto ${discountPercentage}% - ${testIds.length} testes`,

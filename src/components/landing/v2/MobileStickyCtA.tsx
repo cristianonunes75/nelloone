@@ -8,13 +8,12 @@ import { cn } from "@/lib/utils";
 
 export const MobileStickyCtA = () => {
   const navigate = useNavigate();
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const isMobile = useIsMobile();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      // Show after scrolling past the hero section (approximately 500px)
       setIsVisible(window.scrollY > 500);
     };
 
@@ -31,9 +30,16 @@ export const MobileStickyCtA = () => {
         isVisible ? "translate-y-0" : "translate-y-full"
       )}
     >
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-semibold text-destructive">🔥 Lançamento 50% OFF</span>
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-xs text-muted-foreground line-through">R$ 1.297</span>
+          <span className="text-sm font-bold text-foreground">R$ 648,50</span>
+        </div>
+      </div>
       <Button
         size="lg"
-        className="w-full h-14 text-base rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg group"
+        className="w-full h-12 text-base rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg group"
         onClick={() => navigate(language === "en" ? "/en/auth" : "/auth")}
       >
         Acessar meu Código + Ativação
