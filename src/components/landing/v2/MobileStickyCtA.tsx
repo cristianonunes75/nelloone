@@ -36,7 +36,7 @@ export const MobileStickyCtA = () => {
         className="w-full h-14 text-base rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg group"
         onClick={() => navigate(language === "en" ? "/en/auth" : "/auth")}
       >
-        Revelar meu Código
+        Acessar meu Código + Ativação
         <Sparkles className="ml-2 w-5 h-5 text-white/90 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
       </Button>
     </div>

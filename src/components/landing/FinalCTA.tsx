@@ -29,11 +29,11 @@ export const FinalCTA = () => {
               className="bg-nello-gold hover:bg-nello-gold-deep text-white font-semibold text-lg px-8 py-6 rounded-full shadow-lg group"
               onClick={() => navigate("/auth")}
             >
-              Revelar meu Código da Essência
+              Acessar meu Código + 1 Ativação Incluída
               <Sparkles className="w-5 h-5 ml-2 text-white/90 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
             </Button>
             <p className="text-xs text-muted-foreground/70">
-              Acesso vitalício à sua jornada de identidade.
+              Produto premium • Clareza • Direção prática
             </p>
           </div>
 
