@@ -112,12 +112,12 @@ export const NelloOneLanding = () => {
     essence: "Código da Essência"
   };
 
-  // Pricing based on language
+  // Pricing based on language - LAUNCH PHASE (50% OFF)
   const pricing = language === 'en' 
-    ? { price: "$397", currency: "$", installment: "or up to 12x $39.70" }
+    ? { original: "$397", price: "$198,50", currency: "$", installment: "or up to 12x $19.85" }
     : language === 'pt-pt'
-    ? { price: "€297", currency: "€", installment: "ou em até 12x de €29,70" }
-    : { price: "R$ 1.297", currency: "R$", installment: "ou em até 12x de R$ 129,70 no cartão" };
+    ? { original: "€297", price: "€148,50", currency: "€", installment: "ou em até 12x de €14,85" }
+    : { original: "R$ 1.297", price: "R$ 648,50", currency: "R$", installment: "ou em até 12x de R$ 64,85 no cartão" };
 
   return (
     <div className="flex flex-col bg-background">
@@ -427,12 +427,13 @@ export const NelloOneLanding = () => {
             <div className="relative bg-card rounded-2xl border-2 border-nello-gold/30 p-6 md:p-8 shadow-lg">
               
               <div className="flex items-center justify-center gap-2 mb-4">
-                <Sparkles className="w-4 h-4 text-nello-gold" strokeWidth={1.5} />
-                <span className="text-sm font-medium text-nello-gold">{ij.pricing_label || "Jornada Identity Completa"}</span>
+                <Flame className="w-4 h-4 text-destructive" strokeWidth={1.5} />
+                <span className="text-sm font-semibold text-destructive">{language === 'en' ? "Launch • 50% OFF" : "Lançamento • 50% OFF"}</span>
               </div>
               
               <div className="text-center mb-6">
-                <div className="flex items-baseline justify-center gap-2">
+                <div className="flex items-baseline justify-center gap-3">
+                  <span className="text-lg md:text-xl text-muted-foreground line-through">{pricing.original}</span>
                   <span className="font-display text-4xl md:text-5xl text-foreground">{pricing.price}</span>
                 </div>
                 <p className="text-sm text-nello-gold mt-2 font-medium">
@@ -496,7 +497,7 @@ export const NelloOneLanding = () => {
                   <Sparkles className="ml-2 w-4 h-4 sm:w-5 sm:h-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
                 </Button>
                 <p className="text-xs text-muted-foreground/70 text-center">
-                  {language === 'en' ? "Premium product • Clarity • Practical direction" : "Produto premium • Clareza • Direção prática"}
+                  {language === 'en' ? "Launch coupon auto-applied at checkout" : "Cupom de lançamento aplicado automaticamente no checkout"}
                 </p>
               </div>
               
