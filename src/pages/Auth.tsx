@@ -311,7 +311,9 @@ const Auth = () => {
     try {
       // On custom domains, the ~oauth route doesn't exist, so we need to
       // use the lovable.app domain as the OAuth broker
-      const isCustomDomain = !window.location.hostname.endsWith('.lovable.app');
+      const hostname = window.location.hostname;
+      const isLovableDomain = hostname.endsWith('.lovable.app') || hostname.endsWith('.lovableproject.com');
+      const isCustomDomain = !isLovableDomain;
       
       if (isCustomDomain) {
         const lovableAuth = createLovableAuth({
