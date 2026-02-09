@@ -452,13 +452,21 @@ export const NelloOneLanding = () => {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
-                  <span className="text-foreground text-sm font-medium">{language === 'en' ? "Couple Code" : "Código do Casal"}</span>
+                  <span className="text-foreground text-sm font-medium">{language === 'en' ? "Essence Code" : "Código da Essência"}</span>
                 </li>
                 <li className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
                   <span className="text-foreground text-sm font-medium">{language === 'en' ? "1 Practical Activation included" : "1 Ativação prática incluída"}</span>
                 </li>
               </ul>
+              
+              <div className="bg-muted/20 rounded-lg px-4 py-3 mb-6 text-center">
+                <p className="text-xs text-muted-foreground">
+                  {language === 'en' 
+                    ? "Extra available for couples: Couple Code — generated when both complete the journey"
+                    : "Extra disponível para casais: Código do Casal — gerado quando ambos completam a jornada"}
+                </p>
+              </div>
               
               <p className="text-xs text-muted-foreground text-center mb-6 leading-relaxed">
                 {language === 'en' 
