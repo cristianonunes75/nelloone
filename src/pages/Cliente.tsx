@@ -611,19 +611,25 @@ const Cliente = () => {
     ? impersonatedUserName?.split(" ")[0] || "Usuário"
     : profile?.full_name?.split(" ")[0] || user?.user_metadata?.full_name?.split(" ")[0] || "Viajante";
 
-  const handleOnboardingComplete = (path: EntryPath) => {
-    // Invalidate queries to refetch with new journey order
-    queryClient.invalidateQueries({ queryKey: ["user-tests"] });
-    queryClient.invalidateQueries({ queryKey: ["profile"] });
+  const handleOnboardingComplete = async (path: EntryPath) => {
+    // Determine the first test slug directly from the selected path
+    // This avoids the race condition where journeySteps still has the old order
+    const firstSlug = path === "pratico" 
+      ? "disc" 
+      : path === "emocional" 
+        ? "temperamentos" 
+        : "arquetipos_proposito";
     
-    // Start the first test after onboarding + path selection
-    // Use a small delay to allow queries to update
-    setTimeout(() => {
-      const firstStep = journeySteps[0];
-      if (firstStep) {
-        handleStartTest(firstStep);
-      }
-    }, 100);
+    // Find the corresponding step by testType instead of relying on stale journeySteps[0]
+    const targetStep = journeySteps.find(s => s.testType === firstSlug);
+    
+    // Invalidate queries to refetch with new journey order
+    await queryClient.invalidateQueries({ queryKey: ["user-tests"] });
+    await queryClient.invalidateQueries({ queryKey: ["profile"] });
+    
+    if (targetStep) {
+      handleStartTest(targetStep);
+    }
   };
 
   // Get language for translations
