@@ -4,8 +4,8 @@ import { useLanguage, Language } from '@/contexts/LanguageContext';
 
 // Feature flags to control language version availability
 // International versions enabled for geo-redirection
-const ENGLISH_VERSION_ENABLED = true;
-const PT_PT_VERSION_ENABLED = true;
+const ENGLISH_VERSION_ENABLED = false;
+const PT_PT_VERSION_ENABLED = false;
 
 interface LanguageRouteProps {
   children: React.ReactNode;
