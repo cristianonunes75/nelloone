@@ -40,6 +40,9 @@ const LANGUAGE_KEY = "nello-language";
  * Respects user preference if already set.
  */
 export const GeoRedirect = () => {
+  // Temporarily disabled while EN and PT-PT versions are being polished
+  return null;
+
   const location = useLocation();
   const navigate = useNavigate();
   const [hasChecked, setHasChecked] = useState(false);
