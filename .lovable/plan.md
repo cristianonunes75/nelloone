@@ -1,64 +1,50 @@
 
+## Correcao: Testes de usuarios apontando para versoes desativadas (pt-legacy)
 
-## Auditoria do Sistema de Afiliados - Problemas e Correções
+### Diagnostico
 
-### Status Atual
+A Saula completou 3 testes (DISC, Temperamentos, Arquetipos) quando os registros ativos eram da versao `pt-legacy`. Depois, esses testes foram migrados para novos registros `pt`, mas os `user_tests` dela continuam apontando para os IDs antigos (`pt-legacy`, `active=false`).
 
-O sistema de afiliados esta **quase completo**, mas tem **2 bugs criticos** e **1 gap de cobertura** que impedem o funcionamento correto em producao.
+O hook `useTests` filtra apenas testes com `language=pt` e `active=true`, entao esses registros completados ficam invisiveis no dashboard. O perfil mostra 7/7 (porque `journey_tests_status` foi atualizado), mas a interface visual nao encontra os resultados.
 
----
+### Usuarios afetados
 
-### Problema 1: Codigo de afiliado NUNCA e limpo apos compra (BUG)
+Qualquer usuario que completou testes ANTES da migracao `pt-legacy` para `pt` pode ter esse problema. Nao e apenas a Saula.
 
-A funcao `clearAffiliateCode()` existe em `useAffiliateTracking.tsx` mas **nao e chamada em nenhum lugar do codigo**. Isso significa que:
-- Um usuario que chega via `?ref=ERICA` e compra, e depois compra um segundo produto dias depois, gera **comissao duplicada** para o afiliado na segunda compra (mesmo que o afiliado nao tenha influenciado essa segunda compra)
-- O codigo fica no localStorage por 30 dias, gerando comissoes indevidas
+### Solucao em 2 partes
 
-**Correcao:** Chamar `clearAffiliateCode()` na pagina `CheckoutSuccess.tsx` quando o pagamento for confirmado com sucesso (status "success" ou "already_processed").
+#### Parte 1: Migracao SQL (correcao imediata para todos os usuarios afetados)
 
----
+Atualizar todos os `user_tests` que apontam para testes `pt-legacy` desativados, redirecionando para os equivalentes `pt` ativos:
 
-### Problema 2: Fallback verify-checkout NAO processa afiliados (GAP)
+```text
+Para cada tipo de teste (disc, temperamentos, arquetipos_proposito, linguagens_amor, mbti):
+1. Encontrar o test_id da versao pt-legacy (desativada)
+2. Encontrar o test_id da versao pt (ativa)
+3. Atualizar user_tests que apontam para o legacy, redirecionando para o ativo
+4. Tratar duplicatas: se o usuario ja tem registro no teste pt ativo,
+   manter o registro completado e remover o duplicado
+```
 
-O `verify-checkout` e o mecanismo de seguranca que garante que compras sejam processadas mesmo quando o webhook do Stripe falha. Porem, ele **nao tem nenhuma logica de afiliados**. Se o webhook falhar e o verify-checkout processar a compra, a comissao do afiliado e **perdida**.
+Mapeamento especifico:
+- DISC: `7c533b3e` (legacy) para `bdd55908` (ativo)
+- Temperamentos: `2a5c48c4` (legacy) para `b9be06b8` (ativo)
+- Arquetipos: `e1a3511e` (legacy) para `d843395e` (ativo)
+- Estilos Conexao: `2a1fea19` (legacy) para `12aaa9e6` (ativo)
+- Nello16/MBTI: `5b83bbe8` (legacy) para `8de61499` (ativo)
 
-**Correcao:** Adicionar processamento de afiliados no `verify-checkout/index.ts`:
-1. Recuperar o `affiliate_code` dos metadados da sessao Stripe
-2. Implementar a mesma logica de `processAffiliateReferral` do webhook
-3. Verificar duplicidade antes de criar o registro (para evitar dupla-contagem se o webhook tambem processar)
+#### Parte 2: Ajuste no useTests.tsx (prevencao futura)
 
----
+Modificar a query de `userTests` para nao filtrar apenas por idioma ativo. Em vez disso, buscar TODOS os `user_tests` do usuario e depois fazer o mapeamento por `type` para os testes ativos. Isso garante que mesmo se houver registros apontando para versoes antigas, o sistema encontre os resultados.
 
-### Problema 3: AffiliatePanel cria afiliado automaticamente (RISCO)
+### Detalhes tecnicos
 
-No `AffiliatePanel.tsx` (linha 115), se um usuario nao e afiliado, o componente **automaticamente cria um registro de afiliado** com 10% de comissao. Isso pode permitir que qualquer usuario se torne afiliado sem aprovacao do admin.
+**Migracao SQL:**
+- Para cada par legacy/ativo, executar UPDATE com tratamento de conflito
+- Quando o usuario ja tem um `user_test` para ambos os IDs (legacy e ativo), manter o que tem `status=completed` e deletar o duplicado `in_progress`
+- Caso da Saula: DISC e Arquetipos nao tem registro `pt` (apenas legacy), entao e um UPDATE simples. Temperamentos tem ambos (legacy=completed, pt=in_progress), entao deleta o `in_progress` e atualiza o `completed`
 
-**Correcao:** Remover a criacao automatica de afiliados. Se o usuario nao e afiliado, mostrar apenas uma mensagem informativa ou nao mostrar o painel.
-
----
-
-### Resumo das Mudancas
-
-| Arquivo | Mudanca |
-|---------|---------|
-| `src/pages/CheckoutSuccess.tsx` | Importar e chamar `clearAffiliateCode()` apos compra confirmada |
-| `supabase/functions/verify-checkout/index.ts` | Adicionar processamento de referral de afiliado (ler `affiliate_code` dos metadados, criar registro em `affiliate_referrals`, atualizar totais) |
-| `src/components/cliente/AffiliatePanel.tsx` | Remover auto-criacao de afiliado; se nao encontrar registro, retornar null sem criar |
-
-### Detalhes Tecnicos
-
-**CheckoutSuccess.tsx:**
-- Importar `clearAffiliateCode` de `@/hooks/useAffiliateTracking`
-- Chamar `clearAffiliateCode()` dentro do bloco `if (data.success)` no `verifyCheckout()`
-
-**verify-checkout/index.ts:**
-- Apos processar a compra, ler `session.metadata.affiliate_code`
-- Se existir e nao estiver vazio, buscar o afiliado na tabela `affiliates`
-- Verificar se ja existe um `affiliate_referral` com o mesmo `transaction_id` (idempotencia)
-- Calcular comissao e criar registro se nao existir
-- Atualizar `total_sales` e `total_earnings` do afiliado
-
-**AffiliatePanel.tsx:**
-- Remover a funcao `createAffiliateRecord` e sua chamada
-- Se `data` for null no fetch, simplesmente retornar null (nao mostrar painel)
-
+**useTests.tsx:**
+- Remover o pre-filtro por `language` na query de `user_tests`
+- Buscar todos os `user_tests` do usuario com join em `tests`
+- No mapeamento (linha 64), priorizar registros `completed` sobre `in_progress` quando existirem duplicatas para o mesmo `type`
