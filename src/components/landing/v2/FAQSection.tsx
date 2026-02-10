@@ -8,6 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { HelpCircle } from "lucide-react";
+import { FaithFAQSection } from "@/components/FaithFAQSection";
 
 export function FAQSection() {
   const { t, language } = useLanguage();
@@ -65,6 +66,11 @@ export function FAQSection() {
             </AccordionItem>
           ))}
         </Accordion>
+
+        {/* Faith & Clarity FAQ */}
+        <div className="mt-12">
+          <FaithFAQSection />
+        </div>
 
       </div>
     </section>
