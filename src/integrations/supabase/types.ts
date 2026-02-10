@@ -230,6 +230,48 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_marketing_materials: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          description: string | null
+          file_name: string | null
+          id: string
+          is_active: boolean
+          sort_order: number
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          content: string
+          created_at?: string
+          description?: string | null
+          file_name?: string | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          description?: string | null
+          file_name?: string | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       affiliate_referrals: {
         Row: {
           affiliate_id: string

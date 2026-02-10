@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Copy, Check, DollarSign, Users, TrendingUp, Wallet, History, Calendar, Package } from "lucide-react";
+import { AffiliateMarketingKit } from "./AffiliateMarketingKit";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -413,6 +414,9 @@ export const AffiliatePanel = () => {
             )}
           </div>
         </div>
+
+        {/* Marketing Kit */}
+        <AffiliateMarketingKit affiliateLink={affiliateLink} />
 
         {/* Tips */}
         <div className="bg-accent/30 rounded-lg p-3 text-xs text-muted-foreground">

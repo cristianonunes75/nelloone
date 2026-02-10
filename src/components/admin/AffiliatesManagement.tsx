@@ -43,6 +43,7 @@ import {
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { AffiliateMaterialsTab } from "./AffiliateMaterialsTab";
 
 interface Affiliate {
   id: string;
@@ -687,6 +688,7 @@ export const AffiliatesManagement = () => {
               </Badge>
             )}
           </TabsTrigger>
+          <TabsTrigger value="materials">Materiais</TabsTrigger>
         </TabsList>
 
         <TabsContent value="affiliates" className="space-y-4">
@@ -960,6 +962,10 @@ export const AffiliatesManagement = () => {
               </TableBody>
             </Table>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="materials" className="space-y-4">
+          <AffiliateMaterialsTab />
         </TabsContent>
       </Tabs>
 
