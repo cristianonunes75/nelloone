@@ -86,10 +86,8 @@ export const AffiliatePanel = () => {
         
         // Fetch referrals for this affiliate
         await fetchReferrals(data.id);
-      } else {
-        // Create affiliate record if user is a founder with completed journey
-        await createAffiliateRecord();
       }
+      // If not an affiliate, do nothing - admin must create affiliate records
     } catch (error) {
       console.error("Error fetching affiliate data:", error);
     } finally {
@@ -112,29 +110,7 @@ export const AffiliatePanel = () => {
     }
   };
 
-  const createAffiliateRecord = async () => {
-    if (!user?.id) return;
-
-    try {
-      const code = `NELLO${user.id.substring(0, 6).toUpperCase()}`;
-      
-      const { data, error } = await supabase
-        .from("affiliates")
-        .insert({
-          user_id: user.id,
-          affiliate_code: code,
-          commission_percent: 10,
-          is_active: true,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      setAffiliate(data as AffiliateData);
-    } catch (error) {
-      console.error("Error creating affiliate:", error);
-    }
-  };
+  // Removed: createAffiliateRecord - affiliates must be created by admin only
 
   const savePaymentInfo = async () => {
     if (!affiliate?.id) return;
