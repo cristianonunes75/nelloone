@@ -16,6 +16,7 @@ import { DeleteAccountDialog } from "@/components/cliente/DeleteAccountDialog";
 import { PurchaseHistory } from "@/components/cliente/PurchaseHistory";
 import { NotificationPreferences } from "@/components/cliente/NotificationPreferences";
 import { BusinessSharingToggle } from "@/components/cliente/BusinessSharingToggle";
+import { AffiliatePanel } from "@/components/cliente/AffiliatePanel";
 
 const ClientePerfil = () => {
   const { user, profile, signOut } = useAuth();
@@ -207,6 +208,9 @@ const ClientePerfil = () => {
 
             {/* Notification Preferences */}
             <NotificationPreferences />
+
+            {/* Affiliate Panel (only shows for affiliates) */}
+            <AffiliatePanel />
 
             {/* Purchase History */}
             <PurchaseHistory />
