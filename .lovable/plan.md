@@ -1,39 +1,27 @@
 
 
-## Bug: Caminho Prático seleciona DISC mas abre Arquétipos
+## Atualizar valores do Bundle para Oferta de Estreia
 
-### Problema Encontrado
+### O que muda
 
-Quando voce seleciona o caminho "Prático" no modal de entrada, o app diz que vai começar pelo DISC, mas na verdade abre a pagina de Arquétipos.
+O `bundlePrices` em `src/lib/priceConfig.ts` sera atualizado para refletir a "Primeira Edicao - Condicao de Estreia":
 
-### Causa Raiz
+| Moeda | Original (antes) | Preco (antes) | Original (depois) | Preco (depois) |
+|-------|-------------------|---------------|---------------------|-----------------|
+| BRL   | R$ 1.897          | R$ 1.297      | R$ 1.297            | R$ 648,50       |
+| USD   | $597              | $397          | $397                | $198,50         |
+| EUR   | 447 EUR           | 297 EUR       | 297 EUR             | 148,50 EUR      |
 
-Na funcao `handleOnboardingComplete` (Cliente.tsx), apos salvar a preferencia:
+### Arquivo alterado
 
-1. O sistema invalida as queries do perfil (`queryClient.invalidateQueries`)
-2. Mas imediatamente (com apenas 100ms de delay) le `journeySteps[0]` -- que ainda esta com a ordem ANTIGA (default = Arquétipos primeiro)
-3. A nova ordem (Prático = DISC primeiro) so estaria disponivel apos o perfil ser re-buscado do banco, o que leva mais que 100ms
+**`src/lib/priceConfig.ts`** - Linhas 239-267 (`bundlePrices`)
 
-Resultado: navega para Arquétipos em vez de DISC.
+Os valores `original` e `price` serao atualizados para alinhar com os valores ja definidos em `launchPrices`. Isso garante que todos os modais internos (PurchaseJornadaDialog, FullJourneyUpsell, NelloOneUpsell, etc.) mostrem o preco correto da oferta de estreia.
 
-### Solucao
+### Impacto
 
-Em vez de depender do `journeySteps` (que esta stale), usar a ordem do caminho selecionado diretamente no callback:
-
-1. **Receber o path selecionado** no `handleOnboardingComplete` (ja recebe como parametro `EntryPath`)
-2. **Calcular o primeiro teste correto** baseado no path selecionado (ex: "pratico" -> DISC, "emocional" -> Temperamentos)
-3. **Encontrar o step correspondente** diretamente nos testes disponíveis, sem depender do `journeySteps` reativo
-4. **Aguardar a invalidacao das queries** antes de navegar, usando `await queryClient.invalidateQueries()`
-
-### Detalhes Tecnicos
-
-**Arquivo:** `src/pages/Cliente.tsx` (funcao `handleOnboardingComplete`, linhas 614-627)
-
-**Mudanca:**
-- Importar as ordens de jornada diretamente (`EMOTIONAL_JOURNEY_ORDER`, `PRACTICAL_JOURNEY_ORDER`) do hook `useEntryPath`
-- No `handleOnboardingComplete`, determinar o primeiro slug baseado no `path` recebido como parametro
-- Buscar o teste correspondente em `journeySteps` pelo `testType` em vez de pelo indice `[0]`
-- Usar `await` nas invalidacoes antes de navegar
-
-Isso garante que, independente do estado reativo, o teste correto sera aberto.
-
+Todos os componentes que usam `bundlePrices` ou `getBundlePriceForLanguage()` serao atualizados automaticamente:
+- PurchaseJornadaDialog (modal de compra)
+- FullJourneyUpsell (upsell na pagina de testes)
+- NelloOneUpsell (upsell no business)
+- MobileStickyCtA (ja mostra R$ 648,50 hardcoded)
