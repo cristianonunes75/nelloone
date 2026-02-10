@@ -13,6 +13,7 @@ import { useLanguage, Language } from "@/contexts/LanguageContext";
 import { getCurrencyForLanguage, testPrices } from "@/lib/priceConfig";
 import { getAffiliateCode } from "@/hooks/useAffiliateTracking";
 import { useState } from "react";
+import { FaithClarityNotice } from "@/components/FaithClarityNotice";
 
 interface PurchaseAtivacaoDialogProps {
   open: boolean;
@@ -197,6 +198,8 @@ export const PurchaseAtivacaoDialog = ({
           )}
           {t.cta}
         </Button>
+
+        <FaithClarityNotice variant="compact" className="mt-2" />
       </DialogContent>
     </Dialog>
   );

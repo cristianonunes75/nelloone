@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { FaithClarityNotice } from "@/components/FaithClarityNotice";
 import { CodigoEssenciaUpsell } from "@/components/monetization";
 import { useAuth } from "@/hooks/useAuth";
 import { useJourneyProgress } from "@/hooks/useJourneyProgress";
@@ -719,6 +720,9 @@ const CodigoEssenciaInner = () => {
                 }
                 return null;
               })()}
+
+              {/* Faith Clarity Notice - Report variant */}
+              <FaithClarityNotice variant="report" />
 
               {/* === TAB-BASED CONTENT === */}
               <CodigoContentTabs

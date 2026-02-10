@@ -28,6 +28,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ConsentCheckbox, ConsentError } from "@/components/consent/ConsentCheckbox";
 import { recordConsent } from "@/hooks/useConsentRecord";
+import { FaithClarityNotice } from "@/components/FaithClarityNotice";
 
 const Checkout = () => {
   const { user, isLoading: authLoading } = useAuth();
@@ -516,6 +517,9 @@ const Checkout = () => {
                 {texts.securePayment}
               </div>
             </div>
+
+            {/* Faith Clarity Notice */}
+            <FaithClarityNotice />
           </div>
 
           {/* Right Column - Order Summary */}
@@ -659,6 +663,13 @@ const Checkout = () => {
                     </>
                   )}
                 </Button>
+
+                {/* Microcopy pastoral */}
+                <p className="text-xs text-muted-foreground/80 text-center leading-relaxed">
+                  {language === 'en'
+                    ? 'A journey of human self-knowledge, with symbolic and didactic language, without any esoteric connotation.'
+                    : 'Jornada de autoconhecimento humano, com linguagem simbólica e didática, sem qualquer conotação esotérica.'}
+                </p>
 
                 {/* Premium Trust Block */}
                 <CheckoutTrustBlock />
