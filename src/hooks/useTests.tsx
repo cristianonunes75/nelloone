@@ -61,13 +61,23 @@ export const useTests = () => {
       if (error) throw error;
 
       // Map user tests to current language tests (by type)
-      return data?.map(ut => {
+      // and deduplicate: keep only the best record per test type (completed > in_progress > not_started)
+      const mapped = data?.map(ut => {
         const matchingTest = languageTests.find(lt => lt.type === ut.tests?.type);
         return {
           ...ut,
           test_id: matchingTest?.id || ut.test_id,
         };
       }) || [];
+
+      // Deduplicate by test_id: since results are ordered with completed first,
+      // the first occurrence for each test_id is the best one
+      const seen = new Set<string>();
+      return mapped.filter(ut => {
+        if (seen.has(ut.test_id)) return false;
+        seen.add(ut.test_id);
+        return true;
+      });
     },
   });
 
