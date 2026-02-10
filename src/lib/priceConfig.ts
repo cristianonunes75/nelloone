@@ -238,17 +238,17 @@ export const getLaunchPriceForLanguage = (language: Language) => {
 // Includes: 7 tests + Premium PDFs + Código da Essência + 1 Ativação do Código
 export const bundlePrices = {
   brl: {
-    original: 1897,
-    price: 1297,
-    priceId: "price_1SyxwqDjhZZxZELM5b6l6Ug4", // Jornada Identity Completa + Ativação - R$1.297
+    original: 1297,
+    price: 648.50,
+    priceId: "price_1SyxwqDjhZZxZELM5b6l6Ug4",
     currency: "BRL" as Currency,
     symbol: "R$",
     includesCodigoEssencia: true,
     includesAtivacaoCodigo: true,
   },
   usd: {
-    original: 597,
-    price: 397,
+    original: 397,
+    price: 198.50,
     priceId: "price_1Syy0ZDjhZZxZELMo8MD90aY",
     currency: "USD" as Currency,
     symbol: "$",
@@ -256,8 +256,8 @@ export const bundlePrices = {
     includesAtivacaoCodigo: true,
   },
   eur: {
-    original: 447,
-    price: 297,
+    original: 297,
+    price: 148.50,
     priceId: "price_1Syy1CDjhZZxZELMz4OWUNgy",
     currency: "EUR" as Currency,
     symbol: "€",

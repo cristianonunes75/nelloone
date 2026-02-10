@@ -61,9 +61,9 @@ describe('Price Configuration', () => {
 
   describe('Bundle Prices', () => {
     it('should have bundle prices for all currencies', () => {
-      expect(bundlePrices.brl.price).toBe(1297)
-      expect(bundlePrices.usd.price).toBe(397)
-      expect(bundlePrices.eur.price).toBe(297)
+      expect(bundlePrices.brl.price).toBe(648.50)
+      expect(bundlePrices.usd.price).toBe(198.50)
+      expect(bundlePrices.eur.price).toBe(148.50)
     })
 
     it('should have valid bundle price IDs', () => {
