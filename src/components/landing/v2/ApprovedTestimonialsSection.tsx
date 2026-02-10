@@ -161,7 +161,7 @@ export function ApprovedTestimonialsSection() {
         .from("testimonials")
         .select("id, display_name, content, test_slug, created_at, is_featured")
         .eq("status", "approved")
-        .order("is_featured", { ascending: false })
+        .eq("is_featured", true)
         .order("created_at", { ascending: false })
         .limit(6);
 
