@@ -195,32 +195,48 @@ export function ApprovedTestimonialsSection() {
     );
   }
 
+  const hasApprovedTestimonials = dbTestimonials && dbTestimonials.length > 0;
+
   return (
     <section className="py-20 px-6 bg-muted/30">
       <div className="max-w-4xl mx-auto space-y-10">
         <div className="text-center space-y-4">
           <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
-            {title}
+            {hasApprovedTestimonials 
+              ? (language === 'en' ? 'What people say about the journey' : 'O que dizem sobre a jornada')
+              : title}
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {reactions.map((reaction, index) => (
-            <Card 
-              key={index}
-              className="border-border/50 hover:shadow-lg transition-shadow duration-300 bg-nello-gold/5"
-            >
-              <CardContent className="p-6 flex items-center justify-center min-h-[120px]">
-                <div className="flex items-start gap-3">
-                  <Quote className="w-5 h-5 text-nello-gold/40 shrink-0 mt-1" />
-                  <p className="text-foreground text-base md:text-lg font-medium leading-relaxed">
-                    "{reaction.content}"
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {hasApprovedTestimonials ? (
+          <div className={`grid gap-6 ${
+            dbTestimonials.length === 1 ? 'max-w-lg mx-auto' :
+            dbTestimonials.length === 2 ? 'md:grid-cols-2 max-w-3xl mx-auto' :
+            'md:grid-cols-2 lg:grid-cols-3'
+          }`}>
+            {dbTestimonials.map((testimonial) => (
+              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+            ))}
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-3 gap-6">
+            {reactions.map((reaction, index) => (
+              <Card 
+                key={index}
+                className="border-border/50 hover:shadow-lg transition-shadow duration-300 bg-nello-gold/5"
+              >
+                <CardContent className="p-6 flex items-center justify-center min-h-[120px]">
+                  <div className="flex items-start gap-3">
+                    <Quote className="w-5 h-5 text-nello-gold/40 shrink-0 mt-1" />
+                    <p className="text-foreground text-base md:text-lg font-medium leading-relaxed">
+                      "{reaction.content}"
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
         
         <p className="text-xs text-muted-foreground/60 max-w-2xl mx-auto text-center">
           {disclaimer}
