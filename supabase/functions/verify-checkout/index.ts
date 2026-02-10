@@ -282,6 +282,103 @@ serve(async (req) => {
       }
     }
 
+    // Process affiliate referral if applicable
+    const affiliateCode = session.metadata?.affiliate_code;
+    if (affiliateCode && affiliateCode.trim() !== "") {
+      logStep("Processing affiliate referral", { affiliateCode });
+      try {
+        // Find the affiliate by code
+        const { data: affiliateData } = await supabase
+          .from("affiliates")
+          .select("id, commission_percent, user_id")
+          .eq("affiliate_code", affiliateCode.toUpperCase())
+          .eq("is_active", true)
+          .single();
+
+        if (affiliateData) {
+          // Prevent self-referral
+          if (affiliateData.user_id !== userId) {
+            const transactionId = session.payment_intent as string;
+            
+            // Check idempotency - don't create duplicate referral
+            const { data: existingReferral } = await supabase
+              .from("affiliate_referrals")
+              .select("id")
+              .eq("affiliate_id", affiliateData.id)
+              .eq("purchase_id", transactionId)
+              .limit(1);
+
+            if (!existingReferral || existingReferral.length === 0) {
+              const saleAmount = (session.amount_total || 0) / 100;
+              const commissionAmount = saleAmount * (affiliateData.commission_percent / 100);
+
+              await supabase
+                .from("affiliate_referrals")
+                .insert({
+                  affiliate_id: affiliateData.id,
+                  referred_user_id: userId,
+                  sale_amount: saleAmount,
+                  commission_amount: commissionAmount,
+                  currency: (session.currency || "brl").toUpperCase(),
+                  status: "pending",
+                  purchase_id: transactionId,
+                });
+
+              // Update affiliate totals
+              await supabase.rpc("increment_affiliate_totals", {
+                p_affiliate_id: affiliateData.id,
+                p_sale_amount: saleAmount,
+                p_commission_amount: commissionAmount,
+              }).then(({ error: rpcError }) => {
+                if (rpcError) {
+                  // Fallback: manual update
+                  logStep("RPC not available, using manual update");
+                  supabase
+                    .from("affiliates")
+                    .update({
+                      total_sales: affiliateData.user_id ? undefined : 0, // trigger re-read
+                    })
+                    .eq("id", affiliateData.id);
+                }
+              });
+
+              // Manual fallback update for totals
+              const { data: currentAffiliate } = await supabase
+                .from("affiliates")
+                .select("total_sales, total_earnings")
+                .eq("id", affiliateData.id)
+                .single();
+
+              if (currentAffiliate) {
+                await supabase
+                  .from("affiliates")
+                  .update({
+                    total_sales: (currentAffiliate.total_sales || 0) + 1,
+                    total_earnings: (currentAffiliate.total_earnings || 0) + commissionAmount,
+                  })
+                  .eq("id", affiliateData.id);
+              }
+
+              logStep("Affiliate referral created", { 
+                affiliateId: affiliateData.id, 
+                commission: commissionAmount 
+              });
+            } else {
+              logStep("Affiliate referral already exists, skipping");
+            }
+          } else {
+            logStep("Self-referral detected, skipping");
+          }
+        } else {
+          logStep("Affiliate not found or inactive", { affiliateCode });
+        }
+      } catch (affError) {
+        logStep("Error processing affiliate referral (non-fatal)", { 
+          error: affError instanceof Error ? affError.message : String(affError) 
+        });
+      }
+    }
+
     // Log fallback alert in audit_logs for admin visibility
     await supabase
       .from("audit_logs")

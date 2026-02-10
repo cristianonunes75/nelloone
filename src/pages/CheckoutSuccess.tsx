@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useQueryClient } from "@tanstack/react-query";
+import { clearAffiliateCode } from "@/hooks/useAffiliateTracking";
 import { Loader2, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -146,6 +147,9 @@ export default function CheckoutSuccess() {
       }
 
       if (data.success) {
+        // Clear affiliate code after successful purchase to prevent duplicate commissions
+        clearAffiliateCode();
+        
         // Invalidate ALL queries to force refresh - using predicate to catch userId-specific queries
         queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "test-purchases" });
         queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "user-tests" });
