@@ -1,50 +1,64 @@
 
-## Correcao: Testes de usuarios apontando para versoes desativadas (pt-legacy)
 
-### Diagnostico
+# Plano: Sistema PDF Premium para Todos os Relatórios
 
-A Saula completou 3 testes (DISC, Temperamentos, Arquetipos) quando os registros ativos eram da versao `pt-legacy`. Depois, esses testes foram migrados para novos registros `pt`, mas os `user_tests` dela continuam apontando para os IDs antigos (`pt-legacy`, `active=false`).
+## Contexto
 
-O hook `useTests` filtra apenas testes com `language=pt` e `active=true`, entao esses registros completados ficam invisiveis no dashboard. O perfil mostra 7/7 (porque `journey_tests_status` foi atualizado), mas a interface visual nao encontra os resultados.
+O PDF do **Codigo da Essencia** ja usa o sistema programatico jsPDF (`pdfCodigoEssenciaPremium.ts`), e o codigo ja foi atualizado com a linguagem "Como Voce Esta Hoje". O PDF que voce enviou foi gerado **antes** dessa atualizacao -- o codigo atual ja esta correto.
 
-### Usuarios afetados
+Porem, o **Codigo do Casal** (CruzamentoViewer) e os **resultados individuais dos 7 testes** ainda usam `useScreenPDF` (screenshot do ecra), que gera PDFs de qualidade inferior.
 
-Qualquer usuario que completou testes ANTES da migracao `pt-legacy` para `pt` pode ter esse problema. Nao e apenas a Saula.
+## O Que Sera Feito
 
-### Solucao em 2 partes
+### 1. Corrigir o erro de build
+- Corrigir o TypeScript error em `usePushNotifications.tsx` (adicionar type assertion para `pushManager`)
 
-#### Parte 1: Migracao SQL (correcao imediata para todos os usuarios afetados)
+### 2. Criar PDF Programatico para o Codigo do Casal
+- Criar `src/lib/pdf/pdfCodigoCasalPremium.ts` usando o mesmo sistema `PremiumPDFBuilder` do core
+- Estrutura do PDF do Casal:
+  - **Capa Premium** (dark/gold, nomes do casal, disclaimer etico de fase)
+  - **Semaforo Relacional** (verde/amarelo/vermelho com cards coloridos)
+  - **Encontro das Essencias** (narrativa do casal)
+  - **Grafico de Sobreposicao** (barras DISC lado a lado)
+  - **Tabela de Traducao** (tabela formatada)
+  - **Manual do Conjuge A e B**
+  - **Alertas de Pressao**
+  - **Protocolo de Paz**
+  - **Desafio de Conexao 24h**
+  - **Fechamento com CTA**
+- Substituir o `useScreenPDF` no `CruzamentoViewer.tsx` pela funcao programatica
 
-Atualizar todos os `user_tests` que apontam para testes `pt-legacy` desativados, redirecionando para os equivalentes `pt` ativos:
+### 3. Criar PDF Programatico para os 7 Testes Individuais
+- Criar `src/lib/pdf/pdfTestResultPremium.ts` -- gerador generico que recebe o tipo de teste e os dados
+- Testes cobertos: DISC, Eneagrama, Temperamentos, Estilos de Conexao, Inteligencias, Arquetipos, Nello 16
+- Estrutura de cada PDF individual:
+  - **Capa** com nome do mapa e usuario
+  - **Resumo do Perfil** (scores/tipo dominante)
+  - **Grafico de Barras** com os scores
+  - **Descricao detalhada** do resultado
+  - **Rodape** com disclaimer etico
+- Integrar no `TestResults.tsx` substituindo o `useScreenPDF`
 
-```text
-Para cada tipo de teste (disc, temperamentos, arquetipos_proposito, linguagens_amor, mbti):
-1. Encontrar o test_id da versao pt-legacy (desativada)
-2. Encontrar o test_id da versao pt (ativa)
-3. Atualizar user_tests que apontam para o legacy, redirecionando para o ativo
-4. Tratar duplicatas: se o usuario ja tem registro no teste pt ativo,
-   manter o registro completado e remover o duplicado
-```
+### 4. Aplicar Mandato Linguistico em Todos os PDFs
+- Todos os novos PDFs incluirao o disclaimer de fase obrigatorio
+- Linguagem "Como voce esta" em vez de "Quem voce e"
+- Suporte a PT, PT-PT e EN
 
-Mapeamento especifico:
-- DISC: `7c533b3e` (legacy) para `bdd55908` (ativo)
-- Temperamentos: `2a5c48c4` (legacy) para `b9be06b8` (ativo)
-- Arquetipos: `e1a3511e` (legacy) para `d843395e` (ativo)
-- Estilos Conexao: `2a1fea19` (legacy) para `12aaa9e6` (ativo)
-- Nello16/MBTI: `5b83bbe8` (legacy) para `8de61499` (ativo)
+## Detalhes Tecnicos
 
-#### Parte 2: Ajuste no useTests.tsx (prevencao futura)
+### Arquivos a criar:
+- `src/lib/pdf/pdfCodigoCasalPremium.ts` -- gerador programatico do casal
+- `src/lib/pdf/pdfTestResultPremium.ts` -- gerador generico dos 7 testes
 
-Modificar a query de `userTests` para nao filtrar apenas por idioma ativo. Em vez disso, buscar TODOS os `user_tests` do usuario e depois fazer o mapeamento por `type` para os testes ativos. Isso garante que mesmo se houver registros apontando para versoes antigas, o sistema encontre os resultados.
+### Arquivos a editar:
+- `src/hooks/usePushNotifications.tsx` -- fix build error
+- `src/components/codigo-essencia/CruzamentoViewer.tsx` -- trocar useScreenPDF pelo novo gerador
+- `src/pages/TestResults.tsx` -- trocar useScreenPDF pelo novo gerador
+- `src/lib/pdf/pdfPremiumCore.ts` -- adicionar helpers reutilizaveis (tabelas, barras lado a lado)
 
-### Detalhes tecnicos
-
-**Migracao SQL:**
-- Para cada par legacy/ativo, executar UPDATE com tratamento de conflito
-- Quando o usuario ja tem um `user_test` para ambos os IDs (legacy e ativo), manter o que tem `status=completed` e deletar o duplicado `in_progress`
-- Caso da Saula: DISC e Arquetipos nao tem registro `pt` (apenas legacy), entao e um UPDATE simples. Temperamentos tem ambos (legacy=completed, pt=in_progress), entao deleta o `in_progress` e atualiza o `completed`
-
-**useTests.tsx:**
-- Remover o pre-filtro por `language` na query de `user_tests`
-- Buscar todos os `user_tests` do usuario com join em `tests`
-- No mapeamento (linha 64), priorizar registros `completed` sobre `in_progress` quando existirem duplicatas para o mesmo `type`
+### Padrao visual unificado:
+- Cores: Deep Navy (#1f2e4b), Gold (#cdae67), Dark Cover (#0f0f14)
+- Formato A4, margens 15mm
+- Capa elegante com bandas gold
+- Cards com barra lateral colorida
+- Rodape com paginacao e disclaimer
