@@ -34,7 +34,7 @@ import {
   generateCrisisCommunicationTable,
   type CoupleProfiles
 } from "@/lib/coupleSynergyLogic";
-import { useScreenPDF } from "@/hooks/useScreenPDF";
+import { generateCodigoCasalPremiumPDF } from "@/lib/pdf/pdfCodigoCasalPremium";
 
 interface CruzamentoViewerProps {
   crossing: {
@@ -271,8 +271,7 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
   const reportRef = useRef<HTMLDivElement>(null);
   const t = TRANSLATIONS[language];
   
-  // Use screen capture for PDF generation (like a screenshot)
-  const { generatePDFFromRef, isGenerating: isGeneratingPdf } = useScreenPDF();
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   // Keep local copy updated when parent passes a new crossing
   useEffect(() => {
@@ -499,14 +498,26 @@ export const CruzamentoViewer = ({ crossing, language, onBack, onPurchase }: Cru
   };
 
   const handleDownloadPDF = async () => {
-    const fileName = language === 'en' ? 'couple-code' : 'codigo-do-casal';
-    
-    await generatePDFFromRef(reportRef as React.RefObject<HTMLElement>, {
-      fileName,
-      language: language as 'pt' | 'pt-pt' | 'en',
-      scale: 2,
-      quality: 0.95
-    });
+    setIsGeneratingPdf(true);
+    try {
+      const dados = content?.dados_grafico;
+      const nameA = dados?.usuario_a?.nome || 'Pessoa A';
+      const nameB = dados?.usuario_b?.nome || 'Pessoa B';
+      
+      generateCodigoCasalPremiumPDF({
+        nameA,
+        nameB,
+        language: language as 'pt' | 'pt-pt' | 'en',
+        content,
+        relationshipType: liveCrossing.relationship_type,
+      });
+      toast.success(language === 'en' ? 'PDF downloaded!' : 'PDF baixado com sucesso!');
+    } catch (error) {
+      console.error('Error generating couple PDF:', error);
+      toast.error(language === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   // ============== TRAFFIC LIGHT SECTION ==============
