@@ -10,7 +10,7 @@ import { ARCHETYPES } from "@/lib/archetypes";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef, useState, useMemo, Component, type ReactNode } from "react";
-import { useScreenPDF } from "@/hooks/useScreenPDF";
+// useScreenPDF removed - all tests use programmatic PDF generators
 import { toast } from "sonner";
 
 import ArchetypeResults from "@/components/cliente/ArchetypeResults";
@@ -191,7 +191,7 @@ function TestResultsInner() {
   const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   const [isRecalculating, setIsRecalculating] = useState(false);
-  const { generatePDFFromRef, isGenerating: isDownloadingPDF } = useScreenPDF();
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
 
   // Define handleRetry early to avoid hoisting issues
   const handleRetry = () => {
@@ -645,15 +645,29 @@ function TestResultsInner() {
     }
   };
 
-  // Unified PDF download handler for floating menu - captures screen layout exactly
+  // Unified PDF download handler - dispatches to the correct test-specific generator
   const handleUnifiedPDFDownload = async () => {
-    const testName = userTest?.tests?.name?.replace(/\s+/g, '-').toLowerCase() || 'resultado';
-    await generatePDFFromRef(resultsRef as React.RefObject<HTMLElement>, {
-      fileName: `nello-one-${testName}`,
-      language: lang as 'pt' | 'pt-pt' | 'en',
-      scale: 2,
-      quality: 0.95
-    });
+    const testType = userTest?.tests?.type;
+    if (!testType) {
+      toast.error(lang === 'en' ? 'Test type unknown' : 'Tipo de teste desconhecido');
+      return;
+    }
+    setIsDownloadingPDF(true);
+    try {
+      if (testType === 'disc') handleDownloadDISCPDF();
+      else if (testType === 'eneagrama') handleDownloadEneagramaPDF();
+      else if (testType === 'temperamentos') handleDownloadTemperamentosPDF();
+      else if (testType === 'mbti') handleDownloadNello16PDF();
+      else if (testType === 'linguagens_amor') handleDownloadEstilosConexaoPDF();
+      else if (testType === 'inteligencias_multiplas') handleDownloadInteligenciasPDF();
+      else if (testType === 'arquetipos_proposito') handleDownloadArquetiposPDF();
+      else handleDownloadPDF(); // fallback to html2canvas
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error(lang === 'en' ? 'Error generating PDF' : 'Erro ao gerar PDF');
+    } finally {
+      setIsDownloadingPDF(false);
+    }
   };
 
   // Send PDF by email handler
