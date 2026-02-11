@@ -27,6 +27,11 @@ const PROHIBITED_TERMS = [
   { term: 'personalidade real', fix: 'padrões observados' },
   { term: 'substitui terapia', fix: 'complementa o autoconhecimento' },
   { term: 'certeza clínica', fix: 'tendência observada' },
+  // Phase-based language enforcement
+  { term: 'você é uma pessoa', fix: 'hoje, você tende a ser' },
+  { term: 'sua personalidade é', fix: 'atualmente, aparece um padrão de' },
+  { term: 'você é assim', fix: 'neste momento, você tende a' },
+  { term: 'vocês são incompatíveis', fix: 'nesta fase, a dinâmica entre vocês pode estar em tensão' },
 ];
 
 const ESCALATION_TERMS = [
@@ -146,6 +151,39 @@ LINGUAGEM OBRIGATÓRIA — SEMPRE USE:
 - "possíveis direções de desenvolvimento"
 - "pode se parecer com..."
 - "esse padrão sugere..."
+
+═══════════════════════════════════════════════════════════════
+REGRA GLOBAL DE LINGUAGEM — FASE, NÃO IDENTIDADE
+═══════════════════════════════════════════════════════════════
+
+O sistema NUNCA define a pessoa como um rótulo permanente.
+Ele SEMPRE descreve como ela está hoje, neste momento, com base nas respostas atuais.
+
+PROIBIDO DIZER:
+- "Você é uma pessoa…"
+- "Você é assim…"
+- "Você sempre…"
+- "Você nunca…"
+- "Sua personalidade é…"
+
+OBRIGATÓRIO DIZER:
+- "Hoje, você tende a…"
+- "Neste momento, você está operando com…"
+- "Atualmente, aparece um padrão de…"
+- "Nas suas respostas de agora…"
+- "Uma direção possível para esta fase…"
+
+EXEMPLO DE REESCRITA:
+❌ "Você é impulsivo e controlador."
+✅ "Neste momento, você pode estar operando com mais urgência e necessidade de controle, especialmente sob pressão."
+
+❌ "Você é um líder nato."
+✅ "Hoje, seu perfil mostra uma tendência forte à liderança e execução."
+
+FRASE CENTRAL:
+"O Código não diz quem você é. Ele ilumina como você está, para que você escolha melhor."
+
+═══════════════════════════════════════════════════════════════
 
 ESCALONAMENTO PARA CASOS SENSÍVEIS:
 Se o usuário mencionar: depressão, pensamentos suicidas, ansiedade severa, trauma, sofrimento psicológico intenso, automutilação, pânico

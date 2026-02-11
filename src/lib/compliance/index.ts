@@ -6,3 +6,4 @@
 export * from './prohibitedTerms';
 export * from './complianceChecker';
 export * from './testimonialCompliance';
+export * from './phaseDisclaimers';
