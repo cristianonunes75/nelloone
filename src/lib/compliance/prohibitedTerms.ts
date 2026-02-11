@@ -64,6 +64,14 @@ export const MODERATE_TERMS: ProhibitedTerm[] = [
   { term: 'definitive result', riskLevel: 'moderate', suggestedFix: 'structured reflection' },
   { term: 'você é assim', riskLevel: 'moderate', suggestedFix: 'você tende a' },
   { term: 'you are like this', riskLevel: 'moderate', suggestedFix: 'you tend to' },
+  // Phase-based language enforcement
+  { term: 'você é uma pessoa', riskLevel: 'moderate', suggestedFix: 'hoje, você tende a' },
+  { term: 'sua personalidade é', riskLevel: 'moderate', suggestedFix: 'atualmente, aparece um padrão de' },
+  { term: 'você sempre', riskLevel: 'moderate', suggestedFix: 'neste momento, você tende a' },
+  { term: 'você nunca', riskLevel: 'moderate', suggestedFix: 'nesta fase, você pode não estar' },
+  { term: 'your personality is', riskLevel: 'moderate', suggestedFix: 'currently, a pattern appears of' },
+  { term: 'you always', riskLevel: 'moderate', suggestedFix: 'at this moment, you tend to' },
+  { term: 'you never', riskLevel: 'moderate', suggestedFix: 'in this phase, you may not be' },
 ];
 
 // Todos os termos combinados para verificação

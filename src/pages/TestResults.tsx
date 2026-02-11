@@ -861,10 +861,16 @@ function TestResultsInner() {
       }
     }
   };
+  const phaseDisclaimer = lang === 'en' 
+    ? { title: "Important note", line1: "This material does not define who you are.", line2: "It describes how you are today, based on your answers at this moment.", line3: "People mature, go through phases, and change patterns.", line4: "The Code is a mirror of awareness, not a verdict." }
+    : lang === 'pt-pt'
+    ? { title: "Nota importante", line1: "Este material não define quem tu és.", line2: "Ele descreve como estás hoje, com base nas tuas respostas neste momento.", line3: "As pessoas amadurecem, atravessam fases e mudam padrões.", line4: "O Código é um espelho de consciência, não uma sentença." }
+    : { title: "Nota importante", line1: "Este material não define quem você é.", line2: "Ele descreve como você está hoje, com base nas suas respostas neste momento.", line3: "Pessoas amadurecem, atravessam fases e mudam padrões.", line4: "O Código é um espelho de consciência, não uma sentença." };
+
   return (
     <div className="container mx-auto p-6 max-w-4xl space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Seus Resultados</h1>
+        <h1 className="text-3xl font-bold">{lang === 'en' ? 'Your Results' : 'Seus Resultados'}</h1>
         <div className="flex gap-2">
           {canRecalculate && (
             <Button 
@@ -877,17 +883,24 @@ function TestResultsInner() {
               ) : (
                 <Calculator className="w-4 h-4 mr-2" />
               )}
-              Recalcular
+              {lang === 'en' ? 'Recalculate' : 'Recalcular'}
             </Button>
           )}
           {isAdmin && (
             <Button onClick={handleResetTest} variant="outline">
               <RotateCcw className="w-4 h-4 mr-2" />
-              Reiniciar Teste
+              {lang === 'en' ? 'Reset Test' : 'Reiniciar Teste'}
             </Button>
           )}
-          <Button onClick={() => navigate(`${basePath}/cliente`)}>Voltar para Dashboard</Button>
+          <Button onClick={() => navigate(`${basePath}/cliente`)}>{lang === 'en' ? 'Back to Dashboard' : 'Voltar para Dashboard'}</Button>
         </div>
+      </div>
+
+      {/* Phase Disclaimer Block */}
+      <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4 text-sm">
+        <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">{phaseDisclaimer.title}</p>
+        <p className="text-amber-800 dark:text-amber-300">{phaseDisclaimer.line1} {phaseDisclaimer.line2}</p>
+        <p className="text-amber-700 dark:text-amber-400 mt-1">{phaseDisclaimer.line3} {phaseDisclaimer.line4}</p>
       </div>
 
       <div ref={resultsRef} className="space-y-6">

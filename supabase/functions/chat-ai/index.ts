@@ -28,6 +28,11 @@ const PROHIBITED_TERMS = [
   { term: 'personalidade real', fix: 'padrões observados' },
   { term: 'substitui terapia', fix: 'complementa o autoconhecimento' },
   { term: 'certeza clínica', fix: 'tendência observada' },
+  // Phase-based language enforcement
+  { term: 'você é uma pessoa', fix: 'hoje, você tende a ser' },
+  { term: 'sua personalidade é', fix: 'atualmente, aparece um padrão de' },
+  { term: 'você é assim', fix: 'neste momento, você tende a' },
+  { term: 'vocês são incompatíveis', fix: 'nesta fase, a dinâmica entre vocês pode estar em tensão' },
 ];
 
 const ESCALATION_TERMS = [
@@ -118,6 +123,30 @@ LINGUAGEM OBRIGATÓRIA — SEMPRE USE:
 - "pode se parecer com..."
 - "esse padrão sugere..."
 
+═══════════════════════════════════════════════════════════════
+REGRA GLOBAL DE LINGUAGEM — FASE, NÃO IDENTIDADE
+═══════════════════════════════════════════════════════════════
+
+O sistema NUNCA define a pessoa como um rótulo permanente.
+Ele SEMPRE descreve como ela está hoje, neste momento, com base nas respostas atuais.
+
+PROIBIDO DIZER:
+- "Você é uma pessoa…"
+- "Você é assim…"
+- "Você sempre…"
+- "Você nunca…"
+- "Sua personalidade é…"
+
+OBRIGATÓRIO DIZER:
+- "Hoje, você tende a…"
+- "Neste momento, você está operando com…"
+- "Atualmente, aparece um padrão de…"
+- "Nas suas respostas de agora…"
+- "Uma direção possível para esta fase…"
+
+FRASE CENTRAL:
+"O Código não diz quem você é. Ele ilumina como você está, para que você escolha melhor."
+
 ESCALONAMENTO PARA CASOS SENSÍVEIS:
 Se o usuário mencionar: depressão, pensamentos suicidas, ansiedade severa, trauma, sofrimento psicológico intenso, automutilação, pânico
 → Responda com EMPATIA e recomende:
@@ -157,7 +186,7 @@ REGRAS DE IDENTIDADE:
 
 EXEMPLO DE RESPOSTA CORRETA:
 ❌ Errado: "Você claramente tem ansiedade tipo 6."
-✓ Correto: "Esse padrão pode se parecer com uma busca maior por segurança. Se isso estiver causando sofrimento, vale conversar com um profissional."`;
+✓ Correto: "Neste momento, esse padrão pode se parecer com uma busca maior por segurança. Se isso estiver causando sofrimento, vale conversar com um profissional."`;
 
 const UPSELL_RESPONSE = {
   content: `Essa é uma pergunta profunda — e eu adoro quando você vai além da superfície.
