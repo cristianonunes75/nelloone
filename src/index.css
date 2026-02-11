@@ -309,3 +309,42 @@
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
 }
+
+/* Print styles - Hide fixed/sticky elements when using browser Save as PDF */
+@media print {
+  /* Hide all fixed-position elements (navbars, floating menus, chat widgets) */
+  .fixed,
+  [class*="fixed"] {
+    display: none !important;
+  }
+
+  /* Convert sticky elements to static */
+  .sticky {
+    position: relative !important;
+  }
+
+  /* Remove backdrop effects */
+  .backdrop-blur-md,
+  .backdrop-blur-sm,
+  .backdrop-blur-xl {
+    backdrop-filter: none !important;
+  }
+
+  /* Ensure content flows naturally across pages */
+  body, #root {
+    overflow: visible !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Remove top padding that compensates for fixed navbars */
+  .container {
+    padding-top: 0 !important;
+  }
+
+  /* Prevent cards/sections from being split across pages */
+  section, article, [class*="Card"] {
+    break-inside: avoid;
+  }
+}
