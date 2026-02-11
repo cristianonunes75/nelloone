@@ -171,8 +171,10 @@ export async function updateJourneyProgress(
 
     console.log(`Journey progress updated for user ${userId}: ${testSlug} -> ${status}, completed: ${completedCount}/${totalTests}`);
 
-    // If journey just completed, send notification to admin
-    if (completedCount >= totalTests && journeyStatus === 'completed') {
+    // If journey JUST completed (was not already completed before this update), send notification
+    const previousJourneyStatus = profile?.journey_status as JourneyStatus || 'not_started';
+    const justCompleted = journeyStatus === 'completed' && previousJourneyStatus !== 'completed';
+    if (justCompleted) {
       try {
         // Get user profile for notification
         const { data: profileData } = await supabase
