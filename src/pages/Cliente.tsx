@@ -364,11 +364,20 @@ const Cliente = () => {
       testType: step.testType,
     });
 
-    // Start test directly and navigate to test execution
     try {
+      // Check if there's already an in-progress test from cached data
+      const existingUserTest = userTests?.find(
+        ut => ut.test_id === step.testId && ut.status === 'in_progress'
+      );
+
+      if (existingUserTest) {
+        const basePath = getBasePath();
+        navigate(`${basePath}/cliente/test-execution/${step.testId}/${existingUserTest.id}`);
+        return;
+      }
+
       const userTest = await startTestAsync(step.testId);
       const basePath = getBasePath();
-      console.log("[Cliente] Navigating to test execution:", `${basePath}/cliente/test-execution/${step.testId}/${userTest.id}`);
       navigate(`${basePath}/cliente/test-execution/${step.testId}/${userTest.id}`);
     } catch (error) {
       toast({
@@ -380,9 +389,29 @@ const Cliente = () => {
   };
 
   const handleContinueTest = async (step: typeof journeySteps[0]) => {
-    const userTest = await startTestAsync(step.testId);
-    const basePath = getBasePath();
-    navigate(`${basePath}/cliente/test-execution/${step.testId}/${userTest.id}`);
+    try {
+      // Use cached data first to avoid unnecessary API call
+      const existingUserTest = userTests?.find(
+        ut => ut.test_id === step.testId && ut.status === 'in_progress'
+      );
+
+      if (existingUserTest) {
+        const basePath = getBasePath();
+        navigate(`${basePath}/cliente/test-execution/${step.testId}/${existingUserTest.id}`);
+        return;
+      }
+
+      // Fallback: use startTestAsync
+      const userTest = await startTestAsync(step.testId);
+      const basePath = getBasePath();
+      navigate(`${basePath}/cliente/test-execution/${step.testId}/${userTest.id}`);
+    } catch (error) {
+      toast({
+        title: "Erro ao continuar teste",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleViewResult = async (step: typeof journeySteps[0]) => {
