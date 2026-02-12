@@ -124,7 +124,7 @@ const SAFE_BOTTOM = 260;
 const LH = 5;
 
 const stripEmoji = (s: string): string =>
-  s.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}\u{E0020}-\u{E007F}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2702}-\u{27B0}\u{00A9}\u{00AE}\u{203C}-\u{3299}]/gu, "").replace(/\s{2,}/g, " ").trim();
+  s.replace(/[^\p{L}\p{N}\p{P}\p{Z}\p{M}\p{Sc}\n\r\t]/gu, "").replace(/\s{2,}/g, " ").trim();
 
 const safeStr = (v: any): string => {
   if (typeof v === "string") return stripEmoji(v);
@@ -168,15 +168,15 @@ const buildCouplePDF = (options: CouplePDFOptions): jsPDF => {
   const checkPageBreak = (h: number) => { if (needsNewPage(h)) addNewPage(); };
 
   const addSectionTitle = (title: string, color = PRIMARY) => {
-    checkPageBreak(20);
+    // Ensure at least 45mm for title + content to avoid orphan headers
+    checkPageBreak(45);
     currentY += 4;
     doc.setFillColor(color.r, color.g, color.b);
     doc.rect(M, currentY, 3, 10, "F");
     doc.setTextColor(color.r, color.g, color.b);
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
-    // Strip emoji from title for clean PDF
-    const cleanTitle = title.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}]/gu, "").trim();
+    const cleanTitle = stripEmoji(title);
     doc.text(cleanTitle, M + 6, currentY + 7);
     currentY += 15;
   };
@@ -211,7 +211,11 @@ const buildCouplePDF = (options: CouplePDFOptions): jsPDF => {
 
   const addLabelValue = (label: string, value: string, labelColor = PRIMARY) => {
     if (!value) return;
-    checkPageBreak(15);
+    // Estimate total height: label + value lines to avoid orphan labels
+    doc.setFontSize(10);
+    const estLines = doc.splitTextToSize(value, CW - 5);
+    const estH = 5 + estLines.length * LH + 5;
+    checkPageBreak(Math.min(estH, 40));
     doc.setTextColor(labelColor.r, labelColor.g, labelColor.b);
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
@@ -467,11 +471,12 @@ const buildCouplePDF = (options: CouplePDFOptions): jsPDF => {
   // === 9. DISC OVERLAP CHART ===
   const dados = content.dados_grafico as CoupleGraficoData | undefined;
   if (dados?.usuario_a?.disc && dados?.usuario_b?.disc) {
-    addSectionTitle(t.graficoDisc, BLUE);
-
+    // Ensure all 4 DISC bars stay on the same page
     const discKeys = ["D", "I", "S", "C"];
     const barH = 8;
     const barGap = 16;
+    const totalChartH = discKeys.length * barGap + 10;
+    checkPageBreak(totalChartH);
 
     for (const key of discKeys) {
       checkPageBreak(barGap + 4);
