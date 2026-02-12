@@ -124,14 +124,14 @@ export function AbandonmentRecovery({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-sm max-h-[70vh] p-4 sm:p-6">
         <DialogHeader>
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-2">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring" }}
-              className={`p-4 rounded-full ${
+              className={`p-3 rounded-full ${
                 abandonmentType === 'fear' 
                   ? 'bg-rose-100 dark:bg-rose-900/30' 
                   : abandonmentType === 'time'
@@ -139,7 +139,7 @@ export function AbandonmentRecovery({
                     : 'bg-blue-100 dark:bg-blue-900/30'
               }`}
             >
-              <Icon className={`w-8 h-8 ${
+              <Icon className={`w-6 h-6 ${
                 abandonmentType === 'fear' 
                   ? 'text-rose-600' 
                   : abandonmentType === 'time'
@@ -148,17 +148,17 @@ export function AbandonmentRecovery({
               }`} />
             </motion.div>
           </div>
-          <DialogTitle className="text-center text-xl font-display">
+          <DialogTitle className="text-center text-lg font-display">
             {content.title}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="py-6 space-y-6">
+        <div className="py-3 space-y-3">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-center text-muted-foreground leading-relaxed"
+            className="text-center text-sm text-muted-foreground leading-relaxed"
           >
             {message}
           </motion.p>
@@ -168,9 +168,9 @@ export function AbandonmentRecovery({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="flex items-center justify-center gap-2 text-sm text-primary"
+              className="flex items-center justify-center gap-2 text-xs text-primary"
             >
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-3.5 h-3.5" />
               <span>
                 {lang === 'en' 
                   ? `${remainingQuestions} questions remaining`
@@ -181,10 +181,10 @@ export function AbandonmentRecovery({
           )}
 
           {/* Action buttons */}
-          <div className="flex flex-col gap-3 pt-2">
+          <div className="flex flex-col gap-2 pt-1">
             <Button 
               onClick={handleContinue}
-              size="lg"
+              size="default"
               className="w-full gap-2"
             >
               <PlayCircle className="w-4 h-4" />
@@ -194,7 +194,7 @@ export function AbandonmentRecovery({
             <Button 
               onClick={handleSaveExit}
               variant="outline"
-              size="lg"
+              size="default"
               className="w-full"
             >
               {content.secondaryCta}
@@ -222,8 +222,8 @@ export function useAbandonmentDetection(
       const inactiveTime = Date.now() - lastActivityTime;
       const progress = currentQuestionIndex / totalQuestions;
       
-      // If inactive for 30+ seconds
-      if (inactiveTime > 30000 && currentQuestionIndex > 0) {
+      // If inactive for 90+ seconds (was 30s - too aggressive)
+      if (inactiveTime > 90000 && currentQuestionIndex > 0) {
         // If in the emotional/deep part of test (middle sections), might be fear
         if (progress > 0.3 && progress < 0.7) {
           setAbandonmentType('fear');
@@ -234,7 +234,7 @@ export function useAbandonmentDetection(
       }
     };
 
-    const interval = setInterval(checkInactivity, 10000); // Check every 10 seconds
+    const interval = setInterval(checkInactivity, 30000); // Check every 30 seconds (was 10s)
     return () => clearInterval(interval);
   }, [lastActivityTime, currentQuestionIndex, totalQuestions]);
 
