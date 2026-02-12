@@ -1208,9 +1208,9 @@ function TestResultsInner() {
         isDownloading={isDownloadingPDF}
         onShare={() => {
           const testName = userTest.tests?.name || "teste";
-          const shareText = `🌟 Concluí o teste "${testName}" no NELLO ONE!\n\nDescubra sua essência em nello.one`;
+          const shareText = `🌟 Concluí o teste "${testName}" no NELLO ONE!\n\nDescubra sua essência em identity.nello.one`;
           if (navigator.share) {
-            navigator.share({ title: `Resultado: ${testName}`, text: shareText, url: "https://nello.one" }).catch(() => {});
+            navigator.share({ title: `Resultado: ${testName}`, text: shareText, url: "https://identity.nello.one" }).catch(() => {});
           } else {
             navigator.clipboard.writeText(shareText).then(() => toast.success("Link copiado!"));
           }
