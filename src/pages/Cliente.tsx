@@ -452,13 +452,13 @@ const Cliente = () => {
   };
 
   const handleShareResult = (testName: string, summary: string) => {
-    const shareText = `🌟 Descobri meu resultado no teste "${testName}": ${summary}\n\nDescubra sua essência também em nello.one`;
+    const shareText = `🌟 Descobri meu resultado no teste "${testName}": ${summary}\n\nDescubra sua essência também em identity.nello.one`;
     
     if (navigator.share) {
       navigator.share({
         title: `Meu resultado: ${testName}`,
         text: shareText,
-        url: "https://nello.one",
+        url: "https://identity.nello.one",
       }).catch(() => {
         // User cancelled sharing
       });
