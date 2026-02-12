@@ -123,15 +123,18 @@ const CW = PW - M * 2;
 const SAFE_BOTTOM = 260;
 const LH = 5;
 
+const stripEmoji = (s: string): string =>
+  s.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}\u{E0020}-\u{E007F}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2702}-\u{27B0}\u{00A9}\u{00AE}\u{203C}-\u{3299}]/gu, "").replace(/\s{2,}/g, " ").trim();
+
 const safeStr = (v: any): string => {
-  if (typeof v === "string") return v;
+  if (typeof v === "string") return stripEmoji(v);
   if (v == null) return "";
   if (Array.isArray(v)) return v.map(i => safeStr(i)).join(", ");
   if (typeof v === "object") {
     // Try common text fields first
     const textFields = ["texto", "conteudo", "resumo", "descricao", "titulo", "mensagem", "acao", "regra"];
     for (const f of textFields) {
-      if (typeof v[f] === "string") return v[f];
+      if (typeof v[f] === "string") return stripEmoji(v[f]);
     }
     // Don't fallback to JSON.stringify - return empty
     return "";
