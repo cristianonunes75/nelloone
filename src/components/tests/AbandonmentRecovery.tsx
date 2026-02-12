@@ -223,7 +223,7 @@ export function useAbandonmentDetection(
       const progress = currentQuestionIndex / totalQuestions;
       
       // If inactive for 90+ seconds (was 30s - too aggressive)
-      if (inactiveTime > 90000 && currentQuestionIndex > 0) {
+      if (inactiveTime > 180000 && currentQuestionIndex > 0) {
         // If in the emotional/deep part of test (middle sections), might be fear
         if (progress > 0.3 && progress < 0.7) {
           setAbandonmentType('fear');
