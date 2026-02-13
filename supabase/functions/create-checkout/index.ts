@@ -873,19 +873,32 @@ serve(async (req) => {
         if (isNotExpired && hasUsesLeft) {
           let stripeCouponId = launchCoupon.stripe_coupon_id;
           
-          if (!stripeCouponId) {
+          // Validate or create the Stripe coupon
+          let validCouponId = stripeCouponId;
+          if (stripeCouponId) {
+            try {
+              await stripe.coupons.retrieve(stripeCouponId);
+              logStep("Existing Stripe coupon validated", { stripeCouponId });
+            } catch {
+              logStep("Stripe coupon invalid, creating new one", { oldId: stripeCouponId });
+              validCouponId = null;
+            }
+          }
+          
+          if (!validCouponId) {
             const stripeCoupon = await stripe.coupons.create({
               percent_off: 50,
               duration: "once",
               name: "LANCAMENTO50 - 50% OFF",
             });
-            stripeCouponId = stripeCoupon.id;
-            await supabaseAdmin2.from("coupons").update({ stripe_coupon_id: stripeCouponId }).eq("id", launchCoupon.id);
+            validCouponId = stripeCoupon.id;
+            await supabaseAdmin2.from("coupons").update({ stripe_coupon_id: validCouponId }).eq("id", launchCoupon.id);
+            logStep("New Stripe coupon created and saved", { newId: validCouponId });
           }
           
           try {
             const promoCode = await stripe.promotionCodes.create({
-              coupon: stripeCouponId,
+              coupon: validCouponId,
               code: `LANCAMENTO50_${Date.now()}`,
               max_redemptions: 1,
             });
@@ -893,8 +906,8 @@ serve(async (req) => {
             logStep("Auto-applied launch coupon LANCAMENTO50", { promoCodeId: promoCode.id });
           } catch (promoError) {
             // Fallback: apply coupon directly
-            sessionParams.discounts = [{ coupon: stripeCouponId }];
-            logStep("Auto-applied launch coupon via direct coupon", { stripeCouponId });
+            sessionParams.discounts = [{ coupon: validCouponId }];
+            logStep("Auto-applied launch coupon via direct coupon", { stripeCouponId: validCouponId });
           }
           
           await supabaseAdmin2.from("coupons").update({ times_used: (launchCoupon.times_used || 0) + 1 }).eq("id", launchCoupon.id);
