@@ -42,9 +42,9 @@ export const NelloOneLanding = () => {
   const ij = t.landing.identity_journey || {};
   
   const mainPains = ij.pains || [
-    "Você sente que repete os mesmos padrões, mesmo querendo mudar.",
-    "Já fez vários testes, mas nenhum realmente te mostrou o todo.",
-    "Quer se conhecer de verdade, sem rótulos ou promessas vazias.",
+    "Você sente que repete alguns padrões, mesmo querendo agir diferente.",
+    "Você funciona bem por fora, mas por dentro percebe confusão ou sobrecarga.",
+    "Você quer tomar decisões com mais consciência, sem depender apenas de impulso ou ansiedade.",
   ];
 
   const journeySteps = ij.steps || [
@@ -58,22 +58,23 @@ export const NelloOneLanding = () => {
   ];
 
   const discoveries = (ij.discoveries || [
-    { mainText: "Como você reage emocionalmente", testName: "Eneagrama" },
-    { mainText: "Como você toma decisões e se comunica", testName: "DISC" },
-    { mainText: "O que te motiva e o que te bloqueia", testName: "Temperamentos" },
-    { mainText: "Onde estão seus talentos naturais", testName: "Inteligências Múltiplas" },
-    { mainText: "Padrões que pedem maturidade", testName: "Nello 16" },
-    { mainText: "Tendências simbólicas inconscientes", testName: "Arquétipos" },
-    { mainText: "Como você se conecta afetivamente", testName: "Estilos de Conexão" },
+    { mainText: "Como você tende a agir e se comunicar sob pressão", testName: "DISC" },
+    { mainText: "O que te impulsiona ou te desacelera emocionalmente", testName: "Temperamentos" },
+    { mainText: "Padrões de motivação e atenção que podem se repetir", testName: "Eneagrama" },
+    { mainText: "Como você expressa e percebe afeto nos vínculos", testName: "Conexão Afetiva" },
+    { mainText: "Preferências de percepção e decisão no cotidiano", testName: "Nello 16" },
+    { mainText: "Forças simbólicas que influenciam sua expressão e imagem", testName: "Arquétipos" },
+    { mainText: "Talentos naturais e modos de aprender e contribuir", testName: "Inteligências" },
   ]).map((item: any, index: number) => ({
     ...item,
     icon: DISCOVERY_ICONS[index] || Heart
   }));
 
   const forWho = ij.for_you || [
-    "Busca clareza sobre si mesmo",
-    "Quer tomar decisões mais alinhadas",
-    "Valoriza profundidade, não pressa",
+    "Busca clareza para vida real: trabalho, família e relações",
+    "Quer compreender seus padrões atuais sem rótulos",
+    "Valoriza profundidade, reflexão e direção prática",
+    "Deseja caminhar com mais consciência e equilíbrio interior",
   ];
 
   const notForWho = ij.not_for_you || [
@@ -93,9 +94,10 @@ export const NelloOneLanding = () => {
   const nelloTags = ij.nello_tags || ["Relatório PDF", "Resultados integrados", "Linguagem clara"];
   
   const essenceCodeBullets = ij.essence_code_bullets || [
-    "Síntese dos seus padrões emocionais e comportamentais",
-    "Integração dos 7 mapas em uma visão unificada",
-    "Orientações reflexivas para aplicar na vida real"
+    "Uma visão mais organizada de como você está hoje",
+    "Pontos de atenção e forças disponíveis nesta fase",
+    "Reflexões práticas para aplicar no dia a dia",
+    "Um plano orientativo de 90 dias para caminhar com mais clareza"
   ];
 
   const professionalUseCases = ij.professionals_use_cases || [
@@ -145,12 +147,15 @@ export const NelloOneLanding = () => {
             </h1>
             
             <p className="text-base sm:text-lg md:text-xl text-foreground/90 font-display leading-relaxed max-w-2xl mx-auto mb-3 md:mb-4">
-              {ij.hero_subtitle || "Uma jornada guiada com 7 mapas integrados de autoconhecimento e um relatório final em PDF com seu"} <span className="text-nello-gold font-semibold">{ij.hero_subtitle_highlight || "Código da Essência"}</span>.
+              {ij.hero_subtitle || "O Identity é uma jornada guiada para quem sente que algo está desalinhado nesta fase da vida."}
+            </p>
+            
+            <p className="text-sm md:text-base text-foreground/80 leading-relaxed max-w-xl mx-auto mb-3 md:mb-4 px-2">
+              {ij.hero_description_1 || "Para quem vive desafios no trabalho, nas relações, nas decisões do dia a dia, e busca mais clareza sobre seus próprios padrões e caminhos."}
             </p>
             
             <p className="text-sm md:text-base text-foreground/70 leading-relaxed max-w-lg mx-auto mb-8 md:mb-10 px-2">
-              {ij.hero_description_1 || "Não é sobre respostas rápidas. É sobre clareza."}<br />
-              {ij.hero_description_2 || "Você percorre cada etapa no seu ritmo, com profundidade e intenção."}
+              {ij.hero_description_2 || "Ao final, você recebe o seu"} <span className="text-nello-gold font-semibold">{ij.hero_subtitle_highlight || "Código da Essência"}</span>{ij.hero_description_3 || ", uma síntese prática dos 7 mapas da jornada, com reflexões e orientações para aplicar na vida real."}
             </p>
             
             <div className="max-w-sm mx-auto space-y-4 px-2">
@@ -192,7 +197,7 @@ export const NelloOneLanding = () => {
             <CrossDivider className="mb-8" />
           </div>
           
-          <div className="space-y-3 max-w-2xl mx-auto mb-12">
+          <div className="space-y-3 max-w-2xl mx-auto mb-4">
             {mainPains.map((item: string, index: number) => (
               <div 
                 key={index}
@@ -202,6 +207,10 @@ export const NelloOneLanding = () => {
               </div>
             ))}
           </div>
+          
+          <p className="text-sm text-foreground/60 text-center max-w-lg mx-auto mb-12">
+            {ij.pains_disclaimer || "Essa jornada não entrega respostas prontas. Ela oferece clareza e linguagem para você se compreender melhor nesta etapa."}
+          </p>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             <div className="p-6 bg-green-500/5 rounded-2xl border border-green-500/20">
@@ -246,7 +255,7 @@ export const NelloOneLanding = () => {
             </h2>
             <CrossDivider className="mb-6" />
             <p className="text-base text-foreground/70 max-w-xl mx-auto">
-              {ij.journey_subtitle || "O mundo passou anos tentando te \"formatar\". O Identity faz o caminho inverso — decodificando o que sempre esteve aí, mas foi abafado."}
+              {ij.journey_subtitle || "Cada etapa revela uma camada diferente de como você está hoje — com profundidade e no seu ritmo."}
             </p>
           </div>
           
@@ -291,7 +300,7 @@ export const NelloOneLanding = () => {
               {ij.layers_title || "As 7 camadas que o Identity revela"}
             </h3>
             <p className="text-sm text-foreground/60 max-w-xl mx-auto">
-              {ij.layers_subtitle || "Não são rótulos. São mapas de clareza para você se compreender melhor."}
+              {ij.layers_subtitle || "Não são rótulos. São mapas de clareza que ajudam você a entender tendências, reações e formas de se relacionar nesta fase."}
             </p>
           </div>
           
@@ -341,11 +350,15 @@ export const NelloOneLanding = () => {
               </h2>
               
               <p className="text-base text-foreground/80 leading-relaxed mb-6">
-                <span className="text-nello-gold font-medium">Nello</span> {ij.nello_description_1 || "é seu guia de clareza. Ele organiza seus resultados, conecta padrões de forma estruturada e te ajuda a aplicar isso na vida real, como ferramenta de autoconhecimento e desenvolvimento pessoal."}
+                {ij.nello_description_1 || "O Identity organiza seus resultados e oferece uma linguagem clara para você refletir sobre si mesmo."}
               </p>
               
               <p className="text-base text-foreground/80 leading-relaxed mb-6">
-                {ij.nello_description_2 || "No final, você recebe o"} <span className="text-nello-gold font-medium">{ij.hero_subtitle_highlight || "Código da Essência"}</span>{ij.nello_description_3 || ": uma síntese de tudo o que você descobriu."}
+                {ij.nello_description_2 || "Isso pode ajudar a trazer mais consciência para suas escolhas, relações e próximos passos — com profundidade e leveza."}
+              </p>
+              
+              <p className="text-base text-foreground/80 leading-relaxed mb-6">
+                {ij.nello_description_3 || "No final, você recebe o"} <span className="text-nello-gold font-medium">{ij.hero_subtitle_highlight || "Código da Essência"}</span> {ij.nello_description_4 || "como uma síntese integradora da jornada."}
               </p>
               
               <div className="flex flex-wrap gap-2 justify-center md:justify-start">
@@ -387,7 +400,7 @@ export const NelloOneLanding = () => {
             </div>
             
             <p className="text-base text-foreground/80 text-center max-w-lg mx-auto mt-6">
-              {ij.essence_code_full_description || "Um relatório completo que integra os 7 mapas da jornada em uma síntese única."}
+              {ij.essence_code_full_description || "No final da jornada, você recebe o Código da Essência — um relatório que integra os 7 mapas em uma síntese única, oferecendo:"}
             </p>
             
             <div className="max-w-md mx-auto mt-6 space-y-3">
@@ -399,7 +412,11 @@ export const NelloOneLanding = () => {
               ))}
             </div>
             
-            <p className="text-xs text-foreground/50 text-center max-w-md mx-auto mt-6">
+            <p className="text-sm text-nello-gold/80 text-center max-w-md mx-auto mt-6 font-medium italic">
+              {ij.essence_code_closing || "Não é sobre se transformar em outra pessoa. É sobre viver com mais verdade e direção."}
+            </p>
+            
+            <p className="text-xs text-foreground/50 text-center max-w-md mx-auto mt-4">
               {ij.essence_code_disclaimer || "Ferramenta de autoconhecimento e desenvolvimento pessoal. Não é diagnóstico psicológico e não substitui acompanhamento profissional."}
             </p>
           </div>
@@ -669,7 +686,7 @@ export const NelloOneLanding = () => {
           </h2>
           
           <p className="text-white/70 text-base mb-2">
-            {ij.final_cta_description_1 || "Ele revela com clareza aquilo que já estava aí, mas estava confuso."}
+            {ij.final_cta_description_1 || "Ele organiza o que já estava aí, mas precisava de clareza e linguagem."}
           </p>
           
           <p className="text-white/60 text-sm mb-8">

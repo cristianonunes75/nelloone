@@ -17,35 +17,35 @@ interface FAQItem {
 const DEFAULT_FAQ_ITEMS: FAQItem[] = [
   {
     question: "Isso é um teste psicológico ou diagnóstico clínico?",
-    answer: "Não. O Nello Identity é uma jornada de autoconhecimento baseada em modelos amplamente utilizados no desenvolvimento humano. Ele oferece clareza e reflexão estruturada, mas não possui finalidade clínica e não substitui avaliação psicológica profissional.",
+    answer: "Não. O Identity é uma ferramenta de autoconhecimento e reflexão. Ele oferece clareza sobre tendências e padrões do momento, mas não constitui diagnóstico psicológico ou avaliação clínica. Os resultados descrevem como você está hoje — e podem mudar com o tempo e com o desenvolvimento pessoal. Para questões de saúde mental, recomenda-se acompanhamento profissional qualificado.",
   },
   {
     question: "Por que não posso comprar apenas um dos mapas separadamente?",
-    answer: "A Jornada Identity foi desenhada como um processo integrado de 7 etapas. Cada mapa (Eneagrama, DISC, Temperamentos, Inteligências Múltiplas, Nello 16, Arquétipos e Estilos de Conexão Afetiva) revela uma camada diferente da sua personalidade. Quando você compra apenas um mapa isolado, você perde a sinergia entre eles. O Código da Essência é justamente a síntese de TODOS os 7 pilares trabalhando juntos. Vender separadamente seria como vender apenas um capítulo de um livro - você não teria a história completa.",
+    answer: "A Jornada Identity foi desenhada como um processo integrado de 7 etapas. Cada mapa revela uma camada diferente de como você está hoje. Quando isolados, eles perdem a sinergia entre si. O Código da Essência é justamente a síntese de todos os 7 mapas trabalhando juntos — oferecer apenas um seria como entregar um capítulo de um livro sem o restante da história.",
   },
   {
     question: "O que torna o Código da Essência diferente de um relatório comum?",
-    answer: "A maioria dos testes gera relatórios descritivos: 'Você é tipo X porque fez Y'. O Código da Essência é diferente. Ele não apenas descreve - ele conecta padrões, revela contradições, mostra onde você se bloqueia e onde está seu potencial real. Nello (nosso guia de IA) organiza seus 7 mapas, identifica as relações entre eles e te entrega uma síntese que você realmente consegue usar na vida real. É como ter um mentor que leu tudo sobre você e finalmente te mostra o mapa completo.",
+    answer: "A maioria dos testes gera relatórios descritivos. O Código da Essência é diferente: ele conecta padrões, aponta pontos de atenção e mostra forças disponíveis nesta fase da sua vida. O resultado é uma síntese prática que você consegue usar no dia a dia — nas decisões, nas relações e nos seus próximos passos.",
   },
   {
     question: "Eu recebo o Código da Essência logo no início?",
-    answer: "Não. O Código da Essência é o resultado final da Jornada. Você passa pelas 7 etapas (Despertar, Reconhecer, Aprofundar, Conectar, Integrar, Clarear e Viver), e ao final, recebe o seu Código da Essência em um relatório PDF completo. Isso é intencional - o processo de descoberta é tão importante quanto o resultado. Se você recebesse tudo pronto no início, perderia a transformação que acontece no caminho.",
+    answer: "Não. O Código da Essência é o resultado final da Jornada. Você passa pelas 7 etapas no seu ritmo, e ao final recebe o relatório completo em PDF. Isso é intencional: o processo de reflexão em cada camada é tão importante quanto o resultado final.",
   },
   {
     question: "Por que a Jornada Identity é paga, se existem testes gratuitos na internet?",
-    answer: "Existem testes gratuitos, mas eles são fragmentados. Você faz um Eneagrama aqui, um DISC ali, e fica com 7 pedaços de um quebra-cabeça sem conseguir montar. A Jornada Identity integra tudo isso em um processo coerente. Além disso, você tem Nello como seu guia - uma IA que organiza seus resultados, conecta os padrões e te ajuda a aplicar na vida real. Isso tem valor. Você não está pagando pelos mapas - está pagando pela síntese, pela organização e pela transformação.",
+    answer: "Existem testes gratuitos, mas eles são fragmentados. Você faz um aqui, outro ali, e fica com peças soltas de um quebra-cabeça. A Jornada Identity integra 7 mapas em um processo coerente, com uma síntese final que conecta tudo. Você não está pagando pelos mapas isolados — está pagando pela integração, pela organização e pela clareza prática.",
   },
   {
     question: "Como vou usar isso na prática depois?",
-    answer: "Você recebe um relatório final integrado com orientações reflexivas e caminhos de aplicação pessoal. Muitas pessoas usam como clareza para decisões, autoconhecimento e conversas mais profundas, inclusive em contextos profissionais, sempre sem caráter clínico.",
+    answer: "Você recebe um relatório final com reflexões práticas, pontos de atenção e um plano orientativo de 90 dias. Muitas pessoas usam como apoio para decisões, autoconhecimento e conversas mais profundas — inclusive em contextos profissionais. Sempre como ferramenta reflexiva, sem caráter clínico.",
   },
   {
     question: "Por quanto tempo terei acesso aos meus resultados?",
-    answer: "Acesso vitalício. Uma vez que você completa a Jornada Identity, seus resultados ficam salvos na sua conta para sempre. Você pode revisitar seu Código da Essência quantas vezes quiser, em qualquer momento. Não há assinatura recorrente, não há expiração. É seu para a vida toda.",
+    answer: "Acesso vitalício. Uma vez que você completa a Jornada, seus resultados ficam salvos na sua conta para sempre. Você pode revisitar seu Código da Essência quantas vezes quiser. Não há assinatura recorrente nem expiração.",
   },
   {
-    question: "O pagamento é seguro? E se eu não me identificar com o conteúdo?",
-    answer: "Sim, o pagamento é 100% seguro. Usamos Stripe, a plataforma de pagamento mais confiável do mundo. Todos os seus dados são criptografados. Se por algum motivo você não se identificar com o conteúdo ou não ficar satisfeito, você tem 7 dias para solicitar reembolso total. Sem perguntas. Queremos que você tenha certeza de que está fazendo a escolha certa.",
+    question: "O pagamento é seguro?",
+    answer: "Sim, 100% seguro. Usamos Stripe, uma das plataformas de pagamento mais confiáveis do mundo. Todos os seus dados são criptografados. Se não ficar satisfeito, você tem 7 dias para solicitar reembolso total.",
   },
 ];
 
@@ -56,7 +56,7 @@ export const StrategicFAQ = () => {
   const faqSection = t.landing.faq_strategic || {};
   const faqItems: FAQItem[] = faqSection.items || DEFAULT_FAQ_ITEMS;
   const title = faqSection.title || "Perguntas Frequentes";
-  const subtitle = faqSection.subtitle || "Entenda por que a Jornada Identity é diferente de qualquer outro teste";
+  const subtitle = faqSection.subtitle || "Tire suas dúvidas sobre a Jornada Identity";
 
   return (
     <section className="py-16 md:py-24 px-5 sm:px-6 lg:px-8 bg-muted/30">
