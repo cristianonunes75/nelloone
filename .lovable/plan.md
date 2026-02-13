@@ -1,63 +1,29 @@
 
-# Correção: Navegação direta para o Eneagrama (caso Érica Ceolin)
+## Correção do Bug: "Desbloquear por [object Object]"
 
-## Problema identificado
+O problema que o Sérgio encontrou acontece porque o botão de desbloqueio tenta mostrar o preço, mas exibe `[object Object]` em vez do valor formatado (ex: `R$ 648,50`).
 
-A Érica tem o teste Eneagrama "em andamento" (6 de 114 perguntas respondidas). Quando ela clica para continuar, dois problemas ocorrem:
+### Causa
+A variavel `bundlePrice` retorna um objeto com propriedades (`symbol`, `price`, `original`), mas o codigo usa `${bundlePrice}` diretamente no texto do botao, sem acessar as propriedades corretas.
 
-1. A função `handleContinueTest` no dashboard (`Cliente.tsx`) **não tem tratamento de erro** (try/catch). Se `startTestAsync` falhar por qualquer motivo, o erro não é capturado e ela vê um erro genérico sem feedback útil.
+### Correção
+No arquivo `src/pages/TestExecution.tsx`, linha 541-542, trocar:
 
-2. A função `startTestAsync` faz uma **atualização desnecessária** no banco ao continuar um teste em andamento -- ela busca o registro existente e faz um UPDATE mesmo quando nada precisa mudar. Isso cria uma operação extra que pode falhar.
-
-## Solução
-
-### 1. Adicionar tratamento de erro em `handleContinueTest` (`src/pages/Cliente.tsx`)
-
-Envolver a chamada em try/catch e, em vez de chamar `startTestAsync` (que tenta iniciar/atualizar), buscar diretamente o `userTest` existente dos dados já carregados.
-
-```typescript
-const handleContinueTest = async (step: typeof journeySteps[0]) => {
-  try {
-    // First try to find existing in-progress test from already-loaded data
-    const existingUserTest = userTests?.find(
-      ut => ut.test_id === step.testId && ut.status === 'in_progress'
-    );
-    
-    if (existingUserTest) {
-      const basePath = getBasePath();
-      navigate(`${basePath}/cliente/test-execution/${step.testId}/${existingUserTest.id}`);
-      return;
-    }
-    
-    // Fallback: use startTestAsync
-    const userTest = await startTestAsync(step.testId);
-    const basePath = getBasePath();
-    navigate(`${basePath}/cliente/test-execution/${step.testId}/${userTest.id}`);
-  } catch (error) {
-    toast({
-      title: "Erro ao continuar teste",
-      description: "Tente novamente mais tarde.",
-      variant: "destructive",
-    });
-  }
-};
+```
+Unlock for ${bundlePrice}
+Desbloquear por ${bundlePrice}
 ```
 
-### 2. Melhorar `handleStartTest` para usar dados já carregados (`src/pages/Cliente.tsx`)
+Por:
 
-Mesma lógica: primeiro verificar se já existe um userTest carregado antes de chamar o backend.
+```
+Unlock for ${bundlePrice.symbol}${bundlePrice.price}
+Desbloquear por ${bundlePrice.symbol}${bundlePrice.price}
+```
 
-### 3. Verificar e corrigir o `ativacao_codigo_unlocked` da Érica (banco de dados)
+Isso vai exibir corretamente, por exemplo: **"Desbloquear por R$648.5"** ou **"Unlock for $198.5"**.
 
-A Érica tem 6 testes concluídos mas `ativacao_codigo_unlocked` está como `false`. O hook funciona sem isso (verifica `journey_completed_tests >= 5`), mas o campo deveria estar sincronizado. Vou corrigir o valor no banco para garantir consistência.
-
-## Arquivos a editar
-
-- `src/pages/Cliente.tsx` -- adicionar try/catch no `handleContinueTest` e otimizar navegação usando dados já carregados
-- Migração SQL -- atualizar `ativacao_codigo_unlocked` para `true` para a Érica
-
-## Resultado esperado
-
-- Ao clicar "Continuar" no Eneagrama, ela vai direto para a pergunta 7 (onde parou)
-- Se houver qualquer erro, ela verá uma mensagem clara em vez de um erro genérico
-- A navegação é mais rápida pois não precisa chamar o backend desnecessariamente
+### Detalhes Técnicos
+- **Arquivo**: `src/pages/TestExecution.tsx` (linhas 540-542)
+- **Função origem**: `getBundlePriceForLanguage()` em `src/lib/priceConfig.ts` retorna um objeto `{ symbol, price, original, priceId, currency }`
+- Correção pontual de 2 linhas, sem impacto em outros fluxos
