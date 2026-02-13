@@ -538,8 +538,8 @@ export default function TestExecution() {
                   <>
                     <CreditCard className="h-4 w-4" />
                     {language === 'en' 
-                      ? `Unlock for ${bundlePrice}` 
-                      : `Desbloquear por ${bundlePrice}`}
+                      ? `Unlock for ${bundlePrice.symbol}${bundlePrice.price}` 
+                      : `Desbloquear por ${bundlePrice.symbol}${bundlePrice.price}`}
                   </>
                 )}
               </Button>
