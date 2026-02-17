@@ -1118,7 +1118,10 @@ export default function TestExecution() {
             >
               <Button
                 variant="outline"
-                onClick={handlePrevious}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePrevious();
+                }}
                 disabled={isFirstQuestion}
                 className="min-w-[140px] font-light"
               >
@@ -1133,7 +1136,10 @@ export default function TestExecution() {
                 whileTap={{ scale: 0.98 }}
               >
                 <Button 
-                  onClick={handleNext} 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNext();
+                  }}
                   disabled={!selectedAnswer}
                   className="min-w-[140px] font-light"
                 >
@@ -1151,7 +1157,10 @@ export default function TestExecution() {
                 transition={{ duration: 2, repeat: Infinity }}
               >
                 <Button 
-                  onClick={handleComplete} 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleComplete();
+                  }}
                   disabled={!selectedAnswer}
                   className="min-w-[160px] font-light"
                 >

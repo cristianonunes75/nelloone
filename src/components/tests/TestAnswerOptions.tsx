@@ -401,7 +401,10 @@ const ListLayout = ({
               : `bg-transparent border-l-transparent ${style.hoverBg}`
             }
           `}
-          onClick={() => onAnswerChange(value)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onAnswerChange(value);
+          }}
         >
           {/* Number */}
           <div className={`
@@ -419,7 +422,11 @@ const ListLayout = ({
             {option.label}
           </Label>
 
-          <RadioGroupItem value={value} id={value} />
+          <RadioGroupItem 
+            value={value} 
+            id={value}
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       );
     })}
@@ -596,7 +603,9 @@ export default function TestAnswerOptions({
   
   // Shuffle options if questionId is provided (consistent per question)
   // Don't shuffle scale/likert type questions as order matters there
-  const shouldShuffle = questionId && style.layout !== 'scale';
+  // Don't shuffle scale/likert options (order matters) or scale layout
+  const isLikertOptions = options.length <= 7 && options.every(o => !isNaN(Number(o.value)));
+  const shouldShuffle = questionId && style.layout !== 'scale' && !isLikertOptions;
   const displayOptions = shouldShuffle 
     ? shuffleWithSeed(options, questionId) 
     : options;
