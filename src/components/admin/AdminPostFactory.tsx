@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Download, Sun, Moon, Upload, Save, CalendarDays, Copy, Check, Shield, Loader2 } from "lucide-react";
+import { Download, Sun, Moon, Upload, Save, CalendarDays, Copy, Check, Shield, Loader2, MessageSquareHeart } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import { supabase } from "@/integrations/supabase/client";
@@ -70,8 +70,27 @@ export const AdminPostFactory = () => {
   const [showScheduleDialog, setShowScheduleDialog] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   
+  // Testimonial state
+  const [testimonials, setTestimonials] = useState<Array<{ id: string; display_name: string; content: string }>>([]);
+  const [selectedTestimonialId, setSelectedTestimonialId] = useState<string>("none");
+  const [testimonialAuthor, setTestimonialAuthor] = useState("");
+  
   const cardRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch approved testimonials
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      const { data } = await supabase
+        .from("testimonials")
+        .select("id, display_name, content")
+        .eq("consent_given", true)
+        .eq("status", "approved")
+        .order("created_at", { ascending: false });
+      if (data) setTestimonials(data);
+    };
+    fetchTestimonials();
+  }, []);
 
   const renderSymbol = (variant: "default" | "light" | "dark" | "gradient", size: number) => {
     const props = { variant, size };
@@ -331,6 +350,36 @@ export const AdminPostFactory = () => {
                 </div>
 
                 <div className="space-y-3 pt-2 border-t">
+                  {cardType === "testimonial" && (
+                    <div className="space-y-2">
+                      <Label className="text-xs flex items-center gap-1">
+                        <MessageSquareHeart className="w-3 h-3" />
+                        Depoimento aprovado
+                      </Label>
+                      <Select 
+                        value={selectedTestimonialId} 
+                        onValueChange={(v) => {
+                          setSelectedTestimonialId(v);
+                          const t = testimonials.find(t => t.id === v);
+                          if (t) {
+                            setCardContent(t.content);
+                            setTestimonialAuthor(t.display_name);
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="h-9"><SelectValue placeholder="Selecionar depoimento" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Selecionar depoimento...</SelectItem>
+                          {testimonials.map(t => (
+                            <SelectItem key={t.id} value={t.id}>
+                              {t.display_name} — {t.content.slice(0, 50)}…
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div><Label className="text-xs">Autor</Label><Input value={testimonialAuthor} onChange={(e) => setTestimonialAuthor(e.target.value)} /></div>
+                    </div>
+                  )}
                   <div><Label className="text-xs">Título</Label><Input value={cardTitle} onChange={(e) => setCardTitle(e.target.value)} /></div>
                   <div><Label className="text-xs">Subtítulo</Label><Input value={cardSubtitle} onChange={(e) => setCardSubtitle(e.target.value)} /></div>
                   <div><Label className="text-xs">Conteúdo</Label><Textarea value={cardContent} onChange={(e) => setCardContent(e.target.value)} rows={3} /></div>
@@ -366,6 +415,7 @@ export const AdminPostFactory = () => {
                     backgroundImage={useImage ? cardImage || undefined : undefined}
                     imageOpacity={imageOpacity}
                     logoVariant={cardLogo}
+                    testimonialAuthor={testimonialAuthor}
                   />
                 </div>
                 <div className="flex gap-2 w-full">

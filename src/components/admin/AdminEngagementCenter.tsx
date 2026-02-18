@@ -22,21 +22,25 @@ import {
   Loader2,
   Copy,
   Check,
-  History
+  History,
+  CheckCircle2,
+  PlayCircle
 } from "lucide-react";
 import { differenceInDays } from "date-fns";
 import { CampaignHistory } from "./CampaignHistory";
 import { useAuth } from "@/hooks/useAuth";
 
 type Objective = "welcome" | "reactivation" | "discount" | "urgency" | "testimonial" | "custom";
+type JourneyStage = "all" | "not_started" | "in_progress" | "completed";
 
-interface InactiveUser {
+interface EngagementUser {
   id: string;
   full_name: string;
   email?: string;
   phone?: string;
   created_at: string;
   daysSinceRegistration: number;
+  journeyStatus: string;
   selected: boolean;
 }
 
@@ -68,7 +72,7 @@ const objectiveLabels: Record<Objective, { pt: string; icon: React.ReactNode }> 
 export default function AdminEngagementCenter() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<"campaign" | "history">("campaign");
-  const [users, setUsers] = useState<InactiveUser[]>([]);
+  const [users, setUsers] = useState<EngagementUser[]>([]);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -81,6 +85,7 @@ export default function AdminEngagementCenter() {
   const [generatedCopy, setGeneratedCopy] = useState<GeneratedCopy | null>(null);
   const [editedCopy, setEditedCopy] = useState<GeneratedCopy | null>(null);
   const [filter, setFilter] = useState<"all" | "7days" | "14days" | "30days">("all");
+  const [stageFilter, setStageFilter] = useState<JourneyStage>("all");
   const [copiedWhatsapp, setCopiedWhatsapp] = useState(false);
 
   useEffect(() => {
@@ -90,11 +95,10 @@ export default function AdminEngagementCenter() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch users who never started tests
+      // Fetch ALL users (not just not_started)
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, full_name, phone, created_at")
-        .eq("journey_status", "not_started")
+        .select("id, full_name, phone, created_at, journey_status")
         .eq("is_deleted", false)
         .order("created_at", { ascending: false });
 
@@ -113,18 +117,18 @@ export default function AdminEngagementCenter() {
         }
       }
 
-      const usersWithDetails: InactiveUser[] = (profilesData || []).map(p => ({
+      const usersWithDetails: EngagementUser[] = (profilesData || []).map(p => ({
         id: p.id,
         full_name: p.full_name,
         email: emailsMap[p.id],
         phone: p.phone || undefined,
         created_at: p.created_at,
         daysSinceRegistration: differenceInDays(new Date(), new Date(p.created_at)),
+        journeyStatus: p.journey_status || 'not_started',
         selected: false
       }));
 
       setUsers(usersWithDetails);
-
       // Fetch active coupons
       const { data: couponsData, error: couponsError } = await supabase
         .from("coupons")
@@ -143,6 +147,9 @@ export default function AdminEngagementCenter() {
 
   const filteredUsers = users.filter(u => {
     if (!u.email) return false; // Only show users with email
+    // Stage filter
+    if (stageFilter !== "all" && u.journeyStatus !== stageFilter) return false;
+    // Time filter
     if (filter === "7days") return u.daysSinceRegistration >= 7;
     if (filter === "14days") return u.daysSinceRegistration >= 14;
     if (filter === "30days") return u.daysSinceRegistration >= 30;
@@ -291,9 +298,10 @@ export default function AdminEngagementCenter() {
   };
 
   const stats = {
-    total: users.length,
-    withEmail: users.filter(u => u.email).length,
-    moreThan7Days: users.filter(u => u.daysSinceRegistration >= 7).length,
+    total: users.filter(u => u.email).length,
+    notStarted: users.filter(u => u.journeyStatus === 'not_started').length,
+    inProgress: users.filter(u => u.journeyStatus === 'in_progress').length,
+    completed: users.filter(u => u.journeyStatus === 'completed').length,
     withPhone: users.filter(u => u.phone).length,
   };
 
@@ -312,7 +320,7 @@ export default function AdminEngagementCenter() {
         <div>
           <h1 className="text-2xl font-semibold text-ink">Central de Engajamento</h1>
           <p className="text-muted-foreground mt-1">
-            Conecte-se com usuários que ainda não começaram os testes
+            Conecte-se com todos os usuários da plataforma
           </p>
         </div>
         <Button variant="outline" onClick={fetchData} size="sm">
@@ -342,28 +350,41 @@ export default function AdminEngagementCenter() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className={stageFilter === "not_started" ? "ring-2 ring-primary" : "cursor-pointer hover:bg-muted/50"} onClick={() => setStageFilter(s => s === "not_started" ? "all" : "not_started")}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-muted">
                 <UserX className="w-5 h-5 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-2xl font-semibold">{stats.total}</p>
+                <p className="text-2xl font-semibold">{stats.notStarted}</p>
                 <p className="text-xs text-muted-foreground">Nunca começaram</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className={stageFilter === "in_progress" ? "ring-2 ring-primary" : "cursor-pointer hover:bg-muted/50"} onClick={() => setStageFilter(s => s === "in_progress" ? "all" : "in_progress")}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-muted">
-                <Clock className="w-5 h-5 text-muted-foreground" />
+                <PlayCircle className="w-5 h-5 text-amber-500" />
               </div>
               <div>
-                <p className="text-2xl font-semibold">{stats.moreThan7Days}</p>
-                <p className="text-xs text-muted-foreground">7+ dias sem ação</p>
+                <p className="text-2xl font-semibold">{stats.inProgress}</p>
+                <p className="text-xs text-muted-foreground">Em progresso</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className={stageFilter === "completed" ? "ring-2 ring-primary" : "cursor-pointer hover:bg-muted/50"} onClick={() => setStageFilter(s => s === "completed" ? "all" : "completed")}>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-muted">
+                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-semibold">{stats.completed}</p>
+                <p className="text-xs text-muted-foreground">Jornada completa</p>
               </div>
             </div>
           </CardContent>
@@ -372,24 +393,11 @@ export default function AdminEngagementCenter() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-muted">
-                <Mail className="w-5 h-5 text-muted-foreground" />
+                <Users className="w-5 h-5 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-2xl font-semibold">{stats.withEmail}</p>
-                <p className="text-xs text-muted-foreground">Com email</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-muted">
-                <MessageSquare className="w-5 h-5 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-2xl font-semibold">{stats.withPhone}</p>
-                <p className="text-xs text-muted-foreground">Com WhatsApp</p>
+                <p className="text-2xl font-semibold">{stats.total}</p>
+                <p className="text-xs text-muted-foreground">Total com email</p>
               </div>
             </div>
           </CardContent>
@@ -618,6 +626,7 @@ export default function AdminEngagementCenter() {
                       <TableHead className="w-12"></TableHead>
                       <TableHead>Nome</TableHead>
                       <TableHead>Email</TableHead>
+                      <TableHead>Etapa</TableHead>
                       <TableHead>Cadastro</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -632,6 +641,15 @@ export default function AdminEngagementCenter() {
                         </TableCell>
                         <TableCell className="font-medium">{user.full_name}</TableCell>
                         <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                        <TableCell>
+                          <Badge variant={
+                            user.journeyStatus === 'completed' ? 'default' :
+                            user.journeyStatus === 'in_progress' ? 'secondary' : 'outline'
+                          }>
+                            {user.journeyStatus === 'completed' ? '✅ Completa' :
+                             user.journeyStatus === 'in_progress' ? '🔄 Em progresso' : '⏳ Não iniciou'}
+                          </Badge>
+                        </TableCell>
                         <TableCell>
                           <Badge variant="outline">
                             {user.daysSinceRegistration} dias atrás

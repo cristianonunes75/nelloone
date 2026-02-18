@@ -2,7 +2,7 @@
 
 export type NelloProduct = 'identity' | 'life' | 'flow' | 'business' | 'praxis';
 export type CardFormat = "instagram-feed" | "instagram-portrait" | "stories" | "linkedin";
-export type CardType = "institutional" | "educational" | "quote" | "cta" | "feature";
+export type CardType = "institutional" | "educational" | "quote" | "cta" | "feature" | "testimonial";
 export type CardTheme = "light" | "dark";
 export type CardLanguage = "pt" | "en";
 export type PostStatus = 'draft' | 'scheduled' | 'published' | 'failed';
@@ -101,7 +101,7 @@ export const PRODUCT_CONFIGS: Record<NelloProduct, ProductConfig> = {
       pt: 'Reflexivo, profundo, acolhedor. Foca em identidade, essência e autodescoberta.',
       en: 'Reflective, deep, welcoming. Focuses on identity, essence and self-discovery.',
     },
-    contentTypes: ['institutional', 'educational', 'quote', 'cta', 'feature'],
+    contentTypes: ['institutional', 'educational', 'quote', 'cta', 'feature', 'testimonial'],
     defaultCtas: {
       pt: ['Descubra sua essência', 'Começar jornada', 'Conhecer-se melhor', 'Fazer o teste'],
       en: ['Discover your essence', 'Start journey', 'Know yourself better', 'Take the test'],
@@ -199,6 +199,7 @@ export const TYPE_LABELS: Record<CardLanguage, Record<CardType, string>> = {
     quote: 'Frase/Reflexão',
     cta: 'Chamada p/ Ação',
     feature: 'Funcionalidade',
+    testimonial: 'Depoimento',
   },
   en: {
     institutional: 'Institutional',
@@ -206,5 +207,6 @@ export const TYPE_LABELS: Record<CardLanguage, Record<CardType, string>> = {
     quote: 'Quote/Reflection',
     cta: 'Call to Action',
     feature: 'Feature',
+    testimonial: 'Testimonial',
   },
 };

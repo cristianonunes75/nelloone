@@ -26,6 +26,7 @@ interface ProductCardTemplateProps {
   backgroundImage?: string;
   imageOpacity?: number;
   logoVariant?: CardLogoVariant;
+  testimonialAuthor?: string;
 }
 
 export const ProductCardTemplate = ({
@@ -42,7 +43,8 @@ export const ProductCardTemplate = ({
   className,
   backgroundImage,
   imageOpacity = 0.3,
-  logoVariant = "nello-dot-one"
+  logoVariant = "nello-dot-one",
+  testimonialAuthor
 }: ProductCardTemplateProps) => {
   const dimensions = FORMAT_DIMENSIONS[format];
   const productConfig = PRODUCT_CONFIGS[product];
@@ -254,6 +256,54 @@ export const ProductCardTemplate = ({
                 className="w-4 h-4 rounded-full"
                 style={{ backgroundColor: secondaryColor }}
               />
+            </div>
+          </div>
+        );
+
+      case "testimonial":
+        return (
+          <div className="flex flex-col justify-between h-full p-6">
+            <div className="flex items-center gap-2">
+              <NelloSymbolOne 
+                size={24} 
+                variant={isLight ? "default" : "light"} 
+              />
+              <span 
+                className="text-xs font-medium"
+                style={{ color: secondaryColor }}
+              >
+                Depoimento
+              </span>
+            </div>
+            <div className="flex-1 flex flex-col justify-center px-2">
+              <div 
+                className="text-3xl mb-2 leading-none"
+                style={{ color: secondaryColor }}
+              >
+                "
+              </div>
+              {content && (
+                <p className={cn(
+                  "font-sans text-sm leading-relaxed italic",
+                  textPrimary
+                )}>
+                  {content.length > 200 ? content.slice(0, 200) + '…' : content}
+                </p>
+              )}
+              {testimonialAuthor && (
+                <p 
+                  className="mt-3 font-sans text-xs font-semibold tracking-wide"
+                  style={{ color: secondaryColor }}
+                >
+                  — {testimonialAuthor}
+                </p>
+              )}
+            </div>
+            <div className="flex items-center justify-between">
+              {renderLogo()}
+              <span className={cn("text-[10px] font-sans", textSecondary)}>
+                identity.nello.one
+              </span>
             </div>
           </div>
         );
