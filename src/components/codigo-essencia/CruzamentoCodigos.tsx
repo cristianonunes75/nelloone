@@ -517,25 +517,27 @@ export const CruzamentoCodigos = ({ language, hasSavedCodigo }: CruzamentoCodigo
               return (
                 <Card key={crossing.id} className="hover:bg-muted/50 transition-colors">
                   <CardContent className="py-4">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex flex-col gap-3">
+                      {/* Partner info row */}
+                      <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                           <RelIcon className="w-5 h-5 text-primary" />
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-medium truncate">{partnerName}</p>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium break-words">{partnerName}</p>
                           <div className="flex items-center gap-2 text-sm">
                             <StatusIcon className={`w-3 h-3 shrink-0 ${StatusConfig.color}`} />
-                            <span className="text-muted-foreground truncate">
+                            <span className="text-muted-foreground">
                               {t.status[crossing.status as keyof typeof t.status] || crossing.status}
                             </span>
                           </div>
                         </div>
                       </div>
                       
-                      <div className="shrink-0">
+                      {/* Action row */}
+                      <div className="pl-[52px]">
                         {crossing.status === 'generated' ? (
-                          <div className="flex gap-2">
+                          <div className="flex flex-wrap gap-2">
                             <Button 
                               variant="outline" 
                               size="sm"

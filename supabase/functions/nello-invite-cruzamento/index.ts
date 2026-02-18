@@ -132,7 +132,7 @@ serve(async (req) => {
 
     const invitedUserId = invitedUsers?.[0]?.id || null;
 
-    // Check if crossing already exists
+    // Check if crossing already exists (same direction)
     const { data: existingCrossing } = await supabase
       .from('codigo_cruzamentos')
       .select('id, status')
@@ -145,6 +145,54 @@ serve(async (req) => {
         JSON.stringify({ error: 'Invite already sent', existingId: existingCrossing.id }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Check for REVERSE invite: the invited person already invited the current user
+    const inviterEmail = user.email?.toLowerCase();
+    if (inviterEmail) {
+      const { data: reverseCrossing } = await supabase
+        .from('codigo_cruzamentos')
+        .select('id, status, user_a_id, invite_email')
+        .eq('invite_email', inviterEmail)
+        .in('status', ['pending'])
+        .single();
+
+      // Verify reverse crossing was created by the person we're trying to invite
+      if (reverseCrossing) {
+        // Get the email of user_a of the reverse crossing
+        const { data: reverseUserProfile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', reverseCrossing.user_a_id)
+          .eq('email', email.toLowerCase())
+          .single();
+
+        if (reverseUserProfile) {
+          // Auto-accept the reverse crossing instead of creating a duplicate
+          const now = new Date().toISOString();
+          await supabase
+            .from('codigo_cruzamentos')
+            .update({
+              user_b_id: user.id,
+              user_b_consent_at: now,
+              invite_accepted_at: now,
+              status: 'accepted'
+            })
+            .eq('id', reverseCrossing.id);
+
+          console.log('Reverse crossing auto-accepted:', reverseCrossing.id);
+
+          return new Response(
+            JSON.stringify({ 
+              success: true, 
+              crossingId: reverseCrossing.id,
+              autoAccepted: true,
+              message: 'Reverse invite found and auto-accepted'
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
     }
 
     // Create crossing record
