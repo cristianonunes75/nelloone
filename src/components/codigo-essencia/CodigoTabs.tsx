@@ -67,7 +67,7 @@ export const CodigoTabs = ({
     { 
       value: "vida-pratica", 
       label: t.vidaPratica, 
-      shortLabel: "Vida",
+      shortLabel: "Vida Prática",
       icon: Heart,
       gradient: "from-emerald-600 to-teal-600",
       activeBg: "bg-gradient-to-r from-emerald-500/12 to-teal-500/12",
