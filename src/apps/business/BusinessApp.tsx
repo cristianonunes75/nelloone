@@ -7,7 +7,6 @@ import BusinessConsent from './pages/BusinessConsent';
 import BusinessDashboard from './pages/BusinessDashboard';
 import BusinessTeam from './pages/BusinessTeam';
 import BusinessInvite from './pages/BusinessInvite';
-import BusinessReports from './pages/BusinessReports';
 import BusinessSettings from './pages/BusinessSettings';
 import BusinessAcceptInvite from './pages/BusinessAcceptInvite';
 import BusinessCollaboratorRedirect from './pages/BusinessCollaboratorRedirect';
@@ -19,6 +18,7 @@ import BusinessJobDetail from './pages/BusinessJobDetail';
 import BusinessJobPublic from './pages/BusinessJobPublic';
 import BusinessApplicationConfirm from './pages/BusinessApplicationConfirm';
 import BusinessCandidates from './pages/BusinessCandidates';
+import BusinessBilling from './pages/BusinessBilling';
 import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
 import { isFeatureEnabled } from './config/featureFlags';
 
@@ -33,17 +33,11 @@ import { PraxisAuthProvider } from './hooks/usePraxisAuth';
 /**
  * Nello Hiring - B2B Platform for Candidate Behavioral Assessment
  * Subdomain: business.nello.one
- * 
- * STRATEGIC DECISION (Post-Audit):
- * - Only the HIRING module is commercially viable
- * - Praxis, Team Insights, and Reports are DISABLED
- * - Focus: Create jobs → Candidates take DISC/Temperaments → Compare with ideal profile
  */
 export default function BusinessApp() {
   const praxisEnabled = isFeatureEnabled('PRAXIS_MODULE');
   return (
     <Routes>
-      {/* ========== ENTERPRISE MODE (existing) ========== */}
       {/* Public routes */}
       <Route path="/" element={<BusinessLanding />} />
       <Route path="/auth" element={<BusinessAuth />} />
@@ -54,6 +48,13 @@ export default function BusinessApp() {
       <Route path="/vaga/:slug" element={<BusinessJobPublic />} />
       <Route path="/confirmar/:token" element={<BusinessApplicationConfirm />} />
       
+      {/* Billing / Paywall */}
+      <Route path="/billing" element={
+        <BusinessProtectedRoute requiredRole="company_admin" enforceTrial={false}>
+          <BusinessBilling />
+        </BusinessProtectedRoute>
+      } />
+      
       {/* Collaborator consent route */}
       <Route path="/consent" element={
         <BusinessProtectedRoute requiredRole="collaborator">
@@ -61,9 +62,9 @@ export default function BusinessApp() {
         </BusinessProtectedRoute>
       } />
       
-      {/* Company Admin routes */}
+      {/* Company Admin routes - all enforce trial */}
       <Route path="/onboarding" element={
-        <BusinessProtectedRoute requiredRole="company_admin">
+        <BusinessProtectedRoute requiredRole="company_admin" enforceTrial={false}>
           <BusinessOnboarding />
         </BusinessProtectedRoute>
       } />
@@ -80,11 +81,6 @@ export default function BusinessApp() {
       <Route path="/invite" element={
         <BusinessProtectedRoute requiredRole="company_admin">
           <BusinessInvite />
-        </BusinessProtectedRoute>
-      } />
-      <Route path="/reports" element={
-        <BusinessProtectedRoute requiredRole="company_admin">
-          <BusinessReports />
         </BusinessProtectedRoute>
       } />
       <Route path="/settings" element={
@@ -122,18 +118,20 @@ export default function BusinessApp() {
         </BusinessProtectedRoute>
       } />
       
+      {/* Reports - DISABLED, redirect to dashboard */}
+      <Route path="/reports" element={<Navigate to="/dashboard" replace />} />
+      
       {/* Public hiring assessment route - candidates access via token */}
       <Route path="/assessment/:token" element={<BusinessHiringAssessment />} />
       
-      {/* Collaborator routes - redirect to Core with company context */}
+      {/* Collaborator routes */}
       <Route path="/my-journey" element={
         <BusinessProtectedRoute requiredRole="collaborator">
           <BusinessCollaboratorRedirect />
         </BusinessProtectedRoute>
       } />
 
-      {/* ========== PRAXIS MODE - DISABLED ========== */}
-      {/* Praxis routes redirect to landing when feature is disabled */}
+      {/* Praxis - DISABLED */}
       {praxisEnabled ? (
         <>
           <Route path="/praxis" element={<PraxisLanding />} />
@@ -149,7 +147,6 @@ export default function BusinessApp() {
           } />
         </>
       ) : (
-        // Praxis disabled - redirect all praxis routes to main landing
         <Route path="/praxis/*" element={<Navigate to="/" replace />} />
       )}
       

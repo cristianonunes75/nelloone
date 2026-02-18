@@ -492,6 +492,24 @@ export default function BusinessHiringAssessment() {
       
       if (allCompleted) {
         console.log("All assessments completed! Candidate status already updated by RPC.");
+        
+        // Fire-and-forget: notify company admins via edge function
+        try {
+          const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+          const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+          fetch(`${supabaseUrl}/functions/v1/business-assessment-complete-notify`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${anonKey}`,
+              'apikey': anonKey,
+            },
+            body: JSON.stringify({ candidateId: candidate?.id }),
+          }).catch(err => console.warn('Notification call failed (non-blocking):', err));
+        } catch (e) {
+          console.warn('Failed to trigger notification:', e);
+        }
+        
         setPhase("completed");
       } else {
         // Go to next test

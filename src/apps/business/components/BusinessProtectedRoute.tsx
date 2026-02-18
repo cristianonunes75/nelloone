@@ -3,16 +3,22 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useBusinessAuth, BusinessRole } from '../hooks/useBusinessAuth';
 import { useCrossAppAuth } from '@/hooks/useCrossAppAuth';
+import { useTrialEnforcement } from '../hooks/useTrialEnforcement';
 import { Loader2 } from 'lucide-react';
 
 interface BusinessProtectedRouteProps {
   children: ReactNode;
   requiredRole?: BusinessRole | 'any';
+  enforceTrial?: boolean;
 }
+
+// Routes that require active subscription / trial
+const PAYWALL_ROUTES = ['/dashboard', '/jobs', '/hiring', '/candidates', '/team', '/settings', '/billing'];
 
 export function BusinessProtectedRoute({ 
   children, 
-  requiredRole = 'any' 
+  requiredRole = 'any',
+  enforceTrial = true,
 }: BusinessProtectedRouteProps) {
   const { user, userRoles, isLoading: authLoading } = useAuth();
   const { 
@@ -28,11 +34,14 @@ export function BusinessProtectedRoute({
   // Handle cross-app authentication tokens (from AdminAppSwitcher)
   const { isPending: crossAppPending } = useCrossAppAuth();
 
+  // Trial enforcement
+  const { isBlocked: trialBlocked, isLoading: trialLoading } = useTrialEnforcement();
+
   // Check if user is Nello One super admin (has admin role in user_roles)
   const isNelloOneSuperAdmin = userRoles.includes('admin');
 
   // Show loading while checking auth or processing cross-app token
-  if (authLoading || businessLoading || crossAppPending) {
+  if (authLoading || businessLoading || crossAppPending || trialLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
@@ -70,6 +79,11 @@ export function BusinessProtectedRoute({
   // Company admin needs onboarding
   if (needsOnboarding && !location.pathname.includes('/onboarding')) {
     return <Navigate to="/onboarding" replace />;
+  }
+
+  // Trial enforcement: if blocked and NOT already on /billing, redirect
+  if (enforceTrial && trialBlocked && !location.pathname.startsWith('/billing')) {
+    return <Navigate to="/billing" replace />;
   }
 
   // Check role requirement
