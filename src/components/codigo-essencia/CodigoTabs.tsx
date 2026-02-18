@@ -2,6 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, BarChart3, Heart, Sparkles } from "lucide-react";
 import { ReactNode, useState } from "react";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface CodigoTabsProps {
   essenciaContent: ReactNode;
@@ -89,27 +90,28 @@ export const CodigoTabs = ({
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       {/* Sticky Tab Navigation - Premium Design */}
       <div className="sticky top-16 z-20 bg-background/98 backdrop-blur-md py-3 -mx-4 px-4 border-b border-border/30">
-        <TabsList className="w-full h-auto flex justify-center gap-1.5 bg-[hsl(220,50%,18%,0.06)] dark:bg-[hsl(220,50%,80%,0.08)] p-1.5 rounded-2xl border border-border/30">
-          {tabConfig.map((tab, index) => (
-            <TabsTrigger 
-              key={tab.value}
-              value={tab.value}
-              className={`
-                flex-1 min-w-[80px] max-w-[140px] gap-1.5 rounded-xl py-3 px-3 
-                text-xs sm:text-sm font-medium transition-all duration-300
-                border border-transparent
-                data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-muted/50
-                data-[state=active]:${tab.activeBg} 
-                data-[state=active]:${tab.activeText} 
-                data-[state=active]:${tab.activeBorder}
-                data-[state=active]:shadow-sm
-              `}
-            >
-              <tab.icon className="w-4 h-4" />
-              <span className="hidden sm:inline">{tab.label}</span>
-              <span className="sm:hidden">{tab.shortLabel}</span>
-            </TabsTrigger>
-          ))}
+        <TabsList className="w-full h-auto flex justify-center gap-2 bg-[hsl(var(--nello-gold)/0.08)] dark:bg-[hsl(var(--nello-gold)/0.12)] p-2 rounded-2xl border border-[hsl(var(--nello-gold)/0.25)]">
+          {tabConfig.map((tab) => {
+            const isActive = activeTab === tab.value;
+            return (
+              <TabsTrigger 
+                key={tab.value}
+                value={tab.value}
+                className={cn(
+                  "flex-1 min-w-[80px] max-w-[150px] gap-2 rounded-xl py-3 px-3",
+                  "text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer",
+                  "border-2",
+                  isActive
+                    ? "bg-gradient-to-r from-[hsl(var(--nello-gold))] to-[hsl(var(--nello-gold-deep))] text-white border-[hsl(var(--nello-gold-deep))] shadow-md shadow-[hsl(var(--nello-gold)/0.3)]"
+                    : "bg-background/80 text-[hsl(var(--nello-gold-deep))] border-[hsl(var(--nello-gold)/0.3)] hover:bg-[hsl(var(--nello-gold)/0.12)] hover:border-[hsl(var(--nello-gold)/0.5)] hover:shadow-sm"
+                )}
+              >
+                <tab.icon className={cn("w-4 h-4", isActive ? "text-white" : "text-[hsl(var(--nello-gold))]")} />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.shortLabel}</span>
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
       </div>
 
