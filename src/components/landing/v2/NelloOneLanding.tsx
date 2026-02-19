@@ -552,9 +552,9 @@ export const NelloOneLanding = () => {
                <div className="flex items-center justify-center gap-2 mt-4 text-muted-foreground">
                  <Shield className="w-4 h-4 flex-shrink-0" />
                  <span className="text-xs">
-                   {language === 'en' 
-                     ? "One-time payment. Lifetime access to the system and your reports. Secure processing via Stripe." 
-                     : "Pagamento único. Acesso vitalício ao sistema e aos seus relatórios. Processamento seguro via Stripe."}
+                    {language === 'en' 
+                      ? "One-time payment. Secure processing via Stripe." 
+                      : "Pagamento único. Processamento seguro via Stripe."}
                  </span>
                </div>
               
