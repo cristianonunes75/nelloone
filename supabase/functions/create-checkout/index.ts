@@ -140,8 +140,8 @@ const BRL_PRICES: Record<string, string> = {
 
 // EUR Price IDs for PT-PT version (Portugal/European market)
 const EUR_PRICES: Record<string, string> = {
-  arquetipos: "price_1SZywzDjhZZxZELMZfCg6fSd",
-  arquetipos_proposito: "price_1SZywzDjhZZxZELMZfCg6fSd",
+  arquetipos: "price_1SayKNDjhZZxZELMhCJ6Na9m",
+  arquetipos_proposito: "price_1SayKNDjhZZxZELMhCJ6Na9m",
   disc: "price_1SZyxMDjhZZxZELMkolH98fK",
   mbti: "price_1SZz6TDjhZZxZELMXzDUT8kk",
   eneagrama: "price_1SZz5ADjhZZxZELMauUUwZSQ",
@@ -371,6 +371,9 @@ serve(async (req) => {
     // Check for Activation Individual (Professional Direction) purchase
     const isActivationIndividual = body.productType === "activation_individual";
     
+    // Check for Identity Couple Premium purchase
+    const isIdentityCouplePremium = body.productType === "identity_couple_premium";
+    
     // Check for coupon code
     const couponCode = body.couponCode || null;
     
@@ -408,11 +411,11 @@ serve(async (req) => {
       }
     }
     
-    if (testIds.length === 0 && !isBundle && !isFundadores && !isAtivacaoCodigo && !isCodigoCasal && !isActivationIndividual) {
-      throw new Error("At least one test ID is required, or isBundle/isFundadores/isAtivacaoCodigo/isCodigoCasal/isActivationIndividual must be true");
+    if (testIds.length === 0 && !isBundle && !isFundadores && !isAtivacaoCodigo && !isCodigoCasal && !isActivationIndividual && !isIdentityCouplePremium) {
+      throw new Error("At least one test ID is required, or a valid productType must be specified");
     }
     
-    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, isAtivacaoCodigo, isCodigoCasal, isActivationIndividual, language, currency, couponCode });
+    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, isAtivacaoCodigo, isCodigoCasal, isActivationIndividual, isIdentityCouplePremium, language, currency, couponCode });
 
     // Get user (optional - supports guest checkout)
     let user = null;
@@ -480,69 +483,44 @@ serve(async (req) => {
       }];
       logStep("Código do Casal line item created", { currency, amount: codigoCasalAmounts[currency] });
     } else if (isAtivacaoCodigo) {
-      // Ativação do Código purchase - Dynamic pricing based on currency
-      const ativacaoAmounts: Record<string, number> = {
-        brl: 9700,  // R$ 97
-        usd: 2700,  // $27
-        eur: 2700,  // €27
-      };
-      
-      const ativacaoNames: Record<string, { name: string; description: string }> = {
-        brl: {
-          name: "Ativação do Código da Essência – NELLO ONE",
-          description: "Relatório de ativação personalizado baseado no seu Código da Essência",
-        },
-        usd: {
-          name: "Essence Code Activation – NELLO ONE",
-          description: "Personalized activation report based on your Essence Code",
-        },
-        eur: {
-          name: "Ativação do Código da Essência – NELLO ONE",
-          description: "Relatório de ativação personalizado baseado no seu Código da Essência",
-        },
+      // Ativação do Código purchase - Use real Stripe Price IDs
+      const ativacaoPriceIds: Record<string, string> = {
+        brl: "price_1Sw6EEDjhZZxZELMSmPNECig", // R$197
+        usd: "price_1Sw6F6DjhZZxZELMfBW3pn5q", // $57
+        eur: "price_1Sw6FiDjhZZxZELMXDH1ACdx", // €47
       };
       
       lineItems = [{
-        price_data: {
-          currency: currency,
-          product_data: ativacaoNames[currency] || ativacaoNames.brl,
-          unit_amount: ativacaoAmounts[currency] || ativacaoAmounts.brl,
-        },
+        price: ativacaoPriceIds[currency] || ativacaoPriceIds.brl,
         quantity: 1,
       }];
-      logStep("Ativação do Código line item created", { currency, amount: ativacaoAmounts[currency] });
+      logStep("Ativação do Código line item created with Price ID", { currency, priceId: ativacaoPriceIds[currency] });
     } else if (isActivationIndividual) {
-      // Activation Individual (Professional Direction) purchase - Dynamic pricing based on currency
-      const activationAmounts: Record<string, number> = {
-        brl: 9700,  // R$ 97
-        usd: 2700,  // $27
-        eur: 2700,  // €27
-      };
-      
-      const activationNames: Record<string, { name: string; description: string }> = {
-        brl: {
-          name: "Ativação de Direção Profissional – NELLO ONE",
-          description: "Transforme seu Código da Essência em um plano de ação profissional personalizado",
-        },
-        usd: {
-          name: "Professional Direction Activation – NELLO ONE",
-          description: "Transform your Essence Code into a personalized professional action plan",
-        },
-        eur: {
-          name: "Ativação de Direção Profissional – NELLO ONE",
-          description: "Transforme o seu Código da Essência num plano de ação profissional personalizado",
-        },
+      // Activation Individual (Professional Direction) purchase - Use real Stripe Price IDs
+      const activationPriceIds: Record<string, string> = {
+        brl: "price_1SxRhHDjhZZxZELMuoj7N1CN", // R$197
+        usd: "price_1SxRhuDjhZZxZELMsAYBZqUP", // $57
+        eur: "price_1SxRjKDjhZZxZELMAqWHQKbm", // €47
       };
       
       lineItems = [{
-        price_data: {
-          currency: currency,
-          product_data: activationNames[currency] || activationNames.brl,
-          unit_amount: activationAmounts[currency] || activationAmounts.brl,
-        },
+        price: activationPriceIds[currency] || activationPriceIds.brl,
         quantity: 1,
       }];
-      logStep("Activation Individual line item created", { currency, amount: activationAmounts[currency] });
+      logStep("Activation Individual line item created with Price ID", { currency, priceId: activationPriceIds[currency] });
+    } else if (isIdentityCouplePremium) {
+      // Identity Couple Premium - Mapa Definitivo do Casal (High Ticket)
+      const identityCouplePriceIds: Record<string, string> = {
+        brl: "price_1StyMcDjhZZxZELM5IVwqfhV", // R$997
+        usd: "price_1SvfdXDjhZZxZELMaNDfVXox", // $297
+        eur: "price_1SvfdoDjhZZxZELMLaONPhR5", // €247
+      };
+      
+      lineItems = [{
+        price: identityCouplePriceIds[currency] || identityCouplePriceIds.brl,
+        quantity: 1,
+      }];
+      logStep("Identity Couple Premium line item created with Price ID", { currency, priceId: identityCouplePriceIds[currency] });
     } else if (isFundadores) {
       // Fundadores purchase - R$197 BRL only (or free with 100% coupon)
       const fundadoresPriceId = "price_1ScWglDjhZZxZELM3tQocxgu";
@@ -695,7 +673,8 @@ serve(async (req) => {
         is_ativacao_codigo: isAtivacaoCodigo ? "true" : "false",
         is_codigo_casal: isCodigoCasal ? "true" : "false",
         is_activation_individual: isActivationIndividual ? "true" : "false",
-        product_type: isActivationIndividual ? "activation_individual" : isCodigoCasal ? "codigo_casal" : isAtivacaoCodigo ? "ativacao_codigo" : isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
+        is_identity_couple_premium: isIdentityCouplePremium ? "true" : "false",
+        product_type: isIdentityCouplePremium ? "identity_couple_premium" : isActivationIndividual ? "activation_individual" : isCodigoCasal ? "codigo_casal" : isAtivacaoCodigo ? "ativacao_codigo" : isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
         affiliate_code: affiliateCode || "",
         purchase_origin: isCodigoCasal ? "couple_paywall" : "",
       },
