@@ -30,6 +30,13 @@ interface CodigoEssenciaUser {
   mapa_id?: string;
   mapa_version?: number;
   locale?: string;
+  // Additional product statuses
+  has_ativacao_codigo: boolean;
+  ativacao_codigo_date?: string;
+  has_ativacao_profissional: boolean;
+  ativacao_profissional_date?: string;
+  has_codigo_casal: boolean;
+  codigo_casal_date?: string;
 }
 
 // Component protected by AdminGuard at route level - isSuperAdminOnly
@@ -66,8 +73,22 @@ export const AdminCodigoEssencia = () => {
         .from("test_purchases")
         .select("user_id, purchased_at, metadata")
         .eq("payment_status", "completed");
+      
+      // Fetch additional product data
+      const { data: ativacoes } = await supabase.from("ativacao_codigo").select("user_id, created_at");
+      const { data: ativacoesPro } = await supabase.from("ativacao_profissional").select("user_id, created_at");
+      const { data: cruzamentos } = await supabase.from("codigo_cruzamentos").select("user_a_id, user_b_id, created_at, status");
 
       const mapaMap = new Map((mapas || []).map(m => [m.user_id, m]));
+      const ativacaoMap = new Map((ativacoes || []).map(a => [a.user_id, a.created_at]));
+      const ativacaoProMap = new Map((ativacoesPro || []).map(a => [a.user_id, a.created_at]));
+      
+      // Build cruzamento map - user could be user_a or user_b
+      const cruzamentoMap = new Map<string, string>();
+      (cruzamentos || []).forEach(c => {
+        if (c.user_a_id) cruzamentoMap.set(c.user_a_id, c.created_at);
+        if (c.user_b_id) cruzamentoMap.set(c.user_b_id, c.created_at);
+      });
       
       // Find codigo_essencia purchases
       const codigoPurchases = (purchases || []).filter(p => {
@@ -83,14 +104,20 @@ export const AdminCodigoEssencia = () => {
           return {
             id: profile.id,
             full_name: profile.full_name,
-            codigo_essencia_unlocked: true, // Always true when journey is completed
+            codigo_essencia_unlocked: true,
             journey_status: profile.journey_status || 'not_started',
             created_at: profile.created_at,
             purchase_date: purchaseMap.get(profile.id),
             has_mapa: !!mapa,
             mapa_id: mapa?.id,
             mapa_version: mapa?.version ?? undefined,
-            locale: 'pt', // Default
+            locale: 'pt',
+            has_ativacao_codigo: ativacaoMap.has(profile.id),
+            ativacao_codigo_date: ativacaoMap.get(profile.id),
+            has_ativacao_profissional: ativacaoProMap.has(profile.id),
+            ativacao_profissional_date: ativacaoProMap.get(profile.id),
+            has_codigo_casal: cruzamentoMap.has(profile.id),
+            codigo_casal_date: cruzamentoMap.get(profile.id),
           };
         });
 
@@ -212,6 +239,9 @@ export const AdminCodigoEssencia = () => {
     if (filter === "unlocked") return matchesSearch && u.codigo_essencia_unlocked;
     if (filter === "generated") return matchesSearch && u.has_mapa;
     if (filter === "pending") return matchesSearch && u.codigo_essencia_unlocked && !u.has_mapa;
+    if (filter === "ativacao") return matchesSearch && u.has_ativacao_codigo;
+    if (filter === "profissional") return matchesSearch && u.has_ativacao_profissional;
+    if (filter === "casal") return matchesSearch && u.has_codigo_casal;
     
     return matchesSearch;
   });
@@ -221,6 +251,9 @@ export const AdminCodigoEssencia = () => {
     unlocked: users.filter(u => u.codigo_essencia_unlocked).length,
     generated: users.filter(u => u.has_mapa).length,
     pending: users.filter(u => u.codigo_essencia_unlocked && !u.has_mapa).length,
+    ativacaoCodigo: users.filter(u => u.has_ativacao_codigo).length,
+    ativacaoProfissional: users.filter(u => u.has_ativacao_profissional).length,
+    codigoCasal: users.filter(u => u.has_codigo_casal).length,
   };
 
   if (loading) {
@@ -307,22 +340,34 @@ export const AdminCodigoEssencia = () => {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-        <Card className="p-3 md:p-4 border-border/50">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 md:gap-3">
+        <Card className="p-3 border-border/50">
           <p className="text-lg md:text-2xl font-semibold">{stats.total}</p>
           <p className="text-[10px] md:text-xs text-muted-foreground">Jornadas completas</p>
         </Card>
-        <Card className="p-3 md:p-4 border-border/50">
+        <Card className="p-3 border-border/50">
           <p className="text-lg md:text-2xl font-semibold text-emerald-600">{stats.unlocked}</p>
           <p className="text-[10px] md:text-xs text-muted-foreground">Com acesso</p>
         </Card>
-        <Card className="p-3 md:p-4 border-border/50">
+        <Card className="p-3 border-border/50">
           <p className="text-lg md:text-2xl font-semibold text-primary">{stats.generated}</p>
-          <p className="text-[10px] md:text-xs text-muted-foreground">Relatórios gerados</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Código Essência</p>
         </Card>
-        <Card className="p-3 md:p-4 border-border/50">
+        <Card className="p-3 border-border/50">
           <p className="text-lg md:text-2xl font-semibold text-yellow-600">{stats.pending}</p>
           <p className="text-[10px] md:text-xs text-muted-foreground">Aguardando geração</p>
+        </Card>
+        <Card className="p-3 border-border/50">
+          <p className="text-lg md:text-2xl font-semibold text-blue-600">{stats.ativacaoCodigo}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Ativação Código</p>
+        </Card>
+        <Card className="p-3 border-border/50">
+          <p className="text-lg md:text-2xl font-semibold text-violet-600">{stats.ativacaoProfissional}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Ativação Profissional</p>
+        </Card>
+        <Card className="p-3 border-border/50">
+          <p className="text-lg md:text-2xl font-semibold text-rose-600">{stats.codigoCasal}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Código do Casal</p>
         </Card>
       </div>
 
@@ -346,8 +391,11 @@ export const AdminCodigoEssencia = () => {
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="unlocked">Com acesso</SelectItem>
-                <SelectItem value="generated">Gerados</SelectItem>
+                <SelectItem value="generated">Código Gerado</SelectItem>
                 <SelectItem value="pending">Pendentes</SelectItem>
+                <SelectItem value="ativacao">Com Ativação Código</SelectItem>
+                <SelectItem value="profissional">Com Ativação Profissional</SelectItem>
+                <SelectItem value="casal">Com Código do Casal</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -357,9 +405,10 @@ export const AdminCodigoEssencia = () => {
             <TableHeader>
               <TableRow className="hover:bg-transparent">
                 <TableHead>Usuário</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Relatório</TableHead>
-                <TableHead>Data Compra</TableHead>
+                <TableHead>Código Essência</TableHead>
+                <TableHead>Ativação Código</TableHead>
+                <TableHead>Ativação Profissional</TableHead>
+                <TableHead>Código do Casal</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -370,15 +419,6 @@ export const AdminCodigoEssencia = () => {
                     <p className="font-medium text-sm">{user.full_name}</p>
                   </TableCell>
                   <TableCell>
-                    {user.codigo_essencia_unlocked ? (
-                      <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs">
-                        Liberado
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="text-xs">Jornada completa</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
                     {user.has_mapa ? (
                       <div className="flex items-center gap-1.5">
                         <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs gap-1">
@@ -386,26 +426,61 @@ export const AdminCodigoEssencia = () => {
                           Gerado
                         </Badge>
                         <span className="text-xs text-muted-foreground">v{user.mapa_version || 1}</span>
-                        {user.mapa_version === 0 && (
-                          <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs">
-                            Regen liberada
-                          </Badge>
-                        )}
-                        {(user.mapa_version || 1) >= 2 && (
-                          <Badge variant="outline" className="text-xs text-muted-foreground">
-                            Limite
-                          </Badge>
-                        )}
                       </div>
                     ) : (
                       <span className="text-xs text-muted-foreground">Não gerado</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {user.purchase_date 
-                      ? format(new Date(user.purchase_date), "dd/MM/yy", { locale: ptBR })
-                      : "—"
-                    }
+                  <TableCell>
+                    {user.has_ativacao_codigo ? (
+                      <div className="flex flex-col">
+                        <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs gap-1 w-fit">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Gerado
+                        </Badge>
+                        {user.ativacao_codigo_date && (
+                          <span className="text-[10px] text-muted-foreground mt-0.5">
+                            {format(new Date(user.ativacao_codigo_date), "dd/MM/yy", { locale: ptBR })}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {user.has_ativacao_profissional ? (
+                      <div className="flex flex-col">
+                        <Badge className="bg-violet-500/10 text-violet-600 border-violet-500/20 text-xs gap-1 w-fit">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Gerado
+                        </Badge>
+                        {user.ativacao_profissional_date && (
+                          <span className="text-[10px] text-muted-foreground mt-0.5">
+                            {format(new Date(user.ativacao_profissional_date), "dd/MM/yy", { locale: ptBR })}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {user.has_codigo_casal ? (
+                      <div className="flex flex-col">
+                        <Badge className="bg-rose-500/10 text-rose-600 border-rose-500/20 text-xs gap-1 w-fit">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Gerado
+                        </Badge>
+                        {user.codigo_casal_date && (
+                          <span className="text-[10px] text-muted-foreground mt-0.5">
+                            {format(new Date(user.codigo_casal_date), "dd/MM/yy", { locale: ptBR })}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
