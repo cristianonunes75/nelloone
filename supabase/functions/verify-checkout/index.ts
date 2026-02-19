@@ -328,6 +328,42 @@ serve(async (req) => {
 
       logStep("Profile updated with has_nello_couple flag");
 
+    // ====== IDENTITY COUPLE PREMIUM ======
+    } else if (productType === "identity_couple_premium") {
+      logStep("Processing Identity Couple Premium purchase");
+
+      // Update profile - unlock all couple-related features
+      await supabase
+        .from("profiles")
+        .update({ 
+          has_identity_couple_premium: true,
+          has_nello_couple: true,
+          has_activation_couple: true,
+        })
+        .eq("id", userId);
+
+      // Record the purchase
+      await supabase
+        .from("test_purchases")
+        .insert({
+          user_id: userId,
+          test_id: null,
+          price_paid: (session.amount_total || 0) / 100,
+          payment_status: "completed",
+          payment_method: "stripe",
+          transaction_id: session.payment_intent as string,
+          purchase_category: "identity_couple_premium",
+          metadata: {
+            session_id: session.id,
+            product_type: "identity_couple_premium",
+            includes_nello_couple: true,
+            includes_activation_couple: true,
+            verified_via: "verify-checkout",
+          },
+        });
+
+      logStep("Identity Couple Premium purchase recorded successfully");
+
     // ====== ACTIVATION INDIVIDUAL (PROFESSIONAL DIRECTION) ======
     } else if (productType === "activation_individual") {
       logStep("Processing Activation Individual purchase");
