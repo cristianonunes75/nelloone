@@ -23,6 +23,8 @@ import { ApprovedTestimonialsSection } from "./ApprovedTestimonialsSection";
 import { StrategicFAQ } from "./StrategicFAQ";
 import { PillarsSection } from "./PillarsSection";
 import { NavSection } from "./NavSection";
+import { CountdownBanner } from "./CountdownBanner";
+import { FloatingBadge } from "./FloatingBadge";
 import { NelloGlobalFooter } from "@/components/global/NelloGlobalFooter";
 import heroDawn from "@/assets/hero-dawn.jpg";
 import nelloPresence from "@/assets/nello-presence.jpg";
@@ -114,17 +116,20 @@ export const NelloOneLanding = () => {
     essence: "Código da Essência"
   };
 
-  // Pricing based on language - LAUNCH PHASE (50% OFF)
+  // Flash Sale Fevereiro pricing
   const pricing = language === 'en' 
-    ? { original: "$397", price: "$198,50", currency: "$", installment: "or up to 12x $19.85" }
+    ? { original: "$197", price: "$98.50", currency: "$", installment: "" }
     : language === 'pt-pt'
-    ? { original: "€297", price: "€148,50", currency: "€", installment: "ou em até 12x de €14,85" }
-    : { original: "R$ 1.297", price: "R$ 648,50", currency: "R$", installment: "ou em até 12x de R$ 64,85 no cartão" };
+    ? { original: "€147", price: "€74,50", currency: "€", installment: "" }
+    : { original: "R$ 497", price: "R$ 248,50", currency: "R$", installment: "ou em até 12x de R$ 24,85 no cartão" };
 
   return (
     <div className="flex flex-col bg-background">
       {/* Navigation Header */}
       <NavSection />
+      
+      {/* Countdown Banner */}
+      <CountdownBanner />
       
       {/* ========== 1️⃣ HERO ========== */}
       <section className="relative min-h-[90vh] md:min-h-[85vh] flex items-center justify-center overflow-hidden">
@@ -164,8 +169,8 @@ export const NelloOneLanding = () => {
                 size="lg" 
                 className="text-sm sm:text-base px-5 sm:px-8 w-full min-h-[54px] sm:min-h-[56px] bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold rounded-full transition-all duration-300 hover:scale-[1.02] shadow-xl group"
               >
-                <span className="text-center leading-tight">{ij.cta_primary || "Acessar meu Código da Essência"}</span>
-                <Sparkles className="ml-2 h-4 w-4 sm:h-5 sm:w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
+                 <span className="text-center leading-tight">{language === 'en' ? "Get my Code at 50% OFF" : "Garantir meu Código com 50% OFF"}</span>
+                 <Sparkles className="ml-2 h-4 w-4 sm:h-5 sm:w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
               </Button>
               
               <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 py-3 rounded-full bg-background/80 backdrop-blur-sm">
@@ -444,52 +449,57 @@ export const NelloOneLanding = () => {
             <div className="relative bg-card rounded-2xl border-2 border-nello-gold/30 p-6 md:p-8 shadow-lg">
               
               <div className="text-center mb-2">
-                <span className="inline-block text-xs font-semibold tracking-widest uppercase text-nello-gold/80 mb-1">
-                  {language === 'en' ? "First Edition" : "Primeira Edição"}
-                </span>
-                <h3 className="font-display text-lg md:text-xl text-foreground font-semibold">
-                  {language === 'en' ? "Debut Condition" : "Condição de Estreia"}
-                </h3>
-              </div>
-              
-              <div className="text-center mb-6">
-                <span className="font-display text-4xl md:text-5xl text-foreground">{pricing.price}</span>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {pricing.installment}
-                </p>
-                <p className="text-sm text-nello-gold mt-3 font-medium">
-                  {ij.pricing_unique || "Pagamento único • Acesso vitalício"}
-                </p>
-              </div>
-              
-              <ul className="space-y-2.5 mb-6">
-                <li className="flex items-center gap-2.5">
-                  <Check className="w-4 h-4 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
-                  <span className="text-foreground text-sm font-medium">{language === 'en' ? "Essence Code" : "Código da Essência"}</span>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <Check className="w-4 h-4 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
-                  <span className="text-foreground text-sm font-medium">{language === 'en' ? "Essence Code" : "Código da Essência"}</span>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <Check className="w-4 h-4 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
-                  <span className="text-foreground text-sm font-medium">{language === 'en' ? "1 Practical Activation included" : "1 Ativação prática incluída"}</span>
-                </li>
-              </ul>
-              
-              <div className="bg-muted/20 rounded-lg px-4 py-3 mb-6 text-center">
-                <p className="text-xs text-muted-foreground">
-                  {language === 'en' 
-                    ? "Extra available for couples: Couple Code — generated when both complete the journey"
-                    : "Extra disponível para casais: Código do Casal — gerado quando ambos completam a jornada"}
-                </p>
-              </div>
-              
-              <p className="text-xs text-muted-foreground text-center mb-6 leading-relaxed">
-                {language === 'en' 
-                  ? "Condition valid only during this initial phase. After that, the price returns to $397."
-                  : "Condição válida apenas nesta fase inicial. Depois, o valor retorna para R$ 1.297."}
-              </p>
+               <div className="inline-block mb-3">
+                 <span className="bg-nello-gold/20 text-nello-gold text-xs font-bold tracking-wider uppercase px-3 py-1 rounded-full">
+                   {language === 'en' ? "50% Real Discount" : "50% de Desconto Real"}
+                 </span>
+               </div>
+                 <span className="inline-block text-xs font-semibold tracking-widest uppercase text-nello-gold/80 mb-1">
+                   {language === 'en' ? "Flash Sale February" : "Flash Sale Fevereiro"}
+                 </span>
+                 <h3 className="font-display text-lg md:text-xl text-foreground font-semibold">
+                   {language === 'en' ? "50% OFF" : "50% OFF"}
+                 </h3>
+               </div>
+               
+               <div className="text-center mb-6">
+                 <span className="text-lg text-muted-foreground line-through">{pricing.original}</span>
+                 <span className="font-display text-4xl md:text-5xl text-foreground ml-2">{pricing.price}</span>
+                 {pricing.installment && (
+                   <p className="text-xs text-muted-foreground mt-2">
+                     {pricing.installment}
+                   </p>
+                 )}
+                 <p className="text-sm text-nello-gold mt-3 font-medium">
+                   {language === 'en' ? "One-time payment • Lifetime access" : "Pagamento único • Acesso vitalício"}
+                 </p>
+               </div>
+               
+               <p className="text-xs text-foreground/70 text-center mb-4 leading-relaxed">
+                 {language === 'en' 
+                   ? "Exclusive launch condition. Price returns to full on March 1st."
+                   : "Condição exclusiva de lançamento. O valor retorna ao original em 1º de Março."}
+               </p>
+               
+               <div className="bg-muted/30 rounded-xl p-4 mb-6 border border-border/30">
+                 <p className="text-sm font-semibold text-foreground mb-3">
+                   {language === 'en' ? "What you get:" : "O que você recebe:"}
+                 </p>
+                 <ul className="space-y-2">
+                   <li className="flex items-center gap-2.5">
+                     <Check className="w-4 h-4 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
+                     <span className="text-foreground text-sm font-medium">{language === 'en' ? "Essence Code (Your individual profile)" : "Código da Essência (Seu perfil individual)"}</span>
+                   </li>
+                   <li className="flex items-center gap-2.5">
+                     <Check className="w-4 h-4 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
+                     <span className="text-foreground text-sm font-medium">{language === 'en' ? "Couple Code (Synergy with your partner)" : "Código do Casal (Sinergia com seu parceiro/a)"}</span>
+                   </li>
+                   <li className="flex items-center gap-2.5">
+                     <Check className="w-4 h-4 text-nello-gold flex-shrink-0" strokeWidth={2.5} />
+                     <span className="text-foreground text-sm font-medium">{language === 'en' ? "Practical Activation (Concrete decision for the next 7 days)" : "Ativação Prática (Decisão concreta para os próximos 7 dias)"}</span>
+                   </li>
+                 </ul>
+               </div>
               
               {/* Activation explainer */}
               <div className="bg-muted/30 rounded-xl p-4 mb-6 border border-border/30">
@@ -531,18 +541,22 @@ export const NelloOneLanding = () => {
                   size="lg" 
                   className="w-full min-h-[52px] sm:min-h-[56px] text-sm sm:text-base px-4 sm:px-6 rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold group shadow-lg whitespace-normal text-center"
                 >
-                  <span>{language === 'en' ? "Access my Codes" : "Acessar meus Códigos"}</span>
-                  <Sparkles className="ml-2 w-4 h-4 sm:w-5 sm:h-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
-                </Button>
-                <p className="text-xs text-muted-foreground/60 text-center">
-                  {language === 'en' ? "Essence Code + Couple Code + Activation included" : "Código da Essência + Código do Casal + Ativação incluída"}
-                </p>
-              </div>
-              
-              <div className="flex items-center justify-center gap-2 mt-4 text-muted-foreground">
-                <Shield className="w-4 h-4 flex-shrink-0" />
-                <span className="text-xs">{language === 'en' ? "Secure payment via Stripe" : "Pagamento seguro via Stripe"}</span>
-              </div>
+                   <span>{language === 'en' ? "Get my Code at 50% OFF" : "Garantir meu Código com 50% OFF"}</span>
+                   <Sparkles className="ml-2 w-4 h-4 sm:w-5 sm:h-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
+                 </Button>
+                 <p className="text-xs text-muted-foreground/60 text-center">
+                   {language === 'en' ? "Essence Code + Couple Code + Activation included" : "Código da Essência + Código do Casal + Ativação incluída"}
+                 </p>
+               </div>
+               
+               <div className="flex items-center justify-center gap-2 mt-4 text-muted-foreground">
+                 <Shield className="w-4 h-4 flex-shrink-0" />
+                 <span className="text-xs">
+                   {language === 'en' 
+                     ? "One-time payment. Lifetime access to the system and your reports. Secure processing via Stripe." 
+                     : "Pagamento único. Acesso vitalício ao sistema e aos seus relatórios. Processamento seguro via Stripe."}
+                 </span>
+               </div>
               
               <p className="text-[10px] text-muted-foreground/50 text-center mt-4 leading-relaxed max-w-xs mx-auto">
                 {language === 'en' 
@@ -699,7 +713,7 @@ export const NelloOneLanding = () => {
               size="lg" 
               className="text-sm sm:text-base px-6 sm:px-8 w-full min-h-[52px] sm:min-h-[56px] bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold rounded-full transition-all duration-300 hover:scale-[1.02] shadow-xl group whitespace-nowrap"
             >
-              <span className="truncate">{ij.cta_primary || "Acessar meu Código da Essência"}</span>
+              <span className="truncate">{language === 'en' ? "Get my Code at 50% OFF" : "Garantir meu Código com 50% OFF"}</span>
               <Sparkles className="ml-2 h-4 w-4 sm:h-5 sm:w-5 text-nello-graphite/80 group-hover:text-nello-graphite transition-colors flex-shrink-0" strokeWidth={1.5} />
             </Button>
             <p className="text-white/50 text-xs text-center">
@@ -723,6 +737,9 @@ export const NelloOneLanding = () => {
 
       {/* ========== FOOTER GLOBAL ========== */}
       <NelloGlobalFooter currentApp="identity" variant="light" />
+      
+      {/* Floating 50% OFF Badge */}
+      <FloatingBadge />
     </div>
   );
 };
