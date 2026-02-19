@@ -1,96 +1,139 @@
 
 
-# Campanha Flash Sale Fevereiro -- Landing Page Nello One
+# Auditoria Completa das Rotas de Compra - NELLO ONE
 
-## Visao Geral
+## Resumo Executivo
 
-Transformar a landing page atual ("Condicao de Estreia" a R$ 648,50) em uma campanha de tempo limitado "Flash Sale Fevereiro" com countdown, novo preco (R$ 248,50), selo flutuante de 50% OFF e CTAs atualizados.
-
-**Prazo da campanha:** Ate 28 de fevereiro de 2026, 23:59 (horario de Brasilia)
+Foram auditadas **4 Edge Functions de checkout** e **14 componentes frontend** que invocam essas funcoes. A arquitetura geral esta solida, mas foram encontrados **7 problemas** que precisam de correcao.
 
 ---
 
-## O que muda
+## Rotas de Compra Auditadas
 
-| Elemento | Atual | Novo |
-|----------|-------|------|
-| Preco BRL | R$ 648,50 | R$ 248,50 (original R$ 497 riscado) |
-| Preco USD | $198,50 | ~$98,50 |
-| Preco EUR | EUR 148,50 | ~EUR 74,50 |
-| Label | "Primeira Edicao - Condicao de Estreia" | "Flash Sale Fevereiro - 50% OFF" |
-| CTA principal | "Acessar meu Codigo da Essencia" | "Garantir meu Codigo com 50% OFF" |
-| Countdown | Nao existe | Timer regressivo ate 28/02/2026 23:59 BRT |
-| Selo flutuante | Nao existe | Badge "50% OFF" fixo na tela |
-| Texto de confianca | Parcial | "Pagamento unico. Acesso vitalicio. Stripe." |
-
----
-
-## Componentes a criar
-
-### 1. CountdownBanner (novo componente)
-- Barra fixa no topo da pagina (abaixo da NavSection)
-- Contador regressivo com dias, horas, minutos e segundos
-- Data-alvo: 28/02/2026 23:59:59 BRT (UTC-3)
-- Quando expirar, exibe "Oferta encerrada" e oculta automaticamente
-- Estilo: fundo escuro (ink-deep) com texto dourado
-
-### 2. FloatingBadge (novo componente)
-- Selo circular "50% OFF" flutuante
-- Posicao fixa no canto inferior direito (acima do MobileStickyCtA no mobile)
-- Aparece apos scroll de 300px
-- Animacao sutil de pulse
-- Ao clicar, rola ate a secao de precos (#precos)
-
-### 3. FlashSalePricingCard (atualizacao da secao de precos)
-- Preco original R$ 497 com texto riscado (line-through)
-- Preco promocional R$ 248,50 em destaque
-- Badge "50% de Desconto Real" acima do preco
-- Texto: "Condicao exclusiva de lancamento. O valor retorna ao original em 1 de Marco."
-- Texto de confianca: "Pagamento unico. Acesso vitalicio ao sistema e aos seus relatorios. Processamento seguro via Stripe."
-- Secao "O que voce recebe":
-  - Codigo da Essencia (Seu perfil individual)
-  - Codigo do Casal (Sinergia com seu parceiro/a)
-  - Ativacao Pratica (Decisao concreta para os proximos 7 dias)
+| # | Produto | Frontend | Edge Function | Status |
+|---|---------|----------|---------------|--------|
+| 1 | Jornada Completa (Bundle) | PurchaseTestDialog, Checkout, TestExecution, ComprarTeste | create-checkout (isBundle) | COM PROBLEMAS |
+| 2 | Teste Individual/Avulso | CartSummary, ComprarTeste | create-checkout (testIds) | OK |
+| 3 | Fundadores | Checkout (coupon flow) | create-checkout (isFundadores) | OK |
+| 4 | Ativacao do Codigo | PurchaseAtivacaoDialog | create-checkout (ativacao_codigo) | COM PROBLEMAS |
+| 5 | Ativacao Profissional | PurchaseProfessionalActivationDialog | create-checkout (activation_individual) | COM PROBLEMAS |
+| 6 | Codigo do Casal | CruzamentoCodigos | create-checkout (codigo_casal) | OK |
+| 7 | Identity Couple Premium | IdentityCouplePremiumModal | create-checkout (priceId) | COM PROBLEMAS |
+| 8 | Nello Flow (Assinatura) | useFlowSubscription | flow-checkout | OK |
+| 9 | Business (Assinatura) | useBusinessSubscription | business-checkout | OK |
+| 10 | Verificacao pos-compra | CheckoutSuccess | verify-checkout | COM PROBLEMAS |
 
 ---
 
-## Arquivos a modificar
+## Problemas Encontrados
 
-### `src/lib/priceConfig.ts`
-- Atualizar `launchPrices` e `bundlePrices` com os novos valores da Flash Sale
-- BRL: original R$ 497 -> promo R$ 248,50
-- USD: original $197 -> promo $98,50
-- EUR: original EUR 147 -> promo EUR 74,50
+### PROBLEMA 1 - CRITICO: Precos divergentes entre priceConfig.ts e create-checkout
 
-### `src/components/landing/v2/NelloOneLanding.tsx`
-- Adicionar CountdownBanner logo apos NavSection
-- Atualizar secao de pricing (secao 6) com nova estrutura de preco
-- Atualizar CTAs do hero e pricing para novo texto
-- Adicionar FloatingBadge no final do componente
+Os precos da **Ativacao do Codigo** estao diferentes no frontend e no backend:
 
-### Novos arquivos:
-- `src/components/landing/v2/CountdownBanner.tsx` -- componente do countdown
-- `src/components/landing/v2/FloatingBadge.tsx` -- selo flutuante 50% OFF
+- **priceConfig.ts** (frontend): BRL R$197, USD $57, EUR 47 euros -- usa Stripe Price IDs reais
+- **create-checkout** (backend): BRL R$97, USD $27, EUR 27 euros -- usa `price_data` com valores hardcoded diferentes
 
-### `src/components/landing/v2/MobileStickyCtA.tsx`
-- Atualizar preco exibido para R$ 248,50
-- Atualizar texto do CTA para "Garantir meu Codigo com 50% OFF"
+O backend ignora os Price IDs do Stripe e cria precos dinamicos com valores **menores**. Isso significa que o usuario ve R$197 na interface mas pagaria R$97 no Stripe.
+
+O **mesmo problema** existe para o **Activation Individual (Profissional)**:
+- **priceConfig.ts**: BRL R$197, USD $57, EUR 47 euros
+- **create-checkout**: BRL R$97, USD $27, EUR 27 euros
+
+**Correcao**: Atualizar o `create-checkout` para usar os Stripe Price IDs corretos (ja existentes em `priceConfig.ts`) em vez de `price_data` com valores hardcoded.
+
+### PROBLEMA 2 - MEDIO: Bundle Price IDs desatualizados no create-checkout
+
+O `bundlePrices` em `priceConfig.ts` foi atualizado para a Flash Sale:
+- BRL: `price_1T2Wc4DjhZZxZELMq1flZ1uv` (R$248,50)
+- USD: `price_1T2WdaDjhZZxZELMp1qmbc4X` ($98,50)
+- EUR: `price_1T2WftDjhZZxZELMyVAZPHhe` (74,50 euros)
+
+Porem o `create-checkout` usa Price IDs **antigos** nos mapas BRL_PRICES, USD_PRICES, EUR_PRICES:
+- BRL bundle: `price_1SyxwqDjhZZxZELM5b6l6Ug4` (R$1.297)
+- USD bundle: `price_1SZNYXDjhZZxZELMoGVJUZRP`
+- EUR bundle: `price_1SZz6vDjhZZxZELMQsZuLKah`
+
+A Flash Sale **depende do cupom LANCAMENTO50 ser auto-aplicado** no checkout, o que funciona. Mas os Price IDs base nao refletem o preco atualizado.
+
+**Correcao**: Atualizar os Price IDs de bundle no `create-checkout` para os novos da Flash Sale OU manter a logica de auto-apply do cupom como esta (funcional, mas fragil).
+
+### PROBLEMA 3 - MEDIO: priceId enviado pelo frontend e ignorado pelo backend
+
+Os componentes `IdentityCouplePremiumModal` e `ProductPaywallModal` enviam `body.priceId` para o `create-checkout`, mas a Edge Function **nunca usa esse campo**. O backend decide o preco baseado apenas em `productType`.
+
+Isso funciona para produtos que tem logica propria (ativacao_codigo, etc.), mas para `identity_couple_premium` e outros produtos genericos do `ProductPaywallModal`, o backend **nao tem tratamento** -- cai no fluxo de testes individuais com `testIds = []` e falha com erro "At least one test ID is required".
+
+**Correcao**: Adicionar tratamento para `identity_couple_premium` e para o campo `priceId` generico no `create-checkout`.
+
+### PROBLEMA 4 - MEDIO: verify-checkout nao processa identity_couple_premium
+
+A funcao `verify-checkout` trata: fundadores, jornada_completa, codigo_da_essencia, ativacao_codigo, codigo_casal, activation_individual. Mas **nao tem handler para `identity_couple_premium`**, que deveria setar `has_identity_couple_premium = true` no profile.
+
+**Correcao**: Adicionar bloco de processamento para `identity_couple_premium` no `verify-checkout`.
+
+### PROBLEMA 5 - BAIXO: codigo_casal usa price_placeholder
+
+No create-checkout, os Price IDs para `codigo_casal` sao placeholders:
+- `price_placeholder_codigo_casal_brl`
+- `price_placeholder_codigo_casal_usd`
+- `price_placeholder_codigo_casal_eur`
+
+Isso nao causa erro porque o fluxo de `codigo_casal` usa `price_data` dinamico (hardcoded R$47/9 USD/12 EUR). Mas os placeholders nos mapas podem causar confusao.
+
+### PROBLEMA 6 - BAIXO: Fundadores usa Price ID BRL para todas as moedas
+
+Em `priceConfig.ts`, `fundadoresPrices` usa o mesmo Price ID (`price_1ScWglDjhZZxZELM3tQocxgu`) para BRL, USD e EUR. O `create-checkout` tambem hardcoda esse mesmo ID. Isso significa que clientes USD/EUR pagariam em BRL.
+
+### PROBLEMA 7 - BAIXO: EUR Arquetipos Price ID divergente
+
+Em `create-checkout`, o mapa EUR_PRICES usa `price_1SZywzDjhZZxZELMZfCg6fSd` para arquetipos, mas `priceConfig.ts` usa `price_1SayKNDjhZZxZELMhCJ6Na9m`. Sao Price IDs diferentes que podem ter valores diferentes.
 
 ---
 
-## Detalhes tecnicos
+## Detalhes Tecnicos da Correcao
 
-### Countdown Timer
-- Usa `useEffect` + `setInterval` de 1 segundo
-- Calcula diferenca entre `now()` e data-alvo (28/02/2026 23:59:59 no fuso BRT)
-- Exibe dias:horas:minutos:segundos
-- Quando chega a zero, para o timer e pode ocultar elementos promocionais
+### Arquivo 1: `supabase/functions/create-checkout/index.ts`
 
-### Internacionalizacao
-- BRL (pt): "Flash Sale Fevereiro -- 50% OFF"
-- USD (en): "February Flash Sale -- 50% OFF"
-- EUR (pt-pt): "Flash Sale Fevereiro -- 50% OFF"
+1. **Ativacao do Codigo** (linhas ~482-513): Trocar `price_data` por `price` usando os Price IDs de `priceConfig.ts`:
+   - BRL: `price_1Sw6EEDjhZZxZELMSmPNECig`
+   - USD: `price_1Sw6F6DjhZZxZELMfBW3pn5q`
+   - EUR: `price_1Sw6FiDjhZZxZELMXDH1ACdx`
 
-### Stripe
-- Os Stripe Price IDs existentes no bundlePrices serao mantidos -- o desconto sera aplicado via cupom Stripe ou novo Price ID (a definir se voce ja tem um priceId no Stripe para R$ 248,50)
+2. **Activation Individual** (linhas ~514-545): Trocar `price_data` por `price` usando:
+   - BRL: `price_1SxRhHDjhZZxZELMuoj7N1CN`
+   - USD: `price_1SxRhuDjhZZxZELMsAYBZqUP`
+   - EUR: `price_1SxRjKDjhZZxZELMAqWHQKbm`
+
+3. **Adicionar handler para identity_couple_premium** (apos isActivationIndividual): Usar Price IDs:
+   - BRL: `price_1StyMcDjhZZxZELM5IVwqfhV`
+   - USD: `price_1SvfdXDjhZZxZELMaNDfVXox`
+   - EUR: `price_1SvfdoDjhZZxZELMLaONPhR5`
+
+4. **Atualizar bundle Price IDs** para Flash Sale ou manter logica de cupom.
+
+5. **Corrigir EUR Arquetipos**: Alinhar com `priceConfig.ts`.
+
+### Arquivo 2: `supabase/functions/verify-checkout/index.ts`
+
+Adicionar bloco `else if (productType === "identity_couple_premium")` que:
+- Seta `has_identity_couple_premium = true` no profile
+- Tambem seta `has_nello_couple = true` e `has_activation_couple = true` (conforme regra de negocio existente)
+- Registra purchase na tabela `test_purchases`
+
+### Arquivo 3: `src/lib/priceConfig.ts`
+
+Alinhar Price ID do EUR Arquetipos para consistencia.
+
+---
+
+## O Que Esta Funcionando Bem
+
+- Anti-CrossTrade Protection (validacao IP + moeda + idioma)
+- Sistema de cupons (validacao, expiracao, limite de uso)
+- Auto-apply do cupom LANCAMENTO50 para bundles
+- Fluxo de afiliados no verify-checkout
+- Idempotencia de compras (verifica transaction_id duplicado)
+- Flow e Business checkouts (subscricoes Stripe)
+- Redirecionamento pos-checkout com verificacao de sessao
 
