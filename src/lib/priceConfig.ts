@@ -219,9 +219,9 @@ export const LAUNCH_DISCOUNT_PERCENT = 50;
 export const LAUNCH_COUPON_CODE = "LANCAMENTO50";
 
 export const launchPrices = {
-  brl: { original: 1297, price: 648.50, installments: 12, installmentPrice: 64.85, symbol: "R$" },
-  usd: { original: 397, price: 198.50, symbol: "$" },
-  eur: { original: 297, price: 148.50, symbol: "€" },
+  brl: { original: 497, price: 248.50, installments: 12, installmentPrice: 24.85, symbol: "R$" },
+  usd: { original: 197, price: 98.50, symbol: "$" },
+  eur: { original: 147, price: 74.50, symbol: "€" },
 };
 
 // Helper to get launch price based on language
