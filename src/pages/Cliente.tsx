@@ -780,8 +780,8 @@ const Cliente = () => {
         <div className="max-w-3xl mx-auto">
           {/* Evolutionary Dashboard - 3 Stages */}
           {(() => {
-            // Stage C: Potency (Post-purchase Ativação)
-            if (hasSavedCodigo && hasAtivacaoPurchased && !needsAtivacaoPurchase) {
+            // Stage C: Potency (Post-purchase Ativação) - only if all tests still completed
+            if (isJourneyComplete && hasSavedCodigo && hasAtivacaoPurchased && !needsAtivacaoPurchase) {
               return (
                 <DashboardStagePotency
                   displayName={displayName}

@@ -114,10 +114,15 @@ export const AdminTools = () => {
         .delete()
         .eq("user_test_id", userTestId);
 
-      // Delete user test record
+      // Reset user test record (update status instead of deleting)
       await supabase
         .from("user_tests")
-        .delete()
+        .update({
+          status: "not_started",
+          started_at: null,
+          completed_at: null,
+          result_data: null,
+        })
         .eq("id", userTestId);
 
       // Log the action
