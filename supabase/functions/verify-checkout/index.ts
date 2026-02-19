@@ -280,6 +280,81 @@ serve(async (req) => {
           logStep("Individual test purchases recorded", { count: tests.length });
         }
       }
+
+    // ====== CÓDIGO DO CASAL PURCHASE ======
+    } else if (productType === "codigo_casal") {
+      logStep("Processing Código do Casal purchase");
+
+      const amountPaid = (session.amount_total || 0) / 100;
+
+      // Get first available test_id for the purchase record
+      const { data: firstTest } = await supabase
+        .from("tests")
+        .select("id")
+        .eq("active", true)
+        .limit(1)
+        .single();
+
+      const { error: insertError } = await supabase
+        .from("test_purchases")
+        .insert({
+          user_id: userId,
+          test_id: firstTest?.id || null,
+          price_paid: amountPaid,
+          payment_status: "completed",
+          payment_method: "stripe",
+          currency: (session.currency || "brl").toUpperCase(),
+          transaction_id: session.payment_intent as string,
+          purchase_category: "codigo_casal",
+          metadata: {
+            session_id: session.id,
+            product_type: "codigo_casal",
+            purchase_origin: session.metadata?.purchase_origin || "couple_paywall",
+            verified_via: "verify-checkout",
+          },
+        });
+
+      if (insertError) {
+        logStep("ERROR inserting codigo_casal purchase", { error: insertError.message });
+      } else {
+        logStep("Código do Casal purchase recorded successfully");
+      }
+
+      // Also update profile flag
+      await supabase
+        .from("profiles")
+        .update({ has_nello_couple: true })
+        .eq("id", userId);
+
+      logStep("Profile updated with has_nello_couple flag");
+
+    // ====== ACTIVATION INDIVIDUAL (PROFESSIONAL DIRECTION) ======
+    } else if (productType === "activation_individual") {
+      logStep("Processing Activation Individual purchase");
+
+      await supabase
+        .from("profiles")
+        .update({ has_activation_individual: true })
+        .eq("id", userId);
+
+      await supabase
+        .from("test_purchases")
+        .insert({
+          user_id: userId,
+          test_id: null,
+          price_paid: (session.amount_total || 0) / 100,
+          payment_status: "completed",
+          payment_method: "stripe",
+          transaction_id: session.payment_intent as string,
+          purchase_category: "activation_individual",
+          metadata: {
+            session_id: session.id,
+            product_type: "activation_individual",
+            verified_via: "verify-checkout",
+          },
+        });
+
+      logStep("Activation Individual purchase recorded successfully");
     }
 
     // Process affiliate referral if applicable
