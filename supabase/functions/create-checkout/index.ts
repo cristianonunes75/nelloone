@@ -831,69 +831,8 @@ serve(async (req) => {
       }
     }
     
-    // AUTO-APPLY LAUNCH COUPON for bundle purchases without a user coupon
-    if (isBundle && !couponCode && (!sessionParams.discounts || sessionParams.discounts.length === 0)) {
-      const supabaseAdmin2 = createClient(
-        Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-      );
-      
-      const { data: launchCoupon } = await supabaseAdmin2
-        .from("coupons")
-        .select("*")
-        .eq("code", "LANCAMENTO50")
-        .eq("is_active", true)
-        .single();
-      
-      if (launchCoupon) {
-        const isNotExpired = !launchCoupon.expires_at || new Date(launchCoupon.expires_at) > new Date();
-        const hasUsesLeft = !launchCoupon.max_uses || launchCoupon.times_used < launchCoupon.max_uses;
-        
-        if (isNotExpired && hasUsesLeft) {
-          let stripeCouponId = launchCoupon.stripe_coupon_id;
-          
-          // Validate or create the Stripe coupon
-          let validCouponId = stripeCouponId;
-          if (stripeCouponId) {
-            try {
-              await stripe.coupons.retrieve(stripeCouponId);
-              logStep("Existing Stripe coupon validated", { stripeCouponId });
-            } catch {
-              logStep("Stripe coupon invalid, creating new one", { oldId: stripeCouponId });
-              validCouponId = null;
-            }
-          }
-          
-          if (!validCouponId) {
-            const stripeCoupon = await stripe.coupons.create({
-              percent_off: 50,
-              duration: "once",
-              name: "LANCAMENTO50 - 50% OFF",
-            });
-            validCouponId = stripeCoupon.id;
-            await supabaseAdmin2.from("coupons").update({ stripe_coupon_id: validCouponId }).eq("id", launchCoupon.id);
-            logStep("New Stripe coupon created and saved", { newId: validCouponId });
-          }
-          
-          try {
-            const promoCode = await stripe.promotionCodes.create({
-              coupon: validCouponId,
-              code: `LANCAMENTO50_${Date.now()}`,
-              max_redemptions: 1,
-            });
-            sessionParams.discounts = [{ promotion_code: promoCode.id }];
-            logStep("Auto-applied launch coupon LANCAMENTO50", { promoCodeId: promoCode.id });
-          } catch (promoError) {
-            // Fallback: apply coupon directly
-            sessionParams.discounts = [{ coupon: validCouponId }];
-            logStep("Auto-applied launch coupon via direct coupon", { stripeCouponId: validCouponId });
-          }
-          
-          await supabaseAdmin2.from("coupons").update({ times_used: (launchCoupon.times_used || 0) + 1 }).eq("id", launchCoupon.id);
-          logStep("Launch coupon usage incremented");
-        }
-      }
-    }
+    // REMOVED: Auto-apply LANCAMENTO50 block - was preventing coupon field from showing
+    // Users should enter LANCAMENTO50 manually in the Stripe checkout promo code field
     
     if (!couponCode && discountPercentage > 0) {
       // Add quantity-based discount if applicable (only for individual tests without coupon)
@@ -920,8 +859,17 @@ serve(async (req) => {
     }
 
     // Allow users to enter promo codes on the Stripe Checkout page
-    // Only enable if no discount is already applied
-    if (!sessionParams.discounts || sessionParams.discounts.length === 0) {
+    // When user provided a coupon via frontend, it's already in discounts - don't enable promo field
+    // Otherwise, always show the promo code field so users can enter LANCAMENTO50 or any other code
+    if (!couponCode) {
+      // Remove any auto-applied discounts to enable the promo code field
+      delete sessionParams.discounts;
+      sessionParams.allow_promotion_codes = true;
+      logStep("Enabled promotion code field (no user coupon provided)");
+    } else if (sessionParams.discounts && sessionParams.discounts.length > 0) {
+      // User coupon was applied via discounts, don't enable promo field
+      logStep("User coupon applied via discounts, promo field disabled");
+    } else {
       sessionParams.allow_promotion_codes = true;
       logStep("Enabled promotion code field on checkout");
     }
