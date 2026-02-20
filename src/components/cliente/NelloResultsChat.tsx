@@ -186,10 +186,10 @@ export function NelloResultsChat({ testType, testName, userTestId, className }: 
                       </div>
                       <div className="space-y-1">
                         <p className="font-medium text-foreground">
-                          "Bom te ver por aqui!"
+                          "Que bom ver você por aqui!"
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          Estou aqui para te ajudar a entender seus resultados
+                          Estou aqui para ajudar você a entender seus resultados
                           {testName ? ` do ${testName}` : ""}.
                         </p>
                       </div>

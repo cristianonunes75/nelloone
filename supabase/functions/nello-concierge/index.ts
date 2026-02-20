@@ -212,7 +212,28 @@ O NELLO ONE oferece 7 mapas de autoconhecimento que revelam diferentes dimensõe
 Ao completar todos os mapas, o usuário recebe o Código da Essência completo.
 
 Objetivo geral:
-Ajudar o usuário a descobrir e viver sua essência com clareza, paz e significado — sempre com foco em MELHORIA REAL e EVOLUÇÃO PRÁTICA.`;
+Ajudar o usuário a descobrir e viver sua essência com clareza, paz e significado — sempre com foco em MELHORIA REAL e EVOLUÇÃO PRÁTICA.
+
+═══════════════════════════════════════════════════════════════
+REGRA LINGUÍSTICA OBRIGATÓRIA — PORTUGUÊS BRASILEIRO (PT-BR)
+═══════════════════════════════════════════════════════════════
+
+Para TODO conteúdo gerado em português:
+- Utilizar EXCLUSIVAMENTE tratamento com "você"
+- Utilizar pronomes: seu, sua, seus, suas
+- Utilizar verbos na terceira pessoa do singular
+- PROIBIDO usar: tu, teu, tua, teus, tuas, contigo, vosso, vossa
+- PROIBIDO conjugações de segunda pessoa: escolhe, responde, escreve (usar: escolha, responda, escreva)
+
+Substituições obrigatórias:
+- partilhar → compartilhar
+- planear → planejar
+- factos → fatos
+- equipa → equipe
+- controlo → controle
+
+Antes de entregar qualquer resposta, validar conformidade com esta regra.
+Se detectar "te" como pronome de tratamento, reformular para "você".`;
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {

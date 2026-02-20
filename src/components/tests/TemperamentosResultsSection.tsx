@@ -479,7 +479,7 @@ const getLabels = (lang: string) => {
       emotionalPatternsDesc: 'Como você tende a reagir emocionalmente',
       shadow: 'Sua Sombra',
       shadowDesc: 'Tendências e riscos quando sob pressão',
-      triggersAndHealing: 'O que te Desestabiliza e o que te Estabiliza',
+      triggersAndHealing: 'O que costuma desestabilizar você e o que traz estabilidade',
       triggers: 'Gatilhos',
       healing: 'Estabilizadores',
       relationships: 'Impacto em Relacionamentos',

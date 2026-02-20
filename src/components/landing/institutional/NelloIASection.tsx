@@ -84,7 +84,7 @@ export const NelloIASection = () => {
             </p>
             
             <p className="text-foreground/70 text-lg leading-relaxed mb-8">
-              Não são ferramentas isoladas. É um sistema integrado que aprende com você e te acompanha em cada área da vida.
+              Não são ferramentas isoladas. É um sistema integrado que aprende com você e acompanha você em cada área da vida.
             </p>
             
             {/* Integration Points */}

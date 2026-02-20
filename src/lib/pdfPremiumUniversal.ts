@@ -364,7 +364,7 @@ const getTestContent = (testType: string, primaryResultKey: string, lang: 'pt' |
         day3: "Pratique flexibilizar seu estilo em uma conversa.",
         day4: "Reflita: o que você ganha e perde com seu perfil dominante?",
         day5: "Experimente agir a partir de um perfil secundário conscientemente.",
-        day6: "Observe quando seu perfil dominante te atrapalha.",
+        day6: "Observe quando seu perfil dominante atrapalha você.",
         day7: "Defina uma intenção de equilíbrio para a semana seguinte.",
       },
       'pt-pt': {
@@ -408,7 +408,7 @@ const getTestContent = (testType: string, primaryResultKey: string, lang: 'pt' |
       pt: {
         testName: "Eneagrama",
         dailyLife: "Seu tipo de Eneagrama revela sua motivação central — o motor inconsciente que guia suas ações, medos e desejos mais profundos.",
-        shadow: "A sombra do seu tipo aparece quando você opera no automático, repetindo padrões que não te servem mais.",
+        shadow: "A sombra do seu tipo aparece quando você opera no automático, repetindo padrões que não servem mais a você.",
         light: "Sua luz brilha quando você integra as qualidades de sua asa e conecta-se com seu centro de crescimento.",
         emotionalImpact: "Suas emoções são profundamente conectadas à sua motivação central. Reconhecer isso é libertador.",
         decisionImpact: "Você tende a decidir baseado em evitar seu medo central ou buscar seu desejo mais profundo.",
@@ -420,7 +420,7 @@ const getTestContent = (testType: string, primaryResultKey: string, lang: 'pt' |
         day3: "Pratique uma qualidade do seu tipo de crescimento.",
         day4: "Observe padrões de relacionamento típicos do seu tipo.",
         day5: "Experimente agir contra seu padrão automático conscientemente.",
-        day6: "Reflita: como seu tipo te serviu e te limitou?",
+        day6: "Reflita: como seu tipo serviu e limitou você?",
         day7: "Escreva uma intenção de integração para o próximo mês.",
       },
       'pt-pt': {
