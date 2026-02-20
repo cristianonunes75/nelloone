@@ -1,99 +1,96 @@
 
 
-# Correção: Campo de Cupom Não Aparece no Checkout
+# Correção: Liberar Todos os Testes ao Comprar a Jornada
 
-## Problema Identificado
+## Problema
 
-A cliente **tania.manzur@gmail.com** foi cobrada R$ 648,50 sem conseguir inserir um cupom. A análise dos logs mostra:
+Dois problemas foram identificados:
 
-- O bundle (Jornada Completa) tem preço base de **R$ 1.297**
-- O cupom **LANCAMENTO50** (50% OFF) foi **auto-aplicado** pelo backend, resultando em R$ 648,50
-- Como o desconto já foi aplicado automaticamente, o campo `allow_promotion_codes` ficou **desabilitado** no Stripe Checkout
-- A cliente não conseguiu inserir nenhum cupom próprio na página do Stripe
+1. **Webhook desabilitado no Stripe** -- Como mostra a sua captura de tela, o webhook `webhook-pagamento-saas` está com status "Disabled". Isso significa que o Stripe nao consegue notificar o sistema quando um pagamento e concluido, impedindo o desbloqueio automatico dos testes.
 
-## Causa Raiz
+2. **Falta de redundancia no desbloqueio** -- Quando alguem compra a Jornada Completa, o sistema registra compras individuais na tabela `test_purchases`, mas nao ativa o flag `ativacao_codigo_unlocked` no perfil. Se qualquer passo falhar (webhook desabilitado, redirect nao completado), o acesso nao e liberado.
 
-Na Edge Function `create-checkout` (linhas 922-927), a lógica atual impede o campo de cupom quando qualquer desconto já está aplicado:
+## Solucao
 
-```text
-if (!sessionParams.discounts || sessionParams.discounts.length === 0) {
-  sessionParams.allow_promotion_codes = true;  // Só habilita se NÃO tem desconto
-}
-```
+### Passo 1: Habilitar o Webhook no Stripe (acao sua)
 
-Isso significa que **toda compra de bundle** com o LANCAMENTO50 ativo bloqueia o campo de cupom no Stripe.
+1. Acesse o [Stripe Dashboard > Developers > Webhooks](https://dashboard.stripe.com/workbench/webhooks)
+2. Clique no webhook `webhook-pagamento-saas` que esta "Disabled"
+3. Clique nos tres pontinhos (...) e selecione "Enable"
+4. Confirme que o status muda para "Enabled"
 
-## Solução
+Isso e essencial para que compras futuras sejam processadas automaticamente.
 
-### 1. Sempre habilitar o campo de cupom no Stripe Checkout
+### Passo 2: Adicionar flag de desbloqueio na Jornada Completa (alteracao no codigo)
 
-Alterar a lógica na `create-checkout` para **sempre** permitir que o usuário insira códigos promocionais, mesmo quando um desconto já está auto-aplicado. Isso permite que o cliente substitua ou acumule descontos conforme as regras do Stripe.
+Vou modificar as duas Edge Functions que processam a compra da Jornada Completa para tambem ativar `ativacao_codigo_unlocked = true` no perfil do usuario. Isso garante redundancia: mesmo que os registros de `test_purchases` falhem, o flag no perfil desbloqueia tudo.
 
-**Arquivo**: `supabase/functions/create-checkout/index.ts`
+**Arquivo 1**: `supabase/functions/stripe-webhook/index.ts`
 
-Substituir as linhas 922-927 por:
+Na secao "JORNADA COMPLETA PURCHASE" (linha 835), adicionar `ativacao_codigo_unlocked: true` ao update do perfil:
 
 ```text
-// Always allow users to enter promo codes on the Stripe Checkout page
-// Even when a discount is auto-applied, users should be able to enter their own codes
-sessionParams.allow_promotion_codes = true;
-logStep("Enabled promotion code field on checkout");
+// Antes:
+.update({ 
+  journey_status: "in_progress",
+  journey_started_at: new Date().toISOString(),
+  codigo_essencia_unlocked: true,
+})
+
+// Depois:
+.update({ 
+  journey_status: "in_progress",
+  journey_started_at: new Date().toISOString(),
+  codigo_essencia_unlocked: true,
+  ativacao_codigo_unlocked: true,  // Desbloqueia TODOS os testes
+})
 ```
 
-**Nota importante**: O Stripe não permite usar `discounts` e `allow_promotion_codes` simultaneamente na mesma sessão. Portanto, quando o LANCAMENTO50 é auto-aplicado via `discounts`, precisamos de uma abordagem diferente.
+**Arquivo 2**: `supabase/functions/verify-checkout/index.ts`
 
-### 2. Abordagem correta: Remover auto-apply quando o usuário pode ter cupom
-
-A solução mais robusta é:
-
-- Quando o frontend envia `couponCode`, aplicar esse cupom via `discounts` e desabilitar `allow_promotion_codes`
-- Quando NÃO há `couponCode` do frontend, NÃO auto-aplicar o LANCAMENTO50 via `discounts`, e em vez disso, habilitar `allow_promotion_codes = true` para que o cliente possa inserir o código manualmente no Stripe (incluindo o LANCAMENTO50 se ele estiver configurado como promotion code no Stripe)
-
-**OU** (mais simples e recomendado):
-
-- Manter o auto-apply do LANCAMENTO50, mas usando `allow_promotion_codes` em vez de `discounts` - criando o promotion code no Stripe e deixando o campo visível para o cliente ver e/ou trocar
-
-### 3. Solução recomendada (mais simples)
-
-Remover o bloco de auto-apply do LANCAMENTO50 (linhas 834-896) e, em vez disso, **sempre** habilitar `allow_promotion_codes = true`. O cupom LANCAMENTO50 deve ser comunicado ao cliente por outros meios (banner no site, e-mail, etc.) para que ela insira manualmente.
-
-Alternativamente, manter o auto-apply mas converter para usar o campo de cupom visível:
-
-**Arquivo**: `supabase/functions/create-checkout/index.ts`
-
-- Remover o bloco de auto-apply do LANCAMENTO50 (linhas 834-896)
-- Alterar a lógica final (linhas 922-927) para sempre habilitar `allow_promotion_codes = true`, exceto quando um cupom específico do usuário foi aplicado via `discounts`
+Na secao "jornada_completa" (linha 158), adicionar o mesmo flag:
 
 ```text
-// Se o usuário enviou um cupom específico, aplica via discounts (já feito acima)
-// Caso contrário, sempre habilita o campo de promotion codes
-if (!couponCode) {
-  // Remove any auto-applied discounts to enable the promo code field
-  delete sessionParams.discounts;
-  sessionParams.allow_promotion_codes = true;
-  logStep("Enabled promotion code field (no user coupon provided)");
-} else if (sessionParams.discounts && sessionParams.discounts.length > 0) {
-  // User coupon was applied via discounts, don't enable promo field
-  logStep("User coupon applied via discounts, promo field disabled");
-} else {
-  sessionParams.allow_promotion_codes = true;
-  logStep("Enabled promotion code field on checkout");
-}
+// Antes:
+.update({ 
+  journey_status: "in_progress",
+  journey_started_at: new Date().toISOString(),
+  codigo_essencia_unlocked: true,
+})
+
+// Depois:
+.update({ 
+  journey_status: "in_progress",
+  journey_started_at: new Date().toISOString(),
+  codigo_essencia_unlocked: true,
+  ativacao_codigo_unlocked: true,  // Desbloqueia TODOS os testes
+})
 ```
 
-### 4. Garantir que LANCAMENTO50 exista como Promotion Code no Stripe
+### Como funciona o desbloqueio
 
-Para que o cliente possa digitar "LANCAMENTO50" no campo de cupom do Stripe, precisamos garantir que exista um **Promotion Code** ativo no Stripe com esse código. Isso já é feito parcialmente no código atual, mas como promotion codes de uso único. Precisamos criar um promotion code reutilizável.
+O hook `useTestAccessV2.tsx` ja verifica o flag `ativacao_codigo_unlocked` como uma das tres formas de ter acesso total:
 
-## Resumo das Alterações
+```text
+hasFullJourneyAccess = hasBundlePurchase OU hasAtivacaoUnlocked OU hasCompletedArquetipos
+```
 
-| Arquivo | Alteração |
-|---------|-----------|
-| `supabase/functions/create-checkout/index.ts` | Remover auto-apply do LANCAMENTO50 (linhas 834-896) e ajustar lógica de `allow_promotion_codes` (linhas 922-927) para sempre mostrar o campo quando o usuário não enviou cupom |
+Ao ativar `ativacao_codigo_unlocked = true`, o sistema reconhece acesso total e:
+- Remove os botoes "Liberar" e "R$ XX" dos testes
+- Mostra o botao "Comecar" diretamente
+- Funciona mesmo se o webhook falhar no futuro
+
+## Resumo das Alteracoes
+
+| Item | Acao |
+|------|------|
+| Stripe Webhook | Habilitar manualmente no painel do Stripe |
+| `stripe-webhook/index.ts` | Adicionar `ativacao_codigo_unlocked: true` no update da Jornada Completa |
+| `verify-checkout/index.ts` | Adicionar `ativacao_codigo_unlocked: true` no update da Jornada Completa |
 
 ## Resultado Esperado
 
-- O campo de cupom **sempre aparecerá** na página de checkout do Stripe quando o usuário não enviar um cupom do frontend
-- O cliente poderá digitar LANCAMENTO50 (ou qualquer outro código válido) manualmente
-- Se o cliente enviar um cupom do modal da Nello, ele será aplicado automaticamente e o campo não aparecerá (para evitar confusão)
+- Ao comprar a Jornada Completa, **todos os testes sao liberados imediatamente**
+- Nenhum botao de "Liberar" ou preco aparece para quem ja comprou
+- O sistema tem redundancia: webhook + verify-checkout + flag no perfil
 
