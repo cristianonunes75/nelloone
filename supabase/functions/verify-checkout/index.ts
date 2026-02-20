@@ -161,6 +161,7 @@ serve(async (req) => {
           journey_status: "in_progress",
           journey_started_at: new Date().toISOString(),
           codigo_essencia_unlocked: true,
+          ativacao_codigo_unlocked: true, // Desbloqueia TODOS os testes
         })
         .eq("id", userId);
 
