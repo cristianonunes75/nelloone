@@ -322,7 +322,7 @@ const InvestimentoSection = () => (
         className="rounded-full bg-[hsl(var(--nello-gold))] hover:bg-[hsl(var(--nello-gold-deep))] text-white px-10 py-6 text-base shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
         onClick={() =>
           window.open(
-            "https://wa.me/5511999999999?text=Quero%20participar%20da%20Imers%C3%A3o%20C%C3%B3digo%20do%20Casal",
+            "https://wa.me/5561992430090?text=Quero%20participar%20da%20Imers%C3%A3o%20C%C3%B3digo%20do%20Casal",
             "_blank"
           )
         }
