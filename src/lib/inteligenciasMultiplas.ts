@@ -263,7 +263,7 @@ export const INTELLIGENCES: Record<string, IntelligenceProfile> = {
     identificationPhrases: {
       pt: [
         "Você provavelmente se reconhece quando encontra um padrão que ninguém tinha percebido e sente aquela satisfação silenciosa.",
-        "Você provavelmente se reconhece quando alguém te dá uma explicação e você já está pensando nas falhas do argumento.",
+        "Você provavelmente se reconhece quando alguém dá uma explicação e você já está pensando nas falhas do argumento.",
         "Você provavelmente se reconhece quando prefere uma planilha organizada a uma lista rabiscada."
       ],
       en: [
@@ -304,7 +304,7 @@ export const INTELLIGENCES: Record<string, IntelligenceProfile> = {
       en: "Visualization, design, and three-dimensional perception"
     },
     description: {
-      pt: "Você pensa em imagens. Quando alguém te explica algo, você cria um filme mental. Quando resolve um problema, visualiza as peças se encaixando. Seu senso estético é apurado: você percebe quando algo está visualmente 'errado' mesmo sem saber explicar por quê. O problema é que nem sempre consegue traduzir o que vê na cabeça para palavras, e isso pode frustrar tanto você quanto quem tenta te entender.",
+      pt: "Você pensa em imagens. Quando alguém explica algo, você cria um filme mental. Quando resolve um problema, visualiza as peças se encaixando. Seu senso estético é apurado: você percebe quando algo está visualmente 'errado' mesmo sem saber explicar por quê. O problema é que nem sempre consegue traduzir o que vê na cabeça para palavras, e isso pode frustrar tanto você quanto quem tenta entender você.",
       en: "You think in images. When someone explains something to you, you create a mental movie. When solving a problem, you visualize the pieces fitting together. Your aesthetic sense is refined: you notice when something is visually 'wrong' even without knowing how to explain why. The problem is that you can't always translate what you see in your head into words, and this can frustrate both you and those trying to understand you."
     },
     traits: {
@@ -371,7 +371,7 @@ export const INTELLIGENCES: Record<string, IntelligenceProfile> = {
       pt: [
         "Você provavelmente se reconhece quando consegue montar móveis sem ler instruções, só olhando as peças.",
         "Você provavelmente se reconhece quando reorganiza um ambiente e sente uma satisfação quase física quando 'fica certo'.",
-        "Você provavelmente se reconhece quando prefere que te mostrem ao invés de te explicarem."
+        "Você provavelmente se reconhece quando prefere que mostrem a você ao invés de explicarem."
       ],
       en: [
         "You probably recognize yourself when you can assemble furniture without reading instructions, just looking at the pieces.",
@@ -411,7 +411,7 @@ export const INTELLIGENCES: Record<string, IntelligenceProfile> = {
       en: "Sensitivity to rhythms, melodies, and sounds"
     },
     description: {
-      pt: "O mundo tem uma trilha sonora para você. Você percebe ritmos em lugares onde outros só ouvem barulho, memoriza melodias sem esforço e sente a música fisicamente. Som não é só entretenimento, é linguagem. O problema é que sua sensibilidade sonora também significa que barulhos te afetam mais que a maioria, e você pode usar música para se isolar do mundo ao invés de conectar.",
+      pt: "O mundo tem uma trilha sonora para você. Você percebe ritmos em lugares onde outros só ouvem barulho, memoriza melodias sem esforço e sente a música fisicamente. Som não é só entretenimento, é linguagem. O problema é que sua sensibilidade sonora também significa que barulhos afetam você mais que a maioria, e você pode usar música para se isolar do mundo ao invés de conectar.",
       en: "The world has a soundtrack for you. You notice rhythms in places where others only hear noise, memorize melodies effortlessly, and feel music physically. Sound isn't just entertainment, it's language. The problem is that your sound sensitivity also means noises affect you more than most, and you may use music to isolate from the world instead of connecting."
     },
     traits: {
@@ -476,7 +476,7 @@ export const INTELLIGENCES: Record<string, IntelligenceProfile> = {
     },
     identificationPhrases: {
       pt: [
-        "Você provavelmente se reconhece quando uma música nova te arrepia e você precisa ouvir de novo imediatamente.",
+        "Você provavelmente se reconhece quando uma música nova arrepia você e precisa ouvir de novo imediatamente.",
         "Você provavelmente se reconhece quando consegue identificar instrumentos separadamente em uma música complexa.",
         "Você provavelmente se reconhece quando seu humor muda completamente dependendo da playlist."
       ],
@@ -625,7 +625,7 @@ export const INTELLIGENCES: Record<string, IntelligenceProfile> = {
       en: "Understanding others, empathy, and social leadership"
     },
     description: {
-      pt: "Você lê pessoas. Percebe emoções que não foram ditas, motivações que não foram declaradas, tensões que outros não captam. Conectar-se é natural para você. O problema é que essa sensibilidade às vezes te sobrecarrega. Você absorve o que os outros sentem, tem dificuldade de dizer não, e pode confundir seu valor com sua utilidade para os outros.",
+      pt: "Você lê pessoas. Percebe emoções que não foram ditas, motivações que não foram declaradas, tensões que outros não captam. Conectar-se é natural para você. O problema é que essa sensibilidade às vezes sobrecarrega você. Você absorve o que os outros sentem, tem dificuldade de dizer não, e pode confundir seu valor com sua utilidade para os outros.",
       en: "You read people. You perceive emotions that weren't spoken, motivations that weren't declared, tensions that others don't catch. Connecting comes naturally to you. The problem is that this sensitivity sometimes overwhelms you. You absorb what others feel, have difficulty saying no, and may confuse your value with your usefulness to others."
     },
     traits: {
@@ -692,7 +692,7 @@ export const INTELLIGENCES: Record<string, IntelligenceProfile> = {
       pt: [
         "Você provavelmente se reconhece quando entra em uma sala e instantaneamente percebe o 'clima' do ambiente.",
         "Você provavelmente se reconhece quando consegue mediar conflitos que outros não conseguem.",
-        "Você provavelmente se reconhece quando pessoas te contam coisas que não contam para ninguém."
+        "Você provavelmente se reconhece quando pessoas contam a você coisas que não contam para ninguém."
       ],
       en: [
         "You probably recognize yourself when you enter a room and instantly perceive the 'vibe' of the environment.",
