@@ -49,6 +49,7 @@ import CruzamentoPublico from "./pages/CruzamentoPublico";
 import WhatsApp from "./pages/WhatsApp";
 import ParaProfissionais from "./pages/ParaProfissionais";
 import CentralAjuda from "./pages/CentralAjuda";
+import ImersaoCasalLanding from "./pages/ImersaoCasalLanding";
 const queryClient = new QueryClient();
 
 // Component to run version check hook
@@ -123,6 +124,9 @@ const AppRoutes = () => (
     <Route path="/ajuda" element={<CentralAjuda />} />
     <Route path="/en/help" element={<CentralAjuda />} />
     <Route path="/pt-pt/ajuda" element={<CentralAjuda />} />
+    
+    {/* Imersão Código do Casal - Landing page */}
+    <Route path="/imersao-casal" element={<ImersaoCasalLanding />} />
     
     {/* Legal pages - PT */}
     <Route path="/termos" element={<TermsOfService />} />
