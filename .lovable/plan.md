@@ -1,96 +1,52 @@
 
 
-# Correção: Liberar Todos os Testes ao Comprar a Jornada
+# Corrigir Perguntas do DISC e MBTI para Português BR
 
-## Problema
+## Problema Identificado
+As perguntas dos testes **DISC** (28 perguntas) e **MBTI** (48 perguntas) que estao marcadas como `language: 'pt'` estao escritas em portugues de Portugal (PT-PT). Exemplos:
+- "Perante um novo desafio, **tendes** a:" (PT-PT) -- deveria ser "Diante de um novo desafio, voce **tende** a:"
+- "**Recolhes-te** para processar sozinho" (PT-PT) -- deveria ser "Se recolhe para processar sozinho"
+- "**Mantens** o momento para ti" (PT-PT)
 
-Dois problemas foram identificados:
+Os outros 5 testes (Eneagrama, Temperamentos, Inteligencias Multiplas, Linguagens do Amor, Arquetipos) ja estao em PT-BR correto.
 
-1. **Webhook desabilitado no Stripe** -- Como mostra a sua captura de tela, o webhook `webhook-pagamento-saas` está com status "Disabled". Isso significa que o Stripe nao consegue notificar o sistema quando um pagamento e concluido, impedindo o desbloqueio automatico dos testes.
-
-2. **Falta de redundancia no desbloqueio** -- Quando alguem compra a Jornada Completa, o sistema registra compras individuais na tabela `test_purchases`, mas nao ativa o flag `ativacao_codigo_unlocked` no perfil. Se qualquer passo falhar (webhook desabilitado, redirect nao completado), o acesso nao e liberado.
+## Impacto
+A Tania ja completou o DISC com essas perguntas. As respostas dela estao vinculadas por `question_id`, entao os IDs das perguntas NAO podem mudar.
 
 ## Solucao
 
-### Passo 1: Habilitar o Webhook no Stripe (acao sua)
+Executar uma migracao SQL que atualiza APENAS o `question_text` e o texto das `options` das 76 perguntas (28 DISC + 48 MBTI), convertendo de PT-PT para PT-BR natural, mantendo:
+- Os mesmos IDs de perguntas
+- Os mesmos `value` das opcoes (D/I/S/C para DISC, A/B para MBTI)
+- A mesma estrutura de `options` (dimension, direction, etc. para MBTI)
 
-1. Acesse o [Stripe Dashboard > Developers > Webhooks](https://dashboard.stripe.com/workbench/webhooks)
-2. Clique no webhook `webhook-pagamento-saas` que esta "Disabled"
-3. Clique nos tres pontinhos (...) e selecione "Enable"
-4. Confirme que o status muda para "Enabled"
+## Detalhes Tecnicos
 
-Isso e essencial para que compras futuras sejam processadas automaticamente.
+### Testes Afetados
 
-### Passo 2: Adicionar flag de desbloqueio na Jornada Completa (alteracao no codigo)
+| Teste | Test ID | Perguntas | Status |
+|-------|---------|-----------|--------|
+| DISC | `bdd55908-87a6-46de-9d1d-e5b37c24cf58` | 28 | PT-PT (corrigir) |
+| MBTI | `8de61499-2e46-45ad-8f1c-87523ac5d339` | 48 | PT-PT (corrigir) |
 
-Vou modificar as duas Edge Functions que processam a compra da Jornada Completa para tambem ativar `ativacao_codigo_unlocked = true` no perfil do usuario. Isso garante redundancia: mesmo que os registros de `test_purchases` falhem, o flag no perfil desbloqueia tudo.
+### Abordagem
+1. Para cada pergunta, atualizar `question_text` de PT-PT para PT-BR
+2. Para cada opcao dentro de `options` (JSONB), atualizar o campo `text` de PT-PT para PT-BR
+3. Manter todos os outros campos intactos (`value`, `dimension`, `direction`, `question_number`, `id`)
 
-**Arquivo 1**: `supabase/functions/stripe-webhook/index.ts`
+### Conversoes Linguisticas Principais
+- "tendes a" -> "voce tende a" / "tende a"
+- "Perante" -> "Diante de"
+- "precisas de" -> "precisa"
+- "Mantens" -> "Mantem"
+- "Recolhes-te" -> "Se recolhe"
+- "chegas" -> "chega"
+- "Sentes-te" -> "Voce se sente" / "Se sente"
+- "partilhar" -> "compartilhar"
+- "Aproximas-te" -> "Se aproxima"
+- Uso de "tu/teu/tua" -> "voce/seu/sua"
+- Remocao de mesoclise e enclise tipicas de PT-PT
 
-Na secao "JORNADA COMPLETA PURCHASE" (linha 835), adicionar `ativacao_codigo_unlocked: true` ao update do perfil:
-
-```text
-// Antes:
-.update({ 
-  journey_status: "in_progress",
-  journey_started_at: new Date().toISOString(),
-  codigo_essencia_unlocked: true,
-})
-
-// Depois:
-.update({ 
-  journey_status: "in_progress",
-  journey_started_at: new Date().toISOString(),
-  codigo_essencia_unlocked: true,
-  ativacao_codigo_unlocked: true,  // Desbloqueia TODOS os testes
-})
-```
-
-**Arquivo 2**: `supabase/functions/verify-checkout/index.ts`
-
-Na secao "jornada_completa" (linha 158), adicionar o mesmo flag:
-
-```text
-// Antes:
-.update({ 
-  journey_status: "in_progress",
-  journey_started_at: new Date().toISOString(),
-  codigo_essencia_unlocked: true,
-})
-
-// Depois:
-.update({ 
-  journey_status: "in_progress",
-  journey_started_at: new Date().toISOString(),
-  codigo_essencia_unlocked: true,
-  ativacao_codigo_unlocked: true,  // Desbloqueia TODOS os testes
-})
-```
-
-### Como funciona o desbloqueio
-
-O hook `useTestAccessV2.tsx` ja verifica o flag `ativacao_codigo_unlocked` como uma das tres formas de ter acesso total:
-
-```text
-hasFullJourneyAccess = hasBundlePurchase OU hasAtivacaoUnlocked OU hasCompletedArquetipos
-```
-
-Ao ativar `ativacao_codigo_unlocked = true`, o sistema reconhece acesso total e:
-- Remove os botoes "Liberar" e "R$ XX" dos testes
-- Mostra o botao "Comecar" diretamente
-- Funciona mesmo se o webhook falhar no futuro
-
-## Resumo das Alteracoes
-
-| Item | Acao |
-|------|------|
-| Stripe Webhook | Habilitar manualmente no painel do Stripe |
-| `stripe-webhook/index.ts` | Adicionar `ativacao_codigo_unlocked: true` no update da Jornada Completa |
-| `verify-checkout/index.ts` | Adicionar `ativacao_codigo_unlocked: true` no update da Jornada Completa |
-
-## Resultado Esperado
-
-- Ao comprar a Jornada Completa, **todos os testes sao liberados imediatamente**
-- Nenhum botao de "Liberar" ou preco aparece para quem ja comprou
-- O sistema tem redundancia: webhook + verify-checkout + flag no perfil
+### Execucao
+Uma unica migracao SQL com 76 `UPDATE` statements, cada um atualizando `question_text` e `options` para a versao PT-BR natural e fluente.
 
