@@ -1,139 +1,64 @@
 
 
-# Auditoria Completa das Rotas de Compra - NELLO ONE
+# Landing Page - Imersao Codigo do Casal
 
-## Resumo Executivo
+## Resumo
 
-Foram auditadas **4 Edge Functions de checkout** e **14 componentes frontend** que invocam essas funcoes. A arquitetura geral esta solida, mas foram encontrados **7 problemas** que precisam de correcao.
-
----
-
-## Rotas de Compra Auditadas
-
-| # | Produto | Frontend | Edge Function | Status |
-|---|---------|----------|---------------|--------|
-| 1 | Jornada Completa (Bundle) | PurchaseTestDialog, Checkout, TestExecution, ComprarTeste | create-checkout (isBundle) | COM PROBLEMAS |
-| 2 | Teste Individual/Avulso | CartSummary, ComprarTeste | create-checkout (testIds) | OK |
-| 3 | Fundadores | Checkout (coupon flow) | create-checkout (isFundadores) | OK |
-| 4 | Ativacao do Codigo | PurchaseAtivacaoDialog | create-checkout (ativacao_codigo) | COM PROBLEMAS |
-| 5 | Ativacao Profissional | PurchaseProfessionalActivationDialog | create-checkout (activation_individual) | COM PROBLEMAS |
-| 6 | Codigo do Casal | CruzamentoCodigos | create-checkout (codigo_casal) | OK |
-| 7 | Identity Couple Premium | IdentityCouplePremiumModal | create-checkout (priceId) | COM PROBLEMAS |
-| 8 | Nello Flow (Assinatura) | useFlowSubscription | flow-checkout | OK |
-| 9 | Business (Assinatura) | useBusinessSubscription | business-checkout | OK |
-| 10 | Verificacao pos-compra | CheckoutSuccess | verify-checkout | COM PROBLEMAS |
+Criar uma landing page premium e minimalista para a "Imersao Codigo do Casal", com visual sofisticado em tons neutros (bege, off-white), tipografia elegante e micro-animacoes suaves. A pagina sera acessivel via rota `/imersao-casal`.
 
 ---
 
-## Problemas Encontrados
+## Estrutura da Pagina
 
-### PROBLEMA 1 - CRITICO: Precos divergentes entre priceConfig.ts e create-checkout
+A landing page tera 8 secoes, todas dentro de um unico componente standalone:
 
-Os precos da **Ativacao do Codigo** estao diferentes no frontend e no backend:
-
-- **priceConfig.ts** (frontend): BRL R$197, USD $57, EUR 47 euros -- usa Stripe Price IDs reais
-- **create-checkout** (backend): BRL R$97, USD $27, EUR 27 euros -- usa `price_data` com valores hardcoded diferentes
-
-O backend ignora os Price IDs do Stripe e cria precos dinamicos com valores **menores**. Isso significa que o usuario ve R$197 na interface mas pagaria R$97 no Stripe.
-
-O **mesmo problema** existe para o **Activation Individual (Profissional)**:
-- **priceConfig.ts**: BRL R$197, USD $57, EUR 47 euros
-- **create-checkout**: BRL R$97, USD $27, EUR 27 euros
-
-**Correcao**: Atualizar o `create-checkout` para usar os Stripe Price IDs corretos (ja existentes em `priceConfig.ts`) em vez de `price_data` com valores hardcoded.
-
-### PROBLEMA 2 - MEDIO: Bundle Price IDs desatualizados no create-checkout
-
-O `bundlePrices` em `priceConfig.ts` foi atualizado para a Flash Sale:
-- BRL: `price_1T2Wc4DjhZZxZELMq1flZ1uv` (R$248,50)
-- USD: `price_1T2WdaDjhZZxZELMp1qmbc4X` ($98,50)
-- EUR: `price_1T2WftDjhZZxZELMyVAZPHhe` (74,50 euros)
-
-Porem o `create-checkout` usa Price IDs **antigos** nos mapas BRL_PRICES, USD_PRICES, EUR_PRICES:
-- BRL bundle: `price_1SyxwqDjhZZxZELM5b6l6Ug4` (R$1.297)
-- USD bundle: `price_1SZNYXDjhZZxZELMoGVJUZRP`
-- EUR bundle: `price_1SZz6vDjhZZxZELMQsZuLKah`
-
-A Flash Sale **depende do cupom LANCAMENTO50 ser auto-aplicado** no checkout, o que funciona. Mas os Price IDs base nao refletem o preco atualizado.
-
-**Correcao**: Atualizar os Price IDs de bundle no `create-checkout` para os novos da Flash Sale OU manter a logica de auto-apply do cupom como esta (funcional, mas fragil).
-
-### PROBLEMA 3 - MEDIO: priceId enviado pelo frontend e ignorado pelo backend
-
-Os componentes `IdentityCouplePremiumModal` e `ProductPaywallModal` enviam `body.priceId` para o `create-checkout`, mas a Edge Function **nunca usa esse campo**. O backend decide o preco baseado apenas em `productType`.
-
-Isso funciona para produtos que tem logica propria (ativacao_codigo, etc.), mas para `identity_couple_premium` e outros produtos genericos do `ProductPaywallModal`, o backend **nao tem tratamento** -- cai no fluxo de testes individuais com `testIds = []` e falha com erro "At least one test ID is required".
-
-**Correcao**: Adicionar tratamento para `identity_couple_premium` e para o campo `priceId` generico no `create-checkout`.
-
-### PROBLEMA 4 - MEDIO: verify-checkout nao processa identity_couple_premium
-
-A funcao `verify-checkout` trata: fundadores, jornada_completa, codigo_da_essencia, ativacao_codigo, codigo_casal, activation_individual. Mas **nao tem handler para `identity_couple_premium`**, que deveria setar `has_identity_couple_premium = true` no profile.
-
-**Correcao**: Adicionar bloco de processamento para `identity_couple_premium` no `verify-checkout`.
-
-### PROBLEMA 5 - BAIXO: codigo_casal usa price_placeholder
-
-No create-checkout, os Price IDs para `codigo_casal` sao placeholders:
-- `price_placeholder_codigo_casal_brl`
-- `price_placeholder_codigo_casal_usd`
-- `price_placeholder_codigo_casal_eur`
-
-Isso nao causa erro porque o fluxo de `codigo_casal` usa `price_data` dinamico (hardcoded R$47/9 USD/12 EUR). Mas os placeholders nos mapas podem causar confusao.
-
-### PROBLEMA 6 - BAIXO: Fundadores usa Price ID BRL para todas as moedas
-
-Em `priceConfig.ts`, `fundadoresPrices` usa o mesmo Price ID (`price_1ScWglDjhZZxZELM3tQocxgu`) para BRL, USD e EUR. O `create-checkout` tambem hardcoda esse mesmo ID. Isso significa que clientes USD/EUR pagariam em BRL.
-
-### PROBLEMA 7 - BAIXO: EUR Arquetipos Price ID divergente
-
-Em `create-checkout`, o mapa EUR_PRICES usa `price_1SZywzDjhZZxZELMZfCg6fSd` para arquetipos, mas `priceConfig.ts` usa `price_1SayKNDjhZZxZELMhCJ6Na9m`. Sao Price IDs diferentes que podem ter valores diferentes.
+1. **Hero** - Titulo principal, subtitulo, texto emocional e CTA
+2. **Problema** - "Diferenca nao e o problema. Falta de entendimento e." com lista e imagem
+3. **O que e** - Blocos estruturados (Mapeamento, Cruzamento, Padroes, Ajustes)
+4. **Como Funciona** - Timeline vertical com 3 etapas
+5. **Para Quem E** - Lista com checkmarks elegantes
+6. **Quem Conduz** - Duas colunas (Cris e Lisa) com fotos e descricoes
+7. **Investimento** - Bloco destacado: Turma Fundadora, 10 casais, R$ 1.497
+8. **Rodape** - Disclaimer etico
 
 ---
 
-## Detalhes Tecnicos da Correcao
+## Detalhes Tecnicos
 
-### Arquivo 1: `supabase/functions/create-checkout/index.ts`
+### Arquivos a criar
 
-1. **Ativacao do Codigo** (linhas ~482-513): Trocar `price_data` por `price` usando os Price IDs de `priceConfig.ts`:
-   - BRL: `price_1Sw6EEDjhZZxZELMSmPNECig`
-   - USD: `price_1Sw6F6DjhZZxZELMfBW3pn5q`
-   - EUR: `price_1Sw6FiDjhZZxZELMXDH1ACdx`
+1. **`src/pages/ImersaoCasalLanding.tsx`** - Pagina principal com todas as 8 secoes
+2. Rota em **`src/App.tsx`** - Adicionar `/imersao-casal` como rota publica
 
-2. **Activation Individual** (linhas ~514-545): Trocar `price_data` por `price` usando:
-   - BRL: `price_1SxRhHDjhZZxZELMuoj7N1CN`
-   - USD: `price_1SxRhuDjhZZxZELMsAYBZqUP`
-   - EUR: `price_1SxRjKDjhZZxZELMAqWHQKbm`
+### Design System
 
-3. **Adicionar handler para identity_couple_premium** (apos isActivationIndividual): Usar Price IDs:
-   - BRL: `price_1StyMcDjhZZxZELM5IVwqfhV`
-   - USD: `price_1SvfdXDjhZZxZELMaNDfVXox`
-   - EUR: `price_1SvfdoDjhZZxZELMLaONPhR5`
+- Reutilizar componentes existentes: `Button`, `Card`
+- Paleta: tons neutros com dourado sutil (`nello-gold`) como accent
+- Fundo principal: `bg-[#FAF8F5]` (off-white quente)
+- Tipografia: `font-display` (serif) para titulos, `font-body` para texto
+- Animacoes: `useScrollAnimation` hook existente para fade-in ao scroll
+- Bordas suaves, hover elegante com `transition-all duration-300`
+- Scroll suave via CSS `scroll-behavior: smooth`
 
-4. **Atualizar bundle Price IDs** para Flash Sale ou manter logica de cupom.
+### Secoes detalhadas
 
-5. **Corrigir EUR Arquetipos**: Alinhar com `priceConfig.ts`.
+**Hero**: Fundo gradient suave bege, titulo grande serif, subtitulo em dourado, botao CTA arredondado com hover lift. Imagem placeholder de casal (usando Unsplash ou similar via URL externa).
 
-### Arquivo 2: `supabase/functions/verify-checkout/index.ts`
+**Problema**: Layout com texto a esquerda e imagem a direita (grid 2 colunas em desktop). Icones sutis (lucide-react) ao lado de cada item da lista.
 
-Adicionar bloco `else if (productType === "identity_couple_premium")` que:
-- Seta `has_identity_couple_premium = true` no profile
-- Tambem seta `has_nello_couple = true` e `has_activation_couple = true` (conforme regra de negocio existente)
-- Registra purchase na tabela `test_purchases`
+**O que e**: 4 blocos em grid 2x2 com icones, titulo e descricao curta. Sem jargao clinico.
 
-### Arquivo 3: `src/lib/priceConfig.ts`
+**Como Funciona**: Timeline vertical com numeros grandes (01, 02, 03), linha conectora vertical, e texto descritivo ao lado.
 
-Alinhar Price ID do EUR Arquetipos para consistencia.
+**Para Quem E**: Checkmarks elegantes em dourado, lista vertical com espacamento generoso.
 
----
+**Quem Conduz**: Grid 2 colunas com placeholders para fotos de Cris e Lisa. Avatar circular com borda dourada sutil. Descricoes profissionais neutras.
 
-## O Que Esta Funcionando Bem
+**Investimento**: Bloco com fundo levemente diferenciado (`bg-[#F5F0EA]`), preco destacado, badge "Turma Fundadora - 10 casais", botao CTA principal.
 
-- Anti-CrossTrade Protection (validacao IP + moeda + idioma)
-- Sistema de cupons (validacao, expiracao, limite de uso)
-- Auto-apply do cupom LANCAMENTO50 para bundles
-- Fluxo de afiliados no verify-checkout
-- Idempotencia de compras (verifica transaction_id duplicado)
-- Flow e Business checkouts (subscricoes Stripe)
-- Redirecionamento pos-checkout com verificacao de sessao
+**Rodape**: Texto pequeno com disclaimer etico padrao do sistema.
+
+### Rota
+
+Adicionar rota publica `/imersao-casal` no `App.tsx`, sem necessidade de autenticacao.
 
