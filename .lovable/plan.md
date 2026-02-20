@@ -1,64 +1,99 @@
 
 
-# Landing Page - Imersao Codigo do Casal
+# Correção: Campo de Cupom Não Aparece no Checkout
 
-## Resumo
+## Problema Identificado
 
-Criar uma landing page premium e minimalista para a "Imersao Codigo do Casal", com visual sofisticado em tons neutros (bege, off-white), tipografia elegante e micro-animacoes suaves. A pagina sera acessivel via rota `/imersao-casal`.
+A cliente **tania.manzur@gmail.com** foi cobrada R$ 648,50 sem conseguir inserir um cupom. A análise dos logs mostra:
 
----
+- O bundle (Jornada Completa) tem preço base de **R$ 1.297**
+- O cupom **LANCAMENTO50** (50% OFF) foi **auto-aplicado** pelo backend, resultando em R$ 648,50
+- Como o desconto já foi aplicado automaticamente, o campo `allow_promotion_codes` ficou **desabilitado** no Stripe Checkout
+- A cliente não conseguiu inserir nenhum cupom próprio na página do Stripe
 
-## Estrutura da Pagina
+## Causa Raiz
 
-A landing page tera 8 secoes, todas dentro de um unico componente standalone:
+Na Edge Function `create-checkout` (linhas 922-927), a lógica atual impede o campo de cupom quando qualquer desconto já está aplicado:
 
-1. **Hero** - Titulo principal, subtitulo, texto emocional e CTA
-2. **Problema** - "Diferenca nao e o problema. Falta de entendimento e." com lista e imagem
-3. **O que e** - Blocos estruturados (Mapeamento, Cruzamento, Padroes, Ajustes)
-4. **Como Funciona** - Timeline vertical com 3 etapas
-5. **Para Quem E** - Lista com checkmarks elegantes
-6. **Quem Conduz** - Duas colunas (Cris e Lisa) com fotos e descricoes
-7. **Investimento** - Bloco destacado: Turma Fundadora, 10 casais, R$ 1.497
-8. **Rodape** - Disclaimer etico
+```text
+if (!sessionParams.discounts || sessionParams.discounts.length === 0) {
+  sessionParams.allow_promotion_codes = true;  // Só habilita se NÃO tem desconto
+}
+```
 
----
+Isso significa que **toda compra de bundle** com o LANCAMENTO50 ativo bloqueia o campo de cupom no Stripe.
 
-## Detalhes Tecnicos
+## Solução
 
-### Arquivos a criar
+### 1. Sempre habilitar o campo de cupom no Stripe Checkout
 
-1. **`src/pages/ImersaoCasalLanding.tsx`** - Pagina principal com todas as 8 secoes
-2. Rota em **`src/App.tsx`** - Adicionar `/imersao-casal` como rota publica
+Alterar a lógica na `create-checkout` para **sempre** permitir que o usuário insira códigos promocionais, mesmo quando um desconto já está auto-aplicado. Isso permite que o cliente substitua ou acumule descontos conforme as regras do Stripe.
 
-### Design System
+**Arquivo**: `supabase/functions/create-checkout/index.ts`
 
-- Reutilizar componentes existentes: `Button`, `Card`
-- Paleta: tons neutros com dourado sutil (`nello-gold`) como accent
-- Fundo principal: `bg-[#FAF8F5]` (off-white quente)
-- Tipografia: `font-display` (serif) para titulos, `font-body` para texto
-- Animacoes: `useScrollAnimation` hook existente para fade-in ao scroll
-- Bordas suaves, hover elegante com `transition-all duration-300`
-- Scroll suave via CSS `scroll-behavior: smooth`
+Substituir as linhas 922-927 por:
 
-### Secoes detalhadas
+```text
+// Always allow users to enter promo codes on the Stripe Checkout page
+// Even when a discount is auto-applied, users should be able to enter their own codes
+sessionParams.allow_promotion_codes = true;
+logStep("Enabled promotion code field on checkout");
+```
 
-**Hero**: Fundo gradient suave bege, titulo grande serif, subtitulo em dourado, botao CTA arredondado com hover lift. Imagem placeholder de casal (usando Unsplash ou similar via URL externa).
+**Nota importante**: O Stripe não permite usar `discounts` e `allow_promotion_codes` simultaneamente na mesma sessão. Portanto, quando o LANCAMENTO50 é auto-aplicado via `discounts`, precisamos de uma abordagem diferente.
 
-**Problema**: Layout com texto a esquerda e imagem a direita (grid 2 colunas em desktop). Icones sutis (lucide-react) ao lado de cada item da lista.
+### 2. Abordagem correta: Remover auto-apply quando o usuário pode ter cupom
 
-**O que e**: 4 blocos em grid 2x2 com icones, titulo e descricao curta. Sem jargao clinico.
+A solução mais robusta é:
 
-**Como Funciona**: Timeline vertical com numeros grandes (01, 02, 03), linha conectora vertical, e texto descritivo ao lado.
+- Quando o frontend envia `couponCode`, aplicar esse cupom via `discounts` e desabilitar `allow_promotion_codes`
+- Quando NÃO há `couponCode` do frontend, NÃO auto-aplicar o LANCAMENTO50 via `discounts`, e em vez disso, habilitar `allow_promotion_codes = true` para que o cliente possa inserir o código manualmente no Stripe (incluindo o LANCAMENTO50 se ele estiver configurado como promotion code no Stripe)
 
-**Para Quem E**: Checkmarks elegantes em dourado, lista vertical com espacamento generoso.
+**OU** (mais simples e recomendado):
 
-**Quem Conduz**: Grid 2 colunas com placeholders para fotos de Cris e Lisa. Avatar circular com borda dourada sutil. Descricoes profissionais neutras.
+- Manter o auto-apply do LANCAMENTO50, mas usando `allow_promotion_codes` em vez de `discounts` - criando o promotion code no Stripe e deixando o campo visível para o cliente ver e/ou trocar
 
-**Investimento**: Bloco com fundo levemente diferenciado (`bg-[#F5F0EA]`), preco destacado, badge "Turma Fundadora - 10 casais", botao CTA principal.
+### 3. Solução recomendada (mais simples)
 
-**Rodape**: Texto pequeno com disclaimer etico padrao do sistema.
+Remover o bloco de auto-apply do LANCAMENTO50 (linhas 834-896) e, em vez disso, **sempre** habilitar `allow_promotion_codes = true`. O cupom LANCAMENTO50 deve ser comunicado ao cliente por outros meios (banner no site, e-mail, etc.) para que ela insira manualmente.
 
-### Rota
+Alternativamente, manter o auto-apply mas converter para usar o campo de cupom visível:
 
-Adicionar rota publica `/imersao-casal` no `App.tsx`, sem necessidade de autenticacao.
+**Arquivo**: `supabase/functions/create-checkout/index.ts`
+
+- Remover o bloco de auto-apply do LANCAMENTO50 (linhas 834-896)
+- Alterar a lógica final (linhas 922-927) para sempre habilitar `allow_promotion_codes = true`, exceto quando um cupom específico do usuário foi aplicado via `discounts`
+
+```text
+// Se o usuário enviou um cupom específico, aplica via discounts (já feito acima)
+// Caso contrário, sempre habilita o campo de promotion codes
+if (!couponCode) {
+  // Remove any auto-applied discounts to enable the promo code field
+  delete sessionParams.discounts;
+  sessionParams.allow_promotion_codes = true;
+  logStep("Enabled promotion code field (no user coupon provided)");
+} else if (sessionParams.discounts && sessionParams.discounts.length > 0) {
+  // User coupon was applied via discounts, don't enable promo field
+  logStep("User coupon applied via discounts, promo field disabled");
+} else {
+  sessionParams.allow_promotion_codes = true;
+  logStep("Enabled promotion code field on checkout");
+}
+```
+
+### 4. Garantir que LANCAMENTO50 exista como Promotion Code no Stripe
+
+Para que o cliente possa digitar "LANCAMENTO50" no campo de cupom do Stripe, precisamos garantir que exista um **Promotion Code** ativo no Stripe com esse código. Isso já é feito parcialmente no código atual, mas como promotion codes de uso único. Precisamos criar um promotion code reutilizável.
+
+## Resumo das Alterações
+
+| Arquivo | Alteração |
+|---------|-----------|
+| `supabase/functions/create-checkout/index.ts` | Remover auto-apply do LANCAMENTO50 (linhas 834-896) e ajustar lógica de `allow_promotion_codes` (linhas 922-927) para sempre mostrar o campo quando o usuário não enviou cupom |
+
+## Resultado Esperado
+
+- O campo de cupom **sempre aparecerá** na página de checkout do Stripe quando o usuário não enviar um cupom do frontend
+- O cliente poderá digitar LANCAMENTO50 (ou qualquer outro código válido) manualmente
+- Se o cliente enviar um cupom do modal da Nello, ele será aplicado automaticamente e o campo não aparecerá (para evitar confusão)
 
