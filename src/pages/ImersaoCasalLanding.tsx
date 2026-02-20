@@ -11,10 +11,10 @@ import {
   Search,
   Wrench,
   Check,
-  Heart,
 } from "lucide-react";
 import heroImg from "@/assets/imersao-casal-hero.jpg";
 import dialogoImg from "@/assets/imersao-casal-dialogo.jpg";
+import crisLisaImg from "@/assets/cris-lisa-imersao.jpg";
 
 /* ─── Reusable scroll-animated wrapper ─── */
 const Section = ({
@@ -271,28 +271,30 @@ const QuemConduzSection = () => (
       <h2 className="font-display text-3xl md:text-4xl text-foreground text-center">
         Quem Conduz
       </h2>
-      <div className="grid md:grid-cols-2 gap-12">
-        {/* Cris */}
-        <div className="text-center space-y-5">
-          <div className="w-32 h-32 mx-auto rounded-full bg-[hsl(var(--nello-gold-glow))] border-2 border-[hsl(var(--nello-gold-light))] flex items-center justify-center">
-            <Heart className="w-12 h-12 text-[hsl(var(--nello-gold))]" />
-          </div>
-          <h3 className="font-display text-xl text-foreground">Cris</h3>
-          <p className="text-muted-foreground text-sm leading-relaxed max-w-xs mx-auto">
-            Especialista em alinhamento relacional com base em desenvolvimento
-            humano e formação em coaching.
-          </p>
+      <div className="flex flex-col items-center gap-10">
+        <div className="w-64 h-64 md:w-72 md:h-72 rounded-full overflow-hidden border-4 border-[hsl(var(--nello-gold-light))] shadow-lg">
+          <img
+            src={crisLisaImg}
+            alt="Cris e Lisa Marini"
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
         </div>
-        {/* Lisa */}
-        <div className="text-center space-y-5">
-          <div className="w-32 h-32 mx-auto rounded-full bg-[hsl(var(--nello-gold-glow))] border-2 border-[hsl(var(--nello-gold-light))] flex items-center justify-center">
-            <Heart className="w-12 h-12 text-[hsl(var(--nello-gold))]" />
+        <div className="grid md:grid-cols-2 gap-8 max-w-2xl text-center">
+          <div className="space-y-2">
+            <h3 className="font-display text-xl text-foreground">Cris</h3>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Especialista em alinhamento relacional com base em desenvolvimento
+              humano e formação em coaching.
+            </p>
           </div>
-          <h3 className="font-display text-xl text-foreground">Lisa</h3>
-          <p className="text-muted-foreground text-sm leading-relaxed max-w-xs mx-auto">
-            Co-facilitadora responsável pela leitura relacional complementar e
-            equilíbrio de percepção.
-          </p>
+          <div className="space-y-2">
+            <h3 className="font-display text-xl text-foreground">Lisa Marini</h3>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Co-facilitadora responsável pela leitura relacional complementar e
+              equilíbrio de percepção.
+            </p>
+          </div>
         </div>
       </div>
     </div>
