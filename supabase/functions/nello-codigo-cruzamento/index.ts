@@ -558,7 +558,7 @@ function getUserPromptV1(
       "disc": ${JSON.stringify(personA.disc)},
       "temperamento": "${personA.temperament.primary || 'Equilibrado'}",
       "arquetipo": "${personA.archetypes.primary || 'Integrador'}",
-      "nello16": "${personA.nello16.type || 'INFJ'}",
+      "nello16": "${personA.nello16.type || 'N16-05'}",
       "estilo_conexao": "${personA.connectionStyle.primary || 'Tempo de Qualidade'}",
       "eneagrama": "${personA.enneagram.type || 'não identificado'}"
     },
@@ -568,7 +568,7 @@ function getUserPromptV1(
       "disc": ${JSON.stringify(personB.disc)},
       "temperamento": "${personB.temperament.primary || 'Equilibrado'}",
       "arquetipo": "${personB.archetypes.primary || 'Integrador'}",
-      "nello16": "${personB.nello16.type || 'ENTJ'}",
+      "nello16": "${personB.nello16.type || 'N16-03'}",
       "estilo_conexao": "${personB.connectionStyle.primary || 'Atos de Serviço'}",
       "eneagrama": "${personB.enneagram.type || 'não identificado'}"
     }

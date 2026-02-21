@@ -42,6 +42,7 @@ import jsPDF from "jspdf";
 import { calculateArchetypeScores, getDominantArchetypes, ARCHETYPES } from "@/lib/archetypes";
 import { getDISCResults, DISC_PROFILES } from "@/lib/disc";
 import { getNello16Results, NELLO_16_PROFILES } from "@/lib/nello16Personality";
+import { getPublicTypeCode, getNelloDisplayCode, getPublicTypeName } from "@/lib/nello16SafeOutput";
 import { getEnneagramResults } from "@/lib/eneagrama";
 import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
@@ -1064,7 +1065,9 @@ export const SimulationMode = () => {
         return `Perfil Dominante: ${DISC_PROFILES[simulationResult.dominantProfile]?.name || simulationResult.dominantProfile}`;
       }
       if (testType === "mbti" || testType === "nello16") {
-        return `Tipo: ${simulationResult.type}`;
+        const safeCode = getPublicTypeCode(simulationResult.type);
+        const nelloCode = getNelloDisplayCode(simulationResult.type);
+        return `Tipo: ${safeCode} · ${nelloCode}`;
       }
       if (testType === "eneagrama") {
         return `Tipo: ${simulationResult.primaryType} - ${ENNEAGRAM_PROFILES[simulationResult.primaryType]?.name || ''}`;
@@ -1169,9 +1172,11 @@ export const SimulationMode = () => {
         }
         if ((testType === "mbti" || testType === "nello16") && simulationResult.type) {
           const profile = NELLO_16_PROFILES[simulationResult.type];
+          const safeCode = getPublicTypeCode(simulationResult.type);
+          const nelloCode = getNelloDisplayCode(simulationResult.type);
           return {
             title: "Seu tipo Nello 16 é:",
-            name: simulationResult.type,
+            name: `${safeCode} · ${nelloCode}`,
             score: null,
             interpretation: profile?.description?.pt,
             emoji: "🧠",
@@ -1479,9 +1484,9 @@ export const SimulationMode = () => {
                 <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-8">
                   <div className="text-center space-y-4">
                     <div className="text-6xl">🧠</div>
-                    <CardTitle className="text-3xl font-light">{simulationResult.type}</CardTitle>
+                    <CardTitle className="text-3xl font-light">{getPublicTypeCode(simulationResult.type)} · {getNelloDisplayCode(simulationResult.type)}</CardTitle>
                     <CardDescription className="text-lg">
-                      {NELLO_16_PROFILES[simulationResult.type]?.name?.pt || "Seu Tipo Psicológico"}
+                      {NELLO_16_PROFILES[simulationResult.type]?.name?.pt || "Arquitetura Cognitiva"}
                     </CardDescription>
                   </div>
                 </CardHeader>

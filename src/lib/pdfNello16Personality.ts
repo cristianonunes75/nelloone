@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import { getPublicTypeCode, getNelloDisplayCode } from '@/lib/nello16SafeOutput';
 
 interface Nello16PDFData {
   userName: string;
@@ -713,7 +714,8 @@ export function generateNello16PremiumPDF(data: Nello16PDFData): jsPDF {
   const contentWidth = pageWidth - (margin * 2);
   
   const typeData = NELLO_16_TYPES[personalityType] || NELLO_16_TYPES.INFJ;
-  
+  const publicCode = getPublicTypeCode(personalityType);
+  const nelloCode = getNelloDisplayCode(personalityType);
   // ========== COVER PAGE ==========
   doc.setFillColor(31, 46, 75);
   doc.rect(0, 0, pageWidth, pageHeight, 'F');
@@ -733,7 +735,7 @@ export function generateNello16PremiumPDF(data: Nello16PDFData): jsPDF {
   doc.setTextColor(31, 46, 75);
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text(personalityType, pageWidth / 2, 118, { align: 'center' });
+  doc.text(`${publicCode} · ${nelloCode}`, pageWidth / 2, 118, { align: 'center' });
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.text(typeData.name[lang], pageWidth / 2, 132, { align: 'center' });

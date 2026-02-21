@@ -27,7 +27,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { NelloAgent } from "@/components/NelloAgent";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { testSlugs } from "@/lib/testContent";
-import { NELLO_16_PROFILES, getNello16DisplayCode } from "@/lib/nello16Personality";
+import { NELLO_16_PROFILES } from "@/lib/nello16Personality";
+import { getPublicTypeCode, getNelloDisplayCode } from "@/lib/nello16SafeOutput";
 import { DISC_PROFILES } from "@/lib/disc";
 import { ENNEAGRAM_PROFILES } from "@/lib/eneagrama";
 import { supabase } from "@/integrations/supabase/client";
@@ -517,8 +518,9 @@ const Cliente = () => {
       case "nello16":
         if (resultData.type) {
           const profile = NELLO_16_PROFILES[resultData.type];
-          const displayCode = getNello16DisplayCode(resultData.type);
-          return `${displayCode} - ${profile?.name?.pt || ""}`;
+          const publicCode = getPublicTypeCode(resultData.type);
+          const nelloCode = getNelloDisplayCode(resultData.type);
+          return `${publicCode} · ${nelloCode} — ${profile?.name?.pt || ""}`;
         }
         break;
       case "disc":

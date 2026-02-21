@@ -25,7 +25,8 @@ import {
   ArrowRight,
   Loader2
 } from "lucide-react";
-import { getNello16DisplayCode, NELLO_16_PROFILES } from "@/lib/nello16Personality";
+import { NELLO_16_PROFILES } from "@/lib/nello16Personality";
+import { getPublicTypeCode, getNelloDisplayCode, getPublicTypeName, safeOutput } from "@/lib/nello16SafeOutput";
 import { NELLO_16_EXTENDED_DATA, getDeepSummary, getMindInPractice, getSelfExamQuestion, getDevelopmentGuidance, getAIReflection } from "@/lib/nello16ExtendedData";
 
 interface Nello16PersonalityResultsSectionProps {
@@ -265,10 +266,11 @@ export function Nello16PersonalityResultsSection({
   };
 
   const handleShare = async () => {
-    const displayCode = getNello16DisplayCode(mbtiResultData?.type || '');
+    const publicCode = getPublicTypeCode(mbtiResultData?.type || '');
+    const nelloCode = getNelloDisplayCode(mbtiResultData?.type || '');
     const shareText = lang === 'en'
-      ? `I discovered my profile (${displayCode}) on NELLO ONE. Discover yours at nello.one`
-      : `Descobri meu perfil (${displayCode}) no NELLO ONE. Descubra o seu em nello.one`;
+      ? `I discovered my profile (${publicCode} · ${nelloCode}) on NELLO ONE. Discover yours at nello.one`
+      : `Descobri meu perfil (${publicCode} · ${nelloCode}) no NELLO ONE. Descubra o seu em nello.one`;
 
     try {
       if (navigator.share) {
@@ -335,7 +337,8 @@ export function Nello16PersonalityResultsSection({
   
   const profile = NELLO_16_PROFILES[type];
   const extendedData = NELLO_16_EXTENDED_DATA[type];
-  const displayCode = getNello16DisplayCode(type);
+  const publicCode = getPublicTypeCode(type);
+  const nelloCode = getNelloDisplayCode(type);
   const quadrant = profile?.quadrant || 'analytic';
   const quadrantData = QUADRANT_DATA[quadrant];
 
@@ -386,10 +389,10 @@ export function Nello16PersonalityResultsSection({
             
             <div className="flex flex-wrap justify-center gap-4 pt-4">
               <Badge variant="secondary" className="text-lg px-4 py-2 bg-background/20 hover:bg-background/30">
-                {displayCode} / {type}
+                {publicCode} · {nelloCode}
               </Badge>
               <Badge variant="secondary" className="text-lg px-4 py-2 bg-background/20 hover:bg-background/30">
-                {profile?.name?.[lang] || type}
+                {profile?.name?.[lang] || 'Arquitetura Cognitiva'}
               </Badge>
             </div>
             
