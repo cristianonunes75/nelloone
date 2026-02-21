@@ -11,6 +11,7 @@ type TestType =
   | "arquetipos_proposito"
   | "disc"
   | "mbti"
+  | "nello16"
   | "eneagrama"
   | "linguagens_amor"
   | "temperamentos"
@@ -66,8 +67,9 @@ export async function recalculateTestResult(
         break;
       }
 
+      case "nello16":
       case "mbti": {
-        // MBTI calculation from answers
+        // Nello 16 calculation from answers (legacy: mbti)
         const scores: Record<string, number> = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
         
         answers.forEach(answer => {

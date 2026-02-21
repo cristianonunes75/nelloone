@@ -121,6 +121,40 @@ const testImprovements = {
     icon: Brain,
     color: "from-emerald-500/10 to-green-500/10 border-emerald-500/20"
   },
+  nello16: {
+    pt: {
+      title: "O que você melhora com este teste",
+      items: [
+        "Clareza sobre como você toma decisões",
+        "Entendimento da sua energia social",
+        "Consciência de como processa informações",
+        "Melhoria nos relacionamentos interpessoais",
+        "Direcionamento de carreira alinhado"
+      ]
+    },
+    'pt-pt': {
+      title: "O que melhora com este teste",
+      items: [
+        "Clareza sobre como toma decisões",
+        "Entendimento da sua energia social",
+        "Consciência de como processa informações",
+        "Melhoria nas relações interpessoais",
+        "Direcionamento de carreira alinhado"
+      ]
+    },
+    en: {
+      title: "What you improve with this test",
+      items: [
+        "Clarity about how you make decisions",
+        "Understanding your social energy",
+        "Awareness of how you process information",
+        "Improvement in interpersonal relationships",
+        "Aligned career direction"
+      ]
+    },
+    icon: Brain,
+    color: "from-emerald-500/10 to-green-500/10 border-emerald-500/20"
+  },
   eneagrama: {
     pt: {
       title: "O que você melhora com este teste",

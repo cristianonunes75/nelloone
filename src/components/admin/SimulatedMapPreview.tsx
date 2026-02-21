@@ -89,8 +89,8 @@ const generateSimulatedMapContent = (journeyResults: any[], lang: string): MapSe
       if (result.testType === 'linguagens_amor' && result.primary) {
         traits.push(`Conexão: ${result.primary}`);
       }
-      if (result.testType === 'mbti' && result.type) {
-        traits.push(`MBTI: ${result.type}`);
+      if ((result.testType === 'mbti' || result.testType === 'nello16') && result.type) {
+        traits.push(`Nello 16: ${result.type}`);
       }
       if (result.testType === 'eneagrama' && result.primaryType) {
         traits.push(`Eneagrama: Tipo ${result.primaryType}`);

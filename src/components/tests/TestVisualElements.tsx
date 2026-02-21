@@ -104,6 +104,16 @@ const testThemes = {
     gradientTo: "to-blue-50",
     accentClass: "text-slate-600",
     bgPattern: "linear-gradient(180deg, hsl(210 30% 96%) 0%, hsl(220 30% 96%) 100%)"
+  },
+  nello16: {
+    name: "Nello 16 Personality",
+    primaryColor: "hsl(var(--ink-blue))",
+    secondaryColor: "hsl(var(--bruma-blue))",
+    icons: [Brain, Heart, Eye, Compass, Sun, Moon, Lightbulb, Users],
+    gradientFrom: "from-slate-100",
+    gradientTo: "to-blue-50",
+    accentClass: "text-slate-600",
+    bgPattern: "linear-gradient(180deg, hsl(210 30% 96%) 0%, hsl(220 30% 96%) 100%)"
   }
 };
 

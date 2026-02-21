@@ -5374,6 +5374,15 @@ export type Database = {
         }
         Relationships: []
       }
+      test_type_mapping: {
+        Row: {
+          current_type: string | null
+          display_name: string | null
+          is_legacy: boolean | null
+          legacy_type: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_company_invite_by_token: {
@@ -5549,6 +5558,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      resolve_test_type: { Args: { input_type: string }; Returns: string }
       save_hiring_answer: {
         Args: {
           _answer: Json
@@ -5600,6 +5610,7 @@ export type Database = {
         | "eneagrama"
         | "solis"
         | "arquetipos_proposito"
+        | "nello16"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -5761,6 +5772,7 @@ export const Constants = {
         "eneagrama",
         "solis",
         "arquetipos_proposito",
+        "nello16",
       ],
     },
   },

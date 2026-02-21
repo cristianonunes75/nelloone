@@ -117,8 +117,8 @@ export const calculateScoreHighlights = (
     highlights.push(lang === "en" ? `Ennea ${eneaType}` : `Eneagrama ${eneaType}`);
   }
 
-  // Nello16 / MBTI
-  const nello16 = safeGet<string>(testResults, "mbti.type", "");
+  // Nello16 (legacy: mbti)
+  const nello16 = safeGet<string>(testResults, "nello16.type", "") || safeGet<string>(testResults, "mbti.type", "");
   if (nello16) {
     highlights.push(`N16: ${nello16}`);
   }

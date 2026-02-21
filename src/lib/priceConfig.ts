@@ -68,7 +68,13 @@ export const testPrices: Record<string, TestPrice> = {
     eur: { price: 17.90, priceId: "price_1SZyxMDjhZZxZELMkolH98fK" },
   },
   mbti: {
-    testType: "mbti",
+    testType: "nello16",
+    brl: { price: 197, priceId: "price_1SNBJEDjhZZxZELMY1CuVfIZ" },
+    usd: { price: 57, priceId: "price_1SZNWuDjhZZxZELMXezDuVOz" },
+    eur: { price: 52.90, priceId: "price_1SZz6TDjhZZxZELMXzDUT8kk" },
+  },
+  nello16: {
+    testType: "nello16",
     brl: { price: 197, priceId: "price_1SNBJEDjhZZxZELMY1CuVfIZ" },
     usd: { price: 57, priceId: "price_1SZNWuDjhZZxZELMXezDuVOz" },
     eur: { price: 52.90, priceId: "price_1SZz6TDjhZZxZELMXzDUT8kk" },

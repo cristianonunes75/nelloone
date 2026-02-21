@@ -35,6 +35,7 @@ export const testSlugs = {
   inteligencias_multiplas: { pt: 'inteligencias', en: 'intelligences' },
   eneagrama: { pt: 'eneagrama', en: 'enneagram' },
   mbti: { pt: 'nello16', en: 'nello16' },
+  nello16: { pt: 'nello16', en: 'nello16' },
 };
 
 export const testContent: Record<string, TestContentMap> = {

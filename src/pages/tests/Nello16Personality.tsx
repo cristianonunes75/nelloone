@@ -13,7 +13,7 @@ const Nello16Personality = () => {
       storytelling={content.storytelling}
       benefits={content.benefits}
       audience={content.audience}
-      testType="mbti"
+      testType="nello16"
       about={content.about}
     />
   );

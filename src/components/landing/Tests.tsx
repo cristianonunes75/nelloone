@@ -37,7 +37,7 @@ const getTestsData = (language: string) => {
         : isPtPt 
         ? "Mapa das 16 personalidades e perfis psicológicos"
         : "Mapa das 16 personalidades e perfis psicológicos",
-      testKey: "mbti"
+      testKey: "nello16"
     },
     { 
       icon: Compass, 
