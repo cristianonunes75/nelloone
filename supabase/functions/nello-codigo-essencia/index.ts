@@ -1274,7 +1274,7 @@ Baseado em: CRUZAMENTO OBRIGATÓRIO de Inteligências Múltiplas + Arquétipos +
 
 REGRA CRÍTICA: Cada talento DEVE cruzar pelo menos 2 testes. Exemplo:
 - "Liderança Estratégica" → Arquétipo Guerreiro + DISC D + Inteligência Lógica
-- "Comunicação Inspiradora" → Arquétipo Mago + Inteligência Linguística + Nello 16 ENFJ
+- "Comunicação Inspiradora" → Arquétipo Mago + Inteligência Linguística + Nello 16 N16-07 (O Mentor)
 
 {
   "source": "Inteligências Múltiplas + Arquétipos",
@@ -1843,7 +1843,7 @@ const MOCK_SECTIONS = (userName: string, locale: string) => {
         intelligences: { top: [isEnglish ? "Linguistic" : "Linguística", isEnglish ? "Interpersonal" : "Interpessoal", isEnglish ? "Intrapersonal" : "Intrapessoal"], scores: { linguistica: 85, interpessoal: 78, intrapessoal: 72, logica: 65, espacial: 45 } },
         connection_style: { primary: isEnglish ? "Quality Time" : "Tempo de Qualidade", secondary: isEnglish ? "Words of Affirmation" : "Palavras de Afirmação", scores: { tempo_qualidade: 82, palavras: 68, toque: 45, servico: 52, presentes: 28 } },
         enneagram: { type: 3, wing: 4 },
-        nello16: { code: "ENTJ", name: isEnglish ? "The Commander" : "O Comandante" },
+        nello16: { code: "N16-03", name: isEnglish ? "The Commander" : "O Arquitetador" },
         archetypes: { primary: isEnglish ? "Creator" : "Criador", secondary: isEnglish ? "Sage" : "Sábio" }
       },
       bullets: [
@@ -2404,13 +2404,20 @@ serve(async (req) => {
 });
 
 /**
- * Mapping from internal MBTI-style codes to Nello proprietary display codes
+ * Mapping from internal legacy codes to Nello proprietary display codes
  */
 const NELLO_16_CODE_MAP: Record<string, string> = {
   INTJ: "N1-EA", INTP: "N2-AA", ENTJ: "N3-AO", ENTP: "N4-VI",
   INFJ: "N5-CP", INFP: "N6-PI", ENFJ: "N7-MI", ENFP: "N8-IC",
   ISTJ: "N9-GP", ISFJ: "N10-PC", ESTJ: "N11-GE", ESFJ: "N12-AF",
   ISTP: "N13-AV", ISFP: "N14-AE", ESTP: "N15-AT", ESFP: "N16-AP",
+};
+
+const NELLO_16_PUBLIC_CODES: Record<string, string> = {
+  INTJ: "N16-01", INTP: "N16-02", ENTJ: "N16-03", ENTP: "N16-04",
+  INFJ: "N16-05", INFP: "N16-06", ENFJ: "N16-07", ENFP: "N16-08",
+  ISTJ: "N16-09", ISFJ: "N16-10", ESTJ: "N16-11", ESFJ: "N16-12",
+  ISTP: "N16-13", ISFP: "N16-14", ESTP: "N16-15", ESFP: "N16-16",
 };
 
 /**
@@ -2466,9 +2473,11 @@ function extractKeyResults(testType: string, resultData: any): any {
       // Convert MBTI code to Nello code for display
       const internalType = resultData.type || resultData.tipo || resultData.personalityType;
       const nelloCode = NELLO_16_CODE_MAP[internalType] || internalType;
+      const publicCode = NELLO_16_PUBLIC_CODES[internalType] || nelloCode;
       return {
-        personalityType: nelloCode,
-        internalType: internalType, // Keep internal reference if needed
+        personalityType: `${publicCode} · ${nelloCode}`,
+        publicCode: publicCode,
+        internalType: internalType, // Keep internal reference for scoring only
         dimensions: resultData.dimensions || resultData.dimensoes,
         description: resultData.description || resultData.descricao,
         strengths: resultData.strengths || resultData.forcas,
