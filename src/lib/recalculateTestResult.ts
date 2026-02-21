@@ -5,6 +5,7 @@ import { getInteligenciasResults } from "@/lib/inteligenciasMultiplas";
 import { calculateEstilosConexaoAfetiva } from "@/lib/estilosConexaoAfetiva";
 import { calculateTemperamentos } from "@/lib/temperamentos";
 import { getEnneagramResults } from "@/lib/eneagrama";
+import { normalizeTestScores, validateResultData } from "@/lib/scoring";
 
 type TestType = 
   | "arquetipos_proposito"
@@ -154,13 +155,29 @@ export async function recalculateTestResult(
       return { success: false, error: "Não foi possível calcular o resultado" };
     }
 
-    // Save to database
+    // Schema validation (log warnings but don't block)
+    const validation = validateResultData(testType, resultData);
+    if (!validation.valid) {
+      console.warn(`[Scoring] Schema validation warnings for ${testType}:`, validation.errors);
+    }
+
+    // Normalize scores to 0-100 scale
+    let normalizedScores = null;
+    const rawScores = resultData.scores;
+    if (rawScores && typeof rawScores === 'object') {
+      normalizedScores = normalizeTestScores(testType, rawScores);
+    }
+
+    // Save to database with versioning and normalized scores
     const { error: updateError } = await supabase
       .from("user_tests")
       .update({
         result_data: resultData,
         status: "completed",
         completed_at: new Date().toISOString(),
+        scoring_version: 'v1',
+        identity_version: 'v1',
+        normalized_scores: normalizedScores,
       })
       .eq("id", userTestId);
 
