@@ -22,16 +22,18 @@ import BusinessBilling from './pages/BusinessBilling';
 import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
 import { isFeatureEnabled } from './config/featureFlags';
 
-// Praxis imports - DISABLED via feature flag
+// Praxis imports
 import PraxisLanding from './pages/PraxisLanding';
 import PraxisAuth from './pages/PraxisAuth';
 import PraxisOnboarding from './pages/PraxisOnboarding';
 import PraxisDashboard from './pages/PraxisDashboard';
 import PraxisClientDetail from './pages/PraxisClientDetail';
 import { PraxisAuthProvider } from './hooks/usePraxisAuth';
+import { OperatorProvider } from './hooks/useOperatorWorkspace';
 
 /**
  * Nello Hiring - B2B Platform for Candidate Behavioral Assessment
+ * + Nello Praxis - Professional Client Accompaniment
  * Subdomain: business.nello.one
  */
 export default function BusinessApp() {
@@ -131,18 +133,20 @@ export default function BusinessApp() {
         </BusinessProtectedRoute>
       } />
 
-      {/* Praxis - DISABLED */}
+      {/* Praxis - Professional Accompaniment Module */}
       {praxisEnabled ? (
         <>
           <Route path="/praxis" element={<PraxisLanding />} />
           <Route path="/praxis/auth" element={<PraxisAuth />} />
           <Route path="/praxis/*" element={
             <PraxisAuthProvider>
-              <Routes>
-                <Route path="/onboarding" element={<PraxisOnboarding />} />
-                <Route path="/dashboard" element={<PraxisDashboard />} />
-                <Route path="/clients/:clientId" element={<PraxisClientDetail />} />
-              </Routes>
+              <OperatorProvider>
+                <Routes>
+                  <Route path="/onboarding" element={<PraxisOnboarding />} />
+                  <Route path="/dashboard" element={<PraxisDashboard />} />
+                  <Route path="/clients/:clientId" element={<PraxisClientDetail />} />
+                </Routes>
+              </OperatorProvider>
             </PraxisAuthProvider>
           } />
         </>

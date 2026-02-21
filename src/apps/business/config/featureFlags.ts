@@ -13,7 +13,7 @@ export const BUSINESS_FEATURE_FLAGS = {
   TEAM_MANAGEMENT: true, // Basic team management only
   
   // DISABLED - Not ready, hide from UI
-  PRAXIS_MODULE: false,
+  PRAXIS_MODULE: true,
   TEAM_INSIGHTS: false, // Reports page shows "in development"
   PEOPLE_ANALYTICS: false,
   
