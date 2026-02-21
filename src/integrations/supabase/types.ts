@@ -952,6 +952,60 @@ export type Database = {
           },
         ]
       }
+      client_operator_relationships: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          methodology_name: string | null
+          notes: string | null
+          operator_id: string
+          relationship_ended_at: string | null
+          relationship_started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          methodology_name?: string | null
+          notes?: string | null
+          operator_id: string
+          relationship_ended_at?: string | null
+          relationship_started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          methodology_name?: string | null
+          notes?: string | null
+          operator_id?: string
+          relationship_ended_at?: string | null
+          relationship_started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_operator_relationships_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "professional_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_operator_relationships_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "operator_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_session_packages: {
         Row: {
           client_id: string
@@ -3768,6 +3822,232 @@ export type Database = {
         }
         Relationships: []
       }
+      operator_methodologies: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_default: boolean | null
+          meeting_frequency: string | null
+          name: string
+          operator_id: string
+          recurring_questions: Json | null
+          rituals: Json | null
+          stages: Json | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          meeting_frequency?: string | null
+          name: string
+          operator_id: string
+          recurring_questions?: Json | null
+          rituals?: Json | null
+          stages?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          meeting_frequency?: string | null
+          name?: string
+          operator_id?: string
+          recurring_questions?: Json | null
+          rituals?: Json | null
+          stages?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operator_methodologies_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "operator_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operator_reflections: {
+        Row: {
+          client_id: string
+          content: string | null
+          created_at: string
+          id: string
+          operator_id: string
+          reflection_type: string
+          relationship_id: string | null
+          session_id: string | null
+          title: string
+        }
+        Insert: {
+          client_id: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          operator_id: string
+          reflection_type?: string
+          relationship_id?: string | null
+          session_id?: string | null
+          title: string
+        }
+        Update: {
+          client_id?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          operator_id?: string
+          reflection_type?: string
+          relationship_id?: string | null
+          session_id?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operator_reflections_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "professional_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operator_reflections_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "operator_workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operator_reflections_relationship_id_fkey"
+            columns: ["relationship_id"]
+            isOneToOne: false
+            referencedRelation: "client_operator_relationships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operator_reflections_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "client_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operator_tasks: {
+        Row: {
+          client_id: string
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          operator_id: string
+          priority: string | null
+          relationship_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          operator_id: string
+          priority?: string | null
+          relationship_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          operator_id?: string
+          priority?: string | null
+          relationship_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operator_tasks_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "professional_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operator_tasks_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "operator_workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operator_tasks_relationship_id_fkey"
+            columns: ["relationship_id"]
+            isOneToOne: false
+            referencedRelation: "client_operator_relationships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operator_workspaces: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          operator_status: string | null
+          professional_profile_id: string | null
+          settings: Json | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id?: string
+          operator_status?: string | null
+          professional_profile_id?: string | null
+          settings?: Json | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          operator_status?: string | null
+          professional_profile_id?: string | null
+          settings?: Json | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operator_workspaces_professional_profile_id_fkey"
+            columns: ["professional_profile_id"]
+            isOneToOne: false
+            referencedRelation: "professional_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       photo_galleries: {
         Row: {
           client_id: string | null
@@ -5584,7 +5864,7 @@ export type Database = {
         | "suporte"
         | "visualizador"
         | "growth"
-      app_role: "admin" | "fotografo" | "cliente"
+      app_role: "admin" | "fotografo" | "cliente" | "operator"
       business_role: "super_admin" | "company_admin" | "collaborator"
       company_subscription_status:
         | "trialing"
@@ -5744,7 +6024,7 @@ export const Constants = {
         "visualizador",
         "growth",
       ],
-      app_role: ["admin", "fotografo", "cliente"],
+      app_role: ["admin", "fotografo", "cliente", "operator"],
       business_role: ["super_admin", "company_admin", "collaborator"],
       company_subscription_status: [
         "trialing",

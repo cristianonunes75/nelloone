@@ -111,5 +111,5 @@ export const useNelloBusinessFlag = () => {
 
 // Hook for Nello Praxis module
 export const useNelloPraxisFlag = () => {
-  return useFeatureFlag("feature_nello_praxis_enabled", false);
+  return useFeatureFlag("feature_nello_praxis_enabled", true);
 };
