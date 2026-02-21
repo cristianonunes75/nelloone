@@ -3524,6 +3524,54 @@ export type Database = {
           },
         ]
       }
+      journey_checkpoints: {
+        Row: {
+          checkpoint_type: string
+          created_at: string
+          elapsed_seconds: number | null
+          estimated_remaining_seconds: number | null
+          id: string
+          metadata: Json | null
+          paused_at: string | null
+          questions_answered: number | null
+          resumed_at: string | null
+          test_type: string
+          total_questions: number | null
+          user_id: string
+          user_test_id: string | null
+        }
+        Insert: {
+          checkpoint_type?: string
+          created_at?: string
+          elapsed_seconds?: number | null
+          estimated_remaining_seconds?: number | null
+          id?: string
+          metadata?: Json | null
+          paused_at?: string | null
+          questions_answered?: number | null
+          resumed_at?: string | null
+          test_type: string
+          total_questions?: number | null
+          user_id: string
+          user_test_id?: string | null
+        }
+        Update: {
+          checkpoint_type?: string
+          created_at?: string
+          elapsed_seconds?: number | null
+          estimated_remaining_seconds?: number | null
+          id?: string
+          metadata?: Json | null
+          paused_at?: string | null
+          questions_answered?: number | null
+          resumed_at?: string | null
+          test_type?: string
+          total_questions?: number | null
+          user_id?: string
+          user_test_id?: string | null
+        }
+        Relationships: []
+      }
       lead_activities: {
         Row: {
           created_at: string
@@ -4825,6 +4873,45 @@ export type Database = {
         }
         Relationships: []
       }
+      test_conceptual_metadata: {
+        Row: {
+          construct_category: string
+          construct_label: Json
+          created_at: string
+          differentiation_notes: Json | null
+          id: string
+          measures_what: Json
+          metadata: Json | null
+          test_type: string
+          theoretical_framework: string | null
+          updated_at: string
+        }
+        Insert: {
+          construct_category: string
+          construct_label: Json
+          created_at?: string
+          differentiation_notes?: Json | null
+          id?: string
+          measures_what: Json
+          metadata?: Json | null
+          test_type: string
+          theoretical_framework?: string | null
+          updated_at?: string
+        }
+        Update: {
+          construct_category?: string
+          construct_label?: Json
+          created_at?: string
+          differentiation_notes?: Json | null
+          id?: string
+          measures_what?: Json
+          metadata?: Json | null
+          test_type?: string
+          theoretical_framework?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       test_evolution_progress: {
         Row: {
           completed_at: string | null
@@ -4919,6 +5006,7 @@ export type Database = {
           options: Json
           question_number: number
           question_text: string
+          question_version: number
           test_id: string
         }
         Insert: {
@@ -4928,6 +5016,7 @@ export type Database = {
           options: Json
           question_number: number
           question_text: string
+          question_version?: number
           test_id: string
         }
         Update: {
@@ -4937,6 +5026,7 @@ export type Database = {
           options?: Json
           question_number?: number
           question_text?: string
+          question_version?: number
           test_id?: string
         }
         Relationships: [
@@ -5028,6 +5118,7 @@ export type Database = {
           price_brl: number | null
           questions_count: number
           stripe_price_id: string | null
+          test_version: string
           type: Database["public"]["Enums"]["test_type"]
         }
         Insert: {
@@ -5043,6 +5134,7 @@ export type Database = {
           price_brl?: number | null
           questions_count: number
           stripe_price_id?: string | null
+          test_version?: string
           type: Database["public"]["Enums"]["test_type"]
         }
         Update: {
@@ -5058,7 +5150,59 @@ export type Database = {
           price_brl?: number | null
           questions_count?: number
           stripe_price_id?: string | null
+          test_version?: string
           type?: Database["public"]["Enums"]["test_type"]
+        }
+        Relationships: []
+      }
+      theoretical_references: {
+        Row: {
+          academic_references: string[] | null
+          construct_label: string
+          created_at: string
+          dimension: string | null
+          factor: string | null
+          id: string
+          max_raw_score: number | null
+          measurement_level: string | null
+          metadata: Json | null
+          normalization_formula: string | null
+          scale_type: string | null
+          test_type: string
+          theoretical_basis: string | null
+          updated_at: string
+        }
+        Insert: {
+          academic_references?: string[] | null
+          construct_label: string
+          created_at?: string
+          dimension?: string | null
+          factor?: string | null
+          id?: string
+          max_raw_score?: number | null
+          measurement_level?: string | null
+          metadata?: Json | null
+          normalization_formula?: string | null
+          scale_type?: string | null
+          test_type: string
+          theoretical_basis?: string | null
+          updated_at?: string
+        }
+        Update: {
+          academic_references?: string[] | null
+          construct_label?: string
+          created_at?: string
+          dimension?: string | null
+          factor?: string | null
+          id?: string
+          max_raw_score?: number | null
+          measurement_level?: string | null
+          metadata?: Json | null
+          normalization_formula?: string | null
+          scale_type?: string | null
+          test_type?: string
+          theoretical_basis?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -5151,10 +5295,14 @@ export type Database = {
           completed_at: string | null
           created_at: string
           id: string
+          identity_version: string
+          normalized_scores: Json | null
           result_data: Json | null
+          scoring_version: string
           started_at: string | null
           status: Database["public"]["Enums"]["test_status"]
           test_id: string
+          tie_resolution: Json | null
           updated_at: string
           user_id: string
         }
@@ -5162,10 +5310,14 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          identity_version?: string
+          normalized_scores?: Json | null
           result_data?: Json | null
+          scoring_version?: string
           started_at?: string | null
           status?: Database["public"]["Enums"]["test_status"]
           test_id: string
+          tie_resolution?: Json | null
           updated_at?: string
           user_id: string
         }
@@ -5173,10 +5325,14 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          identity_version?: string
+          normalized_scores?: Json | null
           result_data?: Json | null
+          scoring_version?: string
           started_at?: string | null
           status?: Database["public"]["Enums"]["test_status"]
           test_id?: string
+          tie_resolution?: Json | null
           updated_at?: string
           user_id?: string
         }
