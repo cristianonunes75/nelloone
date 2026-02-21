@@ -148,6 +148,7 @@ serve(async (req: Request): Promise<Response> => {
           secondaryResult = resultData.wing?.toString() || null;
           scores = resultData.scores || null;
           break;
+        case 'estilos_conexao_afetiva':
         case 'estilos_conexao':
         case 'linguagens_amor':
           primaryResult = typeof resultData.primary?.name === 'object'

@@ -31,7 +31,8 @@ export const testSlugs = {
   arquetipos: { pt: 'arquetipos', en: 'archetypes' },
   disc: { pt: 'disc', en: 'disc' },
   temperamentos: { pt: 'temperamentos', en: 'temperaments' },
-  linguagens_amor: { pt: 'estilos-conexao-afetiva', en: 'connection-styles' },
+  estilos_conexao_afetiva: { pt: 'estilos-conexao-afetiva', en: 'connection-styles' },
+  linguagens_amor: { pt: 'estilos-conexao-afetiva', en: 'connection-styles' }, // LEGACY alias
   inteligencias_multiplas: { pt: 'inteligencias', en: 'intelligences' },
   eneagrama: { pt: 'eneagrama', en: 'enneagram' },
   mbti: { pt: 'nello16', en: 'nello16' },

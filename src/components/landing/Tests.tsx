@@ -77,7 +77,7 @@ const getTestsData = (language: string) => {
         : isPtPt 
         ? "Descubra como se liga emocionalmente"
         : "Descubra como você se conecta emocionalmente",
-      testKey: "linguagens_amor"
+      testKey: "estilos_conexao_afetiva"
     },
   ];
 };

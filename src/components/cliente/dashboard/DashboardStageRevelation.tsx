@@ -37,8 +37,9 @@ interface DashboardStageRevelationProps {
 const testIcons: Record<string, string> = {
   arquetipos_proposito: "Target",
   inteligencias_multiplas: "Brain",
-  linguagens_amor: "Heart",
+  estilos_conexao_afetiva: "Heart",
   estilos_conexao: "Heart",
+  linguagens_amor: "Heart", // LEGACY
   mbti: "Compass",
   nello16: "Compass",
   disc: "Activity",

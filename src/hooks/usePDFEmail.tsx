@@ -73,7 +73,8 @@ export const usePDFEmail = () => {
             }, { userName, language });
             break;
             
-          case "linguagens_amor":
+          case "estilos_conexao_afetiva":
+          case "linguagens_amor": // LEGACY
             doc = createEstilosConexaoPDF(resultData, userName, { language });
             break;
             

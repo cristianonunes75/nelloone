@@ -7,7 +7,8 @@ import jsPDF from "jspdf";
 interface TestResults {
   arquetipos_proposito?: { primary?: string; secondary?: string };
   inteligencias_multiplas?: { scores?: Record<string, number>; primary?: string; secondary?: string };
-  linguagens_amor?: { primary?: string; secondary?: string; scores?: Record<string, number> };
+  estilos_conexao_afetiva?: { primary?: string; secondary?: string; scores?: Record<string, number> };
+  linguagens_amor?: { primary?: string; secondary?: string; scores?: Record<string, number> }; // LEGACY
   mbti?: { type?: string; scores?: Record<string, number> };
   nello16?: { type?: string; scores?: Record<string, number> };
   disc?: { dominantProfile?: string; scores?: Record<string, number> };
@@ -435,8 +436,8 @@ const buildCodigoEssenciaDoc = (options: CodigoEssenciaOptions): jsPDF => {
   const intelligenceName = INTELLIGENCE_NAMES[intelligence]?.[lang] || intelligence;
 
   // Try multiple sources for connection style
-  const connectionRaw = testResults.linguagens_amor?.primary || 
-    (testResults as any).estilos_conexao_afetiva?.primary ||
+  const connectionRaw = testResults.estilos_conexao_afetiva?.primary ||
+    testResults.linguagens_amor?.primary || 
     (testResults as any).estilos_conexao?.primary;
   const connectionStyle = normalizeConnectionKey(connectionRaw);
   const connectionName = CONNECTION_NAMES[connectionStyle]?.[lang] || connectionRaw || connectionStyle;
@@ -1104,7 +1105,7 @@ export const canGenerateCodigoEssencia = (testResults: TestResults): boolean => 
   return !!(
     testResults.arquetipos_proposito?.primary &&
     testResults.inteligencias_multiplas?.primary &&
-    testResults.linguagens_amor?.primary &&
+    (testResults.estilos_conexao_afetiva?.primary || testResults.linguagens_amor?.primary) &&
     ((testResults as any).nello16?.type || testResults.mbti?.type) &&
     testResults.disc?.dominantProfile &&
     testResults.eneagrama?.primaryType &&
@@ -1139,8 +1140,8 @@ export const getMissingTests = (testResults: TestResults, language: 'pt' | 'pt-p
   if (!hasInteligencias) missing.push(testNames.inteligencias_multiplas[lang]);
   
   // Check for estilos_conexao - handle multiple possible keys (linguagens_amor, estilos_conexao, etc.)
-  const hasEstilosConexao = (testResults as any).estilos_conexao?.primary || 
-    (testResults as any).estilos_conexao_afetiva?.primary ||
+  const hasEstilosConexao = (testResults as any).estilos_conexao_afetiva?.primary ||
+    (testResults as any).estilos_conexao?.primary || 
     (testResults as any).linguagens_amor?.primary;
   if (!hasEstilosConexao) missing.push(testNames.estilos_conexao[lang]);
   

@@ -11,7 +11,8 @@ const AVG_SECONDS_PER_QUESTION: Record<string, number> = {
   temperamentos: 15,
   eneagrama: 20,
   inteligencias_multiplas: 18,
-  linguagens_amor: 12,
+  estilos_conexao_afetiva: 12,
+  linguagens_amor: 12, // LEGACY alias
   arquetipos_proposito: 10,
   mbti: 15,
   nello16: 15,

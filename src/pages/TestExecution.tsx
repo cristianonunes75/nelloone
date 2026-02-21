@@ -405,12 +405,12 @@ export default function TestExecution() {
           scores,
           dominantArchetypes,
         }));
-      } else if (testType === "linguagens_amor") {
+      } else if (testType === "linguagens_amor" || testType === ("estilos_conexao_afetiva" as any)) {
         const linguagensResults = calculateLinguagensAmor(allAnswers as any);
         resultData = JSON.parse(JSON.stringify({
           completed_at: new Date().toISOString(),
           total_questions: questions?.length || 0,
-          testType: "linguagens_amor",
+          testType: "estilos_conexao_afetiva",
           primary: linguagensResults.primary,
           secondary: linguagensResults.secondary,
           scores: linguagensResults.scores,
@@ -655,7 +655,13 @@ export default function TestExecution() {
         accentColor: "text-emerald-600",
         decorativeIcons: ["🎵", "📐", "🌿", "💬"]
       },
-      linguagens_amor: { 
+      estilos_conexao_afetiva: { 
+        icon: "💕", 
+        gradient: "from-rose-100 via-pink-50 to-red-100",
+        accentColor: "text-rose-500",
+        decorativeIcons: ["💬", "🤝", "🎁", "⏰"]
+      },
+      linguagens_amor: { // LEGACY alias
         icon: "💕", 
         gradient: "from-rose-100 via-pink-50 to-red-100",
         accentColor: "text-rose-500",

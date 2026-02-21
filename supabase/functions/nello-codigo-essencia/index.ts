@@ -2149,7 +2149,7 @@ serve(async (req) => {
         const requiredTypes = ['arquetipos_proposito', 'inteligencias_multiplas', 'linguagens_amor', 'mbti', 'disc', 'eneagrama', 'temperamentos'];
         journeyCompleted = requiredTypes.every(type => 
           completedTypes.has(type) || 
-          (type === 'linguagens_amor' && completedTypes.has('estilos_conexao')) ||
+          (type === 'linguagens_amor' && (completedTypes.has('estilos_conexao_afetiva') || completedTypes.has('estilos_conexao'))) ||
           (type === 'mbti' && completedTypes.has('nello16'))
         );
       }
@@ -2179,7 +2179,8 @@ serve(async (req) => {
 
     // Build consolidated results object with copyright-safe names
     const testNameMapping: Record<string, string> = {
-      'linguagens_amor': 'Estilos de Conexão Afetiva',
+      'estilos_conexao_afetiva': 'Estilos de Conexão Afetiva',
+      'linguagens_amor': 'Estilos de Conexão Afetiva', // LEGACY
       'mbti': 'Nello 16 Personality',
       'disc': 'DISC',
       'eneagrama': 'Eneagrama',
@@ -2512,6 +2513,7 @@ function extractKeyResults(testType: string, resultData: any): any {
         learningStyle: resultData.learningStyle || resultData.estiloAprendizagem,
       };
 
+    case 'estilos_conexao_afetiva':
     case 'linguagens_amor':
     case 'estilos_conexao':
       // Map old style names to new proprietary names

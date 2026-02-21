@@ -513,7 +513,7 @@ const CONNECTION_STYLE_NAMES: Record<string, Record<Language, string>> = {
 export const generateConnectionStylesSynergy = (
   profiles: FullCoupleProfiles,
   language: Language
-): { titulo: string; linguagens_amor: { estilo_a: string; estilo_b: string; como_a_ama: string; como_b_ama: string; micro_acordos: string[] } } | null => {
+): { titulo: string; estilos_conexao_afetiva: { estilo_a: string; estilo_b: string; como_a_ama: string; como_b_ama: string; micro_acordos: string[] } } | null => {
   const styleA = profiles.personA.connectionStyle?.primary;
   const styleB = profiles.personB.connectionStyle?.primary;
   
@@ -562,7 +562,7 @@ export const generateConnectionStylesSynergy = (
   
   return {
     titulo: titles[language],
-    linguagens_amor: {
+    estilos_conexao_afetiva: {
       estilo_a: styleNameA,
       estilo_b: styleNameB,
       como_a_ama: t.howLoves(profiles.personA.name, styleNameA),

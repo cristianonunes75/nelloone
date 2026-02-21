@@ -135,7 +135,7 @@ const testStyles = {
     dotBg: 'bg-emerald-500',
     dotBorder: 'border-emerald-500',
   },
-  linguagens_amor: {
+  estilos_conexao_afetiva: {
     layout: 'cards' as const,
     borderRadius: 'rounded-3xl',
     selectedBg: 'bg-rose-50',

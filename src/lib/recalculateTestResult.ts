@@ -13,6 +13,7 @@ type TestType =
   | "mbti"
   | "nello16"
   | "eneagrama"
+  | "estilos_conexao_afetiva"
   | "linguagens_amor"
   | "temperamentos"
   | "inteligencias_multiplas";
@@ -109,12 +110,11 @@ export async function recalculateTestResult(
         break;
       }
 
+      case "estilos_conexao_afetiva":
       case "linguagens_amor": {
         const estilosResults = calculateEstilosConexaoAfetiva(answers as any, "pt");
-        // Format result to be compatible with both the new Estilos system 
-        // and the legacy code that reads primary/secondary as objects
         resultData = {
-          testType: "linguagens_amor",
+          testType: "estilos_conexao_afetiva",
           completed_at: new Date().toISOString(),
           // New format fields
           ...estilosResults,

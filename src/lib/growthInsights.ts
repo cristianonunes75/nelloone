@@ -7,7 +7,7 @@ interface GrowthInsight {
   recommendedEvolution?: string;
 }
 
-type TestType = 'arquetipos_proposito' | 'disc' | 'mbti' | 'eneagrama' | 'linguagens_amor' | 'temperamentos' | 'inteligencias_multiplas';
+type TestType = 'arquetipos_proposito' | 'disc' | 'mbti' | 'nello16' | 'eneagrama' | 'estilos_conexao_afetiva' | 'linguagens_amor' | 'temperamentos' | 'inteligencias_multiplas';
 
 type SupportedLanguage = 'pt' | 'pt-pt' | 'en';
 
@@ -92,7 +92,7 @@ const insightsData: Record<TestType, Record<SupportedLanguage, GrowthInsight>> =
       recommendedEvolution: "Move towards the wings and integration lines of your type for growth."
     }
   },
-  linguagens_amor: {
+  estilos_conexao_afetiva: {
     pt: {
       limitingPattern: "Expectativa de que outros se conectem emocionalmente da mesma forma que você, gerando frustração nos relacionamentos.",
       balancingStrength: "Clareza sobre seu estilo de conexão afetiva e como cultivar relacionamentos mais profundos.",
@@ -112,6 +112,9 @@ const insightsData: Record<TestType, Record<SupportedLanguage, GrowthInsight>> =
       recommendedEvolution: "Learn to be fluent in all connection styles for richer relationships."
     }
   },
+  // LEGACY aliases
+  linguagens_amor: {} as Record<SupportedLanguage, GrowthInsight>,
+  nello16: {} as Record<SupportedLanguage, GrowthInsight>,
   temperamentos: {
     pt: {
       limitingPattern: "Reações emocionais automáticas ligadas ao seu temperamento dominante podem criar conflitos.",

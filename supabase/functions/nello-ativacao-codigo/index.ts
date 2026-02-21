@@ -795,8 +795,8 @@ function buildUserPrompt(codigoEssencia: any, historiaUsuario: any, language: st
     if (codigoEssencia.inteligencias) {
       prompt += `${labels.intelligences}: ${JSON.stringify(codigoEssencia.inteligencias)}\n`;
     }
-    if (codigoEssencia.linguagens_amor) {
-      prompt += `${labels.loveLanguages}: ${JSON.stringify(codigoEssencia.linguagens_amor)}\n`;
+    if (codigoEssencia.estilos_conexao_afetiva || codigoEssencia.linguagens_amor) {
+      prompt += `${labels.loveLanguages}: ${JSON.stringify(codigoEssencia.estilos_conexao_afetiva || codigoEssencia.linguagens_amor)}\n`;
     }
 
     // Add executive summary if available

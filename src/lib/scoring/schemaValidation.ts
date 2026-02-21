@@ -129,7 +129,8 @@ const RESULT_SCHEMAS: Record<string, z.ZodSchema> = {
   temperamentos: TemperamentosResultSchema,
   eneagrama: EnneagramResultSchema,
   inteligencias_multiplas: InteligenciasResultSchema,
-  linguagens_amor: EstilosResultSchema,
+  estilos_conexao_afetiva: EstilosResultSchema,
+  linguagens_amor: EstilosResultSchema, // LEGACY alias
   arquetipos_proposito: ArquetiposResultSchema,
   mbti: MBTIResultSchema,
   nello16: MBTIResultSchema, // Alias: nello16 uses same schema as legacy mbti

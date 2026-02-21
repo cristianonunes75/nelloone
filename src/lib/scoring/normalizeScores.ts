@@ -47,8 +47,12 @@ const NORMALIZATION_CONFIGS: Record<string, {
     maxRawScore: 25, // 5 questions × 5 max
     scaleType: 'linear',
   },
-  linguagens_amor: {
+  estilos_conexao_afetiva: {
     maxRawScore: 30, // forced choice count
+    scaleType: 'linear',
+  },
+  linguagens_amor: { // LEGACY alias
+    maxRawScore: 30,
     scaleType: 'linear',
   },
   arquetipos_proposito: {
