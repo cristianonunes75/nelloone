@@ -480,7 +480,7 @@ function TestResultsInner() {
   // Determine test type
   const isArchetyposTest = userTest.tests?.type === 'arquetipos_proposito';
   const isDISCTest = userTest.tests?.type === 'disc';
-  const isMBTITest = userTest.tests?.type === 'mbti';
+  const isMBTITest = userTest.tests?.type === 'mbti' || userTest.tests?.type === 'nello16';
   const isEnneagramTest = userTest.tests?.type === 'eneagrama';
   const isLinguagensAmorTest = userTest.tests?.type === 'linguagens_amor';
   const isTemperamentosTest = userTest.tests?.type === 'temperamentos';
@@ -657,7 +657,7 @@ function TestResultsInner() {
       if (testType === 'disc') handleDownloadDISCPDF();
       else if (testType === 'eneagrama') handleDownloadEneagramaPDF();
       else if (testType === 'temperamentos') handleDownloadTemperamentosPDF();
-      else if (testType === 'mbti') handleDownloadNello16PDF();
+      else if (testType === 'mbti' || testType === 'nello16') handleDownloadNello16PDF();
       else if (testType === 'linguagens_amor') handleDownloadEstilosConexaoPDF();
       else if (testType === 'inteligencias_multiplas') handleDownloadInteligenciasPDF();
       else if (testType === 'arquetipos_proposito') handleDownloadArquetiposPDF();
@@ -682,7 +682,7 @@ function TestResultsInner() {
     
     if (testType === 'disc' && discResults) {
       resultData = { scores: discResults.scores, dominantProfile: discResults.dominantProfile };
-    } else if (testType === 'mbti' && mbtiResultData) {
+    } else if ((testType === 'mbti' || testType === 'nello16') && mbtiResultData) {
       resultData = { type: mbtiResultData.type, scores: mbtiResultData.scores };
     } else if (testType === 'eneagrama' && enneagramResultData) {
       resultData = { primaryType: enneagramResultData.primaryType, scores: enneagramResultData.scores };

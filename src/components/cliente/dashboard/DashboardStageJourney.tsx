@@ -37,6 +37,7 @@ const stepDescriptions: Record<string, string> = {
   inteligencias_multiplas: "Como sua mente funciona",
   linguagens_amor: "Como você se conecta",
   mbti: "Suas decisões e percepções",
+  nello16: "Suas decisões e percepções",
   disc: "Seu ritmo e postura",
   eneagrama: "A raiz dos comportamentos",
   temperamentos: "Seu modo natural de agir",

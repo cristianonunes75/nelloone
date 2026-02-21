@@ -14,6 +14,7 @@ const AVG_SECONDS_PER_QUESTION: Record<string, number> = {
   linguagens_amor: 12,
   arquetipos_proposito: 10,
   mbti: 15,
+  nello16: 15,
 };
 
 const DEFAULT_SECONDS_PER_QUESTION = 15;

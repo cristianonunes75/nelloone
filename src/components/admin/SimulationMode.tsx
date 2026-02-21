@@ -41,12 +41,11 @@ import { generateInteligenciasPremiumPDF } from "@/lib/pdfInteligenciasMultiplas
 import jsPDF from "jspdf";
 import { calculateArchetypeScores, getDominantArchetypes, ARCHETYPES } from "@/lib/archetypes";
 import { getDISCResults, DISC_PROFILES } from "@/lib/disc";
-import { getMBTIResults } from "@/lib/mbti";
+import { getNello16Results, NELLO_16_PROFILES } from "@/lib/nello16Personality";
 import { getEnneagramResults } from "@/lib/eneagrama";
 import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
 import { INTELLIGENCES } from "@/lib/inteligenciasMultiplas";
-import { getNello16Results, NELLO_16_PROFILES } from "@/lib/nello16Personality";
 import { calculateEstilosConexaoAfetiva, getStyleData } from "@/lib/estilosConexaoAfetiva";
 import { useSimulation, SimulationLanguage, SIMULATION_LANGUAGES } from "@/contexts/SimulationContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -279,7 +278,7 @@ export const SimulationMode = () => {
   const executeJourneySimulation = async () => {
     setIsRunningJourney(true);
     setJourneyResults([]);
-    const journeyOrder = ["arquetipos_proposito", "disc", "inteligencias_multiplas", "linguagens_amor", "mbti", "eneagrama", "temperamentos"];
+    const journeyOrder = ["arquetipos_proposito", "disc", "inteligencias_multiplas", "linguagens_amor", "nello16", "mbti", "eneagrama", "temperamentos"];
     const orderedTests = journeyOrder.map(type => tests.find(t => t.type === type)).filter(Boolean) as Test[];
     
     for (let i = 0; i < orderedTests.length; i++) {
@@ -448,9 +447,9 @@ export const SimulationMode = () => {
     if (testType === "disc") {
       const discResults = getDISCResults(answersForCalc as any);
       result = { testType: "disc", scores: discResults.scores, dominantProfile: discResults.dominantProfile, profileData: discResults.profileData, rawAnswers: simulatedAnswers };
-    } else if (testType === "mbti") {
-      const mbtiResults = getMBTIResults(answersForCalc as any);
-      result = { testType: "mbti", type: mbtiResults.type, scores: mbtiResults.scores, profileData: mbtiResults.profileData, rawAnswers: simulatedAnswers };
+    } else if (testType === "mbti" || testType === "nello16") {
+      const nello16Results = getNello16Results(answersForCalc as any);
+      result = { testType: "nello16", type: nello16Results.type, scores: nello16Results.scores, profileData: nello16Results.profileData, rawAnswers: simulatedAnswers };
     } else if (testType === "eneagrama") {
       const enneagramResults = getEnneagramResults(answersForCalc as any);
       result = { testType: "eneagrama", primaryType: enneagramResults.primaryType, scores: enneagramResults.scores, percentages: enneagramResults.percentages, rawAnswers: simulatedAnswers };
@@ -520,9 +519,9 @@ export const SimulationMode = () => {
     if (testType === "disc") {
       const discResults = getDISCResults(answersForCalc as any);
       result = { testType: "disc", scores: discResults.scores, dominantProfile: discResults.dominantProfile, profileData: discResults.profileData, rawAnswers: answers };
-    } else if (testType === "mbti") {
-      const mbtiResults = getMBTIResults(answersForCalc as any);
-      result = { testType: "mbti", type: mbtiResults.type, scores: mbtiResults.scores, profileData: mbtiResults.profileData, rawAnswers: answers };
+    } else if (testType === "mbti" || testType === "nello16") {
+      const nello16Results = getNello16Results(answersForCalc as any);
+      result = { testType: "nello16", type: nello16Results.type, scores: nello16Results.scores, profileData: nello16Results.profileData, rawAnswers: answers };
     } else if (testType === "eneagrama") {
       const enneagramResults = getEnneagramResults(answersForCalc as any);
       result = { testType: "eneagrama", primaryType: enneagramResults.primaryType, scores: enneagramResults.scores, percentages: enneagramResults.percentages, rawAnswers: answers };
@@ -651,7 +650,8 @@ export const SimulationMode = () => {
     const names: Record<string, string> = {
       temperamentos: "Temperamentos",
       disc: "DISC",
-      mbti: "MBTI",
+      mbti: "Nello 16",
+      nello16: "Nello 16",
       eneagrama: "Eneagrama",
       arquetipos: "Arquétipos",
       arquetipos_proposito: "Arquétipos",
@@ -1063,7 +1063,7 @@ export const SimulationMode = () => {
       if (testType === "disc") {
         return `Perfil Dominante: ${DISC_PROFILES[simulationResult.dominantProfile]?.name || simulationResult.dominantProfile}`;
       }
-      if (testType === "mbti") {
+      if (testType === "mbti" || testType === "nello16") {
         return `Tipo: ${simulationResult.type}`;
       }
       if (testType === "eneagrama") {
@@ -1167,7 +1167,7 @@ export const SimulationMode = () => {
             }))
           };
         }
-        if (testType === "mbti" && simulationResult.type) {
+        if ((testType === "mbti" || testType === "nello16") && simulationResult.type) {
           const profile = NELLO_16_PROFILES[simulationResult.type];
           return {
             title: "Seu tipo Nello 16 é:",
@@ -1464,7 +1464,7 @@ export const SimulationMode = () => {
         }
 
         // Nello 16 / MBTI - Show dimensions
-        if (testType === "mbti" && simulationResult.type) {
+        if ((testType === "mbti" || testType === "nello16") && simulationResult.type) {
           const scores = simulationResult.scores || {};
           const dimensions = [
             { label: "Energia", pairs: [{ key: "E", name: "Extroversão" }, { key: "I", name: "Introversão" }] },

@@ -59,6 +59,10 @@ const NORMALIZATION_CONFIGS: Record<string, {
     maxRawScore: { E: 10, I: 10, S: 10, N: 10, T: 10, F: 10, J: 10, P: 10 },
     scaleType: 'linear',
   },
+  nello16: {
+    maxRawScore: { E: 10, I: 10, S: 10, N: 10, T: 10, F: 10, J: 10, P: 10 },
+    scaleType: 'linear',
+  },
 };
 
 /**

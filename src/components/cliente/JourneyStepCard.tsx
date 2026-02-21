@@ -31,6 +31,7 @@ export function JourneyStepCard({ step, onStart, onContinue, onPurchase, onViewR
     inteligencias_multiplas: "Entenda como sua mente funciona",
     linguagens_amor: "Como você se conecta emocionalmente",
     mbti: "Como você toma decisões e percebe o mundo",
+    nello16: "Como você toma decisões e percebe o mundo",
     disc: "Seu ritmo, sua energia e sua postura",
     eneagrama: "A raiz dos seus comportamentos",
     temperamentos: "O seu modo natural de agir",

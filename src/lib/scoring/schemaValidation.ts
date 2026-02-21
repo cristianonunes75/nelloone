@@ -132,6 +132,7 @@ const RESULT_SCHEMAS: Record<string, z.ZodSchema> = {
   linguagens_amor: EstilosResultSchema,
   arquetipos_proposito: ArquetiposResultSchema,
   mbti: MBTIResultSchema,
+  nello16: MBTIResultSchema, // Alias: nello16 uses same schema as legacy mbti
 };
 
 /**

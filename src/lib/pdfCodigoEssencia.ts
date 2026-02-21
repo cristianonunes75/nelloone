@@ -9,6 +9,7 @@ interface TestResults {
   inteligencias_multiplas?: { scores?: Record<string, number>; primary?: string; secondary?: string };
   linguagens_amor?: { primary?: string; secondary?: string; scores?: Record<string, number> };
   mbti?: { type?: string; scores?: Record<string, number> };
+  nello16?: { type?: string; scores?: Record<string, number> };
   disc?: { dominantProfile?: string; scores?: Record<string, number> };
   eneagrama?: { primaryType?: string | number; scores?: Record<string, number>; percentages?: Record<string, number> };
   temperamentos?: { primary?: { temperament?: string }; secondary?: { temperament?: string } };
@@ -440,7 +441,7 @@ const buildCodigoEssenciaDoc = (options: CodigoEssenciaOptions): jsPDF => {
   const connectionStyle = normalizeConnectionKey(connectionRaw);
   const connectionName = CONNECTION_NAMES[connectionStyle]?.[lang] || connectionRaw || connectionStyle;
 
-  const nello16Type = getKeyValue(testResults.mbti?.type);
+  const nello16Type = getKeyValue((testResults as any).nello16?.type || testResults.mbti?.type);
 
   const discProfile = getKeyValue(testResults.disc?.dominantProfile);
 
@@ -1104,7 +1105,7 @@ export const canGenerateCodigoEssencia = (testResults: TestResults): boolean => 
     testResults.arquetipos_proposito?.primary &&
     testResults.inteligencias_multiplas?.primary &&
     testResults.linguagens_amor?.primary &&
-    testResults.mbti?.type &&
+    ((testResults as any).nello16?.type || testResults.mbti?.type) &&
     testResults.disc?.dominantProfile &&
     testResults.eneagrama?.primaryType &&
     testResults.temperamentos?.primary

@@ -16,7 +16,7 @@ import { getBundlePriceForLanguage, getCurrencyForLanguage } from "@/lib/priceCo
 import { getAffiliateCode } from "@/hooks/useAffiliateTracking";
 import { useToast } from "@/hooks/use-toast";
 import { getDISCResults } from "@/lib/disc";
-import { getMBTIResults } from "@/lib/mbti";
+import { getNello16Results } from "@/lib/nello16Personality";
 import { getEnneagramResults } from "@/lib/eneagrama";
 import { calculateLinguagensAmor } from "@/lib/linguagensAmor";
 import { calculateTemperamentos } from "@/lib/temperamentos";
@@ -375,15 +375,15 @@ export default function TestExecution() {
           dominantProfile: discResults.dominantProfile,
           profileData: discResults.profileData,
         }));
-      } else if (testType === "mbti") {
-        const mbtiResults = getMBTIResults(allAnswers as any);
+      } else if (testType === "mbti" || testType === "nello16") {
+        const nello16Results = getNello16Results(allAnswers as any);
         resultData = JSON.parse(JSON.stringify({
           completed_at: new Date().toISOString(),
           total_questions: questions?.length || 0,
-          testType: "mbti",
-          type: mbtiResults.type,
-          scores: mbtiResults.scores,
-          profileData: mbtiResults.profileData,
+          testType: "nello16",
+          type: nello16Results.type,
+          scores: nello16Results.scores,
+          profileData: nello16Results.profileData,
         }));
       } else if (testType === "eneagrama") {
         const enneagramResults = getEnneagramResults(allAnswers as any);
@@ -668,6 +668,12 @@ export default function TestExecution() {
         decorativeIcons: ["💬", "🤝", "🎁", "⏰"]
       },
       mbti: { 
+        icon: "🧩", 
+        gradient: "from-slate-100 via-gray-50 to-blue-100",
+        accentColor: "text-slate-600",
+        decorativeIcons: ["🌞", "🌙", "🧭", "💡"]
+      },
+      nello16: { 
         icon: "🧩", 
         gradient: "from-slate-100 via-gray-50 to-blue-100",
         accentColor: "text-slate-600",

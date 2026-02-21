@@ -155,6 +155,11 @@ const ComprarTeste = () => {
       "Entenda como você processa informações",
       "Descubra suas preferências naturais",
     ],
+    nello16: [
+      "Conheça seu tipo psicológico",
+      "Entenda como você processa informações",
+      "Descubra suas preferências naturais",
+    ],
   };
 
   const benefits = testBenefits[test.type] || [
