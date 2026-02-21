@@ -332,7 +332,8 @@ const Cliente = () => {
     'eneagrama': 'eneagrama',
     'temperamentos': 'temperamentos',
     'inteligencias_multiplas': 'inteligencias_multiplas',
-    'linguagens_amor': 'linguagens_amor',
+    'estilos_conexao_afetiva': 'estilos_conexao_afetiva',
+    'linguagens_amor': 'estilos_conexao_afetiva', // LEGACY
   };
 
   // Get the correct route based on language

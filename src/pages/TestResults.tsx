@@ -53,7 +53,8 @@ import { recalculateTestResult } from "@/lib/recalculateTestResult";
 const JOURNEY_ORDER = [
   "arquetipos_proposito",
   "inteligencias_multiplas",
-  "linguagens_amor",
+  "estilos_conexao_afetiva",
+  "linguagens_amor", // LEGACY
   "mbti",
   "disc",
   "eneagrama",
@@ -482,7 +483,7 @@ function TestResultsInner() {
   const isDISCTest = userTest.tests?.type === 'disc';
   const isMBTITest = userTest.tests?.type === 'mbti' || userTest.tests?.type === 'nello16';
   const isEnneagramTest = userTest.tests?.type === 'eneagrama';
-  const isLinguagensAmorTest = userTest.tests?.type === 'linguagens_amor';
+  const isLinguagensAmorTest = userTest.tests?.type === ('estilos_conexao_afetiva' as any) || userTest.tests?.type === 'linguagens_amor';
   const isTemperamentosTest = userTest.tests?.type === 'temperamentos';
   const isInteligenciasTest = userTest.tests?.type === 'inteligencias_multiplas';
   const isFreeVersion = userTest.tests?.is_free || false;
@@ -658,7 +659,7 @@ function TestResultsInner() {
       else if (testType === 'eneagrama') handleDownloadEneagramaPDF();
       else if (testType === 'temperamentos') handleDownloadTemperamentosPDF();
       else if (testType === 'mbti' || testType === 'nello16') handleDownloadNello16PDF();
-      else if (testType === 'linguagens_amor') handleDownloadEstilosConexaoPDF();
+      else if (testType === ('estilos_conexao_afetiva' as any) || testType === 'linguagens_amor') handleDownloadEstilosConexaoPDF();
       else if (testType === 'inteligencias_multiplas') handleDownloadInteligenciasPDF();
       else if (testType === 'arquetipos_proposito') handleDownloadArquetiposPDF();
       else handleDownloadPDF(); // fallback to html2canvas
@@ -688,7 +689,7 @@ function TestResultsInner() {
       resultData = { primaryType: enneagramResultData.primaryType, scores: enneagramResultData.scores };
     } else if (testType === 'temperamentos' && temperamentosResultData) {
       resultData = { primary: temperamentosResultData.primary, secondary: temperamentosResultData.secondary };
-    } else if (testType === 'linguagens_amor') {
+    } else if (testType === ('estilos_conexao_afetiva' as any) || testType === 'linguagens_amor') {
       resultData = estilosConexaoResults || linguagensAmorResultData;
     } else if (testType === 'inteligencias_multiplas' && inteligenciasResults) {
       resultData = inteligenciasResults;

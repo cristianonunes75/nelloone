@@ -47,7 +47,8 @@ const TEST_COLORS: Record<string, { r: number; g: number; b: number }> = {
   disc: { r: 59, g: 130, b: 246 },
   eneagrama: { r: 236, g: 72, b: 153 },
   mbti: { r: 16, g: 185, b: 129 },
-  linguagens_amor: { r: 244, g: 63, b: 94 },
+  estilos_conexao_afetiva: { r: 244, g: 63, b: 94 },
+  linguagens_amor: { r: 244, g: 63, b: 94 }, // LEGACY
   temperamentos: { r: 245, g: 158, b: 11 },
   inteligencias_multiplas: { r: 52, g: 211, b: 153 },
 };

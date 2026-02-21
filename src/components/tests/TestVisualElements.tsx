@@ -75,7 +75,7 @@ const testThemes = {
     accentClass: "text-emerald-600",
     bgPattern: "radial-gradient(circle at 50% 50%, hsl(152 60% 95%) 0%, hsl(140 60% 95%) 100%)"
   },
-  linguagens_amor: {
+  estilos_conexao_afetiva: {
     name: "Estilos de Conexão Afetiva",
     primaryColor: "hsl(var(--destructive))",
     secondaryColor: "hsl(var(--accent))",

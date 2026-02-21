@@ -4,7 +4,8 @@ import { testContent } from "@/lib/testContent";
 
 const EstilosConexaoAfetiva = () => {
   const { language } = useLanguage();
-  const content = testContent.linguagens_amor[language as keyof typeof testContent.linguagens_amor] || testContent.linguagens_amor.pt;
+  const contentSource = testContent.estilos_conexao_afetiva || testContent.linguagens_amor;
+  const content = contentSource[language as keyof typeof contentSource] || contentSource.pt;
 
   return (
     <TestDetailLayout
@@ -13,7 +14,7 @@ const EstilosConexaoAfetiva = () => {
       storytelling={content.storytelling}
       benefits={content.benefits}
       audience={content.audience}
-      testType="linguagens_amor"
+      testType="estilos_conexao_afetiva"
       about={content.about}
     />
   );

@@ -223,7 +223,7 @@ const testImprovements = {
     icon: Flame,
     color: "from-red-500/10 to-rose-500/10 border-red-500/20"
   },
-  linguagens_amor: {
+  estilos_conexao_afetiva: {
     pt: {
       title: "O que você melhora com este teste",
       items: [

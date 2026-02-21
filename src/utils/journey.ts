@@ -32,7 +32,8 @@ export const TEST_TYPE_TO_SLUG: Record<string, JourneyTestSlug> = {
   'temperamentos': 'temperamentos',
   // Legacy mappings for backward compatibility
   'arquetipos': 'arquetipos_proposito',
-  'linguagens_amor': 'estilos_conexao', // Old name for Estilos de Conexão
+  'estilos_conexao_afetiva': 'estilos_conexao', // New proprietary name
+  'linguagens_amor': 'estilos_conexao', // LEGACY name
   'mbti': 'nello16', // Old name for Nello 16
 };
 
@@ -40,7 +41,7 @@ export const TEST_TYPE_TO_SLUG: Record<string, JourneyTestSlug> = {
 export const SLUG_TO_DB_TYPES: Record<JourneyTestSlug, string[]> = {
   'arquetipos_proposito': ['arquetipos_proposito', 'arquetipos'],
   'inteligencias_multiplas': ['inteligencias_multiplas'],
-  'estilos_conexao': ['estilos_conexao', 'linguagens_amor'],
+  'estilos_conexao': ['estilos_conexao', 'estilos_conexao_afetiva', 'linguagens_amor'],
   'nello16': ['nello16', 'mbti'],
   'disc': ['disc'],
   'eneagrama': ['eneagrama'],

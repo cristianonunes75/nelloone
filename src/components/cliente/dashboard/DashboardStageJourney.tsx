@@ -35,7 +35,8 @@ interface DashboardStageJourneyProps {
 const stepDescriptions: Record<string, string> = {
   arquetipos_proposito: "A energia que te move",
   inteligencias_multiplas: "Como sua mente funciona",
-  linguagens_amor: "Como você se conecta",
+  estilos_conexao_afetiva: "Como você se conecta",
+  linguagens_amor: "Como você se conecta", // LEGACY
   mbti: "Suas decisões e percepções",
   nello16: "Suas decisões e percepções",
   disc: "Seu ritmo e postura",

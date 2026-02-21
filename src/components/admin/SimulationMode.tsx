@@ -278,7 +278,7 @@ export const SimulationMode = () => {
   const executeJourneySimulation = async () => {
     setIsRunningJourney(true);
     setJourneyResults([]);
-    const journeyOrder = ["arquetipos_proposito", "disc", "inteligencias_multiplas", "linguagens_amor", "nello16", "mbti", "eneagrama", "temperamentos"];
+    const journeyOrder = ["arquetipos_proposito", "disc", "inteligencias_multiplas", "estilos_conexao_afetiva", "linguagens_amor", "nello16", "mbti", "eneagrama", "temperamentos"];
     const orderedTests = journeyOrder.map(type => tests.find(t => t.type === type)).filter(Boolean) as Test[];
     
     for (let i = 0; i < orderedTests.length; i++) {
@@ -457,11 +457,11 @@ export const SimulationMode = () => {
       const scores = calculateArchetypeScores(answersForCalc);
       const dominantArchetypes = getDominantArchetypes(scores);
       result = { testType: "arquetipos", scores, dominantArchetypes, rawAnswers: simulatedAnswers };
-    } else if (testType === "linguagens_amor") {
+    } else if (testType === "estilos_conexao_afetiva" || testType === "linguagens_amor") {
       // Use new Estilos de Conexão Afetiva calculation
       const estilosResults = calculateEstilosConexaoAfetiva(answersForCalc as any);
       result = { 
-        testType: "linguagens_amor", 
+        testType: "estilos_conexao_afetiva", 
         primary: estilosResults.primary.style, 
         secondary: estilosResults.secondary.style, 
         scores: estilosResults.scores, 
