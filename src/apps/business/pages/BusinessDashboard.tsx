@@ -6,7 +6,8 @@ import {
   ClipboardList,
   Target,
   BookOpen,
-  BarChart3
+  BarChart3,
+  Users
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -20,6 +21,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { PRODUCT_IDENTITY } from '../config/featureFlags';
 import { BusinessProgramsTab } from '../components/BusinessProgramsTab';
 import { TeamInsightsTab } from '../components/TeamInsightsTab';
+import { SeatManagementCard } from '../components/SeatManagementCard';
 
 interface DashboardStats {
   activeJobs: number;
@@ -244,6 +246,10 @@ export default function BusinessDashboard() {
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList>
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+            <TabsTrigger value="licenses">
+              <Users className="w-4 h-4 mr-1" />
+              Licenças
+            </TabsTrigger>
             <TabsTrigger value="insights">
               <BarChart3 className="w-4 h-4 mr-1" />
               Team Insights
@@ -269,6 +275,10 @@ export default function BusinessDashboard() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="licenses">
+            <SeatManagementCard />
           </TabsContent>
 
           <TabsContent value="insights">

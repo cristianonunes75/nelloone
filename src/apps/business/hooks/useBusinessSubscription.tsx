@@ -6,10 +6,13 @@ import { toast } from 'sonner';
 export interface BusinessSubscription {
   subscribed: boolean;
   status: 'trial' | 'active' | 'cancelled' | 'past_due';
-  tier: 'trial' | 'starter' | 'growth' | 'enterprise';
+  tier: 'trial' | 'starter' | 'growth' | 'enterprise' | 'corporate';
   maxCollaborators: number;
   currentCollaborators: number;
   subscriptionEnd: string | null;
+  seatsTotal: number;
+  seatsUsed: number;
+  seatsAvailable: number;
 }
 
 export const BUSINESS_TIERS = {
@@ -63,6 +66,9 @@ export function useBusinessSubscription() {
         maxCollaborators: data.maxCollaborators,
         currentCollaborators: data.currentCollaborators,
         subscriptionEnd: data.subscriptionEnd,
+        seatsTotal: data.maxCollaborators,
+        seatsUsed: data.currentCollaborators,
+        seatsAvailable: Math.max(0, data.maxCollaborators - data.currentCollaborators),
       });
     } catch (error: any) {
       console.error('Error checking subscription:', error);
@@ -74,6 +80,9 @@ export function useBusinessSubscription() {
         maxCollaborators: 10,
         currentCollaborators: 0,
         subscriptionEnd: null,
+        seatsTotal: 10,
+        seatsUsed: 0,
+        seatsAvailable: 10,
       });
     } finally {
       setIsLoading(false);
