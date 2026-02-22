@@ -49,6 +49,20 @@ export default function BusinessConsent() {
         return;
       }
 
+      // LGPD: Log consent action in company_audit_logs
+      if (company?.id) {
+        await supabase.from('company_audit_logs').insert({
+          company_id: company.id,
+          actor_id: user.id,
+          action: 'collaborator_consent_granted',
+          details: {
+            consent_version: CONSENT_VERSION,
+            share_report_with_company: shareWithCompany,
+            accepted_at: new Date().toISOString(),
+          },
+        });
+      }
+
       await refetch();
       toast.success('Consentimento registrado! Bem-vindo ao Nello Business.');
       navigate('/my-journey');

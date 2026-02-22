@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { BusinessLayout } from '../components/BusinessLayout';
+import { OperatorLinkingSection } from '../components/OperatorLinkingSection';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -159,9 +160,12 @@ export default function BusinessTeam() {
         <div>
           <h1 className="text-2xl font-bold">Equipe</h1>
           <p className="text-muted-foreground">
-            Gerencie os membros da sua equipe e acompanhe o progresso
+            Gerencie os membros da sua equipe e operadores vinculados
           </p>
         </div>
+
+        {/* Operator Linking Section */}
+        <OperatorLinkingSection />
 
         <Card>
           <CardHeader>
