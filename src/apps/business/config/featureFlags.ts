@@ -14,7 +14,7 @@ export const BUSINESS_FEATURE_FLAGS = {
   
   // DISABLED - Not ready, hide from UI
   PRAXIS_MODULE: true,
-  TEAM_INSIGHTS: false, // Reports page shows "in development"
+  TEAM_INSIGHTS: true, // Enabled for companies with active subscription
   PEOPLE_ANALYTICS: false,
   
   // BILLING - Enable after validation

@@ -60,13 +60,14 @@ serve(async (req: Request): Promise<Response> => {
 
     logStep("User authorized", { userRole: companyUser.role });
 
-    // Get all collaborators who share reports
+    // LGPD: Only read users with explicit consent (share_report_with_company = true AND consent_given = true)
     const { data: collaborators, error: collabError } = await supabase
       .from("company_users")
       .select("user_id")
       .eq("company_id", company_id)
       .eq("is_active", true)
       .eq("share_report_with_company", true)
+      .eq("consent_given", true)
       .eq("role", "collaborator");
 
     if (collabError) {
@@ -206,13 +207,25 @@ serve(async (req: Request): Promise<Response> => {
       logStep("Error saving insights", { error: upsertError.message });
     }
 
-    // Log audit
+    // LGPD: Log audit access
     await supabase.from("company_audit_logs").insert({
       company_id,
       actor_id: user.id,
       action: "insights_calculated",
-      details: { member_count: userIds.length },
+      details: { member_count: userIds.length, consent_verified: true },
     });
+
+    // LGPD: Log AI consultation for traceability
+    await supabase.from("company_ai_consultations").insert({
+      company_id,
+      requested_by: user.id,
+      consultation_type: "team_insights_aggregation",
+      ai_response: JSON.stringify({ summary: "Aggregated team insights calculated", member_count: userIds.length }),
+      context: { source: "business-team-insights", consent_filter: true, aggregated_only: true },
+    });
+
+    // Generate health alerts based on patterns
+    await generateHealthAlerts(supabase, company_id, insights);
 
     return new Response(
       JSON.stringify({ success: true, insights }),
@@ -437,4 +450,65 @@ function generateManagementRecommendations(disc: Record<string, number>, tempera
   }
   
   return recommendations.length > 0 ? recommendations : ["Aplicar gestão situacional conforme perfil individual"];
+}
+
+// deno-lint-ignore no-explicit-any
+async function generateHealthAlerts(supabase: any, companyId: string, insights: Record<string, unknown>) {
+  const alerts: Array<{ alert_type: string; severity: string; title: string; description: string }> = [];
+  
+  const disc = (insights.disc_distribution || {}) as Record<string, number>;
+  const temp = (insights.temperament_distribution || {}) as Record<string, number>;
+
+  // Critical pattern: extreme dominance imbalance
+  if ((disc["D"] || 0) > 50) {
+    alerts.push({
+      alert_type: "profile_imbalance",
+      severity: "warning",
+      title: "Alta concentração de perfis Dominantes",
+      description: "Mais de 50% da equipe tem perfil D dominante. Isso pode gerar conflitos de liderança.",
+    });
+  }
+
+  // Low diversity warning
+  const discEntries = Object.values(disc);
+  if (discEntries.length > 0 && discEntries.some(v => v > 60)) {
+    alerts.push({
+      alert_type: "low_diversity",
+      severity: "warning",
+      title: "Baixa diversidade comportamental",
+      description: "Um perfil comportamental concentra mais de 60% da equipe. Considere diversificar nas próximas contratações.",
+    });
+  }
+
+  // Low assessment completion
+  const totalMembers = (insights.total_members as number) || 0;
+  const completed = (insights.completed_assessments as number) || 0;
+  if (totalMembers > 3 && completed < totalMembers * 0.3) {
+    alerts.push({
+      alert_type: "low_completion",
+      severity: "info",
+      title: "Baixa taxa de avaliações concluídas",
+      description: `Apenas ${completed} de ${totalMembers} membros concluíram avaliações. Incentive a participação.`,
+    });
+  }
+
+  // Upsert alerts (clear old, insert new)
+  if (alerts.length > 0) {
+    // Resolve existing alerts of same types
+    const alertTypes = alerts.map(a => a.alert_type);
+    await supabase
+      .from("business_health_alerts")
+      .update({ status: "resolved", resolved_at: new Date().toISOString() })
+      .eq("company_id", companyId)
+      .eq("status", "active")
+      .in("alert_type", alertTypes);
+
+    // Insert new
+    await supabase
+      .from("business_health_alerts")
+      .insert(alerts.map(a => ({
+        company_id: companyId,
+        ...a,
+      })));
+  }
 }
