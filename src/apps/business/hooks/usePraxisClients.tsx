@@ -1,6 +1,17 @@
+/**
+ * Client and Session management hooks for Nello Praxis.
+ * 
+ * MIGRATED: Now uses operator_workspaces (via useOperatorWorkspace) as the
+ * source of truth for professional identity. The professional_clients table
+ * is still used for data storage but the professional_id column maps to
+ * the operator workspace id.
+ * 
+ * See: /docs/praxis/DOMAIN_MIGRATION.md
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { usePraxisAuth } from './usePraxisAuth';
+import { useOperatorWorkspace } from './useOperatorWorkspace';
 import { toast } from 'sonner';
 import { Json } from '@/integrations/supabase/types';
 
@@ -52,12 +63,14 @@ export interface ClientSession {
 }
 
 export function usePraxisClients() {
-  const { professionalProfile } = usePraxisAuth();
+  const { workspace } = useOperatorWorkspace();
   const [clients, setClients] = useState<PraxisClient[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const operatorId = workspace?.id;
+
   const fetchClients = useCallback(async () => {
-    if (!professionalProfile?.id) {
+    if (!operatorId) {
       setClients([]);
       setIsLoading(false);
       return;
@@ -67,7 +80,7 @@ export function usePraxisClients() {
       const { data, error } = await supabase
         .from('professional_clients')
         .select('*')
-        .eq('professional_id', professionalProfile.id)
+        .eq('professional_id', operatorId)
         .order('name');
 
       if (error) throw error;
@@ -78,20 +91,20 @@ export function usePraxisClients() {
     } finally {
       setIsLoading(false);
     }
-  }, [professionalProfile?.id]);
+  }, [operatorId]);
 
   useEffect(() => {
     fetchClients();
   }, [fetchClients]);
 
   const createClient = async (data: Partial<PraxisClient>): Promise<PraxisClient | null> => {
-    if (!professionalProfile?.id) return null;
+    if (!operatorId) return null;
 
     try {
       const { data: newClient, error } = await supabase
         .from('professional_clients')
         .insert({
-          professional_id: professionalProfile.id,
+          professional_id: operatorId,
           name: data.name || '',
           email: data.email,
           phone: data.phone,
@@ -177,12 +190,14 @@ export function usePraxisClients() {
 }
 
 export function usePraxisSessions(clientId: string | null) {
-  const { professionalProfile } = usePraxisAuth();
+  const { workspace } = useOperatorWorkspace();
   const [sessions, setSessions] = useState<ClientSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const operatorId = workspace?.id;
+
   const fetchSessions = useCallback(async () => {
-    if (!professionalProfile?.id || !clientId) {
+    if (!operatorId || !clientId) {
       setSessions([]);
       setIsLoading(false);
       return;
@@ -192,7 +207,7 @@ export function usePraxisSessions(clientId: string | null) {
       const { data, error } = await supabase
         .from('client_sessions')
         .select('*')
-        .eq('professional_id', professionalProfile.id)
+        .eq('professional_id', operatorId)
         .eq('client_id', clientId)
         .order('session_date', { ascending: false });
 
@@ -204,20 +219,20 @@ export function usePraxisSessions(clientId: string | null) {
     } finally {
       setIsLoading(false);
     }
-  }, [professionalProfile?.id, clientId]);
+  }, [operatorId, clientId]);
 
   useEffect(() => {
     fetchSessions();
   }, [fetchSessions]);
 
   const createSession = async (data: Partial<ClientSession>): Promise<ClientSession | null> => {
-    if (!professionalProfile?.id || !clientId) return null;
+    if (!operatorId || !clientId) return null;
 
     try {
       const { data: newSession, error } = await supabase
         .from('client_sessions')
         .insert({
-          professional_id: professionalProfile.id,
+          professional_id: operatorId,
           client_id: clientId,
           title: data.title || 'Nova Sessão',
           session_date: data.session_date || new Date().toISOString(),

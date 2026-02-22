@@ -134,19 +134,11 @@ export function OperatorProvider({ children }: { children: ReactNode }) {
     if (!user?.id) return null;
 
     try {
-      // Also check if user has a professional_profile
-      const { data: profProfile } = await supabase
-        .from('professional_profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
       const { data: newWorkspace, error } = await supabase
         .from('operator_workspaces')
         .insert({
           user_id: user.id,
           display_name: data.display_name,
-          professional_profile_id: profProfile?.id || null,
           operator_status: 'standard',
         })
         .select()

@@ -32,7 +32,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useOperatorWorkspace, useOperatorTasks, useOperatorReflections } from '../hooks/useOperatorWorkspace';
-import { usePraxisAuth } from '../hooks/usePraxisAuth';
 import { usePraxisClients } from '../hooks/usePraxisClients';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
@@ -42,7 +41,6 @@ import { PraxisClientDialog } from '../components/PraxisClientDialog';
 export default function PraxisDashboard() {
   const { signOut } = useAuth();
   const { workspace, isLoading: workspaceLoading } = useOperatorWorkspace();
-  const { professionalProfile, isLoading: profileLoading } = usePraxisAuth();
   const { clients, activeClients, isLoading: clientsLoading } = usePraxisClients();
   const { tasks } = useOperatorTasks();
   const { reflections } = useOperatorReflections();
@@ -56,9 +54,9 @@ export default function PraxisDashboard() {
 
   const pendingTasks = tasks.filter(t => t.status === 'pending' || t.status === 'in_progress');
   const totalSessions = clients.reduce((acc, c) => acc + c.total_sessions, 0);
-  const displayName = workspace?.display_name || professionalProfile?.business_name || 'Operador';
+  const displayName = workspace?.display_name || 'Operador';
 
-  if (profileLoading || workspaceLoading) {
+  if (workspaceLoading) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
@@ -98,7 +96,6 @@ export default function PraxisDashboard() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon">
                     <Avatar className="w-8 h-8">
-                      <AvatarImage src={professionalProfile?.avatar_url || undefined} />
                       <AvatarFallback className="bg-gradient-to-br from-amber-500 to-orange-600 text-white text-sm">
                         {displayName[0]?.toUpperCase() || 'O'}
                       </AvatarFallback>

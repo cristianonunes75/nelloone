@@ -39,7 +39,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
-import { usePraxisAuth } from '../hooks/usePraxisAuth';
+import { useOperatorWorkspace } from '../hooks/useOperatorWorkspace';
 import { usePraxisSessions, PraxisClient, ClientSession } from '../hooks/usePraxisClients';
 import { PraxisClientDialog } from '../components/PraxisClientDialog';
 import { PraxisSessionDialog } from '../components/PraxisSessionDialog';
@@ -50,7 +50,7 @@ import { toast } from 'sonner';
 export default function PraxisClientDetail() {
   const { clientId } = useParams();
   const navigate = useNavigate();
-  const { professionalProfile } = usePraxisAuth();
+  const { workspace } = useOperatorWorkspace();
   const { sessions, isLoading: sessionsLoading, deleteSession } = usePraxisSessions(clientId || null);
   
   const [client, setClient] = useState<PraxisClient | null>(null);
@@ -62,14 +62,14 @@ export default function PraxisClientDetail() {
 
   useEffect(() => {
     const fetchClient = async () => {
-      if (!clientId || !professionalProfile?.id) return;
+      if (!clientId || !workspace?.id) return;
 
       try {
         const { data, error } = await supabase
           .from('professional_clients')
           .select('*')
           .eq('id', clientId)
-          .eq('professional_id', professionalProfile.id)
+          .eq('professional_id', workspace.id)
           .single();
 
         if (error) throw error;
@@ -84,7 +84,7 @@ export default function PraxisClientDetail() {
     };
 
     fetchClient();
-  }, [clientId, professionalProfile?.id, navigate]);
+  }, [clientId, workspace?.id, navigate]);
 
   const handleDeleteSession = async () => {
     if (!deletingSession) return;
