@@ -1478,6 +1478,158 @@ export type Database = {
           },
         ]
       }
+      company_operators: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          operator_workspace_id: string
+          role_in_company: string
+          started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          operator_workspace_id: string
+          role_in_company?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          operator_workspace_id?: string
+          role_in_company?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_operators_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_operators_operator_workspace_id_fkey"
+            columns: ["operator_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "operator_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_program_members: {
+        Row: {
+          company_program_id: string
+          consent_given_at: string | null
+          consent_revoked_at: string | null
+          consent_status: string
+          created_at: string
+          id: string
+          joined_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_program_id: string
+          consent_given_at?: string | null
+          consent_revoked_at?: string | null
+          consent_status?: string
+          created_at?: string
+          id?: string
+          joined_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_program_id?: string
+          consent_given_at?: string | null
+          consent_revoked_at?: string | null
+          consent_status?: string
+          created_at?: string
+          id?: string
+          joined_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_program_members_company_program_id_fkey"
+            columns: ["company_program_id"]
+            isOneToOne: false
+            referencedRelation: "company_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_programs: {
+        Row: {
+          company_id: string
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          max_participants: number | null
+          methodology_name: string | null
+          operator_workspace_id: string
+          program_name: string
+          start_date: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          max_participants?: number | null
+          methodology_name?: string | null
+          operator_workspace_id: string
+          program_name: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          max_participants?: number | null
+          methodology_name?: string | null
+          operator_workspace_id?: string
+          program_name?: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_programs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_programs_operator_workspace_id_fkey"
+            columns: ["operator_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "operator_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_status_history: {
         Row: {
           changed_by: string | null
@@ -5992,6 +6144,10 @@ export type Database = {
           question_text: string
         }[]
       }
+      get_operator_workspace_id: {
+        Args: { check_user_id: string }
+        Returns: string
+      }
       get_spouse_report_by_token: {
         Args: { _token: string }
         Returns: {
@@ -6030,6 +6186,10 @@ export type Database = {
       init_identity_essencial: { Args: { p_user_id: string }; Returns: Json }
       is_admin_user: { Args: { _user_id: string }; Returns: boolean }
       is_company_admin: {
+        Args: { check_company_id: string; check_user_id: string }
+        Returns: boolean
+      }
+      is_company_operator: {
         Args: { check_company_id: string; check_user_id: string }
         Returns: boolean
       }
