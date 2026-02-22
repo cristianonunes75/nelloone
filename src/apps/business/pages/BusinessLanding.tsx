@@ -8,7 +8,12 @@ import {
   ArrowRight,
   Clock,
   BarChart3,
-  Zap
+  Zap,
+  Building2,
+  UserCheck,
+  TrendingUp,
+  Briefcase,
+  HeartHandshake
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -32,7 +37,7 @@ export default function BusinessLanding() {
               <span className="text-muted-foreground/50">|</span>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Target className="w-4 h-4 text-primary" />
+                  <Building2 className="w-4 h-4 text-primary" />
                 </div>
                 <span className="text-lg font-semibold">{PRODUCT_IDENTITY.name}</span>
               </div>
@@ -42,41 +47,63 @@ export default function BusinessLanding() {
                 <Button variant="ghost">Entrar</Button>
               </Link>
               <Link to="/auth?mode=register">
-                <Button>Começar agora</Button>
+                <Button>Começar empresa</Button>
               </Link>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Hero - Focused on Hiring */}
+      {/* Conceptual Navigation */}
+      <div className="border-b bg-muted/20">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center gap-6 py-2 text-sm text-muted-foreground overflow-x-auto">
+            <span className="flex items-center gap-1.5 text-foreground font-medium whitespace-nowrap">
+              <Building2 className="w-3.5 h-3.5" /> Empresas
+            </span>
+            <span className="flex items-center gap-1.5 whitespace-nowrap">
+              <Users className="w-3.5 h-3.5" /> Equipe
+            </span>
+            <span className="flex items-center gap-1.5 whitespace-nowrap">
+              <UserCheck className="w-3.5 h-3.5" /> Recrutamento
+            </span>
+            <span className="flex items-center gap-1.5 whitespace-nowrap">
+              <BarChart3 className="w-3.5 h-3.5" /> Insights
+            </span>
+            <span className="flex items-center gap-1.5 whitespace-nowrap">
+              <FileText className="w-3.5 h-3.5" /> Billing
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Hero - Corporate Platform */}
       <section className="py-20 lg:py-32">
         <div className="container mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-            <Target className="w-4 h-4" />
-            Avaliação Comportamental para Recrutamento
+            <Building2 className="w-4 h-4" />
+            Plataforma Corporativa Nello
           </div>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground max-w-4xl mx-auto leading-tight">
-            Contrate com mais
+            Entenda pessoas. Contrate melhor.
             <br />
-            <span className="text-primary">assertividade.</span>
+            <span className="text-primary">Desenvolva equipes extraordinárias.</span>
           </h1>
           
           <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
-            {PRODUCT_IDENTITY.tagline}. Avalie candidatos com DISC e Temperamentos 
-            antes de contratar e reduza erros de contratação.
+            {PRODUCT_IDENTITY.description}
           </p>
           
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/auth?mode=register">
               <Button size="lg" className="gap-2">
-                Começar gratuitamente
+                Começar empresa
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
             <Button variant="outline" size="lg">
-              Falar com vendas
+              Falar com especialista
             </Button>
           </div>
           
@@ -91,28 +118,28 @@ export default function BusinessLanding() {
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-center items-center gap-8 text-muted-foreground">
             <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-primary" />
-              <span className="text-sm font-medium">Avaliação em 15 minutos</span>
+              <UserCheck className="w-5 h-5 text-primary" />
+              <span className="text-sm font-medium">Diagnóstico comportamental</span>
             </div>
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-primary" />
               <span className="text-sm font-medium">Dados protegidos</span>
             </div>
             <div className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-primary" />
-              <span className="text-sm font-medium">Relatório comparativo</span>
+              <TrendingUp className="w-5 h-5 text-primary" />
+              <span className="text-sm font-medium">Inteligência organizacional</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How it Works - Hiring Focus */}
+      {/* How it Works - Organizational Cycle */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Como funciona</h2>
+            <h2 className="text-3xl font-bold mb-4">Ciclo organizacional completo</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Um processo simples para avaliar candidatos antes de contratar
+              Do recrutamento ao desenvolvimento contínuo dos seus colaboradores
             </p>
           </div>
           
@@ -120,12 +147,12 @@ export default function BusinessLanding() {
             <Card className="bg-card border-border">
               <CardContent className="pt-6 text-center">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <FileText className="w-6 h-6 text-primary" />
+                  <Target className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">1. Crie a vaga</h3>
+                <h3 className="text-lg font-semibold mb-2">1. Defina o perfil humano ideal</h3>
                 <p className="text-muted-foreground text-sm">
-                  Defina o cargo, descrição e o perfil comportamental ideal 
-                  para a posição que você está contratando.
+                  Determine as competências comportamentais e o perfil ideal para cada função 
+                  na sua organização.
                 </p>
               </CardContent>
             </Card>
@@ -133,12 +160,12 @@ export default function BusinessLanding() {
             <Card className="bg-card border-border">
               <CardContent className="pt-6 text-center">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-6 h-6 text-primary" />
+                  <UserCheck className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">2. Envie o link</h3>
+                <h3 className="text-lg font-semibold mb-2">2. Contrate com inteligência comportamental</h3>
                 <p className="text-muted-foreground text-sm">
-                  Compartilhe o link público da vaga com seus candidatos. 
-                  Eles fazem a avaliação DISC e Temperamentos em ~15 minutos.
+                  Avalie candidatos com DISC e Temperamentos. Compare perfis e tome decisões 
+                  baseadas em dados humanos reais.
                 </p>
               </CardContent>
             </Card>
@@ -146,12 +173,12 @@ export default function BusinessLanding() {
             <Card className="bg-card border-border">
               <CardContent className="pt-6 text-center">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <BarChart3 className="w-6 h-6 text-primary" />
+                  <TrendingUp className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">3. Compare perfis</h3>
+                <h3 className="text-lg font-semibold mb-2">3. Desenvolva colaboradores continuamente</h3>
                 <p className="text-muted-foreground text-sm">
-                  Receba o relatório comportamental de cada candidato 
-                  e veja a compatibilidade com o perfil ideal da vaga.
+                  Acompanhe a evolução comportamental da sua equipe e 
+                  construa uma cultura organizacional sólida.
                 </p>
               </CardContent>
             </Card>
@@ -159,24 +186,63 @@ export default function BusinessLanding() {
         </div>
       </section>
 
-      {/* What You Get */}
+      {/* What You Get - Three Layers */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">O que você recebe</h2>
+              <h2 className="text-3xl font-bold mb-4">O que o Nello Business entrega</h2>
               <p className="text-muted-foreground">
-                Ferramentas objetivas para avaliar candidatos
+                Três camadas integradas para gestão humana completa
               </p>
             </div>
             
-            <div className="grid sm:grid-cols-2 gap-4">
-              {PRODUCT_IDENTITY.delivers.map((item, index) => (
-                <div key={index} className="flex items-start gap-3 p-4 bg-card rounded-lg border">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm">{item}</span>
-                </div>
-              ))}
+            {/* Layer 1: Recrutamento */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Briefcase className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold">Recrutamento Inteligente</h3>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {PRODUCT_IDENTITY.delivers.slice(0, 4).map((item, index) => (
+                  <div key={index} className="flex items-start gap-3 p-4 bg-card rounded-lg border">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Layer 2: Inteligência Organizacional */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart3 className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold">Inteligência Organizacional</h3>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {PRODUCT_IDENTITY.delivers.slice(4, 7).map((item, index) => (
+                  <div key={index} className="flex items-start gap-3 p-4 bg-card rounded-lg border">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Layer 3: Desenvolvimento Contínuo */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <HeartHandshake className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold">Base para Desenvolvimento Contínuo</h3>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {PRODUCT_IDENTITY.delivers.slice(7).map((item, index) => (
+                  <div key={index} className="flex items-start gap-3 p-4 bg-card rounded-lg border">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">{item}</span>
+                  </div>
+                ))}
+              </div>
             </div>
             
             <div className="mt-8 p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
@@ -185,9 +251,9 @@ export default function BusinessLanding() {
                 <div>
                   <h4 className="font-medium text-yellow-700 dark:text-yellow-400">Importante</h4>
                   <p className="text-sm text-yellow-600/80 dark:text-yellow-500/80">
-                    O Nello Hiring é uma ferramenta de avaliação comportamental. 
-                    Não substitui entrevistas — é uma camada adicional de análise para 
-                    sua tomada de decisão.
+                    O Nello Business é uma plataforma de inteligência humana. 
+                    Não substitui entrevistas — é uma camada adicional de análise 
+                    comportamental para decisões mais assertivas.
                   </p>
                 </div>
               </div>
@@ -199,40 +265,51 @@ export default function BusinessLanding() {
       {/* Pricing */}
       <section className="py-20">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Preço simples e transparente</h2>
+          <h2 className="text-3xl font-bold mb-4">Acesse a plataforma completa</h2>
           <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-            Pague por uso. Sem surpresas.
+            O Nello Business inclui todos os módulos em um único plano.
           </p>
           
           <div className="inline-flex flex-col items-center bg-card border rounded-2xl p-8 max-w-md">
-            <span className="text-sm text-muted-foreground mb-2">A partir de</span>
+            <span className="text-sm text-muted-foreground mb-2">Nello Business</span>
             <div className="flex items-baseline gap-1">
               <span className="text-4xl font-bold text-foreground">R$ 49</span>
               <span className="text-muted-foreground">/mês</span>
             </div>
-            <p className="text-sm text-muted-foreground mt-2 mb-6">
-              Inclui até 10 avaliações de candidatos
+            <p className="text-sm text-muted-foreground mt-2 mb-4">
+              Inclui módulo de Recrutamento Inteligente
             </p>
+            <ul className="text-left text-sm text-muted-foreground space-y-2 mb-6">
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-500" /> Até 10 avaliações/mês
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-500" /> Gestão de equipe
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-500" /> Insights organizacionais
+              </li>
+            </ul>
             <Link to="/auth?mode=register">
-              <Button size="lg">Começar agora</Button>
+              <Button size="lg">Começar empresa</Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA - Closing Message */}
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">
-            Pronto para contratar melhor?
+            O Nello Business começa no recrutamento e acompanha o crescimento humano da sua empresa.
           </h2>
           <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
-            Comece hoje e avalie seus candidatos com ferramentas comportamentais 
-            validadas antes de tomar sua decisão.
+            Uma plataforma única para entender, contratar e desenvolver as pessoas 
+            que fazem sua empresa crescer.
           </p>
           <Link to="/auth?mode=register">
             <Button size="lg" variant="secondary">
-              Criar conta gratuita
+              Começar agora
             </Button>
           </Link>
         </div>
@@ -244,7 +321,7 @@ export default function BusinessLanding() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Target className="w-4 h-4 text-primary" />
+                <Building2 className="w-4 h-4 text-primary" />
               </div>
               <span className="font-semibold">{PRODUCT_IDENTITY.name}</span>
             </div>

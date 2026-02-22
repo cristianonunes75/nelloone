@@ -25,27 +25,31 @@ export const BUSINESS_FEATURE_FLAGS = {
  * Product Identity
  */
 export const PRODUCT_IDENTITY = {
-  name: 'Nello Hiring',
-  tagline: 'Avaliação comportamental para contratações mais assertivas',
-  description: 'Ferramenta de avaliação comportamental para processos seletivos. Crie vagas, defina perfis ideais e avalie candidatos com DISC e Temperamentos.',
+  name: 'Nello Business',
+  tagline: 'Plataforma de Inteligência Humana para Empresas',
+  description: 'Integra recrutamento inteligente, diagnóstico comportamental e desenvolvimento humano em uma única plataforma corporativa.',
   
   // What the product delivers (can be mentioned)
   delivers: [
-    'Criação de vagas com link público',
-    'Avaliação DISC + Temperamentos',
+    // Recrutamento Inteligente
+    'Criação de vagas com perfil comportamental ideal',
+    'Avaliação DISC + Temperamentos para candidatos',
     'Relatório individual por candidato',
-    'Comparação candidato x perfil ideal',
+    'Comparação candidato x perfil ideal da função',
+    // Inteligência Organizacional
+    'Visão comportamental da equipe',
+    'Decisões baseadas em dados humanos',
+    'Redução estratégica de turnover',
+    // Base para Desenvolvimento Contínuo
+    'Integração futura com acompanhamento profissional',
+    'Evolução comportamental dos colaboradores',
   ],
   
   // What the product does NOT deliver (cannot be mentioned)
   doesNotDeliver: [
-    'Gestão de equipes existentes',
-    'Insights de colaboradores',
-    'Relatórios consolidados de empresa',
     'Integrações ATS',
     'API',
-    'People Analytics',
-    'Inteligência artificial',
+    'People Analytics avançado',
   ],
 } as const;
 
