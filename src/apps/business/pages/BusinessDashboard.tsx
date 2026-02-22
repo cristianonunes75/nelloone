@@ -4,9 +4,11 @@ import {
   ArrowUpRight,
   Briefcase,
   ClipboardList,
-  Target
+  Target,
+  BookOpen
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
@@ -15,6 +17,7 @@ import { SubscriptionStatusCard } from '../components/SubscriptionStatusCard';
 import { BlockedAccessOverlay } from '../components/BlockedAccessOverlay';
 import { supabase } from '@/integrations/supabase/client';
 import { PRODUCT_IDENTITY } from '../config/featureFlags';
+import { BusinessProgramsTab } from '../components/BusinessProgramsTab';
 
 interface DashboardStats {
   activeJobs: number;
@@ -235,20 +238,37 @@ export default function BusinessDashboard() {
           </Card>
         </div>
 
-        {/* Product Info Card */}
-        <Card className="bg-muted/30 border-dashed">
-          <CardContent className="flex items-start gap-4 pt-6">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Target className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h4 className="font-medium mb-1">{PRODUCT_IDENTITY.name}</h4>
-              <p className="text-sm text-muted-foreground">
-                {PRODUCT_IDENTITY.description}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Tabs: Overview + Programs */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+            <TabsTrigger value="programs">
+              <BookOpen className="w-4 h-4 mr-1" />
+              Programas Praxis
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview">
+            {/* Product Info Card */}
+            <Card className="bg-muted/30 border-dashed">
+              <CardContent className="flex items-start gap-4 pt-6">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Target className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-medium mb-1">{PRODUCT_IDENTITY.name}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {PRODUCT_IDENTITY.description}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="programs">
+            <BusinessProgramsTab />
+          </TabsContent>
+        </Tabs>
       </div>
     </BusinessLayout>
   );

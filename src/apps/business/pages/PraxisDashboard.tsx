@@ -15,7 +15,8 @@ import {
   CheckCircle2,
   ListTodo,
   BookOpen,
-  Lightbulb
+  Lightbulb,
+  Building2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,6 +38,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { PraxisClientDialog } from '../components/PraxisClientDialog';
+import { PraxisCompaniesTab } from '../components/PraxisCompaniesTab';
 
 export default function PraxisDashboard() {
   const { signOut } = useAuth();
@@ -200,6 +202,10 @@ export default function PraxisDashboard() {
         <Tabs defaultValue="clients" className="space-y-6">
           <TabsList>
             <TabsTrigger value="clients">Clientes</TabsTrigger>
+            <TabsTrigger value="companies">
+              <Building2 className="w-4 h-4 mr-1" />
+              Empresas
+            </TabsTrigger>
             <TabsTrigger value="tasks">Tarefas</TabsTrigger>
             <TabsTrigger value="reflections">Reflexões</TabsTrigger>
           </TabsList>
@@ -385,6 +391,11 @@ export default function PraxisDashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Companies Tab */}
+          <TabsContent value="companies">
+            <PraxisCompaniesTab />
           </TabsContent>
         </Tabs>
       </div>
