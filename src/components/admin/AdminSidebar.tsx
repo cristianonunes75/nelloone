@@ -32,6 +32,7 @@ import {
   Heart,
   Mail,
   ShieldCheck,
+  Cpu,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -67,6 +68,7 @@ const menuSections: MenuSection[] = [
   {
     label: "MÉTRICAS",
     items: [
+      { title: "Control Center", url: "/admin/control-center", icon: Cpu, permission: 'super_admin_only' },
       { title: "Dashboard", url: "/admin", icon: Home, exact: true, permission: 'can_view_reports' },
       { title: "Business", url: "/admin/business", icon: Building2, permission: 'can_view_reports' },
       { title: "Tempo Real", url: "/admin/tempo-real", icon: Zap, permission: 'can_view_reports' },

@@ -54,6 +54,7 @@ const AdminDiscernirCasais = lazy(() => import("@/components/admin/discernir/Adm
 const AdminDiscernirConvites = lazy(() => import("@/components/admin/discernir/AdminDiscernirConvites"));
 const AdminDiscernirConsentimentos = lazy(() => import("@/components/admin/discernir/AdminDiscernirConsentimentos"));
 const AdminDiscernirAcessos = lazy(() => import("@/components/admin/discernir/AdminDiscernirAcessos"));
+const AdminControlCenter = lazy(() => import("@/components/admin/AdminControlCenter"));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -231,6 +232,13 @@ const Admin = () => {
                 <Route path="discernir/acessos" element={
                   <AdminGuard isSuperAdminOnly fallbackMessage="O módulo DISCERNIR é restrito a Super Admins.">
                     <AdminDiscernirAcessos />
+                  </AdminGuard>
+                } />
+                
+                {/* Control Center - Super Admin only */}
+                <Route path="control-center" element={
+                  <AdminGuard isSuperAdminOnly fallbackMessage="O Control Center é restrito a Super Admins.">
+                    <AdminControlCenter />
                   </AdminGuard>
                 } />
                 
