@@ -1,123 +1,85 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
-import { Json } from '@/integrations/supabase/types';
+/**
+ * @deprecated This module is deprecated. Use useOperatorWorkspace instead.
+ * 
+ * The professional_profiles table has been superseded by operator_workspaces.
+ * This file now serves as a thin compatibility layer that delegates to useOperatorWorkspace.
+ * All new code should use useOperatorWorkspace directly.
+ * 
+ * See: /docs/praxis/DOMAIN_MIGRATION.md
+ */
 
-interface ProfessionalProfile {
-  id: string;
-  user_id: string;
-  mode: string;
-  business_name: string | null;
-  specialty: string | null;
-  bio: string | null;
-  avatar_url: string | null;
-  website: string | null;
-  phone: string | null;
-  settings: Json;
-  subscription_tier: string;
-  subscription_status: string;
-  trial_ends_at: string | null;
-  current_clients: number;
-  max_clients: number;
-  created_at: string;
-  updated_at: string;
-}
+import { ReactNode } from 'react';
+import { useOperatorWorkspace, OperatorProvider } from './useOperatorWorkspace';
 
-interface PraxisAuthContextType {
-  professionalProfile: ProfessionalProfile | null;
-  isProfessional: boolean;
-  isLoading: boolean;
-  needsOnboarding: boolean;
-  refetch: () => Promise<void>;
-  createProfile: (data: Partial<ProfessionalProfile>) => Promise<ProfessionalProfile | null>;
-}
-
-const PraxisAuthContext = createContext<PraxisAuthContextType | undefined>(undefined);
-
+/**
+ * @deprecated Use OperatorProvider instead
+ */
 export function PraxisAuthProvider({ children }: { children: ReactNode }) {
-  const { user, isLoading: authLoading } = useAuth();
-  const [professionalProfile, setProfessionalProfile] = useState<ProfessionalProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // Simply pass through — OperatorProvider is the real provider now.
+  // This wrapper exists only for backward compatibility during migration.
+  return <>{children}</>;
+}
 
-  const fetchProfile = useCallback(async () => {
-    if (!user?.id) {
-      setProfessionalProfile(null);
-      setIsLoading(false);
-      return;
-    }
+/**
+ * @deprecated Use useOperatorWorkspace instead
+ * 
+ * Returns a compatibility shim that maps operator workspace fields
+ * to the old professionalProfile interface.
+ */
+export function usePraxisAuth() {
+  const { workspace, isOperator, isLoading, needsOnboarding, createWorkspace, refetch } = useOperatorWorkspace();
 
-    try {
-      const { data, error } = await supabase
-        .from('professional_profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+  // Map workspace to legacy professionalProfile shape
+  const professionalProfile = workspace ? {
+    id: workspace.id,
+    user_id: workspace.user_id,
+    mode: 'praxis' as const,
+    business_name: workspace.display_name,
+    specialty: null,
+    bio: null,
+    avatar_url: null,
+    website: null,
+    phone: null,
+    settings: workspace.settings,
+    subscription_tier: 'free',
+    subscription_status: 'active',
+    trial_ends_at: null,
+    current_clients: 0,
+    max_clients: 100,
+    created_at: workspace.created_at,
+    updated_at: workspace.updated_at,
+  } : null;
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching professional profile:', error);
-      }
-
-      setProfessionalProfile(data as ProfessionalProfile | null);
-    } catch (err) {
-      console.error('Error in fetchProfile:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user?.id]);
-
-  useEffect(() => {
-    if (!authLoading) {
-      fetchProfile();
-    }
-  }, [authLoading, fetchProfile]);
-
-  const createProfile = async (data: Partial<ProfessionalProfile>): Promise<ProfessionalProfile | null> => {
-    if (!user?.id) return null;
-
-    try {
-      const { data: newProfile, error } = await supabase
-        .from('professional_profiles')
-        .insert({
-          user_id: user.id,
-          mode: 'praxis',
-          business_name: data.business_name || null,
-          specialty: data.specialty || null,
-          bio: data.bio || null,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      
-      const profile = newProfile as ProfessionalProfile;
-      setProfessionalProfile(profile);
-      return profile;
-    } catch (err) {
-      console.error('Error creating professional profile:', err);
-      return null;
-    }
+  const createProfile = async (data: { business_name?: string; specialty?: string; bio?: string }) => {
+    const ws = await createWorkspace({ display_name: data.business_name || 'Minha Prática' });
+    if (!ws) return null;
+    return {
+      id: ws.id,
+      user_id: ws.user_id,
+      mode: 'praxis' as const,
+      business_name: ws.display_name,
+      specialty: data.specialty || null,
+      bio: data.bio || null,
+      avatar_url: null,
+      website: null,
+      phone: null,
+      settings: ws.settings,
+      subscription_tier: 'free',
+      subscription_status: 'active',
+      trial_ends_at: null,
+      current_clients: 0,
+      max_clients: 100,
+      created_at: ws.created_at,
+      updated_at: ws.updated_at,
+    };
   };
 
-  const value: PraxisAuthContextType = {
+  return {
     professionalProfile,
-    isProfessional: !!professionalProfile,
-    isLoading: authLoading || isLoading,
-    needsOnboarding: !!user && !professionalProfile && !isLoading && !authLoading,
-    refetch: fetchProfile,
+    isProfessional: isOperator,
+    isLoading,
+    needsOnboarding,
+    refetch,
     createProfile,
   };
-
-  return (
-    <PraxisAuthContext.Provider value={value}>
-      {children}
-    </PraxisAuthContext.Provider>
-  );
-}
-
-export function usePraxisAuth() {
-  const context = useContext(PraxisAuthContext);
-  if (context === undefined) {
-    throw new Error('usePraxisAuth must be used within a PraxisAuthProvider');
-  }
-  return context;
 }

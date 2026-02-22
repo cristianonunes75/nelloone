@@ -28,7 +28,6 @@ import PraxisAuth from './pages/PraxisAuth';
 import PraxisOnboarding from './pages/PraxisOnboarding';
 import PraxisDashboard from './pages/PraxisDashboard';
 import PraxisClientDetail from './pages/PraxisClientDetail';
-import { PraxisAuthProvider } from './hooks/usePraxisAuth';
 import { OperatorProvider } from './hooks/useOperatorWorkspace';
 
 /**
@@ -139,15 +138,13 @@ export default function BusinessApp() {
           <Route path="/praxis" element={<PraxisLanding />} />
           <Route path="/praxis/auth" element={<PraxisAuth />} />
           <Route path="/praxis/*" element={
-            <PraxisAuthProvider>
-              <OperatorProvider>
-                <Routes>
-                  <Route path="/onboarding" element={<PraxisOnboarding />} />
-                  <Route path="/dashboard" element={<PraxisDashboard />} />
-                  <Route path="/clients/:clientId" element={<PraxisClientDetail />} />
-                </Routes>
-              </OperatorProvider>
-            </PraxisAuthProvider>
+            <OperatorProvider>
+              <Routes>
+                <Route path="/onboarding" element={<PraxisOnboarding />} />
+                <Route path="/dashboard" element={<PraxisDashboard />} />
+                <Route path="/clients/:clientId" element={<PraxisClientDetail />} />
+              </Routes>
+            </OperatorProvider>
           } />
         </>
       ) : (
