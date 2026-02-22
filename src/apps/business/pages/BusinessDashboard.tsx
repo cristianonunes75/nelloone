@@ -22,6 +22,8 @@ import { PRODUCT_IDENTITY } from '../config/featureFlags';
 import { BusinessProgramsTab } from '../components/BusinessProgramsTab';
 import { TeamInsightsTab } from '../components/TeamInsightsTab';
 import { SeatManagementCard } from '../components/SeatManagementCard';
+import { OrganizationalImpactTab } from '../components/OrganizationalImpactTab';
+import { CompanyReferralsSection } from '../components/CompanyReferralsSection';
 
 interface DashboardStats {
   activeJobs: number;
@@ -244,8 +246,12 @@ export default function BusinessDashboard() {
 
         {/* Tabs: Overview + Programs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList>
+          <TabsList className="flex flex-wrap">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+            <TabsTrigger value="impact">
+              <Target className="w-4 h-4 mr-1" />
+              Impacto
+            </TabsTrigger>
             <TabsTrigger value="licenses">
               <Users className="w-4 h-4 mr-1" />
               Licenças
@@ -275,6 +281,13 @@ export default function BusinessDashboard() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="impact">
+            <div className="space-y-6">
+              <OrganizationalImpactTab />
+              <CompanyReferralsSection />
+            </div>
           </TabsContent>
 
           <TabsContent value="licenses">
