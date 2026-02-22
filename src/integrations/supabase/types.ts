@@ -3872,6 +3872,77 @@ export type Database = {
           },
         ]
       }
+      operator_milestones: {
+        Row: {
+          client_id: string
+          created_at: string
+          description: string | null
+          id: string
+          legacy_milestone_id: string | null
+          milestone_date: string
+          milestone_type: string | null
+          operator_id: string
+          relationship_id: string | null
+          session_id: string | null
+          title: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          legacy_milestone_id?: string | null
+          milestone_date?: string
+          milestone_type?: string | null
+          operator_id: string
+          relationship_id?: string | null
+          session_id?: string | null
+          title: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          legacy_milestone_id?: string | null
+          milestone_date?: string
+          milestone_type?: string | null
+          operator_id?: string
+          relationship_id?: string | null
+          session_id?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operator_milestones_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "professional_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operator_milestones_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "operator_workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operator_milestones_relationship_id_fkey"
+            columns: ["relationship_id"]
+            isOneToOne: false
+            referencedRelation: "client_operator_relationships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operator_milestones_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "operator_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       operator_reflections: {
         Row: {
           client_id: string
@@ -3933,6 +4004,154 @@ export type Database = {
             columns: ["session_id"]
             isOneToOne: false
             referencedRelation: "client_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operator_session_notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          note_type: string
+          operator_id: string
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          note_type?: string
+          operator_id: string
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          note_type?: string
+          operator_id?: string
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operator_session_notes_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "operator_workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operator_session_notes_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "operator_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operator_sessions: {
+        Row: {
+          ai_generated_at: string | null
+          ai_suggestions: Json | null
+          attention_points: string | null
+          client_id: string
+          created_at: string
+          currency: string | null
+          duration_minutes: number
+          id: string
+          insights: string | null
+          legacy_session_id: string | null
+          notes: string | null
+          objectives: string | null
+          operator_id: string
+          paid_at: string | null
+          payment_status: string | null
+          relationship_id: string | null
+          session_date: string
+          session_rate: number | null
+          session_type: string
+          status: string
+          tags: string[] | null
+          tasks_for_client: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          ai_generated_at?: string | null
+          ai_suggestions?: Json | null
+          attention_points?: string | null
+          client_id: string
+          created_at?: string
+          currency?: string | null
+          duration_minutes?: number
+          id?: string
+          insights?: string | null
+          legacy_session_id?: string | null
+          notes?: string | null
+          objectives?: string | null
+          operator_id: string
+          paid_at?: string | null
+          payment_status?: string | null
+          relationship_id?: string | null
+          session_date?: string
+          session_rate?: number | null
+          session_type?: string
+          status?: string
+          tags?: string[] | null
+          tasks_for_client?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          ai_generated_at?: string | null
+          ai_suggestions?: Json | null
+          attention_points?: string | null
+          client_id?: string
+          created_at?: string
+          currency?: string | null
+          duration_minutes?: number
+          id?: string
+          insights?: string | null
+          legacy_session_id?: string | null
+          notes?: string | null
+          objectives?: string | null
+          operator_id?: string
+          paid_at?: string | null
+          payment_status?: string | null
+          relationship_id?: string | null
+          session_date?: string
+          session_rate?: number | null
+          session_type?: string
+          status?: string
+          tags?: string[] | null
+          tasks_for_client?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operator_sessions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "professional_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operator_sessions_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "operator_workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operator_sessions_relationship_id_fkey"
+            columns: ["relationship_id"]
+            isOneToOne: false
+            referencedRelation: "client_operator_relationships"
             referencedColumns: ["id"]
           },
         ]

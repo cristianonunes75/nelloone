@@ -1,10 +1,9 @@
 /**
  * Client and Session management hooks for Nello Praxis.
  * 
- * MIGRATED: Now uses operator_workspaces (via useOperatorWorkspace) as the
- * source of truth for professional identity. The professional_clients table
- * is still used for data storage but the professional_id column maps to
- * the operator workspace id.
+ * MIGRATED (v2): Sessions now use operator_sessions table.
+ * Milestones now use operator_milestones table.
+ * Legacy client_sessions/client_milestones are read-only.
  * 
  * See: /docs/praxis/DOMAIN_MIGRATION.md
  */
@@ -40,7 +39,7 @@ export interface PraxisClient {
 export interface ClientSession {
   id: string;
   client_id: string;
-  professional_id: string;
+  operator_id: string;
   title: string;
   session_date: string;
   duration_minutes: number;
@@ -60,6 +59,19 @@ export interface ClientSession {
   paid_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface OperatorMilestone {
+  id: string;
+  operator_id: string;
+  client_id: string;
+  relationship_id: string | null;
+  session_id: string | null;
+  title: string;
+  description: string | null;
+  milestone_type: string;
+  milestone_date: string;
+  created_at: string;
 }
 
 export function usePraxisClients() {
@@ -189,6 +201,9 @@ export function usePraxisClients() {
   };
 }
 
+/**
+ * Sessions hook - NOW USES operator_sessions table
+ */
 export function usePraxisSessions(clientId: string | null) {
   const { workspace } = useOperatorWorkspace();
   const [sessions, setSessions] = useState<ClientSession[]>([]);
@@ -205,9 +220,9 @@ export function usePraxisSessions(clientId: string | null) {
 
     try {
       const { data, error } = await supabase
-        .from('client_sessions')
+        .from('operator_sessions')
         .select('*')
-        .eq('professional_id', operatorId)
+        .eq('operator_id', operatorId)
         .eq('client_id', clientId)
         .order('session_date', { ascending: false });
 
@@ -230,9 +245,9 @@ export function usePraxisSessions(clientId: string | null) {
 
     try {
       const { data: newSession, error } = await supabase
-        .from('client_sessions')
+        .from('operator_sessions')
         .insert({
-          professional_id: operatorId,
+          operator_id: operatorId,
           client_id: clientId,
           title: data.title || 'Nova Sessão',
           session_date: data.session_date || new Date().toISOString(),
@@ -279,7 +294,7 @@ export function usePraxisSessions(clientId: string | null) {
       if (data.tags !== undefined) updateData.tags = data.tags;
 
       const { error } = await supabase
-        .from('client_sessions')
+        .from('operator_sessions')
         .update(updateData)
         .eq('id', id);
 
@@ -298,7 +313,7 @@ export function usePraxisSessions(clientId: string | null) {
   const deleteSession = async (id: string): Promise<boolean> => {
     try {
       const { error } = await supabase
-        .from('client_sessions')
+        .from('operator_sessions')
         .delete()
         .eq('id', id);
 
@@ -314,12 +329,115 @@ export function usePraxisSessions(clientId: string | null) {
     }
   };
 
+  // Upcoming sessions (scheduled, future date)
+  const upcomingSessions = sessions.filter(
+    s => s.status === 'scheduled' && new Date(s.session_date) >= new Date()
+  );
+
+  const completedSessions = sessions.filter(s => s.status === 'completed');
+
   return {
     sessions,
+    upcomingSessions,
+    completedSessions,
     isLoading,
     refetch: fetchSessions,
     createSession,
     updateSession,
     deleteSession,
+  };
+}
+
+/**
+ * Milestones hook - uses operator_milestones table
+ */
+export function usePraxisMilestones(clientId: string | null) {
+  const { workspace } = useOperatorWorkspace();
+  const [milestones, setMilestones] = useState<OperatorMilestone[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const operatorId = workspace?.id;
+
+  const fetchMilestones = useCallback(async () => {
+    if (!operatorId || !clientId) {
+      setMilestones([]);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('operator_milestones')
+        .select('*')
+        .eq('operator_id', operatorId)
+        .eq('client_id', clientId)
+        .order('milestone_date', { ascending: false });
+
+      if (error) throw error;
+      setMilestones((data || []) as OperatorMilestone[]);
+    } catch (err) {
+      console.error('Error fetching milestones:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [operatorId, clientId]);
+
+  useEffect(() => { fetchMilestones(); }, [fetchMilestones]);
+
+  const createMilestone = async (data: Partial<OperatorMilestone>): Promise<OperatorMilestone | null> => {
+    if (!operatorId || !clientId) return null;
+
+    try {
+      const { data: newMilestone, error } = await supabase
+        .from('operator_milestones')
+        .insert({
+          operator_id: operatorId,
+          client_id: clientId,
+          title: data.title || '',
+          description: data.description,
+          milestone_type: data.milestone_type || 'achievement',
+          milestone_date: data.milestone_date || new Date().toISOString(),
+          session_id: data.session_id,
+          relationship_id: data.relationship_id,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      const milestone = newMilestone as OperatorMilestone;
+      setMilestones(prev => [milestone, ...prev]);
+      toast.success('Marco adicionado');
+      return milestone;
+    } catch (err) {
+      console.error('Error creating milestone:', err);
+      toast.error('Erro ao criar marco');
+      return null;
+    }
+  };
+
+  const deleteMilestone = async (id: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('operator_milestones')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setMilestones(prev => prev.filter(m => m.id !== id));
+      toast.success('Marco removido');
+      return true;
+    } catch (err) {
+      console.error('Error deleting milestone:', err);
+      toast.error('Erro ao remover marco');
+      return false;
+    }
+  };
+
+  return {
+    milestones,
+    isLoading,
+    refetch: fetchMilestones,
+    createMilestone,
+    deleteMilestone,
   };
 }
