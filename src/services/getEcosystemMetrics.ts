@@ -84,6 +84,7 @@ export async function getEcosystemMetrics(): Promise<EcosystemMetrics> {
   const activeModules: string[] = ['Identity'];
   if (activeOperators > 0) activeModules.push('Praxis');
   if (totalCompanies > 0) activeModules.push('Business');
+  if (totalCompanies > 0) activeModules.push('Hiring');
   activeModules.push('Discernir');
 
   const totalSubs = activeSubs + cancelledSubs;

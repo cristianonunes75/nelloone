@@ -73,24 +73,58 @@ function SectionHeader({ icon, title, badge }: { icon: React.ReactNode; title: s
   );
 }
 
-// ─── Module Status Indicator ────────────────────────────
+// ─── Platform Classification ────────────────────────────
+
+const CORE_PLATFORM = ['Identity', 'Praxis', 'Business', 'Hiring'];
+const VERTICAL_PRODUCTS: { name: string; category: string }[] = [
+  { name: 'Discernir', category: 'Pastoral' },
+];
 
 function ModuleStatus({ modules }: { modules: string[] }) {
   const moduleColors: Record<string, string> = {
     Identity: 'bg-primary',
     Praxis: 'bg-emerald-500',
     Business: 'bg-amber-500',
+    Hiring: 'bg-violet-500',
     Discernir: 'bg-sky-500',
   };
 
+  const coreActive = modules.filter(m => CORE_PLATFORM.includes(m));
+  const verticalsActive = VERTICAL_PRODUCTS.filter(v => modules.includes(v.name));
+
   return (
-    <div className="flex flex-wrap gap-2">
-      {modules.map(mod => (
-        <div key={mod} className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border/50 bg-card">
-          <div className={`w-2 h-2 rounded-full ${moduleColors[mod] || 'bg-muted-foreground'}`} />
-          <span className="text-xs font-medium text-foreground/80">{mod}</span>
+    <div className="space-y-3">
+      {/* Platform Core */}
+      <div className="flex items-center gap-3">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 min-w-[100px]">Platform Core</span>
+        <div className="flex flex-wrap gap-2">
+          {CORE_PLATFORM.map(mod => {
+            const isActive = coreActive.includes(mod);
+            return (
+              <div key={mod} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${isActive ? 'border-border/50 bg-card' : 'border-border/20 bg-muted/30 opacity-50'}`}>
+                <div className={`w-2 h-2 rounded-full ${isActive ? (moduleColors[mod] || 'bg-muted-foreground') : 'bg-muted-foreground/40'}`} />
+                <span className="text-xs font-medium text-foreground/80">{mod}</span>
+              </div>
+            );
+          })}
         </div>
-      ))}
+      </div>
+      {/* Active Verticals */}
+      <div className="flex items-center gap-3">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 min-w-[100px]">Verticals</span>
+        <div className="flex flex-wrap gap-2">
+          {VERTICAL_PRODUCTS.map(v => {
+            const isActive = verticalsActive.some(av => av.name === v.name);
+            return (
+              <div key={v.name} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${isActive ? 'border-border/50 bg-card' : 'border-border/20 bg-muted/30 opacity-50'}`}>
+                <div className={`w-2 h-2 rounded-full ${isActive ? (moduleColors[v.name] || 'bg-muted-foreground') : 'bg-muted-foreground/40'}`} />
+                <span className="text-xs font-medium text-foreground/80">{v.name}</span>
+                <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 ml-0.5">{v.category}</Badge>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
@@ -171,11 +205,20 @@ export function AdminControlCenter() {
         </Button>
       </div>
 
-      {/* Active Modules */}
-      <div className="flex items-center gap-4">
-        <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Módulos ativos</span>
+      {/* Module Classification */}
+      <div>
         <ModuleStatus modules={metrics.system.activeModules} />
       </div>
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* PLATFORM CORE                              */}
+      {/* ═══════════════════════════════════════════ */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <div className="h-px flex-1 bg-border/40" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Platform Core</span>
+          <div className="h-px flex-1 bg-border/40" />
+        </div>
 
       {/* ── USERS ──────────────────────────────── */}
       <section>
@@ -274,8 +317,39 @@ export function AdminControlCenter() {
           />
         </div>
       </section>
+      </div>{/* end Platform Core */}
 
-      {/* ── FINANCIAL ──────────────────────────── */}
+      {/* ═══════════════════════════════════════════ */}
+      {/* ACTIVE VERTICALS                           */}
+      {/* ═══════════════════════════════════════════ */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <div className="h-px flex-1 bg-border/40" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Active Verticals</span>
+          <div className="h-px flex-1 bg-border/40" />
+        </div>
+
+        {/* Discernir placeholder */}
+        <section>
+          <SectionHeader icon={<BookOpen className="w-4 h-4" />} title="Discernir" badge="Pastoral" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <MetricCard
+              label="Testes completados"
+              value={metrics.users.activeUsers}
+              icon={<Activity className="w-4 h-4" />}
+              accent="bg-sky-500"
+            />
+            <MetricCard
+              label="Códigos ativados"
+              value={metrics.users.codigosEssenciaAtivados.toLocaleString('pt-BR')}
+              icon={<Zap className="w-4 h-4" />}
+              accent="bg-sky-500"
+            />
+          </div>
+        </section>
+      </div>{/* end Active Verticals */}
+
+      {/* ── FINANCIAL (cross-platform) ─────────── */}
       <section>
         <SectionHeader icon={<DollarSign className="w-4 h-4" />} title="Financeiro" badge="Receita" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
