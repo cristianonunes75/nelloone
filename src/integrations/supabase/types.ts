@@ -1398,6 +1398,100 @@ export type Database = {
           },
         ]
       }
+      company_badges: {
+        Row: {
+          awarded_at: string
+          badge_name: string
+          badge_type: string
+          company_id: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          metadata: Json | null
+        }
+        Insert: {
+          awarded_at?: string
+          badge_name: string
+          badge_type?: string
+          company_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+        }
+        Update: {
+          awarded_at?: string
+          badge_name?: string
+          badge_type?: string
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_badges_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_executive_reports: {
+        Row: {
+          company_id: string
+          created_at: string
+          generated_by: string
+          id: string
+          is_public_active: boolean | null
+          pdf_storage_path: string | null
+          public_expires_at: string | null
+          public_token: string | null
+          report_data: Json
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          generated_by: string
+          id?: string
+          is_public_active?: boolean | null
+          pdf_storage_path?: string | null
+          public_expires_at?: string | null
+          public_token?: string | null
+          report_data?: Json
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          generated_by?: string
+          id?: string
+          is_public_active?: boolean | null
+          pdf_storage_path?: string | null
+          public_expires_at?: string | null
+          public_token?: string | null
+          report_data?: Json
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_executive_reports_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_invites: {
         Row: {
           accepted_at: string | null
@@ -1626,6 +1720,82 @@ export type Database = {
             columns: ["operator_workspace_id"]
             isOneToOne: false
             referencedRelation: "operator_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_referrals: {
+        Row: {
+          contact_email: string
+          contact_name: string | null
+          contact_phone: string | null
+          converted_at: string | null
+          converted_company_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          operator_id: string | null
+          operator_notified_at: string | null
+          referred_by: string
+          referred_company_name: string
+          referring_company_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          contact_email: string
+          contact_name?: string | null
+          contact_phone?: string | null
+          converted_at?: string | null
+          converted_company_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          operator_id?: string | null
+          operator_notified_at?: string | null
+          referred_by: string
+          referred_company_name: string
+          referring_company_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          contact_email?: string
+          contact_name?: string | null
+          contact_phone?: string | null
+          converted_at?: string | null
+          converted_company_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          operator_id?: string | null
+          operator_notified_at?: string | null
+          referred_by?: string
+          referred_company_name?: string
+          referring_company_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_referrals_converted_company_id_fkey"
+            columns: ["converted_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_referrals_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "operator_workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_referrals_referring_company_id_fkey"
+            columns: ["referring_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
