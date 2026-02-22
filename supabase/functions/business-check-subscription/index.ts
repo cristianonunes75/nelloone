@@ -13,11 +13,14 @@ const logStep = (step: string, details?: Record<string, unknown>) => {
 };
 
 // Business pricing tiers
-const BUSINESS_TIERS = {
+const BUSINESS_TIERS: Record<string, { name: string; maxCollaborators: number }> = {
   'prod_TlWOSYdR3XRj2e': { name: 'starter', maxCollaborators: 10 },
   'prod_TlWOSs5LczNGxr': { name: 'growth', maxCollaborators: 30 },
   'prod_TlWOhSZJpVB1Xe': { name: 'enterprise', maxCollaborators: 100 },
 };
+
+// Identity Corporate License - per-seat product
+const CORPORATE_PRODUCT_ID = 'prod_U1f2EgCZazEoN9';
 
 const TRIAL_DURATION_DAYS = 14;
 
@@ -169,11 +172,18 @@ serve(async (req) => {
       status = 'active';
       
       const productId = subscription.items.data[0].price.product as string;
-      const tierInfo = BUSINESS_TIERS[productId as keyof typeof BUSINESS_TIERS];
+      const quantity = subscription.items.data[0].quantity || 1;
       
-      if (tierInfo) {
-        tier = tierInfo.name;
-        maxCollaborators = tierInfo.maxCollaborators;
+      if (productId === CORPORATE_PRODUCT_ID) {
+        // Per-seat corporate license
+        tier = 'corporate';
+        maxCollaborators = quantity; // seats = quantity
+      } else {
+        const tierInfo = BUSINESS_TIERS[productId];
+        if (tierInfo) {
+          tier = tierInfo.name;
+          maxCollaborators = tierInfo.maxCollaborators;
+        }
       }
 
       logStep("Active subscription found", { 
@@ -222,6 +232,8 @@ serve(async (req) => {
         stripe_subscription_id: stripeSubscriptionId,
         current_collaborators: currentCollaborators,
         max_collaborators: maxCollaborators,
+        seats_total: maxCollaborators,
+        seats_used: currentCollaborators,
         plan_tier: tier,
         current_period_end: subscriptionEnd,
         updated_at: new Date().toISOString(),

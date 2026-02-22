@@ -1678,8 +1678,11 @@ export type Database = {
           discount_percent: number | null
           id: string
           max_collaborators: number | null
+          operator_id: string | null
           plan_tier: string | null
           price_per_collaborator: number | null
+          seats_total: number | null
+          seats_used: number | null
           status:
             | Database["public"]["Enums"]["company_subscription_status"]
             | null
@@ -1696,8 +1699,11 @@ export type Database = {
           discount_percent?: number | null
           id?: string
           max_collaborators?: number | null
+          operator_id?: string | null
           plan_tier?: string | null
           price_per_collaborator?: number | null
+          seats_total?: number | null
+          seats_used?: number | null
           status?:
             | Database["public"]["Enums"]["company_subscription_status"]
             | null
@@ -1714,8 +1720,11 @@ export type Database = {
           discount_percent?: number | null
           id?: string
           max_collaborators?: number | null
+          operator_id?: string | null
           plan_tier?: string | null
           price_per_collaborator?: number | null
+          seats_total?: number | null
+          seats_used?: number | null
           status?:
             | Database["public"]["Enums"]["company_subscription_status"]
             | null
@@ -1729,6 +1738,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_subscriptions_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "operator_workspaces"
             referencedColumns: ["id"]
           },
         ]
