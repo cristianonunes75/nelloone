@@ -4069,8 +4069,10 @@ export type Database = {
           created_at: string
           generation_metadata: Json | null
           id: string
+          is_shared_with_professionals: boolean
           raw_content: string | null
           sections: Json
+          shared_at: string | null
           updated_at: string
           user_id: string
           version: number | null
@@ -4079,8 +4081,10 @@ export type Database = {
           created_at?: string
           generation_metadata?: Json | null
           id?: string
+          is_shared_with_professionals?: boolean
           raw_content?: string | null
           sections?: Json
+          shared_at?: string | null
           updated_at?: string
           user_id: string
           version?: number | null
@@ -4089,8 +4093,10 @@ export type Database = {
           created_at?: string
           generation_metadata?: Json | null
           id?: string
+          is_shared_with_professionals?: boolean
           raw_content?: string | null
           sections?: Json
+          shared_at?: string | null
           updated_at?: string
           user_id?: string
           version?: number | null
