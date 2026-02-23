@@ -14,38 +14,38 @@ export const WhatYouGetSection = () => {
   const content = {
     pt: {
       title: "Por dentro do que você recebe",
-      subtitle: "Tudo o que você recebe no NELLO ONE:",
+      subtitle: "Tudo o que está incluído na sua jornada Identity:",
       items: [
-        { title: "7 testes profissionais", description: "Avaliações validadas cientificamente" },
-        { title: "Mapa completo de identidade", description: "Visão integrada de quem você é" },
-        { title: "Insights personalizados via IA", description: "Miguel analisa seus padrões" },
-        { title: "Recomendações práticas", description: "Ações concretas para evoluir" },
-        { title: "Evolução contínua", description: "Seu perfil cresce com você" },
-        { title: "Acesso vitalício", description: "Resultados sempre disponíveis" }
+        { title: "7 dimensões integradas", description: "Leitura completa da identidade humana" },
+        { title: "Mapa da identidade", description: "Visão integrada de quem você é" },
+        { title: "Síntese personalizada via IA", description: "Leitura guiada dos seus padrões" },
+        { title: "Orientações práticas", description: "Direções concretas para aplicar na vida" },
+        { title: "Evolução contínua", description: "Sua leitura cresce com você" },
+        { title: "Acesso contínuo", description: "Suas leituras sempre disponíveis" }
       ]
     },
     'pt-pt': {
       title: "Por dentro do que recebe",
-      subtitle: "Tudo o que recebe no NELLO ONE:",
+      subtitle: "Tudo o que está incluído na sua jornada Identity:",
       items: [
-        { title: "7 testes profissionais", description: "Avaliações validadas cientificamente" },
-        { title: "Mapa completo de identidade", description: "Visão integrada de quem é" },
-        { title: "Insights personalizados via IA", description: "Miguel analisa os seus padrões" },
-        { title: "Recomendações práticas", description: "Ações concretas para evoluir" },
-        { title: "Evolução contínua", description: "O seu perfil cresce consigo" },
-        { title: "Acesso vitalício", description: "Resultados sempre disponíveis" }
+        { title: "7 dimensões integradas", description: "Leitura completa da identidade humana" },
+        { title: "Mapa da identidade", description: "Visão integrada de quem é" },
+        { title: "Síntese personalizada via IA", description: "Leitura guiada dos seus padrões" },
+        { title: "Orientações práticas", description: "Direções concretas para evoluir" },
+        { title: "Evolução contínua", description: "A sua leitura cresce consigo" },
+        { title: "Acesso contínuo", description: "Leituras sempre disponíveis" }
       ]
     },
     en: {
       title: "Inside what you receive",
-      subtitle: "Everything you get with NELLO ONE:",
+      subtitle: "Everything included in your Identity journey:",
       items: [
-        { title: "7 professional tests", description: "Scientifically validated assessments" },
-        { title: "Complete identity map", description: "Integrated view of who you are" },
-        { title: "AI-powered insights", description: "Miguel analyzes your patterns" },
-        { title: "Practical recommendations", description: "Concrete actions for growth" },
-        { title: "Continuous evolution", description: "Your profile grows with you" },
-        { title: "Lifetime access", description: "Results always available" }
+        { title: "7 integrated dimensions", description: "Complete reading of human identity" },
+        { title: "Identity map", description: "Integrated view of who you are" },
+        { title: "AI-powered synthesis", description: "Guided reading of your patterns" },
+        { title: "Practical guidance", description: "Concrete directions for growth" },
+        { title: "Continuous evolution", description: "Your reading grows with you" },
+        { title: "Ongoing access", description: "Readings always available" }
       ]
     }
   };

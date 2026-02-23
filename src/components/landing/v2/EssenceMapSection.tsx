@@ -39,7 +39,7 @@ export const EssenceMapSection = () => {
               isVisible ? "opacity-100 translate-x-0" : "opacity-0 lg:-translate-x-8"
             )}>
               <span className="inline-block text-ink-blue font-medium text-xs md:text-sm tracking-wide uppercase mb-3 md:mb-4">
-                {language === 'en' ? 'The Final Result' : 'O Resultado Final'}
+                {language === 'en' ? 'Your Identity Synthesis' : 'Sua Síntese Identity'}
               </span>
               <h2 className="font-display text-2xl sm:text-display-sm md:text-display-md lg:text-display-lg text-foreground mb-4 md:mb-6">
                 {language === 'en' ? (
@@ -59,8 +59,8 @@ export const EssenceMapSection = () => {
               </p>
               <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8 leading-relaxed">
                 {language === 'en' 
-                  ? 'After completing the 7 tests, Nello synthesizes all your results into a single, personalized document: the NELLO IDENTITY Map. The panel that brings all your results together in a clear and visual map.'
-                  : 'Ao completar os 7 testes, Nello sintetiza todos os seus resultados em um documento único e personalizado: o Mapa NELLO IDENTITY. O painel que une todos os seus resultados em um mapa claro e visual.'}
+                  ? 'After completing the 7 dimensions, Identity synthesizes all your readings into a single, personalized synthesis: a living map of who you are.'
+                  : 'Ao completar as 7 dimensões, o Identity sintetiza todas as suas leituras em uma síntese viva e personalizada: o mapa da sua identidade.'}
               </p>
 
               <div className="space-y-2 md:space-y-3 mb-8 md:mb-10">
@@ -129,7 +129,7 @@ export const EssenceMapSection = () => {
                   isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                 )}>
                   <span className="text-xs md:text-sm font-medium text-ink-blue">
-                    {language === 'en' ? 'Personalized PDF' : 'PDF Personalizado'}
+                    {language === 'en' ? 'Living Synthesis' : 'Síntese Viva'}
                   </span>
                 </div>
               </div>

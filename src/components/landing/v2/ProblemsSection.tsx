@@ -10,7 +10,7 @@ const problemIcons = [AlertCircle, Brain, Target, MessageCircle, Focus, RotateCc
 
 const content = {
   pt: {
-    title: "Desafios que o NELLO ONE ilumina",
+    title: "Desafios que o Identity ilumina",
     subtitle: "Autoconhecimento transforma, mas pode ser confuso quando você não sabe por onde começar.",
     problems: [
       "Sensação de estar perdido, sem direção ou propósito",
@@ -22,10 +22,10 @@ const content = {
       "Saber seus talentos, mas não saber como usá-los",
       "Insegurança sobre qual passo dar primeiro"
     ],
-    closing: "Com o NELLO ONE, você entende quem você é, por que age como age e como transformar o que já não serve mais."
+    closing: "Com o Identity, você entende quem você é, por que age como age e como transformar o que já não serve mais."
   },
   'pt-pt': {
-    title: "Desafios que o NELLO ONE ilumina",
+    title: "Desafios que o Identity ilumina",
     subtitle: "O autoconhecimento transforma, mas pode ser confuso quando não sabe por onde começar.",
     problems: [
       "Sensação de estar perdido, sem direção ou propósito",
@@ -37,10 +37,10 @@ const content = {
       "Saber os seus talentos, mas não saber como usá-los",
       "Insegurança sobre qual passo dar primeiro"
     ],
-    closing: "Com o NELLO ONE, entende quem é, por que age como age e como transformar o que já não o serve."
+    closing: "Com o Identity, entende quem é, por que age como age e como transformar o que já não o serve."
   },
   en: {
-    title: "Challenges NELLO ONE Illuminates",
+    title: "Challenges Identity Illuminates",
     subtitle: "Self-knowledge transforms, but it can be confusing when you don't know where to start.",
     problems: [
       "Feeling lost, without direction or purpose",
@@ -52,7 +52,7 @@ const content = {
       "Knowing your talents but not how to use them",
       "Uncertainty about which step to take first"
     ],
-    closing: "With NELLO ONE, you understand who you are, why you act the way you do, and how to transform what no longer serves you."
+    closing: "With Identity, you understand who you are, why you act the way you do, and how to transform what no longer serves you."
   }
 };
 

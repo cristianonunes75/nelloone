@@ -116,9 +116,14 @@ export const FooterSection = () => {
 
           {/* Bottom */}
           <div className="pt-6 md:pt-8 border-t border-bruma-deep/20 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4">
-            <p className="text-[10px] md:text-xs text-ink-blue/50 text-center md:text-left">
-              © {new Date().getFullYear()} Nello Identity — {language === 'en' ? 'All rights reserved' : 'Todos os direitos reservados'}
-            </p>
+            <div className="text-center md:text-left">
+              <p className="text-[10px] md:text-xs text-ink-blue/50">
+                © {new Date().getFullYear()} Nello Identity — {language === 'en' ? 'All rights reserved' : 'Todos os direitos reservados'}
+              </p>
+              <p className="text-[9px] text-ink-blue/30 mt-1 italic">
+                Identity — Arquitetura de Autoconhecimento Integrado
+              </p>
+            </div>
             <div className="flex items-center gap-3 md:gap-4 text-[10px] md:text-xs text-ink-blue/50">
               <Link to="/termos-de-servico" className="hover:text-ink-blue transition-colors">
                 {language === 'en' ? 'Terms' : 'Termos'}

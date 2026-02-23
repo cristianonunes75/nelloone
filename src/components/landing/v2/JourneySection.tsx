@@ -121,18 +121,18 @@ export const JourneySection = () => {
             >
               {language === 'en' ? (
                 <>
-                  Recognized tests,
-                  <span className="block">accessible language</span>
+                  Seven dimensions,
+                  <span className="block">one integrated reading</span>
                 </>
               ) : language === 'pt-pt' ? (
                 <>
-                  Testes reconhecidos,
-                  <span className="block">linguagem acessível</span>
+                  Sete dimensões,
+                  <span className="block">uma leitura integrada</span>
                 </>
               ) : (
                 <>
-                  Testes reconhecidos,
-                  <span className="block">linguagem acessível</span>
+                  Sete dimensões,
+                  <span className="block">uma leitura integrada</span>
                 </>
               )}
             </h2>
@@ -226,10 +226,10 @@ export const JourneySection = () => {
               <Check className="w-4 h-4 md:w-5 md:h-5" strokeWidth={1.5} />
               <span className="font-medium text-sm md:text-base">
                 {language === 'en' 
-                  ? 'At the end: your complete NELLO IDENTITY Map' 
+                  ? 'At the end: your complete Identity Map' 
                   : language === 'pt-pt'
-                  ? 'No final: o seu Mapa NELLO IDENTITY completo'
-                  : 'Ao final: seu Mapa NELLO IDENTITY completo'}
+                  ? 'No final: a sua síntese Identity completa'
+                  : 'Ao final: sua síntese Identity completa'}
               </span>
             </div>
           </div>
