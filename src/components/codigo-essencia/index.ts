@@ -46,3 +46,4 @@ export { CodigoTabs } from "./CodigoTabs";
 export { PremiumProgressBars } from "./PremiumProgressBars";
 export { AtivacaoTabContent } from "./AtivacaoTabContent";
 export { CodigoContentTabs } from "./CodigoContentTabs";
+export { ShareWithProfessionalCTA } from "./ShareWithProfessionalCTA";

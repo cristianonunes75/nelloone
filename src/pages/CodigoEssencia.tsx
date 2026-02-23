@@ -84,6 +84,7 @@ import {
   AtivacaoTabContent,
   AtivacaoEssenciaCTA,
   CodigoContentTabs,
+  ShareWithProfessionalCTA,
 } from "@/components/codigo-essencia";
 
 // LangKey now imported from codigoEssenciaFallbacks
@@ -1016,6 +1017,13 @@ const CodigoEssenciaInner = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Share with Professional CTA */}
+      {hasGenerated && user?.id && !isViewingOtherUser && (
+        <div className="container px-4 max-w-3xl mx-auto mt-6">
+          <ShareWithProfessionalCTA userId={user.id} language={lang} />
+        </div>
+      )}
 
       {/* Upsell: Show Ativação offer after viewing Código da Essência */}
       {hasGenerated && <CodigoEssenciaUpsell />}
