@@ -18,9 +18,9 @@ const improvementIcons = [Brain, MessageCircle, Target, Zap, Heart, Compass];
 
 const content = {
   pt: {
-    title: "Como o NELLO ONE ajuda você a melhorar",
-    subtitle: "O NELLO ONE não entrega apenas resultados, ele revela caminhos práticos de crescimento pessoal.",
-    description: "Cada teste destaca pontos fortes e mostra onde você pode evoluir, sempre com clareza e objetividade.",
+    title: "Como o Identity revela caminhos práticos",
+    subtitle: "O Identity não entrega apenas leituras — ele revela caminhos práticos de crescimento pessoal.",
+    description: "Cada dimensão destaca pontos fortes e mostra onde você pode evoluir, sempre com clareza e objetividade.",
     improvementsTitle: "Você descobre:",
     improvements: [
       "Quais padrões emocionais sabotam o seu dia a dia",
@@ -30,13 +30,13 @@ const content = {
       "Como desenvolver maturidade emocional",
       "Qual direção seguir para ter mais clareza, equilíbrio e propósito"
     ],
-    closing: "Tudo isso com orientação da IA e um mapa único que traduz sua personalidade, seus talentos e seus desafios — para você usar na vida real.",
+    closing: "Tudo isso com orientação da IA e um mapa da identidade que traduz sua arquitetura comportamental, seus talentos e seus desafios — para você usar na vida real.",
     cta: "Começar Agora",
   },
   'pt-pt': {
-    title: "Como o NELLO ONE o ajuda a melhorar",
-    subtitle: "O NELLO ONE não entrega apenas resultados, revela caminhos práticos de crescimento pessoal.",
-    description: "Cada teste destaca pontos fortes e mostra onde pode evoluir, sempre com clareza e objetividade.",
+    title: "Como o Identity revela caminhos práticos",
+    subtitle: "O Identity não entrega apenas leituras — revela caminhos práticos de crescimento pessoal.",
+    description: "Cada dimensão destaca pontos fortes e mostra onde pode evoluir, sempre com clareza e objetividade.",
     improvementsTitle: "Descobre:",
     improvements: [
       "Que padrões emocionais sabotam o seu dia a dia",
@@ -50,9 +50,9 @@ const content = {
     cta: "Começar Agora",
   },
   en: {
-    title: "How NELLO ONE Helps You Improve",
-    subtitle: "NELLO ONE doesn't just deliver results — it reveals practical paths for personal growth.",
-    description: "Each test highlights your strengths and shows where you can evolve, always with clarity and objectivity.",
+    title: "How Identity Reveals Practical Paths",
+    subtitle: "Identity doesn't just deliver readings — it reveals practical paths for personal growth.",
+    description: "Each dimension highlights your strengths and shows where you can evolve, always with clarity and objectivity.",
     improvementsTitle: "You discover:",
     improvements: [
       "Which emotional patterns are sabotaging your daily life",
@@ -210,7 +210,7 @@ export const WhyItMattersSection = () => {
               {/* Floating badges */}
               <div className="absolute -top-4 -right-4 bg-white rounded-full px-4 py-2 shadow-lg border border-bruma-deep/10">
                 <span className="text-sm font-medium text-ink-blue">
-                  {lang === 'en' ? '7 Tests' : '7 Testes'}
+                  {lang === 'en' ? '7 Dimensions' : '7 Dimensões'}
                 </span>
               </div>
               

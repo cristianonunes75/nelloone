@@ -143,7 +143,7 @@ export const NelloOneLanding = () => {
         <div className="relative z-10 container px-6 sm:px-8 lg:px-10 py-20 md:py-24">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-xs sm:text-sm md:text-base text-nello-gold font-semibold tracking-widest uppercase mb-4 md:mb-6">
-              {ij.tagline || "A Jornada Identity em 7 etapas"}
+              {ij.tagline || "Arquitetura de Autoconhecimento Integrado"}
             </p>
             
             <h1 className="font-display text-[2rem] leading-[1.15] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-foreground tracking-tight mb-5 md:mb-6">
@@ -152,7 +152,7 @@ export const NelloOneLanding = () => {
             </h1>
             
             <p className="text-base sm:text-lg md:text-xl text-foreground/90 font-display leading-relaxed max-w-2xl mx-auto mb-3 md:mb-4">
-              {ij.hero_subtitle || "O Identity é uma jornada guiada para quem sente que algo está desalinhado nesta fase da vida."}
+              {ij.hero_subtitle || "Uma Arquitetura de Autoconhecimento Integrado que revela como você pensa, decide, sente e age."}
             </p>
             
             <p className="text-sm md:text-base text-foreground/80 leading-relaxed max-w-xl mx-auto mb-3 md:mb-4 px-2">
@@ -189,6 +189,15 @@ export const NelloOneLanding = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ========== DEFINIÇÃO INSTITUCIONAL ========== */}
+      <section className="py-10 md:py-14 px-5 sm:px-6 lg:px-8 bg-muted/20 border-y border-border/30">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-base md:text-lg text-foreground/80 leading-relaxed font-display italic">
+            "O Identity é a primeira aplicação prática da Arquitetura de Autoconhecimento Integrado, um sistema proprietário de leitura da identidade humana."
+          </p>
         </div>
       </section>
 
@@ -256,11 +265,11 @@ export const NelloOneLanding = () => {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-semibold text-foreground mb-4">
-              {ij.journey_title || "A Jornada Identity em 7 etapas"}
+              {ij.journey_title || "A Jornada Identity em 7 camadas"}
             </h2>
             <CrossDivider className="mb-6" />
             <p className="text-base text-foreground/70 max-w-xl mx-auto">
-              {ij.journey_subtitle || "Cada etapa revela uma camada diferente de como você está hoje — com profundidade e no seu ritmo."}
+              {ij.journey_subtitle || "A Jornada Identity é um processo progressivo de leitura integrada da identidade humana. Cada camada revela uma dimensão diferente — com profundidade e no seu ritmo."}
             </p>
           </div>
           
@@ -302,10 +311,10 @@ export const NelloOneLanding = () => {
           {/* O que vai descobrir */}
           <div className="text-center mb-6 md:mb-8">
             <h3 className="font-display text-xl sm:text-2xl font-semibold text-foreground mb-2">
-              {ij.layers_title || "As 7 camadas que o Identity revela"}
+              {ij.layers_title || "As 7 dimensões humanas que o Identity integra"}
             </h3>
             <p className="text-sm text-foreground/60 max-w-xl mx-auto">
-              {ij.layers_subtitle || "Não são rótulos. São mapas de clareza que ajudam você a entender tendências, reações e formas de se relacionar nesta fase."}
+              {ij.layers_subtitle || "Não são rótulos. São leituras de clareza que ajudam você a entender tendências, reações e formas de se relacionar nesta fase."}
             </p>
           </div>
           
@@ -397,7 +406,7 @@ export const NelloOneLanding = () => {
                   <div className="aspect-[3/4] bg-gradient-to-b from-muted/30 to-muted/10 rounded-lg flex items-center justify-center border border-border/30">
                     <div className="text-center p-6">
                       <FileText className="w-12 h-12 text-nello-gold/40 mx-auto mb-3" strokeWidth={1} />
-                      <p className="text-sm text-foreground/60 font-medium">{ij.essence_code_description || "Seu Código da Essência, em um relatório final"}</p>
+                      <p className="text-sm text-foreground/60 font-medium">{ij.essence_code_description || "Seu Código da Essência — síntese viva da sua identidade"}</p>
                     </div>
                   </div>
                 </div>
@@ -405,7 +414,7 @@ export const NelloOneLanding = () => {
             </div>
             
             <p className="text-base text-foreground/80 text-center max-w-lg mx-auto mt-6">
-              {ij.essence_code_full_description || "No final da jornada, você recebe o Código da Essência — um relatório que integra os 7 mapas em uma síntese única, oferecendo:"}
+              {ij.essence_code_full_description || "No final da jornada, você recebe o Código da Essência — uma síntese viva que integra as 7 dimensões em uma leitura única, oferecendo:"}
             </p>
             
             <div className="max-w-md mx-auto mt-6 space-y-3">
@@ -589,6 +598,63 @@ export const NelloOneLanding = () => {
         </div>
       </section>
 
+      {/* ========== POR QUE O IDENTITY É DIFERENTE ========== */}
+      <section className="py-16 md:py-24 px-5 sm:px-6 lg:px-8 bg-muted/30">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-semibold text-foreground mb-4">
+              {ij.why_different_title || "Por que o Identity é diferente"}
+            </h2>
+            <CrossDivider className="mb-6" />
+            <p className="text-base text-foreground/70 max-w-2xl mx-auto">
+              {ij.why_different_intro || "O Identity integra múltiplas dimensões humanas normalmente analisadas separadamente."}
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 max-w-3xl mx-auto">
+            {[
+              { icon: Brain, label: "Padrões de comportamento" },
+              { icon: Heart, label: "Estrutura emocional" },
+              { icon: Lightbulb, label: "Arquitetura cognitiva" },
+              { icon: Sparkles, label: "Talentos naturais" },
+              { icon: Flame, label: "Motivações profundas" },
+              { icon: Users, label: "Dinâmica relacional" },
+              { icon: Compass, label: "Sentido existencial" },
+            ].map((item, index) => (
+              <div key={index} className="flex items-center gap-3 p-4 bg-background rounded-xl border border-border/50">
+                <div className="p-2.5 rounded-xl bg-nello-gold/10 flex-shrink-0">
+                  <item.icon className="w-5 h-5 text-nello-gold" strokeWidth={1.5} />
+                </div>
+                <span className="text-foreground text-sm font-medium">{item.label}</span>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-10 text-center">
+            <p className="text-lg md:text-xl font-display text-foreground/80 italic max-w-lg mx-auto">
+              "Outras abordagens analisam partes.<br />
+              <span className="text-nello-gold font-medium">O Identity revela o todo.</span>"
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ========== A ARQUITETURA IDENTITY ========== */}
+      <section className="py-12 md:py-16 px-5 sm:px-6 lg:px-8 bg-background">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="font-display text-xl sm:text-2xl md:text-3xl font-semibold text-foreground mb-4">
+            A Arquitetura Identity
+          </h2>
+          <CrossDivider className="mb-6" />
+          <p className="text-base text-foreground/70 leading-relaxed max-w-2xl mx-auto mb-6">
+            O Identity nasce de uma Arquitetura de Autoconhecimento Integrado desenvolvida para unir ciência comportamental, experiência humana e leitura existencial em um único sistema.
+          </p>
+          <p className="text-sm text-foreground/50 max-w-lg mx-auto">
+            A Arquitetura Identity permite aplicações pessoais, profissionais e organizacionais.
+          </p>
+        </div>
+      </section>
+
       {/* ========== 7️⃣ PILARES DO IDENTITY (SEO BLOG) ========== */}
       <PillarsSection />
 
@@ -729,8 +795,11 @@ export const NelloOneLanding = () => {
           <p className="text-xs font-medium text-muted-foreground/80 mb-2">
             {ij.responsibility_note_title || "Nota de responsabilidade"}
           </p>
-          <p className="text-xs text-muted-foreground/60 leading-relaxed">
+          <p className="text-xs text-muted-foreground/60 leading-relaxed mb-3">
             {ij.responsibility_note || "O Nello Identity é uma ferramenta de autoconhecimento e desenvolvimento humano, baseada em modelos amplamente utilizados em contextos educacionais, corporativos e de reflexão pessoal. Ele não substitui diagnóstico psicológico, avaliação clínica ou acompanhamento terapêutico profissional."}
+          </p>
+          <p className="text-[10px] text-muted-foreground/40 italic">
+            Identity — Arquitetura de Autoconhecimento Integrado
           </p>
         </div>
       </section>
