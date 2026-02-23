@@ -10,12 +10,16 @@ import {
   TrendingUp, TrendingDown, Activity, RefreshCw,
   UserCheck, BookOpen, CreditCard, AlertTriangle,
   ToggleLeft, Zap, ServerCrash, Layers,
-  ArrowUpRight, ArrowDownRight, Minus,
+  ArrowUpRight, ArrowDownRight, Minus, Ticket,
+  ShieldCheck, ShieldOff, Gift,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from '@/components/ui/table';
 import { getEcosystemMetrics, type EcosystemMetrics } from '@/services/getEcosystemMetrics';
 
 // ─── Metric Card ────────────────────────────────────────
@@ -351,8 +355,15 @@ export function AdminControlCenter() {
 
       {/* ── FINANCIAL (cross-platform) ─────────── */}
       <section>
-        <SectionHeader icon={<DollarSign className="w-4 h-4" />} title="Financeiro" badge="Receita" />
+        <SectionHeader icon={<DollarSign className="w-4 h-4" />} title="Financeiro" badge="Receita Real" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <MetricCard
+            label="Receita real (paga)"
+            value={formatCurrency(metrics.financial.realRevenue)}
+            icon={<DollarSign className="w-4 h-4" />}
+            trend={metrics.financial.realRevenue > 0 ? 'up' : 'neutral'}
+            accent="bg-emerald-500"
+          />
           <MetricCard
             label="MRR Individual"
             value={formatCurrency(metrics.financial.mrrIndividual)}
@@ -366,13 +377,6 @@ export function AdminControlCenter() {
             accent="bg-amber-500"
           />
           <MetricCard
-            label="Receita total"
-            value={formatCurrency(metrics.financial.totalRevenue)}
-            icon={<DollarSign className="w-4 h-4" />}
-            trend={metrics.financial.totalRevenue > 0 ? 'up' : 'neutral'}
-            accent="bg-emerald-500"
-          />
-          <MetricCard
             label="Churn rate"
             value={`${metrics.financial.churnRate}%`}
             icon={<TrendingDown className="w-4 h-4" />}
@@ -380,6 +384,85 @@ export function AdminControlCenter() {
             accent="bg-destructive"
           />
         </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+          <MetricCard
+            label="Compras pagas"
+            value={metrics.financial.paidPurchases}
+            icon={<CreditCard className="w-4 h-4" />}
+            accent="bg-emerald-500"
+          />
+          <MetricCard
+            label="Compras gratuitas (cupom)"
+            value={metrics.financial.zeroPricePurchases}
+            icon={<Gift className="w-4 h-4" />}
+            subtitle={`${metrics.financial.coupon100Count} via cupom 100%`}
+            accent="bg-amber-500"
+          />
+          <MetricCard
+            label="Total de compras"
+            value={metrics.financial.totalPurchases}
+            icon={<Ticket className="w-4 h-4" />}
+            accent="bg-primary"
+          />
+          <MetricCard
+            label="Receita bruta (registrada)"
+            value={formatCurrency(metrics.financial.totalRevenue)}
+            icon={<DollarSign className="w-4 h-4" />}
+            subtitle="inclui R$0 de cupons"
+            accent="bg-muted-foreground"
+          />
+        </div>
+      </section>
+
+      {/* ── COUPONS ─────────────────────────────── */}
+      <section>
+        <SectionHeader icon={<Ticket className="w-4 h-4" />} title="Cupons" badge={`${metrics.coupons.length} cupons`} />
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Código</TableHead>
+                  <TableHead>Desconto</TableHead>
+                  <TableHead>Produto</TableHead>
+                  <TableHead className="text-center">Usos</TableHead>
+                  <TableHead className="text-center">Limite</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {metrics.coupons.map((coupon) => (
+                  <TableRow key={coupon.code}>
+                    <TableCell className="font-mono font-semibold text-sm">{coupon.code}</TableCell>
+                    <TableCell>
+                      <Badge variant={coupon.discountValue === 100 ? 'destructive' : 'outline'} className="text-xs">
+                        {coupon.discountValue}%
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground max-w-[150px] truncate">
+                      {coupon.allowedProduct || 'all'}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <span className={`font-semibold ${coupon.timesUsed > 0 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        {coupon.timesUsed}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-center text-muted-foreground">
+                      {coupon.maxUses ?? '∞'}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {coupon.isActive ? (
+                        <ShieldCheck className="w-4 h-4 text-emerald-500 inline-block" />
+                      ) : (
+                        <ShieldOff className="w-4 h-4 text-destructive inline-block" />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       </section>
 
       {/* ── SYSTEM ─────────────────────────────── */}
