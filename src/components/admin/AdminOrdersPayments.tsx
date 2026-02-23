@@ -166,7 +166,10 @@ export const AdminOrdersPayments = () => {
     toast.success("CSV exportado com sucesso");
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, purchase?: Purchase) => {
+    if (status === "completed" && purchase && isCortesia(purchase)) {
+      return <Badge className="bg-muted text-muted-foreground border-border">Cortesia</Badge>;
+    }
     switch (status) {
       case "completed":
         return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Pago</Badge>;
@@ -209,14 +212,23 @@ export const AdminOrdersPayments = () => {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
+  const isCortesia = (p: Purchase) => {
+    const method = p.payment_method || '';
+    return method === 'coupon_100' || method === 'founder_grant' || method === 'stripe_coupon_100' || Number(p.price_paid) === 0;
+  };
+
+  const paidCompleted = purchases.filter(p => p.payment_status === "completed" && !isCortesia(p));
+  const cortesiaCompleted = purchases.filter(p => p.payment_status === "completed" && isCortesia(p));
+
   const stats = {
     total: purchases.length,
-    completed: purchases.filter(p => p.payment_status === "completed").length,
+    completed: paidCompleted.length,
+    cortesia: cortesiaCompleted.length,
     pending: purchases.filter(p => p.payment_status === "pending").length,
-    jornada: purchases.filter(p => p.purchase_category === "jornada_completa" && p.payment_status === "completed").length,
-    avulsos: purchases.filter(p => p.purchase_category === "test_avulso" && p.payment_status === "completed").length,
-    codigo: purchases.filter(p => p.purchase_category === "codigo_essencia" && p.payment_status === "completed").length,
-    totalRevenue: purchases.filter(p => p.payment_status === "completed").reduce((sum, p) => sum + Number(p.price_paid), 0),
+    jornada: paidCompleted.filter(p => p.purchase_category === "jornada_completa").length,
+    avulsos: paidCompleted.filter(p => p.purchase_category === "test_avulso").length,
+    codigo: paidCompleted.filter(p => p.purchase_category === "codigo_essencia").length,
+    totalRevenue: paidCompleted.reduce((sum, p) => sum + Number(p.price_paid), 0),
   };
 
   if (loading) {
@@ -255,11 +267,11 @@ export const AdminOrdersPayments = () => {
         </Card>
         <Card className="p-3 md:p-4 border-border/50">
           <p className="text-lg md:text-2xl font-semibold text-emerald-600">{stats.completed}</p>
-          <p className="text-[10px] md:text-xs text-muted-foreground">Pagos</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Vendas Reais</p>
         </Card>
         <Card className="p-3 md:p-4 border-border/50">
-          <p className="text-lg md:text-2xl font-semibold text-yellow-600">{stats.pending}</p>
-          <p className="text-[10px] md:text-xs text-muted-foreground">Pendentes</p>
+          <p className="text-lg md:text-2xl font-semibold text-muted-foreground">{stats.cortesia}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">Cortesia</p>
         </Card>
         <Card className="p-3 md:p-4 border-border/50">
           <p className="text-lg md:text-2xl font-semibold text-primary">{stats.jornada}</p>
@@ -354,7 +366,7 @@ export const AdminOrdersPayments = () => {
                         {purchase.currency === 'USD' ? '$' : purchase.currency === 'EUR' ? '€' : 'R$'} {Number(purchase.price_paid).toFixed(2)}
                       </span>
                     </TableCell>
-                    <TableCell>{getStatusBadge(purchase.payment_status)}</TableCell>
+                    <TableCell>{getStatusBadge(purchase.payment_status, purchase)}</TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
@@ -414,7 +426,7 @@ export const AdminOrdersPayments = () => {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Status</p>
-                  {getStatusBadge(selectedPurchase.payment_status)}
+                  {getStatusBadge(selectedPurchase.payment_status, selectedPurchase)}
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Data</p>
