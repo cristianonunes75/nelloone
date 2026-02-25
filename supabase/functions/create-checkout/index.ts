@@ -538,7 +538,17 @@ serve(async (req) => {
       }];
       logStep("Identity Couple Premium line item created with Price ID", { currency, priceId: identityCouplePriceIds[currency] });
     } else if (isFundadores) {
-      // Fundadores purchase - R$197 BRL only (or free with 100% coupon)
+      // Fundadores purchase - R$197 BRL ONLY (restricted to Brazilian market)
+      if (currency !== "brl") {
+        logStep("BLOCKED: Fundadores purchase attempted with non-BRL currency", { currency });
+        return new Response(JSON.stringify({ 
+          error: "Fundadores is only available in BRL (Brazilian market).",
+          code: "FUNDADORES_BRL_ONLY",
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        });
+      }
       const fundadoresPriceId = "price_1ScWglDjhZZxZELM3tQocxgu";
       
       lineItems = [{
@@ -590,7 +600,20 @@ serve(async (req) => {
         logStep("Bundle line item created with price_data", { currency });
       }
     } else {
-      // Individual tests purchase
+      // Individual tests purchase - DISCONTINUED
+      // Individual test purchases are no longer available. Users should purchase the Jornada Completa bundle.
+      logStep("BLOCKED: Individual test purchase attempted (discontinued)", { testIds });
+      return new Response(JSON.stringify({ 
+        error: language === "en" 
+          ? "Individual test purchases are no longer available. Please purchase the complete journey." 
+          : "A compra de testes avulsos não está mais disponível. Por favor, adquira a Jornada Completa.",
+        code: "INDIVIDUAL_TESTS_DISCONTINUED",
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+
+      // Legacy code below kept for reference but unreachable
       const { data: tests, error: testsError } = await supabaseClient
         .from("tests")
         .select("id, name, price_brl, stripe_price_id, type")
@@ -690,7 +713,7 @@ serve(async (req) => {
         is_codigo_casal: isCodigoCasal ? "true" : "false",
         is_activation_individual: isActivationIndividual ? "true" : "false",
         is_identity_couple_premium: isIdentityCouplePremium ? "true" : "false",
-        product_type: isCodigoEssenciaExpress ? "codigo_essencia_express" : isIdentityCouplePremium ? "identity_couple_premium" : isActivationIndividual ? "activation_individual" : isCodigoCasal ? "codigo_casal" : isAtivacaoCodigo ? "ativacao_codigo" : isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
+        product_type: isCodigoEssenciaExpress ? "jornada_completa" : isIdentityCouplePremium ? "identity_couple_premium" : isActivationIndividual ? "activation_individual" : isCodigoCasal ? "codigo_casal" : isAtivacaoCodigo ? "ativacao_codigo" : isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
         affiliate_code: affiliateCode || "",
         purchase_origin: isCodigoCasal ? "couple_paywall" : "",
       },
