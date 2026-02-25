@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, ArrowRight, TrendingUp, Brain, Heart, Shield, Zap, Star } from "lucide-react";
+import { Sparkles, ArrowRight, Brain, Heart, Shield, Compass, Flame, Star } from "lucide-react";
 import type { ExpressPrediction, ExpressDimension } from "@/lib/codigoExpress";
 
 interface Props {
@@ -10,19 +10,24 @@ interface Props {
   onDeepen: () => void;
 }
 
-const DIMENSION_META: Record<ExpressDimension, { label: string; icon: React.ReactNode; color: string }> = {
-  decision_mode: { label: 'Modo de Decisão', icon: <Brain className="h-4 w-4" />, color: 'text-blue-500' },
-  social_reaction: { label: 'Reação Social', icon: <Heart className="h-4 w-4" />, color: 'text-rose-500' },
-  pressure_response: { label: 'Resposta sob Pressão', icon: <Shield className="h-4 w-4" />, color: 'text-amber-500' },
-  mental_processing: { label: 'Processamento Mental', icon: <TrendingUp className="h-4 w-4" />, color: 'text-emerald-500' },
-  inner_tension: { label: 'Tensão Interna', icon: <Zap className="h-4 w-4" />, color: 'text-purple-500' },
+/** Human-readable dimension labels — no technical siglas */
+const DIMENSION_META: Record<ExpressDimension, { label: string; description: string; icon: React.ReactNode; color: string }> = {
+  decision_mode: { label: 'Estilo de Decisão', description: 'Como você escolhe e age', icon: <Brain className="h-4 w-4" />, color: 'text-blue-500' },
+  social_reaction: { label: 'Forma de Conectar', description: 'Como você se relaciona', icon: <Heart className="h-4 w-4" />, color: 'text-rose-500' },
+  pressure_response: { label: 'Modo de Ação', description: 'Como você reage sob pressão', icon: <Shield className="h-4 w-4" />, color: 'text-amber-500' },
+  mental_processing: { label: 'Energia Base', description: 'Como sua mente processa', icon: <Compass className="h-4 w-4" />, color: 'text-emerald-500' },
+  inner_tension: { label: 'Força Interior', description: 'O que move você por dentro', icon: <Flame className="h-4 w-4" />, color: 'text-purple-500' },
 };
 
-const DISC_LABELS: Record<string, string> = { D: 'Dominância', I: 'Influência', S: 'Estabilidade', C: 'Conformidade' };
-const TEMP_LABELS: Record<string, string> = { sanguineo: 'Sanguíneo', colerico: 'Colérico', melancolico: 'Melancólico', fleumatico: 'Fleumático' };
-const ENNEA_LABELS: Record<string, string> = {
-  '1': 'Reformador', '2': 'Ajudante', '3': 'Realizador', '4': 'Romântico', '5': 'Investigador',
-  '6': 'Leal', '7': 'Entusiasta', '8': 'Desafiador', '9': 'Pacificador',
+/** Human identity translations for DISC — used only for display */
+const ACTION_MODE_LABELS: Record<string, string> = { D: 'Ação Direta', I: 'Conexão Ativa', S: 'Presença Constante', C: 'Precisão Estratégica' };
+/** Human identity translations for Temperaments */
+const ENERGY_LABELS: Record<string, string> = { sanguineo: 'Energia Expansiva', colerico: 'Energia Propulsora', melancolico: 'Energia Profunda', fleumatico: 'Energia Sustentada' };
+/** Human identity translations for Enneagram */
+const DRIVE_LABELS: Record<string, string> = {
+  '1': 'Busca pela Excelência', '2': 'Cuidado Essencial', '3': 'Realização e Impacto',
+  '4': 'Autenticidade Profunda', '5': 'Compreensão do Mundo', '6': 'Segurança e Lealdade',
+  '7': 'Liberdade e Possibilidades', '8': 'Força e Autonomia', '9': 'Paz e Harmonia',
 };
 
 export default function ExpressResult({ prediction, onDeepen }: Props) {
@@ -74,30 +79,35 @@ export default function ExpressResult({ prediction, onDeepen }: Props) {
           </Card>
         </motion.div>
 
-        {/* Dimension Profile — Primary visual */}
+        {/* Dimension Profile — Primary visual (human labels) */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
         >
           <Card>
-            <CardContent className="p-5 space-y-3">
-              <h3 className="text-sm font-semibold text-foreground">Perfil Dimensional</h3>
+            <CardContent className="p-5 space-y-4">
+              <h3 className="text-sm font-semibold text-foreground">Suas Dimensões</h3>
               {(Object.entries(prediction.dimensionProfile) as [ExpressDimension, number][]).map(([dim, value]) => {
                 const meta = DIMENSION_META[dim];
                 return (
-                  <div key={dim} className="flex items-center gap-3">
-                    <span className={`${meta.color}`}>{meta.icon}</span>
-                    <span className="text-xs text-muted-foreground w-36 flex-shrink-0">{meta.label}</span>
-                    <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${Math.min(100, value)}%` }}
-                        transition={{ delay: 1.1, duration: 0.8 }}
-                        className="h-full rounded-full bg-primary/70"
-                      />
+                  <div key={dim} className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className={meta.color}>{meta.icon}</span>
+                      <span className="text-sm font-medium text-foreground">{meta.label}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground w-8 text-right">{value}</span>
+                    <p className="text-[11px] text-muted-foreground ml-6">{meta.description}</p>
+                    <div className="flex items-center gap-3 ml-6">
+                      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.min(100, value)}%` }}
+                          transition={{ delay: 1.1, duration: 0.8 }}
+                          className="h-full rounded-full bg-primary/70"
+                        />
+                      </div>
+                      <span className="text-xs text-muted-foreground w-8 text-right">{value}</span>
+                    </div>
                   </div>
                 );
               })}
@@ -105,46 +115,46 @@ export default function ExpressResult({ prediction, onDeepen }: Props) {
           </Card>
         </motion.div>
 
-        {/* Technical Validations — Secondary position */}
+        {/* Identity Dimensions — humanized, no siglas */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2 }}
           className="space-y-2"
         >
-          <p className="text-xs text-muted-foreground font-medium px-1">Dimensões identificadas</p>
+          <p className="text-xs text-muted-foreground font-medium px-1">O que compõe seu Código</p>
           <div className="grid grid-cols-2 gap-3">
             {[
               {
-                label: 'Perfil DISC',
-                value: DISC_LABELS[prediction.disc.primary] || prediction.disc.primary,
-                sub: `+ ${DISC_LABELS[prediction.disc.secondary] || prediction.disc.secondary}`,
+                label: 'Modo de Ação',
+                value: ACTION_MODE_LABELS[prediction.disc.primary] || 'Modo Natural',
+                sub: ACTION_MODE_LABELS[prediction.disc.secondary] || '',
                 confidence: prediction.disc.confidence,
               },
               {
-                label: 'Temperamento',
-                value: TEMP_LABELS[prediction.temperament.primary] || prediction.temperament.primary,
-                sub: `+ ${TEMP_LABELS[prediction.temperament.secondary] || prediction.temperament.secondary}`,
+                label: 'Energia Base',
+                value: ENERGY_LABELS[prediction.temperament.primary] || 'Energia Natural',
+                sub: ENERGY_LABELS[prediction.temperament.secondary] || '',
                 confidence: prediction.temperament.confidence,
               },
               {
-                label: 'Personalidade',
-                value: prediction.nello16.type,
-                sub: 'Nello16',
+                label: 'Arquitetura Cognitiva',
+                value: 'Padrão Identificado',
+                sub: `Clareza: ${prediction.nello16.confidence}%`,
                 confidence: prediction.nello16.confidence,
               },
               {
-                label: 'Eneagrama',
-                value: `Tipo ${prediction.enneagram.primary}`,
-                sub: ENNEA_LABELS[prediction.enneagram.primary] || '',
+                label: 'Força Interior',
+                value: DRIVE_LABELS[prediction.enneagram.primary] || 'Motivação Central',
+                sub: DRIVE_LABELS[prediction.enneagram.secondary] || '',
                 confidence: prediction.enneagram.confidence,
               },
             ].map((item) => (
               <Card key={item.label} className="h-full">
                 <CardContent className="p-3 space-y-1">
                   <p className="text-[11px] text-muted-foreground">{item.label}</p>
-                  <p className="text-base font-bold text-foreground">{item.value}</p>
-                  <p className="text-[11px] text-muted-foreground">{item.sub}</p>
+                  <p className="text-sm font-bold text-foreground leading-tight">{item.value}</p>
+                  {item.sub && <p className="text-[11px] text-muted-foreground">{item.sub}</p>}
                   <div className="flex items-center gap-1.5 mt-1.5">
                     <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
                       <div
