@@ -13,9 +13,10 @@ export const TestimonialsSection = () => {
   const { data: testimonials } = useQuery({
     queryKey: ["landing-testimonials"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch testimonials
+      const { data: rawTestimonials, error } = await supabase
         .from("testimonials")
-        .select("id, content, is_featured, user_id, profiles:user_id(full_name, profession)")
+        .select("id, content, is_featured, user_id, display_name")
         .eq("status", "approved")
         .eq("is_featured", true)
         .eq("consent_given", true)
@@ -23,13 +24,25 @@ export const TestimonialsSection = () => {
         .limit(3);
 
       if (error) throw error;
+      if (!rawTestimonials || rawTestimonials.length === 0) return [];
 
-      return (data || [])
+      // Fetch profiles for these users
+      const userIds = rawTestimonials.map(t => t.user_id).filter(Boolean);
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, full_name, profession")
+        .in("id", userIds);
+
+      const profileMap = new Map(
+        (profiles || []).map(p => [p.id, p])
+      );
+
+      return rawTestimonials
         .filter(t => checkTestimonialCompliance(t.content).riskLevel !== 'critical')
         .map(t => {
-          const profile = t.profiles as unknown as { full_name: string | null; profession: string | null } | null;
+          const profile = profileMap.get(t.user_id);
           return {
-            name: profile?.full_name || "Usuário",
+            name: profile?.full_name || t.display_name || "Usuário",
             role: profile?.profession || "Usuário Identity",
             content: t.content,
             rating: 5,
