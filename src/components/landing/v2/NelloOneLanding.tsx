@@ -3,12 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { NavSection } from "./NavSection";
 import { LandingFooterSimple } from "./LandingFooterSimple";
 import { HeroSection } from "./HeroSection";
-import { PromiseSection } from "./PromiseSection";
 import { EmotionalIdentificationSection } from "./EmotionalIdentificationSection";
-import { TestimonialsSection } from "./TestimonialsSection";
 import { DifferentiationSection } from "./DifferentiationSection";
+import { TestimonialsSection } from "./TestimonialsSection";
 import { FinalCTASection } from "./FinalCTASection";
-import { BrandSignature } from "./BrandSignature";
 
 export const NelloOneLanding = () => {
   const { language } = useLanguage();
@@ -26,12 +24,10 @@ export const NelloOneLanding = () => {
     <div className="flex flex-col bg-background min-h-screen">
       <NavSection />
       <HeroSection onCTA={handleCTA} />
-      <PromiseSection />
       <EmotionalIdentificationSection />
-      <TestimonialsSection />
       <DifferentiationSection />
+      <TestimonialsSection />
       <FinalCTASection onCTA={handleCTA} />
-      <BrandSignature />
 
       {/* Disclaimer institucional */}
       <section className="py-8 px-5 sm:px-6 lg:px-8 bg-muted/20 border-t border-border/30">
