@@ -1,19 +1,14 @@
 import { Star, Quote } from "lucide-react";
-import { useScrollAnimation, getStaggerDelay } from "@/hooks/useScrollAnimation";
-import { cn } from "@/lib/utils";
 import { TESTIMONIAL_DISCLAIMER } from "@/lib/compliance/testimonialCompliance";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { checkTestimonialCompliance } from "@/lib/compliance/testimonialCompliance";
 
 export const TestimonialsSection = () => {
-  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
-  const { ref: cardsRef, isVisible: cardsVisible } = useScrollAnimation();
-
   const { data: testimonials } = useQuery({
     queryKey: ["landing-testimonials"],
     queryFn: async () => {
-      // Fetch testimonials
+      // Busca mais itens para garantir 3 válidos após filtros
       const { data: rawTestimonials, error } = await supabase
         .from("testimonials")
         .select("id, content, is_featured, user_id, display_name")
@@ -21,25 +16,22 @@ export const TestimonialsSection = () => {
         .eq("is_featured", true)
         .eq("consent_given", true)
         .order("created_at", { ascending: false })
-        .limit(3);
+        .limit(12);
 
       if (error) throw error;
       if (!rawTestimonials || rawTestimonials.length === 0) return [];
 
-      // Fetch profiles for these users
-      const userIds = rawTestimonials.map(t => t.user_id).filter(Boolean);
+      const userIds = rawTestimonials.map((t) => t.user_id).filter(Boolean);
       const { data: profiles } = await supabase
         .from("profiles")
         .select("id, full_name, profession")
         .in("id", userIds);
 
-      const profileMap = new Map(
-        (profiles || []).map(p => [p.id, p])
-      );
+      const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
 
-      return rawTestimonials
-        .filter(t => checkTestimonialCompliance(t.content).riskLevel !== 'critical')
-        .map(t => {
+      const validTestimonials = rawTestimonials
+        .filter((t) => checkTestimonialCompliance(t.content).riskLevel !== "critical")
+        .map((t) => {
           const profile = profileMap.get(t.user_id);
           return {
             name: profile?.full_name || t.display_name || "Usuário",
@@ -47,51 +39,36 @@ export const TestimonialsSection = () => {
             content: t.content,
             rating: 5,
           };
-        });
+        })
+        .slice(0, 3);
+
+      return validTestimonials;
     },
     staleTime: 1000 * 60 * 5,
+    retry: 1,
   });
 
-  // Hide section entirely if no real testimonials
-  if (!testimonials || testimonials.length === 0) return null;
+  // Regra solicitada: só exibe com 3 depoimentos reais
+  if (!testimonials || testimonials.length < 3) return null;
 
   return (
     <section className="py-12 md:py-20 bg-muted/20">
       <div className="container px-4 md:px-6">
         <div className="max-w-4xl mx-auto">
-          {/* Section header */}
-          <div ref={headerRef} className="text-center mb-8 md:mb-12">
-            <h2
-              className={cn(
-                "font-display text-2xl sm:text-3xl text-foreground mb-3 transition-all duration-500",
-                headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              )}
-            >
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="font-display text-2xl sm:text-3xl text-foreground mb-3">
               Experiências reais
             </h2>
-            <p
-              className={cn(
-                "text-xs text-muted-foreground/70 max-w-xl mx-auto transition-all duration-500 delay-100",
-                headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              )}
-            >
+            <p className="text-xs text-muted-foreground/70 max-w-xl mx-auto">
               {TESTIMONIAL_DISCLAIMER.pt}
             </p>
           </div>
 
-          {/* Testimonials */}
-          <div
-            ref={cardsRef}
-            className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory md:snap-none scrollbar-hide"
-          >
+          <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory md:snap-none scrollbar-hide">
             {testimonials.map((testimonial, index) => (
               <div
-                key={testimonial.name + index}
-                className={cn(
-                  "bg-card rounded-xl p-4 md:p-6 border border-border/30 shadow-soft hover:shadow-medium transition-all duration-300 min-w-[280px] md:min-w-0 snap-center flex-shrink-0 md:flex-shrink",
-                  cardsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-                )}
-                style={cardsVisible ? getStaggerDelay(index, 0.15) : {}}
+                key={`${testimonial.name}-${index}`}
+                className="bg-card rounded-xl p-4 md:p-6 border border-border/30 shadow-soft hover:shadow-medium transition-all duration-300 min-w-[280px] md:min-w-0 snap-center flex-shrink-0 md:flex-shrink"
               >
                 <Quote className="w-6 h-6 text-muted-foreground/30 mb-3" strokeWidth={1.5} />
                 <p className="text-foreground mb-4 md:mb-6 leading-relaxed text-xs md:text-sm line-clamp-4 md:line-clamp-none">
