@@ -2907,6 +2907,39 @@ export type Database = {
           },
         ]
       }
+      filme_identidade_cache: {
+        Row: {
+          audio_base64: string
+          created_at: string
+          gender: string | null
+          id: string
+          music_base64: string | null
+          script: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audio_base64: string
+          created_at?: string
+          gender?: string | null
+          id?: string
+          music_base64?: string | null
+          script: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audio_base64?: string
+          created_at?: string
+          gender?: string | null
+          id?: string
+          music_base64?: string | null
+          script?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       flow_chats: {
         Row: {
           created_at: string | null
