@@ -1,16 +1,19 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, ArrowRight, Brain, Heart, Shield, Compass, Flame, Star } from "lucide-react";
 import type { ExpressPrediction, ExpressDimension } from "@/lib/codigoExpress";
+import LeadCaptureGate from "./LeadCaptureGate";
+import EssenceUpsell from "./EssenceUpsell";
 
 interface Props {
   prediction: ExpressPrediction;
+  answers: Record<string, number>;
   onDeepen: () => void;
 }
 
-/** Human-readable dimension labels — no technical siglas */
 const DIMENSION_META: Record<ExpressDimension, { label: string; description: string; icon: React.ReactNode; color: string }> = {
   decision_mode: { label: 'Estilo de Decisão', description: 'Como você escolhe e age', icon: <Brain className="h-4 w-4" />, color: 'text-blue-500' },
   social_reaction: { label: 'Forma de Conectar', description: 'Como você se relaciona', icon: <Heart className="h-4 w-4" />, color: 'text-rose-500' },
@@ -19,18 +22,39 @@ const DIMENSION_META: Record<ExpressDimension, { label: string; description: str
   inner_tension: { label: 'Força Interior', description: 'O que move você por dentro', icon: <Flame className="h-4 w-4" />, color: 'text-purple-500' },
 };
 
-/** Human identity translations for DISC — used only for display */
 const ACTION_MODE_LABELS: Record<string, string> = { D: 'Ação Direta', I: 'Conexão Ativa', S: 'Presença Constante', C: 'Precisão Estratégica' };
-/** Human identity translations for Temperaments */
 const ENERGY_LABELS: Record<string, string> = { sanguineo: 'Energia Expansiva', colerico: 'Energia Propulsora', melancolico: 'Energia Profunda', fleumatico: 'Energia Sustentada' };
-/** Human identity translations for Enneagram */
 const DRIVE_LABELS: Record<string, string> = {
   '1': 'Busca pela Excelência', '2': 'Cuidado Essencial', '3': 'Realização e Impacto',
   '4': 'Autenticidade Profunda', '5': 'Compreensão do Mundo', '6': 'Segurança e Lealdade',
   '7': 'Liberdade e Possibilidades', '8': 'Força e Autonomia', '9': 'Paz e Harmonia',
 };
 
-export default function ExpressResult({ prediction, onDeepen }: Props) {
+type FlowStep = 'result' | 'lead_capture' | 'upsell';
+
+export default function ExpressResult({ prediction, answers, onDeepen }: Props) {
+  const [step, setStep] = useState<FlowStep>('result');
+
+  if (step === 'lead_capture') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <LeadCaptureGate
+          prediction={prediction}
+          answers={answers}
+          onSaved={() => setStep('upsell')}
+        />
+      </div>
+    );
+  }
+
+  if (step === 'upsell') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <EssenceUpsell onDeepen={onDeepen} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <motion.div
@@ -79,7 +103,7 @@ export default function ExpressResult({ prediction, onDeepen }: Props) {
           </Card>
         </motion.div>
 
-        {/* Dimension Profile — Primary visual (human labels) */}
+        {/* Dimension Profile */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -115,7 +139,7 @@ export default function ExpressResult({ prediction, onDeepen }: Props) {
           </Card>
         </motion.div>
 
-        {/* Identity Dimensions — humanized, no siglas */}
+        {/* Identity Dimensions — humanized */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -125,30 +149,10 @@ export default function ExpressResult({ prediction, onDeepen }: Props) {
           <p className="text-xs text-muted-foreground font-medium px-1">O que compõe seu Código</p>
           <div className="grid grid-cols-2 gap-3">
             {[
-              {
-                label: 'Modo de Ação',
-                value: ACTION_MODE_LABELS[prediction.disc.primary] || 'Modo Natural',
-                sub: ACTION_MODE_LABELS[prediction.disc.secondary] || '',
-                confidence: prediction.disc.confidence,
-              },
-              {
-                label: 'Energia Base',
-                value: ENERGY_LABELS[prediction.temperament.primary] || 'Energia Natural',
-                sub: ENERGY_LABELS[prediction.temperament.secondary] || '',
-                confidence: prediction.temperament.confidence,
-              },
-              {
-                label: 'Arquitetura Cognitiva',
-                value: 'Padrão Identificado',
-                sub: `Clareza: ${prediction.nello16.confidence}%`,
-                confidence: prediction.nello16.confidence,
-              },
-              {
-                label: 'Força Interior',
-                value: DRIVE_LABELS[prediction.enneagram.primary] || 'Motivação Central',
-                sub: DRIVE_LABELS[prediction.enneagram.secondary] || '',
-                confidence: prediction.enneagram.confidence,
-              },
+              { label: 'Modo de Ação', value: ACTION_MODE_LABELS[prediction.disc.primary] || 'Modo Natural', sub: ACTION_MODE_LABELS[prediction.disc.secondary] || '', confidence: prediction.disc.confidence },
+              { label: 'Energia Base', value: ENERGY_LABELS[prediction.temperament.primary] || 'Energia Natural', sub: ENERGY_LABELS[prediction.temperament.secondary] || '', confidence: prediction.temperament.confidence },
+              { label: 'Arquitetura Cognitiva', value: 'Padrão Identificado', sub: `Clareza: ${prediction.nello16.confidence}%`, confidence: prediction.nello16.confidence },
+              { label: 'Força Interior', value: DRIVE_LABELS[prediction.enneagram.primary] || 'Motivação Central', sub: DRIVE_LABELS[prediction.enneagram.secondary] || '', confidence: prediction.enneagram.confidence },
             ].map((item) => (
               <Card key={item.label} className="h-full">
                 <CardContent className="p-3 space-y-1">
@@ -157,10 +161,7 @@ export default function ExpressResult({ prediction, onDeepen }: Props) {
                   {item.sub && <p className="text-[11px] text-muted-foreground">{item.sub}</p>}
                   <div className="flex items-center gap-1.5 mt-1.5">
                     <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-primary/50 transition-all duration-1000"
-                        style={{ width: `${item.confidence}%` }}
-                      />
+                      <div className="h-full rounded-full bg-primary/50 transition-all duration-1000" style={{ width: `${item.confidence}%` }} />
                     </div>
                     <span className="text-[10px] text-muted-foreground">{item.confidence}%</span>
                   </div>
@@ -170,7 +171,7 @@ export default function ExpressResult({ prediction, onDeepen }: Props) {
           </div>
         </motion.div>
 
-        {/* Transition Block + CTA */}
+        {/* Transition Block + CTA to Lead Capture */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -190,9 +191,9 @@ export default function ExpressResult({ prediction, onDeepen }: Props) {
                   O Código da Essência aprofunda essa jornada, revelando conexões internas, padrões invisíveis e caminhos práticos para acompanhar e desenvolver quem você realmente é.
                 </p>
               </div>
-              <Button onClick={onDeepen} className="w-full" size="lg">
+              <Button onClick={() => setStep('lead_capture')} className="w-full" size="lg">
                 <Sparkles className="h-4 w-4 mr-2" />
-                Descobrir meu Código da Essência
+                Salvar meu Código e continuar
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </CardContent>

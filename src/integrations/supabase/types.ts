@@ -1313,6 +1313,51 @@ export type Database = {
         }
         Relationships: []
       }
+      codigo_inicial_leads: {
+        Row: {
+          answers: Json
+          archetype_name: string | null
+          confidence_score: number | null
+          converted_at: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          prediction: Json
+          updated_at: string
+          user_id: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          answers?: Json
+          archetype_name?: string | null
+          confidence_score?: number | null
+          converted_at?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          prediction?: Json
+          updated_at?: string
+          user_id?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          answers?: Json
+          archetype_name?: string | null
+          confidence_score?: number | null
+          converted_at?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          prediction?: Json
+          updated_at?: string
+          user_id?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           billing_email: string | null

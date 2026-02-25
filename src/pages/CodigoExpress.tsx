@@ -8,7 +8,7 @@ import { EXPRESS_QUESTIONS, calculateExpressPrediction, type ExpressPrediction }
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, ArrowRight, Zap, Sparkles, ChevronRight, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Zap, Sparkles, ChevronRight } from "lucide-react";
 import ExpressResult from "@/components/express/ExpressResult";
 
 export default function CodigoExpress() {
@@ -21,7 +21,6 @@ export default function CodigoExpress() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [prediction, setPrediction] = useState<ExpressPrediction | null>(null);
-  const [saving, setSaving] = useState(false);
 
   const totalQuestions = EXPRESS_QUESTIONS.length;
   const progress = started ? ((currentIndex + (answers[EXPRESS_QUESTIONS[currentIndex]?.id] ? 1 : 0)) / totalQuestions) * 100 : 0;
@@ -31,7 +30,6 @@ export default function CodigoExpress() {
     const qId = currentQuestion.id;
     setAnswers(prev => ({ ...prev, [qId]: value }));
 
-    // Auto-advance after 400ms
     setTimeout(() => {
       if (currentIndex < totalQuestions - 1) {
         setCurrentIndex(prev => prev + 1);
@@ -43,8 +41,8 @@ export default function CodigoExpress() {
     const result = calculateExpressPrediction(answers);
     setPrediction(result);
 
+    // If user is logged in, also save to codigo_express table
     if (user) {
-      setSaving(true);
       try {
         await supabase.from("codigo_express").insert({
           user_id: user.id,
@@ -60,8 +58,6 @@ export default function CodigoExpress() {
         });
       } catch (e) {
         console.error("Error saving express result:", e);
-      } finally {
-        setSaving(false);
       }
     }
   }, [answers, user]);
@@ -72,7 +68,13 @@ export default function CodigoExpress() {
 
   // ── Prediction Result Screen ──
   if (prediction) {
-    return <ExpressResult prediction={prediction} onDeepen={() => navigate(`${basePath}/cliente`)} />;
+    return (
+      <ExpressResult
+        prediction={prediction}
+        answers={answers}
+        onDeepen={() => navigate(`${basePath}/cliente`)}
+      />
+    );
   }
 
   // ── Landing/Intro Screen ──
@@ -119,15 +121,8 @@ export default function CodigoExpress() {
             onClick={() => setStarted(true)}
           >
             <Sparkles className="h-5 w-5 mr-2" />
-            Descobrir meu Código Inicial
+            Descobrir meu Código
           </Button>
-
-          {!user && (
-            <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-              <Lock className="h-3 w-3" />
-              Faça login para salvar seu resultado
-            </p>
-          )}
         </motion.div>
       </div>
     );
@@ -205,10 +200,9 @@ export default function CodigoExpress() {
             {isLastQuestion && allAnswered ? (
               <Button
                 onClick={handleComplete}
-                disabled={saving}
                 className="px-6"
               >
-                {saving ? 'Calculando...' : 'Ver meu Código'}
+                Ver meu Código
                 <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
             ) : (
