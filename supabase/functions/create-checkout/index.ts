@@ -374,6 +374,9 @@ serve(async (req) => {
     // Check for Identity Couple Premium purchase
     const isIdentityCouplePremium = body.productType === "identity_couple_premium";
     
+    // Check for Código da Essência Express purchase (R$99 upsell from Código Inicial)
+    const isCodigoEssenciaExpress = body.productType === "codigo_essencia_express";
+    
     // Check for coupon code
     const couponCode = body.couponCode || null;
     
@@ -411,11 +414,11 @@ serve(async (req) => {
       }
     }
     
-    if (testIds.length === 0 && !isBundle && !isFundadores && !isAtivacaoCodigo && !isCodigoCasal && !isActivationIndividual && !isIdentityCouplePremium) {
+    if (testIds.length === 0 && !isBundle && !isFundadores && !isAtivacaoCodigo && !isCodigoCasal && !isActivationIndividual && !isIdentityCouplePremium && !isCodigoEssenciaExpress) {
       throw new Error("At least one test ID is required, or a valid productType must be specified");
     }
     
-    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, isAtivacaoCodigo, isCodigoCasal, isActivationIndividual, isIdentityCouplePremium, language, currency, couponCode });
+    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, isAtivacaoCodigo, isCodigoCasal, isActivationIndividual, isIdentityCouplePremium, isCodigoEssenciaExpress, language, currency, couponCode });
 
     // Get user (optional - supports guest checkout)
     let user = null;
@@ -450,7 +453,20 @@ serve(async (req) => {
     let lineItems: any[] = [];
     const priceMap = getPriceMap(currency);
     
-    if (isCodigoCasal) {
+    if (isCodigoEssenciaExpress) {
+      // Código da Essência Express - R$99 BRL / $19 USD / €19 EUR upsell from Código Inicial
+      const expressPriceIds: Record<string, string> = {
+        brl: "price_1T4nJjDjhZZxZELMvsHEYimS", // R$99
+        usd: "price_1T4nKmDjhZZxZELMKy13VF6R", // $19
+        eur: "price_1T4nLGDjhZZxZELMSEOF1Yjg", // €19
+      };
+      
+      lineItems = [{
+        price: expressPriceIds[currency] || expressPriceIds.brl,
+        quantity: 1,
+      }];
+      logStep("Código da Essência Express line item created", { currency, priceId: expressPriceIds[currency] });
+    } else if (isCodigoCasal) {
       // Código do Casal purchase - Dynamic pricing based on currency
       const codigoCasalAmounts: Record<string, number> = {
         brl: 4700,  // R$ 47
@@ -674,7 +690,7 @@ serve(async (req) => {
         is_codigo_casal: isCodigoCasal ? "true" : "false",
         is_activation_individual: isActivationIndividual ? "true" : "false",
         is_identity_couple_premium: isIdentityCouplePremium ? "true" : "false",
-        product_type: isIdentityCouplePremium ? "identity_couple_premium" : isActivationIndividual ? "activation_individual" : isCodigoCasal ? "codigo_casal" : isAtivacaoCodigo ? "ativacao_codigo" : isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
+        product_type: isCodigoEssenciaExpress ? "codigo_essencia_express" : isIdentityCouplePremium ? "identity_couple_premium" : isActivationIndividual ? "activation_individual" : isCodigoCasal ? "codigo_casal" : isAtivacaoCodigo ? "ativacao_codigo" : isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
         affiliate_code: affiliateCode || "",
         purchase_origin: isCodigoCasal ? "couple_paywall" : "",
       },

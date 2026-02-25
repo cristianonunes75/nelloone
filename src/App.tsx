@@ -343,10 +343,10 @@ const AppRoutes = () => (
     <Route path="/pt-pt/reset-password" element={<ResetPassword />} />
     <Route path="/pt-pt" element={<Landing />} />
     
-    {/* Journey redirect - /jornada -> /cliente */}
-    <Route path="/jornada" element={<Cliente />} />
-    <Route path="/en/journey" element={<Cliente />} />
-    <Route path="/pt-pt/jornada" element={<Cliente />} />
+    {/* Journey redirect - /jornada -> /cliente (protected) */}
+    <Route path="/jornada" element={<ProtectedRoute allowedRoles={["cliente", "admin"]}><Cliente /></ProtectedRoute>} />
+    <Route path="/en/journey" element={<ProtectedRoute allowedRoles={["cliente", "admin"]}><Cliente /></ProtectedRoute>} />
+    <Route path="/pt-pt/jornada" element={<ProtectedRoute allowedRoles={["cliente", "admin"]}><Cliente /></ProtectedRoute>} />
     
     {/* Protected client routes */}
     <Route

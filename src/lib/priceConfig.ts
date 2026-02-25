@@ -132,6 +132,13 @@ export const testPrices: Record<string, TestPrice> = {
     usd: { price: 57, priceId: "price_1SxRhuDjhZZxZELMsAYBZqUP" },
     eur: { price: 47, priceId: "price_1SxRjKDjhZZxZELMAqWHQKbm" },
   },
+  // Código da Essência Express - Upsell from Código Inicial (R$99)
+  codigo_essencia_express: {
+    testType: "codigo_essencia_express",
+    brl: { price: 99, priceId: "price_1T4nJjDjhZZxZELMvsHEYimS" },
+    usd: { price: 19, priceId: "price_1T4nKmDjhZZxZELMKy13VF6R" },
+    eur: { price: 19, priceId: "price_1T4nLGDjhZZxZELMSEOF1Yjg" },
+  },
   // Identity Couple Premium - Mapa Definitivo do Casal (7 Pilares) HIGH TICKET
   identity_couple_premium: {
     testType: "identity_couple_premium",

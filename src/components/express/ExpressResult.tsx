@@ -37,6 +37,7 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
   const [step, setStep] = useState<FlowStep>('result');
   const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
   const [savedName, setSavedName] = useState<string>('');
+  const [savedEmail, setSavedEmail] = useState<string>('');
 
   if (step === 'lead_capture') {
     return (
@@ -45,9 +46,10 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
           prediction={prediction}
           answers={answers}
           refCode={refCode}
-          onSaved={(leadId, name) => {
+          onSaved={(leadId, name, email) => {
             setSavedLeadId(leadId);
             setSavedName(name);
+            setSavedEmail(email || '');
             setStep('upsell');
           }}
         />
@@ -62,6 +64,7 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
           onDeepen={onDeepen}
           inviterName={savedName}
           inviterLeadId={savedLeadId || undefined}
+          leadEmail={savedEmail}
         />
       </div>
     );

@@ -13,7 +13,7 @@ interface Props {
   prediction: ExpressPrediction;
   answers: Record<string, number>;
   refCode?: string | null;
-  onSaved: (leadId: string, name: string) => void;
+  onSaved: (leadId: string, name: string, email?: string) => void;
 }
 
 export default function LeadCaptureGate({ prediction, answers, refCode, onSaved }: Props) {
@@ -67,8 +67,18 @@ export default function LeadCaptureGate({ prediction, answers, refCode, onSaved 
         }
       }
 
+      // Send confirmation email (fire and forget)
+      supabase.functions.invoke("send-lead-email", {
+        body: {
+          email: email.trim().toLowerCase(),
+          name: name.trim(),
+          archetypeName: prediction.archetypeName,
+          leadId: (data as any)?.id,
+        },
+      }).catch(e => console.error("Error sending lead email:", e));
+
       toast.success("Seu Código foi salvo com sucesso!");
-      onSaved((data as any)?.id || '', name.trim());
+      onSaved((data as any)?.id || '', name.trim(), email.trim().toLowerCase());
     } catch (e) {
       console.error("Error saving lead:", e);
       toast.error("Erro ao salvar. Tente novamente.");
