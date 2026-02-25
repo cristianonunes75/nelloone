@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +30,12 @@ const DRIVE_LABELS: Record<string, string> = {
   '4': 'Autenticidade Profunda', '5': 'Compreensão do Mundo', '6': 'Segurança e Lealdade',
   '7': 'Liberdade e Possibilidades', '8': 'Força e Autonomia', '9': 'Paz e Harmonia',
 };
+
+const RESULT_TESTIMONIALS = [
+  "Quando vi meu resultado inicial percebi que existia algo muito maior por trás.",
+  "A leitura foi certeira. O Código completo explicou o resto.",
+  "Foi aqui que entendi que precisava ir mais fundo.",
+];
 
 type FlowStep = 'result' | 'lead_capture' | 'upsell';
 
@@ -71,34 +77,48 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-lg w-full space-y-6"
-      >
-        {/* Header */}
-        <div className="text-center space-y-4">
+    <div className="min-h-screen bg-background py-12 px-4">
+      <div className="max-w-lg mx-auto space-y-8">
+        
+        {/* ========== BLOCO 1 — RESULTADO ========== */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center space-y-4"
+        >
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
-            className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-nello-gold/10"
           >
-            <Star className="h-8 w-8 text-primary" />
+            <Star className="h-8 w-8 text-nello-gold" />
           </motion.div>
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-            <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium mb-2">Seu Código Inicial</p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">{prediction.archetypeName}</h1>
-          </motion.div>
-        </div>
+          
+          <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">Sua Leitura Inicial</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">{prediction.archetypeName}</h1>
+        </motion.div>
+
+        {/* Emotional message */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+          <div className="text-center space-y-3 py-4">
+            <p className="font-display text-lg text-foreground/90 italic leading-relaxed">
+              "Esta não é uma definição sobre você.
+              <br />
+              É apenas o início de uma leitura."
+            </p>
+          </div>
+        </motion.div>
 
         {/* Narrative */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
-          <Card className="border-primary/20 bg-primary/5">
-            <CardContent className="p-5">
+          <Card className="border-nello-gold/20 bg-nello-gold/5">
+            <CardContent className="p-5 space-y-3">
               <p className="text-base text-foreground leading-relaxed">{prediction.narrativeText}</p>
+              <p className="text-sm text-foreground/70 leading-relaxed">
+                Este resultado oferece um norte inicial sobre como você tende a perceber o mundo, agir e tomar decisões.
+              </p>
             </CardContent>
           </Card>
         </motion.div>
@@ -119,7 +139,7 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
                     <p className="text-[11px] text-muted-foreground ml-6">{meta.description}</p>
                     <div className="flex items-center gap-3 ml-6">
                       <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-                        <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, value)}%` }} transition={{ delay: 1.1, duration: 0.8 }} className="h-full rounded-full bg-primary/70" />
+                        <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, value)}%` }} transition={{ delay: 1.1, duration: 0.8 }} className="h-full rounded-full bg-nello-gold/70" />
                       </div>
                       <span className="text-xs text-muted-foreground w-8 text-right">{value}</span>
                     </div>
@@ -131,8 +151,8 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
         </motion.div>
 
         {/* Identity cards */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }} className="space-y-2">
-          <p className="text-xs text-muted-foreground font-medium px-1">O que compõe seu Código</p>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }} className="space-y-2">
+          <p className="text-xs text-muted-foreground font-medium px-1">O que compõe sua Leitura</p>
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'Modo de Ação', value: ACTION_MODE_LABELS[prediction.disc.primary] || 'Modo Natural', sub: ACTION_MODE_LABELS[prediction.disc.secondary] || '', confidence: prediction.disc.confidence },
@@ -147,7 +167,7 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
                   {item.sub && <p className="text-[11px] text-muted-foreground">{item.sub}</p>}
                   <div className="flex items-center gap-1.5 mt-1.5">
                     <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
-                      <div className="h-full rounded-full bg-primary/50 transition-all duration-1000" style={{ width: `${item.confidence}%` }} />
+                      <div className="h-full rounded-full bg-nello-gold/50 transition-all duration-1000" style={{ width: `${item.confidence}%` }} />
                     </div>
                     <span className="text-[10px] text-muted-foreground">{item.confidence}%</span>
                   </div>
@@ -157,32 +177,71 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
           </div>
         </motion.div>
 
-        {/* Transition + CTA */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }} className="space-y-3">
-          <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10">
-            <CardContent className="p-5 text-center space-y-4">
-              <div className="space-y-3">
-                <p className="text-base text-foreground leading-relaxed">Você viu agora o início da sua leitura.</p>
-                <p className="text-base text-foreground leading-relaxed">O Código Inicial mostra a direção do seu funcionamento natural.</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">O Código da Essência aprofunda essa jornada, revelando conexões internas, padrões invisíveis e caminhos práticos para acompanhar e desenvolver quem você realmente é.</p>
-              </div>
-              <Button onClick={() => setStep('lead_capture')} className="w-full" size="lg">
-                <Sparkles className="h-4 w-4 mr-2" />
-                Salvar meu Código e continuar
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-
-          <div className="flex items-center justify-center gap-2">
-            <Badge variant="secondary" className="text-[10px]">Confiança geral: {prediction.overallConfidence}%</Badge>
-          </div>
-
-          <p className="text-[11px] text-center text-muted-foreground">
-            Este resultado é uma leitura inicial baseada em modelo preditivo. Não constitui diagnóstico clínico ou avaliação terapêutica.
+        {/* Human notice */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3 }}>
+          <p className="text-sm text-muted-foreground text-center leading-relaxed italic px-4">
+            A Leitura Inicial não mostra toda a profundidade do seu funcionamento.
+            Ela apenas revela a primeira camada.
           </p>
         </motion.div>
-      </motion.div>
+
+        {/* ========== BLOCO 2 — DEPOIMENTOS ========== */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }} className="space-y-4 pt-4">
+          <h3 className="text-base font-semibold text-foreground text-center">
+            Outras pessoas começaram exatamente daqui
+          </h3>
+          <div className="space-y-3">
+            {RESULT_TESTIMONIALS.map((text, i) => (
+              <div key={i} className="py-3 px-4 bg-muted/30 rounded-xl">
+                <p className="text-sm text-foreground/70 italic leading-relaxed">"{text}"</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ========== BLOCO 3 — TRANSIÇÃO ========== */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.6 }} className="space-y-4 pt-4">
+          <div className="text-center space-y-3">
+            <h3 className="font-display text-xl font-semibold text-foreground">
+              Existe uma leitura muito mais profunda esperando por você.
+            </h3>
+            <p className="text-sm text-foreground/70 leading-relaxed max-w-md mx-auto">
+              O Código da Essência conecta múltiplas dimensões do seu funcionamento e revela padrões que não aparecem nesta etapa inicial.
+            </p>
+          </div>
+        </motion.div>
+
+        {/* ========== BLOCO 4 — OFERTA ========== */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8 }}>
+          <Card className="border-nello-gold/30 bg-gradient-to-b from-nello-gold/5 to-transparent">
+            <CardContent className="p-6 text-center space-y-4">
+              <div className="space-y-2">
+                <span className="font-display text-3xl font-bold text-foreground">R$ 99</span>
+              </div>
+
+              <Button onClick={() => setStep('lead_capture')} className="w-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold rounded-full" size="lg">
+                <Sparkles className="h-4 w-4 mr-2" />
+                Desbloquear Código da Essência
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                A Leitura Inicial mostra o caminho.
+                <br />
+                O Código da Essência revela o mapa completo.
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Confidence + disclaimer */}
+        <div className="space-y-3 text-center">
+          <Badge variant="secondary" className="text-[10px]">Confiança geral: {prediction.overallConfidence}%</Badge>
+          <p className="text-[11px] text-muted-foreground">
+            Este resultado é uma leitura inicial. Não constitui diagnóstico clínico ou avaliação terapêutica.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
