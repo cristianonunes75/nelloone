@@ -818,9 +818,10 @@ serve(async (req) => {
         });
       }
 
-      // ====== JORNADA COMPLETA PURCHASE ======
+      // ====== JORNADA COMPLETA PURCHASE (also handles codigo_essencia_express) ======
       // VALIDATION PHASE: Jornada Completa now includes Código da Essência
-      if (productType === "jornada_completa" || productType === "journey") {
+      // codigo_essencia_express is treated identically to jornada_completa for fulfillment
+      if (productType === "jornada_completa" || productType === "journey" || productType === "codigo_essencia_express") {
         logStep("Processing Jornada Completa purchase (includes Código da Essência)", { userId });
         
         if (!userId || userId === "guest") {

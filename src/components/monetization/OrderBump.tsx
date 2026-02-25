@@ -171,18 +171,22 @@ export function OrderBump({
   );
 }
 
-// Price IDs for the activation guide
+// DEPRECATED: Activation guide prices — legacy Price ID, no longer sold individually
+// Kept for backward compatibility but should not be used for new checkouts
 export const ACTIVATION_GUIDE_PRICE = {
   brl: {
-    priceId: 'price_1Sr5iNDjhZZxZELMJegsuana',
+    priceId: null as unknown as string, // Legacy: price_1Sr5iNDjhZZxZELMJegsuana (discontinued)
     amount: 2700,
+    discontinued: true,
   },
   eur: {
-    priceId: 'price_1Sr5iNDjhZZxZELMJegsuana', // Same for now, update when EUR price exists
+    priceId: null as unknown as string,
     amount: 700,
+    discontinued: true,
   },
   usd: {
-    priceId: 'price_1Sr5iNDjhZZxZELMJegsuana', // Same for now, update when USD price exists
+    priceId: null as unknown as string,
     amount: 700,
+    discontinued: true,
   },
 };

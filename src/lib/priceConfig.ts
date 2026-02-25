@@ -214,16 +214,18 @@ export const fundadoresPrices = {
   usd: {
     price: 97,
     originalPrice: 147,
-    priceId: "price_1ScWglDjhZZxZELM3tQocxgu", // Same price for now
+    priceId: null as unknown as string, // Fundadores is BRL-only — no USD price
     currency: "USD" as Currency,
     symbol: "$",
+    disabled: true, // Not available outside Brazil
   },
   eur: {
     price: 97,
     originalPrice: 147,
-    priceId: "price_1ScWglDjhZZxZELM3tQocxgu", // Same price for now
+    priceId: null as unknown as string, // Fundadores is BRL-only — no EUR price
     currency: "EUR" as Currency,
     symbol: "€",
+    disabled: true, // Not available outside Brazil
   },
 };
 
