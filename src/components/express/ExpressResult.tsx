@@ -179,13 +179,15 @@ export default function ExpressResult({ prediction, onDeepen }: Props) {
         >
           <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10">
             <CardContent className="p-5 text-center space-y-4">
-              <div className="space-y-2">
-                <p className="text-base text-foreground font-semibold">
-                  Este é o seu Código Inicial.
+              <div className="space-y-3">
+                <p className="text-base text-foreground leading-relaxed">
+                  Você viu agora o início da sua leitura.
+                </p>
+                <p className="text-base text-foreground leading-relaxed">
+                  O Código Inicial mostra a direção do seu funcionamento natural.
                 </p>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  O Código da Essência revela camadas mais profundas que ainda não apareceram aqui.
-                  São 7 dimensões de análise, cruzamentos e um relatório personalizado com IA.
+                  O Código da Essência aprofunda essa jornada, revelando conexões internas, padrões invisíveis e caminhos práticos para acompanhar e desenvolver quem você realmente é.
                 </p>
               </div>
               <Button onClick={onDeepen} className="w-full" size="lg">
