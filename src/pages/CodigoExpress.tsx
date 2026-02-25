@@ -1,0 +1,231 @@
+import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { EXPRESS_QUESTIONS, calculateExpressPrediction, type ExpressPrediction } from "@/lib/codigoExpress";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft, ArrowRight, Zap, Sparkles, ChevronRight, Lock } from "lucide-react";
+import ExpressResult from "@/components/express/ExpressResult";
+
+export default function CodigoExpress() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { language } = useLanguage();
+  const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
+
+  const [started, setStarted] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [prediction, setPrediction] = useState<ExpressPrediction | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const totalQuestions = EXPRESS_QUESTIONS.length;
+  const progress = started ? ((currentIndex + (answers[EXPRESS_QUESTIONS[currentIndex]?.id] ? 1 : 0)) / totalQuestions) * 100 : 0;
+  const currentQuestion = EXPRESS_QUESTIONS[currentIndex];
+
+  const handleAnswer = useCallback((value: number) => {
+    const qId = currentQuestion.id;
+    setAnswers(prev => ({ ...prev, [qId]: value }));
+
+    // Auto-advance after 400ms
+    setTimeout(() => {
+      if (currentIndex < totalQuestions - 1) {
+        setCurrentIndex(prev => prev + 1);
+      }
+    }, 400);
+  }, [currentQuestion, currentIndex, totalQuestions]);
+
+  const handleComplete = useCallback(async () => {
+    const result = calculateExpressPrediction(answers);
+    setPrediction(result);
+
+    if (user) {
+      setSaving(true);
+      try {
+        await supabase.from("codigo_express").insert({
+          user_id: user.id,
+          answers: answers as any,
+          prediction: result as any,
+          confidence_score: result.overallConfidence,
+          predicted_disc: result.disc.primary,
+          predicted_temperament: result.temperament.primary,
+          predicted_enneagram: result.enneagram.primary,
+          predicted_nello16: result.nello16.type,
+          model_version: result.modelVersion,
+          completed_at: new Date().toISOString(),
+        });
+      } catch (e) {
+        console.error("Error saving express result:", e);
+      } finally {
+        setSaving(false);
+      }
+    }
+  }, [answers, user]);
+
+  const canGoBack = currentIndex > 0;
+  const isLastQuestion = currentIndex === totalQuestions - 1;
+  const allAnswered = Object.keys(answers).length === totalQuestions;
+
+  // ── Prediction Result Screen ──
+  if (prediction) {
+    return <ExpressResult prediction={prediction} onDeepen={() => navigate(`${basePath}/cliente`)} />;
+  }
+
+  // ── Landing/Intro Screen ──
+  if (!started) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-lg w-full text-center space-y-8"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
+            <Zap className="h-4 w-4" />
+            2-3 minutos
+          </div>
+
+          <div className="space-y-4">
+            <h1 className="text-4xl font-bold tracking-tight text-foreground">
+              Código Express
+            </h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              17 perguntas. Uma estimativa poderosa de quem você é.
+              <br />
+              <span className="text-foreground font-medium">Rápido. Intuitivo. Revelador.</span>
+            </p>
+          </div>
+
+          <div className="space-y-3 text-left">
+            {[
+              'Responda com sua primeira reação',
+              'Não existe resposta certa ou errada',
+              'Confie no que sentir, não no que pensar',
+            ].map((tip, i) => (
+              <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
+                <ChevronRight className="h-4 w-4 text-primary flex-shrink-0" />
+                {tip}
+              </div>
+            ))}
+          </div>
+
+          <Button
+            size="lg"
+            className="w-full h-14 text-lg rounded-xl"
+            onClick={() => setStarted(true)}
+          >
+            <Sparkles className="h-5 w-5 mr-2" />
+            Descobrir meu Código
+          </Button>
+
+          {!user && (
+            <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+              <Lock className="h-3 w-3" />
+              Faça login para salvar seu resultado
+            </p>
+          )}
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ── Question Flow ──
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Progress bar */}
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border/50 px-4 py-3">
+        <div className="max-w-lg mx-auto flex items-center gap-3">
+          <span className="text-xs text-muted-foreground font-medium whitespace-nowrap">
+            {currentIndex + 1}/{totalQuestions}
+          </span>
+          <Progress value={progress} className="flex-1 h-2" />
+          <span className="text-xs text-muted-foreground whitespace-nowrap">
+            {Math.round(progress)}%
+          </span>
+        </div>
+      </div>
+
+      {/* Question */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="max-w-lg w-full">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentQuestion.id}
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.25 }}
+            >
+              <Card className="border-0 shadow-lg bg-card">
+                <CardContent className="p-6 sm:p-8 space-y-6">
+                  <p className="text-xl sm:text-2xl font-medium text-foreground leading-relaxed">
+                    {currentQuestion.text}
+                  </p>
+
+                  <div className="space-y-2">
+                    {currentQuestion.options.map((opt) => {
+                      const isSelected = answers[currentQuestion.id] === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          onClick={() => handleAnswer(opt.value)}
+                          className={`w-full text-left px-4 py-3 rounded-xl border-2 transition-all duration-200 text-sm sm:text-base ${
+                            isSelected
+                              ? 'border-primary bg-primary/10 text-primary font-medium'
+                              : 'border-border hover:border-primary/40 hover:bg-accent/50 text-foreground'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Navigation */}
+          <div className="flex items-center justify-between mt-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentIndex(prev => prev - 1)}
+              disabled={!canGoBack}
+              className="text-muted-foreground"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Anterior
+            </Button>
+
+            {isLastQuestion && allAnswered ? (
+              <Button
+                onClick={handleComplete}
+                disabled={saving}
+                className="px-6"
+              >
+                {saving ? 'Calculando...' : 'Ver meu Código'}
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentIndex(prev => prev + 1)}
+                disabled={!answers[currentQuestion.id] || isLastQuestion}
+                className="text-muted-foreground"
+              >
+                Próxima
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
