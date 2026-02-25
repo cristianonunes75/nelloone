@@ -19,8 +19,12 @@ import {
   RefreshCw,
   Search,
   Send,
-  Loader2
+  Loader2,
+  Timer,
+  Zap,
+  Hourglass
 } from "lucide-react";
+import { JourneyTimeDistribution } from "./JourneyTimeDistribution";
 
 interface JourneyUser {
   id: string;
@@ -31,6 +35,7 @@ interface JourneyUser {
   journey_completed_tests: number;
   journey_tests_status: Record<string, string>;
   journey_started_at: string | null;
+  journey_completed_at: string | null;
   updated_at: string;
 }
 
@@ -99,6 +104,7 @@ export function AdminJourneyDashboard({ hideHeader = false }: AdminJourneyDashbo
         journey_completed_tests: p.journey_completed_tests,
         journey_tests_status: (p.journey_tests_status as Record<string, string>) || {},
         journey_started_at: p.journey_started_at,
+        journey_completed_at: p.journey_completed_at,
         updated_at: p.updated_at,
       }));
 
@@ -114,6 +120,29 @@ export function AdminJourneyDashboard({ hideHeader = false }: AdminJourneyDashbo
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const formatDuration = (ms: number): string => {
+    const hours = ms / (1000 * 60 * 60);
+    if (hours < 24) return `${Math.round(hours)}h`;
+    const days = Math.floor(hours / 24);
+    const remainingHours = Math.round(hours % 24);
+    return remainingHours > 0 ? `${days}d ${remainingHours}h` : `${days}d`;
+  };
+
+  const completionDurations = useMemo(() => {
+    return users
+      .filter(u => u.journey_status === "completed" && u.journey_started_at && u.journey_completed_at)
+      .map(u => new Date(u.journey_completed_at!).getTime() - new Date(u.journey_started_at!).getTime())
+      .filter(d => d > 0);
+  }, [users]);
+
+  const timeStats = useMemo(() => {
+    if (completionDurations.length === 0) return null;
+    const avg = completionDurations.reduce((a, b) => a + b, 0) / completionDurations.length;
+    const min = Math.min(...completionDurations);
+    const max = Math.max(...completionDurations);
+    return { avg: formatDuration(avg), min: formatDuration(min), max: formatDuration(max) };
+  }, [completionDurations]);
 
   const stats = useMemo(() => {
     const total = users.length;
@@ -373,7 +402,54 @@ export function AdminJourneyDashboard({ hideHeader = false }: AdminJourneyDashbo
         </Card>
       </div>
 
-      {/* Filters */}
+      {/* Time Stats Cards */}
+      {timeStats && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Timer className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-2xl font-semibold">{timeStats.avg}</p>
+                  <p className="text-xs text-muted-foreground">Tempo Médio</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Zap className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-2xl font-semibold">{timeStats.min}</p>
+                  <p className="text-xs text-muted-foreground">Mais Rápido</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Hourglass className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-2xl font-semibold">{timeStats.max}</p>
+                  <p className="text-xs text-muted-foreground">Mais Lento</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Time Distribution */}
+      <JourneyTimeDistribution durations={completionDurations} />
+
       <Card>
         <CardHeader className="pb-4">
           <CardTitle className="text-lg">Filtros e Ações</CardTitle>
@@ -446,6 +522,7 @@ export function AdminJourneyDashboard({ hideHeader = false }: AdminJourneyDashbo
                   <TableHead>Status</TableHead>
                   <TableHead>Progresso</TableHead>
                   <TableHead>Teste Atual</TableHead>
+                  <TableHead>Tempo</TableHead>
                   <TableHead>Inativo</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
@@ -476,6 +553,11 @@ export function AdminJourneyDashboard({ hideHeader = false }: AdminJourneyDashbo
                         </div>
                       </TableCell>
                       <TableCell>{currentTest}</TableCell>
+                      <TableCell>
+                        {user.journey_started_at && user.journey_completed_at
+                          ? formatDuration(new Date(user.journey_completed_at).getTime() - new Date(user.journey_started_at).getTime())
+                          : "—"}
+                      </TableCell>
                       <TableCell>
                         <span className={`text-sm ${
                           inactiveDays >= 7 ? "text-red-600 font-medium" :
