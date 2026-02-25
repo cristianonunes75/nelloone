@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Share2, ArrowLeft, Play, Volume2, FileText, Copy, RefreshCw } from "lucide-react";
+import TrendVideo from "@/components/filme/TrendVideo";
 import {
   Dialog,
   DialogContent,
@@ -454,12 +455,14 @@ function FilmeFinished({
   onReplay,
   onBack,
   onSaveAndRewatch,
+  onShareVideo,
 }: {
   displayName: string;
   script: FilmeScript | null;
   onReplay: () => void;
   onBack: () => void;
   onSaveAndRewatch: (newNarration: string) => Promise<void>;
+  onShareVideo: () => void;
 }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editedNarration, setEditedNarration] = useState(script?.narration || "");
@@ -533,6 +536,14 @@ function FilmeFinished({
         >
           <Play className="w-4 h-4 mr-2" />
           Assistir Novamente
+        </Button>
+        <Button
+          onClick={onShareVideo}
+          variant="ghost"
+          className="text-white/70 hover:text-white border border-white/20 hover:border-white/50 px-8 py-5 text-sm tracking-[0.1em] uppercase rounded-none"
+        >
+          <Share2 className="w-4 h-4 mr-2" />
+          Compartilhar
         </Button>
         <Button
           onClick={onBack}
@@ -644,6 +655,8 @@ export default function RevelacaoEssencia() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [musicUrl, setMusicUrl] = useState<string | null>(null);
   const [prepStep, setPrepStep] = useState(0);
+  const [showTrendVideo, setShowTrendVideo] = useState(false);
+  const [hasCachedFilm, setHasCachedFilm] = useState(false);
 
   // Redirect if not enabled and not admin
   useEffect(() => {
@@ -656,6 +669,60 @@ export default function RevelacaoEssencia() {
     () => (Array.isArray(savedCodigo?.sections) ? savedCodigo.sections : []),
     [savedCodigo]
   );
+
+  // Extract symbolic codes from Código da Essência for trend video
+  const symbolicCodes = useMemo(() => {
+    const codes: { label: string; value: string }[] = [];
+    if (!savedCodigo?.sections) return codes;
+
+    for (const section of savedCodigo.sections) {
+      if (section.id === "arquetipos_chamado" && section.primary?.archetype) {
+        codes.push({ label: "PRIME CODE", value: section.primary.archetype });
+      }
+      if (section.id === "sua_vocacao" && section.core_message) {
+        // Extract a short label from vocation
+        const firstField = section.fields?.[0]?.field;
+        if (firstField) codes.push({ label: "INNER CODE", value: firstField });
+      }
+      if (section.id === "seu_proposito" && section.motivation) {
+        // Use a brief label
+        const purposeLabel = section.motivation.split(" ").slice(0, 3).join(" ");
+        if (purposeLabel) codes.push({ label: "HUMAN ID", value: purposeLabel });
+      }
+    }
+
+    // Fallback: use displayName-based codes if extraction failed
+    if (codes.length === 0) {
+      codes.push({ label: "IDENTITY CODE", value: displayName.toUpperCase() });
+    }
+
+    return codes.slice(0, 3);
+  }, [savedCodigo, displayName]);
+
+  // Load cached film on mount
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const loadCachedFilm = async () => {
+      const { data, error } = await supabase
+        .from("filme_identidade_cache")
+        .select("script, audio_base64, music_base64")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!error && data) {
+        setScript(data.script as unknown as FilmeScript);
+        setAudioUrl(`data:audio/mpeg;base64,${data.audio_base64}`);
+        if (data.music_base64) {
+          setMusicUrl(`data:audio/mpeg;base64,${data.music_base64}`);
+        }
+        setHasCachedFilm(true);
+        setFilmeState("ready");
+      }
+    };
+
+    loadCachedFilm();
+  }, [user?.id]);
 
   // Generate the film
   const generateFilm = useCallback(async () => {
@@ -757,7 +824,30 @@ export default function RevelacaoEssencia() {
       setScript(finalScript);
       setAudioUrl(generatedAudioUrl);
       setMusicUrl(generatedMusicUrl);
+      setHasCachedFilm(true);
       setFilmeState("ready");
+
+      // Cache the film in the database
+      if (user?.id) {
+        const ttsDataForCache = await ttsResponse.clone?.()?.json?.().catch(() => null);
+        // Extract base64 from data URLs
+        const audioB64 = generatedAudioUrl.replace("data:audio/mpeg;base64,", "");
+        const musicB64 = generatedMusicUrl?.replace("data:audio/mpeg;base64,", "") || null;
+
+        supabase
+          .from("filme_identidade_cache")
+          .upsert({
+            user_id: user.id,
+            script: finalScript as any,
+            audio_base64: audioB64,
+            music_base64: musicB64,
+            gender: profile?.gender || null,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: "user_id" })
+          .then(({ error }) => {
+            if (error) console.warn("Failed to cache film:", error);
+          });
+      }
     } catch (error) {
       console.error("Film generation error:", error);
       toast.error(
@@ -891,12 +981,24 @@ export default function RevelacaoEssencia() {
             }}
             onBack={() => navigate("/cliente")}
             onSaveAndRewatch={handleSaveAndRewatch}
+            onShareVideo={() => setShowTrendVideo(true)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Trend Video Overlay */}
+      <AnimatePresence>
+        {showTrendVideo && (
+          <TrendVideo
+            userName={displayName}
+            codes={symbolicCodes}
+            onClose={() => setShowTrendVideo(false)}
           />
         )}
       </AnimatePresence>
 
       {/* Back button (always visible except during playback) */}
-      {filmeState !== "playing" && filmeState !== "preparing" && (
+      {filmeState !== "playing" && filmeState !== "preparing" && !showTrendVideo && (
         <motion.button
           className="fixed top-6 left-6 z-50 text-white/30 hover:text-white/60 transition-colors"
           onClick={() => navigate("/cliente")}
