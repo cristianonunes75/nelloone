@@ -12,6 +12,7 @@ interface Props {
   prediction: ExpressPrediction;
   answers: Record<string, number>;
   onDeepen: () => void;
+  refCode?: string | null;
 }
 
 const DIMENSION_META: Record<ExpressDimension, { label: string; description: string; icon: React.ReactNode; color: string }> = {
@@ -32,8 +33,10 @@ const DRIVE_LABELS: Record<string, string> = {
 
 type FlowStep = 'result' | 'lead_capture' | 'upsell';
 
-export default function ExpressResult({ prediction, answers, onDeepen }: Props) {
+export default function ExpressResult({ prediction, answers, onDeepen, refCode }: Props) {
   const [step, setStep] = useState<FlowStep>('result');
+  const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
+  const [savedName, setSavedName] = useState<string>('');
 
   if (step === 'lead_capture') {
     return (
@@ -41,7 +44,12 @@ export default function ExpressResult({ prediction, answers, onDeepen }: Props) 
         <LeadCaptureGate
           prediction={prediction}
           answers={answers}
-          onSaved={() => setStep('upsell')}
+          refCode={refCode}
+          onSaved={(leadId, name) => {
+            setSavedLeadId(leadId);
+            setSavedName(name);
+            setStep('upsell');
+          }}
         />
       </div>
     );
@@ -50,7 +58,11 @@ export default function ExpressResult({ prediction, answers, onDeepen }: Props) 
   if (step === 'upsell') {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <EssenceUpsell onDeepen={onDeepen} />
+        <EssenceUpsell
+          onDeepen={onDeepen}
+          inviterName={savedName}
+          inviterLeadId={savedLeadId || undefined}
+        />
       </div>
     );
   }
@@ -63,7 +75,7 @@ export default function ExpressResult({ prediction, answers, onDeepen }: Props) 
         transition={{ duration: 0.5 }}
         className="max-w-lg w-full space-y-6"
       >
-        {/* Header — Archetype Identity */}
+        {/* Header */}
         <div className="text-center space-y-4">
           <motion.div
             initial={{ scale: 0 }}
@@ -73,42 +85,23 @@ export default function ExpressResult({ prediction, answers, onDeepen }: Props) 
           >
             <Star className="h-8 w-8 text-primary" />
           </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium mb-2">
-              Seu Código Inicial
-            </p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-              {prediction.archetypeName}
-            </h1>
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+            <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium mb-2">Seu Código Inicial</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">{prediction.archetypeName}</h1>
           </motion.div>
         </div>
 
-        {/* Human Narrative */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-        >
+        {/* Narrative */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-5">
-              <p className="text-base text-foreground leading-relaxed">
-                {prediction.narrativeText}
-              </p>
+              <p className="text-base text-foreground leading-relaxed">{prediction.narrativeText}</p>
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Dimension Profile */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 }}
-        >
+        {/* Dimensions */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
           <Card>
             <CardContent className="p-5 space-y-4">
               <h3 className="text-sm font-semibold text-foreground">Suas Dimensões</h3>
@@ -123,12 +116,7 @@ export default function ExpressResult({ prediction, answers, onDeepen }: Props) 
                     <p className="text-[11px] text-muted-foreground ml-6">{meta.description}</p>
                     <div className="flex items-center gap-3 ml-6">
                       <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${Math.min(100, value)}%` }}
-                          transition={{ delay: 1.1, duration: 0.8 }}
-                          className="h-full rounded-full bg-primary/70"
-                        />
+                        <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, value)}%` }} transition={{ delay: 1.1, duration: 0.8 }} className="h-full rounded-full bg-primary/70" />
                       </div>
                       <span className="text-xs text-muted-foreground w-8 text-right">{value}</span>
                     </div>
@@ -139,13 +127,8 @@ export default function ExpressResult({ prediction, answers, onDeepen }: Props) 
           </Card>
         </motion.div>
 
-        {/* Identity Dimensions — humanized */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2 }}
-          className="space-y-2"
-        >
+        {/* Identity cards */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }} className="space-y-2">
           <p className="text-xs text-muted-foreground font-medium px-1">O que compõe seu Código</p>
           <div className="grid grid-cols-2 gap-3">
             {[
@@ -171,25 +154,14 @@ export default function ExpressResult({ prediction, answers, onDeepen }: Props) 
           </div>
         </motion.div>
 
-        {/* Transition Block + CTA to Lead Capture */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.5 }}
-          className="space-y-3"
-        >
+        {/* Transition + CTA */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }} className="space-y-3">
           <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10">
             <CardContent className="p-5 text-center space-y-4">
               <div className="space-y-3">
-                <p className="text-base text-foreground leading-relaxed">
-                  Você viu agora o início da sua leitura.
-                </p>
-                <p className="text-base text-foreground leading-relaxed">
-                  O Código Inicial mostra a direção do seu funcionamento natural.
-                </p>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  O Código da Essência aprofunda essa jornada, revelando conexões internas, padrões invisíveis e caminhos práticos para acompanhar e desenvolver quem você realmente é.
-                </p>
+                <p className="text-base text-foreground leading-relaxed">Você viu agora o início da sua leitura.</p>
+                <p className="text-base text-foreground leading-relaxed">O Código Inicial mostra a direção do seu funcionamento natural.</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">O Código da Essência aprofunda essa jornada, revelando conexões internas, padrões invisíveis e caminhos práticos para acompanhar e desenvolver quem você realmente é.</p>
               </div>
               <Button onClick={() => setStep('lead_capture')} className="w-full" size="lg">
                 <Sparkles className="h-4 w-4 mr-2" />
@@ -200,14 +172,11 @@ export default function ExpressResult({ prediction, answers, onDeepen }: Props) 
           </Card>
 
           <div className="flex items-center justify-center gap-2">
-            <Badge variant="secondary" className="text-[10px]">
-              Confiança geral: {prediction.overallConfidence}%
-            </Badge>
+            <Badge variant="secondary" className="text-[10px]">Confiança geral: {prediction.overallConfidence}%</Badge>
           </div>
 
           <p className="text-[11px] text-center text-muted-foreground">
-            Este resultado é uma leitura inicial baseada em modelo preditivo.
-            Não constitui diagnóstico clínico ou avaliação terapêutica.
+            Este resultado é uma leitura inicial baseada em modelo preditivo. Não constitui diagnóstico clínico ou avaliação terapêutica.
           </p>
         </motion.div>
       </motion.div>

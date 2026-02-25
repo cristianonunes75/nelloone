@@ -5546,6 +5546,89 @@ export type Database = {
         }
         Relationships: []
       }
+      social_invite_connections: {
+        Row: {
+          created_at: string
+          id: string
+          invite_id: string
+          invited_lead_id: string | null
+          invited_name: string | null
+          invited_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_id: string
+          invited_lead_id?: string | null
+          invited_name?: string | null
+          invited_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_id?: string
+          invited_lead_id?: string | null
+          invited_name?: string | null
+          invited_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_invite_connections_invite_id_fkey"
+            columns: ["invite_id"]
+            isOneToOne: false
+            referencedRelation: "social_invites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_invite_connections_invited_lead_id_fkey"
+            columns: ["invited_lead_id"]
+            isOneToOne: false
+            referencedRelation: "codigo_inicial_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_invites: {
+        Row: {
+          clicks: number
+          completions: number
+          created_at: string
+          id: string
+          invite_code: string
+          inviter_lead_id: string | null
+          inviter_name: string | null
+          inviter_user_id: string | null
+        }
+        Insert: {
+          clicks?: number
+          completions?: number
+          created_at?: string
+          id?: string
+          invite_code: string
+          inviter_lead_id?: string | null
+          inviter_name?: string | null
+          inviter_user_id?: string | null
+        }
+        Update: {
+          clicks?: number
+          completions?: number
+          created_at?: string
+          id?: string
+          invite_code?: string
+          inviter_lead_id?: string | null
+          inviter_name?: string | null
+          inviter_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_invites_inviter_lead_id_fkey"
+            columns: ["inviter_lead_id"]
+            isOneToOne: false
+            referencedRelation: "codigo_inicial_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       social_media_posts: {
         Row: {
           ai_generated: boolean | null

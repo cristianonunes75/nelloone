@@ -12,10 +12,11 @@ import { toast } from "sonner";
 interface Props {
   prediction: ExpressPrediction;
   answers: Record<string, number>;
-  onSaved: () => void;
+  refCode?: string | null;
+  onSaved: (leadId: string, name: string) => void;
 }
 
-export default function LeadCaptureGate({ prediction, answers, onSaved }: Props) {
+export default function LeadCaptureGate({ prediction, answers, refCode, onSaved }: Props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -28,7 +29,7 @@ export default function LeadCaptureGate({ prediction, answers, onSaved }: Props)
     setSaving(true);
 
     try {
-      const { error } = await supabase.from("codigo_inicial_leads" as any).insert({
+      const { data, error } = await supabase.from("codigo_inicial_leads" as any).insert({
         full_name: name.trim(),
         email: email.trim().toLowerCase(),
         whatsapp: whatsapp.trim() || null,
@@ -36,12 +37,38 @@ export default function LeadCaptureGate({ prediction, answers, onSaved }: Props)
         answers: answers as any,
         archetype_name: prediction.archetypeName,
         confidence_score: prediction.overallConfidence,
-      } as any);
+      } as any).select('id').single();
 
       if (error) throw error;
 
+      // If this person came via a ref code, track the connection
+      if (refCode) {
+        try {
+          // Increment completions on the invite
+          const { data: invite } = await supabase
+            .from("social_invites" as any)
+            .select("id, completions")
+            .eq("invite_code", refCode)
+            .single();
+
+          if (invite) {
+            await supabase.from("social_invite_connections" as any).insert({
+              invite_id: (invite as any).id,
+              invited_lead_id: (data as any)?.id || null,
+              invited_name: name.trim(),
+            } as any);
+
+            await supabase.from("social_invites" as any)
+              .update({ completions: ((invite as any).completions || 0) + 1 } as any)
+              .eq("id", (invite as any).id);
+          }
+        } catch (refErr) {
+          console.error("Error tracking referral:", refErr);
+        }
+      }
+
       toast.success("Seu Código foi salvo com sucesso!");
-      onSaved();
+      onSaved((data as any)?.id || '', name.trim());
     } catch (e) {
       console.error("Error saving lead:", e);
       toast.error("Erro ao salvar. Tente novamente.");
@@ -64,9 +91,7 @@ export default function LeadCaptureGate({ prediction, answers, onSaved }: Props)
               <Bookmark className="h-6 w-6 text-primary" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-xl font-bold text-foreground">
-                Seu Código foi revelado.
-              </h3>
+              <h3 className="text-xl font-bold text-foreground">Seu Código foi revelado.</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Quer guardar essa leitura e continuar sua jornada depois?
               </p>
@@ -76,46 +101,21 @@ export default function LeadCaptureGate({ prediction, answers, onSaved }: Props)
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="lead-name">Nome</Label>
-              <Input
-                id="lead-name"
-                placeholder="Como você se chama?"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoFocus
-              />
+              <Input id="lead-name" placeholder="Como você se chama?" value={name} onChange={(e) => setName(e.target.value)} autoFocus />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="lead-email">Email</Label>
-              <Input
-                id="lead-email"
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <Input id="lead-email" type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="lead-whatsapp" className="flex items-center gap-1">
                 WhatsApp <span className="text-xs text-muted-foreground">(opcional)</span>
               </Label>
-              <Input
-                id="lead-whatsapp"
-                type="tel"
-                placeholder="(00) 00000-0000"
-                value={whatsapp}
-                onChange={(e) => setWhatsapp(e.target.value)}
-              />
+              <Input id="lead-whatsapp" type="tel" placeholder="(00) 00000-0000" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} />
             </div>
           </div>
 
-          <Button
-            onClick={handleSave}
-            disabled={!isValid || saving}
-            className="w-full h-12 text-base rounded-xl"
-            size="lg"
-          >
+          <Button onClick={handleSave} disabled={!isValid || saving} className="w-full h-12 text-base rounded-xl" size="lg">
             {saving ? "Salvando..." : "Salvar meu Código"}
           </Button>
 
