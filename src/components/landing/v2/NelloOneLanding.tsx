@@ -22,9 +22,9 @@ export const NelloOneLanding = () => {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   const getLeituraPath = () => {
-    if (language === 'en') return '/en/initial-code';
-    if (language === 'pt-pt') return '/pt-pt/codigo-inicial';
-    return '/codigo-inicial';
+    if (language === 'en') return '/en/initial-reading';
+    if (language === 'pt-pt') return '/pt-pt/leitura-inicial';
+    return '/leitura-inicial';
   };
 
   const handleCTA = () => navigate(getLeituraPath());
