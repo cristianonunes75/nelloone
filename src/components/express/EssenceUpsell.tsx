@@ -1,14 +1,19 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, ArrowRight, CheckCircle2, Eye, ShieldQuestion, Puzzle, Layers } from "lucide-react";
+import { Sparkles, ArrowRight, CheckCircle2, Eye, ShieldQuestion, Puzzle, Layers, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { toast } from "sonner";
 import SocialInviteShare from "./SocialInviteShare";
 
 interface Props {
   onDeepen: () => void;
   inviterName?: string;
   inviterLeadId?: string;
+  leadEmail?: string;
 }
 
 const HIDDEN_DIMENSIONS = [
@@ -18,7 +23,34 @@ const HIDDEN_DIMENSIONS = [
   { icon: <Layers className="h-4 w-4" />, text: 'A integração entre suas forças naturais e seus desafios invisíveis' },
 ];
 
-export default function EssenceUpsell({ onDeepen, inviterName, inviterLeadId }: Props) {
+export default function EssenceUpsell({ onDeepen, inviterName, inviterLeadId, leadEmail }: Props) {
+  const [loading, setLoading] = useState(false);
+  const { language } = useLanguage();
+
+  const handleCheckout = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: {
+          productType: "codigo_essencia_express",
+          language,
+          userEmail: leadEmail || undefined,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (e) {
+      console.error("Checkout error:", e);
+      toast.error("Erro ao iniciar pagamento. Tente novamente.");
+      setLoading(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -99,13 +131,18 @@ export default function EssenceUpsell({ onDeepen, inviterName, inviterLeadId }: 
             </div>
 
             <Button
-              onClick={onDeepen}
+              onClick={handleCheckout}
+              disabled={loading}
               className="w-full h-12 text-base rounded-xl"
               size="lg"
             >
-              <Sparkles className="h-4 w-4 mr-2" />
-              Quero ver minha leitura completa
-              <ArrowRight className="h-4 w-4 ml-2" />
+              {loading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4 mr-2" />
+              )}
+              {loading ? "Preparando..." : "Quero ver minha leitura completa"}
+              {!loading && <ArrowRight className="h-4 w-4 ml-2" />}
             </Button>
           </CardContent>
         </Card>
