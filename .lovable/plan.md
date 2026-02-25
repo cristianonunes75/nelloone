@@ -1,81 +1,41 @@
 
 
-# Plano: Página de Venda "Jornada Identity - Código da Essência" (R$ 99)
+# Adicionar botão de Login na Landing Page para usuários que retornam
 
-## Contexto
+## Problema
 
-Atualmente, o produto "Código da Essência Express" (R$ 99) é vendido apenas como upsell inline no componente `EssenceUpsell.tsx`, que aparece após a Leitura Inicial. Não existe uma página de venda dedicada e independente. A "Jornada Completa" (R$ 248,50) foi descontinuada como produto separado.
+Quando um usuário que já fez a Leitura Inicial retorna ao site, ele vê apenas o botão "Fazer minha Leitura Inicial" na navegação. Não há nenhum botão de login visível, forçando-o a refazer a leitura ou procurar manualmente a página de autenticação.
 
-O objetivo é criar uma **página de venda dedicada** para o produto unificado, agora chamado **"Jornada Identity"**, com todos os depoimentos aprovados e um botão de login para usuários que já fizeram a Leitura Inicial.
+## Solução
 
----
+Adicionar um botão/link discreto de login ao lado do CTA principal na navegação (NavSection), tanto no desktop quanto no mobile.
 
-## O que muda
+## Mudanças
 
-### 1. Nova página de venda: `/jornada-identity`
+### Arquivo: `src/components/landing/v2/NavSection.tsx`
 
-Uma página completa e dedicada com:
-
-- **Nome do produto**: "Jornada Identity - Código da Essência"
-- **Preço**: R$ 99,00 (pagamento único)
-- **Seção de depoimentos**: Todos os depoimentos aprovados do banco (não apenas 3 featured)
-- **Botão "Já fiz minha Leitura Inicial"**: Redireciona para `/auth` (login), para que o usuário acesse seu dashboard e compre de lá
-- **Botão de compra principal**: Inicia o checkout do `codigo_essencia_express` via edge function `create-checkout`
-- **Seções explicativas**: O que está incluído, como funciona, benefícios
-
-### 2. Desabilitar caminho da Jornada Completa (R$ 248,50)
-
-- A página `/checkout` (que vendia a Jornada Completa) será redirecionada para `/jornada-identity`
-- O `bundlePrices` permanece no código para compatibilidade com compras existentes, mas não será mais acessível por novos usuários
-
-### 3. Depoimentos - Todos os aprovados
-
-- Query sem filtro `is_featured`, trazendo todos os aprovados com `consent_given = true`
-- Layout em grid responsivo com scroll
-- Exibindo nome (display_name prioritário) e produto "Jornada Identity"
-
----
-
-## Detalhes Técnicos
-
-### Arquivos a criar
-- `src/pages/JornadaIdentity.tsx` - Nova página de venda dedicada
-
-### Arquivos a modificar
-
-- **`src/App.tsx`**: Adicionar rota `/jornada-identity` e redirecionar `/checkout` para ela
-- **`src/components/express/EssenceUpsell.tsx`**: Atualizar nome do produto para "Jornada Identity - Código da Essência"
-- **`src/components/express/ExpressResult.tsx`**: Atualizar referências ao nome do produto
-
-### Estrutura da página `/jornada-identity`
+**Desktop (linha ~166-177):** Onde atualmente só aparece o botão dourado "Fazer minha Leitura Inicial" para visitantes não logados, adicionar um botão ghost de login antes dele:
 
 ```text
-+------------------------------------------+
-|  Hero: Jornada Identity                  |
-|  Código da Essência                      |
-|  Subtítulo explicativo                   |
-+------------------------------------------+
-|  O que você vai descobrir                |
-|  (dimensoes ocultas - lista)             |
-+------------------------------------------+
-|  Preço: R$ 99,00                         |
-|  [Começar minha Jornada] (checkout)      |
-+------------------------------------------+
-|  Depoimentos (todos aprovados)           |
-|  Grid responsivo                         |
-+------------------------------------------+
-|  Já fez a Leitura Inicial?               |
-|  [Entrar na minha conta] (login)         |
-+------------------------------------------+
-|  Disclaimer institucional                |
-+------------------------------------------+
+[Entrar]  [Fazer minha Leitura Inicial]
 ```
 
-### Query de depoimentos
+- Botão "Entrar" com estilo `variant="ghost"` e ícone `LogIn`, discreto
+- Redireciona para `/auth?redirect=/dashboard`
+- Mantém o CTA principal dourado como ação prioritária
 
-Busca todos os aprovados (sem limite de 3, sem filtro `is_featured`), com `display_name` prioritário e label fixo "Jornada Identity".
+**Mobile (linha ~258-268):** No menu mobile, adicionar um botão de login acima do CTA principal:
 
-### Botão Login
+- Botão outline "Já tenho conta" com ícone `LogIn`
+- Mesmo redirecionamento para `/auth?redirect=/dashboard`
 
-Para usuários que já fizeram a Leitura Inicial: redireciona para `/auth` com parâmetro `?redirect=/dashboard`, permitindo que acessem o dashboard e comprem de lá.
+### Detalhes visuais
 
+- O botão de login será secundário (ghost/outline) para não competir visualmente com o CTA dourado
+- Texto em português: "Entrar" (desktop) / "Já tenho conta" (mobile)
+- Texto em inglês: "Sign In" (desktop) / "I have an account" (mobile)
+- Mantém a hierarquia visual: o CTA dourado continua sendo a ação principal
+
+### Nenhuma outra mudança necessária
+
+A rota `/auth` já existe e aceita o parâmetro `?redirect=`, então o fluxo de redirecionamento ao dashboard após login já funciona.
