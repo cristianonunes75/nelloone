@@ -10,8 +10,8 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Loader2, Settings, Shield, Users, AlertTriangle, Server, Sparkles, Building2, GraduationCap } from "lucide-react";
-import { useAtivacaoCodigoFlag, useNelloBusinessFlag, useNelloPraxisFlag } from "@/hooks/useFeatureFlag";
+import { Loader2, Settings, Shield, Users, AlertTriangle, Server, Sparkles, Building2, GraduationCap, Film } from "lucide-react";
+import { useAtivacaoCodigoFlag, useNelloBusinessFlag, useNelloPraxisFlag, useRevelacaoEssenciaFlag } from "@/hooks/useFeatureFlag";
 import { useAdminPermissions } from "@/hooks/useAdminPermissions";
 
 interface AdminUser {
@@ -45,9 +45,16 @@ export const AdminSettings = () => {
     isLoading: praxisLoading,
     toggle: togglePraxis
   } = useNelloPraxisFlag();
+  
+  const {
+    isEnabled: revelacaoEnabled,
+    isLoading: revelacaoLoading,
+    toggle: toggleRevelacao
+  } = useRevelacaoEssenciaFlag();
   const [savingAtivacao, setSavingAtivacao] = useState(false);
   const [savingBusiness, setSavingBusiness] = useState(false);
   const [savingPraxis, setSavingPraxis] = useState(false);
+  const [savingRevelacao, setSavingRevelacao] = useState(false);
   
   // Permission check
   const { hasPermission, isSuperAdmin, isLoading: permLoading } = useAdminPermissions();
@@ -175,7 +182,24 @@ export const AdminSettings = () => {
       console.error("Error toggling Nello Praxis:", error);
       toast.error("Erro ao alterar configuração");
     } finally {
-      setSavingPraxis(false);
+    setSavingPraxis(false);
+    }
+  };
+
+  const handleToggleRevelacao = async () => {
+    setSavingRevelacao(true);
+    try {
+      await toggleRevelacao();
+      toast.success(
+        !revelacaoEnabled
+          ? "Revelação da Essência habilitada para todos os usuários"
+          : "Revelação da Essência desabilitada"
+      );
+    } catch (error) {
+      console.error("Error toggling Revelação:", error);
+      toast.error("Erro ao alterar configuração");
+    } finally {
+      setSavingRevelacao(false);
     }
   };
 
@@ -300,6 +324,38 @@ export const AdminSettings = () => {
               checked={praxisEnabled} 
               onCheckedChange={handleTogglePraxis}
               disabled={praxisLoading || savingPraxis}
+            />
+          </div>
+
+          {/* Revelação da Essência */}
+          <div className="flex items-center justify-between py-3 border-t border-border/50">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Film className="w-4 h-4 text-purple-500" />
+                <Label className="text-sm font-medium">Revelação da Essência</Label>
+                {revelacaoEnabled ? (
+                  <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs">
+                    Ativo
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="text-xs text-muted-foreground">
+                    Desabilitado
+                  </Badge>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Experiência cinematográfica imersiva de contemplação da essência
+              </p>
+              {revelacaoEnabled && (
+                <p className="text-xs text-amber-600 mt-1">
+                  Rota: /cliente/revelacao
+                </p>
+              )}
+            </div>
+            <Switch
+              checked={revelacaoEnabled}
+              onCheckedChange={handleToggleRevelacao}
+              disabled={revelacaoLoading || savingRevelacao}
             />
           </div>
         </CardContent>

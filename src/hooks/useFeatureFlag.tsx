@@ -113,3 +113,8 @@ export const useNelloBusinessFlag = () => {
 export const useNelloPraxisFlag = () => {
   return useFeatureFlag("feature_nello_praxis_enabled", true);
 };
+
+// Hook for Revelação da Essência cinematic experience
+export const useRevelacaoEssenciaFlag = () => {
+  return useFeatureFlag("feature_revelacao_essencia_enabled", false);
+};
