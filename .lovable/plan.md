@@ -1,46 +1,41 @@
 
 
-## Acesso ao Texto da Narração do Filme
+# Tempo de Conclusao da Jornada - Admin Dashboard
 
-### O que será feito
+## Objetivo
+Adicionar metricas de tempo de conclusao da jornada completa na area admin, mostrando quanto tempo cada usuario levou para completar os 7 testes.
 
-Adicionar na tela final do filme ("Finished") um painel expansível onde você pode **ler o roteiro completo da narração** e, como admin, **editar o texto** diretamente para refinar antes de reassistir.
+## Dados Disponiveis (sem mudancas no banco)
+- `profiles.journey_started_at` -- quando o usuario iniciou a jornada
+- `profiles.journey_completed_at` -- quando completou todos os 7 testes
+- `user_tests.started_at` / `completed_at` -- timestamps por teste individual
 
-### Mudanças
+## Mudancas
 
-#### 1. `src/pages/cliente/RevelacaoEssencia.tsx`
+### 1. AdminJourneyDashboard.tsx - Adicionar secao de Tempo de Conclusao
 
-- **Passar o `script` para o componente `FilmeFinished`** (atualmente ele não recebe o roteiro)
-- **Adicionar botão "Ver Narração"** na tela final, abaixo dos botões existentes
-- Ao clicar, abre um **Dialog/modal** com:
-  - O texto completo da narração em uma `Textarea` editável
-  - As palavras-chave de cada cena listadas
-  - Botão **"Salvar e Reassistir"** que atualiza o `script.narration` no state e reinicia o filme com o texto editado (gerando novo TTS automaticamente)
-  - Botão **"Copiar Texto"** para copiar a narração para a área de transferência
-- O fluxo de "Salvar e Reassistir" vai:
-  1. Atualizar o texto da narração no state
-  2. Chamar novamente a edge function `filme-identidade-tts` com o texto editado
-  3. Iniciar a reprodução automaticamente com o novo áudio
+**Stats Cards novos** (no topo, junto aos existentes):
+- **Tempo Medio** -- media de dias entre `journey_started_at` e `journey_completed_at` para usuarios com status "completed"
+- **Mais Rapido** -- menor tempo registrado
+- **Mais Lento** -- maior tempo registrado
 
-#### 2. Componentes utilizados
+**Coluna nova na tabela de usuarios:**
+- Coluna "Tempo" ao lado de "Inativo", mostrando a duracao formatada (ex: "2d 4h", "5d", "12h") para usuarios com jornada completa
 
-- `Dialog` (já existe em `src/components/ui/dialog.tsx`)
-- `Textarea` (já existe em `src/components/ui/textarea.tsx`)
-- `Button` (já existe)
-- Ícones: `FileText`, `Copy`, `RefreshCw` do lucide-react
+**Card de Distribuicao de Tempo** (novo card abaixo dos stats):
+- Agrupamento por faixas: menos de 1 dia, 1-3 dias, 3-7 dias, 7-14 dias, 14+ dias
+- Barras horizontais simples mostrando a contagem em cada faixa
+- Permitira entender onde esta a maioria dos usuarios
 
-### Detalhes Técnicos
+### 2. Logica de Calculo
+- Buscar `journey_started_at` e `journey_completed_at` dos profiles que ja sao carregados
+- Calcular diferenca em horas/dias
+- Agregar estatisticas (media, min, max, distribuicao)
+- Tudo client-side, sem queries adicionais -- os dados ja estao no fetch existente
 
-```text
-FilmeFinished
-  ├── Botões existentes (Assistir Novamente, Voltar)
-  ├── Novo botão "Ver Narração" (ícone FileText)
-  └── Dialog modal ao clicar:
-       ├── Textarea com narração completa (editável)
-       ├── Lista de keywords das cenas
-       ├── [Copiar Texto]
-       └── [Salvar e Reassistir] → gera novo TTS → reproduz
-```
-
-Nenhuma mudança no banco de dados. Apenas alterações no componente da página `RevelacaoEssencia.tsx`.
-
+### Detalhes Tecnicos
+- Arquivo modificado: `src/components/admin/AdminJourneyDashboard.tsx`
+- Sem migracoes de banco de dados
+- Sem novas dependencias
+- Calculo feito com `useMemo` sobre os dados ja carregados
+- Formatacao de tempo: funcao utilitaria para converter ms em "Xd Yh"
