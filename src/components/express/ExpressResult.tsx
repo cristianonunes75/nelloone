@@ -240,6 +240,28 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
           </Card>
         </motion.div>
 
+        {/* ========== JORNADA IDENTITY — Links institucionais (Etapa 2) ========== */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.0 }}>
+          <div className="rounded-xl border border-border/50 bg-muted/20 p-5 space-y-4">
+            <p className="text-sm font-semibold text-foreground text-center">
+              Tudo o que você viu agora faz parte da Jornada Identity
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a href="/os-7-mapas" className="text-sm text-nello-gold hover:underline transition-colors">
+                Conheça os 7 Mapas
+              </a>
+              <span className="hidden sm:inline text-muted-foreground/40">•</span>
+              <a href="/metodologia" className="text-sm text-nello-gold hover:underline transition-colors">
+                Como funciona a metodologia
+              </a>
+              <span className="hidden sm:inline text-muted-foreground/40">•</span>
+              <a href="/para-profissionais" className="text-sm text-nello-gold hover:underline transition-colors">
+                Identity para profissionais
+              </a>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Confidence + disclaimer */}
         <div className="space-y-3 text-center">
           <Badge variant="secondary" className="text-[10px]">Confiança geral: {prediction.overallConfidence}%</Badge>

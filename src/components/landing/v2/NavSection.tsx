@@ -67,11 +67,8 @@ export const NavSection = () => {
     return '/auth';
   };
 
-  // Links for non-logged users
-  const publicLinks = [
-    { label: t.landing.nav.tests, action: () => scrollToSection("#testes"), icon: FileText },
-    { label: t.landing.nav.pricing, action: () => scrollToSection("#precos"), icon: HelpCircle },
-  ];
+  // No public links for non-logged users — landing is single-focus on Leitura Inicial
+  const publicLinks: { label: string; action: () => void; icon: typeof FileText }[] = [];
 
   // Links for logged users - Results scrolls to results section
   const authLinks = [
@@ -127,6 +124,7 @@ export const NavSection = () => {
             {isLoading ? (
               <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
             ) : isLoggedIn ? (
+              /* logged-in dropdown unchanged */
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
@@ -167,12 +165,14 @@ export const NavSection = () => {
               </DropdownMenu>
             ) : (
               <Button 
-                variant="ghost" 
                 size="sm"
-                onClick={() => navigate(getAuthPath())}
-                className="text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                onClick={() => {
+                  const leituraPath = language === 'en' ? '/en/initial-reading' : language === 'pt-pt' ? '/pt-pt/leitura-inicial' : '/leitura-inicial';
+                  navigate(leituraPath);
+                }}
+                className="rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold text-sm"
               >
-                {t.landing.nav.login}
+                {language === 'en' ? 'Start my Reading' : 'Fazer minha Leitura Inicial'}
               </Button>
             )}
           </div>
@@ -257,12 +257,13 @@ export const NavSection = () => {
               </>
             ) : (
               <Button 
-                variant="outline" 
-                className="w-full rounded-xl border-border"
-                onClick={() => handleNavigation("/auth")}
+                className="w-full rounded-xl bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold"
+                onClick={() => {
+                  const leituraPath = language === 'en' ? '/en/initial-reading' : language === 'pt-pt' ? '/pt-pt/leitura-inicial' : '/leitura-inicial';
+                  handleNavigation(leituraPath.replace(/^\/(en|pt-pt)\//, '/'));
+                }}
               >
-                <LogIn className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                {t.landing.nav.login}
+                {language === 'en' ? 'Start my Reading' : 'Fazer minha Leitura Inicial'}
               </Button>
             )}
           </div>

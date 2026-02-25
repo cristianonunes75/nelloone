@@ -873,6 +873,29 @@ const Cliente = () => {
             </div>
           </div>
 
+          {/* ========== EXPLORAR IDENTITY — Etapa 3 ========== */}
+          <div className="mt-8 p-6 rounded-2xl border border-border/50 bg-muted/20">
+            <h3 className="text-sm font-semibold uppercase tracking-widest text-foreground mb-4">
+              {language === 'en' ? 'Explore Identity' : 'Explorar Identity'}
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { label: language === 'en' ? 'The 7 Maps' : 'Os 7 Mapas', href: language === 'en' ? '/en/the-7-maps' : '/os-7-mapas' },
+                { label: language === 'en' ? 'Methodology' : 'Metodologia', href: language === 'en' ? '/en/methodology' : '/metodologia' },
+                { label: language === 'en' ? 'For Professionals' : 'Para Profissionais', href: language === 'en' ? '/en/for-professionals' : '/para-profissionais' },
+                { label: language === 'en' ? 'Help Center' : 'Central de Ajuda', href: language === 'en' ? '/en/help' : '/ajuda' },
+              ].map((link) => (
+                <button
+                  key={link.href}
+                  onClick={() => navigate(link.href)}
+                  className="text-sm text-muted-foreground hover:text-foreground hover:bg-background/60 transition-colors rounded-xl py-3 px-4 border border-border/30 text-center"
+                >
+                  {link.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Disclaimer */}
           <div className="bg-accent/10 border border-border rounded-xl md:rounded-2xl p-4 md:p-6 text-center mt-8">
             <p className="text-xs md:text-sm text-muted-foreground">
