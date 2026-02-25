@@ -1,52 +1,81 @@
 
 
-# Depoimentos reais na Landing Page
+# Plano: Página de Venda "Jornada Identity - Código da Essência" (R$ 99)
 
-## Objetivo
-Substituir os depoimentos fictícios/hardcoded da landing por depoimentos reais do banco de dados, exibindo nome completo e profissao dos usuarios.
+## Contexto
 
-## Como funciona hoje
-- A `TestimonialsSection` na landing usa 3 depoimentos hardcoded com nomes inventados (Mariana S., Rafael M., Camila L.)
-- Ja existe uma `ApprovedTestimonialsSection` que busca depoimentos aprovados e featured do banco, mas nao e usada na landing
-- A tabela `testimonials` tem `display_name` e `user_id` (ligado a `profiles` que tem `full_name` e `profession`)
+Atualmente, o produto "Código da Essência Express" (R$ 99) é vendido apenas como upsell inline no componente `EssenceUpsell.tsx`, que aparece após a Leitura Inicial. Não existe uma página de venda dedicada e independente. A "Jornada Completa" (R$ 248,50) foi descontinuada como produto separado.
 
-## Plano de implementacao
+O objetivo é criar uma **página de venda dedicada** para o produto unificado, agora chamado **"Jornada Identity"**, com todos os depoimentos aprovados e um botão de login para usuários que já fizeram a Leitura Inicial.
 
-### 1. Atualizar TestimonialsSection para buscar do banco
-- Adicionar query ao banco buscando depoimentos com `status = 'approved'` e `is_featured = true`, limitando a 3
-- Fazer join com `profiles` via `user_id` para obter `full_name` e `profession`
-- Usar `full_name` do perfil (nome e sobrenome) em vez do `display_name` do depoimento
-- Usar `profession` do perfil como subtitulo (ex: "Arquiteta", "Empresario")
-- Manter compliance check (filtrar depoimentos com risco critico)
-- Manter fallback para os depoimentos hardcoded caso nao existam depoimentos aprovados no banco
+---
 
-### 2. Estilo visual
-- Manter o layout minimalista atual (cards com Quote icon, rating stars)
-- Exibir nome completo (ex: "Mariana Santos") em vez de iniciais abreviadas
-- Exibir profissao real do perfil
-- Manter scroll horizontal no mobile e grid 3 colunas no desktop
+## O que muda
 
-### 3. Privacidade e compliance
-- Buscar apenas depoimentos com `consent_given = true` (ja garantido pelo fluxo de aprovacao)
-- Aplicar filtro de compliance existente (`checkTestimonialCompliance`)
-- Manter disclaimer institucional
+### 1. Nova página de venda: `/jornada-identity`
 
-## Detalhes tecnicos
+Uma página completa e dedicada com:
 
-**Arquivo editado:** `src/components/landing/v2/TestimonialsSection.tsx`
+- **Nome do produto**: "Jornada Identity - Código da Essência"
+- **Preço**: R$ 99,00 (pagamento único)
+- **Seção de depoimentos**: Todos os depoimentos aprovados do banco (não apenas 3 featured)
+- **Botão "Já fiz minha Leitura Inicial"**: Redireciona para `/auth` (login), para que o usuário acesse seu dashboard e compre de lá
+- **Botão de compra principal**: Inicia o checkout do `codigo_essencia_express` via edge function `create-checkout`
+- **Seções explicativas**: O que está incluído, como funciona, benefícios
 
-**Query:**
-```sql
-SELECT t.id, t.content, t.is_featured, p.full_name, p.profession
-FROM testimonials t
-JOIN profiles p ON t.user_id = p.id
-WHERE t.status = 'approved' 
-  AND t.is_featured = true
-  AND t.consent_given = true
-ORDER BY t.created_at DESC
-LIMIT 3
+### 2. Desabilitar caminho da Jornada Completa (R$ 248,50)
+
+- A página `/checkout` (que vendia a Jornada Completa) será redirecionada para `/jornada-identity`
+- O `bundlePrices` permanece no código para compatibilidade com compras existentes, mas não será mais acessível por novos usuários
+
+### 3. Depoimentos - Todos os aprovados
+
+- Query sem filtro `is_featured`, trazendo todos os aprovados com `consent_given = true`
+- Layout em grid responsivo com scroll
+- Exibindo nome (display_name prioritário) e produto "Jornada Identity"
+
+---
+
+## Detalhes Técnicos
+
+### Arquivos a criar
+- `src/pages/JornadaIdentity.tsx` - Nova página de venda dedicada
+
+### Arquivos a modificar
+
+- **`src/App.tsx`**: Adicionar rota `/jornada-identity` e redirecionar `/checkout` para ela
+- **`src/components/express/EssenceUpsell.tsx`**: Atualizar nome do produto para "Jornada Identity - Código da Essência"
+- **`src/components/express/ExpressResult.tsx`**: Atualizar referências ao nome do produto
+
+### Estrutura da página `/jornada-identity`
+
+```text
++------------------------------------------+
+|  Hero: Jornada Identity                  |
+|  Código da Essência                      |
+|  Subtítulo explicativo                   |
++------------------------------------------+
+|  O que você vai descobrir                |
+|  (dimensoes ocultas - lista)             |
++------------------------------------------+
+|  Preço: R$ 99,00                         |
+|  [Começar minha Jornada] (checkout)      |
++------------------------------------------+
+|  Depoimentos (todos aprovados)           |
+|  Grid responsivo                         |
++------------------------------------------+
+|  Já fez a Leitura Inicial?               |
+|  [Entrar na minha conta] (login)         |
++------------------------------------------+
+|  Disclaimer institucional                |
++------------------------------------------+
 ```
 
-**Fallback:** Se a query retornar 0 resultados, exibir os depoimentos hardcoded atuais para que a secao nunca fique vazia.
+### Query de depoimentos
 
-Nenhuma alteracao de banco, migrations ou RLS necessaria — a tabela testimonials ja tem RLS permitindo leitura publica para depoimentos aprovados.
+Busca todos os aprovados (sem limite de 3, sem filtro `is_featured`), com `display_name` prioritário e label fixo "Jornada Identity".
+
+### Botão Login
+
+Para usuários que já fizeram a Leitura Inicial: redireciona para `/auth` com parâmetro `?redirect=/dashboard`, permitindo que acessem o dashboard e comprem de lá.
+
