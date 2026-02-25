@@ -1,11 +1,12 @@
 /**
- * Código Express — Predictive Essence Code Model
+ * Código Inicial — Predictive Essence Code Model
  * Model Version: express_v1
  * 
  * Uses 17 sentinel questions from DISC, Nello16, Temperamentos, and Eneagrama V2
  * to estimate the Essence Code with ~65-75% predictive accuracy.
  * 
  * NOT a reduced test — a compressed predictive model.
+ * The "Código Inicial" is the first layer of identity revelation.
  */
 
 export const EXPRESS_MODEL_VERSION = 'express_v1';
@@ -496,6 +497,10 @@ export interface ExpressPrediction {
   dimensionProfile: Record<ExpressDimension, number>;
   /** Summary sentence */
   essenceSummary: string;
+  /** Identity archetype name (e.g. "O Estrategista Natural") */
+  archetypeName: string;
+  /** Human narrative (2-3 lines) */
+  narrativeText: string;
   modelVersion: string;
 }
 
@@ -598,6 +603,21 @@ export function calculateExpressPrediction(answers: Record<string, number>): Exp
     enneaSorted[0][0]
   );
 
+  // ── Archetype Name ──
+  const archetypeName = buildArchetypeName(
+    discSorted[0][0],
+    tempSorted[0][0],
+    enneaSorted[0][0]
+  );
+
+  // ── Narrative Text ──
+  const narrativeText = buildNarrativeText(
+    discSorted[0][0],
+    tempSorted[0][0],
+    n16type,
+    enneaSorted[0][0]
+  );
+
   return {
     disc: { primary: discSorted[0][0], secondary: discSorted[1][0], confidence: discConfidence },
     temperament: { primary: tempSorted[0][0], secondary: tempSorted[1][0], confidence: tempConfidence },
@@ -606,6 +626,8 @@ export function calculateExpressPrediction(answers: Record<string, number>): Exp
     overallConfidence,
     dimensionProfile,
     essenceSummary,
+    archetypeName,
+    narrativeText,
     modelVersion: EXPRESS_MODEL_VERSION,
   };
 }
@@ -624,6 +646,75 @@ function buildEssenceSummary(disc: string, temp: string, n16: string, ennea: str
   };
 
   return `Seu padrão indica ${discLabels[disc] || disc} como modo de ação, ${tempLabels[temp] || temp} como energia base, e uma busca central por ${enneaLabels[ennea] || ennea}.`;
+}
+
+// ========== ARCHETYPE NAME GENERATOR ==========
+
+const ARCHETYPE_MAP: Record<string, Record<string, Record<string, string>>> = {
+  D: {
+    colerico: { '1': 'O Líder Exigente', '2': 'O Protetor Firme', '3': 'O Realizador Nato', '4': 'O Criador Intenso', '5': 'O Estrategista Direto', '6': 'O Comandante Leal', '7': 'O Desbravador Audaz', '8': 'O Conquistador Natural', '9': 'O Líder Sereno' },
+    sanguineo: { '1': 'O Reformador Carismático', '2': 'O Catalisador Social', '3': 'O Protagonista Magnético', '4': 'O Artista Determinado', '5': 'O Visionário Expansivo', '6': 'O Aliado Enérgico', '7': 'O Entusiasta Estratégico', '8': 'O Desafiador Vibrante', '9': 'O Harmonizador Ativo' },
+    melancolico: { '1': 'O Perfeccionista Decidido', '2': 'O Guardião Analítico', '3': 'O Realizador Metódico', '4': 'O Visionário Profundo', '5': 'O Investigador Implacável', '6': 'O Analista Protetor', '7': 'O Estrategista Inventivo', '8': 'O Protetor Analítico', '9': 'O Pensador Resoluto' },
+    fleumatico: { '1': 'O Reformador Pragmático', '2': 'O Protetor Constante', '3': 'O Realizador Estável', '4': 'O Criador Resiliente', '5': 'O Estrategista Natural', '6': 'O Guardião da Ação', '7': 'O Visionário Pragmático', '8': 'O Líder Inabalável', '9': 'O Pacificador Firme' },
+  },
+  I: {
+    colerico: { '1': 'O Inspirador Exigente', '2': 'O Catalisador Instintivo', '3': 'O Performer Magnético', '4': 'O Artista Flamejante', '5': 'O Comunicador Profundo', '6': 'O Mobilizador Leal', '7': 'O Entusiasta Contagiante', '8': 'O Líder Carismático', '9': 'O Conector Pacífico' },
+    sanguineo: { '1': 'O Otimista Estruturado', '2': 'O Conector Natural', '3': 'O Comunicador Brilhante', '4': 'O Artista Expressivo', '5': 'O Explorador Social', '6': 'O Companheiro Fiel', '7': 'O Entusiasta Puro', '8': 'O Influenciador Forte', '9': 'O Harmonizador Social' },
+    melancolico: { '1': 'O Idealista Sensível', '2': 'O Cuidador Profundo', '3': 'O Artista Performático', '4': 'O Romântico Expressivo', '5': 'O Pensador Empático', '6': 'O Conselheiro Leal', '7': 'O Sonhador Criativo', '8': 'O Protetor Apaixonado', '9': 'O Mediador Reflexivo' },
+    fleumatico: { '1': 'O Diplomata Íntegro', '2': 'O Acolhedor Constante', '3': 'O Inspirador Tranquilo', '4': 'O Artista Contemplativo', '5': 'O Observador Gentil', '6': 'O Amigo Inabalável', '7': 'O Otimista Sereno', '8': 'O Influenciador Firme', '9': 'O Pacificador Nato' },
+  },
+  S: {
+    colerico: { '1': 'O Guardião Determinado', '2': 'O Protetor Dedicado', '3': 'O Construtor Incansável', '4': 'O Criador Persistente', '5': 'O Especialista Focado', '6': 'O Sentinela Firme', '7': 'O Estabilizador Criativo', '8': 'O Protetor Inabalável', '9': 'O Âncora Resiliente' },
+    sanguineo: { '1': 'O Facilitador Justo', '2': 'O Cuidador Alegre', '3': 'O Apoiador Entusiasmado', '4': 'O Artista Acolhedor', '5': 'O Observador Sociável', '6': 'O Companheiro Presente', '7': 'O Otimista Constante', '8': 'O Guardião Carismático', '9': 'O Harmonizador Nato' },
+    melancolico: { '1': 'O Guardião Meticuloso', '2': 'O Cuidador Devoto', '3': 'O Construtor Silencioso', '4': 'O Contemplativo Leal', '5': 'O Investigador Paciente', '6': 'O Protetor Vigilante', '7': 'O Planejador Imaginativo', '8': 'O Guardião Profundo', '9': 'O Pacificador Reflexivo' },
+    fleumatico: { '1': 'O Estabilizador Íntegro', '2': 'O Porto Seguro', '3': 'O Construtor Sereno', '4': 'O Contemplativo Estável', '5': 'O Observador Calmo', '6': 'O Pilar Inabalável', '7': 'O Otimista Equilibrado', '8': 'O Protetor Tranquilo', '9': 'O Pacificador Essencial' },
+  },
+  C: {
+    colerico: { '1': 'O Perfeccionista Intenso', '2': 'O Analista Dedicado', '3': 'O Realizador Preciso', '4': 'O Criador Exigente', '5': 'O Investigador Implacável', '6': 'O Analista Vigilante', '7': 'O Inovador Metódico', '8': 'O Estrategista Implacável', '9': 'O Pensador Decidido' },
+    sanguineo: { '1': 'O Perfeccionista Comunicativo', '2': 'O Analista Empático', '3': 'O Realizador Articulado', '4': 'O Artista Analítico', '5': 'O Explorador Sistemático', '6': 'O Conselheiro Preciso', '7': 'O Inventore Otimista', '8': 'O Estrategista Social', '9': 'O Mediador Analítico' },
+    melancolico: { '1': 'O Perfeccionista Nato', '2': 'O Analista Sensível', '3': 'O Realizador Criterioso', '4': 'O Artista Perfeccionista', '5': 'O Investigador Profundo', '6': 'O Analista Cauteloso', '7': 'O Pensador Inventivo', '8': 'O Estrategista Profundo', '9': 'O Pensador Contemplativo' },
+    fleumatico: { '1': 'O Perfeccionista Sereno', '2': 'O Analista Acolhedor', '3': 'O Construtor Preciso', '4': 'O Artista Paciente', '5': 'O Observador Metódico', '6': 'O Guardião Sistemático', '7': 'O Planejador Tranquilo', '8': 'O Estrategista Estável', '9': 'O Pensador Pacífico' },
+  },
+};
+
+function buildArchetypeName(disc: string, temp: string, ennea: string): string {
+  const discMap = ARCHETYPE_MAP[disc];
+  if (!discMap) return 'O Explorador da Essência';
+  const tempMap = discMap[temp];
+  if (!tempMap) return 'O Explorador da Essência';
+  return tempMap[ennea] || 'O Explorador da Essência';
+}
+
+// ========== NARRATIVE TEXT GENERATOR ==========
+
+function buildNarrativeText(disc: string, temp: string, n16: string, ennea: string): string {
+  const entryMode: Record<string, string> = {
+    D: 'Você entra no mundo com decisão. Quando algo precisa acontecer, seu instinto é assumir o comando e agir.',
+    I: 'Você entra no mundo através das pessoas. Sua energia natural é conectar, inspirar e mover quem está ao redor.',
+    S: 'Você entra no mundo com presença constante. Sua força está na consistência e na capacidade de sustentar o que importa.',
+    C: 'Você entra no mundo com precisão. Sua mente analisa, organiza e busca entender antes de se mover.',
+  };
+
+  const energyBase: Record<string, string> = {
+    sanguineo: 'Sua energia é expansiva — você se renova no contato, na leveza e na troca.',
+    colerico: 'Sua energia é propulsora — você avança com intensidade e não aceita estagnação.',
+    melancolico: 'Sua energia é profunda — você precisa de sentido, qualidade e tempo para processar.',
+    fleumatico: 'Sua energia é sustentada — você mantém o equilíbrio mesmo quando tudo ao redor se agita.',
+  };
+
+  const innerDrive: Record<string, string> = {
+    '1': 'No fundo, você busca fazer as coisas do jeito certo — e isso guia suas escolhas mais do que percebe.',
+    '2': 'No fundo, você busca ser essencial para quem ama — e isso move silenciosamente suas decisões.',
+    '3': 'No fundo, você busca realizar algo que importe — e isso alimenta sua disciplina natural.',
+    '4': 'No fundo, você busca ser autêntico — e isso faz você sentir o mundo de forma diferente dos outros.',
+    '5': 'No fundo, você busca compreender — e isso faz você observar mais do que a maioria percebe.',
+    '6': 'No fundo, você busca segurança verdadeira — e isso faz você antecipar riscos antes de qualquer um.',
+    '7': 'No fundo, você busca liberdade e possibilidades — e isso faz você sempre enxergar o próximo passo.',
+    '8': 'No fundo, você busca força e autonomia — e isso faz você proteger o que importa com intensidade.',
+    '9': 'No fundo, você busca paz interior — e isso faz você criar harmonia mesmo em cenários difíceis.',
+  };
+
+  return `${entryMode[disc] || ''} ${energyBase[temp] || ''} ${innerDrive[ennea] || ''}`.trim();
 }
 
 // ========== QUESTION STATS ==========
