@@ -118,7 +118,7 @@ export default function EssenceUpsell({ onDeepen, inviterName, inviterLeadId, le
                 Próximo passo da sua jornada
               </Badge>
               <h3 className="text-2xl font-bold text-foreground tracking-tight">
-                Descubra seu Código da Essência
+                Jornada Identity — Código da Essência
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Uma leitura profunda integrando padrões emocionais, comportamentais e internos que não aparecem em uma análise rápida.

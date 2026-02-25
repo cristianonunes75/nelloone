@@ -212,7 +212,7 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
               Existe uma leitura muito mais profunda esperando por você.
             </h3>
             <p className="text-sm text-foreground/70 leading-relaxed max-w-md mx-auto">
-              O Código da Essência conecta múltiplas dimensões do seu funcionamento e revela padrões que não aparecem nesta etapa inicial.
+              A Jornada Identity — Código da Essência conecta múltiplas dimensões do seu funcionamento e revela padrões que não aparecem nesta etapa inicial.
             </p>
           </div>
         </motion.div>
@@ -227,7 +227,7 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
 
               <Button onClick={() => setStep('lead_capture')} className="w-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold rounded-full" size="lg">
                 <Sparkles className="h-4 w-4 mr-2" />
-                Desbloquear Código da Essência
+                Desbloquear Jornada Identity
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
 
