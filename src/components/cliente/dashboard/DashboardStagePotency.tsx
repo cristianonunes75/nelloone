@@ -14,7 +14,8 @@ import {
   CheckCircle2,
   Loader2,
   Building2,
-  Users
+  Users,
+  Film
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { JourneyStep } from "@/hooks/useJourneyProgress";
@@ -23,7 +24,9 @@ import { getNelloAppUrl } from "@/hooks/useSubdomain";
 import { ProgressiveUpsellSection } from "@/components/monetization/ProgressiveUpsellSection";
 import { useProgressiveFunnel } from "@/hooks/useProgressiveFunnel";
 import { DashboardTestimonialSection } from "./DashboardTestimonialSection";
-import { useNelloBusinessFlag, useNelloPraxisFlag } from "@/hooks/useFeatureFlag";
+import { useNelloBusinessFlag, useNelloPraxisFlag, useRevelacaoEssenciaFlag } from "@/hooks/useFeatureFlag";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 interface TestResult {
   testType: string;
@@ -146,6 +149,13 @@ export function DashboardStagePotency({
   // Feature flags for Business and Praxis modules
   const { isEnabled: showBusiness } = useNelloBusinessFlag();
   const { isEnabled: showPraxis } = useNelloPraxisFlag();
+
+  // Revelação da Essência visibility
+  const { isEnabled: revelacaoEnabled } = useRevelacaoEssenciaFlag();
+  const { userRole } = useAuth();
+  const navigate = useNavigate();
+  const isAdmin = userRole === "admin";
+  const showRevelacao = revelacaoEnabled || isAdmin;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -314,6 +324,35 @@ export function DashboardStagePotency({
           </Button>
         </div>
       </motion.div>
+
+      {/* Revelação da Essência - Cinematic Experience */}
+      {showRevelacao && (
+        <motion.div 
+          variants={itemVariants}
+          className="relative overflow-hidden bg-gradient-to-r from-zinc-900 to-zinc-800 border border-zinc-700/50 rounded-2xl p-6 md:p-8 text-white"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,hsl(var(--primary)/0.15),transparent_60%)]" />
+          <div className="relative flex flex-col md:flex-row items-start md:items-center gap-5">
+            <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
+              <Film className="w-6 h-6 text-white/80" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold mb-1">A Revelação da Essência</h3>
+              <p className="text-sm text-white/60">
+                Uma experiência contemplativa sobre quem você é. Sem pressa, sem explicações — apenas reconhecimento.
+              </p>
+            </div>
+            <Button
+              onClick={() => navigate("/cliente/revelacao")}
+              variant="ghost"
+              className="text-white/80 hover:text-white border border-white/20 hover:border-white/40 gap-2 shrink-0"
+            >
+              Vivenciar
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </motion.div>
+      )}
 
       {/* Knowledge Base - Results Grid */}
       <motion.div variants={itemVariants}>
