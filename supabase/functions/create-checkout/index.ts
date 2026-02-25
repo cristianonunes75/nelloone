@@ -749,7 +749,8 @@ serve(async (req) => {
         // Determine the product type being purchased
         const productType = body.productType || (
           isCodigoCasal ? "nello_couple" : 
-          isAtivacaoCodigo ? "activation_individual" : 
+          isAtivacaoCodigo ? "ativacao_codigo" : 
+          isCodigoEssenciaExpress ? "codigo_essencia_express" :
           isFundadores ? "fundadores" : 
           isBundle ? "jornada_completa" : 
           "test_avulso"
