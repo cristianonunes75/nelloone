@@ -1,14 +1,22 @@
-import { Star, Quote } from "lucide-react";
+import { Quote } from "lucide-react";
 import { TESTIMONIAL_DISCLAIMER } from "@/lib/compliance/testimonialCompliance";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { checkTestimonialCompliance } from "@/lib/compliance/testimonialCompliance";
 
+const PRODUCT_LABELS: Record<string, string> = {
+  jornada_completa: "Jornada Completa",
+  codigo_casal: "Código do Casal",
+  test_avulso: "Mapa Avulso",
+  fundadores: "Plano Fundadores",
+  codigo_essencia_express: "Código da Essência Express",
+  ativacao_codigo: "Ativação do Código",
+};
+
 export const TestimonialsSection = () => {
   const { data: testimonials } = useQuery({
     queryKey: ["landing-testimonials"],
     queryFn: async () => {
-      // Busca mais itens para garantir 3 válidos após filtros
       const { data: rawTestimonials, error } = await supabase
         .from("testimonials")
         .select("id, content, is_featured, user_id, display_name")
@@ -22,22 +30,48 @@ export const TestimonialsSection = () => {
       if (!rawTestimonials || rawTestimonials.length === 0) return [];
 
       const userIds = rawTestimonials.map((t) => t.user_id).filter(Boolean);
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, full_name, profession")
-        .in("id", userIds);
 
-      const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
+      // Fetch profiles and last purchase in parallel
+      const [profilesRes, purchasesRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, full_name, profession")
+          .in("id", userIds),
+        supabase
+          .from("test_purchases")
+          .select("user_id, purchase_category, purchased_at")
+          .in("user_id", userIds)
+          .order("purchased_at", { ascending: false }),
+      ]);
+
+      const profileMap = new Map(
+        (profilesRes.data || []).map((p) => [p.id, p])
+      );
+
+      // Get the most recent purchase per user
+      const purchaseMap = new Map<string, string>();
+      for (const p of purchasesRes.data || []) {
+        if (!purchaseMap.has(p.user_id)) {
+          purchaseMap.set(p.user_id, p.purchase_category || "");
+        }
+      }
 
       const validTestimonials = rawTestimonials
-        .filter((t) => checkTestimonialCompliance(t.content).riskLevel !== "critical")
+        .filter(
+          (t) =>
+            checkTestimonialCompliance(t.content).riskLevel !== "critical"
+        )
         .map((t) => {
           const profile = profileMap.get(t.user_id);
+          const purchaseCategory = purchaseMap.get(t.user_id) || "";
+          const productLabel = PRODUCT_LABELS[purchaseCategory] || "";
+
           return {
             name: profile?.full_name || t.display_name || "Usuário",
-            role: profile?.profession || "Usuário Identity",
+            subtitle: [profile?.profession, productLabel]
+              .filter(Boolean)
+              .join(" · ") || "",
             content: t.content,
-            rating: 5,
           };
         })
         .slice(0, 3);
@@ -48,7 +82,6 @@ export const TestimonialsSection = () => {
     retry: 1,
   });
 
-  // Regra solicitada: só exibe com 3 depoimentos reais
   if (!testimonials || testimonials.length < 3) return null;
 
   return (
@@ -70,20 +103,22 @@ export const TestimonialsSection = () => {
                 key={`${testimonial.name}-${index}`}
                 className="bg-card rounded-xl p-4 md:p-6 border border-border/30 shadow-soft hover:shadow-medium transition-all duration-300 min-w-[280px] md:min-w-0 snap-center flex-shrink-0 md:flex-shrink"
               >
-                <Quote className="w-6 h-6 text-muted-foreground/30 mb-3" strokeWidth={1.5} />
+                <Quote
+                  className="w-6 h-6 text-muted-foreground/30 mb-3"
+                  strokeWidth={1.5}
+                />
                 <p className="text-foreground mb-4 md:mb-6 leading-relaxed text-xs md:text-sm line-clamp-4 md:line-clamp-none">
                   "{testimonial.content}"
                 </p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-foreground text-xs md:text-sm">{testimonial.name}</p>
-                    <p className="text-[10px] md:text-xs text-muted-foreground">{testimonial.role}</p>
-                  </div>
-                  <div className="flex gap-0.5">
-                    {Array.from({ length: testimonial.rating }).map((_, i) => (
-                      <Star key={i} className="w-3 h-3 md:w-3.5 md:h-3.5 text-foreground/40 fill-foreground/40" />
-                    ))}
-                  </div>
+                <div>
+                  <p className="font-medium text-foreground text-xs md:text-sm">
+                    {testimonial.name}
+                  </p>
+                  {testimonial.subtitle && (
+                    <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">
+                      {testimonial.subtitle}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
