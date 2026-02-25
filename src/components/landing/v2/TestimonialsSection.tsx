@@ -35,7 +35,7 @@ export const TestimonialsSection = () => {
       const [profilesRes, purchasesRes] = await Promise.all([
         supabase
           .from("profiles")
-          .select("id, full_name, profession")
+          .select("id, full_name, profession, journey_status")
           .in("id", userIds),
         supabase
           .from("test_purchases")
@@ -48,11 +48,22 @@ export const TestimonialsSection = () => {
         (profilesRes.data || []).map((p) => [p.id, p])
       );
 
-      // Get the most recent purchase per user
+      // Determine best product label per user:
+      // 1. If journey_status=completed → "Jornada Completa"
+      // 2. If has jornada_completa purchase → "Jornada Completa"
+      // 3. Otherwise → most recent purchase
       const purchaseMap = new Map<string, string>();
+      const userPurchases = new Map<string, string[]>();
       for (const p of purchasesRes.data || []) {
-        if (!purchaseMap.has(p.user_id)) {
-          purchaseMap.set(p.user_id, p.purchase_category || "");
+        if (!userPurchases.has(p.user_id)) userPurchases.set(p.user_id, []);
+        userPurchases.get(p.user_id)!.push(p.purchase_category || "");
+      }
+      for (const [userId, categories] of userPurchases) {
+        const profile = profileMap.get(userId);
+        if (profile?.journey_status === "completed" || categories.includes("jornada_completa")) {
+          purchaseMap.set(userId, "jornada_completa");
+        } else {
+          purchaseMap.set(userId, categories[0] || "");
         }
       }
 
