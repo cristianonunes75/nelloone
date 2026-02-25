@@ -1,116 +1,111 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { cn } from "@/lib/utils";
+import { ArrowRight, Clock } from "lucide-react";
+import { motion } from "framer-motion";
 
-export const HeroSection = () => {
-  const navigate = useNavigate();
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
-  const { t, language } = useLanguage();
+interface HeroSectionProps {
+  onCTA: () => void;
+}
 
-  const getAuthPath = () => {
-    if (language === 'en') return "/en/auth";
-    if (language === 'pt-pt') return "/pt-pt/auth";
-    return "/auth";
-  };
-
+export const HeroSection = ({ onCTA }: HeroSectionProps) => {
   return (
-    <section className="relative min-h-[90vh] md:min-h-screen flex items-center justify-center overflow-hidden bg-background">
-      {/* Warm gradient background */}
-      <div className="absolute inset-0 gradient-warm" />
-      
-      {/* Subtle golden glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[400px] h-[400px] md:w-[700px] md:h-[700px] bg-nello-gold/5 rounded-full blur-3xl subtle-pulse" />
-      
-      {/* Light decorative circles */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] md:w-[700px] md:h-[700px] border border-nello-gold/10 rounded-full opacity-30" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] md:w-[500px] md:h-[500px] border border-nello-gold/8 rounded-full opacity-20" />
-      
-      <div ref={ref} className="container relative z-10 px-4 md:px-6 py-20 md:py-32">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Small decorative icon */}
-          <div 
-            className={cn(
-              "mb-6 md:mb-8 flex justify-center transition-all duration-700",
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-            )}
-          >
-            <Sparkles className="w-6 h-6 text-nello-gold" strokeWidth={1.5} />
-          </div>
+    <section className="relative min-h-[85vh] md:min-h-[90vh] flex items-center overflow-hidden pt-16">
+      {/* Subtle warm glow */}
+      <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] md:w-[700px] md:h-[700px] bg-nello-gold/5 rounded-full blur-3xl" />
 
-          {/* Main headline - Serif editorial */}
-          <h1 
-            className={cn(
-              "font-heading text-[2.5rem] leading-[1.1] sm:text-5xl md:text-6xl lg:text-[4.5rem] text-foreground mb-6 md:mb-8 transition-all duration-700 delay-100",
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-            )}
-          >
-            <span className="block">O Identity não te define.</span>
-            <span className="block text-nello-gold">Ele te liberta.</span>
-          </h1>
+      <div className="relative z-10 container px-6 sm:px-8 lg:px-10 py-16 md:py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16 items-center max-w-6xl mx-auto">
+          {/* Text — left 60% */}
+          <div className="lg:col-span-3 text-center lg:text-left">
+            {/* Microlabel */}
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-xs uppercase tracking-[0.2em] text-nello-gold font-medium mb-4"
+            >
+              Uma experiência guiada de autoconhecimento
+            </motion.p>
 
-          {/* Subheadline */}
-          <p 
-            className={cn(
-              "font-body text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto mb-5 md:mb-6 leading-relaxed transition-all duration-700 delay-200",
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-            )}
-          >
-            Pare de tentar se encaixar. A Jornada Identity é o processo de remoção de tudo o que não é você.
-          </p>
-          
-          {/* Tagline */}
-          <p 
-            className={cn(
-              "text-sm md:text-base text-muted-foreground/70 max-w-xl mx-auto mb-10 md:mb-12 transition-all duration-700 delay-300",
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-            )}
-          >
-            Uma jornada em 7 camadas para revelar seu Código da Essência.
-          </p>
+            <motion.h1
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="font-display text-[1.75rem] leading-[1.2] sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight mb-6 md:mb-8"
+            >
+              Talvez você não precise mudar de vida.
+              <br />
+              <span className="text-nello-gold">Talvez precise apenas se compreender.</span>
+            </motion.h1>
 
-          {/* CTA Button - Golden warm */}
-          <div 
-            className={cn(
-              "flex flex-col items-center justify-center gap-4 px-4 md:px-0 transition-all duration-700 delay-400",
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-            )}
-          >
-            <div className="flex flex-col items-center gap-3">
-              <Button 
-                size="lg" 
-                className="group w-full sm:w-auto h-14 md:h-16 px-10 md:px-12 text-base md:text-lg rounded-full bg-nello-gold hover:bg-nello-gold-deep text-white shadow-lg hover:shadow-gold hover-lift press-effect font-sans-ui font-medium"
-                onClick={() => navigate(getAuthPath())}
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="text-base sm:text-lg md:text-xl text-foreground/70 leading-relaxed max-w-2xl mx-auto lg:mx-0 mb-8 md:mb-10"
+            >
+              A Leitura Inicial apresenta tendências de comportamento e percepção pessoal de forma reflexiva e educativa.
+            </motion.p>
+
+            {/* Badges */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-8 md:mb-10"
+            >
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/50 text-sm text-foreground/70">
+                <Clock className="w-3.5 h-3.5" />
+                2 minutos
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/50 text-sm text-foreground/70">
+                ✓ Gratuito
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/50 text-sm text-foreground/70">
+                ✓ Sem cadastro obrigatório
+              </span>
+            </motion.div>
+
+            {/* CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="max-w-sm mx-auto lg:mx-0"
+            >
+              <Button
+                onClick={onCTA}
+                size="lg"
+                className="w-full min-h-[56px] text-base px-8 rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold shadow-lg transition-all duration-300 hover:scale-[1.02] group"
               >
-                Revelar meu Código da Essência
-                <Sparkles className="ml-2 w-5 h-5 md:w-6 md:h-6 text-white/90 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
+                Começar minha Leitura Inicial
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <p className="text-xs md:text-sm text-muted-foreground/70">
-                Acesso vitalício à sua jornada de identidade.
-              </p>
-            </div>
+            </motion.div>
           </div>
 
-          {/* Social proof */}
-          <p 
-            className={cn(
-              "mt-10 md:mt-12 text-xs md:text-sm text-muted-foreground/80 font-body transition-all duration-700 delay-500",
-              isVisible ? "opacity-100" : "opacity-0"
-            )}
+          {/* Image — right 40% */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9, delay: 0.3 }}
+            className="lg:col-span-2 flex justify-center"
           >
-            ✓ {(t.landing.hero as any).social_proof || (language === 'en' 
-              ? 'Over 2,000 people have started their journey' 
-              : language === 'pt-pt'
-              ? 'Mais de 2.000 pessoas já iniciaram a sua jornada'
-              : 'Mais de 2.000 pessoas já iniciaram sua jornada')}
-          </p>
+            <div className="relative w-full max-w-md lg:max-w-none">
+              <img
+                src="/images/landing-hero-introspection.webp"
+                alt="Pessoa em momento de reflexão e introspecção"
+                className="w-full h-auto rounded-2xl shadow-2xl object-cover"
+                loading="eager"
+              />
+              {/* Soft overlay fade at edges */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-background/20 to-transparent pointer-events-none" />
+            </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 md:h-32 bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 };
