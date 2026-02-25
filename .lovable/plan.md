@@ -1,40 +1,46 @@
 
 
-## Problema
+## Acesso ao Texto da Narração do Filme
 
-O CTA "A Revelação da Essência" só existe no componente `DashboardStageRevelation` (Stage B). Porém, quando o usuário já comprou a Ativação, o dashboard pula direto para o `DashboardStagePotency` (Stage C), que não contém esse CTA. Como admin, você está no Stage C.
+### O que será feito
 
-## Solução
+Adicionar na tela final do filme ("Finished") um painel expansível onde você pode **ler o roteiro completo da narração** e, como admin, **editar o texto** diretamente para refinar antes de reassistir.
 
-Adicionar o mesmo CTA cinematográfico da Revelação no `DashboardStagePotency`, com a mesma lógica de visibilidade:
-- **Admin**: sempre vê o botão
-- **Usuários**: só veem quando o feature flag `feature_revelacao_essencia_enabled` está ativo
+### Mudanças
 
-## Mudanças
+#### 1. `src/pages/cliente/RevelacaoEssencia.tsx`
 
-### 1. `src/components/cliente/dashboard/DashboardStagePotency.tsx`
+- **Passar o `script` para o componente `FilmeFinished`** (atualmente ele não recebe o roteiro)
+- **Adicionar botão "Ver Narração"** na tela final, abaixo dos botões existentes
+- Ao clicar, abre um **Dialog/modal** com:
+  - O texto completo da narração em uma `Textarea` editável
+  - As palavras-chave de cada cena listadas
+  - Botão **"Salvar e Reassistir"** que atualiza o `script.narration` no state e reinicia o filme com o texto editado (gerando novo TTS automaticamente)
+  - Botão **"Copiar Texto"** para copiar a narração para a área de transferência
+- O fluxo de "Salvar e Reassistir" vai:
+  1. Atualizar o texto da narração no state
+  2. Chamar novamente a edge function `filme-identidade-tts` com o texto editado
+  3. Iniciar a reprodução automaticamente com o novo áudio
 
-- Importar `useRevelacaoEssenciaFlag` e `useAuth`
-- Importar o icone `Film`
-- Adicionar a mesma lógica `showRevelacao = revelacaoEnabled || isAdmin`
-- Inserir o bloco cinematográfico escuro (identico ao do `DashboardStageRevelation`) logo abaixo do card "Codigo da Essencia Quick Access" (linha ~316), antes do grid de resultados
+#### 2. Componentes utilizados
 
-O bloco a ser adicionado:
-```tsx
-{showRevelacao && (
-  <motion.div 
-    variants={itemVariants}
-    className="relative overflow-hidden bg-gradient-to-r from-zinc-900 to-zinc-800 border border-zinc-700/50 rounded-2xl p-6 md:p-8 text-white"
-  >
-    <div className="absolute inset-0 bg-[radial-gradient(...)]" />
-    <div className="relative flex ...">
-      <Film icon />
-      <h3>A Revelacao da Essencia</h3>
-      <Button onClick={() => navigate("/cliente/revelacao")}>Vivenciar</Button>
-    </div>
-  </motion.div>
-)}
+- `Dialog` (já existe em `src/components/ui/dialog.tsx`)
+- `Textarea` (já existe em `src/components/ui/textarea.tsx`)
+- `Button` (já existe)
+- Ícones: `FileText`, `Copy`, `RefreshCw` do lucide-react
+
+### Detalhes Técnicos
+
+```text
+FilmeFinished
+  ├── Botões existentes (Assistir Novamente, Voltar)
+  ├── Novo botão "Ver Narração" (ícone FileText)
+  └── Dialog modal ao clicar:
+       ├── Textarea com narração completa (editável)
+       ├── Lista de keywords das cenas
+       ├── [Copiar Texto]
+       └── [Salvar e Reassistir] → gera novo TTS → reproduz
 ```
 
-Nenhuma outra alteracao necessaria. Sem mudancas em banco de dados, rotas ou checkout.
+Nenhuma mudança no banco de dados. Apenas alterações no componente da página `RevelacaoEssencia.tsx`.
 
