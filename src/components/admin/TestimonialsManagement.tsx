@@ -70,6 +70,7 @@ export function TestimonialsManagement() {
   const [isSendingReply, setIsSendingReply] = useState(false);
   const [editDialog, setEditDialog] = useState<Testimonial | null>(null);
   const [editContent, setEditContent] = useState('');
+  const [editDisplayName, setEditDisplayName] = useState('');
 
   // External testimonial creation state
   const [addExternalDialog, setAddExternalDialog] = useState(false);
@@ -155,10 +156,10 @@ export function TestimonialsManagement() {
   });
 
   const updateContentMutation = useMutation({
-    mutationFn: async ({ id, content }: { id: string; content: string }) => {
+    mutationFn: async ({ id, content, display_name }: { id: string; content: string; display_name: string }) => {
       const { error } = await supabase
         .from('testimonials')
-        .update({ content, updated_at: new Date().toISOString() })
+        .update({ content, display_name, updated_at: new Date().toISOString() })
         .eq('id', id);
       
       if (error) throw error;
@@ -476,6 +477,7 @@ export function TestimonialsManagement() {
                       onClick={() => {
                         setEditDialog(testimonial);
                         setEditContent(testimonial.content);
+                        setEditDisplayName(testimonial.display_name);
                       }}
                       title="Editar conteúdo"
                     >
@@ -649,6 +651,15 @@ export function TestimonialsManagement() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
+              <Label htmlFor="editDisplayName">Nome de exibição</Label>
+              <Input
+                id="editDisplayName"
+                placeholder="Nome completo..."
+                value={editDisplayName}
+                onChange={(e) => setEditDisplayName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="editContent">Conteúdo</Label>
               <Textarea
                 id="editContent"
@@ -672,7 +683,8 @@ export function TestimonialsManagement() {
                 if (editDialog) {
                   updateContentMutation.mutate({
                     id: editDialog.id,
-                    content: editContent.trim()
+                    content: editContent.trim(),
+                    display_name: editDisplayName.trim()
                   });
                 }
               }}
