@@ -5,12 +5,16 @@ import {
   Eye,
   Target,
   ArrowRight,
-  Star
+  Star,
+  Film
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { JourneyStep } from "@/hooks/useJourneyProgress";
 import * as Icons from "lucide-react";
 import { DashboardTestimonialSection } from "./DashboardTestimonialSection";
+import { useNavigate } from "react-router-dom";
+import { useRevelacaoEssenciaFlag } from "@/hooks/useFeatureFlag";
+import { useAuth } from "@/hooks/useAuth";
 
 interface TestResult {
   testType: string;
@@ -61,6 +65,12 @@ export function DashboardStageRevelation({
   onPurchaseAtivacao,
   onStartAtivacao,
 }: DashboardStageRevelationProps) {
+  const navigate = useNavigate();
+  const { userRole } = useAuth();
+  const { isEnabled: revelacaoEnabled } = useRevelacaoEssenciaFlag();
+  const isAdmin = userRole === "admin";
+  const showRevelacao = revelacaoEnabled || isAdmin;
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -151,7 +161,35 @@ export function DashboardStageRevelation({
         </div>
       </motion.div>
 
-      {/* Results Grid - Compact */}
+      {/* Revelação da Essência - Cinematic Experience */}
+      {showRevelacao && hasSavedCodigo && (
+        <motion.div 
+          variants={itemVariants}
+          className="relative overflow-hidden bg-gradient-to-r from-zinc-900 to-zinc-800 border border-zinc-700/50 rounded-2xl p-6 md:p-8 text-white"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,hsl(var(--primary)/0.15),transparent_60%)]" />
+          <div className="relative flex flex-col md:flex-row items-start md:items-center gap-5">
+            <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
+              <Film className="w-6 h-6 text-white/80" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold mb-1">A Revelação da Essência</h3>
+              <p className="text-sm text-white/60">
+                Uma experiência contemplativa sobre quem você é. Sem pressa, sem explicações — apenas reconhecimento.
+              </p>
+            </div>
+            <Button
+              onClick={() => navigate("/cliente/revelacao")}
+              variant="ghost"
+              className="text-white/80 hover:text-white border border-white/20 hover:border-white/40 gap-2 shrink-0"
+            >
+              Vivenciar
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </motion.div>
+      )}
+
       <motion.div variants={itemVariants}>
         <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
           Seus Resultados

@@ -35,6 +35,7 @@ import CodigoEssencia from "./pages/CodigoEssencia";
 import AtivacaoCodigoPage from "./pages/cliente/AtivacaoCodigoPage";
 import AtivacaoProfissionalPage from "./pages/cliente/AtivacaoProfissionalPage";
 import CruzamentosPage from "./pages/cliente/CruzamentosPage";
+import RevelacaoEssencia from "./pages/cliente/RevelacaoEssencia";
 // CodigoEssencia sales pages removed - now included in journey
 import ComprarTeste from "./pages/ComprarTeste";
 import DiagnosticoPDF from "./pages/DiagnosticoPDF";
@@ -425,6 +426,14 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute allowedRoles={["cliente", "admin"]}>
           <CodigoEssencia />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/cliente/revelacao"
+      element={
+        <ProtectedRoute allowedRoles={["cliente", "admin"]}>
+          <RevelacaoEssencia />
         </ProtectedRoute>
       }
     />
