@@ -164,16 +164,27 @@ export const NavSection = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button 
-                size="sm"
-                onClick={() => {
-                  const leituraPath = language === 'en' ? '/en/initial-reading' : language === 'pt-pt' ? '/pt-pt/leitura-inicial' : '/leitura-inicial';
-                  navigate(leituraPath);
-                }}
-                className="rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold text-sm"
-              >
-                {language === 'en' ? 'Start my Reading' : 'Fazer minha Leitura Inicial'}
-              </Button>
+              <>
+                <Button 
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate(getAuthPath() + '?redirect=/dashboard')}
+                  className="gap-1.5 text-muted-foreground hover:text-foreground"
+                >
+                  <LogIn className="w-4 h-4" strokeWidth={1.5} />
+                  {language === 'en' ? 'Sign In' : 'Entrar'}
+                </Button>
+                <Button 
+                  size="sm"
+                  onClick={() => {
+                    const leituraPath = language === 'en' ? '/en/initial-reading' : language === 'pt-pt' ? '/pt-pt/leitura-inicial' : '/leitura-inicial';
+                    navigate(leituraPath);
+                  }}
+                  className="rounded-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold text-sm"
+                >
+                  {language === 'en' ? 'Start my Reading' : 'Fazer minha Leitura Inicial'}
+                </Button>
+              </>
             )}
           </div>
 
@@ -256,15 +267,28 @@ export const NavSection = () => {
                 </Button>
               </>
             ) : (
-              <Button 
-                className="w-full rounded-xl bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold"
-                onClick={() => {
-                  const leituraPath = language === 'en' ? '/en/initial-reading' : language === 'pt-pt' ? '/pt-pt/leitura-inicial' : '/leitura-inicial';
-                  handleNavigation(leituraPath.replace(/^\/(en|pt-pt)\//, '/'));
-                }}
-              >
-                {language === 'en' ? 'Start my Reading' : 'Fazer minha Leitura Inicial'}
-              </Button>
+              <>
+                <Button 
+                  variant="outline"
+                  className="w-full rounded-xl gap-2"
+                  onClick={() => {
+                    navigate(getAuthPath() + '?redirect=/dashboard');
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <LogIn className="w-4 h-4" strokeWidth={1.5} />
+                  {language === 'en' ? 'I have an account' : 'Já tenho conta'}
+                </Button>
+                <Button 
+                  className="w-full rounded-xl bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold"
+                  onClick={() => {
+                    const leituraPath = language === 'en' ? '/en/initial-reading' : language === 'pt-pt' ? '/pt-pt/leitura-inicial' : '/leitura-inicial';
+                    handleNavigation(leituraPath.replace(/^\/(en|pt-pt)\//, '/'));
+                  }}
+                >
+                  {language === 'en' ? 'Start my Reading' : 'Fazer minha Leitura Inicial'}
+                </Button>
+              </>
             )}
           </div>
         </div>
