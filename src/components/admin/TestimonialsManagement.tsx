@@ -21,7 +21,8 @@ import {
   Star,
   Mail,
   Send,
-  Pencil
+  Pencil,
+  Plus
 } from 'lucide-react';
 import {
   Dialog,
@@ -69,6 +70,12 @@ export function TestimonialsManagement() {
   const [isSendingReply, setIsSendingReply] = useState(false);
   const [editDialog, setEditDialog] = useState<Testimonial | null>(null);
   const [editContent, setEditContent] = useState('');
+
+  // External testimonial creation state
+  const [addExternalDialog, setAddExternalDialog] = useState(false);
+  const [externalName, setExternalName] = useState('');
+  const [externalContent, setExternalContent] = useState('');
+  const [externalSource, setExternalSource] = useState('');
 
   const { data: testimonials, isLoading, refetch } = useQuery({
     queryKey: ['admin-testimonials', statusFilter],
@@ -174,6 +181,44 @@ export function TestimonialsManagement() {
     }
   });
 
+  const createExternalMutation = useMutation({
+    mutationFn: async ({ displayName, content, source }: { displayName: string; content: string; source?: string }) => {
+      const { error } = await supabase
+        .from('testimonials')
+        .insert({
+          user_id: user!.id,
+          display_name: displayName,
+          content,
+          consent_given: true,
+          status: 'approved',
+          test_slug: 'externo',
+          admin_notes: source ? `Origem: ${source}` : 'Depoimento externo adicionado manualmente',
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: user!.id,
+        });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
+      queryClient.invalidateQueries({ queryKey: ['approved-testimonials-landing'] });
+      toast({
+        title: "Depoimento adicionado",
+        description: "O depoimento externo foi criado e já está aprovado."
+      });
+      setAddExternalDialog(false);
+      setExternalName('');
+      setExternalContent('');
+      setExternalSource('');
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível criar o depoimento.",
+        variant: "destructive"
+      });
+    }
+  });
+
   const handleOpenReplyDialog = async (testimonial: Testimonial) => {
     setReplyDialog(testimonial);
     setReplySubject(`Agradecemos seu depoimento sobre o NELLO ONE`);
@@ -273,7 +318,8 @@ export function TestimonialsManagement() {
       'estilos-conexao-afetiva': 'Estilos de Conexão',
       'inteligencias': 'Inteligências Múltiplas',
       'eneagrama': 'Eneagrama',
-      'nello-16': 'Nello 16'
+      'nello-16': 'Nello 16',
+      'externo': 'Externo'
     };
     return slug ? testNames[slug] || slug : 'Geral';
   };
@@ -308,6 +354,10 @@ export function TestimonialsManagement() {
           <Button variant="outline" size="sm" onClick={() => refetch()}>
             <RefreshCw className="w-4 h-4 mr-2" />
             Atualizar
+          </Button>
+          <Button size="sm" onClick={() => setAddExternalDialog(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Adicionar Externo
           </Button>
         </div>
       </div>
@@ -637,6 +687,78 @@ export function TestimonialsManagement() {
                 <>
                   <Check className="w-4 h-4 mr-2" />
                   Salvar
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add External Testimonial Dialog */}
+      <Dialog open={addExternalDialog} onOpenChange={setAddExternalDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Adicionar Depoimento Externo</DialogTitle>
+            <DialogDescription>
+              Cole um depoimento feito fora da plataforma. Ele será salvo como aprovado.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="ext-name">Nome da pessoa</Label>
+              <Input
+                id="ext-name"
+                value={externalName}
+                onChange={(e) => setExternalName(e.target.value)}
+                placeholder="Ex: Maria Silva"
+                maxLength={100}
+              />
+            </div>
+            <div>
+              <Label htmlFor="ext-content">Depoimento</Label>
+              <Textarea
+                id="ext-content"
+                value={externalContent}
+                onChange={(e) => setExternalContent(e.target.value)}
+                placeholder="Cole o depoimento aqui..."
+                rows={5}
+                maxLength={2000}
+              />
+            </div>
+            <div>
+              <Label htmlFor="ext-source">Origem (opcional)</Label>
+              <Input
+                id="ext-source"
+                value={externalSource}
+                onChange={(e) => setExternalSource(e.target.value)}
+                placeholder="Ex: WhatsApp, Instagram, Email..."
+                maxLength={100}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddExternalDialog(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                createExternalMutation.mutate({
+                  displayName: externalName.trim(),
+                  content: externalContent.trim(),
+                  source: externalSource.trim() || undefined,
+                });
+              }}
+              disabled={createExternalMutation.isPending || !externalName.trim() || !externalContent.trim()}
+            >
+              {createExternalMutation.isPending ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Adicionar
                 </>
               )}
             </Button>
