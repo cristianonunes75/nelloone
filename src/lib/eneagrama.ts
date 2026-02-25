@@ -77,117 +77,114 @@ export interface EnneagramResult {
   };
   hasCloseSecondary?: boolean;
   completed_at?: string;
-  // Instinctive subtypes
   instinct?: 'SP' | 'SO' | 'SX';
   instinctScores?: {
     SP: number;
     SO: number;
     SX: number;
   };
-  // Consistency check
   consistencyScore?: number;
   isConsistent?: boolean;
+  scoringVersion?: string;
 }
 
 /**
  * Calculate the wing (adjacent type with highest score)
- * Wings can only be the types immediately adjacent to the primary type
- * Type 1's wings are 9 and 2, Type 2's are 1 and 3, etc.
  */
 const calculateWing = (primaryType: string, scores: { [key: string]: number }): string => {
   const primary = parseInt(primaryType);
-  
-  // Calculate adjacent types (wrap around for 1 and 9)
   const prevType = primary === 1 ? "9" : String(primary - 1);
   const nextType = primary === 9 ? "1" : String(primary + 1);
-  
   const prevScore = scores[prevType] || 0;
   const nextScore = scores[nextType] || 0;
-  
-  // Return the adjacent type with the higher score
   return prevScore >= nextScore ? prevType : nextType;
 };
 
 /**
- * Enhanced Enneagram results calculation with:
- * - All 9 scores always saved
- * - Secondary type identification
- * - Wing calculation
- * - Tie-breaking logic
- * - Normalized percentages
+ * V2 Enneagram scoring: uses AVERAGE per type instead of raw sum.
+ * This eliminates bias from unequal question counts and
+ * normalizes all types to the same 1-5 scale.
  */
 export const getEnneagramResults = (answers: EnneagramAnswer[]): EnneagramResult => {
-  // Initialize all 9 types with 0
-  const scores: { [key: string]: number } = {
+  // Track sums AND counts for average calculation
+  const sums: { [key: string]: number } = {
+    "1": 0, "2": 0, "3": 0, "4": 0, "5": 0,
+    "6": 0, "7": 0, "8": 0, "9": 0
+  };
+  const counts: { [key: string]: number } = {
     "1": 0, "2": 0, "3": 0, "4": 0, "5": 0,
     "6": 0, "7": 0, "8": 0, "9": 0
   };
 
-  // Initialize instinct scores
   const instinctScores = { SP: 0, SO: 0, SX: 0 };
-  
-  // Consistency tracking
+  const instinctCounts = { SP: 0, SO: 0, SX: 0 };
+
   let consistencyTotal = 0;
   let consistencyCount = 0;
 
-// Calculate scores for each type and instinct
   answers.forEach((answer) => {
     const type = answer.test_questions?.options?.type;
-// Handle both formats: { value: number } or just number
     const rawAnswer = answer.answer as { value?: number } | number | null | undefined;
     const value = rawAnswer && typeof rawAnswer === 'object' && 'value' in rawAnswer
       ? Number(rawAnswer.value)
       : Number(rawAnswer ?? 0);
     
-    // Skip if value is not a valid number
     if (isNaN(value)) return;
     
     const typeStr = String(type);
-    if (typeStr && scores.hasOwnProperty(typeStr)) {
-      // Type 1-9 question
-      scores[typeStr] += value;
+    if (typeStr && sums.hasOwnProperty(typeStr)) {
+      sums[typeStr] += value;
+      counts[typeStr]++;
     } else if (type === 'SP' || type === 'SO' || type === 'SX') {
-      // Instinctive subtype question
       instinctScores[type] += value;
+      instinctCounts[type]++;
     } else if (type === 'consistency') {
-      // Consistency question (high scores indicate inconsistency)
       consistencyTotal += value;
       consistencyCount++;
     }
   });
 
-  // Sort types by score (descending)
+  // V2: Calculate AVERAGE scores per type (not raw sums)
+  const scores: { [key: string]: number } = {};
+  Object.keys(sums).forEach(type => {
+    scores[type] = counts[type] > 0
+      ? Math.round((sums[type] / counts[type]) * 100) / 100
+      : 0;
+  });
+
+  // Sort types by average score (descending)
   const sortedTypes = Object.entries(scores)
     .sort(([, a], [, b]) => b - a);
 
-  // Primary type is the highest scoring
   const primaryType = sortedTypes[0][0];
   const primaryScore = sortedTypes[0][1];
   
-  // Secondary type (second highest)
   const secondaryType = sortedTypes[1][0];
   const secondaryScore = sortedTypes[1][1];
   
-  // Check if secondary is close (within 3 points for 10 questions per type)
-  const hasCloseSecondary = (primaryScore - secondaryScore) <= 3;
+  // Close secondary threshold: within 0.5 average points
+  const hasCloseSecondary = (primaryScore - secondaryScore) <= 0.5;
 
-  // Calculate wing based on adjacent types
   const wing = calculateWing(primaryType, scores);
 
-  // Calculate percentages (each type has 10 questions, max score per type is 50)
-  const maxScorePerType = 50;
+  // Percentages: average score / max (5) * 100
   const percentages: { [key: string]: number } = {};
   Object.keys(scores).forEach(type => {
-    percentages[type] = Math.round((scores[type] / maxScorePerType) * 100);
+    percentages[type] = Math.round((scores[type] / 5) * 100);
   });
 
-  // Determine dominant instinct
-  const sortedInstincts = Object.entries(instinctScores)
+  // Determine dominant instinct (also using averages)
+  const instinctAverages: Record<string, number> = {};
+  (['SP', 'SO', 'SX'] as const).forEach(inst => {
+    instinctAverages[inst] = instinctCounts[inst] > 0
+      ? instinctScores[inst] / instinctCounts[inst]
+      : 0;
+  });
+  const sortedInstincts = Object.entries(instinctAverages)
     .sort(([, a], [, b]) => b - a);
   const instinct = sortedInstincts[0][0] as 'SP' | 'SO' | 'SX';
 
-  // Calculate consistency score (lower is better, range 6-30)
-  // Average above 3.5 suggests inconsistent responses
+  // Consistency score
   const consistencyScore = consistencyCount > 0 
     ? Math.round((consistencyTotal / consistencyCount) * 10) / 10 
     : 0;
@@ -204,13 +201,13 @@ export const getEnneagramResults = (answers: EnneagramAnswer[]): EnneagramResult
     instinctScores,
     consistencyScore,
     isConsistent,
+    scoringVersion: 'v2',
     completed_at: new Date().toISOString()
   };
 };
 
 /**
  * Get display name for the type with wing
- * Example: "4w5" means Type 4 with a 5 wing
  */
 export const getTypeWithWing = (result: EnneagramResult): string => {
   if (!result.wing) return result.primaryType;
@@ -219,9 +216,6 @@ export const getTypeWithWing = (result: EnneagramResult): string => {
 
 /**
  * Get the center (triad) for a type
- * Types 2, 3, 4: Heart/Feeling Center
- * Types 5, 6, 7: Head/Thinking Center  
- * Types 8, 9, 1: Body/Instinctive Center
  */
 export const getTypeCenter = (type: string): 'heart' | 'head' | 'body' => {
   const typeNum = parseInt(type);
