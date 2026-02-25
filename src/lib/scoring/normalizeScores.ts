@@ -40,7 +40,7 @@ const NORMALIZATION_CONFIGS: Record<string, {
     scaleType: 'linear',
   },
   eneagrama: {
-    maxRawScore: 50, // 10 questions × 5 max per question
+    maxRawScore: 5, // V2: average per type (1-5 scale)
     scaleType: 'linear',
   },
   inteligencias_multiplas: {
