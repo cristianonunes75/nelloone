@@ -1265,6 +1265,54 @@ export type Database = {
           },
         ]
       }
+      codigo_express: {
+        Row: {
+          answers: Json
+          completed_at: string | null
+          confidence_score: number | null
+          created_at: string
+          id: string
+          model_version: string
+          predicted_disc: string | null
+          predicted_enneagram: string | null
+          predicted_nello16: string | null
+          predicted_temperament: string | null
+          prediction: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          completed_at?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          model_version?: string
+          predicted_disc?: string | null
+          predicted_enneagram?: string | null
+          predicted_nello16?: string | null
+          predicted_temperament?: string | null
+          prediction?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          completed_at?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          model_version?: string
+          predicted_disc?: string | null
+          predicted_enneagram?: string | null
+          predicted_nello16?: string | null
+          predicted_temperament?: string | null
+          prediction?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           billing_email: string | null

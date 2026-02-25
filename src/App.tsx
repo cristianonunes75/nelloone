@@ -22,6 +22,7 @@ import Cliente from "./pages/Cliente";
 import ClientePerfil from "./pages/ClientePerfil";
 import UserArea from "./pages/UserArea";
 import TestExecution from "./pages/TestExecution";
+import CodigoExpress from "./pages/CodigoExpress";
 import TestResults from "./pages/TestResults";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
@@ -129,6 +130,10 @@ const AppRoutes = () => (
     {/* Imersão Código do Casal - Landing page */}
     <Route path="/imersao-casal" element={<ImersaoCasalLanding />} />
     
+    {/* Código Express - Predictive quick assessment */}
+    <Route path="/codigo-express" element={<CodigoExpress />} />
+    <Route path="/en/code-express" element={<CodigoExpress />} />
+    <Route path="/pt-pt/codigo-express" element={<CodigoExpress />} />
     {/* Legal pages - PT */}
     <Route path="/termos" element={<TermsOfService />} />
     <Route path="/termos-de-servico" element={<TermsOfService />} />
