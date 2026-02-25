@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, ArrowRight, TrendingUp, Brain, Heart, Shield, Zap } from "lucide-react";
+import { Sparkles, ArrowRight, TrendingUp, Brain, Heart, Shield, Zap, Star } from "lucide-react";
 import type { ExpressPrediction, ExpressDimension } from "@/lib/codigoExpress";
 
 interface Props {
@@ -34,100 +34,51 @@ export default function ExpressResult({ prediction, onDeepen }: Props) {
         transition={{ duration: 0.5 }}
         className="max-w-lg w-full space-y-6"
       >
-        {/* Header */}
-        <div className="text-center space-y-3">
+        {/* Header — Archetype Identity */}
+        <div className="text-center space-y-4">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
             className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10"
           >
-            <Sparkles className="h-8 w-8 text-primary" />
+            <Star className="h-8 w-8 text-primary" />
           </motion.div>
-          <h1 className="text-3xl font-bold text-foreground">Seu Código Express</h1>
-          <Badge variant="secondary" className="text-xs">
-            Confiança: {prediction.overallConfidence}%
-          </Badge>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium mb-2">
+              Seu Código Inicial
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
+              {prediction.archetypeName}
+            </h1>
+          </motion.div>
         </div>
 
-        {/* Essence Summary */}
+        {/* Human Narrative */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.7 }}
         >
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-5">
-              <p className="text-base text-foreground leading-relaxed italic">
-                "{prediction.essenceSummary}"
+              <p className="text-base text-foreground leading-relaxed">
+                {prediction.narrativeText}
               </p>
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Predictions Grid */}
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            {
-              label: 'Perfil DISC',
-              value: DISC_LABELS[prediction.disc.primary] || prediction.disc.primary,
-              sub: `+ ${DISC_LABELS[prediction.disc.secondary] || prediction.disc.secondary}`,
-              confidence: prediction.disc.confidence,
-              delay: 0.6,
-            },
-            {
-              label: 'Temperamento',
-              value: TEMP_LABELS[prediction.temperament.primary] || prediction.temperament.primary,
-              sub: `+ ${TEMP_LABELS[prediction.temperament.secondary] || prediction.temperament.secondary}`,
-              confidence: prediction.temperament.confidence,
-              delay: 0.7,
-            },
-            {
-              label: 'Personalidade',
-              value: prediction.nello16.type,
-              sub: 'Nello16',
-              confidence: prediction.nello16.confidence,
-              delay: 0.8,
-            },
-            {
-              label: 'Eneagrama',
-              value: `Tipo ${prediction.enneagram.primary}`,
-              sub: ENNEA_LABELS[prediction.enneagram.primary] || '',
-              confidence: prediction.enneagram.confidence,
-              delay: 0.9,
-            },
-          ].map((item) => (
-            <motion.div
-              key={item.label}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: item.delay }}
-            >
-              <Card className="h-full">
-                <CardContent className="p-4 space-y-1">
-                  <p className="text-xs text-muted-foreground">{item.label}</p>
-                  <p className="text-lg font-bold text-foreground">{item.value}</p>
-                  <p className="text-xs text-muted-foreground">{item.sub}</p>
-                  <div className="flex items-center gap-1.5 mt-2">
-                    <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-primary transition-all duration-1000"
-                        style={{ width: `${item.confidence}%` }}
-                      />
-                    </div>
-                    <span className="text-[10px] text-muted-foreground">{item.confidence}%</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Dimension Profile */}
+        {/* Dimension Profile — Primary visual */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.0 }}
+          transition={{ delay: 0.9 }}
         >
           <Card>
             <CardContent className="p-5 space-y-3">
@@ -142,7 +93,7 @@ export default function ExpressResult({ prediction, onDeepen }: Props) {
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.min(100, value)}%` }}
-                        transition={{ delay: 1.2, duration: 0.8 }}
+                        transition={{ delay: 1.1, duration: 0.8 }}
                         className="h-full rounded-full bg-primary/70"
                       />
                     </div>
@@ -154,30 +105,95 @@ export default function ExpressResult({ prediction, onDeepen }: Props) {
           </Card>
         </motion.div>
 
-        {/* CTA */}
+        {/* Technical Validations — Secondary position */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.3 }}
+          transition={{ delay: 1.2 }}
+          className="space-y-2"
+        >
+          <p className="text-xs text-muted-foreground font-medium px-1">Dimensões identificadas</p>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              {
+                label: 'Perfil DISC',
+                value: DISC_LABELS[prediction.disc.primary] || prediction.disc.primary,
+                sub: `+ ${DISC_LABELS[prediction.disc.secondary] || prediction.disc.secondary}`,
+                confidence: prediction.disc.confidence,
+              },
+              {
+                label: 'Temperamento',
+                value: TEMP_LABELS[prediction.temperament.primary] || prediction.temperament.primary,
+                sub: `+ ${TEMP_LABELS[prediction.temperament.secondary] || prediction.temperament.secondary}`,
+                confidence: prediction.temperament.confidence,
+              },
+              {
+                label: 'Personalidade',
+                value: prediction.nello16.type,
+                sub: 'Nello16',
+                confidence: prediction.nello16.confidence,
+              },
+              {
+                label: 'Eneagrama',
+                value: `Tipo ${prediction.enneagram.primary}`,
+                sub: ENNEA_LABELS[prediction.enneagram.primary] || '',
+                confidence: prediction.enneagram.confidence,
+              },
+            ].map((item) => (
+              <Card key={item.label} className="h-full">
+                <CardContent className="p-3 space-y-1">
+                  <p className="text-[11px] text-muted-foreground">{item.label}</p>
+                  <p className="text-base font-bold text-foreground">{item.value}</p>
+                  <p className="text-[11px] text-muted-foreground">{item.sub}</p>
+                  <div className="flex items-center gap-1.5 mt-1.5">
+                    <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-primary/50 transition-all duration-1000"
+                        style={{ width: `${item.confidence}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] text-muted-foreground">{item.confidence}%</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Transition Block + CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5 }}
           className="space-y-3"
         >
           <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10">
-            <CardContent className="p-5 text-center space-y-3">
-              <p className="text-sm text-foreground font-medium">
-                Isso é uma estimativa. O Código completo revela muito mais.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                7 testes × análise profunda × relatório personalizado com IA
-              </p>
+            <CardContent className="p-5 text-center space-y-4">
+              <div className="space-y-2">
+                <p className="text-base text-foreground font-semibold">
+                  Este é o seu Código Inicial.
+                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  O Código da Essência revela camadas mais profundas que ainda não apareceram aqui.
+                  São 7 dimensões de análise, cruzamentos e um relatório personalizado com IA.
+                </p>
+              </div>
               <Button onClick={onDeepen} className="w-full" size="lg">
-                Descobrir meu Código completo
+                <Sparkles className="h-4 w-4 mr-2" />
+                Descobrir meu Código da Essência
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </CardContent>
           </Card>
 
+          <div className="flex items-center justify-center gap-2">
+            <Badge variant="secondary" className="text-[10px]">
+              Confiança geral: {prediction.overallConfidence}%
+            </Badge>
+          </div>
+
           <p className="text-[11px] text-center text-muted-foreground">
-            Este resultado é uma estimativa baseada em modelo preditivo comprimido.
+            Este resultado é uma leitura inicial baseada em modelo preditivo.
             Não constitui diagnóstico clínico ou avaliação terapêutica.
           </p>
         </motion.div>

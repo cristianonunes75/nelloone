@@ -91,10 +91,10 @@ export default function CodigoExpress() {
 
           <div className="space-y-4">
             <h1 className="text-4xl font-bold tracking-tight text-foreground">
-              Código Express
+              Código Inicial
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              17 perguntas. Uma estimativa poderosa de quem você é.
+              17 perguntas. Uma primeira leitura de quem você é.
               <br />
               <span className="text-foreground font-medium">Rápido. Intuitivo. Revelador.</span>
             </p>
@@ -119,7 +119,7 @@ export default function CodigoExpress() {
             onClick={() => setStarted(true)}
           >
             <Sparkles className="h-5 w-5 mr-2" />
-            Descobrir meu Código
+            Descobrir meu Código Inicial
           </Button>
 
           {!user && (
