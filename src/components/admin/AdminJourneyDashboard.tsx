@@ -122,11 +122,16 @@ export function AdminJourneyDashboard({ hideHeader = false }: AdminJourneyDashbo
   }, []);
 
   const formatDuration = (ms: number): string => {
-    const hours = ms / (1000 * 60 * 60);
-    if (hours < 24) return `${Math.round(hours)}h`;
+    const totalMinutes = Math.round(ms / (1000 * 60));
+    if (totalMinutes < 60) return `${totalMinutes}min`;
+    const hours = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+    if (hours < 24) return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
     const days = Math.floor(hours / 24);
-    const remainingHours = Math.round(hours % 24);
-    return remainingHours > 0 ? `${days}d ${remainingHours}h` : `${days}d`;
+    const remainingHours = hours % 24;
+    if (remainingHours === 0 && mins === 0) return `${days}d`;
+    if (mins === 0) return `${days}d ${remainingHours}h`;
+    return `${days}d ${remainingHours}h ${mins}min`;
   };
 
   const completionDurations = useMemo(() => {
