@@ -1,41 +1,52 @@
 
 
-# Tempo de Conclusao da Jornada - Admin Dashboard
+# Depoimentos reais na Landing Page
 
 ## Objetivo
-Adicionar metricas de tempo de conclusao da jornada completa na area admin, mostrando quanto tempo cada usuario levou para completar os 7 testes.
+Substituir os depoimentos fictícios/hardcoded da landing por depoimentos reais do banco de dados, exibindo nome completo e profissao dos usuarios.
 
-## Dados Disponiveis (sem mudancas no banco)
-- `profiles.journey_started_at` -- quando o usuario iniciou a jornada
-- `profiles.journey_completed_at` -- quando completou todos os 7 testes
-- `user_tests.started_at` / `completed_at` -- timestamps por teste individual
+## Como funciona hoje
+- A `TestimonialsSection` na landing usa 3 depoimentos hardcoded com nomes inventados (Mariana S., Rafael M., Camila L.)
+- Ja existe uma `ApprovedTestimonialsSection` que busca depoimentos aprovados e featured do banco, mas nao e usada na landing
+- A tabela `testimonials` tem `display_name` e `user_id` (ligado a `profiles` que tem `full_name` e `profession`)
 
-## Mudancas
+## Plano de implementacao
 
-### 1. AdminJourneyDashboard.tsx - Adicionar secao de Tempo de Conclusao
+### 1. Atualizar TestimonialsSection para buscar do banco
+- Adicionar query ao banco buscando depoimentos com `status = 'approved'` e `is_featured = true`, limitando a 3
+- Fazer join com `profiles` via `user_id` para obter `full_name` e `profession`
+- Usar `full_name` do perfil (nome e sobrenome) em vez do `display_name` do depoimento
+- Usar `profession` do perfil como subtitulo (ex: "Arquiteta", "Empresario")
+- Manter compliance check (filtrar depoimentos com risco critico)
+- Manter fallback para os depoimentos hardcoded caso nao existam depoimentos aprovados no banco
 
-**Stats Cards novos** (no topo, junto aos existentes):
-- **Tempo Medio** -- media de dias entre `journey_started_at` e `journey_completed_at` para usuarios com status "completed"
-- **Mais Rapido** -- menor tempo registrado
-- **Mais Lento** -- maior tempo registrado
+### 2. Estilo visual
+- Manter o layout minimalista atual (cards com Quote icon, rating stars)
+- Exibir nome completo (ex: "Mariana Santos") em vez de iniciais abreviadas
+- Exibir profissao real do perfil
+- Manter scroll horizontal no mobile e grid 3 colunas no desktop
 
-**Coluna nova na tabela de usuarios:**
-- Coluna "Tempo" ao lado de "Inativo", mostrando a duracao formatada (ex: "2d 4h", "5d", "12h") para usuarios com jornada completa
+### 3. Privacidade e compliance
+- Buscar apenas depoimentos com `consent_given = true` (ja garantido pelo fluxo de aprovacao)
+- Aplicar filtro de compliance existente (`checkTestimonialCompliance`)
+- Manter disclaimer institucional
 
-**Card de Distribuicao de Tempo** (novo card abaixo dos stats):
-- Agrupamento por faixas: menos de 1 dia, 1-3 dias, 3-7 dias, 7-14 dias, 14+ dias
-- Barras horizontais simples mostrando a contagem em cada faixa
-- Permitira entender onde esta a maioria dos usuarios
+## Detalhes tecnicos
 
-### 2. Logica de Calculo
-- Buscar `journey_started_at` e `journey_completed_at` dos profiles que ja sao carregados
-- Calcular diferenca em horas/dias
-- Agregar estatisticas (media, min, max, distribuicao)
-- Tudo client-side, sem queries adicionais -- os dados ja estao no fetch existente
+**Arquivo editado:** `src/components/landing/v2/TestimonialsSection.tsx`
 
-### Detalhes Tecnicos
-- Arquivo modificado: `src/components/admin/AdminJourneyDashboard.tsx`
-- Sem migracoes de banco de dados
-- Sem novas dependencias
-- Calculo feito com `useMemo` sobre os dados ja carregados
-- Formatacao de tempo: funcao utilitaria para converter ms em "Xd Yh"
+**Query:**
+```sql
+SELECT t.id, t.content, t.is_featured, p.full_name, p.profession
+FROM testimonials t
+JOIN profiles p ON t.user_id = p.id
+WHERE t.status = 'approved' 
+  AND t.is_featured = true
+  AND t.consent_given = true
+ORDER BY t.created_at DESC
+LIMIT 3
+```
+
+**Fallback:** Se a query retornar 0 resultados, exibir os depoimentos hardcoded atuais para que a secao nunca fique vazia.
+
+Nenhuma alteracao de banco, migrations ou RLS necessaria — a tabela testimonials ja tem RLS permitindo leitura publica para depoimentos aprovados.
