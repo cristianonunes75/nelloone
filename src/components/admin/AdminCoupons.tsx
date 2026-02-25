@@ -59,9 +59,11 @@ const PRODUCT_TYPE_OPTIONS = [
 // Produtos monetizados do ecossistema Nello One
 const MONETIZATION_PRODUCTS = [
   { value: "all", label: "✅ Válido para Todos", description: "Aplicável a qualquer produto" },
-  { value: "jornada_completa", label: "🎯 Jornada Completa", description: "Pacote completo R$197" },
-  { value: "codigo_essencia", label: "🧬 Código da Essência", description: "Relatório individual" },
-  { value: "activation_individual", label: "🔥 Ativação Individual", description: "R$97" },
+  { value: "jornada_completa", label: "🎯 Jornada Completa", description: "Pacote completo R$248,50" },
+  { value: "codigo_essencia_express", label: "⚡ Código da Essência Express", description: "Upsell Código Inicial R$99" },
+  { value: "codigo_essencia", label: "🧬 Código da Essência", description: "Relatório individual R$397" },
+  { value: "ativacao_codigo", label: "🔑 Ativação do Código", description: "Ativação da Essência R$197" },
+  { value: "activation_individual", label: "🔥 Ativação Profissional", description: "Direção Profissional R$197" },
   { value: "nello_couple", label: "💕 Código do Casal", description: "7 pilares cruzados R$297" },
   { value: "activation_couple", label: "💑 Ativação Casal", description: "R$197" },
   { value: "identity_couple_premium", label: "👑 Identity Couple Premium", description: "Manual do Casal R$997" },
@@ -72,9 +74,11 @@ const MONETIZATION_PRODUCTS = [
 // Opções específicas dentro do Nello One (legacy - mantido para compatibilidade)
 const NELLO_ONE_SUB_OPTIONS = [
   { value: "all", label: "Todos os produtos One" },
-  { value: "jornada_completa", label: "Jornada Completa" },
-  { value: "codigo_essencia", label: "Código da Essência" },
-  { value: "activation_individual", label: "🔥 Ativação Individual (R$97)" },
+  { value: "jornada_completa", label: "Jornada Completa (R$248,50)" },
+  { value: "codigo_essencia_express", label: "⚡ Código da Essência Express (R$99)" },
+  { value: "codigo_essencia", label: "🧬 Código da Essência (R$397)" },
+  { value: "ativacao_codigo", label: "🔑 Ativação do Código (R$197)" },
+  { value: "activation_individual", label: "🔥 Ativação Profissional (R$197)" },
   { value: "nello_couple", label: "💕 Código do Casal (R$297)" },
   { value: "activation_couple", label: "💑 Ativação Casal (R$197)" },
   { value: "identity_couple_premium", label: "👑 Identity Couple Premium (R$997)" },
