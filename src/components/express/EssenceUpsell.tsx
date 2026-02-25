@@ -3,9 +3,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, ArrowRight, CheckCircle2, Eye, ShieldQuestion, Puzzle, Layers } from "lucide-react";
+import SocialInviteShare from "./SocialInviteShare";
 
 interface Props {
   onDeepen: () => void;
+  inviterName?: string;
+  inviterLeadId?: string;
 }
 
 const HIDDEN_DIMENSIONS = [
@@ -15,7 +18,7 @@ const HIDDEN_DIMENSIONS = [
   { icon: <Layers className="h-4 w-4" />, text: 'A integração entre suas forças naturais e seus desafios invisíveis' },
 ];
 
-export default function EssenceUpsell({ onDeepen }: Props) {
+export default function EssenceUpsell({ onDeepen, inviterName, inviterLeadId }: Props) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -34,7 +37,13 @@ export default function EssenceUpsell({ onDeepen }: Props) {
         </CardContent>
       </Card>
 
-      {/* Identity Gap — psychological continuity */}
+      {/* Social Invite */}
+      <SocialInviteShare
+        inviterName={inviterName}
+        inviterLeadId={inviterLeadId}
+      />
+
+      {/* Identity Gap */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
