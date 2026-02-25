@@ -67,7 +67,7 @@ export const TestimonialsSection = () => {
           const productLabel = PRODUCT_LABELS[purchaseCategory] || "";
 
           return {
-            name: profile?.full_name || t.display_name || "Usuário",
+            name: t.display_name || profile?.full_name || "Usuário",
             subtitle: [profile?.profession, productLabel]
               .filter(Boolean)
               .join(" · ") || "",
