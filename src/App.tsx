@@ -42,6 +42,7 @@ import ComprarTeste from "./pages/ComprarTeste";
 import DiagnosticoPDF from "./pages/DiagnosticoPDF";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import Checkout from "./pages/Checkout";
+import JornadaIdentity from "./pages/JornadaIdentity";
 import RelatorioConjugePublico from "./pages/RelatorioConjugePublico";
 import RelatorioContextualPublico from "./pages/RelatorioContextualPublico";
 import ResetPassword from "./pages/ResetPassword";
@@ -92,10 +93,14 @@ const AppRoutes = () => (
     <Route path="/en/report/:tipo/:token" element={<RelatorioContextualPublico />} />
     <Route path="/pt-pt/relatorio/:tipo/:token" element={<RelatorioContextualPublico />} />
     
-    {/* Checkout page - purchase journey */}
-    <Route path="/checkout" element={<Checkout />} />
-    <Route path="/en/checkout" element={<Checkout />} />
-    <Route path="/pt-pt/checkout" element={<Checkout />} />
+    {/* Jornada Identity - Sales page */}
+    <Route path="/jornada-identity" element={<JornadaIdentity />} />
+    <Route path="/en/identity-journey" element={<JornadaIdentity />} />
+    
+    {/* Checkout page - redirects to jornada-identity */}
+    <Route path="/checkout" element={<JornadaIdentity />} />
+    <Route path="/en/checkout" element={<JornadaIdentity />} />
+    <Route path="/pt-pt/checkout" element={<JornadaIdentity />} />
     
     {/* Checkout success - verifies payment server-side */}
     <Route path="/checkout/success" element={<CheckoutSuccess />} />
