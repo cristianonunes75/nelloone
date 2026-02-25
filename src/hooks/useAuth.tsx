@@ -11,6 +11,7 @@ interface Profile {
   phone: string | null;
   profession: string | null;
   avatar_url: string | null;
+  gender?: string | null;
   // Journey tracking fields
   journey_status?: string;
   journey_total_tests?: number;

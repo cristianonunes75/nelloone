@@ -181,10 +181,12 @@ function FilmePreparation({ currentStep }: { currentStep: number }) {
 function FilmePlayer({
   script,
   audioUrl,
+  musicUrl,
   onFinish,
 }: {
   script: FilmeScript;
   audioUrl: string;
+  musicUrl: string | null;
   onFinish: () => void;
 }) {
   const [currentScene, setCurrentScene] = useState(-1); // -1 = fade in
@@ -192,6 +194,7 @@ function FilmePlayer({
   const [showClimax, setShowClimax] = useState(false);
   const [showClosing, setShowClosing] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const musicRef = useRef<HTMLAudioElement | null>(null);
   const totalScenes = script.scenes.length;
   const sceneDuration = 12000; // 12 seconds per scene
 
@@ -201,15 +204,36 @@ function FilmePlayer({
     audioRef.current = audio;
     audio.volume = 1;
 
+    // Background music
+    let music: HTMLAudioElement | null = null;
+    if (musicUrl) {
+      music = new Audio(musicUrl);
+      music.volume = 0.15; // Low volume background
+      music.loop = true;
+      musicRef.current = music;
+    }
+
     // Start with a 2-second black fade-in, then begin
     const startTimer = setTimeout(() => {
+      music?.play().catch(console.error);
       audio.play().catch(console.error);
       setCurrentScene(0);
     }, 2000);
 
-    // When audio ends, show climax
+    // When narration ends, fade out music and show climax
     audio.addEventListener("ended", () => {
       setShowClimax(true);
+      // Fade out music over 3 seconds
+      if (music) {
+        const fadeInterval = setInterval(() => {
+          if (music && music.volume > 0.01) {
+            music.volume = Math.max(0, music.volume - 0.005);
+          } else {
+            clearInterval(fadeInterval);
+            music?.pause();
+          }
+        }, 100);
+      }
       setTimeout(() => {
         setShowClosing(true);
       }, 8000);
@@ -218,9 +242,10 @@ function FilmePlayer({
     return () => {
       clearTimeout(startTimer);
       audio.pause();
+      music?.pause();
       audio.removeEventListener("ended", () => {});
     };
-  }, [audioUrl]);
+  }, [audioUrl, musicUrl]);
 
   // Advance scenes on timer
   useEffect(() => {
@@ -267,7 +292,7 @@ function FilmePlayer({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 2 }}
         >
-          Você não acabou de descobrir quem é.
+          Talvez você não tenha mudado.
         </motion.p>
         <motion.p
           className="text-xl md:text-3xl font-extralight text-center max-w-lg leading-relaxed tracking-wide text-white/85 mt-4"
@@ -275,7 +300,7 @@ function FilmePlayer({
           animate={{ opacity: 1 }}
           transition={{ delay: 3, duration: 2 }}
         >
-          Você apenas se lembrou.
+          Talvez apenas tenha se reconhecido.
         </motion.p>
 
         <motion.div
@@ -617,6 +642,7 @@ export default function RevelacaoEssencia() {
   const [filmeState, setFilmeState] = useState<FilmeState>("intro");
   const [script, setScript] = useState<FilmeScript | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [musicUrl, setMusicUrl] = useState<string | null>(null);
   const [prepStep, setPrepStep] = useState(0);
 
   // Redirect if not enabled and not admin
@@ -651,19 +677,34 @@ export default function RevelacaoEssencia() {
       const filmScript = scriptData as FilmeScript;
       setPrepStep(1);
 
-      // Step 2: Generate TTS audio
+      // Step 2: Generate TTS audio + background music in parallel
       setPrepStep(2);
-      const ttsResponse = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/filme-identidade-tts`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ text: filmScript.narration }),
-        }
-      );
+      const userGender = profile?.gender || undefined;
+
+      const [ttsResponse, musicResponse] = await Promise.all([
+        fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/filme-identidade-tts`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            },
+            body: JSON.stringify({ text: filmScript.narration, gender: userGender }),
+          }
+        ),
+        fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/filme-identidade-music`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            },
+            body: JSON.stringify({}),
+          }
+        ).catch(() => null), // Music is optional, don't fail the film
+      ]);
 
       if (!ttsResponse.ok) {
         throw new Error("Erro ao gerar narração de voz");
@@ -671,6 +712,18 @@ export default function RevelacaoEssencia() {
 
       const ttsData = await ttsResponse.json();
       const generatedAudioUrl = `data:audio/mpeg;base64,${ttsData.audioContent}`;
+
+      let generatedMusicUrl: string | null = null;
+      if (musicResponse && musicResponse.ok) {
+        try {
+          const musicData = await musicResponse.json();
+          if (musicData.audioContent) {
+            generatedMusicUrl = `data:audio/mpeg;base64,${musicData.audioContent}`;
+          }
+        } catch {
+          console.warn("Music generation failed, continuing without music");
+        }
+      }
       setPrepStep(3);
 
       // Step 3: Generate images in parallel (with fallback)
@@ -703,6 +756,7 @@ export default function RevelacaoEssencia() {
 
       setScript(finalScript);
       setAudioUrl(generatedAudioUrl);
+      setMusicUrl(generatedMusicUrl);
       setFilmeState("ready");
     } catch (error) {
       console.error("Film generation error:", error);
@@ -732,7 +786,7 @@ export default function RevelacaoEssencia() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ text: newNarration }),
+        body: JSON.stringify({ text: newNarration, gender: profile?.gender || undefined }),
       }
     );
 
@@ -822,6 +876,7 @@ export default function RevelacaoEssencia() {
             key="playing"
             script={script}
             audioUrl={audioUrl}
+            musicUrl={musicUrl}
             onFinish={() => setFilmeState("finished")}
           />
         )}

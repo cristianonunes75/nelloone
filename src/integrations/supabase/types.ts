@@ -5062,6 +5062,7 @@ export type Database = {
           deleted_by: string | null
           entry_path: string | null
           full_name: string
+          gender: string | null
           has_activation_couple: boolean | null
           has_activation_individual: boolean | null
           has_activation_professional: boolean | null
@@ -5090,6 +5091,7 @@ export type Database = {
           deleted_by?: string | null
           entry_path?: string | null
           full_name: string
+          gender?: string | null
           has_activation_couple?: boolean | null
           has_activation_individual?: boolean | null
           has_activation_professional?: boolean | null
@@ -5118,6 +5120,7 @@ export type Database = {
           deleted_by?: string | null
           entry_path?: string | null
           full_name?: string
+          gender?: string | null
           has_activation_couple?: boolean | null
           has_activation_individual?: boolean | null
           has_activation_professional?: boolean | null
