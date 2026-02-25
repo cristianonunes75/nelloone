@@ -7,7 +7,15 @@ import { useRevelacaoEssenciaFlag } from "@/hooks/useFeatureFlag";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Share2, ArrowLeft, Play, Volume2 } from "lucide-react";
+import { Loader2, Share2, ArrowLeft, Play, Volume2, FileText, Copy, RefreshCw } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -417,13 +425,42 @@ function FilmePlayer({
 
 function FilmeFinished({
   displayName,
+  script,
   onReplay,
   onBack,
+  onSaveAndRewatch,
 }: {
   displayName: string;
+  script: FilmeScript | null;
   onReplay: () => void;
   onBack: () => void;
+  onSaveAndRewatch: (newNarration: string) => Promise<void>;
 }) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editedNarration, setEditedNarration] = useState(script?.narration || "");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(editedNarration);
+      toast.success("Texto copiado!");
+    } catch {
+      toast.error("Erro ao copiar texto");
+    }
+  };
+
+  const handleSaveAndRewatch = async () => {
+    setIsSaving(true);
+    try {
+      await onSaveAndRewatch(editedNarration);
+      setDialogOpen(false);
+    } catch {
+      toast.error("Erro ao regerar narração");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <motion.div
       className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-black via-zinc-950 to-zinc-900 text-white px-6"
@@ -481,6 +518,87 @@ function FilmeFinished({
           Voltar
         </Button>
       </motion.div>
+
+      {/* Ver Narração button */}
+      {script && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 4.5, duration: 1 }}
+          className="mt-8"
+        >
+          <Button
+            onClick={() => setDialogOpen(true)}
+            variant="ghost"
+            className="text-white/30 hover:text-white/60 text-xs tracking-[0.1em] uppercase rounded-none"
+          >
+            <FileText className="w-3 h-3 mr-2" />
+            Ver Narração
+          </Button>
+        </motion.div>
+      )}
+
+      {/* Narration Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="bg-zinc-950 border-white/10 text-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-white/90 font-light tracking-wide">
+              Roteiro da Narração
+            </DialogTitle>
+            <DialogDescription className="text-white/40">
+              Edite o texto abaixo e clique em "Salvar e Reassistir" para gerar um novo áudio.
+            </DialogDescription>
+          </DialogHeader>
+
+          <Textarea
+            value={editedNarration}
+            onChange={(e) => setEditedNarration(e.target.value)}
+            className="bg-zinc-900 border-white/10 text-white/90 min-h-[200px] text-sm leading-relaxed resize-y"
+            placeholder="Texto da narração..."
+          />
+
+          {/* Scene keywords */}
+          {script?.scenes && script.scenes.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs text-white/40 uppercase tracking-wider">Palavras-chave das cenas</p>
+              <div className="flex flex-wrap gap-2">
+                {script.scenes.map((scene, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 text-xs bg-white/5 border border-white/10 rounded-full text-white/50"
+                  >
+                    {scene.keyword}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <Button
+              onClick={handleCopy}
+              variant="ghost"
+              className="text-white/50 hover:text-white border border-white/10 hover:border-white/30 rounded-none text-xs tracking-wider"
+            >
+              <Copy className="w-3 h-3 mr-2" />
+              Copiar Texto
+            </Button>
+            <Button
+              onClick={handleSaveAndRewatch}
+              disabled={isSaving || editedNarration.trim().length < 10}
+              variant="ghost"
+              className="text-white/80 hover:text-white border border-white/20 hover:border-white/50 rounded-none text-xs tracking-wider"
+            >
+              {isSaving ? (
+                <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="w-3 h-3 mr-2" />
+              )}
+              Salvar e Reassistir
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }
@@ -601,11 +719,32 @@ export default function RevelacaoEssencia() {
     }
   }, [script, audioUrl]);
 
-  const handleReplay = useCallback(() => {
-    if (script && audioUrl) {
-      setFilmeState("playing");
+  const handleSaveAndRewatch = useCallback(async (newNarration: string) => {
+    // Update script with edited narration
+    setScript((prev) => prev ? { ...prev, narration: newNarration } : prev);
+
+    // Regenerate TTS
+    const ttsResponse = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/filme-identidade-tts`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ text: newNarration }),
+      }
+    );
+
+    if (!ttsResponse.ok) {
+      throw new Error("Erro ao regerar narração de voz");
     }
-  }, [script, audioUrl]);
+
+    const ttsData = await ttsResponse.json();
+    const newAudioUrl = `data:audio/mpeg;base64,${ttsData.audioContent}`;
+    setAudioUrl(newAudioUrl);
+    setFilmeState("playing");
+  }, []);
 
   if (flagLoading) return null;
 
@@ -691,8 +830,12 @@ export default function RevelacaoEssencia() {
           <FilmeFinished
             key="finished"
             displayName={displayName}
-            onReplay={handleReplay}
+            script={script}
+            onReplay={() => {
+              if (script && audioUrl) setFilmeState("playing");
+            }}
             onBack={() => navigate("/cliente")}
+            onSaveAndRewatch={handleSaveAndRewatch}
           />
         )}
       </AnimatePresence>
