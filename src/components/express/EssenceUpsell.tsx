@@ -63,8 +63,8 @@ export default function EssenceUpsell({ onDeepen, inviterName, inviterLeadId, le
         <CardContent className="p-5 flex items-center gap-3">
           <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
           <div>
-            <p className="text-sm font-medium text-foreground">Seu Código está salvo.</p>
-            <p className="text-xs text-muted-foreground">Agora você pode descobrir sua leitura completa.</p>
+            <p className="text-sm font-medium text-foreground">Sua Leitura Inicial está salva.</p>
+            <p className="text-xs text-muted-foreground">Agora você pode acessar a leitura completa.</p>
           </div>
         </CardContent>
       </Card>

@@ -130,13 +130,16 @@ const AppRoutes = () => (
     {/* Imersão Código do Casal - Landing page */}
     <Route path="/imersao-casal" element={<ImersaoCasalLanding />} />
     
-    {/* Código Inicial - Predictive first-layer identity reading */}
+    {/* Leitura Inicial - First identity reading */}
+    <Route path="/leitura-inicial" element={<CodigoExpress />} />
     <Route path="/codigo-express" element={<CodigoExpress />} />
     <Route path="/codigo-inicial" element={<CodigoExpress />} />
     <Route path="/en/code-express" element={<CodigoExpress />} />
     <Route path="/en/initial-code" element={<CodigoExpress />} />
+    <Route path="/en/initial-reading" element={<CodigoExpress />} />
     <Route path="/pt-pt/codigo-express" element={<CodigoExpress />} />
     <Route path="/pt-pt/codigo-inicial" element={<CodigoExpress />} />
+    <Route path="/pt-pt/leitura-inicial" element={<CodigoExpress />} />
     {/* Legal pages - PT */}
     <Route path="/termos" element={<TermsOfService />} />
     <Route path="/termos-de-servico" element={<TermsOfService />} />

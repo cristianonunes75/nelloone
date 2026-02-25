@@ -97,16 +97,22 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
           </motion.div>
           
           <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">Sua Leitura Inicial</p>
+
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">{prediction.archetypeName}</h1>
         </motion.div>
 
         {/* Emotional message */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
           <div className="text-center space-y-3 py-4">
-            <p className="font-display text-lg text-foreground/90 italic leading-relaxed">
-              "Esta não é uma definição sobre você.
+            <p className="font-display text-lg text-foreground/90 leading-relaxed">
+              Esta é sua Leitura Inicial.
               <br />
-              É apenas o início de uma leitura."
+              <span className="text-nello-gold font-medium">Ela revela o primeiro código do seu funcionamento.</span>
+            </p>
+            <p className="text-sm text-muted-foreground italic">
+              Não é uma definição completa.
+              <br />
+              É o início da sua jornada Identity.
             </p>
           </div>
         </motion.div>

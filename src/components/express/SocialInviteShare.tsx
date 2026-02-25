@@ -25,7 +25,7 @@ export default function SocialInviteShare({ inviterName, inviterUserId, inviterL
   const [creating, setCreating] = useState(false);
 
   const inviteUrl = inviteCode
-    ? `${window.location.origin}/codigo-inicial?ref=${inviteCode}`
+    ? `${window.location.origin}/leitura-inicial?ref=${inviteCode}`
     : null;
 
   const createInvite = async () => {
@@ -70,8 +70,8 @@ export default function SocialInviteShare({ inviterName, inviterUserId, inviterL
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Descubra seu Código Inicial',
-          text: 'Eu descobri meu Código Inicial. Agora quero descobrir o seu.',
+          title: 'Descobri minha Leitura Inicial no Identity',
+          text: 'Descobri minha Leitura Inicial no Identity. Quero que você descubra a sua também.',
           url: inviteUrl,
         });
       } catch {
@@ -100,7 +100,7 @@ export default function SocialInviteShare({ inviterName, inviterUserId, inviterL
             </div>
             <div>
               <h3 className="text-base font-bold text-foreground">
-                Agora quero descobrir o código de alguém próximo.
+                Descubra a Leitura Inicial de alguém próximo.
               </h3>
             </div>
           </div>

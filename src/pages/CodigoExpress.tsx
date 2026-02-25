@@ -109,11 +109,11 @@ export default function CodigoExpress() {
           </div>
 
           <div className="space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground">Código Inicial</h1>
+            <h1 className="text-4xl font-bold tracking-tight text-foreground">Leitura Inicial</h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              17 perguntas. Uma primeira leitura de quem você é.
+              Algumas perguntas rápidas. Uma primeira leitura de quem você é.
               <br />
-              <span className="text-foreground font-medium">Rápido. Intuitivo. Revelador.</span>
+              <span className="text-foreground font-medium">Simples. Intuitivo. Revelador.</span>
             </p>
           </div>
 
@@ -128,7 +128,7 @@ export default function CodigoExpress() {
 
           <Button size="lg" className="w-full h-14 text-lg rounded-xl" onClick={() => setStarted(true)}>
             <Sparkles className="h-5 w-5 mr-2" />
-            Descobrir meu Código
+            Começar minha Leitura
           </Button>
         </motion.div>
       </div>
@@ -189,7 +189,7 @@ export default function CodigoExpress() {
 
             {isLastQuestion && allAnswered ? (
               <Button onClick={handleComplete} className="px-6">
-                Ver meu Código
+                Ver minha Leitura
                 <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
             ) : (
