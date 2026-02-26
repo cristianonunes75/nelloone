@@ -57,42 +57,13 @@ const EU_COUNTRIES = [
   "GR", "LU", "MT", "CY", "SK", "SI", "EE", "LV", "LT", "HR"
 ];
 
-// Validate IP country matches currency (Anti-CrossTrade Protection)
-function validateIPForCurrency(country: string | null, currency: string): { valid: boolean; reason?: string } {
-  if (!country) {
-    logStep("Country detection failed, allowing transaction");
-    return { valid: true };
-  }
+// Get correct currency based on IP country
+function getCurrencyForCountry(country: string | null): string | null {
+  if (!country) return null;
   
-  // BRL can only be used from Brazil
-  if (currency === "brl" && country !== "BR") {
-    logStep("BLOCKED: BRL purchase from non-Brazilian IP", { country, currency });
-    return { 
-      valid: false, 
-      reason: "BRL_FROM_NON_BRAZIL"
-    };
-  }
-  
-  // USD cannot be used from Brazil or EU
-  if (currency === "usd" && (country === "BR" || EU_COUNTRIES.includes(country))) {
-    logStep("BLOCKED: USD purchase from Brazil/EU IP", { country, currency });
-    return { 
-      valid: false, 
-      reason: "USD_FROM_BRAZIL_OR_EU"
-    };
-  }
-  
-  // EUR can only be used from EU countries (primarily Portugal)
-  if (currency === "eur" && !EU_COUNTRIES.includes(country)) {
-    logStep("BLOCKED: EUR purchase from non-EU IP", { country, currency });
-    return { 
-      valid: false, 
-      reason: "EUR_FROM_NON_EU"
-    };
-  }
-  
-  logStep("IP country validation passed", { country, currency });
-  return { valid: true };
+  if (country === "BR") return "brl";
+  if (EU_COUNTRIES.includes(country)) return "eur";
+  return "usd";
 }
 
 // Currency validation error messages
@@ -306,44 +277,24 @@ serve(async (req) => {
       });
     }
     
-    const currency = validation.expectedCurrency;
-    logStep("Currency validated", { language, currency });
+    let currency = validation.expectedCurrency;
+    logStep("Currency validated from language", { language, currency });
     
-    // IP-BASED CURRENCY PROTECTION: Validate IP country matches currency
+    // IP-BASED CURRENCY AUTO-CORRECTION: adjust currency to match user's actual location
     const clientIP = getClientIP(req);
     logStep("Client IP detected", { ip: clientIP });
     
     const ipCountry = await getCountryFromIP(clientIP);
-    const ipValidation = validateIPForCurrency(ipCountry, currency);
+    const ipCurrency = getCurrencyForCountry(ipCountry);
     
-    if (!ipValidation.valid) {
-      let errorMessage: string;
-      switch (language) {
-        case "pt-pt":
-          errorMessage = "A sua localização não corresponde à moeda selecionada. Por favor, aceda à versão correta do site para a sua região.";
-          break;
-        case "en":
-          errorMessage = "Your location does not match the selected currency. Please access the correct version of the site for your region.";
-          break;
-        default:
-          errorMessage = "Sua localização não corresponde à moeda selecionada. Por favor, acesse a versão correta do site para sua região.";
-      }
-      
-      logStep("BLOCKED: IP-currency mismatch", { 
+    if (ipCurrency && ipCurrency !== currency) {
+      logStep("AUTO-CORRECTING currency based on IP location", { 
+        originalCurrency: currency, 
+        correctedCurrency: ipCurrency, 
         ip: clientIP, 
-        country: ipCountry, 
-        currency, 
-        reason: ipValidation.reason 
+        country: ipCountry 
       });
-      
-      return new Response(JSON.stringify({ 
-        error: errorMessage,
-        code: "IP_CURRENCY_MISMATCH",
-        reason: ipValidation.reason,
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 403,
-      });
+      currency = ipCurrency;
     }
     
     // Support both single test (legacy) and multiple tests (new)
