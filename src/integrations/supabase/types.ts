@@ -2542,6 +2542,84 @@ export type Database = {
           },
         ]
       }
+      discernir_circle_profile_questions: {
+        Row: {
+          block: string
+          id: string
+          is_active: boolean
+          order_index: number
+          prompt: string
+          version: string
+        }
+        Insert: {
+          block: string
+          id?: string
+          is_active?: boolean
+          order_index: number
+          prompt: string
+          version?: string
+        }
+        Update: {
+          block?: string
+          id?: string
+          is_active?: boolean
+          order_index?: number
+          prompt?: string
+          version?: string
+        }
+        Relationships: []
+      }
+      discernir_circle_profiles: {
+        Row: {
+          answers: Json
+          created_at: string
+          id: string
+          notes: string | null
+          percentages: Json
+          primary_role: string
+          ranking: Json
+          scores: Json
+          secondary_role: string | null
+          status: string
+          tertiary_role: string | null
+          updated_at: string
+          user_id: string
+          version: string
+        }
+        Insert: {
+          answers: Json
+          created_at?: string
+          id?: string
+          notes?: string | null
+          percentages: Json
+          primary_role: string
+          ranking: Json
+          scores: Json
+          secondary_role?: string | null
+          status?: string
+          tertiary_role?: string | null
+          updated_at?: string
+          user_id: string
+          version?: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          id?: string
+          notes?: string | null
+          percentages?: Json
+          primary_role?: string
+          ranking?: Json
+          scores?: Json
+          secondary_role?: string | null
+          status?: string
+          tertiary_role?: string | null
+          updated_at?: string
+          user_id?: string
+          version?: string
+        }
+        Relationships: []
+      }
       discernir_consents: {
         Row: {
           consent_text: string
