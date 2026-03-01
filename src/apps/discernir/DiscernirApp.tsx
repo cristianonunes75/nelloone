@@ -14,6 +14,8 @@ import { DiscernirPriestInvites } from './pages/priest/DiscernirPriestInvites';
 import { DiscernirProtectedRoute } from './components/DiscernirProtectedRoute';
 import { IdentityEssencialJourney } from './pages/IdentityEssencialJourney';
 import { DiscernirPerfilServico } from './pages/DiscernirPerfilServico';
+import { useDiscernirPilotMode } from './hooks/useDiscernirPilotMode';
+import { DiscernirPilotStandby } from './components/DiscernirPilotStandby';
 
 /**
  * DISCERNIR - Pastoral Listening Experience
@@ -28,13 +30,15 @@ import { DiscernirPerfilServico } from './pages/DiscernirPerfilServico';
  * - Audit trail for priest access
  */
 export default function DiscernirApp() {
+  const isPilotMode = useDiscernirPilotMode();
+
   return (
     <DiscernirAuthProvider>
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<DiscernirLanding />} />
         <Route path="/auth" element={<DiscernirAuth />} />
-        <Route path="/convite/:token" element={<DiscernirConvite />} />
+        <Route path="/convite/:token" element={isPilotMode ? <Navigate to="/" replace /> : <DiscernirConvite />} />
         
         {/* Protected routes - Couples */}
         <Route element={<DiscernirLayout />}>
@@ -47,26 +51,36 @@ export default function DiscernirApp() {
             } 
           />
           <Route 
+            path="/perfil-servico" 
+            element={
+              <DiscernirProtectedRoute>
+                <DiscernirPerfilServico />
+              </DiscernirProtectedRoute>
+            } 
+          />
+
+          {/* Routes behind pilot gate */}
+          <Route 
             path="/consentimento" 
             element={
               <DiscernirProtectedRoute>
-                <DiscernirConsent />
+                {isPilotMode ? <DiscernirPilotStandby /> : <DiscernirConsent />}
               </DiscernirProtectedRoute>
             } 
           />
           <Route 
             path="/apoio-escuta" 
             element={
-              <DiscernirProtectedRoute requiresConsent>
-                <DiscernirApoioEscuta />
+              <DiscernirProtectedRoute>
+                {isPilotMode ? <DiscernirPilotStandby /> : <DiscernirApoioEscuta />}
               </DiscernirProtectedRoute>
             } 
           />
           <Route 
             path="/cruzamento" 
             element={
-              <DiscernirProtectedRoute requiresConsent requiresCouple>
-                <DiscernirCruzamento />
+              <DiscernirProtectedRoute>
+                {isPilotMode ? <DiscernirPilotStandby /> : <DiscernirCruzamento />}
               </DiscernirProtectedRoute>
             } 
           />
@@ -74,15 +88,7 @@ export default function DiscernirApp() {
             path="/identity-essencial" 
             element={
               <DiscernirProtectedRoute>
-                <IdentityEssencialJourney />
-              </DiscernirProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/perfil-servico" 
-            element={
-              <DiscernirProtectedRoute>
-                <DiscernirPerfilServico />
+                {isPilotMode ? <DiscernirPilotStandby /> : <IdentityEssencialJourney />}
               </DiscernirProtectedRoute>
             } 
           />
@@ -94,7 +100,7 @@ export default function DiscernirApp() {
             path="/padre" 
             element={
               <DiscernirProtectedRoute requiredRole="priest">
-                <DiscernirPriestDashboard />
+                {isPilotMode ? <DiscernirPilotStandby /> : <DiscernirPriestDashboard />}
               </DiscernirProtectedRoute>
             } 
           />
@@ -102,7 +108,7 @@ export default function DiscernirApp() {
             path="/padre/casais" 
             element={
               <DiscernirProtectedRoute requiredRole="priest">
-                <DiscernirPriestCouples />
+                {isPilotMode ? <DiscernirPilotStandby /> : <DiscernirPriestCouples />}
               </DiscernirProtectedRoute>
             } 
           />
@@ -110,7 +116,7 @@ export default function DiscernirApp() {
             path="/padre/convites" 
             element={
               <DiscernirProtectedRoute requiredRole="priest">
-                <DiscernirPriestInvites />
+                {isPilotMode ? <DiscernirPilotStandby /> : <DiscernirPriestInvites />}
               </DiscernirProtectedRoute>
             } 
           />
