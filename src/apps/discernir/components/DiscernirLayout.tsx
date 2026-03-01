@@ -31,6 +31,7 @@ export function DiscernirLayout({ isPriest = false }: DiscernirLayoutProps) {
     { path: '/consentimento', label: 'Consentimento', icon: Heart },
     { path: '/apoio-escuta', label: 'Apoio de Escuta', icon: FileHeart },
     { path: '/cruzamento', label: 'Proteção do Casal', icon: Users },
+    { path: '/perfil-servico', label: 'Perfil de Serviço', icon: Church },
   ];
 
   const priestNavItems = [

@@ -13,6 +13,7 @@ import { DiscernirPriestCouples } from './pages/priest/DiscernirPriestCouples';
 import { DiscernirPriestInvites } from './pages/priest/DiscernirPriestInvites';
 import { DiscernirProtectedRoute } from './components/DiscernirProtectedRoute';
 import { IdentityEssencialJourney } from './pages/IdentityEssencialJourney';
+import { DiscernirPerfilServico } from './pages/DiscernirPerfilServico';
 
 /**
  * DISCERNIR - Pastoral Listening Experience
@@ -74,6 +75,14 @@ export default function DiscernirApp() {
             element={
               <DiscernirProtectedRoute>
                 <IdentityEssencialJourney />
+              </DiscernirProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/perfil-servico" 
+            element={
+              <DiscernirProtectedRoute>
+                <DiscernirPerfilServico />
               </DiscernirProtectedRoute>
             } 
           />
