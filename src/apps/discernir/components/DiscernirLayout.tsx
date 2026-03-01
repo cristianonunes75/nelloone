@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useDiscernirPilotMode } from '../hooks/useDiscernirPilotMode';
 
 interface DiscernirLayoutProps {
   isPriest?: boolean;
@@ -25,20 +26,30 @@ export function DiscernirLayout({ isPriest = false }: DiscernirLayoutProps) {
   const { role, couple, priest } = useDiscernirAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isPilotMode = useDiscernirPilotMode();
 
-  const coupleNavItems = [
-    { path: '/dashboard', label: 'Início', icon: Home },
-    { path: '/consentimento', label: 'Consentimento', icon: Heart },
-    { path: '/apoio-escuta', label: 'Apoio de Escuta', icon: FileHeart },
-    { path: '/cruzamento', label: 'Proteção do Casal', icon: Users },
-    { path: '/perfil-servico', label: 'Perfil de Serviço', icon: Church },
-  ];
+  const coupleNavItems = isPilotMode
+    ? [
+        { path: '/dashboard', label: 'Início', icon: Home },
+        { path: '/perfil-servico', label: 'Perfil de Serviço', icon: Church },
+      ]
+    : [
+        { path: '/dashboard', label: 'Início', icon: Home },
+        { path: '/consentimento', label: 'Consentimento', icon: Heart },
+        { path: '/apoio-escuta', label: 'Apoio de Escuta', icon: FileHeart },
+        { path: '/cruzamento', label: 'Proteção do Casal', icon: Users },
+        { path: '/perfil-servico', label: 'Perfil de Serviço', icon: Church },
+      ];
 
-  const priestNavItems = [
-    { path: '/padre', label: 'Painel', icon: Home },
-    { path: '/padre/casais', label: 'Casais', icon: Users },
-    { path: '/padre/convites', label: 'Convites', icon: Send },
-  ];
+  const priestNavItems = isPilotMode
+    ? [
+        { path: '/padre', label: 'Painel', icon: Home },
+      ]
+    : [
+        { path: '/padre', label: 'Painel', icon: Home },
+        { path: '/padre/casais', label: 'Casais', icon: Users },
+        { path: '/padre/convites', label: 'Convites', icon: Send },
+      ];
 
   const navItems = isPriest ? priestNavItems : coupleNavItems;
 
