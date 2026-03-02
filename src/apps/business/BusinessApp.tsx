@@ -19,6 +19,7 @@ import BusinessJobPublic from './pages/BusinessJobPublic';
 import BusinessApplicationConfirm from './pages/BusinessApplicationConfirm';
 import BusinessCandidates from './pages/BusinessCandidates';
 import BusinessBilling from './pages/BusinessBilling';
+import BusinessWhatsApp from './pages/BusinessWhatsApp';
 import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
 import { isFeatureEnabled } from './config/featureFlags';
 
@@ -116,6 +117,13 @@ export default function BusinessApp() {
       <Route path="/candidates" element={
         <BusinessProtectedRoute requiredRole="company_admin">
           <BusinessCandidates />
+        </BusinessProtectedRoute>
+      } />
+      
+      {/* WhatsApp Automation */}
+      <Route path="/whatsapp" element={
+        <BusinessProtectedRoute requiredRole="company_admin">
+          <BusinessWhatsApp />
         </BusinessProtectedRoute>
       } />
       
