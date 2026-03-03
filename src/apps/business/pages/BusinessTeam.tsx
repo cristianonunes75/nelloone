@@ -41,6 +41,7 @@ interface TeamMember {
   role: string;
   is_active: boolean;
   consent_given: boolean;
+  share_report_with_company: boolean;
   joined_at: string | null;
   profile: {
     full_name: string;
@@ -48,6 +49,7 @@ interface TeamMember {
     journey_completed_tests: number;
     journey_total_tests: number;
   } | null;
+  has_essence_code: boolean;
 }
 
 export default function BusinessTeam() {
@@ -74,6 +76,7 @@ export default function BusinessTeam() {
           role,
           is_active,
           consent_given,
+          share_report_with_company,
           joined_at,
           profiles:user_id (
             full_name,
@@ -86,11 +89,23 @@ export default function BusinessTeam() {
         .order('joined_at', { ascending: false });
       
       if (error) throw error;
+
+      // Check which users have essence code generated
+      const userIds = (data || []).map(d => d.user_id);
+      const { data: essenceCodes } = userIds.length > 0
+        ? await supabase
+            .from('ativacao_codigo')
+            .select('user_id')
+            .in('user_id', userIds)
+        : { data: [] };
+      
+      const essenceUserIds = new Set((essenceCodes || []).map(e => e.user_id));
       
       // Transform the data to match our interface
       const transformedData = (data || []).map(item => ({
         ...item,
-        profile: Array.isArray(item.profiles) ? item.profiles[0] : item.profiles
+        profile: Array.isArray(item.profiles) ? item.profiles[0] : item.profiles,
+        has_essence_code: essenceUserIds.has(item.user_id),
       }));
       
       setMembers(transformedData as unknown as TeamMember[]);
@@ -221,13 +236,23 @@ export default function BusinessTeam() {
                         <TableCell>{getRoleBadge(member.role)}</TableCell>
                         <TableCell>{getStatusBadge(member)}</TableCell>
                         <TableCell>
-                          {member.profile ? (
-                            <span className="text-sm">
-                              {member.profile.journey_completed_tests}/{member.profile.journey_total_tests} testes
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
+                          <div className="flex flex-col gap-1">
+                            {member.profile ? (
+                              <span className="text-sm">
+                                {member.profile.journey_completed_tests}/7 mapas
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">-</span>
+                            )}
+                            {member.has_essence_code && (
+                              <Badge className="bg-emerald-100 text-emerald-700 gap-1 w-fit text-[10px]">
+                                <CheckCircle2 className="w-3 h-3" /> Código da Essência
+                              </Badge>
+                            )}
+                            {member.share_report_with_company && (
+                              <span className="text-[10px] text-muted-foreground">📊 Compartilhando</span>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell className="text-muted-foreground text-sm">
                           {member.joined_at 

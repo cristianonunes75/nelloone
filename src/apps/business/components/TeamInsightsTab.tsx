@@ -7,7 +7,8 @@
 import { useEffect, useState } from 'react';
 import { 
   BarChart3, RefreshCw, AlertTriangle, TrendingUp, 
-  Users, Shield, Lightbulb, Clock, CheckCircle, Target
+  Users, Shield, Lightbulb, Clock, CheckCircle, Target,
+  Sparkles, BookOpen
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -152,6 +153,46 @@ export function TeamInsightsTab() {
             icon={<Lightbulb className="w-5 h-5 text-primary" />}
             emptyText="Sem recomendações no momento"
           />
+
+          {/* Código da Essência Section */}
+          {insights.essence_code && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  Código da Essência da Equipe
+                </CardTitle>
+                <CardDescription>
+                  Dados agregados da jornada completa (7 mapas) e ativação do Código da Essência
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center p-3 rounded-lg bg-muted/50">
+                    <p className="text-2xl font-bold">{insights.essence_code.total_with_journey_complete}</p>
+                    <p className="text-xs text-muted-foreground">Jornada completa (7 mapas)</p>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-muted/50">
+                    <p className="text-2xl font-bold">{insights.essence_code.total_with_essence_code}</p>
+                    <p className="text-xs text-muted-foreground">Código da Essência gerado</p>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-muted/50">
+                    <p className="text-2xl font-bold">{insights.essence_code.completion_rate}%</p>
+                    <p className="text-xs text-muted-foreground">Taxa de ativação</p>
+                  </div>
+                </div>
+                {insights.essence_code.total_with_essence_code === 0 && (
+                  <div className="flex items-start gap-2 text-sm text-muted-foreground p-3 bg-muted/30 rounded-lg">
+                    <BookOpen className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span>
+                      Nenhum colaborador gerou o Código da Essência ainda. Incentive a equipe a completar
+                      os 7 mapas da jornada Identity para desbloquear insights mais profundos.
+                    </span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* LGPD Notice */}
           <div className="text-xs text-muted-foreground p-3 bg-muted/30 rounded-lg border border-dashed flex items-start gap-2">

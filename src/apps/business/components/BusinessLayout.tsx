@@ -29,6 +29,8 @@ interface BusinessLayoutProps {
 // Nello Hiring - Menu simplificado (foco apenas em recrutamento)
 const adminNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/team', label: 'Equipe', icon: Users },
+  { href: '/invite', label: 'Convidar', icon: UserPlus },
   { href: '/jobs', label: 'Vagas', icon: ClipboardList },
   { href: '/candidates', label: 'Candidatos', icon: Users },
   { href: '/hiring', label: 'Avaliações', icon: Briefcase },

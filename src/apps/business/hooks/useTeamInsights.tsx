@@ -8,6 +8,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useBusinessAuth } from './useBusinessAuth';
 import { toast } from 'sonner';
 
+export interface EssenceCodeInsights {
+  total_with_journey_complete: number;
+  total_with_essence_code: number;
+  completion_rate: number;
+}
+
 export interface TeamInsightsData {
   total_members: number;
   completed_assessments: number;
@@ -21,6 +27,7 @@ export interface TeamInsightsData {
   leadership_potential_indicators: string[];
   team_building_suggestions: string[];
   management_recommendations: string[];
+  essence_code?: EssenceCodeInsights;
 }
 
 export interface HealthAlert {
@@ -54,7 +61,7 @@ export function useTeamInsights() {
         .maybeSingle();
 
       if (cached) {
-        setInsights({
+        const cachedData: TeamInsightsData = {
           total_members: cached.total_members || 0,
           completed_assessments: cached.completed_assessments || 0,
           temperament_distribution: (cached.temperament_distribution as Record<string, number>) || {},
@@ -67,7 +74,13 @@ export function useTeamInsights() {
           leadership_potential_indicators: (cached.leadership_potential_indicators as string[]) || [],
           team_building_suggestions: (cached.team_building_suggestions as string[]) || [],
           management_recommendations: (cached.management_recommendations as string[]) || [],
-        });
+        };
+        // essence_code may be stored in the cached record if the edge function populated it
+        const rawEssence = (cached as Record<string, unknown>).essence_code;
+        if (rawEssence && typeof rawEssence === 'object') {
+          cachedData.essence_code = rawEssence as EssenceCodeInsights;
+        }
+        setInsights(cachedData);
         setLastCalculated(cached.last_calculated_at);
       }
 
