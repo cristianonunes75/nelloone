@@ -34,16 +34,43 @@ interface BusinessLayoutProps {
   children: ReactNode;
 }
 
-const adminNavItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/team', label: 'Equipe', icon: Users },
-  { href: '/invite', label: 'Convidar', icon: UserPlus },
-  { href: '/jobs', label: 'Vagas', icon: ClipboardList },
-  { href: '/candidates', label: 'Candidatos', icon: Users },
-  { href: '/hiring', label: 'Avaliações', icon: Briefcase },
-  { href: '/whatsapp', label: 'WhatsApp', icon: MessageCircle },
-  { href: '/people-strategy', label: 'People Strategy', icon: BarChart3 },
+interface NavSection {
+  label: string;
+  items: { href: string; label: string; icon: any }[];
+}
+
+const adminNavSections: NavSection[] = [
+  {
+    label: 'Estratégia',
+    items: [
+      { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/people-strategy', label: 'People Strategy', icon: BarChart3 },
+    ],
+  },
+  {
+    label: 'Organização',
+    items: [
+      { href: '/team', label: 'Equipe', icon: Users },
+      { href: '/invite', label: 'Convidar', icon: UserPlus },
+      { href: '/hiring', label: 'Avaliações', icon: Briefcase },
+    ],
+  },
+  {
+    label: 'Recrutamento',
+    items: [
+      { href: '/jobs', label: 'Vagas', icon: ClipboardList },
+      { href: '/candidates', label: 'Candidatos', icon: Users },
+    ],
+  },
+  {
+    label: 'Comunicação',
+    items: [
+      { href: '/whatsapp', label: 'WhatsApp', icon: MessageCircle },
+    ],
+  },
 ];
+
+const adminNavItems = adminNavSections.flatMap(s => s.items);
 
 const bottomNavItems = [
   { href: '/settings', label: 'Configurações', icon: Settings },
@@ -61,6 +88,7 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const navSections = isCompanyAdmin ? adminNavSections : [{ label: '', items: collaboratorNavItems }];
   const navItems = isCompanyAdmin ? adminNavItems : collaboratorNavItems;
   const bottomItems = isCompanyAdmin ? bottomNavItems : [];
 
@@ -131,11 +159,21 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
           {/* Mobile Menu Overlay */}
           {mobileMenuOpen && (
             <div className="fixed inset-0 top-14 z-40 bg-background/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
-              <nav className="bg-card border-r w-64 h-full p-4 space-y-1 shadow-lg" onClick={(e) => e.stopPropagation()}>
-                {navItems.map((item) => (
-                  <NavItem key={item.href} item={item} onClick={() => setMobileMenuOpen(false)} />
+              <nav className="bg-card border-r w-64 h-full p-4 space-y-3 shadow-lg" onClick={(e) => e.stopPropagation()}>
+                {navSections.map((section, idx) => (
+                  <div key={section.label || idx}>
+                    {idx > 0 && <div className="h-px bg-border" />}
+                    {section.label && (
+                      <p className="px-3 pt-1 pb-0.5 text-[10px] font-semibold tracking-widest text-muted-foreground/60 uppercase">{section.label}</p>
+                    )}
+                    <div className="space-y-0.5">
+                      {section.items.map((item) => (
+                        <NavItem key={item.href} item={item} onClick={() => setMobileMenuOpen(false)} />
+                      ))}
+                    </div>
+                  </div>
                 ))}
-                <div className="border-t my-3" />
+                <div className="h-px bg-border" />
                 {bottomItems.map((item) => (
                   <NavItem key={item.href} item={item} onClick={() => setMobileMenuOpen(false)} />
                 ))}
@@ -181,9 +219,20 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
             </div>
 
             {/* Nav Items */}
-            <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-              {navItems.map((item) => (
-                <NavItem key={item.href} item={item} />
+            <nav className="flex-1 p-3 space-y-3 overflow-y-auto">
+              {navSections.map((section, idx) => (
+                <div key={section.label || idx}>
+                  {idx > 0 && <div className="h-px bg-border" />}
+                  {section.label && !collapsed && (
+                    <p className="px-3 pt-1 pb-0.5 text-[10px] font-semibold tracking-widest text-muted-foreground/60 uppercase">{section.label}</p>
+                  )}
+                  {collapsed && idx > 0 && <div className="h-px bg-border mx-1" />}
+                  <div className="space-y-0.5">
+                    {section.items.map((item) => (
+                      <NavItem key={item.href} item={item} />
+                    ))}
+                  </div>
+                </div>
               ))}
             </nav>
 
