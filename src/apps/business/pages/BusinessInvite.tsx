@@ -18,6 +18,7 @@ import { BlockedAccessOverlay } from '../components/BlockedAccessOverlay';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { InviteHistory } from '../components/InviteHistory';
 
 type InviteRole = 'collaborator' | 'company_admin';
 
@@ -269,7 +270,7 @@ export default function BusinessInvite() {
       {/* Blocked overlay when trial expired or suspended */}
       <BlockedAccessOverlay />
       
-      <div className="space-y-6 max-w-2xl">
+      <div className="space-y-6 max-w-4xl">
         {/* Subscription Status Banner */}
         <SubscriptionStatusBanner />
         
@@ -613,6 +614,11 @@ export default function BusinessInvite() {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Invite History Table */}
+        {company && (
+          <InviteHistory companyId={company.id} />
         )}
 
         {/* Info Card */}
