@@ -208,7 +208,7 @@ function ExecutiveEmptyState() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Link to="/invite">
+          <Link to="/team?tab=invite">
             <Button size="sm" variant="outline" className="gap-1.5">
               <Users className="w-3.5 h-3.5" /> Convidar equipe
             </Button>
@@ -365,7 +365,7 @@ function OrgProgressChecklist({ data }: { data: JourneyData }) {
   const steps = [
     { id: 'jobs', label: 'Cargos configurados', done: data.hasJobs, link: '/jobs' },
     { id: 'ideal', label: 'Perfil ideal definido', done: data.hasIdealProfiles, link: '/jobs' },
-    { id: 'team', label: 'Equipe convidada', done: data.hasTeamMembers, link: '/invite' },
+    { id: 'team', label: 'Equipe convidada', done: data.hasTeamMembers, link: '/team?tab=invite' },
     { id: 'assess', label: 'Avaliações concluídas', done: data.hasAssessments, link: '/team' },
     { id: 'climate', label: 'Ciclo de clima ativo', done: data.hasClimateCycle, link: '/people-strategy' },
     { id: 'enps', label: 'Ciclo eNPS ativo', done: data.hasENPSCycle, link: '/people-strategy' },
@@ -585,21 +585,29 @@ export default function BusinessDashboard() {
 
           {hasStrategicData ? (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <HealthIndexCard index={healthIndex} />
-              <ENPSCard
-                score={displayEnps?.enps_score ?? null}
-                promoters={displayEnps?.promoters_count ?? 0}
-                neutrals={displayEnps?.neutrals_count ?? 0}
-                detractors={displayEnps?.detractors_count ?? 0}
-                cycleStatus={displayEnps?.status ?? null}
-              />
-              <ClimateCard
-                score={displayClimate?.overall_score ?? null}
-                worstDimension={worstClimateDimension}
-                worstScore={worstClimateScore}
-                cycleStatus={displayClimate?.status ?? null}
-              />
-              <AdherenceCard avgAdherence={null} totalEvaluated={0} />
+              <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
+                <HealthIndexCard index={healthIndex} />
+              </Link>
+              <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
+                <ENPSCard
+                  score={displayEnps?.enps_score ?? null}
+                  promoters={displayEnps?.promoters_count ?? 0}
+                  neutrals={displayEnps?.neutrals_count ?? 0}
+                  detractors={displayEnps?.detractors_count ?? 0}
+                  cycleStatus={displayEnps?.status ?? null}
+                />
+              </Link>
+              <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
+                <ClimateCard
+                  score={displayClimate?.overall_score ?? null}
+                  worstDimension={worstClimateDimension}
+                  worstScore={worstClimateScore}
+                  cycleStatus={displayClimate?.status ?? null}
+                />
+              </Link>
+              <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
+                <AdherenceCard avgAdherence={null} totalEvaluated={0} />
+              </Link>
             </div>
           ) : (
             <ExecutiveEmptyState />
@@ -663,7 +671,7 @@ export default function BusinessDashboard() {
             </Card>
 
             <Card className="hover:border-primary/50 transition-colors cursor-pointer">
-              <Link to="/hiring" className="block h-full">
+              <Link to="/candidates" className="block h-full">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <Briefcase className="w-5 h-5 text-primary" />
