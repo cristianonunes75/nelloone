@@ -15,7 +15,11 @@ export function useCrossAppAuth() {
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useAuth();
   const [isValidating, setIsValidating] = useState(false);
-  const [validationComplete, setValidationComplete] = useState(false);
+  // Initialize synchronously: if no crossAppToken in URL, skip validation entirely
+  const [validationComplete, setValidationComplete] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return !params.has('crossAppToken');
+  });
 
   useEffect(() => {
     const crossAppToken = searchParams.get("crossAppToken");
