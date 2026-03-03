@@ -1,100 +1,60 @@
 
 
-# Correção Critica: RLS e Edge Functions do DISCERNIR
+# Plano: Visibilidade da Equipe + Código da Essência no Business
 
-## Problema
-A auditoria identificou que varias tabelas do Discernir tem RLS ativo mas faltam policies de INSERT/UPDATE, causando falhas silenciosas. A edge function `discernir-generate-apoio` tambem falha porque tenta inserir dados como usuario comum, mas nao existe policy INSERT na tabela `discernir_apoio_escuta`.
+## Problema Atual
 
-## Resumo das Correcoes
+O menu do Business não tem links diretos para "Equipe" e "Convidar" — essas rotas existem (`/team`, `/invite`) mas ficaram escondidas após a reestruturação focada em Hiring. Além disso, o Team Insights só processa DISC e Temperamentos, ignorando o Código da Essência.
 
-### 1. Adicionar policies INSERT/UPDATE faltantes
+## Mudanças Propostas
 
-**`discernir_apoio_escuta`** - Falta INSERT e UPDATE para o proprio usuario:
-- INSERT: `user_id = auth.uid()` (usuario pode gerar seu proprio apoio)
-- UPDATE: `user_id = auth.uid()` (usuario pode invalidar registros antigos)
+### 1. Restaurar "Equipe" e "Convidar" no menu principal
 
-**`discernir_access_logs`** - Falta INSERT para padres registrarem acesso:
-- INSERT: permitido para padres ativos (via join com `discernir_priests`)
-
-**`discernir_couples`** - Falta INSERT para criacao de casais:
-- INSERT: permitido via service role (edge function ou trigger), pois casais sao criados pelo sistema ao aceitar convite
-
-**`discernir_feedback`** - A policy FOR ALL ja cobre INSERT, OK.
-
-### 2. Corrigir visibilidade de `discernir_parishes`
-
-Atualmente so padres veem a paroquia. Casais vinculados tambem precisam ver o nome da sua paroquia:
-- Adicionar SELECT policy: usuarios que pertencem a um casal naquela paroquia podem ver
-
-### 3. Corrigir edge function `discernir-generate-apoio`
-
-A funcao usa `supabaseAnonKey` com header do usuario, o que faz os inserts passarem pelo RLS como usuario comum. Com a correcao da policy INSERT na tabela `discernir_apoio_escuta` (item 1), isso passa a funcionar. Nenhuma mudanca na edge function e necessaria apos adicionar a policy.
-
-### 4. Adicionar SELECT em `discernir_couple_invites` para convidados
-
-Usuarios que recebem convite por email precisam ver o convite pelo token. Adicionar policy SELECT para acesso publico filtrado por token (via RPC existente ou policy direta).
-
----
-
-## Detalhes Tecnicos
-
-### Migration SQL
-
-Uma unica migration com:
+No `BusinessLayout.tsx`, adicionar dois itens ao menu admin:
 
 ```text
--- 1. INSERT/UPDATE policies para discernir_apoio_escuta
-CREATE POLICY "Users can insert own apoio escuta"
-  ON discernir_apoio_escuta FOR INSERT
-  TO authenticated
-  WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY "Users can update own apoio escuta"
-  ON discernir_apoio_escuta FOR UPDATE
-  TO authenticated
-  USING (user_id = auth.uid());
-
--- 2. INSERT policy para discernir_access_logs (padres)
-CREATE POLICY "Priests can insert access logs"
-  ON discernir_access_logs FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM discernir_priests
-      WHERE id = discernir_access_logs.priest_id
-      AND user_id = auth.uid()
-    )
-  );
-
--- 3. SELECT em discernir_parishes para casais
-CREATE POLICY "Couples can view their parish"
-  ON discernir_parishes FOR SELECT
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM discernir_couples
-      WHERE parish_id = discernir_parishes.id
-      AND (spouse_a_user_id = auth.uid() OR spouse_b_user_id = auth.uid())
-    )
-  );
-
--- 4. INSERT em discernir_couples (sistema/convite)
-CREATE POLICY "System can create couples"
-  ON discernir_couples FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    spouse_a_user_id = auth.uid() OR spouse_b_user_id = auth.uid()
-  );
+Menu atual:  Dashboard | Vagas | Candidatos | Avaliações | WhatsApp | Config
+Menu novo:   Dashboard | Equipe | Convidar | Vagas | Candidatos | Avaliações | WhatsApp | Config
 ```
 
-### Arquivos modificados
-- Nenhum arquivo frontend precisa mudar
-- Apenas 1 migration SQL nova
-- Edge function `discernir-generate-apoio` permanece inalterada (o fix do RLS resolve o problema)
+- "Equipe" → `/team` (icon: Users)
+- "Convidar" → `/invite` (icon: UserPlus)
 
-### Resultado esperado
-- `discernir-generate-apoio` consegue salvar e atualizar registros
-- Padres conseguem registrar logs de acesso
-- Casais veem o nome da paroquia
-- Casais podem ser criados ao aceitar convite
+### 2. Estender Team Insights com dados do Código da Essência
+
+**Edge function `business-team-insights`**: Adicionar processamento da tabela `ativacao_codigo` para membros com consentimento, extraindo:
+- Distribuição de temperamentos dominantes da equipe
+- Padrões de essência agregados (sem expor dados individuais)
+- Indicadores de complementaridade (diversidade de perfis)
+
+**UI `TeamInsightsTab`**: Nova seção "Código da Essência da Equipe" mostrando:
+- Quantos membros completaram a jornada completa (7 mapas)
+- Quantos têm o Código da Essência gerado
+- Gráfico agregado de tendências (temperamentos dominantes, padrões comportamentais)
+- Alertas de concentração (ex: "80% da equipe tem perfil S — considere diversificar")
+
+### 3. Melhorar a coluna de progresso na tela de Equipe
+
+No `BusinessTeam.tsx`, expandir a coluna "Progresso" para mostrar:
+- `X/7 mapas` em vez de apenas `X/Y testes`
+- Badge "Código da Essência ✓" quando o membro completou
+- Status de consentimento de compartilhamento
+
+## Detalhes Técnicos
+
+### Arquivos modificados
+1. **`src/apps/business/components/BusinessLayout.tsx`** — Adicionar itens "Equipe" e "Convidar" ao `adminNavItems`
+2. **`supabase/functions/business-team-insights/index.ts`** — Estender query para incluir dados de `ativacao_codigo` e `test_results` dos 7 mapas
+3. **`src/apps/business/components/TeamInsightsTab.tsx`** — Nova seção com métricas do Código da Essência
+4. **`src/apps/business/pages/BusinessTeam.tsx`** — Melhorar coluna de progresso
+
+### Segurança (LGPD)
+- Dados do Código da Essência só são processados para membros com `consent_given = true` E `share_report_with_company = true`
+- RH/dono vê apenas dados **agregados** (tendências da equipe, distribuições percentuais)
+- Nenhum relatório individual ou resposta específica é exposta
+- Todas as consultas são registradas em `company_audit_logs`
+
+### Banco de dados
+- Nenhuma nova tabela necessária — as tabelas `ativacao_codigo`, `test_results`, `company_users` já existem
+- Possivelmente uma nova coluna `has_essence_code boolean` em `company_users` para cache (opcional, pode ser derivado via join)
 
