@@ -1,8 +1,13 @@
 /**
  * Sales Match Engine - Intelligent Candidate-Job Compatibility
  * 
- * Evaluates compatibility between candidate behavioral profiles (DISC + Temperament)
- * and the specific business context requirements configured for each job posting.
+ * Evaluates compatibility between candidate behavioral profiles and the specific
+ * business context requirements configured for each job posting.
+ * 
+ * ARCHITECTURAL NOTE: DISC and Temperaments are consolidation inputs of the
+ * "Código da Essência" (Essence Code). The match engine uses these as facets of
+ * the consolidated Essence Code — not as independent dimensions. This avoids
+ * double-counting while preserving the granularity needed for functional fit.
  * 
  * This is NOT a value judgment - only functional compatibility assessment.
  */
@@ -439,18 +444,19 @@ export function calculateSalesMatch(
   let recommendation: 'contratar' | 'entrevistar_atencao' | 'nao_seguir';
   let summary: string;
   
-  if (totalScore >= 75) {
+  // Updated thresholds: 80+ Excelente Fit, 60-79 Fit Parcial, <60 Risco Estrutural
+  if (totalScore >= 80) {
     level = 'ideal';
     recommendation = 'contratar';
-    summary = 'Perfil altamente compatível com o contexto deste negócio e função.';
-  } else if (totalScore >= 50) {
+    summary = 'Excelente Fit — Perfil altamente compatível com o contexto deste negócio e função.';
+  } else if (totalScore >= 60) {
     level = 'parcial';
     recommendation = 'entrevistar_atencao';
-    summary = 'Perfil compatível com ajustes, clareza de processo e acompanhamento inicial.';
+    summary = 'Fit Parcial — Perfil compatível com ajustes, clareza de processo e acompanhamento inicial.';
   } else {
     level = 'nao_match';
     recommendation = 'nao_seguir';
-    summary = 'Perfil não indicado para este contexto específico. Avaliação baseada em compatibilidade funcional.';
+    summary = 'Risco Estrutural — Perfil não indicado para este contexto específico. Avaliação baseada em compatibilidade funcional.';
   }
   
   const details = {

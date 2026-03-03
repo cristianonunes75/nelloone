@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import {
   TrendingUp, TrendingDown, Minus, BarChart3, Brain, Plus, Play, Square,
   Loader2, Sparkles, Users, ShieldAlert, Thermometer, AlertTriangle,
-  Target, BookOpen, MessageCircle
+  Target, BookOpen, MessageCircle, Download, Map
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -21,10 +21,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-// Lazy imports for tabs
+// Strategy components
 import PerformanceTab from '../components/strategy/PerformanceTab';
 import PDITab from '../components/strategy/PDITab';
 import AIChatTab from '../components/strategy/AIChatTab';
+import { OrganizationalHealthCard, calculateHealthIndex } from '../components/strategy/OrganizationalHealthCard';
+import { OrganizationalMap } from '../components/strategy/OrganizationalMap';
+import { JourneyChecklist } from '../components/strategy/JourneyChecklist';
+import { generateTeamReportPDF } from '../lib/teamReportPDF';
 
 // ── eNPS Score Card ──
 function ENPSScoreCard({ score, total }: { score: number | null; total: number }) {
@@ -100,43 +104,6 @@ function CriticalDimensionCard({ dimensions }: { dimensions: Record<string, numb
   );
 }
 
-// ── Risk Index Card ──
-function RiskIndexCard({ riskIndex, factors }: { riskIndex: number | null; factors: string[] }) {
-  const getRiskLevel = (v: number | null) => {
-    if (v === null) return { label: 'Sem dados', color: 'text-muted-foreground', bg: 'bg-muted' };
-    if (v >= 70) return { label: 'Verde', color: 'text-green-500', bg: 'bg-green-500/10' };
-    if (v >= 40) return { label: 'Amarelo', color: 'text-amber-500', bg: 'bg-amber-500/10' };
-    return { label: 'Vermelho', color: 'text-red-500', bg: 'bg-red-500/10' };
-  };
-  const { label, color, bg } = getRiskLevel(riskIndex);
-  return (
-    <Card className={bg}>
-      <CardHeader className="pb-2">
-        <div className="flex items-center gap-2">
-          <ShieldAlert className={`w-5 h-5 ${color}`} />
-          <CardDescription>Índice de Risco</CardDescription>
-        </div>
-        <CardTitle className={`text-4xl font-bold ${color}`}>
-          {riskIndex !== null ? riskIndex : '—'}
-          {riskIndex !== null && <span className="text-lg text-muted-foreground">/100</span>}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className={`text-sm font-medium ${color}`}>{label}</p>
-        {factors.length > 0 && (
-          <div className="mt-2 space-y-1">
-            {factors.map((f, i) => (
-              <p key={i} className="text-xs text-muted-foreground flex items-start gap-1">
-                <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />{f}
-              </p>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
 // ── Climate Heatmap ──
 function ClimateHeatmap({ dimensions }: { dimensions: Record<string, number> }) {
   const entries = Object.entries(dimensions);
@@ -203,10 +170,8 @@ function ComparisonChart({ enpsCycles, climateCycles }: {
 }
 
 // ── AI Insights Card ──
-function AIInsightsCard({ companyId }: { companyId: string }) {
+function AIInsightsCard({ companyId, onInsightsLoaded }: { companyId: string; onInsightsLoaded?: (risks: string[], strengths: string[]) => void }) {
   const [insights, setInsights] = useState<Record<string, string> | null>(null);
-  const [riskIndex, setRiskIndex] = useState<number | null>(null);
-  const [riskFactors, setRiskFactors] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchInsights = async () => {
@@ -216,9 +181,13 @@ function AIInsightsCard({ companyId }: { companyId: string }) {
         body: { company_id: companyId },
       });
       if (error) throw error;
-      if (data?.insights) setInsights(data.insights);
-      if (data?.risk_index !== undefined) setRiskIndex(data.risk_index);
-      if (data?.risk_factors) setRiskFactors(data.risk_factors);
+      if (data?.insights) {
+        setInsights(data.insights);
+        // Parse risks and strengths for PDF
+        const risks = (data.insights.top_risks || '').split('\n').filter(Boolean);
+        const strengths = (data.insights.top_strengths || '').split('\n').filter(Boolean);
+        onInsightsLoaded?.(risks, strengths);
+      }
     } catch (err) {
       console.error('Error fetching AI insights:', err);
       toast.error('Erro ao gerar insights');
@@ -345,8 +314,13 @@ export default function BusinessPeopleStrategy() {
   const climate = useClimate();
   const { insights: teamInsights, fetchInsights: fetchTeamInsights } = useTeamInsights();
 
-  const [riskIndex, setRiskIndex] = useState<number | null>(null);
-  const [riskFactors, setRiskFactors] = useState<string[]>([]);
+  const [aiRisks, setAiRisks] = useState<string[]>([]);
+  const [aiStrengths, setAiStrengths] = useState<string[]>([]);
+  const [journeyData, setJourneyData] = useState({
+    hasJobs: false, hasTeamMembers: false, hasAssessments: false,
+    hasEssenceCodes: false, hasIdealProfiles: false,
+    hasENPSCycle: false, hasClimateCycle: false,
+  });
 
   useEffect(() => {
     enps.fetchCycles();
@@ -354,10 +328,62 @@ export default function BusinessPeopleStrategy() {
     fetchTeamInsights();
   }, [enps.fetchCycles, climate.fetchCycles, fetchTeamInsights]);
 
+  // Fetch journey progress
+  useEffect(() => {
+    if (!company?.id) return;
+    const fetchJourney = async () => {
+      const [jobs, team, enpsC, climC] = await Promise.all([
+        supabase.from('job_postings').select('id, ideal_profile').eq('company_id', company.id).limit(5),
+        supabase.from('company_users').select('id, user_id').eq('company_id', company.id).eq('is_active', true).limit(5),
+        supabase.from('company_enps_cycles').select('id').eq('company_id', company.id).limit(1),
+        supabase.from('company_climate_cycles').select('id').eq('company_id', company.id).limit(1),
+      ]);
+      const jobData = jobs.data || [];
+      const teamData = team.data || [];
+      setJourneyData({
+        hasJobs: jobData.length > 0,
+        hasTeamMembers: teamData.length > 0,
+        hasAssessments: (teamInsights?.completed_assessments ?? 0) > 0,
+        hasEssenceCodes: (teamInsights?.essence_code?.total_with_essence_code ?? 0) > 0,
+        hasIdealProfiles: jobData.some((j: any) => j.ideal_profile !== null),
+        hasENPSCycle: (enpsC.data || []).length > 0,
+        hasClimateCycle: (climC.data || []).length > 0,
+      });
+    };
+    fetchJourney();
+  }, [company?.id, teamInsights]);
+
   const displayEnps = enps.activeCycle || enps.cycles.find(c => c.status === 'closed' && c.enps_score !== null) || null;
   const displayClimate = climate.activeCycle || climate.cycles.find(c => c.status === 'closed' && c.overall_score !== null) || null;
 
   const refreshAll = () => { enps.fetchCycles(); climate.fetchCycles(); };
+
+  // PDF Export
+  const handleExportPDF = () => {
+    if (!company) return;
+    const healthIndex = calculateHealthIndex(
+      displayEnps?.enps_score ?? null,
+      displayClimate?.overall_score ?? null,
+      null, null
+    );
+    const doc = generateTeamReportPDF({
+      companyName: company.name,
+      generatedAt: new Date().toLocaleDateString('pt-BR'),
+      healthIndex,
+      enpsScore: displayEnps?.enps_score ?? null,
+      climateScore: displayClimate?.overall_score ?? null,
+      performanceAvg: null,
+      adherenceAvg: null,
+      discDistribution: teamInsights?.disc_distribution || {},
+      temperamentDistribution: teamInsights?.temperament_distribution || {},
+      totalMembers: teamInsights?.total_members ?? 0,
+      completedAssessments: teamInsights?.completed_assessments ?? 0,
+      topRisks: aiRisks,
+      topStrengths: aiStrengths,
+    });
+    doc.save(`mapa-equipe-${company.name.toLowerCase().replace(/\s+/g, '-')}.pdf`);
+    toast.success('Relatório PDF gerado');
+  };
 
   return (
     <BusinessLayout>
@@ -374,16 +400,25 @@ export default function BusinessPeopleStrategy() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" className="gap-1.5" onClick={handleExportPDF}>
+              <Download className="w-3.5 h-3.5" />PDF
+            </Button>
             <CreateCycleDialog type="enps" onCreated={refreshAll} />
             <CreateCycleDialog type="climate" onCreated={refreshAll} />
           </div>
         </div>
 
+        {/* Journey Checklist */}
+        <JourneyChecklist {...journeyData} />
+
         {/* Tabs */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview" className="gap-1.5">
               <BarChart3 className="w-3.5 h-3.5" />Visão Geral
+            </TabsTrigger>
+            <TabsTrigger value="map" className="gap-1.5">
+              <Map className="w-3.5 h-3.5" />Mapa
             </TabsTrigger>
             <TabsTrigger value="performance" className="gap-1.5">
               <Target className="w-3.5 h-3.5" />Performance
@@ -416,12 +451,19 @@ export default function BusinessPeopleStrategy() {
               </div>
             )}
 
-            {/* Top Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Health Index - Main Card */}
+            <OrganizationalHealthCard
+              enpsScore={displayEnps?.enps_score ?? null}
+              climateScore={displayClimate?.overall_score ?? null}
+              performanceAvg={null}
+              adherenceAvg={null}
+            />
+
+            {/* Key Metrics */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <ENPSScoreCard score={displayEnps?.enps_score ?? null} total={displayEnps?.total_responses ?? 0} />
               <ClimateScoreCard score={displayClimate?.overall_score ?? null} total={displayClimate?.total_responses ?? 0} />
               <CriticalDimensionCard dimensions={displayClimate?.dimension_scores ?? {}} />
-              <RiskIndexCard riskIndex={riskIndex} factors={riskFactors} />
             </div>
 
             {/* Heatmap + Comparison */}
@@ -430,53 +472,48 @@ export default function BusinessPeopleStrategy() {
               <ComparisonChart enpsCycles={enps.cycles} climateCycles={climate.cycles} />
             </div>
 
-            {/* DISC Distribution + Team */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card>
-                <CardHeader className="pb-2"><CardDescription>Distribuição DISC</CardDescription></CardHeader>
-                <CardContent>
-                  {teamInsights?.disc_distribution && Object.keys(teamInsights.disc_distribution).length > 0 ? (
-                    <div className="space-y-2">
-                      {Object.entries(teamInsights.disc_distribution).map(([profile, count]) => {
-                        const total = Object.values(teamInsights.disc_distribution).reduce((a, b) => a + b, 0);
-                        const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-                        return (
-                          <div key={profile} className="flex items-center justify-between">
-                            <span className="text-sm font-medium">{profile}</span>
-                            <div className="flex items-center gap-2">
-                              <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                                <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
-                              </div>
-                              <span className="text-xs text-muted-foreground w-10 text-right">{pct}%</span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Sem dados DISC</p>
-                  )}
-                </CardContent>
-              </Card>
+            {/* AI Insights */}
+            {company?.id && (
+              <AIInsightsCard
+                companyId={company.id}
+                onInsightsLoaded={(risks, strengths) => {
+                  setAiRisks(risks);
+                  setAiStrengths(strengths);
+                }}
+              />
+            )}
+          </TabsContent>
 
+          {/* Organizational Map Tab */}
+          <TabsContent value="map" className="space-y-6 mt-6">
+            <OrganizationalMap
+              discDistribution={teamInsights?.disc_distribution || {}}
+              temperamentDistribution={teamInsights?.temperament_distribution || {}}
+              totalMembers={teamInsights?.total_members ?? 0}
+              completedAssessments={teamInsights?.completed_assessments ?? 0}
+            />
+
+            {/* Team Summary */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardDescription>Equipe</CardDescription>
-                  <CardTitle className="text-3xl flex items-center gap-2">
-                    <Users className="w-6 h-6 text-muted-foreground" />
-                    {teamInsights?.total_members ?? '—'}
-                  </CardTitle>
+                  <CardDescription>Total Membros</CardDescription>
+                  <CardTitle className="text-3xl">{teamInsights?.total_members ?? '—'}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    {teamInsights?.completed_assessments ?? 0} com avaliação completa
-                  </p>
-                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Perfis Mapeados</CardDescription>
+                  <CardTitle className="text-3xl">{teamInsights?.completed_assessments ?? 0}</CardTitle>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Código da Essência</CardDescription>
+                  <CardTitle className="text-3xl">{teamInsights?.essence_code?.total_with_essence_code ?? 0}</CardTitle>
+                </CardHeader>
               </Card>
             </div>
-
-            {/* AI Insights */}
-            {company?.id && <AIInsightsCard companyId={company.id} />}
           </TabsContent>
 
           {/* Performance Tab */}
