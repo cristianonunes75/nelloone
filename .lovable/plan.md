@@ -1,61 +1,42 @@
 
 
-## Diagnóstico
+## Audit Results
 
-### Raíssa (rayssasamarafm@gmail.com)
-- **Conta existe** desde 7/Jan, último login 2/Mar
-- **Jornada:** `not_started`, 0 testes concluídos
-- **Testes iniciados:** Arquétipos e Temperamentos (ambos `in_progress`)
-- **Compras:** ZERO registros em `test_purchases`
-- **Problema claro:** Sem nenhum registro de compra `jornada_completa`, o hook `useTestAccess` bloqueia o acesso aos testes pagos. Ela provavelmente está vendo paywall ao tentar avançar
+Here's exactly what's **NOT done yet** from the pending tasks:
 
-### Larissa, Hanna e Suzanne
-- **Não possuem conta** no sistema ainda
+### 1. Dashboard executive cards are NOT clickable
+The 4 executive cards (Health Index, eNPS, Climate, Adherence) at lines 588-603 are plain `<Card>` components with no `<Link>` wrapping. They should link to `/people-strategy`.
+
+### 2. Stale links pointing to old routes
+- **Line 211**: `<Link to="/invite">` in `ExecutiveEmptyState` -- should be `/team?tab=invite`
+- **Line 666**: `<Link to="/hiring">` in the Recruitment section -- should be `/candidates`
+- **Line 368**: Checklist step link `/invite` -- should be `/team?tab=invite`
+- **`TeamMembersSection.tsx` lines 173, 191**: `<Link to="/invite">` -- should be `/team?tab=invite`
+- **`JourneyChecklist.tsx` line 39**: link `/invite` -- should be `/team?tab=invite`
+
+### 3. Unused imports in BusinessApp.tsx
+- `BusinessInvite` (line 9) -- `/invite` now redirects, import unused
+- `BusinessHiring` (line 13) -- `/hiring` now redirects, import unused
 
 ---
 
-## Plano de Ação
+## Plan
 
-### 1. Criar edge function `grant-cortesia-access`
+### Task A: Wrap executive cards with links to People Strategy
+Wrap each of the 4 cards (`HealthIndexCard`, `ENPSCard`, `ClimateCard`, `AdherenceCard`) in `<Link to="/people-strategy">` with hover styling (`hover:border-primary/50 transition-colors cursor-pointer`) and a subtle arrow indicator.
 
-Uma função administrativa que:
-- Recebe uma lista de emails
-- Para cada email de usuário existente:
-  - Insere registros `test_purchases` para os 7 testes com `payment_method: 'founder_grant'`, `price_paid: 0`, `purchase_category: 'jornada_completa'`
-  - Atualiza `profiles` com `ativacao_codigo_unlocked: true`
-- Para emails não cadastrados: armazena em `pending_cortesia_grants` (nova tabela simples) para liberar automaticamente quando criarem conta
-- Retorna relatório de quais emails foram processados e quais ficaram pendentes
+### Task B: Fix all stale internal links
+In `BusinessDashboard.tsx`:
+- Line 211: `/invite` → `/team?tab=invite`
+- Line 666: `/hiring` → `/candidates`
+- Line 368: `/invite` → `/team?tab=invite`
 
-Isso garante que:
-- Não contabiliza como venda (payment_method = `founder_grant`, price = 0)
-- O filtro de cortesia existente no `AdminOrdersPayments` já reconhece `founder_grant`
-- O `useTestAccess` reconhece via `hasBundlePurchase` (purchase_category = `jornada_completa`)
+In `TeamMembersSection.tsx`:
+- Lines 173, 191: `/invite` → `/team?tab=invite`
 
-### 2. Criar tabela `pending_cortesia_grants`
+In `JourneyChecklist.tsx`:
+- Line 39: `/invite` → `/team?tab=invite`
 
-```sql
-CREATE TABLE pending_cortesia_grants (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  email text NOT NULL,
-  granted_by uuid REFERENCES auth.users(id),
-  created_at timestamptz DEFAULT now(),
-  processed_at timestamptz,
-  status text DEFAULT 'pending'
-);
-```
-
-Com trigger no `handle_new_user` para verificar se o novo email tem cortesia pendente.
-
-### 3. Executar imediatamente para os 4 emails
-
-Após deploy da edge function, invocar para os 4 emails. Raíssa terá acesso imediato; as outras 3 ficarão na fila.
-
-### 4. Página admin para gerenciar cortesias (opcional)
-
-Adicionar uma seção simples no painel admin para conceder cortesias futuras.
-
-### Arquivos afetados
-- `supabase/functions/grant-cortesia-access/index.ts` (novo)
-- Migração SQL para tabela `pending_cortesia_grants` + trigger
-- Ajuste no `handle_new_user()` para processar cortesias pendentes
+### Task C: Remove unused imports in BusinessApp.tsx
+Remove `BusinessInvite` (line 9) and `BusinessHiring` (line 13) imports.
 
