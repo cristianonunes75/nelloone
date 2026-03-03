@@ -1,17 +1,21 @@
 import { useState, useEffect } from 'react';
 import { 
-  Users, CheckCircle2, Clock, AlertCircle, Search, MoreHorizontal, Mail, Trash2
+  Users, CheckCircle2, Clock, AlertCircle, Search, MoreHorizontal, Mail, Trash2, Pencil
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from '@/components/ui/dialog';
 import { OperatorLinkingSection } from './OperatorLinkingSection';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,6 +31,8 @@ interface TeamMember {
   consent_given: boolean;
   share_report_with_company: boolean;
   joined_at: string | null;
+  job_title: string | null;
+  department: string | null;
   profile: {
     full_name: string;
     journey_status: string;
@@ -41,6 +47,10 @@ export function TeamMembersTab() {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const [editJobTitle, setEditJobTitle] = useState('');
+  const [editDepartment, setEditDepartment] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (company) fetchMembers();
@@ -52,7 +62,7 @@ export function TeamMembersTab() {
       const { data, error } = await supabase
         .from('company_users')
         .select(`
-          id, user_id, role, is_active, consent_given, share_report_with_company, joined_at,
+          id, user_id, role, is_active, consent_given, share_report_with_company, joined_at, job_title, department,
           profiles:user_id (full_name, journey_status, journey_completed_tests, journey_total_tests)
         `)
         .eq('company_id', company.id)
@@ -94,9 +104,39 @@ export function TeamMembersTab() {
     toast.info('Funcionalidade em desenvolvimento');
   };
 
+  const openEditDialog = (member: TeamMember) => {
+    setEditingMember(member);
+    setEditJobTitle(member.job_title || '');
+    setEditDepartment(member.department || '');
+  };
+
+  const handleSaveJobTitle = async () => {
+    if (!editingMember) return;
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('company_users')
+        .update({
+          job_title: editJobTitle.trim() || null,
+          department: editDepartment.trim() || null,
+        })
+        .eq('id', editingMember.id);
+      if (error) throw error;
+      toast.success('Cargo atualizado com sucesso');
+      setEditingMember(null);
+      fetchMembers();
+    } catch (error) {
+      toast.error('Erro ao atualizar cargo');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const filteredMembers = members.filter(member =>
     member.profile?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.role.toLowerCase().includes(searchTerm.toLowerCase())
+    member.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    member.job_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    member.department?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusBadge = (member: TeamMember) => {
@@ -156,6 +196,7 @@ export function TeamMembersTab() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nome</TableHead>
+                    <TableHead>Cargo</TableHead>
                     <TableHead>Função</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Progresso</TableHead>
@@ -168,6 +209,14 @@ export function TeamMembersTab() {
                     <TableRow key={member.id}>
                       <TableCell className="font-medium">
                         {member.profile?.full_name || 'Nome não disponível'}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-sm">{member.job_title || <span className="text-muted-foreground">—</span>}</span>
+                          {member.department && (
+                            <span className="text-xs text-muted-foreground">{member.department}</span>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>{getRoleBadge(member.role)}</TableCell>
                       <TableCell>{getStatusBadge(member)}</TableCell>
@@ -197,6 +246,9 @@ export function TeamMembersTab() {
                             <Button variant="ghost" size="icon"><MoreHorizontal className="w-4 h-4" /></Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => openEditDialog(member)}>
+                              <Pencil className="w-4 h-4 mr-2" /> Editar cargo
+                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleResendInvite('')}>
                               <Mail className="w-4 h-4 mr-2" /> Reenviar email
                             </DropdownMenuItem>
@@ -214,6 +266,43 @@ export function TeamMembersTab() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={!!editingMember} onOpenChange={(open) => !open && setEditingMember(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar cargo</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <p className="text-sm text-muted-foreground">
+              {editingMember?.profile?.full_name || 'Colaborador'}
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="job_title">Cargo</Label>
+              <Input
+                id="job_title"
+                placeholder="Ex: Gerente de Marketing"
+                value={editJobTitle}
+                onChange={(e) => setEditJobTitle(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="department">Departamento</Label>
+              <Input
+                id="department"
+                placeholder="Ex: Comercial"
+                value={editDepartment}
+                onChange={(e) => setEditDepartment(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingMember(null)}>Cancelar</Button>
+            <Button onClick={handleSaveJobTitle} disabled={isSaving}>
+              {isSaving ? 'Salvando...' : 'Salvar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

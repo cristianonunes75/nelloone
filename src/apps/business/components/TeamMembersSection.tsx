@@ -42,6 +42,8 @@ interface TeamMember {
   is_active: boolean;
   consent_given: boolean;
   joined_at: string | null;
+  job_title: string | null;
+  department: string | null;
   profile: {
     full_name: string;
     journey_status: string;
@@ -75,6 +77,8 @@ export function TeamMembersSection() {
           is_active,
           consent_given,
           joined_at,
+          job_title,
+          department,
           profiles:user_id (
             full_name,
             journey_status,

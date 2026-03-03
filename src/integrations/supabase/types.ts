@@ -2966,9 +2966,11 @@ export type Database = {
           consent_given_at: string | null
           consent_text_version: string | null
           created_at: string
+          department: string | null
           id: string
           invited_by: string | null
           is_active: boolean | null
+          job_title: string | null
           joined_at: string | null
           onboarding_completed: boolean | null
           onboarding_completed_at: string | null
@@ -2983,9 +2985,11 @@ export type Database = {
           consent_given_at?: string | null
           consent_text_version?: string | null
           created_at?: string
+          department?: string | null
           id?: string
           invited_by?: string | null
           is_active?: boolean | null
+          job_title?: string | null
           joined_at?: string | null
           onboarding_completed?: boolean | null
           onboarding_completed_at?: string | null
@@ -3000,9 +3004,11 @@ export type Database = {
           consent_given_at?: string | null
           consent_text_version?: string | null
           created_at?: string
+          department?: string | null
           id?: string
           invited_by?: string | null
           is_active?: boolean | null
+          job_title?: string | null
           joined_at?: string | null
           onboarding_completed?: boolean | null
           onboarding_completed_at?: string | null
