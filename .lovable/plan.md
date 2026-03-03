@@ -1,20 +1,56 @@
 
 
-## Diagnóstico
+## Plano: Lista de Convites Enviados com Status e Informações dos Colaboradores
 
-O refresh automático durante o uso é causado pelo hook `useVersionCheck` em `src/hooks/useVersionCheck.tsx`. Ele verifica periodicamente se o bundle JS mudou e, quando detecta diferença, força um `window.location.reload()`.
+### O que será criado
 
-No ambiente de preview da Lovable (`lovableproject.com` / `lovable.app`), ele **deveria** estar desativado pela função `isDevelopment()`, mas o domínio publicado (`nelloone.lovable.app`) **não** está na lista de exceções — então o reload ocorre lá.
+Uma nova seção na página de Convites (BusinessInvite.tsx) que exibe uma **tabela completa de todos os convites enviados**, com informações ricas sobre cada colaborador contactado.
 
-Além disso, a cada deploy do Lovable o hash do bundle muda, disparando o reload mesmo durante uso ativo.
+### Dados disponíveis por colaborador
 
-## Plano
+Cruzando `company_invites`, `company_users` e `profiles`, podemos mostrar:
 
-**Arquivo**: `src/hooks/useVersionCheck.tsx`
+| Coluna | Fonte | Descrição |
+|--------|-------|-----------|
+| Email | `company_invites.email` | Email contactado |
+| Status do Convite | `company_invites.status` | Pendente / Aceito |
+| Tipo de Acesso | `company_invites.role` | Colaborador / Admin |
+| Data do Envio | `company_invites.sent_at` | Quando foi enviado |
+| Data de Aceite | `company_invites.accepted_at` | Quando aceitou |
+| Nome | `profiles.full_name` | Nome completo (após aceite) |
+| Fase da Jornada | `profiles.journey_status` | Não iniciado / Em andamento / Concluído |
+| Progresso (mapas) | `profiles.journey_completed_tests / 7` | X/7 mapas concluídos |
+| Código da Essência | `ativacao_codigo` | Se gerou o código |
+| Consentimento LGPD | `company_users.consent_given` | Se aceitou compartilhar |
+| Compartilhando dados | `company_users.share_report_with_company` | Se compartilha relatórios |
+| Profissão | `profiles.profession` | Profissão informada |
+| Gênero | `profiles.gender` | Gênero informado |
 
-1. Adicionar `lovable.app` à lista de domínios ignorados na função `isDevelopment()` (linha 11), para que o version check não rode no ambiente publicado da Lovable.
+### Indicadores visuais de fase
 
-2. Como medida extra de segurança, aumentar o `MIN_TIME_BETWEEN_RELOADS` de 5 minutos para 30 minutos e o `INITIAL_CHECK_DELAY` de 1 minuto para 5 minutos — evitando reloads frequentes mesmo em produção real (domínio customizado).
+- **Convite Pendente** → Badge amarelo "Aguardando"
+- **Aceito, Não Iniciou** → Badge cinza "Não iniciou"
+- **Em Andamento** → Badge azul "Em andamento" + barra X/7
+- **Concluído** → Badge verde "Concluído"
+- **Código da Essência** → Badge dourado especial
 
-Isso resolve o problema sem remover a funcionalidade para quando o app estiver em domínio próprio (nello.one).
+### Implementação
+
+**Arquivo**: `src/apps/business/pages/BusinessInvite.tsx`
+
+1. Adicionar estado `inviteHistory` e função `fetchInviteHistory` que:
+   - Busca todos os registros de `company_invites` da empresa
+   - Para convites aceitos (`accepted_by` não nulo), busca dados de `profiles` e `company_users`
+   - Verifica se o usuário tem `ativacao_codigo`
+
+2. Adicionar nova seção **"Histórico de Convites"** abaixo do card de envio, com:
+   - Contador total e filtros por status (Todos / Pendentes / Aceitos)
+   - Tabela responsiva com todas as colunas acima
+   - Badges coloridos para cada fase
+   - Busca por nome/email
+   - Botão de reenviar convite para pendentes
+
+3. Carregar dados no `useEffect` quando `company` estiver disponível.
+
+Nenhuma mudança de banco de dados necessária — todos os dados já existem nas tabelas atuais.
 
