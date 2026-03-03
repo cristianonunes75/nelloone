@@ -6,21 +6,31 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+const isDevelopment = () => {
+  const hostname = window.location.hostname;
+  return hostname.includes('localhost') || 
+         hostname.includes('lovableproject.com') || 
+         hostname.includes('lovable.app') ||
+         hostname.includes('preview');
+};
+
 export const usePWAInstall = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
 
-  // Register service worker with update detection
+  const skipSW = isDevelopment();
+
+  // Register service worker with update detection — skip in dev/preview
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
   } = useRegisterSW({
-    immediate: true,
+    immediate: !skipSW,
     onRegisteredSW(swUrl, r) {
+      if (skipSW) return;
       console.log('SW registered:', swUrl);
-      // Check for updates every 60 minutes (reduced frequency to prevent disruption)
       if (r) {
         setInterval(() => {
           r.update();
@@ -28,6 +38,7 @@ export const usePWAInstall = () => {
       }
     },
     onRegisterError(error) {
+      if (skipSW) return;
       console.error('SW registration error:', error);
     },
   });

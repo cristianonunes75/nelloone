@@ -157,8 +157,8 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
             "hidden md:flex flex-col border-r bg-card/50 sticky top-0 h-screen transition-all duration-200",
             collapsed ? "w-16" : "w-56"
           )}>
-            {/* Logo */}
-            <div className="flex items-center gap-3 p-4 border-b h-16">
+            {/* Logo + Company Switcher */}
+            <div className="p-4 border-b space-y-2">
               <Link to="/dashboard" className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                   <Target className="w-4 h-4 text-primary" />
@@ -172,6 +172,12 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
                   </div>
                 )}
               </Link>
+              {!collapsed && (
+                <CompanySwitcher 
+                  currentCompanyId={company?.id || null} 
+                  onCompanyChange={switchCompany} 
+                />
+              )}
             </div>
 
             {/* Nav Items */}
@@ -186,16 +192,6 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
               {bottomItems.map((item) => (
                 <NavItem key={item.href} item={item} />
               ))}
-
-              {!collapsed && (
-                <div className="flex items-center gap-1 pt-2">
-                  <CompanySwitcher 
-                    currentCompanyId={company?.id || null} 
-                    onCompanyChange={switchCompany} 
-                  />
-                  <AdminAppSwitcher />
-                </div>
-              )}
 
               <button
                 onClick={handleSignOut}
