@@ -7,7 +7,8 @@ import {
   Target,
   BookOpen,
   BarChart3,
-  Users
+  Users,
+  FileDown
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -155,12 +156,24 @@ export default function BusinessDashboard() {
               {PRODUCT_IDENTITY.tagline}
             </p>
           </div>
-          <Link to="/jobs">
-            <Button className="gap-2">
-              <ClipboardList className="w-4 h-4" />
-              Criar nova vaga
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => {
+                import('@/lib/pdf/pdfBusinessAudit').then(m => m.generateBusinessAuditPDF());
+              }}
+            >
+              <FileDown className="w-4 h-4" />
+              Auditoria PDF
             </Button>
-          </Link>
+            <Link to="/jobs">
+              <Button className="gap-2">
+                <ClipboardList className="w-4 h-4" />
+                Criar nova vaga
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Stats Grid + Subscription Card - HIRING FOCUSED */}
