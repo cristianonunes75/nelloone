@@ -5647,6 +5647,36 @@ export type Database = {
           },
         ]
       }
+      pending_cortesia_grants: {
+        Row: {
+          created_at: string | null
+          email: string
+          granted_by: string | null
+          id: string
+          processed_at: string | null
+          processed_user_id: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          granted_by?: string | null
+          id?: string
+          processed_at?: string | null
+          processed_user_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          granted_by?: string | null
+          id?: string
+          processed_at?: string | null
+          processed_user_id?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       photo_galleries: {
         Row: {
           client_id: string | null
