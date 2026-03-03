@@ -1,8 +1,8 @@
 import { useEffect, useCallback, useRef } from 'react';
 
 const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // Check every 30 minutes
-const INITIAL_CHECK_DELAY = 60 * 1000; // Wait 1 minute after page load
-const MIN_TIME_BETWEEN_RELOADS = 5 * 60 * 1000; // Minimum 5 minutes between reloads
+const INITIAL_CHECK_DELAY = 5 * 60 * 1000; // Wait 5 minutes after page load
+const MIN_TIME_BETWEEN_RELOADS = 30 * 60 * 1000; // Minimum 30 minutes between reloads
 
 // Detect if we're in development/preview mode
 const isDevelopment = () => {
