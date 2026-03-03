@@ -50,7 +50,9 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff,woff2}'],
+        // IMPORTANT: Exclude HTML from precache to prevent serving stale pages
+        globPatterns: ['**/*.{js,css,ico,png,svg,jpg,jpeg,webp,woff,woff2}'],
+        navigateFallback: null,
       skipWaiting: false,
         clientsClaim: false,
         runtimeCaching: [

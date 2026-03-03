@@ -9,7 +9,7 @@ interface CurrencyProtectionProps {
 }
 
 export function CurrencyProtection({ children }: CurrencyProtectionProps) {
-  const { language, setLanguage } = useLanguage();
+  const { language } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -18,18 +18,8 @@ export function CurrencyProtection({ children }: CurrencyProtectionProps) {
     const isEnRoute = path.startsWith('/en');
     const isPtPtRoute = path.startsWith('/pt-pt');
     
-    // IMPORTANT: First sync language with URL route - this is the source of truth
-    // This prevents false cross-trade detection on initial page load
-    if (isEnRoute && language !== 'en') {
-      setLanguage('en');
-      return; // Exit early to let state update before protection logic
-    } else if (isPtPtRoute && language !== 'pt-pt') {
-      setLanguage('pt-pt');
-      return; // Exit early to let state update before protection logic
-    } else if (!isEnRoute && !isPtPtRoute && (language === 'en' || language === 'pt-pt')) {
-      // Only redirect if user explicitly has non-default language set and is on root routes
-      // Don't auto-redirect for root path - let user browse
-    }
+    // NOTE: Language sync is handled by LanguageRoute component.
+    // This component only handles cross-trade protection for commerce routes.
 
     // Cross-trade protection: Only applies after language is synced with route
     // PT-BR users (language='pt') should stay on / routes (BRL)
@@ -93,7 +83,7 @@ export function CurrencyProtection({ children }: CurrencyProtectionProps) {
       navigate(enPath, { replace: true });
       return;
     }
-  }, [location.pathname, language, navigate, setLanguage]);
+  }, [location.pathname, language, navigate]);
 
   return <>{children}</>;
 }
