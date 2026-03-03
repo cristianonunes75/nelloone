@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 const SESSION_KEY = "nello_visitor_session";
-const HEARTBEAT_INTERVAL = 30000; // 30 seconds
+const HEARTBEAT_INTERVAL = 60000; // 60 seconds
+const VISIBILITY_DEBOUNCE = 5000; // 5 seconds debounce for visibility changes
 
 function generateSessionId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -87,13 +88,17 @@ export function useVisitorTracking() {
     // Start heartbeat
     heartbeatRef.current = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL);
 
-    // Handle visibility change
+    // Handle visibility change with debounce
+    let visibilityTimeout: NodeJS.Timeout | null = null;
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        markInactive();
-      } else {
-        sendHeartbeat();
-      }
+      if (visibilityTimeout) clearTimeout(visibilityTimeout);
+      visibilityTimeout = setTimeout(() => {
+        if (document.hidden) {
+          markInactive();
+        } else {
+          sendHeartbeat();
+        }
+      }, VISIBILITY_DEBOUNCE);
     };
 
     // Handle page unload
@@ -108,6 +113,7 @@ export function useVisitorTracking() {
       if (heartbeatRef.current) {
         clearInterval(heartbeatRef.current);
       }
+      if (visibilityTimeout) clearTimeout(visibilityTimeout);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("beforeunload", handleUnload);
       markInactive();

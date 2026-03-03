@@ -35,9 +35,7 @@ export const useHomeContent = (section: string) => {
         content: data.content as unknown as HomeContentData,
       } as HomeContent;
     },
-    staleTime: 0, // Always consider data stale
-    refetchOnMount: true, // Refetch when component mounts
-    refetchOnWindowFocus: true, // Refetch when window regains focus
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
   });
 
   const updateContent = useMutation({

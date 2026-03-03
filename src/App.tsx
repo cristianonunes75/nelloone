@@ -53,7 +53,15 @@ import WhatsApp from "./pages/WhatsApp";
 import ParaProfissionais from "./pages/ParaProfissionais";
 import CentralAjuda from "./pages/CentralAjuda";
 import ImersaoCasalLanding from "./pages/ImersaoCasalLanding";
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes default
+      retry: 1,
+    },
+  },
+});
 
 // Component to run version check hook
 const VersionChecker = ({ children }: { children: React.ReactNode }) => {
