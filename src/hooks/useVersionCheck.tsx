@@ -14,15 +14,14 @@ const isDevelopment = () => {
 };
 
 export const useVersionCheck = () => {
+  // Completely skip in development/preview - no hooks, no timers, nothing
+  const skipCheck = isDevelopment();
   const hasUpdated = useRef(false);
   const lastHash = useRef<string | null>(null);
   const lastReloadAttempt = useRef<number>(0);
   
   const checkForUpdates = useCallback(async () => {
-    // Skip version check entirely in development/preview environments
-    if (isDevelopment()) {
-      return;
-    }
+    if (skipCheck) return;
     
     // Don't check again if we already triggered an update
     if (hasUpdated.current) return;
@@ -103,11 +102,7 @@ export const useVersionCheck = () => {
   }, []);
 
   useEffect(() => {
-    // Skip entirely in development
-    if (isDevelopment()) {
-      console.debug('Version check disabled in development environment');
-      return;
-    }
+    if (skipCheck) return;
     
     // Initialize hash from session storage
     const stored = sessionStorage.getItem('app-main-hash');
