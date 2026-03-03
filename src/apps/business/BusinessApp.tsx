@@ -81,21 +81,15 @@ export default function BusinessApp() {
           <BusinessTeam />
         </BusinessProtectedRoute>
       } />
-      <Route path="/invite" element={
-        <BusinessProtectedRoute requiredRole="company_admin">
-          <BusinessInvite />
-        </BusinessProtectedRoute>
-      } />
+      {/* Redirect old /invite to /team?tab=invite */}
+      <Route path="/invite" element={<Navigate to="/team?tab=invite" replace />} />
       <Route path="/settings" element={
         <BusinessProtectedRoute requiredRole="company_admin">
           <BusinessSettings />
         </BusinessProtectedRoute>
       } />
-      <Route path="/hiring" element={
-        <BusinessProtectedRoute requiredRole="company_admin">
-          <BusinessHiring />
-        </BusinessProtectedRoute>
-      } />
+      {/* Redirect old /hiring to /candidates?tab=direct */}
+      <Route path="/hiring" element={<Navigate to="/candidates?tab=direct" replace />} />
       <Route path="/hiring/:candidateId" element={
         <BusinessProtectedRoute requiredRole="company_admin">
           <BusinessHiringResults />

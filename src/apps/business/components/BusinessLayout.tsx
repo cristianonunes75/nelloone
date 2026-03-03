@@ -48,18 +48,16 @@ const adminNavSections: NavSection[] = [
     ],
   },
   {
-    label: 'Organização',
+    label: 'Pessoas',
     items: [
       { href: '/team', label: 'Equipe', icon: Users },
-      { href: '/invite', label: 'Convidar', icon: UserPlus },
-      { href: '/hiring', label: 'Avaliações', icon: Briefcase },
     ],
   },
   {
     label: 'Recrutamento',
     items: [
       { href: '/jobs', label: 'Vagas', icon: ClipboardList },
-      { href: '/candidates', label: 'Candidatos', icon: Users },
+      { href: '/candidates', label: 'Candidatos', icon: Briefcase },
     ],
   },
   {
