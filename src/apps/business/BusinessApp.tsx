@@ -20,6 +20,7 @@ import BusinessApplicationConfirm from './pages/BusinessApplicationConfirm';
 import BusinessCandidates from './pages/BusinessCandidates';
 import BusinessBilling from './pages/BusinessBilling';
 import BusinessWhatsApp from './pages/BusinessWhatsApp';
+import BusinessPeopleStrategy from './pages/BusinessPeopleStrategy';
 import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
 import { isFeatureEnabled } from './config/featureFlags';
 
@@ -124,6 +125,13 @@ export default function BusinessApp() {
       <Route path="/whatsapp" element={
         <BusinessProtectedRoute requiredRole="company_admin">
           <BusinessWhatsApp />
+        </BusinessProtectedRoute>
+      } />
+      
+      {/* People Strategy - CEO View */}
+      <Route path="/people-strategy" element={
+        <BusinessProtectedRoute requiredRole="company_admin">
+          <BusinessPeopleStrategy />
         </BusinessProtectedRoute>
       } />
       
