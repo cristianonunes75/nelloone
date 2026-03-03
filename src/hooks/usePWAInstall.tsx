@@ -20,11 +20,11 @@ export const usePWAInstall = () => {
     immediate: true,
     onRegisteredSW(swUrl, r) {
       console.log('SW registered:', swUrl);
-      // Check for updates every 5 minutes (was 1 hour)
+      // Check for updates every 60 minutes (reduced frequency to prevent disruption)
       if (r) {
         setInterval(() => {
           r.update();
-        }, 5 * 60 * 1000);
+        }, 60 * 60 * 1000);
       }
     },
     onRegisterError(error) {
