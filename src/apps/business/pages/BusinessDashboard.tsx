@@ -4,11 +4,12 @@ import {
   ArrowUpRight, Briefcase, ClipboardList, Target, BookOpen,
   BarChart3, Users, Shield, TrendingUp, TrendingDown, Minus,
   Thermometer, AlertTriangle, Map, Compass, CheckCircle, Circle,
-  ChevronDown, ChevronUp,
+  ChevronDown, ChevronUp, HelpCircle,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
 import { SubscriptionStatusBanner } from '../components/SubscriptionStatusBanner';
@@ -36,6 +37,20 @@ interface JourneyData {
   hasClimateCycle: boolean;
 }
 
+// ── Info Tooltip helper ──
+function InfoTip({ text }: { text: string }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <HelpCircle className="w-3.5 h-3.5 text-muted-foreground/50 hover:text-muted-foreground cursor-help shrink-0" />
+      </TooltipTrigger>
+      <TooltipContent side="top" className="max-w-[260px] text-xs leading-relaxed">
+        {text}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 // ══════════════════════════════════════
 // CAMADA 1 — VISÃO EXECUTIVA (CEO VIEW)
 // ══════════════════════════════════════
@@ -61,7 +76,10 @@ function HealthIndexCard({
             <Shield className={`w-4 h-4 ${color}`} />
             Saúde Organizacional
           </CardDescription>
-          <div className={`w-2.5 h-2.5 rounded-full ${dot}`} />
+          <div className="flex items-center gap-1.5">
+            <InfoTip text="Índice composto (0-100) que combina eNPS (30%), Clima (30%), Performance (20%) e Aderência ao cargo (20%). Verde ≥70, Amarelo ≥40, Vermelho <40." />
+            <div className={`w-2.5 h-2.5 rounded-full ${dot}`} />
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -98,6 +116,7 @@ function ENPSCard({
         <CardDescription className="flex items-center gap-1.5">
           <BarChart3 className="w-4 h-4 text-primary" />
           eNPS
+          <InfoTip text="Employee Net Promoter Score: mede a lealdade dos colaboradores. Varia de -100 a +100. Acima de 50 é excelente, acima de 0 é bom, abaixo de 0 exige atenção. P=Promotores, N=Neutros, D=Detratores." />
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -134,6 +153,7 @@ function ClimateCard({
         <CardDescription className="flex items-center gap-1.5">
           <Thermometer className="w-4 h-4 text-primary" />
           Clima Geral
+          <InfoTip text="Nota média de satisfação dos colaboradores em múltiplas dimensões (Liderança, Comunicação, Reconhecimento, etc.). Escala de 1 a 5. Acima de 4 é excelente. O ⚠ indica a dimensão mais frágil." />
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -176,6 +196,7 @@ function AdherenceCard({
         <CardDescription className="flex items-center gap-1.5">
           <Target className="w-4 h-4 text-primary" />
           Aderência Média
+          <InfoTip text="Percentual médio de compatibilidade entre o perfil comportamental dos colaboradores e o perfil ideal definido para seus cargos. Quanto maior, melhor o fit cultural e funcional da equipe." />
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -256,13 +277,17 @@ function OrganizationalMapSection({
       <div className="flex items-center gap-2">
         <Map className="w-5 h-5 text-primary" />
         <h2 className="text-lg font-semibold text-foreground">Mapa Organizacional</h2>
+        <InfoTip text="Visão panorâmica da composição comportamental da sua equipe, riscos estruturais e cobertura de avaliações. Dados baseados nos perfis mapeados pelo Identity." />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* DISC Distribution compact */}
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Distribuição DISC</CardDescription>
+            <CardDescription className="flex items-center gap-1.5">
+              Distribuição DISC
+              <InfoTip text="O perfil DISC classifica o comportamento em 4 eixos: Dominância (decisão rápida), Influência (comunicação), Estabilidade (consistência) e Conformidade (análise). Equipes saudáveis têm diversidade entre os perfis." />
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {discTotal > 0 ? (
@@ -301,7 +326,10 @@ function OrganizationalMapSection({
         {/* Risk Heatmap */}
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Risco Estrutural</CardDescription>
+            <CardDescription className="flex items-center gap-1.5">
+              Risco Estrutural
+              <InfoTip text="Avalia riscos na composição da equipe. Concentração alta (>60% de um perfil DISC) indica falta de diversidade comportamental. Clima vulnerável mostra a dimensão com menor pontuação na pesquisa de clima." />
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {/* Concentration risk */}
@@ -331,7 +359,10 @@ function OrganizationalMapSection({
         {/* Team summary */}
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Equipe</CardDescription>
+            <CardDescription className="flex items-center gap-1.5">
+              Equipe
+              <InfoTip text="Resumo da cobertura de avaliações comportamentais. 'Perfil mapeado' indica quantos colaboradores já concluíram o Identity. Cobertura é o percentual do total que já foi avaliado." />
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex items-center justify-between text-sm">
@@ -383,6 +414,7 @@ function OrgProgressChecklist({ data }: { data: JourneyData }) {
           <div className="flex items-center gap-2">
             <Compass className="w-4 h-4 text-primary" />
             <CardTitle className="text-sm">Progresso da Estrutura Organizacional</CardTitle>
+            <InfoTip text="Checklist das etapas necessárias para ativar toda a inteligência organizacional. Complete todas para obter a visão executiva mais precisa possível." />
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground font-semibold">{progressPct}%</span>
@@ -566,130 +598,139 @@ export default function BusinessDashboard() {
   return (
     <BusinessLayout>
       <BlockedAccessOverlay />
+      <TooltipProvider delayDuration={300}>
+        <div className="space-y-8">
+          <SubscriptionStatusBanner />
 
-      <div className="space-y-8">
-        <SubscriptionStatusBanner />
-
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground text-sm">{PRODUCT_IDENTITY.tagline}</p>
-        </div>
-
-        {/* ═══════ CAMADA 1 — VISÃO EXECUTIVA ═══════ */}
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-            <Shield className="w-4 h-4" />
-            Visão Executiva
-          </h2>
-
-          {hasStrategicData ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
-                <HealthIndexCard index={healthIndex} />
-              </Link>
-              <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
-                <ENPSCard
-                  score={displayEnps?.enps_score ?? null}
-                  promoters={displayEnps?.promoters_count ?? 0}
-                  neutrals={displayEnps?.neutrals_count ?? 0}
-                  detractors={displayEnps?.detractors_count ?? 0}
-                  cycleStatus={displayEnps?.status ?? null}
-                />
-              </Link>
-              <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
-                <ClimateCard
-                  score={displayClimate?.overall_score ?? null}
-                  worstDimension={worstClimateDimension}
-                  worstScore={worstClimateScore}
-                  cycleStatus={displayClimate?.status ?? null}
-                />
-              </Link>
-              <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
-                <AdherenceCard avgAdherence={null} totalEvaluated={0} />
-              </Link>
-            </div>
-          ) : (
-            <ExecutiveEmptyState />
-          )}
-        </section>
-
-        {/* ═══════ CAMADA 2 — MAPA ORGANIZACIONAL ═══════ */}
-        <OrganizationalMapSection
-          discDistribution={teamInsights?.disc_distribution || {}}
-          totalMembers={teamInsights?.total_members ?? 0}
-          completedAssessments={teamInsights?.completed_assessments ?? 0}
-          worstClimateDimension={worstClimateDimension}
-          worstClimateScore={worstClimateScore}
-        />
-
-        {/* ═══════ CAMADA 3 — RECRUTAMENTO E SELEÇÃO ═══════ */}
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-            <Briefcase className="w-4 h-4" />
-            Recrutamento e Seleção
-          </h2>
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {/* Stats */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardDescription>Vagas ativas</CardDescription>
-                <ClipboardList className="w-4 h-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.activeJobs}</div>
-                <p className="text-xs text-muted-foreground mt-1">publicadas</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardDescription>Total de candidatos</CardDescription>
-                <Briefcase className="w-4 h-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.totalCandidates}</div>
-                <p className="text-xs text-muted-foreground mt-1">em avaliação</p>
-              </CardContent>
-            </Card>
-
-            {/* Quick actions */}
-            <Card className="hover:border-primary/50 transition-colors cursor-pointer">
-              <Link to="/jobs" className="block h-full">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <ClipboardList className="w-5 h-5 text-primary" />
-                    <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="font-medium text-sm">Gerenciar vagas</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Criar vagas e definir perfis ideais</p>
-                </CardContent>
-              </Link>
-            </Card>
-
-            <Card className="hover:border-primary/50 transition-colors cursor-pointer">
-              <Link to="/candidates" className="block h-full">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <Briefcase className="w-5 h-5 text-primary" />
-                    <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="font-medium text-sm">Ver candidatos</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Avaliações DISC e Temperamentos</p>
-                </CardContent>
-              </Link>
-            </Card>
+          {/* Header */}
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-muted-foreground text-sm">{PRODUCT_IDENTITY.tagline}</p>
           </div>
-        </section>
 
-        {/* ═══════ CAMADA 5 — PROGRESSO ═══════ */}
-        <OrgProgressChecklist data={journeyData} />
-      </div>
+          {/* ═══════ CAMADA 1 — VISÃO EXECUTIVA ═══════ */}
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <Shield className="w-4 h-4" />
+              Visão Executiva
+              <InfoTip text="Painel estratégico com os 4 indicadores-chave da saúde organizacional. Clique em qualquer card para acessar os detalhes no módulo People Strategy." />
+            </h2>
+
+            {hasStrategicData ? (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
+                  <HealthIndexCard index={healthIndex} />
+                </Link>
+                <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
+                  <ENPSCard
+                    score={displayEnps?.enps_score ?? null}
+                    promoters={displayEnps?.promoters_count ?? 0}
+                    neutrals={displayEnps?.neutrals_count ?? 0}
+                    detractors={displayEnps?.detractors_count ?? 0}
+                    cycleStatus={displayEnps?.status ?? null}
+                  />
+                </Link>
+                <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
+                  <ClimateCard
+                    score={displayClimate?.overall_score ?? null}
+                    worstDimension={worstClimateDimension}
+                    worstScore={worstClimateScore}
+                    cycleStatus={displayClimate?.status ?? null}
+                  />
+                </Link>
+                <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
+                  <AdherenceCard avgAdherence={null} totalEvaluated={0} />
+                </Link>
+              </div>
+            ) : (
+              <ExecutiveEmptyState />
+            )}
+          </section>
+
+          {/* ═══════ CAMADA 2 — MAPA ORGANIZACIONAL ═══════ */}
+          <OrganizationalMapSection
+            discDistribution={teamInsights?.disc_distribution || {}}
+            totalMembers={teamInsights?.total_members ?? 0}
+            completedAssessments={teamInsights?.completed_assessments ?? 0}
+            worstClimateDimension={worstClimateDimension}
+            worstClimateScore={worstClimateScore}
+          />
+
+          {/* ═══════ CAMADA 3 — RECRUTAMENTO E SELEÇÃO ═══════ */}
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <Briefcase className="w-4 h-4" />
+              Recrutamento e Seleção
+              <InfoTip text="Acompanhe suas vagas abertas e candidatos em processo seletivo. Crie vagas com perfis ideais para que candidatos sejam automaticamente ranqueados por aderência comportamental." />
+            </h2>
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {/* Stats */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardDescription className="flex items-center gap-1.5">
+                    Vagas ativas
+                    <InfoTip text="Quantidade de vagas publicadas e recebendo candidatos no momento." />
+                  </CardDescription>
+                  <ClipboardList className="w-4 h-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.activeJobs}</div>
+                  <p className="text-xs text-muted-foreground mt-1">publicadas</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardDescription className="flex items-center gap-1.5">
+                    Total de candidatos
+                    <InfoTip text="Total de candidatos que se inscreveram nas suas vagas e estão em processo de avaliação comportamental." />
+                  </CardDescription>
+                  <Briefcase className="w-4 h-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalCandidates}</div>
+                  <p className="text-xs text-muted-foreground mt-1">em avaliação</p>
+                </CardContent>
+              </Card>
+
+              {/* Quick actions */}
+              <Card className="hover:border-primary/50 transition-colors cursor-pointer">
+                <Link to="/jobs" className="block h-full">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <ClipboardList className="w-5 h-5 text-primary" />
+                      <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="font-medium text-sm">Gerenciar vagas</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Criar vagas e definir perfis ideais</p>
+                  </CardContent>
+                </Link>
+              </Card>
+
+              <Card className="hover:border-primary/50 transition-colors cursor-pointer">
+                <Link to="/candidates" className="block h-full">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <Briefcase className="w-5 h-5 text-primary" />
+                      <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="font-medium text-sm">Ver candidatos</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Avaliações DISC e Temperamentos</p>
+                  </CardContent>
+                </Link>
+              </Card>
+            </div>
+          </section>
+
+          {/* ═══════ CAMADA 5 — PROGRESSO ═══════ */}
+          <OrgProgressChecklist data={journeyData} />
+        </div>
+      </TooltipProvider>
     </BusinessLayout>
   );
 }
