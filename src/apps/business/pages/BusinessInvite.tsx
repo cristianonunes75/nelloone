@@ -34,6 +34,8 @@ export default function BusinessInvite() {
   
   const [emails, setEmails] = useState<EmailWithInfo[]>([]);
   const [currentEmail, setCurrentEmail] = useState('');
+  const [bulkEmails, setBulkEmails] = useState('');
+  const [showBulkInput, setShowBulkInput] = useState(false);
   const [customMessage, setCustomMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [sentEmails, setSentEmails] = useState<string[]>([]);
@@ -131,6 +133,56 @@ export default function BusinessInvite() {
     }]);
     setCurrentEmail('');
     setEmailPreview(null);
+  };
+
+  const addBulkEmails = () => {
+    if (!bulkEmails.trim()) return;
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Split by comma, semicolon, space, tab, or newline
+    const rawEmails = bulkEmails
+      .split(/[,;\s\n\r\t]+/)
+      .map(e => e.trim().toLowerCase())
+      .filter(e => e.length > 0);
+    
+    const uniqueEmails = [...new Set(rawEmails)];
+    let added = 0;
+    let invalid = 0;
+    let duplicates = 0;
+    
+    const newEmails = [...emails];
+    
+    for (const email of uniqueEmails) {
+      if (!emailRegex.test(email)) {
+        invalid++;
+        continue;
+      }
+      if (newEmails.some(e => e.email === email)) {
+        duplicates++;
+        continue;
+      }
+      if (selectedRole === 'collaborator' && newEmails.length >= enforcement.remainingSlots) {
+        toast.error(`Limite de vagas atingido. ${added} email(s) adicionados.`);
+        break;
+      }
+      newEmails.push({ email, requestImport: false });
+      added++;
+    }
+    
+    setEmails(newEmails);
+    setBulkEmails('');
+    setShowBulkInput(false);
+    
+    const messages: string[] = [];
+    if (added > 0) messages.push(`${added} email(s) adicionado(s)`);
+    if (duplicates > 0) messages.push(`${duplicates} duplicado(s)`);
+    if (invalid > 0) messages.push(`${invalid} inválido(s)`);
+    
+    if (added > 0) {
+      toast.success(messages.join(' · '));
+    } else if (messages.length > 0) {
+      toast.warning(messages.join(' · '));
+    }
   };
 
   const removeEmail = (emailToRemove: string) => {
@@ -409,9 +461,47 @@ export default function BusinessInvite() {
                 </div>
               )}
               
-              <p className="text-xs text-muted-foreground">
-                Pressione Enter ou vírgula para adicionar múltiplos emails
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-muted-foreground flex-1">
+                  Pressione Enter ou vírgula para adicionar múltiplos emails
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowBulkInput(!showBulkInput)}
+                  className="text-xs text-primary hover:underline font-medium"
+                >
+                  {showBulkInput ? 'Ocultar' : 'Colar lista de emails'}
+                </button>
+              </div>
+
+              {showBulkInput && (
+                <div className="space-y-2 p-3 rounded-lg border border-dashed border-primary/30 bg-primary/5">
+                  <Label htmlFor="bulk-emails" className="text-sm font-medium">
+                    Cole vários emails de uma vez
+                  </Label>
+                  <Textarea
+                    id="bulk-emails"
+                    placeholder={"email1@empresa.com, email2@empresa.com\nemail3@empresa.com; email4@empresa.com"}
+                    value={bulkEmails}
+                    onChange={(e) => setBulkEmails(e.target.value)}
+                    rows={4}
+                    className="text-sm"
+                  />
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      Separe por vírgula, ponto-e-vírgula, espaço ou quebra de linha
+                    </p>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={addBulkEmails}
+                      disabled={!bulkEmails.trim()}
+                    >
+                      Adicionar todos
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {emails.length > 0 && (
