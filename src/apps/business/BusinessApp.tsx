@@ -6,11 +6,11 @@ import BusinessOnboarding from './pages/BusinessOnboarding';
 import BusinessConsent from './pages/BusinessConsent';
 import BusinessDashboard from './pages/BusinessDashboard';
 import BusinessTeam from './pages/BusinessTeam';
-import BusinessInvite from './pages/BusinessInvite';
+
 import BusinessSettings from './pages/BusinessSettings';
 import BusinessAcceptInvite from './pages/BusinessAcceptInvite';
 import BusinessCollaboratorRedirect from './pages/BusinessCollaboratorRedirect';
-import BusinessHiring from './pages/BusinessHiring';
+
 import BusinessHiringResults from './pages/BusinessHiringResults';
 import BusinessHiringAssessment from './pages/BusinessHiringAssessment';
 import BusinessJobs from './pages/BusinessJobs';

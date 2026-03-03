@@ -170,7 +170,7 @@ export function TeamMembersSection() {
                 className="pl-9"
               />
             </div>
-            <Link to="/invite">
+            <Link to="/team?tab=invite">
               <Button size="sm" className="gap-2">
                 <UserPlus className="w-4 h-4" />
                 <span className="hidden sm:inline">Convidar</span>
@@ -188,7 +188,7 @@ export function TeamMembersSection() {
           <div className="text-center py-8">
             <Users className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
             <p className="text-muted-foreground">Nenhum membro encontrado</p>
-            <Link to="/invite">
+            <Link to="/team?tab=invite">
               <Button variant="outline" size="sm" className="mt-4 gap-2">
                 <UserPlus className="w-4 h-4" />
                 Convidar primeiro membro

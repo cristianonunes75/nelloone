@@ -36,7 +36,7 @@ export function JourneyChecklist({
 
   const steps: JourneyStep[] = [
     { id: 'jobs', title: 'Criar cargos e definir Perfil Ideal', description: 'Configure as posições e o perfil comportamental ideal para cada função.', link: '/jobs', check: hasJobs && hasIdealProfiles },
-    { id: 'team', title: 'Convidar equipe', description: 'Adicione os colaboradores à plataforma.', link: '/invite', check: hasTeamMembers },
+    { id: 'team', title: 'Convidar equipe', description: 'Adicione os colaboradores à plataforma.', link: '/team?tab=invite', check: hasTeamMembers },
     { id: 'assessments', title: 'Realizar avaliações', description: 'Garanta que os colaboradores completem os mapas comportamentais.', link: '/team', check: hasAssessments },
     { id: 'essence', title: 'Gerar Códigos da Essência', description: 'Colaboradores concluem a jornada Identity completa.', check: hasEssenceCodes },
     { id: 'match', title: 'Analisar Match Perfil x Cargo', description: 'Visualize aderência de cada colaborador à função.', link: '/team', check: hasIdealProfiles && hasAssessments },
