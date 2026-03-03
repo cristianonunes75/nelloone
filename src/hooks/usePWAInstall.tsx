@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useRegisterSW } from 'virtual:pwa-register/react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -14,37 +13,54 @@ const isDevelopment = () => {
          hostname.includes('preview');
 };
 
+// Unregister any existing service workers in dev/preview
+if (isDevelopment() && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    registrations.forEach(reg => {
+      reg.unregister();
+      console.log('🧹 Unregistered SW in dev environment');
+    });
+  });
+}
+
 export const usePWAInstall = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [needRefresh, setNeedRefresh] = useState(false);
 
   const skipSW = isDevelopment();
 
-  // Register service worker with update detection — skip in dev/preview
-  const {
-    needRefresh: [needRefresh, setNeedRefresh],
-    updateServiceWorker,
-  } = useRegisterSW({
-    immediate: !skipSW,
-    onRegisteredSW(swUrl, r) {
-      if (skipSW) return;
-      console.log('SW registered:', swUrl);
-      if (r) {
-        setInterval(() => {
-          r.update();
-        }, 60 * 60 * 1000);
-      }
-    },
-    onRegisterError(error) {
-      if (skipSW) return;
-      console.error('SW registration error:', error);
-    },
-  });
+  // Only import and use registerSW in production
+  useEffect(() => {
+    if (skipSW) return;
+
+    // Dynamically import to avoid SW registration in dev
+    import('virtual:pwa-register').then(({ registerSW }) => {
+      const updateSW = registerSW({
+        immediate: true,
+        onRegisteredSW(swUrl: string, r: ServiceWorkerRegistration | undefined) {
+          console.log('SW registered:', swUrl);
+          if (r) {
+            setInterval(() => {
+              r.update();
+            }, 60 * 60 * 1000);
+          }
+        },
+        onNeedRefresh() {
+          setNeedRefresh(true);
+        },
+        onRegisterError(error: any) {
+          console.error('SW registration error:', error);
+        },
+      });
+      // Store updateSW for later use
+      (window as any).__updateSW = updateSW;
+    });
+  }, [skipSW]);
 
   useEffect(() => {
-    // Check if already installed
     const checkInstalled = () => {
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
       const isInWebAppiOS = (window.navigator as any).standalone === true;
@@ -52,7 +68,6 @@ export const usePWAInstall = () => {
     };
     checkInstalled();
 
-    // Detect iOS
     const checkIOS = () => {
       const userAgent = window.navigator.userAgent.toLowerCase();
       const isIOSDevice = /iphone|ipad|ipod/.test(userAgent);
@@ -61,7 +76,6 @@ export const usePWAInstall = () => {
     };
     checkIOS();
 
-    // Listen for beforeinstallprompt event (Android/Chrome)
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
@@ -70,7 +84,6 @@ export const usePWAInstall = () => {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // Listen for app installed event
     const handleAppInstalled = () => {
       setIsInstalled(true);
       setIsInstallable(false);
@@ -87,11 +100,9 @@ export const usePWAInstall = () => {
 
   const promptInstall = async () => {
     if (!deferredPrompt) return false;
-
     try {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
         setIsInstallable(false);
@@ -105,12 +116,13 @@ export const usePWAInstall = () => {
   };
 
   const updateApp = useCallback(async () => {
-    await updateServiceWorker(true);
-  }, [updateServiceWorker]);
+    const updateSW = (window as any).__updateSW;
+    if (updateSW) await updateSW(true);
+  }, []);
 
   const dismissUpdate = useCallback(() => {
     setNeedRefresh(false);
-  }, [setNeedRefresh]);
+  }, []);
 
   return {
     isInstallable: isInstallable || isIOS,
