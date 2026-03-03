@@ -1,56 +1,30 @@
 
 
-## Plano: Lista de Convites Enviados com Status e Informações dos Colaboradores
+## Problemas Identificados
 
-### O que será criado
+### 1. Sidebar - Seção inferior confusa
+A imagem mostra o `CompanySwitcher` e o `AdminAppSwitcher` empilhados na parte inferior do sidebar, criando um visual poluído. O dropdown do CompanySwitcher aparece cortado na parte de baixo.
 
-Uma nova seção na página de Convites (BusinessInvite.tsx) que exibe uma **tabela completa de todos os convites enviados**, com informações ricas sobre cada colaborador contactado.
+### 2. Refresh automático persistente
+O `useVersionCheck` já ignora `lovable.app`, mas o **Service Worker (PWA)** com `immediate: true` no `useRegisterSW` continua registrando e verificando atualizações automaticamente. Quando o SW detecta uma nova versão, ele pode provocar reload via `clients.claim()` ou via o prompt de atualização. Além disso, o `useRegisterSW` roda um `setInterval` de 60 minutos chamando `r.update()` que pode acionar reloads.
 
-### Dados disponíveis por colaborador
+---
 
-Cruzando `company_invites`, `company_users` e `profiles`, podemos mostrar:
+## Plano
 
-| Coluna | Fonte | Descrição |
-|--------|-------|-----------|
-| Email | `company_invites.email` | Email contactado |
-| Status do Convite | `company_invites.status` | Pendente / Aceito |
-| Tipo de Acesso | `company_invites.role` | Colaborador / Admin |
-| Data do Envio | `company_invites.sent_at` | Quando foi enviado |
-| Data de Aceite | `company_invites.accepted_at` | Quando aceitou |
-| Nome | `profiles.full_name` | Nome completo (após aceite) |
-| Fase da Jornada | `profiles.journey_status` | Não iniciado / Em andamento / Concluído |
-| Progresso (mapas) | `profiles.journey_completed_tests / 7` | X/7 mapas concluídos |
-| Código da Essência | `ativacao_codigo` | Se gerou o código |
-| Consentimento LGPD | `company_users.consent_given` | Se aceitou compartilhar |
-| Compartilhando dados | `company_users.share_report_with_company` | Se compartilha relatórios |
-| Profissão | `profiles.profession` | Profissão informada |
-| Gênero | `profiles.gender` | Gênero informado |
+### Corrigir Sidebar (BusinessLayout.tsx)
 
-### Indicadores visuais de fase
+1. Mover o `CompanySwitcher` para dentro do **header do sidebar** (junto ao logo/nome da empresa), onde faz mais sentido contextualmente
+2. Remover o `AdminAppSwitcher` da parte inferior do sidebar -- mantê-lo apenas no header mobile
+3. Limpar a seção inferior para conter apenas: Configurações, Sair e Recolher
+4. Garantir que no modo `collapsed` a seção inferior mostre apenas ícones
 
-- **Convite Pendente** → Badge amarelo "Aguardando"
-- **Aceito, Não Iniciou** → Badge cinza "Não iniciou"
-- **Em Andamento** → Badge azul "Em andamento" + barra X/7
-- **Concluído** → Badge verde "Concluído"
-- **Código da Essência** → Badge dourado especial
+### Eliminar refresh no domínio lovable.app (usePWAInstall.tsx)
 
-### Implementação
+1. Adicionar verificação `isDevelopment()` (mesma lógica do `useVersionCheck`) dentro do `usePWAInstall` para **não registrar o Service Worker** em ambientes lovable.app/preview
+2. Isso impede que o SW fique verificando atualizações e provocando reloads nesse ambiente
 
-**Arquivo**: `src/apps/business/pages/BusinessInvite.tsx`
-
-1. Adicionar estado `inviteHistory` e função `fetchInviteHistory` que:
-   - Busca todos os registros de `company_invites` da empresa
-   - Para convites aceitos (`accepted_by` não nulo), busca dados de `profiles` e `company_users`
-   - Verifica se o usuário tem `ativacao_codigo`
-
-2. Adicionar nova seção **"Histórico de Convites"** abaixo do card de envio, com:
-   - Contador total e filtros por status (Todos / Pendentes / Aceitos)
-   - Tabela responsiva com todas as colunas acima
-   - Badges coloridos para cada fase
-   - Busca por nome/email
-   - Botão de reenviar convite para pendentes
-
-3. Carregar dados no `useEffect` quando `company` estiver disponível.
-
-Nenhuma mudança de banco de dados necessária — todos os dados já existem nas tabelas atuais.
+### Arquivos afetados
+- `src/apps/business/components/BusinessLayout.tsx` -- reorganizar sidebar
+- `src/hooks/usePWAInstall.tsx` -- desabilitar SW em ambientes de preview/lovable.app
 
