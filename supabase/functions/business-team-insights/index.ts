@@ -95,14 +95,18 @@ serve(async (req: Request): Promise<Response> => {
             leadership_potential_indicators: [],
             team_building_suggestions: [],
             management_recommendations: [],
+            essence_code: {
+              total_with_journey_complete: 0,
+              total_with_essence_code: 0,
+              completion_rate: 0,
+            },
           },
         }),
         { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Get test results for these users from user_tests (the actual source of truth)
-    // Note: test_results table doesn't exist - data is in user_tests.result_data
+    // Get test results for these users
     const { data: userTestsData, error: resultsError } = await supabase
       .from("user_tests")
       .select(`
@@ -118,6 +122,28 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     logStep("Fetched user tests", { count: userTestsData?.length || 0 });
+
+    // LGPD: Fetch Código da Essência data (aggregated only)
+    const { data: essenceData, error: essenceError } = await supabase
+      .from("ativacao_codigo")
+      .select("user_id, relatorio")
+      .in("user_id", userIds);
+
+    if (essenceError) {
+      logStep("Error fetching essence codes", { error: essenceError.message });
+    }
+
+    logStep("Fetched essence codes", { count: essenceData?.length || 0 });
+
+    // Count journey completions from profiles
+    const { data: profilesData } = await supabase
+      .from("profiles")
+      .select("id, journey_status")
+      .in("id", userIds)
+      .eq("journey_status", "completed");
+
+    const journeyCompleteCount = profilesData?.length || 0;
+    const essenceCodeCount = essenceData?.length || 0;
 
     // Transform user_tests data to the format expected by calculateTeamInsights
     const testResults: TestResult[] = (userTestsData || []).map(ut => {
@@ -181,6 +207,13 @@ serve(async (req: Request): Promise<Response> => {
 
     // Calculate aggregated insights (without revealing individual data)
     const insights = calculateTeamInsights(testResults || [], userIds.length);
+
+    // Add Código da Essência aggregated metrics
+    insights.essence_code = {
+      total_with_journey_complete: journeyCompleteCount,
+      total_with_essence_code: essenceCodeCount,
+      completion_rate: userIds.length > 0 ? Math.round((essenceCodeCount / userIds.length) * 100) : 0,
+    };
 
     // Get total company members
     const { count: totalMembers } = await supabase
