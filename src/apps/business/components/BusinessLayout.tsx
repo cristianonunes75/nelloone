@@ -11,7 +11,8 @@ import {
   Briefcase,
   ClipboardList,
   Target,
-  MessageCircle
+  MessageCircle,
+  BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -35,6 +36,7 @@ const adminNavItems = [
   { href: '/candidates', label: 'Candidatos', icon: Users },
   { href: '/hiring', label: 'Avaliações', icon: Briefcase },
   { href: '/whatsapp', label: 'WhatsApp', icon: MessageCircle },
+  { href: '/people-strategy', label: 'People Strategy', icon: BarChart3 },
   { href: '/settings', label: 'Configurações', icon: Settings },
 ];
 

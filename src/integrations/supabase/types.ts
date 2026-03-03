@@ -1707,6 +1707,110 @@ export type Database = {
           },
         ]
       }
+      company_enps_cycles: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string
+          detractors_count: number | null
+          end_date: string | null
+          enps_score: number | null
+          id: string
+          neutrals_count: number | null
+          promoters_count: number | null
+          start_date: string
+          status: string
+          title: string
+          total_responses: number | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by: string
+          detractors_count?: number | null
+          end_date?: string | null
+          enps_score?: number | null
+          id?: string
+          neutrals_count?: number | null
+          promoters_count?: number | null
+          start_date?: string
+          status?: string
+          title?: string
+          total_responses?: number | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string
+          detractors_count?: number | null
+          end_date?: string | null
+          enps_score?: number | null
+          id?: string
+          neutrals_count?: number | null
+          promoters_count?: number | null
+          start_date?: string
+          status?: string
+          title?: string
+          total_responses?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_enps_cycles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_enps_responses: {
+        Row: {
+          anonymous: boolean
+          comment: string | null
+          company_user_id: string | null
+          created_at: string
+          cycle_id: string
+          id: string
+          score: number
+        }
+        Insert: {
+          anonymous?: boolean
+          comment?: string | null
+          company_user_id?: string | null
+          created_at?: string
+          cycle_id: string
+          id?: string
+          score: number
+        }
+        Update: {
+          anonymous?: boolean
+          comment?: string | null
+          company_user_id?: string | null
+          created_at?: string
+          cycle_id?: string
+          id?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_enps_responses_company_user_id_fkey"
+            columns: ["company_user_id"]
+            isOneToOne: false
+            referencedRelation: "company_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_enps_responses_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "company_enps_cycles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_executive_reports: {
         Row: {
           company_id: string
@@ -6864,6 +6968,10 @@ export type Database = {
         Returns: string
       }
       owns_user_test: { Args: { _user_test_id: string }; Returns: boolean }
+      recalculate_enps_score: {
+        Args: { _cycle_id: string }
+        Returns: undefined
+      }
       remove_user_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
