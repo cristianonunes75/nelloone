@@ -188,3 +188,9 @@ verify_jwt = false
 
 [functions.send-password-reset]
 verify_jwt = false
+
+[functions.people-strategy-chat]
+verify_jwt = true
+
+[functions.people-pdi-generator]
+verify_jwt = true

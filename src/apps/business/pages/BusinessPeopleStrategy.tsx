@@ -11,7 +11,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   TrendingUp, TrendingDown, Minus, BarChart3, Brain, Plus, Play, Square,
-  Loader2, Sparkles, Users, ShieldAlert, Thermometer, AlertTriangle
+  Loader2, Sparkles, Users, ShieldAlert, Thermometer, AlertTriangle,
+  Target, BookOpen, MessageCircle
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -19,6 +20,11 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+
+// Lazy imports for tabs
+import PerformanceTab from '../components/strategy/PerformanceTab';
+import PDITab from '../components/strategy/PDITab';
+import AIChatTab from '../components/strategy/AIChatTab';
 
 // ── eNPS Score Card ──
 function ENPSScoreCard({ score, total }: { score: number | null; total: number }) {
@@ -78,11 +84,9 @@ function CriticalDimensionCard({ dimensions }: { dimensions: Record<string, numb
       </Card>
     );
   }
-
   const sorted = entries.sort((a, b) => a[1] - b[1]);
   const [worstKey, worstScore] = sorted[0];
   const { color } = getClimateClassification(worstScore);
-
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -91,9 +95,7 @@ function CriticalDimensionCard({ dimensions }: { dimensions: Record<string, numb
           {DIMENSION_LABELS[worstKey] || worstKey}
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <p className={`text-sm ${color}`}>{worstScore.toFixed(1)}/5</p>
-      </CardContent>
+      <CardContent><p className={`text-sm ${color}`}>{worstScore.toFixed(1)}/5</p></CardContent>
     </Card>
   );
 }
@@ -106,9 +108,7 @@ function RiskIndexCard({ riskIndex, factors }: { riskIndex: number | null; facto
     if (v >= 40) return { label: 'Amarelo', color: 'text-amber-500', bg: 'bg-amber-500/10' };
     return { label: 'Vermelho', color: 'text-red-500', bg: 'bg-red-500/10' };
   };
-
   const { label, color, bg } = getRiskLevel(riskIndex);
-
   return (
     <Card className={bg}>
       <CardHeader className="pb-2">
@@ -141,7 +141,6 @@ function RiskIndexCard({ riskIndex, factors }: { riskIndex: number | null; facto
 function ClimateHeatmap({ dimensions }: { dimensions: Record<string, number> }) {
   const entries = Object.entries(dimensions);
   if (entries.length === 0) return null;
-
   return (
     <Card>
       <CardHeader className="pb-2"><CardDescription>Heatmap por Dimensão</CardDescription></CardHeader>
@@ -163,15 +162,13 @@ function ClimateHeatmap({ dimensions }: { dimensions: Record<string, number> }) 
   );
 }
 
-// ── Comparison Chart (eNPS vs Climate) ──
+// ── Comparison Chart ──
 function ComparisonChart({ enpsCycles, climateCycles }: {
   enpsCycles: Array<{ title: string; enps_score: number | null; created_at: string }>;
   climateCycles: Array<{ title: string; overall_score: number | null; created_at: string }>;
 }) {
-  // Merge by title or date proximity
   const enpsData = enpsCycles.filter(c => c.enps_score !== null).reverse();
   const climateData = climateCycles.filter(c => c.overall_score !== null).reverse();
-
   if (enpsData.length < 1 && climateData.length < 1) {
     return (
       <Card>
@@ -180,15 +177,12 @@ function ComparisonChart({ enpsCycles, climateCycles }: {
       </Card>
     );
   }
-
-  // Simple: use index-based alignment
   const maxLen = Math.max(enpsData.length, climateData.length);
   const data = Array.from({ length: maxLen }, (_, i) => ({
     name: enpsData[i]?.title || climateData[i]?.title || `${i + 1}`,
     eNPS: enpsData[i] ? Math.round(((enpsData[i].enps_score! + 100) / 200) * 5 * 10) / 10 : null,
     Clima: climateData[i]?.overall_score ?? null,
   }));
-
   return (
     <Card>
       <CardHeader className="pb-2"><CardDescription>eNPS (normalizado) vs Clima</CardDescription></CardHeader>
@@ -208,7 +202,7 @@ function ComparisonChart({ enpsCycles, climateCycles }: {
   );
 }
 
-// ── AI Insights Card (updated for strategy) ──
+// ── AI Insights Card ──
 function AIInsightsCard({ companyId }: { companyId: string }) {
   const [insights, setInsights] = useState<Record<string, string> | null>(null);
   const [riskIndex, setRiskIndex] = useState<number | null>(null);
@@ -281,7 +275,7 @@ function AIInsightsCard({ companyId }: { companyId: string }) {
   );
 }
 
-// ── Create Cycle Dialog (reusable for eNPS and Climate) ──
+// ── Create Cycle Dialog ──
 function CreateCycleDialog({ type, onCreated }: { type: 'enps' | 'climate'; onCreated: () => void }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
@@ -351,7 +345,6 @@ export default function BusinessPeopleStrategy() {
   const climate = useClimate();
   const { insights: teamInsights, fetchInsights: fetchTeamInsights } = useTeamInsights();
 
-  // AI-computed risk from edge function
   const [riskIndex, setRiskIndex] = useState<number | null>(null);
   const [riskFactors, setRiskFactors] = useState<string[]>([]);
 
@@ -377,7 +370,7 @@ export default function BusinessPeopleStrategy() {
               People Strategy — CEO View
             </h1>
             <p className="text-muted-foreground mt-1">
-              Visão executiva integrada: eNPS + Clima + Perfil Comportamental
+              Visão executiva integrada: eNPS · Clima · Performance · PDI · IA
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -386,85 +379,121 @@ export default function BusinessPeopleStrategy() {
           </div>
         </div>
 
-        {/* Cycle management */}
-        {(enps.cycles.length > 0 || climate.cycles.length > 0) && (
-          <div className="flex flex-col sm:flex-row gap-4">
-            {enps.cycles.length > 0 && (
-              <div>
-                <p className="text-xs text-muted-foreground mb-1">eNPS</p>
-                <CyclePills cycles={enps.cycles} onActivate={enps.activateCycle} onClose={enps.closeCycle} />
+        {/* Tabs */}
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview" className="gap-1.5">
+              <BarChart3 className="w-3.5 h-3.5" />Visão Geral
+            </TabsTrigger>
+            <TabsTrigger value="performance" className="gap-1.5">
+              <Target className="w-3.5 h-3.5" />Performance
+            </TabsTrigger>
+            <TabsTrigger value="pdi" className="gap-1.5">
+              <BookOpen className="w-3.5 h-3.5" />PDI
+            </TabsTrigger>
+            <TabsTrigger value="chat" className="gap-1.5">
+              <MessageCircle className="w-3.5 h-3.5" />IA Chat
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6 mt-6">
+            {/* Cycle management */}
+            {(enps.cycles.length > 0 || climate.cycles.length > 0) && (
+              <div className="flex flex-col sm:flex-row gap-4">
+                {enps.cycles.length > 0 && (
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">eNPS</p>
+                    <CyclePills cycles={enps.cycles} onActivate={enps.activateCycle} onClose={enps.closeCycle} />
+                  </div>
+                )}
+                {climate.cycles.length > 0 && (
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Clima</p>
+                    <CyclePills cycles={climate.cycles} onActivate={climate.activateCycle} onClose={climate.closeCycle} />
+                  </div>
+                )}
               </div>
             )}
-            {climate.cycles.length > 0 && (
-              <div>
-                <p className="text-xs text-muted-foreground mb-1">Clima</p>
-                <CyclePills cycles={climate.cycles} onActivate={climate.activateCycle} onClose={climate.closeCycle} />
-              </div>
-            )}
-          </div>
-        )}
 
-        {/* Top 4 Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <ENPSScoreCard score={displayEnps?.enps_score ?? null} total={displayEnps?.total_responses ?? 0} />
-          <ClimateScoreCard score={displayClimate?.overall_score ?? null} total={displayClimate?.total_responses ?? 0} />
-          <CriticalDimensionCard dimensions={displayClimate?.dimension_scores ?? {}} />
-          <RiskIndexCard riskIndex={riskIndex} factors={riskFactors} />
-        </div>
+            {/* Top Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <ENPSScoreCard score={displayEnps?.enps_score ?? null} total={displayEnps?.total_responses ?? 0} />
+              <ClimateScoreCard score={displayClimate?.overall_score ?? null} total={displayClimate?.total_responses ?? 0} />
+              <CriticalDimensionCard dimensions={displayClimate?.dimension_scores ?? {}} />
+              <RiskIndexCard riskIndex={riskIndex} factors={riskFactors} />
+            </div>
 
-        {/* Heatmap + Comparison */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <ClimateHeatmap dimensions={displayClimate?.dimension_scores ?? {}} />
-          <ComparisonChart enpsCycles={enps.cycles} climateCycles={climate.cycles} />
-        </div>
+            {/* Heatmap + Comparison */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <ClimateHeatmap dimensions={displayClimate?.dimension_scores ?? {}} />
+              <ComparisonChart enpsCycles={enps.cycles} climateCycles={climate.cycles} />
+            </div>
 
-        {/* DISC Distribution */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader className="pb-2"><CardDescription>Distribuição DISC</CardDescription></CardHeader>
-            <CardContent>
-              {teamInsights?.disc_distribution && Object.keys(teamInsights.disc_distribution).length > 0 ? (
-                <div className="space-y-2">
-                  {Object.entries(teamInsights.disc_distribution).map(([profile, count]) => {
-                    const total = Object.values(teamInsights.disc_distribution).reduce((a, b) => a + b, 0);
-                    const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-                    return (
-                      <div key={profile} className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{profile}</span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
+            {/* DISC Distribution + Team */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader className="pb-2"><CardDescription>Distribuição DISC</CardDescription></CardHeader>
+                <CardContent>
+                  {teamInsights?.disc_distribution && Object.keys(teamInsights.disc_distribution).length > 0 ? (
+                    <div className="space-y-2">
+                      {Object.entries(teamInsights.disc_distribution).map(([profile, count]) => {
+                        const total = Object.values(teamInsights.disc_distribution).reduce((a, b) => a + b, 0);
+                        const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                        return (
+                          <div key={profile} className="flex items-center justify-between">
+                            <span className="text-sm font-medium">{profile}</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                                <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
+                              </div>
+                              <span className="text-xs text-muted-foreground w-10 text-right">{pct}%</span>
+                            </div>
                           </div>
-                          <span className="text-xs text-muted-foreground w-10 text-right">{pct}%</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">Sem dados DISC</p>
-              )}
-            </CardContent>
-          </Card>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Sem dados DISC</p>
+                  )}
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Equipe</CardDescription>
-              <CardTitle className="text-3xl flex items-center gap-2">
-                <Users className="w-6 h-6 text-muted-foreground" />
-                {teamInsights?.total_members ?? '—'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                {teamInsights?.completed_assessments ?? 0} com avaliação completa
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Equipe</CardDescription>
+                  <CardTitle className="text-3xl flex items-center gap-2">
+                    <Users className="w-6 h-6 text-muted-foreground" />
+                    {teamInsights?.total_members ?? '—'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    {teamInsights?.completed_assessments ?? 0} com avaliação completa
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
 
-        {/* AI Insights */}
-        {company?.id && <AIInsightsCard companyId={company.id} />}
+            {/* AI Insights */}
+            {company?.id && <AIInsightsCard companyId={company.id} />}
+          </TabsContent>
+
+          {/* Performance Tab */}
+          <TabsContent value="performance" className="mt-6">
+            <PerformanceTab />
+          </TabsContent>
+
+          {/* PDI Tab */}
+          <TabsContent value="pdi" className="mt-6">
+            <PDITab />
+          </TabsContent>
+
+          {/* AI Chat Tab */}
+          <TabsContent value="chat" className="mt-6">
+            <AIChatTab />
+          </TabsContent>
+        </Tabs>
       </div>
     </BusinessLayout>
   );

@@ -1619,6 +1619,44 @@ export type Database = {
           },
         ]
       }
+      company_ai_queries: {
+        Row: {
+          company_id: string
+          company_user_id: string | null
+          created_at: string
+          feature: string
+          id: string
+          question_text: string
+          response_text: string | null
+        }
+        Insert: {
+          company_id: string
+          company_user_id?: string | null
+          created_at?: string
+          feature?: string
+          id?: string
+          question_text: string
+          response_text?: string | null
+        }
+        Update: {
+          company_id?: string
+          company_user_id?: string | null
+          created_at?: string
+          feature?: string
+          id?: string
+          question_text?: string
+          response_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_ai_queries_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_audit_logs: {
         Row: {
           action: string
@@ -2117,6 +2155,392 @@ export type Database = {
             columns: ["operator_workspace_id"]
             isOneToOne: false
             referencedRelation: "operator_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_pdi_actions: {
+        Row: {
+          action_text: string
+          created_at: string
+          due_date: string | null
+          frequency: string | null
+          id: string
+          owner: string
+          pdi_goal_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          action_text: string
+          created_at?: string
+          due_date?: string | null
+          frequency?: string | null
+          id?: string
+          owner?: string
+          pdi_goal_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          action_text?: string
+          created_at?: string
+          due_date?: string | null
+          frequency?: string | null
+          id?: string
+          owner?: string
+          pdi_goal_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_pdi_actions_pdi_goal_id_fkey"
+            columns: ["pdi_goal_id"]
+            isOneToOne: false
+            referencedRelation: "company_pdi_goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_pdi_checkins: {
+        Row: {
+          blockers: string | null
+          checkin_date: string
+          created_at: string
+          id: string
+          mood_score: number | null
+          next_steps: string | null
+          pdi_plan_id: string
+          progress_notes: string | null
+        }
+        Insert: {
+          blockers?: string | null
+          checkin_date?: string
+          created_at?: string
+          id?: string
+          mood_score?: number | null
+          next_steps?: string | null
+          pdi_plan_id: string
+          progress_notes?: string | null
+        }
+        Update: {
+          blockers?: string | null
+          checkin_date?: string
+          created_at?: string
+          id?: string
+          mood_score?: number | null
+          next_steps?: string | null
+          pdi_plan_id?: string
+          progress_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_pdi_checkins_pdi_plan_id_fkey"
+            columns: ["pdi_plan_id"]
+            isOneToOne: false
+            referencedRelation: "company_pdi_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_pdi_goals: {
+        Row: {
+          category: string
+          created_at: string
+          deadline: string | null
+          description: string | null
+          id: string
+          pdi_plan_id: string
+          priority: string
+          status: string
+          success_metric: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          pdi_plan_id: string
+          priority?: string
+          status?: string
+          success_metric?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          pdi_plan_id?: string
+          priority?: string
+          status?: string
+          success_metric?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_pdi_goals_pdi_plan_id_fkey"
+            columns: ["pdi_plan_id"]
+            isOneToOne: false
+            referencedRelation: "company_pdi_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_pdi_plans: {
+        Row: {
+          company_id: string
+          company_user_id: string
+          created_at: string
+          created_by: string
+          id: string
+          start_date: string
+          status: string
+          target_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          company_user_id: string
+          created_at?: string
+          created_by: string
+          id?: string
+          start_date?: string
+          status?: string
+          target_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          company_user_id?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          start_date?: string
+          status?: string
+          target_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_pdi_plans_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_pdi_plans_company_user_id_fkey"
+            columns: ["company_user_id"]
+            isOneToOne: false
+            referencedRelation: "company_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_performance_answers: {
+        Row: {
+          comment_text: string | null
+          created_at: string
+          dimension: string
+          id: string
+          question: string
+          review_id: string
+          score: number | null
+        }
+        Insert: {
+          comment_text?: string | null
+          created_at?: string
+          dimension: string
+          id?: string
+          question: string
+          review_id: string
+          score?: number | null
+        }
+        Update: {
+          comment_text?: string | null
+          created_at?: string
+          dimension?: string
+          id?: string
+          question?: string
+          review_id?: string
+          score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_performance_answers_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "company_performance_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_performance_cycles: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string
+          end_date: string | null
+          id: string
+          review_type: string
+          start_date: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by: string
+          end_date?: string | null
+          id?: string
+          review_type?: string
+          start_date?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string
+          end_date?: string | null
+          id?: string
+          review_type?: string
+          start_date?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_performance_cycles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_performance_reviews: {
+        Row: {
+          company_user_id: string
+          created_at: string
+          cycle_id: string
+          id: string
+          is_anonymous: boolean
+          overall_score: number | null
+          reviewer_company_user_id: string | null
+          status: string
+          submitted_at: string | null
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_user_id: string
+          created_at?: string
+          cycle_id: string
+          id?: string
+          is_anonymous?: boolean
+          overall_score?: number | null
+          reviewer_company_user_id?: string | null
+          status?: string
+          submitted_at?: string | null
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_user_id?: string
+          created_at?: string
+          cycle_id?: string
+          id?: string
+          is_anonymous?: boolean
+          overall_score?: number | null
+          reviewer_company_user_id?: string | null
+          status?: string
+          submitted_at?: string | null
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_performance_reviews_company_user_id_fkey"
+            columns: ["company_user_id"]
+            isOneToOne: false
+            referencedRelation: "company_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_performance_reviews_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "company_performance_cycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_performance_reviews_reviewer_company_user_id_fkey"
+            columns: ["reviewer_company_user_id"]
+            isOneToOne: false
+            referencedRelation: "company_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_performance_reviews_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "company_performance_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_performance_templates: {
+        Row: {
+          active: boolean
+          company_id: string
+          competencies_json: Json
+          created_at: string
+          goals_json: Json
+          id: string
+          name: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          company_id: string
+          competencies_json?: Json
+          created_at?: string
+          goals_json?: Json
+          id?: string
+          name: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          company_id?: string
+          competencies_json?: Json
+          created_at?: string
+          goals_json?: Json
+          id?: string
+          name?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_performance_templates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -7106,6 +7530,10 @@ export type Database = {
       }
       recalculate_enps_score: {
         Args: { _cycle_id: string }
+        Returns: undefined
+      }
+      recalculate_review_score: {
+        Args: { _review_id: string }
         Returns: undefined
       }
       remove_user_role: {
