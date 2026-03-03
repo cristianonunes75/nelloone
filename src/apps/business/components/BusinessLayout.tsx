@@ -7,12 +7,13 @@ import {
   Settings, 
   LogOut,
   Menu,
-  X,
   Briefcase,
   ClipboardList,
   Target,
   MessageCircle,
-  BarChart3
+  BarChart3,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -22,12 +23,17 @@ import { CompanySwitcher } from './CompanySwitcher';
 import { cn } from '@/lib/utils';
 import { NelloGlobalFooter } from '@/components/global/NelloGlobalFooter';
 import { PRODUCT_IDENTITY } from '../config/featureFlags';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface BusinessLayoutProps {
   children: ReactNode;
 }
 
-// Nello Hiring - Menu simplificado (foco apenas em recrutamento)
 const adminNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/team', label: 'Equipe', icon: Users },
@@ -37,6 +43,9 @@ const adminNavItems = [
   { href: '/hiring', label: 'Avaliações', icon: Briefcase },
   { href: '/whatsapp', label: 'WhatsApp', icon: MessageCircle },
   { href: '/people-strategy', label: 'People Strategy', icon: BarChart3 },
+];
+
+const bottomNavItems = [
   { href: '/settings', label: 'Configurações', icon: Settings },
 ];
 
@@ -49,128 +58,179 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
   const { company, isCompanyAdmin, switchCompany } = useBusinessAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = isCompanyAdmin ? adminNavItems : collaboratorNavItems;
+  const bottomItems = isCompanyAdmin ? bottomNavItems : [];
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
   };
 
+  const NavItem = ({ item, onClick }: { item: typeof adminNavItems[0]; onClick?: () => void }) => {
+    const isActive = location.pathname === item.href;
+    const content = (
+      <Link
+        to={item.href}
+        onClick={onClick}
+        className={cn(
+          "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+          collapsed && "justify-center px-2",
+          isActive 
+            ? "bg-primary/10 text-primary" 
+            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+        )}
+      >
+        <item.icon className="w-4 h-4 shrink-0" />
+        {!collapsed && <span>{item.label}</span>}
+      </Link>
+    );
+
+    if (collapsed) {
+      return (
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>{content}</TooltipTrigger>
+          <TooltipContent side="right" sideOffset={8}>
+            {item.label}
+          </TooltipContent>
+        </Tooltip>
+      );
+    }
+
+    return content;
+  };
+
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Top Navigation */}
-      <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur">
-        <div className="container mx-auto px-4">
-          <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
-            <Link to="/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Target className="w-5 h-5 text-primary" />
-              </div>
-              <div className="hidden sm:block">
-                <span className="text-lg font-semibold text-foreground">{PRODUCT_IDENTITY.name}</span>
-                {company && (
-                  <span className="text-sm text-muted-foreground block -mt-1">{company.name}</span>
-                )}
-              </div>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-1">
-              {navItems.map((item) => {
-                const isActive = location.pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    className={cn(
-                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                      isActive 
-                        ? "bg-primary/10 text-primary" 
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    )}
-                  >
-                    <item.icon className="w-4 h-4" />
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2">
+    <TooltipProvider>
+      <div className="min-h-screen bg-background flex flex-col">
+        {/* Mobile Header */}
+        <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur md:hidden">
+          <div className="flex h-14 items-center justify-between px-4">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="shrink-0"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+              <span className="text-base font-semibold">{PRODUCT_IDENTITY.name}</span>
+            </div>
+            <div className="flex items-center gap-1">
               <CompanySwitcher 
                 currentCompanyId={company?.id || null} 
                 onCompanyChange={switchCompany} 
               />
               <AdminAppSwitcher />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSignOut}
-                className="hidden sm:flex items-center gap-2 text-muted-foreground"
-              >
-                <LogOut className="w-4 h-4" />
-                Sair
-              </Button>
-              
-              {/* Mobile menu button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </Button>
             </div>
           </div>
-        </div>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t bg-card">
-            <nav className="container mx-auto px-4 py-4 space-y-1">
-              {navItems.map((item) => {
-                const isActive = location.pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
-                      isActive 
-                        ? "bg-primary/10 text-primary" 
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+          {/* Mobile Menu Overlay */}
+          {mobileMenuOpen && (
+            <div className="fixed inset-0 top-14 z-40 bg-background/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
+              <nav className="bg-card border-r w-64 h-full p-4 space-y-1 shadow-lg" onClick={(e) => e.stopPropagation()}>
+                {navItems.map((item) => (
+                  <NavItem key={item.href} item={item} onClick={() => setMobileMenuOpen(false)} />
+                ))}
+                <div className="border-t my-3" />
+                {bottomItems.map((item) => (
+                  <NavItem key={item.href} item={item} onClick={() => setMobileMenuOpen(false)} />
+                ))}
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted w-full"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sair
+                </button>
+              </nav>
+            </div>
+          )}
+        </header>
+
+        <div className="flex flex-1">
+          {/* Desktop Sidebar */}
+          <aside className={cn(
+            "hidden md:flex flex-col border-r bg-card/50 sticky top-0 h-screen transition-all duration-200",
+            collapsed ? "w-16" : "w-56"
+          )}>
+            {/* Logo */}
+            <div className="flex items-center gap-3 p-4 border-b h-16">
+              <Link to="/dashboard" className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <Target className="w-4 h-4 text-primary" />
+                </div>
+                {!collapsed && (
+                  <div className="min-w-0">
+                    <span className="text-sm font-semibold text-foreground block truncate">{PRODUCT_IDENTITY.name}</span>
+                    {company && (
+                      <span className="text-xs text-muted-foreground block truncate">{company.name}</span>
                     )}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    {item.label}
-                  </Link>
-                );
-              })}
+                  </div>
+                )}
+              </Link>
+            </div>
+
+            {/* Nav Items */}
+            <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+              {navItems.map((item) => (
+                <NavItem key={item.href} item={item} />
+              ))}
+            </nav>
+
+            {/* Bottom Section */}
+            <div className="p-3 border-t space-y-1">
+              {bottomItems.map((item) => (
+                <NavItem key={item.href} item={item} />
+              ))}
+
+              {!collapsed && (
+                <div className="flex items-center gap-1 pt-2">
+                  <CompanySwitcher 
+                    currentCompanyId={company?.id || null} 
+                    onCompanyChange={switchCompany} 
+                  />
+                  <AdminAppSwitcher />
+                </div>
+              )}
+
               <button
                 onClick={handleSignOut}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted w-full text-left"
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted w-full",
+                  collapsed && "justify-center px-2"
+                )}
               >
-                <LogOut className="w-5 h-5" />
-                Sair
+                <LogOut className="w-4 h-4 shrink-0" />
+                {!collapsed && <span>Sair</span>}
               </button>
-            </nav>
+
+              {/* Collapse Toggle */}
+              <button
+                onClick={() => setCollapsed(!collapsed)}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted w-full",
+                  collapsed && "justify-center px-2"
+                )}
+              >
+                {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                {!collapsed && <span>Recolher</span>}
+              </button>
+            </div>
+          </aside>
+
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col min-w-0">
+            <main className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
+              {children}
+            </main>
+            <NelloGlobalFooter currentApp="business" variant="light" />
           </div>
-        )}
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 flex-1">
-        {children}
-      </main>
-
-      {/* Global Footer */}
-      <NelloGlobalFooter currentApp="business" variant="light" />
-    </div>
+        </div>
+      </div>
+    </TooltipProvider>
   );
 }
