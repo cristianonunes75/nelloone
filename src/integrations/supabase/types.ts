@@ -1707,6 +1707,138 @@ export type Database = {
           },
         ]
       }
+      company_climate_cycles: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string
+          dimension_scores: Json | null
+          end_date: string | null
+          id: string
+          overall_score: number | null
+          start_date: string
+          status: string
+          title: string
+          total_responses: number | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by: string
+          dimension_scores?: Json | null
+          end_date?: string | null
+          id?: string
+          overall_score?: number | null
+          start_date?: string
+          status?: string
+          title?: string
+          total_responses?: number | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string
+          dimension_scores?: Json | null
+          end_date?: string | null
+          id?: string
+          overall_score?: number | null
+          start_date?: string
+          status?: string
+          title?: string
+          total_responses?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_climate_cycles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_climate_questions: {
+        Row: {
+          active: boolean
+          created_at: string
+          dimension: string
+          id: string
+          question_text: string
+          sort_order: number | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          dimension: string
+          id?: string
+          question_text: string
+          sort_order?: number | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          dimension?: string
+          id?: string
+          question_text?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      company_climate_responses: {
+        Row: {
+          anonymous: boolean
+          company_user_id: string | null
+          created_at: string
+          cycle_id: string
+          id: string
+          question_id: string
+          score: number
+        }
+        Insert: {
+          anonymous?: boolean
+          company_user_id?: string | null
+          created_at?: string
+          cycle_id: string
+          id?: string
+          question_id: string
+          score: number
+        }
+        Update: {
+          anonymous?: boolean
+          company_user_id?: string | null
+          created_at?: string
+          cycle_id?: string
+          id?: string
+          question_id?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_climate_responses_company_user_id_fkey"
+            columns: ["company_user_id"]
+            isOneToOne: false
+            referencedRelation: "company_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_climate_responses_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "company_climate_cycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_climate_responses_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "company_climate_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_enps_cycles: {
         Row: {
           company_id: string
@@ -6968,6 +7100,10 @@ export type Database = {
         Returns: string
       }
       owns_user_test: { Args: { _user_test_id: string }; Returns: boolean }
+      recalculate_climate_scores: {
+        Args: { _cycle_id: string }
+        Returns: undefined
+      }
       recalculate_enps_score: {
         Args: { _cycle_id: string }
         Returns: undefined
