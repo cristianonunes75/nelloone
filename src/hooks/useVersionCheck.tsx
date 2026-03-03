@@ -1,8 +1,8 @@
 import { useEffect, useCallback, useRef } from 'react';
+import { toast } from 'sonner';
 
 const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // Check every 30 minutes
 const INITIAL_CHECK_DELAY = 5 * 60 * 1000; // Wait 5 minutes after page load
-const MIN_TIME_BETWEEN_RELOADS = 30 * 60 * 1000; // Minimum 30 minutes between reloads
 
 // Detect if we're in development/preview mode
 const isDevelopment = () => {
@@ -14,27 +14,18 @@ const isDevelopment = () => {
 };
 
 export const useVersionCheck = () => {
-  // Completely skip in development/preview - no hooks, no timers, nothing
+  // Completely skip in development/preview
   const skipCheck = isDevelopment();
-  const hasUpdated = useRef(false);
+  const hasNotified = useRef(false);
   const lastHash = useRef<string | null>(null);
-  const lastReloadAttempt = useRef<number>(0);
   
   const checkForUpdates = useCallback(async () => {
     if (skipCheck) return;
     
-    // Don't check again if we already triggered an update
-    if (hasUpdated.current) return;
-    
-    // Prevent reload storms - minimum 5 minutes between reload attempts
-    const now = Date.now();
-    if (now - lastReloadAttempt.current < MIN_TIME_BETWEEN_RELOADS) {
-      console.debug('Version check skipped - too soon since last attempt');
-      return;
-    }
+    // Don't check again if we already notified user
+    if (hasNotified.current) return;
     
     try {
-      // Fetch the current index.html to check for new version
       const response = await fetch('/?_v=' + Date.now(), {
         cache: 'no-store',
         headers: {
@@ -47,7 +38,7 @@ export const useVersionCheck = () => {
       
       const html = await response.text();
       
-      // Extract ONLY the main bundle hash (more stable than all scripts)
+      // Extract the main bundle hash
       const mainScript = html.match(/src="\/assets\/index-[a-zA-Z0-9]+\.js"/)?.[0] || '';
       
       if (!mainScript) return;
@@ -63,40 +54,31 @@ export const useVersionCheck = () => {
       const storedHash = sessionStorage.getItem('app-main-hash');
       
       if (storedHash && storedHash !== mainScript && lastHash.current !== mainScript) {
-        // Check if user is in the middle of a form - don't reload during critical operations
-        const hasUnsavedFormData = 
-          sessionStorage.getItem('discernir_rhythm_answers') ||
-          sessionStorage.getItem('test_in_progress');
+        // New version detected — show a non-intrusive toast instead of reloading
+        hasNotified.current = true;
+        lastHash.current = mainScript;
+        sessionStorage.setItem('app-main-hash', mainScript);
         
-        if (hasUnsavedFormData) {
-          // Defer the update until user is done
-          console.debug('Version update deferred - user has unsaved form data');
-          lastHash.current = mainScript;
-          sessionStorage.setItem('app-main-hash', mainScript);
-          return;
-        }
-        
-        // Mark reload attempt time to prevent storms
-        lastReloadAttempt.current = now;
-        
-        // New version detected - update silently
-        hasUpdated.current = true;
-        
-        // Clear all caches and reload silently
-        if ('caches' in window) {
-          caches.keys().then(names => {
-            names.forEach(name => caches.delete(name));
-          });
-        }
-        sessionStorage.removeItem('app-main-hash');
-        
-        // Small delay to ensure caches are cleared
-        setTimeout(() => {
-          window.location.reload();
-        }, 100);
+        toast('Nova versão disponível', {
+          description: 'Atualize para a versão mais recente.',
+          duration: Infinity,
+          action: {
+            label: 'Atualizar',
+            onClick: () => {
+              // Clear caches and reload only when user clicks
+              if ('caches' in window) {
+                caches.keys().then(names => {
+                  names.forEach(name => caches.delete(name));
+                });
+              }
+              sessionStorage.removeItem('app-main-hash');
+              window.location.reload();
+            },
+          },
+        });
       }
     } catch (error) {
-      // Silently fail - don't disrupt user experience
+      // Silently fail
       console.debug('Version check failed:', error);
     }
   }, []);
@@ -110,13 +92,10 @@ export const useVersionCheck = () => {
       lastHash.current = stored;
     }
     
-    // Check after a longer delay to not slow initial load
     const initialCheck = setTimeout(checkForUpdates, INITIAL_CHECK_DELAY);
-    
-    // Then check less frequently
     const interval = setInterval(checkForUpdates, VERSION_CHECK_INTERVAL);
     
-    // Also check when tab becomes visible again (but with debounce)
+    // Check when tab becomes visible (debounced)
     let lastVisibilityCheck = 0;
     const handleVisibilityChange = () => {
       const now = Date.now();

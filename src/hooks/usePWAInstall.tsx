@@ -43,9 +43,10 @@ export const usePWAInstall = () => {
         onRegisteredSW(swUrl: string, r: ServiceWorkerRegistration | undefined) {
           console.log('SW registered:', swUrl);
           if (r) {
+            // Check for SW updates every 4 hours (not hourly) to reduce refresh triggers
             setInterval(() => {
               r.update();
-            }, 60 * 60 * 1000);
+            }, 4 * 60 * 60 * 1000);
           }
         },
         onNeedRefresh() {
