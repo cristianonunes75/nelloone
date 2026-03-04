@@ -113,8 +113,9 @@ export default function BusinessAcceptInvite() {
         }
       }
       
-      // If not logged in, create account
+      // If not logged in, try to create account or sign in if account exists
       if (!user) {
+        // First try signUp
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: invite.email,
           password,
@@ -123,10 +124,46 @@ export default function BusinessAcceptInvite() {
           }
         });
         
-        if (authError) throw authError;
-        if (!authData.user) throw new Error('Erro ao criar conta');
-        
-        userId = authData.user.id;
+        if (authError) {
+          // If user already exists, try to sign in instead
+          if (authError.message?.includes('already registered') || authError.message?.includes('already exists') || authError.status === 422) {
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+              email: invite.email,
+              password,
+            });
+            
+            if (signInError) {
+              toast.error('Conta já existe. Verifique a senha ou faça login primeiro.');
+              setIsAccepting(false);
+              return;
+            }
+            
+            userId = signInData.user?.id;
+          } else {
+            throw authError;
+          }
+        } else {
+          if (!authData.user) throw new Error('Erro ao criar conta');
+          userId = authData.user.id;
+          
+          // Check if the user was auto-confirmed or needs confirmation
+          // If identities is empty, user already existed (fake signup response)
+          if (!authData.user.identities?.length) {
+            // User already exists - try sign in
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+              email: invite.email,
+              password,
+            });
+            
+            if (signInError) {
+              toast.error('Conta já existe para este email. Faça login primeiro e depois acesse o link do convite.');
+              setIsAccepting(false);
+              return;
+            }
+            
+            userId = signInData.user?.id;
+          }
+        }
       }
       
       // Create or update company_user link with the invited role
