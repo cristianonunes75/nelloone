@@ -8,6 +8,7 @@ import { clearAffiliateCode } from "@/hooks/useAffiliateTracking";
 import { Loader2, CheckCircle2, XCircle, AlertCircle, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import SocialInviteShare from "@/components/express/SocialInviteShare";
 
 type VerifyStatus = "verifying" | "success" | "already_processed" | "error" | "pending";
 
@@ -73,9 +74,16 @@ export default function CheckoutSuccess() {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<VerifyStatus>("verifying");
   const [errorMessage, setErrorMessage] = useState("");
+  const [guestName, setGuestName] = useState<string | null>(null);
 
   const t = MESSAGES[language as keyof typeof MESSAGES] || MESSAGES.pt;
   const sessionId = searchParams.get("session_id");
+
+  // Check for guest name (set by LeadCaptureGate before redirect to Stripe)
+  useEffect(() => {
+    const name = sessionStorage.getItem("expressLeadName");
+    if (name) setGuestName(name);
+  }, []);
 
   // Check for pending test redirect
   const pendingTestId = sessionStorage.getItem("pendingTestId");
@@ -209,6 +217,12 @@ export default function CheckoutSuccess() {
                 <UserPlus className="h-4 w-4 mr-2" />
                 Criar minha conta e acessar
               </Button>
+              <div className="pt-2">
+                <SocialInviteShare
+                  inviterName={guestName || undefined}
+                  inviterLeadId={sessionStorage.getItem("expressLeadId") || undefined}
+                />
+              </div>
             </>
           )}
 

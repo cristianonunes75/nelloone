@@ -70,12 +70,6 @@ export default function EssenceUpsell({ onDeepen, inviterName, inviterLeadId, le
         </CardContent>
       </Card>
 
-      {/* Social Invite */}
-      <SocialInviteShare
-        inviterName={inviterName}
-        inviterLeadId={inviterLeadId}
-      />
-
       {/* Identity Gap */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}

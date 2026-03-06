@@ -72,10 +72,14 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
           prediction={prediction}
           answers={answers}
           refCode={refCode}
+          defaultName={savedName}
+          defaultEmail={savedEmail}
           onSaved={async (leadId, name, email) => {
             setSavedLeadId(leadId);
             setSavedName(name);
             setSavedEmail(email || '');
+            sessionStorage.setItem("expressLeadName", name);
+            sessionStorage.setItem("expressLeadId", leadId);
             setCheckoutLoading(true);
             try {
               const { data, error } = await supabase.functions.invoke("create-checkout", {
@@ -279,15 +283,15 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
               Tudo o que você viu agora faz parte da Jornada Identity
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <a href="/os-7-mapas" className="text-sm text-nello-gold hover:underline transition-colors">
+              <a href="/os-7-mapas" target="_blank" rel="noopener noreferrer" className="text-sm text-nello-gold hover:underline transition-colors">
                 Conheça os 7 Mapas
               </a>
               <span className="hidden sm:inline text-muted-foreground/40">•</span>
-              <a href="/metodologia" className="text-sm text-nello-gold hover:underline transition-colors">
+              <a href="/metodologia" target="_blank" rel="noopener noreferrer" className="text-sm text-nello-gold hover:underline transition-colors">
                 Como funciona a metodologia
               </a>
               <span className="hidden sm:inline text-muted-foreground/40">•</span>
-              <a href="/para-profissionais" className="text-sm text-nello-gold hover:underline transition-colors">
+              <a href="/para-profissionais" target="_blank" rel="noopener noreferrer" className="text-sm text-nello-gold hover:underline transition-colors">
                 Identity para profissionais
               </a>
             </div>

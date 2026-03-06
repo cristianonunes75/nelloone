@@ -14,11 +14,13 @@ interface Props {
   answers: Record<string, number>;
   refCode?: string | null;
   onSaved: (leadId: string, name: string, email?: string) => void;
+  defaultName?: string;
+  defaultEmail?: string;
 }
 
-export default function LeadCaptureGate({ prediction, answers, refCode, onSaved }: Props) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+export default function LeadCaptureGate({ prediction, answers, refCode, onSaved, defaultName = "", defaultEmail = "" }: Props) {
+  const [name, setName] = useState(defaultName);
+  const [email, setEmail] = useState(defaultEmail);
   const [whatsapp, setWhatsapp] = useState("");
   const [saving, setSaving] = useState(false);
 
