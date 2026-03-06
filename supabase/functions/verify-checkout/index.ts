@@ -54,10 +54,12 @@ serve(async (req) => {
     });
 
     // Check if payment was successful
-    if (session.status !== "complete" || session.payment_status !== "paid") {
+    // "no_payment_required" happens when a 100% discount coupon is applied
+    const isPaid = session.payment_status === "paid" || session.payment_status === "no_payment_required";
+    if (session.status !== "complete" || !isPaid) {
       logStep("Payment not completed", { status: session.status, payment_status: session.payment_status });
-      return new Response(JSON.stringify({ 
-        success: false, 
+      return new Response(JSON.stringify({
+        success: false,
         error: "Payment not completed",
         status: session.status,
         payment_status: session.payment_status,
