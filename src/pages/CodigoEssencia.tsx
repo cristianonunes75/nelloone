@@ -1,4 +1,6 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FaithClarityNotice } from "@/components/FaithClarityNotice";
 import { CodigoEssenciaUpsell } from "@/components/monetization";
@@ -106,7 +108,7 @@ const TRANSLATIONS = {
     downloadPDF: "PDF",
     sendEmail: "Email",
     missingTests: "Faltam:",
-    disclaimer: "Que bom que você chegou até aqui! Este relatório reflete as respostas que você ofereceu com a verdade do seu coração. No entanto, lembre-se: este resultado não é uma sentença definitiva ou um 'selo' imutável. O ser humano é um todo composto de corpo, mente e espírito.\n\nFases da vida — como alterações hormonais, desafios físicos ou momentos de transição — podem influenciar temporariamente sua disposição e percepção. Use este diagnóstico como uma ferramenta de autoconhecimento para honrar quem você é hoje e, se desejar, como um ponto de partida para as mudanças que busca. Olhe para si com cuidado e integridade.",
+    disclaimer: "Este Código não é um diagnóstico clínico. É uma bússola — não uma gaiola.\n\nEle reflete quem você é hoje, com base nas respostas que deu. Mas você é maior do que qualquer mapa. Fases de vida, momentos de transição e até como você estava no dia em que respondeu podem colorir a forma como você se percebe. Olhe para o que encontrou aqui com curiosidade, não com julgamento.",
     emailSent: "PDF enviado!",
     emailError: "Erro ao enviar.",
     pdfDownloaded: "PDF baixado!",
@@ -142,7 +144,7 @@ const TRANSLATIONS = {
     downloadPDF: "PDF",
     sendEmail: "Email",
     missingTests: "Faltam:",
-    disclaimer: "Que bom que chegaste até aqui! Este relatório reflete as respostas que ofereceste com a verdade do teu coração. No entanto, lembra-te: este resultado não é uma sentença definitiva ou um 'selo' imutável. O ser humano é um todo composto de corpo, mente e espírito.\n\nFases da vida — como alterações hormonais, desafios físicos ou momentos de transição — podem influenciar temporariamente a tua disposição e perceção. Usa este diagnóstico como uma ferramenta de autoconhecimento para honrar quem és hoje e, se desejares, como um ponto de partida para as mudanças que procuras. Olha para ti com cuidado e integridade.",
+    disclaimer: "Este Código não é um diagnóstico clínico. É uma bússola — não uma gaiola.\n\nEle reflete quem és hoje, com base nas respostas que deste. Mas és maior do que qualquer mapa. Fases de vida, momentos de transição e até como estavas no dia em que respondeste podem influenciar a forma como te percebes. Olha para o que encontraste aqui com curiosidade, não com julgamento.",
     emailSent: "PDF enviado!",
     emailError: "Erro ao enviar.",
     pdfDownloaded: "PDF transferido!",
@@ -178,7 +180,7 @@ const TRANSLATIONS = {
     downloadPDF: "PDF",
     sendEmail: "Email",
     missingTests: "Missing:",
-    disclaimer: "We're glad you made it here! This report reflects the answers you gave with the truth of your heart. However, remember: this result is not a definitive sentence or an immutable 'label'. The human being is a whole made of body, mind and spirit.\n\nLife phases — such as hormonal changes, physical challenges or transitional moments — can temporarily influence your disposition and perception. Use this diagnosis as a tool for self-knowledge to honor who you are today and, if you wish, as a starting point for the changes you seek. Look at yourself with care and integrity.",
+    disclaimer: "This Code is not a clinical diagnosis. It's a compass — not a cage.\n\nIt reflects who you are today, based on the answers you gave. But you are larger than any map. Life phases, transitional moments, and even how you were feeling the day you answered can colour how you perceive yourself. Look at what you found here with curiosity, not judgement.",
     emailSent: "PDF sent!",
     emailError: "Error sending.",
     pdfDownloaded: "PDF downloaded!",
@@ -234,6 +236,9 @@ const CodigoEssenciaInner = () => {
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [generatedSections, setGeneratedSections] = useState<any[]>([]);
   const autoGenAttemptedRef = useRef(false);
+  const [showDemographicsModal, setShowDemographicsModal] = useState(false);
+  const [demoGender, setDemoGender] = useState<string>("");
+  const [demoAgeRange, setDemoAgeRange] = useState<string>("");
 
   const lang = (language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt') as LangKey;
   const t = TRANSLATIONS[lang];
@@ -372,12 +377,38 @@ const CodigoEssenciaInner = () => {
   // REMOVED: Auto-generation removed to prevent unwanted credit consumption
   // Users must now click "Generate Code" button explicitly
 
-  const handleGenerateCodigo = async () => {
+  const handleRequestGenerate = useCallback(() => {
+    if (!user?.id) return;
+    const gender = profile?.gender || demoGender;
+    const ageRange = (profile as any)?.age_range || demoAgeRange;
+    if (!gender || !ageRange) {
+      setDemoGender(profile?.gender || "");
+      setDemoAgeRange((profile as any)?.age_range || "");
+      setShowDemographicsModal(true);
+      return;
+    }
+    handleGenerateCodigo(gender, ageRange);
+  }, [user, profile, demoGender, demoAgeRange]);
+
+  const handleDemographicsConfirm = async () => {
+    if (!demoGender || !demoAgeRange || !user?.id) return;
+    setShowDemographicsModal(false);
+    // Save to profile
+    await supabase.from("profiles").update({ gender: demoGender, age_range: demoAgeRange } as any).eq("id", user.id);
+    handleGenerateCodigo(demoGender, demoAgeRange);
+  };
+
+  const handleGenerateCodigo = async (gender?: string, ageRange?: string) => {
     if (!user?.id) return;
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('nello-codigo-essencia', {
-        body: { user_id: user.id, locale: lang === 'en' ? 'en' : lang === 'pt-pt' ? 'pt-pt' : 'pt-br' }
+        body: {
+          user_id: user.id,
+          locale: lang === 'en' ? 'en' : lang === 'pt-pt' ? 'pt-pt' : 'pt-br',
+          gender: gender || profile?.gender || undefined,
+          age_range: ageRange || (profile as any)?.age_range || undefined,
+        }
       });
 
       // Some failures return as `error`, others return a 200 with an `error` field.
@@ -481,7 +512,7 @@ const CodigoEssenciaInner = () => {
     // This prevents users from getting stuck with an empty report if AI credits are insufficient or the request fails.
     toast.info(lang === 'en' ? 'Regenerating...' : 'Regenerando...');
     setShowRegenerateConfirm(false);
-    await handleGenerateCodigo();
+    await handleGenerateCodigo(profile?.gender || demoGender || undefined, (profile as any)?.age_range || demoAgeRange || undefined);
   };
 
   // Find sections
@@ -667,7 +698,7 @@ const CodigoEssenciaInner = () => {
                 {lang === 'en' ? `Generation ${currentVersion + 1} of ${maxGenerations}` : `Geração ${currentVersion + 1} de ${maxGenerations}`}
               </p>
               <Button 
-                onClick={handleGenerateCodigo} 
+                onClick={handleRequestGenerate}
                 disabled={isGenerating} 
                 className="gap-2 h-11 px-6 bg-gradient-to-r from-[hsl(42,70%,50%)] to-[hsl(40,75%,40%)] hover:from-[hsl(42,70%,55%)] hover:to-[hsl(40,75%,45%)] text-white border-0 shadow-lg"
                 style={{ boxShadow: '0 4px 16px hsla(42,70%,50%,0.3)' }}
@@ -979,6 +1010,66 @@ const CodigoEssenciaInner = () => {
           <RelatorioSelector language={lang} hasSavedCodigo={hasSavedCodigo} />
         )}
       </main>
+
+      {/* Demographics Modal — collected once before first generation */}
+      <Dialog open={showDemographicsModal} onOpenChange={setShowDemographicsModal}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              {lang === 'en' ? 'Personalise your reading' : 'Personalizar sua leitura'}
+            </DialogTitle>
+            <DialogDescription>
+              {lang === 'en'
+                ? 'Two quick questions so we can contextualise your Essence Code for your life phase.'
+                : 'Duas perguntas rápidas para contextualizar seu Código para a fase de vida em que você está.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-5 py-2">
+            <div className="space-y-2">
+              <Label>{lang === 'en' ? 'How do you identify?' : 'Como você se identifica?'}</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {(lang === 'en'
+                  ? [['masculino','Man'],['feminino','Woman'],['outro','Other']]
+                  : [['masculino','Homem'],['feminino','Mulher'],['outro','Outro']]
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    onClick={() => setDemoGender(value)}
+                    className={`py-2 rounded-lg border text-sm transition-all ${demoGender === value ? 'border-primary bg-primary/10 text-primary font-medium' : 'border-border hover:border-primary/40'}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>{lang === 'en' ? 'Age range' : 'Faixa etária'}</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {['15–24','25–34','35–44','45–54','55–64','65+'].map(range => (
+                  <button
+                    key={range}
+                    onClick={() => setDemoAgeRange(range)}
+                    className={`py-2 rounded-lg border text-sm transition-all ${demoAgeRange === range ? 'border-primary bg-primary/10 text-primary font-medium' : 'border-border hover:border-primary/40'}`}
+                  >
+                    {range}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <Button
+            onClick={handleDemographicsConfirm}
+            disabled={!demoGender || !demoAgeRange}
+            className="w-full"
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
+            {lang === 'en' ? 'Generate my Code' : 'Gerar meu Código'}
+          </Button>
+        </DialogContent>
+      </Dialog>
 
       {/* Regenerate Confirmation Dialog */}
       <AlertDialog open={showRegenerateConfirm} onOpenChange={setShowRegenerateConfirm}>

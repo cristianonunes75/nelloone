@@ -751,21 +751,53 @@ REGRAS DE NOMENCLATURA
 Responde APENAS em JSON válido. Sem texto fora do JSON.`;
 
 // User prompt refinado - mais estruturado e exigente
-const getUserPrompt = (locale: string, results: any, userName: string) => {
+const getUserPrompt = (locale: string, results: any, userName: string, gender?: string | null, ageRange?: string | null) => {
   const isEuropean = locale === 'pt-pt';
   const isEnglish = locale === 'en';
-  
+
   const youWord = isEuropean ? 'Tu' : isEnglish ? 'You' : 'Você';
   const yourWord = isEuropean ? 'teu' : isEnglish ? 'your' : 'seu';
-  
+
   const firstName = userName.split(' ')[0];
 
   const resultsJson = JSON.stringify(results, null, 2);
+
+  // Build personalized life-phase context for the AI
+  const buildLifePhaseContext = () => {
+    if (!gender && !ageRange) return '';
+    const genderLabel = isEnglish
+      ? (gender === 'masculino' ? 'man' : gender === 'feminino' ? 'woman' : 'person')
+      : isEuropean
+        ? (gender === 'masculino' ? 'homem' : gender === 'feminino' ? 'mulher' : 'pessoa')
+        : (gender === 'masculino' ? 'homem' : gender === 'feminino' ? 'mulher' : 'pessoa');
+    if (isEnglish) {
+      return `
+PERSONAL CONTEXT (use to personalise the opening paragraph only):
+- Gender: ${genderLabel}
+- Age range: ${ageRange || 'unknown'}
+Use this to write a 2-3 sentence personalised opening ("contexto_leitura") that acknowledges their life phase and sets the right tone. Make it warm, specific, and human. Explicitly state this is NOT a clinical diagnosis — it is a self-knowledge tool. Different life phases can temporarily change how we perceive ourselves.`;
+    }
+    if (isEuropean) {
+      return `
+CONTEXTO PESSOAL (usar apenas para personalizar o parágrafo de abertura):
+- Género: ${genderLabel}
+- Faixa etária: ${ageRange || 'desconhecida'}
+Usa isto para escrever uma abertura personalizada ("contexto_leitura") de 2-3 frases que reconheça a fase de vida desta pessoa e defina o tom certo. Que seja calorosa, específica e humana. Deixa explícito que isto NÃO é um diagnóstico clínico — é uma ferramenta de autoconhecimento. Diferentes fases da vida podem influenciar temporariamente como nos percebemos.`;
+    }
+    return `
+CONTEXTO PESSOAL (usar apenas para personalizar o parágrafo de abertura):
+- Gênero: ${genderLabel}
+- Faixa etária: ${ageRange || 'desconhecida'}
+Use isso para escrever uma abertura personalizada ("contexto_leitura") de 2-3 frases que reconheça a fase de vida desta pessoa e defina o tom certo. Que seja calorosa, específica e humana. Deixe explícito que isso NÃO é um diagnóstico clínico — é uma ferramenta de autoconhecimento. Diferentes fases da vida podem influenciar temporariamente como nos percebemos.`;
+  };
+
+  const lifePhaseContext = buildLifePhaseContext();
 
   if (isEnglish) {
     return `USER: ${firstName}
 TEST RESULTS:
 ${resultsJson}
+${lifePhaseContext}
 
 GENERATE THE ESSENCE CODE WITH THIS EXACT STRUCTURE:
 
@@ -1143,6 +1175,7 @@ CRITICAL RULES:
   return `USUÁRIO: ${firstName}
 RESULTADOS DOS TESTES:
 ${resultsJson}
+${lifePhaseContext}
 
 GERE O CÓDIGO DA ESSÊNCIA COM ESTA ESTRUTURA EXATA:
 
@@ -2026,7 +2059,7 @@ serve(async (req) => {
   }
 
   try {
-    const { user_id, locale = 'pt-br', mock = false } = await req.json();
+    const { user_id, locale = 'pt-br', mock = false, gender, age_range } = await req.json();
 
     if (!user_id) {
       return new Response(
@@ -2092,7 +2125,7 @@ serve(async (req) => {
     // 1. Get user profile
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("journey_status, full_name")
+      .select("journey_status, full_name, gender, age_range")
       .eq("id", user_id)
       .single();
 
@@ -2234,7 +2267,9 @@ serve(async (req) => {
       systemPrompt = SYSTEM_PROMPT_PT_PT;
     }
 
-    const userPrompt = getUserPrompt(locale, results, userName);
+    const resolvedGender = gender || (profile as any)?.gender || null;
+    const resolvedAgeRange = age_range || (profile as any)?.age_range || null;
+    const userPrompt = getUserPrompt(locale, results, userName, resolvedGender, resolvedAgeRange);
 
     console.log("Calling Lovable AI Gateway to generate Código da Essência for user:", user_id);
 
