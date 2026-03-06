@@ -177,18 +177,6 @@ export function DashboardStageJourney({
                 </div>
               </div>
               
-              {/* Show unlock full journey option if user doesn't have full access */}
-              {!hasFullJourneyAccess && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onPurchase(nextStep)}
-                  className="mt-3 w-full gap-2 border-primary/30 text-primary hover:bg-primary/10"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Desbloquear Jornada Completa
-                </Button>
-              )}
             </div>
           </motion.div>
         )}
