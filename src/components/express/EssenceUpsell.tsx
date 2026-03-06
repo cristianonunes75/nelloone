@@ -14,6 +14,7 @@ interface Props {
   inviterName?: string;
   inviterLeadId?: string;
   leadEmail?: string;
+  onCaptureLead?: () => void;
 }
 
 const HIDDEN_DIMENSIONS = [
@@ -23,7 +24,7 @@ const HIDDEN_DIMENSIONS = [
   { icon: <Layers className="h-4 w-4" />, text: 'A integração entre suas forças naturais e seus desafios invisíveis' },
 ];
 
-export default function EssenceUpsell({ onDeepen, inviterName, inviterLeadId, leadEmail }: Props) {
+export default function EssenceUpsell({ onDeepen, inviterName, inviterLeadId, leadEmail, onCaptureLead }: Props) {
   const [loading, setLoading] = useState(false);
   const { language } = useLanguage();
 
@@ -63,8 +64,8 @@ export default function EssenceUpsell({ onDeepen, inviterName, inviterLeadId, le
         <CardContent className="p-5 flex items-center gap-3">
           <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
           <div>
-            <p className="text-sm font-medium text-foreground">Sua Leitura Inicial está salva.</p>
-            <p className="text-xs text-muted-foreground">Agora você pode acessar a leitura completa.</p>
+            <p className="text-sm font-medium text-foreground">Sua Leitura Inicial foi revelada.</p>
+            <p className="text-xs text-muted-foreground">Veja o que ainda não apareceu na sua leitura.</p>
           </div>
         </CardContent>
       </Card>
@@ -131,7 +132,7 @@ export default function EssenceUpsell({ onDeepen, inviterName, inviterLeadId, le
             </div>
 
             <Button
-              onClick={handleCheckout}
+              onClick={onCaptureLead ?? handleCheckout}
               disabled={loading}
               className="w-full h-12 text-base rounded-xl"
               size="lg"

@@ -7,6 +7,9 @@ import { Sparkles, ArrowRight, Brain, Heart, Shield, Compass, Flame, Star } from
 import type { ExpressPrediction, ExpressDimension } from "@/lib/codigoExpress";
 import LeadCaptureGate from "./LeadCaptureGate";
 import EssenceUpsell from "./EssenceUpsell";
+import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { toast } from "sonner";
 
 interface Props {
   prediction: ExpressPrediction;
@@ -44,25 +47,10 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
   const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
   const [savedName, setSavedName] = useState<string>('');
   const [savedEmail, setSavedEmail] = useState<string>('');
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const { language } = useLanguage();
 
-  if (step === 'lead_capture') {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <LeadCaptureGate
-          prediction={prediction}
-          answers={answers}
-          refCode={refCode}
-          onSaved={(leadId, name, email) => {
-            setSavedLeadId(leadId);
-            setSavedName(name);
-            setSavedEmail(email || '');
-            setStep('upsell');
-          }}
-        />
-      </div>
-    );
-  }
-
+  // Nova ordem: result → upsell → lead_capture → checkout
   if (step === 'upsell') {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -71,7 +59,51 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
           inviterName={savedName}
           inviterLeadId={savedLeadId || undefined}
           leadEmail={savedEmail}
+          onCaptureLead={() => setStep('lead_capture')}
         />
+      </div>
+    );
+  }
+
+  if (step === 'lead_capture') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <LeadCaptureGate
+          prediction={prediction}
+          answers={answers}
+          refCode={refCode}
+          onSaved={async (leadId, name, email) => {
+            setSavedLeadId(leadId);
+            setSavedName(name);
+            setSavedEmail(email || '');
+            setCheckoutLoading(true);
+            try {
+              const { data, error } = await supabase.functions.invoke("create-checkout", {
+                body: {
+                  productType: "codigo_essencia_express",
+                  language,
+                  userEmail: email || undefined,
+                },
+              });
+              if (error) throw error;
+              if (data?.url) {
+                window.location.href = data.url;
+              } else {
+                throw new Error("URL de checkout não retornada");
+              }
+            } catch (e) {
+              console.error("Checkout error:", e);
+              toast.error("Erro ao iniciar pagamento. Tente novamente.");
+              setCheckoutLoading(false);
+              setStep('upsell');
+            }
+          }}
+        />
+        {checkoutLoading && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
+            <p className="text-sm text-muted-foreground animate-pulse">Preparando seu pagamento...</p>
+          </div>
+        )}
       </div>
     );
   }
@@ -225,7 +257,7 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
                 <span className="font-display text-3xl font-bold text-foreground">R$ 99</span>
               </div>
 
-              <Button onClick={() => setStep('lead_capture')} className="w-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold rounded-full" size="lg">
+              <Button onClick={() => setStep('upsell')} className="w-full bg-nello-gold hover:bg-nello-gold/90 text-nello-graphite font-semibold rounded-full" size="lg">
                 <Sparkles className="h-4 w-4 mr-2" />
                 Desbloquear Jornada Identity
                 <ArrowRight className="h-4 w-4 ml-2" />
