@@ -1,12 +1,14 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { 
-  Sparkles, 
+import {
+  Sparkles,
   Eye,
   Target,
   ArrowRight,
   Star,
-  Film
+  Film,
+  Heart,
+  Users
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { JourneyStep } from "@/hooks/useJourneyProgress";
@@ -15,6 +17,7 @@ import { DashboardTestimonialSection } from "./DashboardTestimonialSection";
 import { useNavigate } from "react-router-dom";
 import { useRevelacaoEssenciaFlag } from "@/hooks/useFeatureFlag";
 import { useAuth } from "@/hooks/useAuth";
+import { useCoupleCodeAccess } from "@/hooks/useCoupleCodeAccess";
 
 interface TestResult {
   testType: string;
@@ -68,6 +71,7 @@ export function DashboardStageRevelation({
   const navigate = useNavigate();
   const { userRole } = useAuth();
   const { isEnabled: revelacaoEnabled } = useRevelacaoEssenciaFlag();
+  const { hasPurchased: hasCoupleCodePurchased } = useCoupleCodeAccess();
   const isAdmin = userRole === "admin";
   const showRevelacao = revelacaoEnabled || isAdmin;
 
@@ -284,6 +288,45 @@ export function DashboardStageRevelation({
               Iniciar Ativação
               <ArrowRight className="w-4 h-4" />
             </Button>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Código do Casal - Upsell Banner */}
+      {hasSavedCodigo && !hasCoupleCodePurchased && (
+        <motion.div
+          variants={itemVariants}
+          className="relative overflow-hidden bg-gradient-to-r from-pink-500/15 via-rose-400/10 to-pink-500/15 border border-pink-500/30 rounded-2xl p-6 md:p-8"
+        >
+          <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/20 rounded-full translate-x-1/2 -translate-y-1/2 blur-2xl" />
+
+          <div className="relative flex flex-col md:flex-row items-start md:items-center gap-6">
+            <div className="w-14 h-14 bg-gradient-to-br from-pink-500 to-rose-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-pink-500/30">
+              <Heart className="w-7 h-7 text-white" />
+            </div>
+
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <Users className="w-4 h-4 text-pink-500" />
+                <span className="text-xs font-semibold text-pink-600 uppercase tracking-wider">
+                  Cruzamento de Códigos
+                </span>
+              </div>
+              <h3 className="text-xl font-bold mb-2">Código do Casal</h3>
+              <p className="text-muted-foreground text-sm">
+                Descubra como sua essência se conecta com a de outra pessoa. Invite seu parceiro(a) e gerem juntos o mapa do relacionamento.
+              </p>
+            </div>
+
+            <div className="shrink-0">
+              <Button
+                onClick={() => navigate("/cliente/cruzamentos")}
+                className="gap-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg shadow-pink-500/30"
+              >
+                Convidar parceiro(a)
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </motion.div>
       )}
