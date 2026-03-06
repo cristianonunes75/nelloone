@@ -106,7 +106,7 @@ const TRANSLATIONS = {
     downloadPDF: "PDF",
     sendEmail: "Email",
     missingTests: "Faltam:",
-    disclaimer: "Use para reflexão e ação.",
+    disclaimer: "Que bom que você chegou até aqui! Este relatório reflete as respostas que você ofereceu com a verdade do seu coração. No entanto, lembre-se: este resultado não é uma sentença definitiva ou um 'selo' imutável. O ser humano é um todo composto de corpo, mente e espírito.\n\nFases da vida — como alterações hormonais, desafios físicos ou momentos de transição — podem influenciar temporariamente sua disposição e percepção. Use este diagnóstico como uma ferramenta de autoconhecimento para honrar quem você é hoje e, se desejar, como um ponto de partida para as mudanças que busca. Olhe para si com cuidado e integridade.",
     emailSent: "PDF enviado!",
     emailError: "Erro ao enviar.",
     pdfDownloaded: "PDF baixado!",
@@ -142,7 +142,7 @@ const TRANSLATIONS = {
     downloadPDF: "PDF",
     sendEmail: "Email",
     missingTests: "Faltam:",
-    disclaimer: "Usa para reflexão e ação.",
+    disclaimer: "Que bom que chegaste até aqui! Este relatório reflete as respostas que ofereceste com a verdade do teu coração. No entanto, lembra-te: este resultado não é uma sentença definitiva ou um 'selo' imutável. O ser humano é um todo composto de corpo, mente e espírito.\n\nFases da vida — como alterações hormonais, desafios físicos ou momentos de transição — podem influenciar temporariamente a tua disposição e perceção. Usa este diagnóstico como uma ferramenta de autoconhecimento para honrar quem és hoje e, se desejares, como um ponto de partida para as mudanças que procuras. Olha para ti com cuidado e integridade.",
     emailSent: "PDF enviado!",
     emailError: "Erro ao enviar.",
     pdfDownloaded: "PDF transferido!",
@@ -178,7 +178,7 @@ const TRANSLATIONS = {
     downloadPDF: "PDF",
     sendEmail: "Email",
     missingTests: "Missing:",
-    disclaimer: "Use for reflection and action.",
+    disclaimer: "We're glad you made it here! This report reflects the answers you gave with the truth of your heart. However, remember: this result is not a definitive sentence or an immutable 'label'. The human being is a whole made of body, mind and spirit.\n\nLife phases — such as hormonal changes, physical challenges or transitional moments — can temporarily influence your disposition and perception. Use this diagnosis as a tool for self-knowledge to honor who you are today and, if you wish, as a starting point for the changes you seek. Look at yourself with care and integrity.",
     emailSent: "PDF sent!",
     emailError: "Error sending.",
     pdfDownloaded: "PDF downloaded!",
@@ -963,8 +963,12 @@ const CodigoEssenciaInner = () => {
             />
 
             {/* Disclaimer */}
-            <div className="text-center py-3">
-              <p className="text-xs text-muted-foreground">{t.disclaimer}</p>
+            <div className="rounded-xl border border-border/60 bg-muted/30 px-6 py-5 text-sm text-muted-foreground space-y-3">
+              {t.disclaimer.split("\n\n").map((paragraph, i) => (
+                <p key={i} className={i === 0 ? "font-medium text-foreground/80" : ""}>
+                  {paragraph}
+                </p>
+              ))}
             </div>
           </div>
         )}
