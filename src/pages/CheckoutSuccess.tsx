@@ -6,6 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { clearAffiliateCode } from "@/hooks/useAffiliateTracking";
 import { pixel } from "@/lib/metaPixel";
+import { capi } from "@/lib/metaCapi";
 import { Loader2, CheckCircle2, XCircle, AlertCircle, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -160,6 +161,7 @@ export default function CheckoutSuccess() {
         clearAffiliateCode();
         if (!data.already_processed) {
           pixel.purchase(99, "BRL");
+          capi.purchase(user?.email ?? undefined, 99, "BRL");
         }
         
         // Invalidate ALL queries to force refresh - using predicate to catch userId-specific queries
