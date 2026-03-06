@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import EssenceUpsell from "./EssenceUpsell";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
+import { pixel } from "@/lib/metaPixel";
 
 interface Props {
   prediction: ExpressPrediction;
@@ -44,6 +45,7 @@ type FlowStep = 'result' | 'lead_capture' | 'upsell';
 
 export default function ExpressResult({ prediction, answers, onDeepen, refCode }: Props) {
   const [step, setStep] = useState<FlowStep>('result');
+  useEffect(() => { pixel.viewContent('Leitura Inicial - ' + prediction.archetypeName); }, []);
   const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
   const [savedName, setSavedName] = useState<string>('');
   const [savedEmail, setSavedEmail] = useState<string>('');
@@ -91,6 +93,7 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
               });
               if (error) throw error;
               if (data?.url) {
+                pixel.initiateCheckout(99, "BRL");
                 window.location.href = data.url;
               } else {
                 throw new Error("URL de checkout não retornada");

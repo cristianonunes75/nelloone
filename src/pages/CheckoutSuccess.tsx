@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { clearAffiliateCode } from "@/hooks/useAffiliateTracking";
+import { pixel } from "@/lib/metaPixel";
 import { Loader2, CheckCircle2, XCircle, AlertCircle, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -157,6 +158,9 @@ export default function CheckoutSuccess() {
       if (data.success) {
         // Clear affiliate code after successful purchase to prevent duplicate commissions
         clearAffiliateCode();
+        if (!data.already_processed) {
+          pixel.purchase(99, "BRL");
+        }
         
         // Invalidate ALL queries to force refresh - using predicate to catch userId-specific queries
         queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "test-purchases" });

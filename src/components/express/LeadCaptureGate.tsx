@@ -8,6 +8,7 @@ import { Shield, Bookmark } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { ExpressPrediction } from "@/lib/codigoExpress";
 import { toast } from "sonner";
+import { pixel } from "@/lib/metaPixel";
 
 interface Props {
   prediction: ExpressPrediction;
@@ -79,6 +80,7 @@ export default function LeadCaptureGate({ prediction, answers, refCode, onSaved,
         },
       }).catch(e => console.error("Error sending lead email:", e));
 
+      pixel.lead();
       toast.success("Sua Leitura foi salva com sucesso!");
       onSaved((data as any)?.id || '', name.trim(), email.trim().toLowerCase());
     } catch (e) {
