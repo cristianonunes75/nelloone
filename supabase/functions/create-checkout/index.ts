@@ -83,7 +83,7 @@ const USD_PRICES: Record<string, string> = {
   temperamentos: "price_1SZNXKDjhZZxZELMhOhi8sCL",
   linguagens_amor: "price_1SZNXYDjhZZxZELMtlzZO8Id",
   inteligencias_multiplas: "price_1SZNXnDjhZZxZELMuGMkDImQ",
-  bundle: "price_1SZNYXDjhZZxZELMoGVJUZRP",
+  bundle: "price_1T2WdaDjhZZxZELMp1qmbc4X", // $98.50 USD - Jornada Completa (atualizado)
   codigo_da_essencia: "price_1Sc2RfDjhZZxZELMbZP1CvLO", // $97 USD
   ativacao_codigo: "price_1Sw6F6DjhZZxZELMfBW3pn5q", // $57 USD - Ativação do Código da Essência
   activation_individual: "price_1SxRhuDjhZZxZELMsAYBZqUP", // $57 USD - Ativação de Direção Profissional (UNIQUE)
@@ -101,7 +101,7 @@ const BRL_PRICES: Record<string, string> = {
   temperamentos: "price_1SZUnqDjhZZxZELMtU9tUMFm",
   linguagens_amor: "price_1SZUoWDjhZZxZELMxEJJKhDn",
   inteligencias_multiplas: "price_1SZUpxDjhZZxZELMAkQlFX11",
-  bundle: "price_1SyxwqDjhZZxZELM5b6l6Ug4", // R$1.297 - Jornada Identity Completa + 1 Ativação do Código
+  bundle: "price_1T2Wc4DjhZZxZELMq1flZ1uv", // R$248,50 BRL - Jornada Identity Completa (atualizado)
   codigo_da_essencia: "price_1Sc2RRDjhZZxZELMPxAnu0I5", // R$397 BRL
   ativacao_codigo: "price_1Sw6EEDjhZZxZELMSmPNECig", // R$197 BRL - Ativação do Código da Essência
   activation_individual: "price_1SxRhHDjhZZxZELMuoj7N1CN", // R$197 BRL - Ativação de Direção Profissional (UNIQUE)
@@ -119,7 +119,7 @@ const EUR_PRICES: Record<string, string> = {
   temperamentos: "price_1SZyxYDjhZZxZELMATbPpg7h",
   linguagens_amor: "price_1SZyykDjhZZxZELM9mlhNwLh",
   inteligencias_multiplas: "price_1SZz0nDjhZZxZELMVagCtoXs",
-  bundle: "price_1SZz6vDjhZZxZELMQsZuLKah",
+  bundle: "price_1T2WftDjhZZxZELMyVAZPHhe", // €74,50 EUR - Jornada Identity Completa (atualizado)
   codigo_da_essencia: "price_1Sc2TRDjhZZxZELMr66uJZZm", // €97 EUR
   ativacao_codigo: "price_1Sw6FiDjhZZxZELMXDH1ACdx", // €47 EUR - Ativação do Código da Essência
   activation_individual: "price_1SxRjKDjhZZxZELMAqWHQKbm", // €47 EUR - Ativação de Direção Profissional (UNIQUE)
@@ -520,9 +520,9 @@ serve(async (req) => {
       } else {
         // Fallback: create price_data for bundle - ALWAYS use NELLO ONE branding
         const bundleAmounts: Record<string, number> = {
-          brl: 129700, // R$ 1.297
-          usd: 39700,  // $397
-          eur: 29700,  // €297
+          brl: 24850, // R$ 248,50
+          usd: 9850,  // $98,50
+          eur: 7450,  // €74,50
         };
         
         const bundleNames: Record<string, { name: string; description: string }> = {
