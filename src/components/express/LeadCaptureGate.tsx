@@ -101,9 +101,9 @@ export default function LeadCaptureGate({ prediction, answers, refCode, onSaved 
               <Bookmark className="h-6 w-6 text-primary" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-xl font-bold text-foreground">Sua Leitura Inicial foi revelada.</h3>
+              <h3 className="text-xl font-bold text-foreground">Antes de pagar, precisamos do seu contato.</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Quer guardar sua leitura e continuar a jornada?
+                Seus dados garantem o acesso à leitura completa após o pagamento.
               </p>
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function LeadCaptureGate({ prediction, answers, refCode, onSaved 
           </div>
 
           <Button onClick={handleSave} disabled={!isValid || saving} className="w-full h-12 text-base rounded-xl" size="lg">
-            {saving ? "Salvando..." : "Salvar minha Leitura"}
+            {saving ? "Salvando..." : "Continuar para o pagamento →"}
           </Button>
 
           <p className="text-[11px] text-center text-muted-foreground flex items-center justify-center gap-1">

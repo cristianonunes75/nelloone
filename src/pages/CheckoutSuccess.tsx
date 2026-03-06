@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { clearAffiliateCode } from "@/hooks/useAffiliateTracking";
-import { Loader2, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, AlertCircle, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -196,30 +196,61 @@ export default function CheckoutSuccess() {
             </>
           )}
 
-          {status === "success" && (
+          {status === "success" && !user && (
             <>
               <CheckCircle2 className="w-16 h-16 mx-auto text-emerald-500" />
               <div className="space-y-2">
                 <h1 className="text-xl font-semibold text-emerald-600">{t.success}</h1>
                 <p className="text-muted-foreground text-sm">
-                  {pendingAtivacaoRedirect 
-                    ? t.successDescAtivacao 
-                    : hasPendingTest 
-                      ? t.successDescContinue 
+                  Crie sua conta gratuita para acessar sua leitura completa. Use o mesmo email que usou no pagamento.
+                </p>
+              </div>
+              <Button onClick={() => navigate("/auth?mode=signup&from=checkout")} className="w-full">
+                <UserPlus className="h-4 w-4 mr-2" />
+                Criar minha conta e acessar
+              </Button>
+            </>
+          )}
+
+          {status === "success" && user && (
+            <>
+              <CheckCircle2 className="w-16 h-16 mx-auto text-emerald-500" />
+              <div className="space-y-2">
+                <h1 className="text-xl font-semibold text-emerald-600">{t.success}</h1>
+                <p className="text-muted-foreground text-sm">
+                  {pendingAtivacaoRedirect
+                    ? t.successDescAtivacao
+                    : hasPendingTest
+                      ? t.successDescContinue
                       : t.successDesc}
                 </p>
               </div>
               <Button onClick={handleRedirect} className="w-full">
-                {pendingAtivacaoRedirect 
-                  ? t.goToAtivacao 
-                  : hasPendingTest 
-                    ? t.continueTest 
+                {pendingAtivacaoRedirect
+                  ? t.goToAtivacao
+                  : hasPendingTest
+                    ? t.continueTest
                     : t.goToDashboard}
               </Button>
             </>
           )}
 
-          {status === "already_processed" && (
+          {status === "already_processed" && !user && (
+            <>
+              <CheckCircle2 className="w-16 h-16 mx-auto text-blue-500" />
+              <div className="space-y-2">
+                <h1 className="text-xl font-semibold text-blue-600">{t.already_processed}</h1>
+                <p className="text-muted-foreground text-sm">
+                  {t.alreadyDesc} Acesse sua conta para ver sua leitura.
+                </p>
+              </div>
+              <Button onClick={() => navigate("/auth?from=checkout")} className="w-full">
+                Entrar na minha conta
+              </Button>
+            </>
+          )}
+
+          {status === "already_processed" && user && (
             <>
               <CheckCircle2 className="w-16 h-16 mx-auto text-blue-500" />
               <div className="space-y-2">
@@ -227,10 +258,10 @@ export default function CheckoutSuccess() {
                 <p className="text-muted-foreground text-sm">{t.alreadyDesc}</p>
               </div>
               <Button onClick={handleRedirect} className="w-full">
-                {pendingAtivacaoRedirect 
-                  ? t.goToAtivacao 
-                  : hasPendingTest 
-                    ? t.continueTest 
+                {pendingAtivacaoRedirect
+                  ? t.goToAtivacao
+                  : hasPendingTest
+                    ? t.continueTest
                     : t.goToDashboard}
               </Button>
             </>
