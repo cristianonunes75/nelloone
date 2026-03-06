@@ -71,18 +71,41 @@ serve(async (req) => {
     const productType = session.metadata?.product_type;
     const testIdsJson = session.metadata?.test_ids;
 
+    // For guest checkouts, try to find the user by email
+    let resolvedUserId = userId;
     if (!userId || userId === "guest") {
-      logStep("No user_id in metadata, skipping database update");
-      return new Response(JSON.stringify({ 
-        success: true, 
-        message: "Payment verified but no user to update (guest checkout)",
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
+      const customerEmail = session.customer_email || session.customer_details?.email;
+      if (customerEmail) {
+        logStep("Guest checkout - looking up user by email", { email: customerEmail });
+        const { data: userData } = await supabase.auth.admin.listUsers();
+        const matchedUser = userData?.users?.find(u => u.email?.toLowerCase() === customerEmail.toLowerCase());
+        if (matchedUser) {
+          resolvedUserId = matchedUser.id;
+          logStep("Found user by email", { userId: resolvedUserId });
+        } else {
+          logStep("No user found for email, skipping database update");
+          return new Response(JSON.stringify({
+            success: true,
+            message: "Payment verified but no matching user found yet (guest checkout)",
+          }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        }
+      } else {
+        logStep("No user_id and no email in session, skipping database update");
+        return new Response(JSON.stringify({
+          success: true,
+          message: "Payment verified but no user to update (guest checkout)",
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
     }
+    const userId2 = resolvedUserId;
 
-    logStep("Processing purchase for user", { userId, productType });
+    logStep("Processing purchase for user", { userId: userId2, productType });
 
     // Check if purchase was already processed (idempotency)
     const { data: existingPurchase } = await supabase
@@ -116,7 +139,7 @@ serve(async (req) => {
           journey_started_at: new Date().toISOString(),
           is_founder: true,
         })
-        .eq("id", userId);
+        .eq("id", userId2);
 
       // Get all tests and create purchase records
       const { data: allTests } = await supabase
@@ -129,7 +152,7 @@ serve(async (req) => {
         const pricePerTest = amountPaid / allTests.length;
 
         const purchaseRecords = allTests.map(test => ({
-          user_id: userId,
+          user_id: userId2,
           test_id: test.id,
           price_paid: pricePerTest,
           payment_status: "completed",
@@ -162,7 +185,7 @@ serve(async (req) => {
           journey_started_at: new Date().toISOString(),
           codigo_essencia_unlocked: true,
         })
-        .eq("id", userId);
+        .eq("id", userId2);
 
       // Get all tests and create purchase records
       const { data: allTests } = await supabase
@@ -175,7 +198,7 @@ serve(async (req) => {
         const pricePerTest = amountPaid / allTests.length;
 
         const purchaseRecords = allTests.map(test => ({
-          user_id: userId,
+          user_id: userId2,
           test_id: test.id,
           price_paid: pricePerTest,
           payment_status: "completed",
@@ -204,7 +227,7 @@ serve(async (req) => {
       await supabase
         .from("profiles")
         .update({ codigo_essencia_unlocked: true })
-        .eq("id", userId);
+        .eq("id", userId2);
 
       logStep("Código da Essência unlocked successfully");
 
@@ -215,13 +238,13 @@ serve(async (req) => {
       await supabase
         .from("profiles")
         .update({ ativacao_codigo_unlocked: true })
-        .eq("id", userId);
+        .eq("id", userId2);
 
       // Also record the purchase
       await supabase
         .from("test_purchases")
         .insert({
-          user_id: userId,
+          user_id: userId2,
           test_id: null,
           price_paid: (session.amount_total || 0) / 100,
           payment_status: "completed",
@@ -258,7 +281,7 @@ serve(async (req) => {
           const pricePerTest = amountPaid / tests.length;
 
           const purchaseRecords = tests.map(test => ({
-            user_id: userId,
+            user_id: userId2,
             test_id: test.id,
             price_paid: pricePerTest,
             payment_status: "completed",
@@ -298,7 +321,7 @@ serve(async (req) => {
       const { error: insertError } = await supabase
         .from("test_purchases")
         .insert({
-          user_id: userId,
+          user_id: userId2,
           test_id: firstTest?.id || null,
           price_paid: amountPaid,
           payment_status: "completed",
@@ -324,7 +347,7 @@ serve(async (req) => {
       await supabase
         .from("profiles")
         .update({ has_nello_couple: true })
-        .eq("id", userId);
+        .eq("id", userId2);
 
       logStep("Profile updated with has_nello_couple flag");
 
@@ -340,13 +363,13 @@ serve(async (req) => {
           has_nello_couple: true,
           has_activation_couple: true,
         })
-        .eq("id", userId);
+        .eq("id", userId2);
 
       // Record the purchase
       await supabase
         .from("test_purchases")
         .insert({
-          user_id: userId,
+          user_id: userId2,
           test_id: null,
           price_paid: (session.amount_total || 0) / 100,
           payment_status: "completed",
@@ -371,12 +394,12 @@ serve(async (req) => {
       await supabase
         .from("profiles")
         .update({ has_activation_individual: true })
-        .eq("id", userId);
+        .eq("id", userId2);
 
       await supabase
         .from("test_purchases")
         .insert({
-          user_id: userId,
+          user_id: userId2,
           test_id: null,
           price_paid: (session.amount_total || 0) / 100,
           payment_status: "completed",
@@ -427,7 +450,7 @@ serve(async (req) => {
                 .from("affiliate_referrals")
                 .insert({
                   affiliate_id: affiliateData.id,
-                  referred_user_id: userId,
+                  referred_user_id: userId2,
                   sale_amount: saleAmount,
                   commission_amount: commissionAmount,
                   currency: (session.currency || "brl").toUpperCase(),
@@ -497,7 +520,7 @@ serve(async (req) => {
         action: "FALLBACK_CHECKOUT_VERIFICATION",
         table_name: "test_purchases",
         record_id: userId,
-        user_id: userId,
+        user_id: userId2,
         new_data: {
           session_id: session.id,
           product_type: productType,

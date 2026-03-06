@@ -217,7 +217,10 @@ export default function CheckoutSuccess() {
                   Crie sua conta gratuita para acessar sua leitura completa. Use o mesmo email que usou no pagamento.
                 </p>
               </div>
-              <Button onClick={() => navigate("/auth?mode=signup&from=checkout")} className="w-full">
+              <Button onClick={() => {
+                if (sessionId) sessionStorage.setItem("pendingCheckoutSession", sessionId);
+                navigate("/auth?mode=signup&from=checkout");
+              }} className="w-full">
                 <UserPlus className="h-4 w-4 mr-2" />
                 Criar minha conta e acessar
               </Button>

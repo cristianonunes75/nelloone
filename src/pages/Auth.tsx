@@ -225,15 +225,23 @@ const Auth = () => {
             navigate("/fundadores?autoCheckout=true");
             return;
           }
-          
+
+          // If there's a pending checkout session (guest paid then created account)
+          const pendingSession = sessionStorage.getItem("pendingCheckoutSession");
+          if (pendingSession) {
+            sessionStorage.removeItem("pendingCheckoutSession");
+            navigate(`/checkout/success?session_id=${pendingSession}`);
+            return;
+          }
+
           const { data: rolesData } = await supabase
             .from("user_roles")
             .select("role")
             .eq("user_id", (await supabase.auth.getUser()).data.user?.id);
-          
+
           const roles = (rolesData || []).map((r: any) => r.role);
           const primaryRole = roles.find((r: string) => r === "admin") || "cliente";
-          
+
           if (primaryRole === "admin") {
             navigate("/admin");
           } else {
