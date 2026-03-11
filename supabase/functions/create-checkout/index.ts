@@ -252,6 +252,11 @@ serve(async (req) => {
     Deno.env.get("SUPABASE_ANON_KEY") ?? ""
   );
 
+  const supabaseAdmin = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+  );
+
   try {
     logStep("Function started");
     
@@ -335,18 +340,13 @@ serve(async (req) => {
     // If so, convert this to a Fundadores purchase automatically
     let fundadoresCoupon = null;
     if (couponCode) {
-      const supabaseAdmin = createClient(
-        Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-      );
-      
       const { data: dbCoupon } = await supabaseAdmin
         .from("coupons")
         .select("*")
         .eq("code", couponCode)
         .eq("is_active", true)
         .single();
-      
+
       if (dbCoupon) {
         // Check if it's a fundadores coupon (allowed_product_type = 'fundadores' OR 100% discount)
         const isFundadoresCoupon = dbCoupon.allowed_product_type === "fundadores" || 
@@ -401,15 +401,41 @@ serve(async (req) => {
       }
     }
 
+    // LOAD PRICES FROM DB — makes Gestão de Preços the source of truth
+    // Starts with hardcoded values as fallback, overrides with live DB values
+    const liveBrlPrices: Record<string, string> = { ...BRL_PRICES };
+    const liveUsdPrices: Record<string, string> = { ...USD_PRICES };
+    const liveEurPrices: Record<string, string> = { ...EUR_PRICES };
+    try {
+      const { data: productPrices } = await supabaseAdmin
+        .from("product_prices")
+        .select("product_key, stripe_price_id_brl, stripe_price_id_usd, stripe_price_id_eur")
+        .eq("is_active", true);
+      if (productPrices && productPrices.length > 0) {
+        for (const p of productPrices) {
+          if (p.stripe_price_id_brl) liveBrlPrices[p.product_key] = p.stripe_price_id_brl;
+          if (p.stripe_price_id_usd) liveUsdPrices[p.product_key] = p.stripe_price_id_usd;
+          if (p.stripe_price_id_eur) liveEurPrices[p.product_key] = p.stripe_price_id_eur;
+        }
+        // arquetipos_proposito is an alias for arquetipos
+        if (!liveBrlPrices.arquetipos_proposito) liveBrlPrices.arquetipos_proposito = liveBrlPrices.arquetipos;
+        if (!liveUsdPrices.arquetipos_proposito) liveUsdPrices.arquetipos_proposito = liveUsdPrices.arquetipos;
+        if (!liveEurPrices.arquetipos_proposito) liveEurPrices.arquetipos_proposito = liveEurPrices.arquetipos;
+        logStep("Prices loaded from DB", { count: productPrices.length });
+      }
+    } catch (dbError) {
+      logStep("DB price load failed, using hardcoded fallback", { error: String(dbError) });
+    }
+
     let lineItems: any[] = [];
-    const priceMap = getPriceMap(currency);
+    const priceMap = currency === "usd" ? liveUsdPrices : currency === "eur" ? liveEurPrices : liveBrlPrices;
     
     if (isCodigoEssenciaExpress) {
       // Código da Essência Express - R$99 BRL / $19 USD / €19 EUR upsell from Código Inicial
       const expressPriceIds: Record<string, string> = {
-        brl: "price_1T4nJjDjhZZxZELMvsHEYimS", // R$99
-        usd: "price_1T4nKmDjhZZxZELMKy13VF6R", // $19
-        eur: "price_1T4nLGDjhZZxZELMSEOF1Yjg", // €19
+        brl: liveBrlPrices.codigo_essencia_express || "price_1T4nJjDjhZZxZELMvsHEYimS",
+        usd: liveUsdPrices.codigo_essencia_express || "price_1T4nKmDjhZZxZELMKy13VF6R",
+        eur: liveEurPrices.codigo_essencia_express || "price_1T4nLGDjhZZxZELMSEOF1Yjg",
       };
       
       lineItems = [{
@@ -452,9 +478,9 @@ serve(async (req) => {
     } else if (isAtivacaoCodigo) {
       // Ativação do Código purchase - Use real Stripe Price IDs
       const ativacaoPriceIds: Record<string, string> = {
-        brl: "price_1Sw6EEDjhZZxZELMSmPNECig", // R$197
-        usd: "price_1Sw6F6DjhZZxZELMfBW3pn5q", // $57
-        eur: "price_1Sw6FiDjhZZxZELMXDH1ACdx", // €47
+        brl: liveBrlPrices.ativacao_codigo || "price_1Sw6EEDjhZZxZELMSmPNECig",
+        usd: liveUsdPrices.ativacao_codigo || "price_1Sw6F6DjhZZxZELMfBW3pn5q",
+        eur: liveEurPrices.ativacao_codigo || "price_1Sw6FiDjhZZxZELMXDH1ACdx",
       };
       
       lineItems = [{
@@ -465,9 +491,9 @@ serve(async (req) => {
     } else if (isActivationIndividual) {
       // Activation Individual (Professional Direction) purchase - Use real Stripe Price IDs
       const activationPriceIds: Record<string, string> = {
-        brl: "price_1SxRhHDjhZZxZELMuoj7N1CN", // R$197
-        usd: "price_1SxRhuDjhZZxZELMsAYBZqUP", // $57
-        eur: "price_1SxRjKDjhZZxZELMAqWHQKbm", // €47
+        brl: liveBrlPrices.activation_individual || "price_1SxRhHDjhZZxZELMuoj7N1CN",
+        usd: liveUsdPrices.activation_individual || "price_1SxRhuDjhZZxZELMsAYBZqUP",
+        eur: liveEurPrices.activation_individual || "price_1SxRjKDjhZZxZELMAqWHQKbm",
       };
       
       lineItems = [{
@@ -478,9 +504,9 @@ serve(async (req) => {
     } else if (isIdentityCouplePremium) {
       // Identity Couple Premium - Mapa Definitivo do Casal (High Ticket)
       const identityCouplePriceIds: Record<string, string> = {
-        brl: "price_1StyMcDjhZZxZELM5IVwqfhV", // R$997
-        usd: "price_1SvfdXDjhZZxZELMaNDfVXox", // $297
-        eur: "price_1SvfdoDjhZZxZELMLaONPhR5", // €247
+        brl: liveBrlPrices.identity_couple_premium || "price_1StyMcDjhZZxZELM5IVwqfhV",
+        usd: liveUsdPrices.identity_couple_premium || "price_1SvfdXDjhZZxZELMaNDfVXox",
+        eur: liveEurPrices.identity_couple_premium || "price_1SvfdoDjhZZxZELMLaONPhR5",
       };
       
       lineItems = [{
@@ -500,7 +526,7 @@ serve(async (req) => {
           status: 400,
         });
       }
-      const fundadoresPriceId = "price_1ScWglDjhZZxZELM3tQocxgu";
+      const fundadoresPriceId = liveBrlPrices.fundadores || "price_1ScWglDjhZZxZELM3tQocxgu";
       
       lineItems = [{
         price: fundadoresPriceId,
@@ -674,11 +700,6 @@ serve(async (req) => {
     // Check for user-provided coupon code (from database)
     // If fundadoresCoupon was already loaded, use it instead of fetching again
     if (couponCode) {
-      const supabaseAdmin = createClient(
-        Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-      );
-      
       // Use already fetched coupon if available, otherwise fetch
       let dbCoupon = fundadoresCoupon;
       if (!dbCoupon) {
