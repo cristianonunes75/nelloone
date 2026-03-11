@@ -250,21 +250,21 @@ export default function ConvitePessoal() {
       {/* O PEDIDO */}
       <Section className="bg-stone-900 text-white">
         <div className="max-w-3xl mx-auto px-5 py-20 space-y-8">
-          <p className="text-amber-300 font-semibold text-sm uppercase tracking-wider">Por que estou te convidando</p>
+          <p className="text-amber-300 font-semibold text-sm uppercase tracking-wider">Uma conversa franca</p>
           <h2 className="font-serif text-3xl md:text-4xl font-bold leading-tight">
-            Porque acredito que você merece se conhecer de verdade.
+            Não tem frase de vendas aqui.
           </h2>
           <p className="text-white/80 leading-relaxed text-lg">
-            Não tem frase de vendas aqui. Não tem urgência fabricada. Tem um Cristiano que passou décadas buscando respostas sobre si mesmo, que encontrou um caminho, e que agora quer compartilhar esse caminho com as pessoas que ele respeita.
+            Tem um Cristiano que passou décadas buscando respostas sobre si mesmo, que encontrou um caminho, e que agora quer compartilhar esse caminho com as pessoas que ele respeita.
+          </p>
+          <p className="text-white/80 leading-relaxed text-lg">
+            Quando construí isso, pensei em cada pessoa que já me disse "eu não me conheço direito" ou "não entendo por que ajo assim." Talvez você já tenha dito isso alguma vez. Talvez esteja sentindo isso agora.
           </p>
           <div className="border-l-2 border-amber-500 pl-5">
             <p className="font-serif text-xl text-white leading-relaxed italic">
-              Quando construí isso, pensei em cada pessoa que já me disse "eu não me conheço direito" ou "não entendo por que ajo assim." Pensei em você.
+              Se algo nessa história ressoou, esse convite é para você. Sem pressão. Com carinho.
             </p>
           </div>
-          <p className="text-white/80 leading-relaxed text-lg">
-            Se algo nessa história ressoou, se você se reconheceu em alguma parte do caminho, então esse convite é para você. Sem pressão. Com carinho.
-          </p>
         </div>
       </Section>
 
@@ -491,7 +491,7 @@ export default function ConvitePessoal() {
           </Button>
 
           <p className="text-white/40 text-xs">
-            Pagamento seguro via Stripe · Cartão de crédito ou débito · Acesso imediato
+            Pagamento seguro via Stripe · Cartão de crédito · Acesso imediato
           </p>
 
           <p className="font-serif text-white/50 text-sm italic pt-4 leading-relaxed">
