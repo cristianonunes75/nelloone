@@ -3,8 +3,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { useDiscernirAuth } from '../contexts/DiscernirAuthContext';
 import { useIdentityEssencial } from '../hooks/useIdentityEssencial';
 import { useDiscernirPilotMode } from '../hooks/useDiscernirPilotMode';
+import { useDiscernimentoEspiritual } from '../hooks/useDiscernimentoEspiritual';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Church, ArrowRight } from 'lucide-react';
+import { Loader2, Church, ArrowRight, Cross } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ export function DiscernirDashboard() {
   } = useDiscernirAuth();
   const { status: essencialStatus, isLoading: essencialLoading, isJourneyComplete } = useIdentityEssencial();
   const isPilotMode = useDiscernirPilotMode();
+  const { hasCodigoEssencia, discernimento } = useDiscernimentoEspiritual();
 
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [parishName, setParishName] = useState<string | null>(null);
@@ -165,6 +167,38 @@ export function DiscernirDashboard() {
             </CardContent>
           </Card>
 
+          {/* Card Discernimento Espiritual — modo piloto */}
+          {hasCodigoEssencia && (
+            <Card className="border-amber-300/50 bg-gradient-to-br from-amber-50/80 to-orange-50/40">
+              <CardContent className="p-8 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-full bg-amber-100 p-3">
+                    <Cross className="h-6 w-6 text-amber-700" />
+                  </div>
+                  <div>
+                    <h2 className="font-serif text-lg font-semibold text-foreground">
+                      Discernimento Espiritual
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Guia pessoal para direção espiritual
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {discernimento
+                    ? 'Seu Perfil de Discernimento Espiritual está pronto. Leve-o para sua próxima direção espiritual.'
+                    : 'Gere um resumo espiritual baseado no seu Código da Essência para apoiar o discernimento da sua vocação, tensões interiores e caminhos de crescimento.'}
+                </p>
+                <Link to="/discernimento-espiritual" className="block">
+                  <Button className="w-full gap-2 bg-amber-600 hover:bg-amber-700">
+                    {discernimento ? 'Ver Perfil' : 'Gerar Discernimento Espiritual'}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+
           <PersonalSpaceFooter />
         </div>
       </div>
@@ -216,6 +250,8 @@ export function DiscernirDashboard() {
           essencialCompletionSource={essencialStatus?.completion_source}
           hasConjugalConsent={hasConjugalConsent}
           hasPriestAccessConsent={hasPriestAccessConsent}
+          hasCodigoEssencia={hasCodigoEssencia}
+          hasDiscernimento={!!discernimento}
         />
 
         {/* LGPD Footer */}

@@ -2,14 +2,15 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  FileHeart, 
-  Compass, 
-  Heart, 
+import {
+  FileHeart,
+  Compass,
+  Heart,
   ArrowRight,
   CheckCircle2,
   AlertCircle,
-  Loader2
+  Loader2,
+  Cross,
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
@@ -17,15 +18,19 @@ interface FunctionalCardsProps {
   // Apoio de Escuta
   hasIndividualConsent: boolean;
   isJourneyComplete: boolean;
-  
+
   // Experiência de Autoconhecimento
   essencialLoading: boolean;
   essencialProgress: number;
   essencialCompletionSource?: string | null;
-  
+
   // Consentimentos
   hasConjugalConsent: boolean;
   hasPriestAccessConsent: boolean;
+
+  // Discernimento Espiritual
+  hasCodigoEssencia?: boolean;
+  hasDiscernimento?: boolean;
 }
 
 export function FunctionalCards({
@@ -35,7 +40,9 @@ export function FunctionalCards({
   essencialProgress,
   essencialCompletionSource,
   hasConjugalConsent,
-  hasPriestAccessConsent
+  hasPriestAccessConsent,
+  hasCodigoEssencia = false,
+  hasDiscernimento = false,
 }: FunctionalCardsProps) {
   return (
     <div className="grid gap-5">
@@ -120,6 +127,43 @@ export function FunctionalCards({
           )}
         </CardContent>
       </Card>
+
+      {/* Discernimento Espiritual — aparece apenas se tiver Código da Essência */}
+      {hasCodigoEssencia && (
+        <Card className="border-amber-300/50 bg-gradient-to-br from-amber-50/80 to-orange-50/40">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2 font-serif text-amber-900">
+              <Cross className="h-5 w-5 text-amber-600" />
+              Discernimento Espiritual
+            </CardTitle>
+            <CardDescription className="text-sm text-amber-700/70">
+              Guia pessoal para conversa com diretor espiritual
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {hasDiscernimento && (
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                <span className="text-green-700 font-medium text-sm">Perfil gerado</span>
+              </div>
+            )}
+            <p className="text-xs text-amber-700 leading-relaxed">
+              {hasDiscernimento
+                ? 'Seu Perfil de Discernimento Espiritual está pronto. Leve-o para sua próxima direção espiritual.'
+                : 'Gere um resumo espiritual baseado no seu Código da Essência para apoiar o discernimento da sua vocação.'}
+            </p>
+            <Link to="/discernimento-espiritual">
+              <Button
+                size="sm"
+                className="w-full bg-amber-600 hover:bg-amber-700 text-sm gap-2"
+              >
+                {hasDiscernimento ? 'Ver Perfil' : 'Gerar Discernimento Espiritual'}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Consentimentos */}
       <Card className="border-amber-200/50 bg-white/80">

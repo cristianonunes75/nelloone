@@ -14,6 +14,7 @@ import { DiscernirPriestInvites } from './pages/priest/DiscernirPriestInvites';
 import { DiscernirProtectedRoute } from './components/DiscernirProtectedRoute';
 import { IdentityEssencialJourney } from './pages/IdentityEssencialJourney';
 import { DiscernirPerfilServico } from './pages/DiscernirPerfilServico';
+import { DiscernirDiscernimento } from './pages/DiscernirDiscernimento';
 import { useDiscernirPilotMode } from './hooks/useDiscernirPilotMode';
 import { DiscernirPilotStandby } from './components/DiscernirPilotStandby';
 
@@ -50,13 +51,21 @@ export default function DiscernirApp() {
               </DiscernirProtectedRoute>
             } 
           />
-          <Route 
-            path="/perfil-servico" 
+          <Route
+            path="/perfil-servico"
             element={
               <DiscernirProtectedRoute>
                 <DiscernirPerfilServico />
               </DiscernirProtectedRoute>
-            } 
+            }
+          />
+          <Route
+            path="/discernimento-espiritual"
+            element={
+              <DiscernirProtectedRoute>
+                <DiscernirDiscernimento />
+              </DiscernirProtectedRoute>
+            }
           />
 
           {/* Routes behind pilot gate */}
