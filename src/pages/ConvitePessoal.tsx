@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
@@ -104,6 +104,19 @@ export default function ConvitePessoal() {
     },
     staleTime: 1000 * 60 * 5,
   });
+
+  // Auto-dispara checkout se voltou do login com intenção salva
+  useEffect(() => {
+    const intent = sessionStorage.getItem("convite_checkout_intent");
+    if (!intent) return;
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        sessionStorage.removeItem("convite_checkout_intent");
+        handleCheckout();
+      }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCheckout = async () => {
     setLoading(true);

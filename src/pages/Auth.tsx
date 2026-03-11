@@ -73,6 +73,8 @@ const Auth = () => {
   const redirectParam = searchParams.get("redirect");
   const redirectToPurchase = redirectParam === "purchase";
   const redirectToFundadores = redirectParam === "/fundadores" || redirectParam === "fundadores";
+  // Generic path redirect (e.g. /convite, /convite#comecar)
+  const redirectToPath = redirectParam && redirectParam.startsWith("/") && !redirectToFundadores ? redirectParam : null;
 
   // Helper to get localized path
   const getLocalizedPath = (path: string) => {
@@ -153,6 +155,8 @@ const Auth = () => {
   if (user) {
     if (redirectToFundadores) {
       navigate("/fundadores?autoCheckout=true");
+    } else if (redirectToPath) {
+      navigate(redirectToPath);
     } else {
       navigate(getLocalizedPath("/cliente"));
     }
@@ -223,6 +227,12 @@ const Auth = () => {
           // If coming from Fundadores, redirect there with autoCheckout
           if (redirectToFundadores) {
             navigate("/fundadores?autoCheckout=true");
+            return;
+          }
+
+          // Generic path redirect (e.g. /convite)
+          if (redirectToPath) {
+            navigate(redirectToPath);
             return;
           }
 
