@@ -335,6 +335,18 @@ export default function ConvitePessoal() {
         <p className="text-stone-600 leading-relaxed">
           O resultado é uma <strong>leitura integrada de como você está funcionando neste momento da sua vida</strong>: seus talentos naturais, padrões de decisão, tensões internas e riscos emocionais. Não um teste. Um mapa.
         </p>
+
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex gap-4 items-start">
+          <div className="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <Star className="h-4 w-4 text-amber-700" />
+          </div>
+          <div>
+            <p className="font-semibold text-amber-900 mb-1">Uma dica importante</p>
+            <p className="text-amber-800 text-sm leading-relaxed">
+              Recomendo que você faça todos os testes no mesmo dia, de preferência num momento tranquilo. O relatório vai retratar você do jeito que você está hoje, e quanto mais presente você estiver nas respostas, mais fiel será o resultado.
+            </p>
+          </div>
+        </div>
       </Section>
 
       {/* CÓDIGO DO CASAL */}
