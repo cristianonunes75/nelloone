@@ -190,13 +190,13 @@ export function TestProgressFeedback({
     <>
       {/* Block indicator - shows current block */}
       <div className="fixed top-4 left-4 z-30">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-card/90 backdrop-blur-sm border border-border/50 rounded-full text-xs text-muted-foreground">
+        <div className="flex items-center gap-1.5 px-2 py-1 bg-card/90 backdrop-blur-sm border border-border/50 rounded-full text-[10px] text-muted-foreground">
           <span className="font-medium">
             {lang === 'en' ? `Block ${block}/${totalBlocks}` : `Bloco ${block}/${totalBlocks}`}
           </span>
           <span className="text-muted-foreground/60">•</span>
-          <span className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
+          <span className="flex items-center gap-0.5">
+            <Clock className="h-2.5 w-2.5" />
             {lang === 'en' ? `${remaining} left` : `${remaining} restantes`}
           </span>
         </div>
@@ -224,7 +224,7 @@ export function TestProgressFeedback({
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary/10 to-accent/30 border border-primary/20 shadow-lg rounded-full"
+            className="fixed top-16 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary/10 to-accent/30 border border-primary/20 shadow-lg rounded-full"
           >
             <Star className="h-4 w-4 text-primary" />
             <span className="text-sm font-light text-foreground">{contextualMessage}</span>
@@ -239,7 +239,7 @@ export function TestProgressFeedback({
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-4 py-2.5 bg-card border border-border shadow-lg rounded-full"
+            className="fixed top-16 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-4 py-2.5 bg-card border border-border shadow-lg rounded-full"
           >
             <Sparkles className="h-4 w-4 text-primary" />
             <span className="text-sm font-light text-foreground">{milestoneMessage}</span>
