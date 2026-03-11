@@ -47,7 +47,7 @@ const SaintQuote = ({ text, author }: { text: string; author: string }) => (
     <Quote className="h-5 w-5 text-amber-400 flex-shrink-0 mt-1" />
     <div>
       <p className="font-serif italic text-stone-600 leading-relaxed">{text}</p>
-      <p className="text-xs text-amber-700 mt-1 font-semibold">— {author}</p>
+      <p className="text-xs text-amber-700 mt-1 font-semibold">{author}</p>
     </div>
   </div>
 );
@@ -192,7 +192,7 @@ export default function ConvitePessoal() {
             Mas antes de continuar, preciso te fazer uma pergunta.
           </p>
           <p className="text-stone-600 leading-relaxed text-lg">
-            Você já acordou com a sensação de que está no lugar errado, fazendo a coisa certa do jeito errado? Que tem muito dentro de você — talentos, vontade, fé — mas que nada parece se encaixar direito?
+            Você já acordou com a sensação de que está no lugar errado, fazendo a coisa certa do jeito errado? Que tem muito dentro de você, talentos, vontade, fé, mas que nada parece se encaixar direito?
           </p>
           <p className="text-stone-600 leading-relaxed">
             Que às vezes você compara a sua história com a dos outros e se pergunta: <em>"Mas o que é que há comigo?"</em>
@@ -243,7 +243,7 @@ export default function ConvitePessoal() {
         </div>
 
         <p className="text-stone-600 leading-relaxed text-lg">
-          Então passei os últimos <strong>8 meses</strong> construindo uma ferramenta. Com oração, com estudo, com fé — e com tudo que aprendi sobre o funcionamento humano em mais de três décadas de vida intensa.
+          Então passei os últimos <strong>8 meses</strong> construindo uma ferramenta. Com oração, com estudo, com fé. Com tudo que aprendi sobre o funcionamento humano em mais de três décadas de vida intensa.
         </p>
       </Section>
 
@@ -262,11 +262,11 @@ export default function ConvitePessoal() {
           </p>
           <div className="border-l-2 border-amber-500 pl-5 space-y-3">
             <p className="font-serif text-xl text-white leading-relaxed italic">
-              Não estou te pedindo para me fazer um favor. Estou te convidando a investir em algo real — em você mesmo — e, ao fazer isso, ajudar um amigo que acredita nessa obra.
+              Não estou te pedindo para me fazer um favor. Estou te convidando a investir em você mesmo. E, ao fazer isso, ajudar um amigo que acredita de verdade nessa obra.
             </p>
           </div>
           <p className="text-white/80 leading-relaxed">
-            Se depois de ler tudo isso você sentir que não é para você, tudo bem. Mas se alguma coisa aqui tocou, se você se reconheceu em alguma parte dessa história — então talvez esse seja o momento.
+            Se depois de ler tudo isso você sentir que não é para você, tudo bem. Mas se alguma coisa aqui tocou, se você se reconheceu em alguma parte dessa história, então talvez esse seja o momento.
           </p>
           <p className="font-serif text-xl text-amber-300 font-medium">
             Não porque eu preciso. Mas porque você merece se conhecer.
@@ -309,7 +309,7 @@ export default function ConvitePessoal() {
             Como você pode ser livre se não conhece a verdade sobre como Deus te desenhou? Como pode servir ao Senhor com seus talentos se você vive fugindo deles ou se sentindo culpado por ter tantos?
           </p>
           <p className="font-serif text-xl text-stone-700">
-            O sistema <strong>IDENTITY - NELLO ONE</strong> nasceu para ser esse pão — uma ferramenta inspirada por Deus para ajudar mais pessoas a serem <strong>DELE</strong>.
+            O sistema <strong>IDENTITY - NELLO ONE</strong> nasceu para ser esse pão. Uma ferramenta inspirada por Deus para ajudar mais pessoas a serem <strong>DELE</strong>.
           </p>
         </div>
       </Section>
@@ -330,11 +330,11 @@ export default function ConvitePessoal() {
         <div className="grid md:grid-cols-2 gap-4 text-sm">
           <div className="bg-white border border-amber-100 rounded-xl p-4">
             <p className="font-semibold text-stone-700 mb-1">NELLO</p>
-            <p className="text-stone-500">Nele — O reconhecimento de que sua identidade está guardada no coração do Pai. É o Elo que nos liga à nossa origem divina.</p>
+            <p className="text-stone-500">Nele. O reconhecimento de que sua identidade está guardada no coração do Pai. É o Elo que nos liga à nossa origem divina.</p>
           </div>
           <div className="bg-white border border-amber-100 rounded-xl p-4">
             <p className="font-semibold text-stone-700 mb-1">ONE</p>
-            <p className="text-stone-500">Único — A prova de que Deus não faz cópias. Ele só faz o "Um". Você é o projeto original que Ele planejou.</p>
+            <p className="text-stone-500">Único. A prova de que Deus não faz cópias. Ele só faz o "Um". Você é o projeto original que Ele planejou.</p>
           </div>
         </div>
 
@@ -355,16 +355,16 @@ export default function ConvitePessoal() {
             <span className="text-rose-600">Onde a Empatia Floresce</span>
           </h2>
           <p className="text-stone-600 leading-relaxed text-lg">
-            No ECC (Encontro de Casais com Cristo), onde tenho a alegria de dar palestras ao lado da minha esposa Lisa, percebo que a maioria dos conflitos não nasce da falta de amor — mas da <strong>ignorância sobre o funcionamento do outro</strong>.
+            No ECC (Encontro de Casais com Cristo), onde tenho a alegria de dar palestras ao lado da minha esposa Lisa, percebo que a maioria dos conflitos não nasce da falta de amor. Nasce da <strong>ignorância sobre o funcionamento do outro</strong>.
           </p>
           <div className="bg-white rounded-2xl p-6 border border-rose-100 shadow-sm">
             <p className="font-serif text-lg text-stone-700 leading-relaxed italic">
-              "Quando você conhece o código do outro, a empatia, a tolerância e o amor aumentam. Você entende que o silêncio dele não é desprezo, ou que a agitação dela não é cobrança — são apenas formas diferentes de processar a vida."
+              "Quando você conhece o código do outro, a empatia, a tolerância e o amor aumentam. Você entende que o silêncio dele não é desprezo, e que a agitação dela não é cobrança. São apenas formas diferentes de processar a vida."
             </p>
-            <p className="text-sm text-rose-600 mt-3 font-medium">— Cristiano Nunes</p>
+            <p className="text-sm text-rose-600 mt-3 font-medium">Cristiano Nunes</p>
           </div>
           <p className="text-stone-600 leading-relaxed">
-            Também ideal para <strong>pais e filhos</strong> — entender o código do seu filho para direcioná-lo — e para <strong>sócios e colaboradores</strong> — saber que tipo de pessoa combina com você em uma futura sociedade.
+            Também ideal para <strong>pais e filhos</strong> que querem entender o código um do outro, e para <strong>sócios e colaboradores</strong> que querem saber se combinam antes de dividir um projeto.
           </p>
         </div>
       </Section>
@@ -490,14 +490,14 @@ export default function ConvitePessoal() {
 
           <p className="font-serif text-white/50 text-sm italic pt-4 leading-relaxed">
             "Senhor, que eu me conheça para que eu Te conheça."<br />
-            <span className="text-amber-400/60 text-xs not-italic">— Santo Agostinho</span>
+            <span className="text-amber-400/60 text-xs not-italic">Santo Agostinho</span>
           </p>
         </div>
       </Section>
 
       {/* FOOTER */}
       <div className="text-center py-10 text-stone-400 text-sm px-5 space-y-3">
-        <p>© {new Date().getFullYear()} Nello One — Identity</p>
+        <p>© {new Date().getFullYear()} Nello One · Identity</p>
         <p className="text-xs">Desenvolvido com fé e propósito por Cristiano Nunes</p>
         <p className="text-xs text-stone-300 max-w-xl mx-auto leading-relaxed">
           Este relatório é uma ferramenta de autoconhecimento e não substitui diagnóstico clínico ou acompanhamento profissional. Use-o como um mapa, não como uma sentença.
