@@ -185,6 +185,22 @@ export default function ConvitePessoal() {
         <p className="font-serif text-xl text-stone-700 leading-relaxed">
           Minha vida sempre foi uma <strong>explosão de intensidades</strong>. E por muito tempo, eu penei para entender que podia conviver com todos esses talentos <em>sem culpa</em>.
         </p>
+
+        {/* ESPELHO — dor do leitor */}
+        <div className="border-t border-stone-200 pt-8 space-y-4">
+          <p className="font-serif text-xl text-stone-700 leading-relaxed">
+            Mas antes de continuar, preciso te fazer uma pergunta.
+          </p>
+          <p className="text-stone-600 leading-relaxed text-lg">
+            Você já acordou com a sensação de que está no lugar errado, fazendo a coisa certa do jeito errado? Que tem muito dentro de você — talentos, vontade, fé — mas que nada parece se encaixar direito?
+          </p>
+          <p className="text-stone-600 leading-relaxed">
+            Que às vezes você compara a sua história com a dos outros e se pergunta: <em>"Mas o que é que há comigo?"</em>
+          </p>
+          <p className="font-serif text-xl text-amber-800 leading-relaxed font-medium">
+            Se você conhece essa sensação, então você sabe exatamente o que eu vivi por décadas. E é por isso que estou te escrevendo.
+          </p>
+        </div>
       </Section>
 
       {/* PERGUNTA SILENCIOSA */}
@@ -223,6 +239,37 @@ export default function ConvitePessoal() {
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
           <p className="font-serif text-xl text-amber-900 leading-relaxed">
             E foi aí que Deus colocou um desejo ardente no meu coração: <strong>ninguém mais deveria levar 50 anos para descobrir quem é e como funciona.</strong>
+          </p>
+        </div>
+
+        <p className="text-stone-600 leading-relaxed text-lg">
+          Então passei os últimos <strong>8 meses</strong> construindo uma ferramenta. Com oração, com estudo, com fé — e com tudo que aprendi sobre o funcionamento humano em mais de três décadas de vida intensa.
+        </p>
+      </Section>
+
+      {/* O PEDIDO */}
+      <Section className="bg-stone-900 text-white">
+        <div className="max-w-3xl mx-auto px-5 py-20 space-y-8">
+          <p className="text-amber-300 font-semibold text-sm uppercase tracking-wider">Uma conversa franca</p>
+          <h2 className="font-serif text-3xl md:text-4xl font-bold leading-tight">
+            Eu poderia escrever um texto cheio de gatilhos e urgências. Não vou fazer isso.
+          </h2>
+          <p className="text-white/80 leading-relaxed text-lg">
+            Você me conhece. Sabe que eu não sou esse tipo de pessoa. Então vou ser direto como a gente costuma ser quando está falando com um amigo de verdade.
+          </p>
+          <p className="text-white/80 leading-relaxed text-lg">
+            Estou em um momento difícil financeiramente. Não vou esconder isso. Coloquei minha energia, meu tempo e o pouco que tinha de recursos para construir algo que acredito que vai mudar a vida de quem usar. E agora estou aqui, com o coração na mão, te pedindo que seja um dos primeiros.
+          </p>
+          <div className="border-l-2 border-amber-500 pl-5 space-y-3">
+            <p className="font-serif text-xl text-white leading-relaxed italic">
+              Não estou te pedindo para me fazer um favor. Estou te convidando a investir em algo real — em você mesmo — e, ao fazer isso, ajudar um amigo que acredita nessa obra.
+            </p>
+          </div>
+          <p className="text-white/80 leading-relaxed">
+            Se depois de ler tudo isso você sentir que não é para você, tudo bem. Mas se alguma coisa aqui tocou, se você se reconheceu em alguma parte dessa história — então talvez esse seja o momento.
+          </p>
+          <p className="font-serif text-xl text-amber-300 font-medium">
+            Não porque eu preciso. Mas porque você merece se conhecer.
           </p>
         </div>
       </Section>
@@ -292,12 +339,8 @@ export default function ConvitePessoal() {
         </div>
 
         <p className="text-stone-600 leading-relaxed">
-          Dediquei os últimos <strong>8 meses</strong> a treinar e desenvolver um sistema que integra tudo o que estudei sobre o funcionamento humano com o poder da Inteligência Artificial. O resultado é uma <strong>leitura integrada de como você está funcionando neste momento da sua vida</strong>: seus talentos naturais, padrões de decisão, tensões internas e riscos emocionais.
+          O resultado é uma <strong>leitura integrada de como você está funcionando neste momento da sua vida</strong>: seus talentos naturais, padrões de decisão, tensões internas e riscos emocionais. Não um teste. Um mapa.
         </p>
-
-        <div className="bg-stone-50 border border-stone-200 rounded-2xl p-5 text-sm text-stone-500 italic leading-relaxed">
-          <strong className="text-stone-700 not-italic">Lembrete humano:</strong> Este relatório reflete as respostas que você ofereceu com a verdade do seu coração. O ser humano é um todo composto de corpo, mente e espírito. Use este diagnóstico como uma ferramenta de autoconhecimento — não como uma sentença definitiva. O Código da Essência não substitui diagnóstico clínico. Nosso objetivo é que você tenha a fundamentação necessária para buscar ajuda profissional especializada.
-        </div>
       </Section>
 
       {/* CÓDIGO DO CASAL */}
@@ -355,9 +398,12 @@ export default function ConvitePessoal() {
       <Section className="bg-amber-950 text-white" id="comecar">
         <div className="max-w-2xl mx-auto px-5 py-20 text-center space-y-10">
           <h2 className="font-serif text-3xl md:text-4xl font-bold leading-tight">
-            Comece sua jornada agora
+            Se você chegou até aqui,<br />
+            <span className="text-amber-300">já sente que é para você.</span>
           </h2>
-          <p className="text-white/70 text-lg">A vida necessita de pausas. Esta é a sua.</p>
+          <p className="text-white/70 text-lg leading-relaxed">
+            Confie nesse sentimento. Ele não chegou até aqui por acaso.
+          </p>
 
           {/* Produto 1 */}
           <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-left space-y-4">
@@ -434,20 +480,28 @@ export default function ConvitePessoal() {
             className="w-full bg-amber-500 hover:bg-amber-400 text-white font-bold py-5 rounded-full text-lg shadow-xl hover:shadow-amber-500/30 transition-all duration-300 disabled:opacity-60"
           >
             {loading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
-            {loading ? "Aguarde..." : "Finalizar meu pedido"}
+            {loading ? "Aguarde..." : "Quero conhecer meu Código da Essência"}
             {!loading && <ArrowRight className="ml-2 h-5 w-5" />}
           </Button>
 
           <p className="text-white/40 text-xs">
             Pagamento seguro via Stripe · Cartão de crédito ou débito · Acesso imediato
           </p>
+
+          <p className="font-serif text-white/50 text-sm italic pt-4 leading-relaxed">
+            "Senhor, que eu me conheça para que eu Te conheça."<br />
+            <span className="text-amber-400/60 text-xs not-italic">— Santo Agostinho</span>
+          </p>
         </div>
       </Section>
 
-      {/* FOOTER SIMPLES */}
-      <div className="text-center py-10 text-stone-400 text-sm px-5">
+      {/* FOOTER */}
+      <div className="text-center py-10 text-stone-400 text-sm px-5 space-y-3">
         <p>© {new Date().getFullYear()} Nello One — Identity</p>
-        <p className="mt-1 text-xs">Desenvolvido com fé e propósito por Cristiano Nunes</p>
+        <p className="text-xs">Desenvolvido com fé e propósito por Cristiano Nunes</p>
+        <p className="text-xs text-stone-300 max-w-xl mx-auto leading-relaxed">
+          Este relatório é uma ferramenta de autoconhecimento e não substitui diagnóstico clínico ou acompanhamento profissional. Use-o como um mapa, não como uma sentença.
+        </p>
       </div>
     </div>
   );
