@@ -84,55 +84,46 @@ ${contextText || "Pessoa em busca de discernimento espiritual"}
 Retorne APENAS JSON válido sem markdown:
 {"apresentacao":"texto 2-3 frases sobre a pessoa","tendencias_personalidade":["item1","item2","item3"],"tensoes_interiores":["item1","item2","item3"],"riscos_espirituais":["item1","item2","item3"],"potenciais_vocacao":["item1","item2","item3"],"perguntas_direcao":["p1","p2","p3","p4","p5"]}`;
 
-    const geminiKey = Deno.env.get("GEMINI_API_KEY");
-    console.log(`[DISC] geminiKey present: ${!!geminiKey}, length: ${geminiKey?.length}`);
+    // 5. Chamar IA via Lovable Gateway
+    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+    console.log(`[DISC] lovableApiKey present: ${!!lovableApiKey}`);
+    console.log(`[DISC] contextText length: ${contextText.length}`);
 
     let aiResponse: any = null;
 
-    if (geminiKey) {
-      for (const model of ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro"]) {
-        if (aiResponse) break;
-        try {
-          console.log(`[DISC] Trying model: ${model}`);
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 45000);
-          const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.7, maxOutputTokens: 1500 },
-              }),
-              signal: controller.signal,
-            }
-          );
-          clearTimeout(timeoutId);
-          console.log(`[DISC] ${model} HTTP status: ${res.status}`);
-          const geminiData = await res.json();
-          if (geminiData.error) {
-            console.error(`[DISC] ${model} API error: ${JSON.stringify(geminiData.error)}`);
-            continue;
-          }
-          const text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-          console.log(`[DISC] ${model} text length: ${text.length}, preview: "${text.slice(0, 100)}"`);
-          const jsonMatch = text.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            aiResponse = JSON.parse(jsonMatch[0]);
-            console.log(`[DISC] Parsed OK, keys: ${Object.keys(aiResponse).join(", ")}`);
-          } else {
-            console.error(`[DISC] ${model} no JSON found in: "${text.slice(0, 200)}"`);
-          }
-        } catch (e: any) {
-          console.error(`[DISC] ${model} exception: ${e.message || String(e)}`);
-        }
+    try {
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${lovableApiKey}`,
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.0-flash",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.7,
+          max_tokens: 1500,
+          response_format: { type: "json_object" },
+        }),
+      });
+
+      console.log(`[DISC] gateway status: ${res.status}`);
+      const data = await res.json();
+      if (data.error) {
+        console.error(`[DISC] gateway error:`, JSON.stringify(data.error));
+      } else {
+        const text = data?.choices?.[0]?.message?.content || "{}";
+        console.log(`[DISC] response text length: ${text.length}`);
+        aiResponse = JSON.parse(text);
+        console.log(`[DISC] parsed keys: ${Object.keys(aiResponse).join(", ")}`);
       }
+    } catch (e: any) {
+      console.error(`[DISC] gateway exception: ${e.message || e}`);
     }
 
     if (!aiResponse) {
-      console.error(`[DISC] All models failed. geminiKey: ${!!geminiKey}`);
-      return new Response(JSON.stringify({ error: "Erro ao gerar relatório. Verifique os logs." }), {
+      console.error("[DISC] IA falhou.");
+      return new Response(JSON.stringify({ error: "Erro ao gerar relatório. Tente novamente." }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
