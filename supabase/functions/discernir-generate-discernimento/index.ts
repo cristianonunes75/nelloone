@@ -89,8 +89,8 @@ ${contextText}
 TESTES:
 ${testsContext}
 
-Retorne APENAS JSON válido:
-{"apresentacao":"texto 2-3 frases","tendencias_personalidade":["item1","item2","item3"],"tensoes_interiores":["item1","item2","item3"],"riscos_espirituais":["item1","item2","item3"],"potenciais_vocacao":["item1","item2","item3"],"perguntas_direcao":["p1","p2","p3","p4","p5"]}`;
+Retorne APENAS este JSON sem nenhum texto adicional:
+{"apresentacao":"2-3 frases sobre ${userName}","tendencias_personalidade":["tendencia1","tendencia2","tendencia3"],"tensoes_interiores":["tensao1","tensao2","tensao3"],"riscos_espirituais":["risco1","risco2","risco3"],"potenciais_vocacao":["potencial1","potencial2","potencial3"],"perguntas_direcao":["pergunta1","pergunta2","pergunta3","pergunta4","pergunta5"]}`;
 
     // 5. Chamar Gemini via OpenAI-compatible endpoint
     const geminiApiKey = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("OPENAI_API_KEY");
