@@ -137,15 +137,11 @@ export default function ConvitePessoal() {
     <div className="min-h-screen bg-[#FAF8F5] text-stone-800">
 
       {/* HERO */}
-      <div className="relative min-h-[92vh] flex flex-col items-center justify-center text-center px-5 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-950/75 via-stone-900/65 to-amber-950/85 z-0" />
-        <div
-          className="absolute inset-0 z-[-1] bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('/images/cristiano-nunes.png')",
-            backgroundPosition: "center top",
-          }}
-        />
+      <div
+        className="relative min-h-[92vh] flex flex-col items-center justify-center text-center px-5 overflow-hidden bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/images/cristiano-nunes.png')" }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-950/80 via-stone-900/70 to-amber-950/90" />
         <div className="relative z-10 max-w-2xl mx-auto space-y-6">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-amber-200 text-sm font-medium">
             <Cross className="h-3.5 w-3.5" />
