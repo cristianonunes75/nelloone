@@ -250,26 +250,20 @@ export default function ConvitePessoal() {
       {/* O PEDIDO */}
       <Section className="bg-stone-900 text-white">
         <div className="max-w-3xl mx-auto px-5 py-20 space-y-8">
-          <p className="text-amber-300 font-semibold text-sm uppercase tracking-wider">Uma conversa franca</p>
+          <p className="text-amber-300 font-semibold text-sm uppercase tracking-wider">Por que estou te convidando</p>
           <h2 className="font-serif text-3xl md:text-4xl font-bold leading-tight">
-            Eu poderia escrever um texto cheio de gatilhos e urgências. Não vou fazer isso.
+            Porque acredito que você merece se conhecer de verdade.
           </h2>
           <p className="text-white/80 leading-relaxed text-lg">
-            Você me conhece. Sabe que eu não sou esse tipo de pessoa. Então vou ser direto como a gente costuma ser quando está falando com um amigo de verdade.
+            Não tem frase de vendas aqui. Não tem urgência fabricada. Tem um Cristiano que passou décadas buscando respostas sobre si mesmo, que encontrou um caminho, e que agora quer compartilhar esse caminho com as pessoas que ele respeita.
           </p>
-          <p className="text-white/80 leading-relaxed text-lg">
-            Estou em um momento difícil financeiramente. Não vou esconder isso. Coloquei minha energia, meu tempo e o pouco que tinha de recursos para construir algo que acredito que vai mudar a vida de quem usar. E agora estou aqui, com o coração na mão, te pedindo que seja um dos primeiros.
-          </p>
-          <div className="border-l-2 border-amber-500 pl-5 space-y-3">
+          <div className="border-l-2 border-amber-500 pl-5">
             <p className="font-serif text-xl text-white leading-relaxed italic">
-              Não estou te pedindo para me fazer um favor. Estou te convidando a investir em você mesmo. E, ao fazer isso, ajudar um amigo que acredita de verdade nessa obra.
+              Quando construí isso, pensei em cada pessoa que já me disse "eu não me conheço direito" ou "não entendo por que ajo assim." Pensei em você.
             </p>
           </div>
-          <p className="text-white/80 leading-relaxed">
-            Se depois de ler tudo isso você sentir que não é para você, tudo bem. Mas se alguma coisa aqui tocou, se você se reconheceu em alguma parte dessa história, então talvez esse seja o momento.
-          </p>
-          <p className="font-serif text-xl text-amber-300 font-medium">
-            Não porque eu preciso. Mas porque você merece se conhecer.
+          <p className="text-white/80 leading-relaxed text-lg">
+            Se algo nessa história ressoou, se você se reconheceu em alguma parte do caminho, então esse convite é para você. Sem pressão. Com carinho.
           </p>
         </div>
       </Section>
