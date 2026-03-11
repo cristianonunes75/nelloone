@@ -1,4 +1,4 @@
-project_id = "hoxcnuzfqwcissykayqa"
+project_id = "eqksszzusydsfzgydhos"
 
 [functions.create-checkout]
 verify_jwt = true
@@ -6,11 +6,6 @@ verify_jwt = true
 [functions.stripe-webhook]
 verify_jwt = false
 
-[functions.lumen-agent]
-verify_jwt = false
-
-[functions.essentia-concierge]
-verify_jwt = false
 
 [functions.nello-agent]
 verify_jwt = false

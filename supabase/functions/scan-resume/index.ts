@@ -127,9 +127,9 @@ serve(async (req) => {
 
     console.log("Scanning resume for application:", application_id);
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+    if (!OPENROUTER_API_KEY) {
+      throw new Error("OPENROUTER_API_KEY is not configured");
     }
 
     // Create Supabase client
@@ -236,10 +236,10 @@ Por favor, extraia todos os dados estruturados deste currículo.`
           }
         ];
     
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -505,10 +505,10 @@ IMPORTANTE: SEMPRE responda usando a função extract_resume_data com os dados e
       
       try {
         // Use AI to extract/crop just the photo from the resume
-        const photoExtractionResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        const photoExtractionResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            Authorization: `Bearer ${OPENROUTER_API_KEY}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({

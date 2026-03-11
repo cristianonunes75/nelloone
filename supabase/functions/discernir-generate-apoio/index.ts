@@ -194,9 +194,9 @@ serve(async (req) => {
     console.log("Identity data collected:", Object.keys(identityData));
 
     // 7. Generate Apoio de Escuta using Lovable AI
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY not configured");
+    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+    if (!OPENROUTER_API_KEY) {
+      console.error("OPENROUTER_API_KEY not configured");
       return new Response(JSON.stringify({ error: "Configuração de IA não encontrada" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -243,10 +243,10 @@ Lembre-se:
 
 Retorne APENAS o JSON válido, sem texto adicional.`;
 
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

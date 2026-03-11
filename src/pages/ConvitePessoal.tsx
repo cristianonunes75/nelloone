@@ -1,7 +1,13 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
-import { Heart, Star, BookOpen, Users, ArrowRight, Quote, CheckCircle2, Cross } from "lucide-react";
+import { Heart, Star, BookOpen, Users, ArrowRight, Quote, CheckCircle2, Cross, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 const Section = ({
@@ -46,53 +52,85 @@ const SaintQuote = ({ text, author }: { text: string; author: string }) => (
   </div>
 );
 
-const TestimonialCard = ({
-  name,
-  role,
-  text,
-}: {
-  name: string;
-  role: string;
-  text: string;
-}) => (
+interface Testimonial {
+  id: string;
+  display_name: string;
+  content: string;
+  test_slug: string | null;
+}
+
+const TestimonialCard = ({ name, role, text }: { name: string; role?: string; text: string }) => (
   <div className="bg-white rounded-2xl p-6 shadow-md border border-amber-100 flex flex-col gap-3">
     <Quote className="h-5 w-5 text-amber-300" />
     <p className="text-stone-600 leading-relaxed text-sm italic flex-1">"{text}"</p>
     <div>
       <p className="font-semibold text-stone-800 text-sm">{name}</p>
-      <p className="text-xs text-amber-700">{role}</p>
+      {role && <p className="text-xs text-amber-700">{role}</p>}
     </div>
   </div>
 );
 
-const testimonials = [
-  {
-    name: "Ana Paula M.",
-    role: "Professora, 42 anos",
-    text: "Fiz o Código da Essência achando que já me conhecia bem. Me enganei. Chorei lendo o resultado porque finalmente vi, com clareza, quem eu sou — e por que sempre me senti deslocada nos ambientes que escolhi.",
-  },
-  {
-    name: "Ricardo e Fernanda",
-    role: "Casal, casados há 14 anos",
-    text: "O Código do Casal foi o presente mais bonito que nos demos. Entendemos que nossas diferenças não são falhas — são complementos. O amor ficou mais leve depois disso.",
-  },
-  {
-    name: "Thiago B.",
-    role: "Empreendedor, 38 anos",
-    text: "Tentei vários testes de personalidade ao longo da vida. Nenhum chegou perto disso. O Cristiano construiu algo que vai fundo. Me ajudou a entender porque certas decisões de negócio me travavam.",
-  },
-  {
-    name: "Cláudia R.",
-    role: "Mãe e terapeuta",
-    text: "Indiquei para minha filha de 19 anos, que estava perdida sobre a faculdade. O relatório trouxe uma clareza que dois anos de terapia não tinham dado. Não que substituí­a — ela tem terapeuta — mas foi o mapa que faltava.",
-  },
-];
+const getTestLabel = (slug: string | null): string => {
+  const map: Record<string, string> = {
+    arquetipos: "Arquétipos",
+    disc: "DISC",
+    temperamentos: "Temperamentos",
+    "estilos-conexao-afetiva": "Estilos de Conexão",
+    inteligencias: "Inteligências Múltiplas",
+    eneagrama: "Eneagrama",
+    "nello-16": "Nello 16",
+    externo: "Externo",
+  };
+  return slug ? map[slug] || "Jornada Identity" : "Jornada Identity";
+};
 
 export default function ConvitePessoal() {
   const navigate = useNavigate();
+  const [addCruzamento, setAddCruzamento] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleCTA = () => {
-    navigate("/jornada-identity");
+  const { data: testimonials = [] } = useQuery<Testimonial[]>({
+    queryKey: ["approved-testimonials-landing"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("testimonials")
+        .select("id, display_name, content, test_slug")
+        .eq("status", "approved")
+        .eq("is_featured", true)
+        .order("created_at", { ascending: false })
+        .limit(6);
+      if (error) throw error;
+      return (data || []) as Testimonial[];
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const handleCheckout = async () => {
+    setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        // Salva intenção e redireciona para login
+        sessionStorage.setItem("convite_checkout_intent", "codigo_essencia_express");
+        navigate("/auth?redirect=/convite#comecar");
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { productType: "codigo_essencia_express", language: "pt" },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("URL de checkout não retornada");
+      }
+    } catch (e: any) {
+      toast.error("Erro ao iniciar pagamento. Tente novamente.");
+      console.error("[CONVITE] checkout error:", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -123,9 +161,11 @@ export default function ConvitePessoal() {
           </p>
           <Button
             size="lg"
-            onClick={handleCTA}
+            onClick={handleCheckout}
+            disabled={loading}
             className="bg-amber-500 hover:bg-amber-400 text-white font-semibold px-8 py-4 rounded-full text-base shadow-lg hover:shadow-amber-500/30 transition-all duration-300"
           >
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Começar minha jornada
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
@@ -288,22 +328,29 @@ export default function ConvitePessoal() {
       </Section>
 
       {/* TESTEMUNHOS */}
-      <Section className="max-w-5xl mx-auto px-5 py-20 space-y-10" id="testemunhos">
-        <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-3">
-            <Users className="h-5 w-5 text-amber-500" />
-            <span className="text-amber-700 font-semibold text-sm uppercase tracking-wider">Quem já fez a jornada</span>
+      {testimonials.length > 0 && (
+        <Section className="max-w-5xl mx-auto px-5 py-20 space-y-10" id="testemunhos">
+          <div className="text-center space-y-2">
+            <div className="flex items-center justify-center gap-3">
+              <Users className="h-5 w-5 text-amber-500" />
+              <span className="text-amber-700 font-semibold text-sm uppercase tracking-wider">Quem já fez a jornada</span>
+            </div>
+            <h2 className="font-serif text-3xl font-bold text-stone-800">
+              Palavras de quem se encontrou
+            </h2>
           </div>
-          <h2 className="font-serif text-3xl font-bold text-stone-800">
-            Palavras de quem se encontrou
-          </h2>
-        </div>
-        <div className="grid md:grid-cols-2 gap-5">
-          {testimonials.map((t) => (
-            <TestimonialCard key={t.name} {...t} />
-          ))}
-        </div>
-      </Section>
+          <div className="grid md:grid-cols-2 gap-5">
+            {testimonials.map((t) => (
+              <TestimonialCard
+                key={t.id}
+                name={t.display_name}
+                role={getTestLabel(t.test_slug)}
+                text={t.content}
+              />
+            ))}
+          </div>
+        </Section>
+      )}
 
       {/* PRICING / CTA */}
       <Section className="bg-amber-950 text-white" id="comecar">
@@ -321,7 +368,7 @@ export default function ConvitePessoal() {
                 <p className="text-white/60 text-sm mt-1">Autoconhecimento integrado • Jovens em escolha de carreira • Marketing pessoal</p>
               </div>
               <div className="text-right flex-shrink-0">
-                <p className="text-3xl font-bold text-amber-300">R$ 97</p>
+                <p className="text-3xl font-bold text-amber-300">R$ 99</p>
               </div>
             </div>
             <ul className="space-y-2 text-sm text-white/80">
@@ -334,37 +381,66 @@ export default function ConvitePessoal() {
             </ul>
           </div>
 
-          {/* Produto 2 */}
-          <div className="bg-rose-900/40 border border-rose-400/30 rounded-2xl p-6 text-left space-y-4">
+          {/* Produto 2 — add-on */}
+          <div
+            className={cn(
+              "border rounded-2xl p-6 text-left space-y-4 cursor-pointer transition-all duration-200",
+              addCruzamento
+                ? "bg-rose-900/60 border-rose-400/60 shadow-lg shadow-rose-900/30"
+                : "bg-rose-900/20 border-rose-400/20 opacity-80"
+            )}
+            onClick={() => setAddCruzamento((v) => !v)}
+          >
             <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <Heart className="h-4 w-4 text-rose-300" />
-                  <span className="text-rose-300 text-xs font-semibold uppercase tracking-wider">Adicional</span>
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="cruzamento"
+                  checked={addCruzamento}
+                  onCheckedChange={(v) => setAddCruzamento(!!v)}
+                  onClick={(e) => e.stopPropagation()}
+                  className="mt-1 border-rose-300 data-[state=checked]:bg-rose-500 data-[state=checked]:border-rose-500"
+                />
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Heart className="h-4 w-4 text-rose-300" />
+                    <Label htmlFor="cruzamento" className="text-rose-300 text-xs font-semibold uppercase tracking-wider cursor-pointer">
+                      Adicional
+                    </Label>
+                  </div>
+                  <p className="font-serif text-xl font-bold text-white">Cruzamento dos Códigos</p>
+                  <p className="text-white/60 text-sm mt-1">Casais • Pais e filhos • Futuros sócios</p>
                 </div>
-                <p className="font-serif text-xl font-bold text-white">Cruzamento dos Códigos</p>
-                <p className="text-white/60 text-sm mt-1">Casais • Pais e filhos • Futuros sócios</p>
               </div>
               <div className="text-right flex-shrink-0">
                 <p className="text-3xl font-bold text-rose-300">+ R$ 47</p>
               </div>
             </div>
             <p className="text-sm text-white/70">
-              Cruza dois Códigos da Essência e gera a leitura de conexão entre duas pessoas. Requer que ambos tenham feito o Código da Essência.
+              Cruza dois Códigos da Essência e gera a leitura de conexão entre duas pessoas. Requer que ambos tenham feito o Código da Essência. Será oferecido logo após sua jornada inicial.
             </p>
           </div>
 
+          {/* Total */}
+          {addCruzamento && (
+            <div className="flex items-center justify-between bg-white/5 rounded-xl px-5 py-3 border border-white/10">
+              <span className="text-white/70 text-sm">Total</span>
+              <span className="font-bold text-white text-xl">R$ 146</span>
+            </div>
+          )}
+
           <Button
             size="lg"
-            onClick={handleCTA}
-            className="w-full bg-amber-500 hover:bg-amber-400 text-white font-bold py-5 rounded-full text-lg shadow-xl hover:shadow-amber-500/30 transition-all duration-300"
+            onClick={handleCheckout}
+            disabled={loading}
+            className="w-full bg-amber-500 hover:bg-amber-400 text-white font-bold py-5 rounded-full text-lg shadow-xl hover:shadow-amber-500/30 transition-all duration-300 disabled:opacity-60"
           >
-            Finalizar meu pedido
-            <ArrowRight className="ml-2 h-5 w-5" />
+            {loading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
+            {loading ? "Aguarde..." : "Finalizar meu pedido"}
+            {!loading && <ArrowRight className="ml-2 h-5 w-5" />}
           </Button>
 
           <p className="text-white/40 text-xs">
-            Pagamento seguro via Stripe · Cartão, Pix ou Boleto · Acesso imediato
+            Pagamento seguro via Stripe · Cartão de crédito ou débito · Acesso imediato
           </p>
         </div>
       </Section>

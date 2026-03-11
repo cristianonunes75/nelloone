@@ -84,15 +84,15 @@ ${contextText || "Pessoa em busca de discernimento espiritual"}
 Retorne APENAS JSON válido sem markdown:
 {"apresentacao":"texto 2-3 frases sobre a pessoa","tendencias_personalidade":["item1","item2","item3"],"tensoes_interiores":["item1","item2","item3"],"riscos_espirituais":["item1","item2","item3"],"potenciais_vocacao":["item1","item2","item3"],"perguntas_direcao":["p1","p2","p3","p4","p5"]}`;
 
-    // 5. Chamar IA via Lovable Gateway
-    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+    // 5. Chamar IA via OpenRouter
+    const lovableApiKey = Deno.env.get("OPENROUTER_API_KEY");
     console.log(`[DISC] lovableApiKey present: ${!!lovableApiKey}`);
     console.log(`[DISC] contextText length: ${contextText.length}`);
 
     let aiResponse: any = null;
 
     try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -103,19 +103,27 @@ Retorne APENAS JSON válido sem markdown:
           messages: [{ role: "user", content: prompt }],
           temperature: 0.7,
           max_tokens: 1500,
-          response_format: { type: "json_object" },
         }),
       });
-
       console.log(`[DISC] gateway status: ${res.status}`);
       const data = await res.json();
-      if (data.error) {
-        console.error(`[DISC] gateway error:`, JSON.stringify(data.error));
+      if (!res.ok) {
+        console.error(`[DISC] gateway error body:`, JSON.stringify(data));
       } else {
-        const text = data?.choices?.[0]?.message?.content || "{}";
-        console.log(`[DISC] response text length: ${text.length}`);
-        aiResponse = JSON.parse(text);
-        console.log(`[DISC] parsed keys: ${Object.keys(aiResponse).join(", ")}`);
+        const text = data?.choices?.[0]?.message?.content || "";
+        console.log(`[DISC] response text length: ${text.length}, preview: "${text.slice(0, 100)}"`);
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.apresentacao) {
+            aiResponse = parsed;
+            console.log(`[DISC] parsed keys: ${Object.keys(aiResponse).join(", ")}`);
+          } else {
+            console.error(`[DISC] parsed but missing apresentacao. Keys: ${Object.keys(parsed).join(", ")}`);
+          }
+        } else {
+          console.error(`[DISC] no JSON in response: "${text.slice(0, 300)}"`);
+        }
       }
     } catch (e: any) {
       console.error(`[DISC] gateway exception: ${e.message || e}`);
