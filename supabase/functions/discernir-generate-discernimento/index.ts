@@ -67,7 +67,28 @@ serve(async (req) => {
     const userName = profile?.full_name || "Peregrino";
 
     // 4. Montar contexto para a IA
-    const mapaSections = mapa.sections as Record<string, string>;
+    // sections é um array de objetos — extrair campos de texto relevantes
+    const sectionsArray = Array.isArray(mapa.sections) ? mapa.sections : [];
+    const sectionsText = sectionsArray.map((s: any) => {
+      const fields = ['title', 'quem_voce_e', 'maior_forca', 'maior_risco', 'tensao_central',
+        'direcao_90_dias', 'frase_sintese', 'content', 'summary', 'description'];
+      const parts: string[] = [];
+      if (s.title) parts.push(`[${s.title}]`);
+      for (const f of fields) {
+        if (s[f] && f !== 'title') parts.push(s[f]);
+      }
+      // arrays dentro da seção
+      for (const key of Object.keys(s)) {
+        if (Array.isArray(s[key])) {
+          const items = s[key].map((item: any) =>
+            typeof item === 'string' ? item : (item.content || item.title || JSON.stringify(item))
+          );
+          parts.push(...items);
+        }
+      }
+      return parts.join(' | ');
+    }).filter(Boolean).join('\n\n');
+
     const testsContext = (testResults || []).map(t => ({
       tipo: t.test_type,
       resultado: t.result_data,
@@ -79,12 +100,12 @@ Com base no Código da Essência de ${userName} (perfil de autoconhecimento prof
 IMPORTANTE:
 - Linguagem contemplativa, acolhedora e espiritual
 - Nunca diagnosticar, nunca julgar
-- Baseado unicamente nos dados fornecidos
+- Baseado exclusivamente nos dados abaixo — cite traços específicos do perfil
 - Sem referências a marcas ou sistemas específicos
 - Máximo 3 pontos por seção (exceto perguntas: exatamente 5)
 
-CÓDIGO DA ESSÊNCIA (seções do relatório de autoconhecimento):
-${JSON.stringify(mapaSections, null, 2)}
+CÓDIGO DA ESSÊNCIA DE ${userName.toUpperCase()} (seções do relatório de autoconhecimento):
+${sectionsText}
 
 RESULTADOS DOS TESTES COMPLEMENTARES:
 ${JSON.stringify(testsContext, null, 2)}
