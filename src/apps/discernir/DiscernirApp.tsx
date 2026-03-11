@@ -3,7 +3,7 @@ import { DiscernirAuthProvider } from './contexts/DiscernirAuthContext';
 import { DiscernirLayout } from './components/DiscernirLayout';
 import { DiscernirLanding } from './pages/DiscernirLanding';
 import { DiscernirAuth } from './pages/DiscernirAuth';
-import { DiscernirDashboard } from './pages/DiscernirDashboard';
+import { DiscernirCaminhoDashboard } from './pages/DiscernirCaminhoDashboard';
 import { DiscernirConsent } from './pages/DiscernirConsent';
 import { DiscernirApoioEscuta } from './pages/DiscernirApoioEscuta';
 import { DiscernirCruzamento } from './pages/DiscernirCruzamento';
@@ -43,13 +43,13 @@ export default function DiscernirApp() {
         
         {/* Protected routes - Couples */}
         <Route element={<DiscernirLayout />}>
-          <Route 
-            path="/dashboard" 
+          <Route
+            path="/dashboard"
             element={
               <DiscernirProtectedRoute>
-                <DiscernirDashboard />
+                <DiscernirCaminhoDashboard />
               </DiscernirProtectedRoute>
-            } 
+            }
           />
           <Route
             path="/perfil-servico"

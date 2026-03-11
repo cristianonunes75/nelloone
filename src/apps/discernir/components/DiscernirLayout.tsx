@@ -32,6 +32,7 @@ export function DiscernirLayout({ isPriest = false }: DiscernirLayoutProps) {
     ? [
         { path: '/dashboard', label: 'Início', icon: Home },
         { path: '/perfil-servico', label: 'Perfil de Serviço', icon: Church },
+        { path: '/discernimento-espiritual', label: 'Discernimento', icon: FileHeart },
       ]
     : [
         { path: '/dashboard', label: 'Início', icon: Home },
@@ -39,6 +40,7 @@ export function DiscernirLayout({ isPriest = false }: DiscernirLayoutProps) {
         { path: '/apoio-escuta', label: 'Apoio de Escuta', icon: FileHeart },
         { path: '/cruzamento', label: 'Proteção do Casal', icon: Users },
         { path: '/perfil-servico', label: 'Perfil de Serviço', icon: Church },
+        { path: '/discernimento-espiritual', label: 'Discernimento', icon: FileHeart },
       ];
 
   const priestNavItems = isPilotMode
