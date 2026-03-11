@@ -155,16 +155,6 @@ export default function ConvitePessoal() {
             Se você chegou até aqui, provavelmente me conhece de alguma fase da vida.
             Esta carta é para você.
           </p>
-          <Button
-            size="lg"
-            onClick={handleCheckout}
-            disabled={loading}
-            className="bg-amber-500 hover:bg-amber-400 text-white font-semibold px-8 py-4 rounded-full text-base shadow-lg hover:shadow-amber-500/30 transition-all duration-300"
-          >
-            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Começar minha jornada
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
         </div>
         <div className="absolute bottom-8 left-0 right-0 flex justify-center">
           <div className="w-px h-12 bg-gradient-to-b from-white/40 to-transparent animate-bounce" />
