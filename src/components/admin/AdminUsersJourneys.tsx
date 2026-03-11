@@ -275,7 +275,7 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
       const [{ data: profile }, { data: purchases }, { data: testResults }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", userToDelete.id).single(),
         supabase.from("test_purchases").select("*").eq("user_id", userToDelete.id),
-        supabase.from("test_results").select("*").eq("user_id", userToDelete.id),
+        (supabase as any).from("test_results").select("*").eq("user_id", userToDelete.id),
       ]);
 
       await supabase.rpc('log_audit', {
@@ -288,7 +288,7 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
           test_results: testResults || [],
           snapshot_at: new Date().toISOString(),
           deleted_by: 'admin',
-        },
+        } as any,
       });
 
       const { data, error } = await supabase.functions.invoke("admin-delete-user", {

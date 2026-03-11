@@ -19,7 +19,7 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   
   // Auto-save state
   const [pendingAnswer, setPendingAnswer] = useState<{questionId: string; answer: any} | null>(null);
-  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const autoSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';

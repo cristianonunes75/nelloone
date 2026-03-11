@@ -25,7 +25,7 @@ function isMobileDevice(): boolean {
 }
 
 export function useVisitorTracking() {
-  const heartbeatRef = useRef<NodeJS.Timeout | null>(null);
+  const heartbeatRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sessionIdRef = useRef<string>("");
 
   useEffect(() => {
@@ -89,7 +89,7 @@ export function useVisitorTracking() {
     heartbeatRef.current = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL);
 
     // Handle visibility change with debounce
-    let visibilityTimeout: NodeJS.Timeout | null = null;
+    let visibilityTimeout: ReturnType<typeof setTimeout> | null = null;
     const handleVisibilityChange = () => {
       if (visibilityTimeout) clearTimeout(visibilityTimeout);
       visibilityTimeout = setTimeout(() => {

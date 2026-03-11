@@ -13,7 +13,7 @@ export function usePasswordBreachCheck(debounceMs: number = 500): PasswordBreach
   const [isBreached, setIsBreached] = useState<boolean | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [breachCount, setBreachCount] = useState(0);
-  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+  const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const reset = useCallback(() => {

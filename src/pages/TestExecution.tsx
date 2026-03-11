@@ -62,7 +62,7 @@ export default function TestExecution() {
   const [showSavedIndicator, setShowSavedIndicator] = useState(false);
   const [isResuming, setIsResuming] = useState(false);
   const [resumeRemainingQuestions, setResumeRemainingQuestions] = useState(0);
-  const autoAdvanceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const autoAdvanceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { toast } = useToast();
   const [partialArchetypes, setPartialArchetypes] = useState<{
     primary: { archetype: string; score: number };
