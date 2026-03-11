@@ -138,12 +138,12 @@ export default function ConvitePessoal() {
 
       {/* HERO */}
       <div className="relative min-h-[92vh] flex flex-col items-center justify-center text-center px-5 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-950/80 via-stone-900/70 to-amber-950/80 z-0" />
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-950/75 via-stone-900/65 to-amber-950/85 z-0" />
         <div
-          className="absolute inset-0 z-[-1] bg-cover bg-center"
+          className="absolute inset-0 z-[-1] bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=1600&q=80')",
+            backgroundImage: "url('/images/cristiano-nunes.png')",
+            backgroundPosition: "center top",
           }}
         />
         <div className="relative z-10 max-w-2xl mx-auto space-y-6">
