@@ -24,7 +24,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Loader2, Shield, Crown, Heart, Sparkles, Package } from "lucide-react";
+import { Loader2, Shield, Crown, Heart, Sparkles, Package, Map } from "lucide-react";
 
 interface UserData {
   id: string;
@@ -86,6 +86,8 @@ export const AdminUserManagementDialog = ({
   const [confirmAdminAction, setConfirmAdminAction] = useState<"add" | "remove" | null>(null);
   
   const [isAdmin, setIsAdmin] = useState(false);
+  const [hasJornadaCompleta, setHasJornadaCompleta] = useState(false);
+  const [savingJornada, setSavingJornada] = useState(false);
   const [productAccess, setProductAccess] = useState<ProductAccess>({
     has_activation_individual: false,
     has_nello_couple: false,
@@ -115,6 +117,18 @@ export const AdminUserManagementDialog = ({
         .maybeSingle();
       
       setIsAdmin(!!roleData);
+
+      // Check Jornada Completa access
+      const { data: jornada } = await supabase
+        .from("test_purchases")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("purchase_category", "jornada_completa")
+        .eq("payment_status", "completed")
+        .limit(1)
+        .maybeSingle();
+
+      setHasJornadaCompleta(!!jornada);
 
       // Fetch product access
       const { data: profile, error } = await supabase
@@ -209,6 +223,54 @@ export const AdminUserManagementDialog = ({
     } finally {
       setSaving(false);
       setConfirmAdminAction(null);
+    }
+  };
+
+  const handleJornadaCompletaToggle = async (value: boolean) => {
+    if (!user) return;
+    setSavingJornada(true);
+    try {
+      if (value) {
+        const { data: tests } = await supabase
+          .from("tests")
+          .select("id, type")
+          .eq("active", true);
+
+        if (!tests || tests.length === 0) throw new Error("Nenhum teste ativo encontrado");
+
+        const inserts = tests.map((t) => ({
+          user_id: user.id,
+          test_id: t.id,
+          price_paid: 0,
+          payment_status: "completed" as const,
+          payment_method: "manual",
+          purchase_category: "jornada_completa",
+          test_slug: t.type,
+          metadata: { granted_manually: true, granted_by: "admin" },
+        }));
+
+        const { error } = await supabase.from("test_purchases").insert(inserts);
+        if (error && error.code !== "23505") throw error;
+
+        toast.success("Jornada Completa liberada com sucesso");
+        setHasJornadaCompleta(true);
+      } else {
+        const { error } = await supabase
+          .from("test_purchases")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("purchase_category", "jornada_completa");
+
+        if (error) throw error;
+        toast.success("Acesso à Jornada Completa removido");
+        setHasJornadaCompleta(false);
+      }
+      onUpdate();
+    } catch (error) {
+      console.error("Error toggling jornada completa:", error);
+      toast.error("Erro ao alterar acesso à Jornada Completa");
+    } finally {
+      setSavingJornada(false);
     }
   };
 
@@ -311,6 +373,43 @@ export const AdminUserManagementDialog = ({
                     checked={isAdmin}
                     onCheckedChange={handleAdminToggle}
                     disabled={saving}
+                  />
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Jornada Completa Section */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium flex items-center gap-2">
+                  <Map className="w-4 h-4" />
+                  Jornada Completa
+                </h4>
+                <div
+                  className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
+                    hasJornadaCompleta ? "bg-primary/5 border-primary/20" : "bg-card"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <Map className="w-4 h-4 text-primary mt-0.5" />
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm font-medium">Acesso à Jornada Completa</Label>
+                        {hasJornadaCompleta && (
+                          <Badge variant="outline" className="text-xs text-primary border-primary/30">
+                            Liberado
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Libera todos os 7 testes da jornada
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={hasJornadaCompleta}
+                    onCheckedChange={handleJornadaCompletaToggle}
+                    disabled={savingJornada}
                   />
                 </div>
               </div>
