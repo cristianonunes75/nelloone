@@ -55,6 +55,7 @@ export function useDiscernimentoEspiritual() {
   };
 
   const refresh = () => fetchData();
+  // expose as async so callers can await it
 
   return { discernimento, hasCodigoEssencia, isLoading, refresh };
 }

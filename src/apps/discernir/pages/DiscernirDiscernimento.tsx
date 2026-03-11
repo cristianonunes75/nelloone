@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useDiscernimentoEspiritual } from '../hooks/useDiscernimentoEspiritual';
+import { jsPDF } from 'jspdf';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -111,7 +112,6 @@ export function DiscernirDiscernimento() {
   const handleGenerate = async () => {
     setGenerating(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
       const { data, error } = await supabase.functions.invoke('discernir-generate-discernimento', {
         body: {},
       });
@@ -119,8 +119,8 @@ export function DiscernirDiscernimento() {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
+      await refresh();
       toast.success('Perfil de Discernimento Espiritual gerado com sucesso');
-      refresh();
     } catch (error: any) {
       console.error('Generate error:', error);
       toast.error(error.message || 'Erro ao gerar relatório. Tente novamente.');
@@ -130,16 +130,58 @@ export function DiscernirDiscernimento() {
   };
 
   const handleDownloadPDF = () => {
-    if (!discernimento?.relatorio_texto) return;
+    if (!discernimento) return;
 
-    const blob = new Blob([discernimento.relatorio_texto], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Discernimento_Espiritual_${format(new Date(), 'yyyy-MM-dd')}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success('Relatório baixado');
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const pageW = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const maxW = pageW - margin * 2;
+    let y = 20;
+
+    const addLine = (text: string, fontSize = 11, bold = false) => {
+      doc.setFontSize(fontSize);
+      doc.setFont('helvetica', bold ? 'bold' : 'normal');
+      const lines = doc.splitTextToSize(text, maxW);
+      lines.forEach((line: string) => {
+        if (y > 270) { doc.addPage(); y = 20; }
+        doc.text(line, margin, y);
+        y += fontSize * 0.5;
+      });
+      y += 3;
+    };
+
+    const addSection = (title: string, items: string[]) => {
+      y += 4;
+      addLine(title, 12, true);
+      items.forEach((item, i) => addLine(`${i + 1 < 10 ? ' ' : ''}• ${item}`, 10));
+    };
+
+    // Título
+    addLine('PERFIL DE DISCERNIMENTO ESPIRITUAL', 16, true);
+    addLine(user?.user_metadata?.full_name || 'Peregrino', 13);
+    addLine(format(new Date(discernimento.generated_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }), 10);
+    y += 4;
+
+    // Aviso
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'italic');
+    const aviso = doc.splitTextToSize('Este documento é um instrumento de reflexão espiritual. Não substitui acompanhamento pastoral ou direção espiritual.', maxW);
+    aviso.forEach((l: string) => { doc.text(l, margin, y); y += 5; });
+    y += 4;
+
+    // Apresentação
+    addLine('Apresentação', 12, true);
+    addLine(discernimento.apresentacao || '', 10);
+
+    // Seções
+    addSection('Tendências da Personalidade', discernimento.tendencias_personalidade);
+    addSection('Tensões Interiores Prováveis', discernimento.tensoes_interiores);
+    addSection('Riscos Espirituais', discernimento.riscos_espirituais);
+    addSection('Potenciais de Vocação', discernimento.potenciais_vocacao);
+    addSection('Perguntas para Direção Espiritual', discernimento.perguntas_direcao);
+
+    doc.save(`Discernimento_Espiritual_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+    toast.success('PDF baixado');
   };
 
   if (isLoading) {
