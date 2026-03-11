@@ -151,6 +151,26 @@ export const AdminPermissionsManager = () => {
 
   const savePermissions = async () => {
     if (!selectedAdmin) return;
+
+    // Impede remover o último super_admin
+    const currentAdmin = admins.find(a => a.user_id === selectedAdmin.user_id);
+    if (
+      currentAdmin?.permission_level === 'super_admin' &&
+      selectedAdmin.permission_level !== 'super_admin'
+    ) {
+      const otherSuperAdmins = admins.filter(
+        a => a.permission_level === 'super_admin' && a.user_id !== selectedAdmin.user_id
+      );
+      if (otherSuperAdmins.length === 0) {
+        toast({
+          title: "Ação bloqueada",
+          description: "Não é possível rebaixar o único Super Admin. Promova outro admin primeiro.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setSaving(true);
 
     try {

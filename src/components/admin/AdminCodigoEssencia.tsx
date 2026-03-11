@@ -143,14 +143,30 @@ export const AdminCodigoEssencia = () => {
 
       if (error) throw error;
 
+      // Confirma que o mapa foi efetivamente criado/atualizado
+      const { data: mapaAtualizado } = await supabase
+        .from("mapa_essencia")
+        .select("id, version, updated_at")
+        .eq("user_id", user.id)
+        .single();
+
       await supabase.rpc('log_audit', {
         p_action: 'regenerate_codigo_essencia',
         p_table_name: 'mapa_essencia',
-        p_record_id: user.mapa_id || user.id,
-        p_new_data: { regenerated_by: 'admin', user_id: user.id }
+        p_record_id: mapaAtualizado?.id || user.mapa_id || user.id,
+        p_new_data: {
+          regenerated_by: 'admin',
+          user_id: user.id,
+          mapa_version: mapaAtualizado?.version,
+          updated_at: mapaAtualizado?.updated_at,
+        }
       });
 
-      toast.success(`Código da Essência regenerado para ${user.full_name}`);
+      if (!mapaAtualizado) {
+        toast.warning(`IA chamada mas mapa não encontrado — verifique os logs da edge function`);
+      } else {
+        toast.success(`Código da Essência regenerado para ${user.full_name} (v${mapaAtualizado.version})`);
+      }
       setConfirmRegenerate(null);
       fetchUsers();
     } catch (error) {

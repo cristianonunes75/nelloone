@@ -103,11 +103,11 @@ export const AdminOrdersPayments = () => {
 
   const handleRefund = async () => {
     if (!selectedPurchase) return;
-    
+
     setRefundLoading(true);
     try {
       const { error } = await supabase.functions.invoke('stripe-refund', {
-        body: { 
+        body: {
           transaction_id: selectedPurchase.transaction_id,
           purchase_id: selectedPurchase.id,
         }
@@ -115,23 +115,46 @@ export const AdminOrdersPayments = () => {
 
       if (error) throw error;
 
-      await supabase
-        .from("test_purchases")
-        .update({ payment_status: "refunded" })
-        .eq("id", selectedPurchase.id);
+      const category = selectedPurchase.purchase_category;
+
+      // Revoke access based on category
+      if (category === 'jornada_completa') {
+        // Revoke ALL test purchases for this user in this bundle
+        await supabase
+          .from("test_purchases")
+          .update({ payment_status: "refunded" })
+          .eq("user_id", selectedPurchase.user_id)
+          .eq("purchase_category", "jornada_completa")
+          .eq("payment_status", "completed");
+      } else {
+        // Revoke just this specific purchase
+        await supabase
+          .from("test_purchases")
+          .update({ payment_status: "refunded" })
+          .eq("id", selectedPurchase.id);
+      }
+
+      // If codigo_essencia, also revoke profile unlock flag
+      if (category === 'codigo_essencia') {
+        await supabase
+          .from("profiles")
+          .update({ ativacao_codigo_unlocked: false })
+          .eq("id", selectedPurchase.user_id);
+      }
 
       await supabase.rpc('log_audit', {
         p_action: 'refund_payment',
         p_table_name: 'test_purchases',
         p_record_id: selectedPurchase.id,
         p_old_data: { payment_status: selectedPurchase.payment_status },
-        p_new_data: { payment_status: 'refunded' }
+        p_new_data: {
+          payment_status: 'refunded',
+          category,
+          access_revoked: true,
+        }
       });
 
-      // Note: codigo_essencia is now automatic when journey is complete
-      // No need to update any profile flag
-
-      toast.success("Reembolso realizado com sucesso");
+      toast.success("Reembolso realizado e acesso revogado com sucesso");
       setShowRefundDialog(false);
       setShowDetails(false);
       fetchPurchases();
@@ -483,8 +506,14 @@ export const AdminOrdersPayments = () => {
               <ul className="list-disc list-inside mt-2 text-sm">
                 <li>Processar o reembolso no Stripe</li>
                 <li>Atualizar o status do pedido</li>
-                {(selectedPurchase?.metadata as any)?.product_type === 'codigo_da_essencia' && (
-                  <li>Remover acesso ao Código da Essência</li>
+                {selectedPurchase?.purchase_category === 'jornada_completa' && (
+                  <li className="text-destructive font-medium">Revogar acesso a todos os testes da Jornada Completa</li>
+                )}
+                {selectedPurchase?.purchase_category === 'codigo_essencia' && (
+                  <li className="text-destructive font-medium">Remover acesso ao Código da Essência</li>
+                )}
+                {selectedPurchase?.purchase_category === 'test_avulso' && (
+                  <li className="text-destructive font-medium">Revogar acesso ao teste avulso</li>
                 )}
                 <li>Registrar a ação nos logs de auditoria</li>
               </ul>

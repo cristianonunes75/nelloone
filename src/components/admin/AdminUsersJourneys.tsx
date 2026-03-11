@@ -271,8 +271,26 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
     if (!userToDelete) return;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      // Snapshot: salva dados do usuário antes de deletar para recuperação futura
+      const [{ data: profile }, { data: purchases }, { data: testResults }] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", userToDelete.id).single(),
+        supabase.from("test_purchases").select("*").eq("user_id", userToDelete.id),
+        supabase.from("test_results").select("*").eq("user_id", userToDelete.id),
+      ]);
+
+      await supabase.rpc('log_audit', {
+        p_action: 'delete_user_snapshot',
+        p_table_name: 'profiles',
+        p_record_id: userToDelete.id,
+        p_old_data: {
+          profile,
+          purchases: purchases || [],
+          test_results: testResults || [],
+          snapshot_at: new Date().toISOString(),
+          deleted_by: 'admin',
+        },
+      });
+
       const { data, error } = await supabase.functions.invoke("admin-delete-user", {
         body: { target_user_id: userToDelete.id },
       });
@@ -285,7 +303,7 @@ export const AdminUsersJourneys = ({ hideHeader = false }: AdminUsersJourneysPro
       }
 
       toast.success(`Usuário ${userToDelete.full_name} deletado com sucesso`);
-      
+
       // Remove user from the list
       setUsers(prev => prev.filter(u => u.id !== userToDelete.id));
       setUserToDelete(null);
