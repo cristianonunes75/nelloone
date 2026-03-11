@@ -201,7 +201,7 @@ Baseado no Código da Essência — Nello One`;
 
     // 7. Salvar no banco (upsert)
     const dadosBase = {
-      mapa_sections: mapaSections,
+      mapa_sections: sectionsArray,
       mapa_version: mapa.version,
       mapa_created_at: mapa.created_at,
       tests_snapshot: testsContext,
