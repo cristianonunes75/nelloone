@@ -265,6 +265,9 @@ export default function ConvitePessoal() {
               Se algo nessa história ressoou, esse convite é para você. Sem pressão. Com carinho.
             </p>
           </div>
+          <p className="text-white/60 leading-relaxed text-sm">
+            Este projeto vive de quem acredita nele. Cada pessoa que faz a jornada ajuda a manter essa ferramenta viva e a levar essa mensagem mais longe. Obrigado por fazer parte disso.
+          </p>
         </div>
       </Section>
 
