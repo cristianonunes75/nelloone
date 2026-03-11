@@ -67,80 +67,30 @@ serve(async (req) => {
     const userName = profile?.full_name || "Peregrino";
 
     // 4. Montar contexto para a IA
-    // sections é um array de objetos — extrair campos de texto relevantes
-    const sectionsArray = Array.isArray(mapa.sections) ? mapa.sections : [];
-    const sectionsText = sectionsArray.map((s: any) => {
-      const fields = ['title', 'quem_voce_e', 'maior_forca', 'maior_risco', 'tensao_central',
-        'direcao_90_dias', 'frase_sintese', 'content', 'summary', 'description'];
-      const parts: string[] = [];
-      if (s.title) parts.push(`[${s.title}]`);
-      for (const f of fields) {
-        if (s[f] && f !== 'title') parts.push(s[f]);
-      }
-      // arrays dentro da seção
-      for (const key of Object.keys(s)) {
-        if (Array.isArray(s[key])) {
-          const items = s[key].map((item: any) =>
-            typeof item === 'string' ? item : (item.content || item.title || JSON.stringify(item))
-          );
-          parts.push(...items);
-        }
-      }
-      return parts.join(' | ');
-    }).filter(Boolean).join('\n\n');
+    const sectionsArray = Array.isArray(mapa.sections) ? mapa.sections as any[] : [];
+    const resumo = sectionsArray.find((s: any) => s.id === 'resumo_executivo') || sectionsArray[0] || {};
+    const contextText = [
+      resumo.quem_voce_e,
+      resumo.maior_forca,
+      resumo.maior_risco,
+      resumo.tensao_central,
+      resumo.frase_sintese,
+      resumo.direcao_90_dias,
+      ...(Array.isArray(resumo.tres_forcas_centrais) ? resumo.tres_forcas_centrais : []),
+    ].filter(Boolean).join('\n');
 
-    const testsContext = (testResults || []).map(t => ({
-      tipo: t.test_type,
-      resultado: t.result_data,
-    }));
+    const testsContext = (testResults || []).map((t: any) => `${t.test_type}: ${JSON.stringify(t.result_data).slice(0, 200)}`).join('\n');
 
-    const prompt = `Você é um assistente de discernimento espiritual cristão.
-Com base no Código da Essência de ${userName} (perfil de autoconhecimento profundo), gere um Perfil de Discernimento Espiritual estruturado.
+    const prompt = `Você é um assistente de discernimento espiritual cristão. Gere um Perfil de Discernimento Espiritual para ${userName}.
 
-IMPORTANTE:
-- Linguagem contemplativa, acolhedora e espiritual
-- Nunca diagnosticar, nunca julgar
-- Baseado exclusivamente nos dados abaixo — cite traços específicos do perfil
-- Sem referências a marcas ou sistemas específicos
-- Máximo 3 pontos por seção (exceto perguntas: exatamente 5)
+PERFIL DE ${userName.toUpperCase()}:
+${contextText}
 
-CÓDIGO DA ESSÊNCIA DE ${userName.toUpperCase()} (seções do relatório de autoconhecimento):
-${sectionsText}
+TESTES:
+${testsContext}
 
-RESULTADOS DOS TESTES COMPLEMENTARES:
-${JSON.stringify(testsContext, null, 2)}
-
-Retorne APENAS um JSON válido com esta estrutura exata:
-{
-  "apresentacao": "Texto introdutório personalizado de 2-3 frases para ${userName}",
-  "tendencias_personalidade": [
-    "Tendência humana observada 1",
-    "Tendência humana observada 2",
-    "Tendência humana observada 3"
-  ],
-  "tensoes_interiores": [
-    "Tensão interior provável 1",
-    "Tensão interior provável 2",
-    "Tensão interior provável 3"
-  ],
-  "riscos_espirituais": [
-    "Risco espiritual baseado no perfil 1",
-    "Risco espiritual baseado no perfil 2",
-    "Risco espiritual baseado no perfil 3"
-  ],
-  "potenciais_vocacao": [
-    "Potencial de vocação ou dom observado 1",
-    "Potencial de vocação ou dom observado 2",
-    "Potencial de vocação ou dom observado 3"
-  ],
-  "perguntas_direcao": [
-    "Pergunta para direção espiritual 1",
-    "Pergunta para direção espiritual 2",
-    "Pergunta para direção espiritual 3",
-    "Pergunta para direção espiritual 4",
-    "Pergunta para direção espiritual 5"
-  ]
-}`;
+Retorne APENAS JSON válido:
+{"apresentacao":"texto 2-3 frases","tendencias_personalidade":["item1","item2","item3"],"tensoes_interiores":["item1","item2","item3"],"riscos_espirituais":["item1","item2","item3"],"potenciais_vocacao":["item1","item2","item3"],"perguntas_direcao":["p1","p2","p3","p4","p5"]}`;
 
     // 5. Chamar Gemini via OpenAI-compatible endpoint
     const geminiApiKey = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("OPENAI_API_KEY");
@@ -251,7 +201,7 @@ Baseado no Código da Essência — Nello One`;
 
     // 7. Salvar no banco (upsert)
     const dadosBase = {
-      mapa_sections: mapaSections,
+      mapa_sections: sectionsArray,
       mapa_version: mapa.version,
       mapa_created_at: mapa.created_at,
       tests_snapshot: testsContext,
