@@ -3196,6 +3196,57 @@ export type Database = {
         }
         Relationships: []
       }
+      discernimento_espiritual: {
+        Row: {
+          apresentacao: string | null
+          dados_base_codigo: Json
+          generated_at: string
+          generation_metadata: Json | null
+          id: string
+          perguntas_direcao: Json
+          potenciais_vocacao: Json
+          relatorio_texto: string | null
+          riscos_espirituais: Json
+          tendencias_personalidade: Json
+          tensoes_interiores: Json
+          updated_at: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          apresentacao?: string | null
+          dados_base_codigo?: Json
+          generated_at?: string
+          generation_metadata?: Json | null
+          id?: string
+          perguntas_direcao?: Json
+          potenciais_vocacao?: Json
+          relatorio_texto?: string | null
+          riscos_espirituais?: Json
+          tendencias_personalidade?: Json
+          tensoes_interiores?: Json
+          updated_at?: string
+          user_id: string
+          version?: number
+        }
+        Update: {
+          apresentacao?: string | null
+          dados_base_codigo?: Json
+          generated_at?: string
+          generation_metadata?: Json | null
+          id?: string
+          perguntas_direcao?: Json
+          potenciais_vocacao?: Json
+          relatorio_texto?: string | null
+          riscos_espirituais?: Json
+          tendencias_personalidade?: Json
+          tensoes_interiores?: Json
+          updated_at?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: []
+      }
       discernir_access_logs: {
         Row: {
           action: string
