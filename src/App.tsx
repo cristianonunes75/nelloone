@@ -53,6 +53,7 @@ import WhatsApp from "./pages/WhatsApp";
 import ParaProfissionais from "./pages/ParaProfissionais";
 import CentralAjuda from "./pages/CentralAjuda";
 import ImersaoCasalLanding from "./pages/ImersaoCasalLanding";
+import ConvitePessoal from "./pages/ConvitePessoal";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -142,6 +143,9 @@ const AppRoutes = () => (
     
     {/* Imersão Código do Casal - Landing page */}
     <Route path="/imersao-casal" element={<ImersaoCasalLanding />} />
+
+    {/* Convite Pessoal - Página emotiva para amigos */}
+    <Route path="/convite" element={<ConvitePessoal />} />
     
     {/* Leitura Inicial - First identity reading */}
     <Route path="/leitura-inicial" element={<CodigoExpress />} />
