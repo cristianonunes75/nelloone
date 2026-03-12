@@ -544,6 +544,39 @@ function TestResultsInner() {
     estilosConexaoResults = calculateEstilosConexaoAfetiva(answers as any, lang as 'pt' | 'en' | 'pt-pt');
   }
 
+  // Normalize legacy linguagens_amor result_data to new EstilosConexaoAfetiva format
+  // Old format has primary.language instead of primary.style, and old score keys
+  const OLD_TO_NEW_SCORES: Record<string, string> = {
+    palavras_afirmacao: 'expressao_verbal',
+    tempo_qualidade: 'presenca_ativa',
+    presentes: 'gestos_simbolicos',
+    atos_servico: 'cuidado_pratico',
+    toque_fisico: 'conexao_fisica',
+  };
+  const normalizeLegacyResult = (data: any) => {
+    if (!data || data.primary?.style) return data; // already new format
+    const normalizeStyle = (item: any) => {
+      if (!item) return item;
+      const style = item.style || OLD_TO_NEW_SCORES[item.language] || item.language;
+      return { ...item, style };
+    };
+    const normalizeScores = (scores: any) => {
+      if (!scores) return scores;
+      const normalized: Record<string, number> = {};
+      for (const [key, val] of Object.entries(scores)) {
+        const newKey = OLD_TO_NEW_SCORES[key] || key;
+        normalized[newKey] = (normalized[newKey] || 0) + (val as number);
+      }
+      return normalized;
+    };
+    return {
+      ...data,
+      primary: normalizeStyle(data.primary),
+      secondary: normalizeStyle(data.secondary),
+      scores: normalizeScores(data.scores),
+    };
+  };
+
   const handleDownloadInteligenciasPDF = () => {
     if (inteligenciasResults) {
       try {
@@ -1057,8 +1090,8 @@ function TestResultsInner() {
         )}
 
         {isLinguagensAmorTest && (estilosConexaoResults || linguagensAmorResultData) && (
-          <EstilosConexaoResultsSection 
-            estilosResults={estilosConexaoResults || linguagensAmorResultData}
+          <EstilosConexaoResultsSection
+            estilosResults={estilosConexaoResults || normalizeLegacyResult(linguagensAmorResultData)}
             userName={userFirstName}
             lang={lang as 'pt' | 'pt-pt' | 'en'}
           />
