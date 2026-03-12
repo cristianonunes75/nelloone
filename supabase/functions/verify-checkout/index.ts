@@ -398,11 +398,14 @@ serve(async (req) => {
         .update({ has_activation_individual: true })
         .eq("id", userId2);
 
+      const { data: firstTestAI } = await supabase
+        .from("tests").select("id").eq("active", true).limit(1).single();
+
       await supabase
         .from("test_purchases")
         .insert({
           user_id: userId2,
-          test_id: null,
+          test_id: firstTestAI?.id || "00000000-0000-0000-0000-000000000000",
           price_paid: (session.amount_total || 0) / 100,
           payment_status: "completed",
           payment_method: "stripe",
@@ -416,6 +419,68 @@ serve(async (req) => {
         });
 
       logStep("Activation Individual purchase recorded successfully");
+
+    // ====== NELLO COUPLE PURCHASE ======
+    } else if (productType === "nello_couple") {
+      logStep("Processing Nello Couple purchase");
+
+      await supabase
+        .from("profiles")
+        .update({ has_nello_couple: true })
+        .eq("id", userId2);
+
+      const { data: firstTestNC } = await supabase
+        .from("tests").select("id").eq("active", true).limit(1).single();
+
+      await supabase
+        .from("test_purchases")
+        .insert({
+          user_id: userId2,
+          test_id: firstTestNC?.id || "00000000-0000-0000-0000-000000000000",
+          price_paid: (session.amount_total || 0) / 100,
+          payment_status: "completed",
+          payment_method: "stripe",
+          transaction_id: session.payment_intent as string,
+          purchase_category: "nello_couple",
+          metadata: {
+            session_id: session.id,
+            product_type: "nello_couple",
+            verified_via: "verify-checkout",
+          },
+        });
+
+      logStep("Nello Couple purchase recorded successfully");
+
+    // ====== ACTIVATION COUPLE PURCHASE ======
+    } else if (productType === "activation_couple") {
+      logStep("Processing Activation Couple purchase");
+
+      await supabase
+        .from("profiles")
+        .update({ has_activation_couple: true })
+        .eq("id", userId2);
+
+      const { data: firstTestACpl } = await supabase
+        .from("tests").select("id").eq("active", true).limit(1).single();
+
+      await supabase
+        .from("test_purchases")
+        .insert({
+          user_id: userId2,
+          test_id: firstTestACpl?.id || "00000000-0000-0000-0000-000000000000",
+          price_paid: (session.amount_total || 0) / 100,
+          payment_status: "completed",
+          payment_method: "stripe",
+          transaction_id: session.payment_intent as string,
+          purchase_category: "activation_couple",
+          metadata: {
+            session_id: session.id,
+            product_type: "activation_couple",
+            verified_via: "verify-checkout",
+          },
+        });
+
+      logStep("Activation Couple purchase recorded successfully");
     }
 
     // Process affiliate referral if applicable
