@@ -253,7 +253,7 @@ const CodigoEssenciaInner = () => {
   const firstName = userName?.split(' ')[0] || (lang === 'en' ? "Traveler" : "Viajante");
 
   const canGenerateReport = isJourneyComplete;
-  const canDownloadPdf = isJourneyComplete;
+  const canDownloadPdf = isJourneyComplete && (hasSavedCodigo || hasGenerated) && !isGenerating;
 
   const missingTests = useMemo(() => {
     try {
