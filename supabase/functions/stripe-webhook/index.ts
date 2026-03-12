@@ -355,10 +355,95 @@ serve(async (req) => {
         await processAffiliateReferral(session, affiliateCode, userId);
       }
 
-      // ====== LEGACY FUNDADORES REDIRECT - Now treated as jornada_completa ======
+      // ====== FUNDADORES PURCHASE (treated as jornada_completa) ======
       if (productType === "fundadores") {
-        logStep("Redirecting legacy Fundadores purchase to jornada_completa flow", { userId });
-        // Fall through to jornada_completa handling below
+        logStep("Processing Fundadores purchase (as jornada_completa)", { userId });
+        
+        if (!userId || userId === "guest") {
+          logStep("WARN: Guest purchase for fundadores");
+          return new Response(JSON.stringify({ received: true, warning: "Guest purchase" }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        // Update journey status AND unlock Código da Essência + founder flag
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ 
+            journey_status: "in_progress",
+            journey_started_at: new Date().toISOString(),
+            codigo_essencia_unlocked: true,
+            is_founder: true,
+          })
+          .eq("id", userId);
+
+        if (updateError) {
+          logStep("ERROR: Failed to update profile for fundadores", { error: updateError });
+        }
+
+        // Fetch all tests and record purchases
+        const { data: allTestsFundadores } = await supabase
+          .from("tests")
+          .select("id, name, type")
+          .eq("active", true);
+
+        if (allTestsFundadores && allTestsFundadores.length > 0) {
+          const amountPaid = (session.amount_total || 0) / 100;
+          const pricePerTest = amountPaid / allTestsFundadores.length;
+
+          const purchaseRecords = allTestsFundadores.map(test => ({
+            user_id: userId,
+            test_id: test.id,
+            price_paid: pricePerTest,
+            payment_status: "completed" as const,
+            payment_method: "stripe",
+            transaction_id: session.payment_intent as string,
+            purchase_category: "fundadores",
+            test_slug: test.type,
+            metadata: {
+              session_id: session.id,
+              product_type: "fundadores",
+            },
+          }));
+
+          const { error: purchaseError } = await supabase
+            .from("test_purchases")
+            .upsert(purchaseRecords, {
+              onConflict: "user_id,test_id",
+              ignoreDuplicates: false,
+            });
+
+          if (purchaseError) {
+            logStep("ERROR: Failed to record fundadores purchases", { error: purchaseError });
+          } else {
+            logStep("Fundadores purchases recorded", { count: allTestsFundadores.length });
+          }
+        }
+
+        // Notify admin
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", userId)
+            .single();
+          const { data: userAuth } = await supabase.auth.admin.getUserById(userId);
+          await notifyAdminNewPurchase(
+            profile?.full_name || "Não informado",
+            userAuth?.user?.email || "sem email",
+            (session.amount_total || 0) / 100,
+            session.metadata?.currency?.toUpperCase() || "BRL",
+            "fundadores"
+          );
+        } catch (notifyError) {
+          logStep("WARN: Failed to notify admin", { error: notifyError });
+        }
+
+        return new Response(JSON.stringify({ received: true, product: "fundadores" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
       }
 
       // ====== CÓDIGO DO CASAL PURCHASE ======
@@ -373,18 +458,26 @@ serve(async (req) => {
           });
         }
 
+        // Get a test_id for the purchase record (required column)
+        const { data: firstTestCC } = await supabase
+          .from("tests")
+          .select("id")
+          .eq("active", true)
+          .limit(1)
+          .single();
+
         // Record purchase in test_purchases
         const { error: purchaseError } = await supabase
           .from("test_purchases")
           .insert({
             user_id: userId,
-            test_id: null,
+            test_id: firstTestCC?.id || "00000000-0000-0000-0000-000000000000",
             payment_status: "completed",
-            amount_paid: (session.amount_total || 0) / 100,
+            payment_method: "stripe",
+            price_paid: (session.amount_total || 0) / 100,
             currency: session.metadata?.currency?.toUpperCase() || "BRL",
-            stripe_session_id: session.id,
-            purchase_category: "codigo_casal",
             transaction_id: session.payment_intent as string,
+            purchase_category: "codigo_casal",
             metadata: {
               session_id: session.id,
               product_type: "codigo_casal",
@@ -491,15 +584,19 @@ serve(async (req) => {
         }
 
         // Record purchase
+        const { data: firstTestAC } = await supabase
+          .from("tests").select("id").eq("active", true).limit(1).single();
+
         const { error: purchaseError } = await supabase
           .from("test_purchases")
           .insert({
             user_id: userId,
-            test_id: null,
+            test_id: firstTestAC?.id || "00000000-0000-0000-0000-000000000000",
             payment_status: "completed",
-            amount_paid: (session.amount_total || 0) / 100,
+            payment_method: "stripe",
+            price_paid: (session.amount_total || 0) / 100,
             currency: session.metadata?.currency?.toUpperCase() || "BRL",
-            stripe_session_id: session.id,
+            transaction_id: session.payment_intent as string,
             purchase_category: "ativacao_codigo",
           });
 
@@ -651,15 +748,19 @@ serve(async (req) => {
         }
 
         // Record purchase
+        const { data: firstTestAI } = await supabase
+          .from("tests").select("id").eq("active", true).limit(1).single();
+
         const { error: purchaseError } = await supabase
           .from("test_purchases")
           .insert({
             user_id: userId,
-            test_id: null,
+            test_id: firstTestAI?.id || "00000000-0000-0000-0000-000000000000",
             payment_status: "completed",
-            amount_paid: (session.amount_total || 0) / 100,
+            payment_method: "stripe",
+            price_paid: (session.amount_total || 0) / 100,
             currency: session.metadata?.currency?.toUpperCase() || "BRL",
-            stripe_session_id: session.id,
+            transaction_id: session.payment_intent as string,
             purchase_category: "activation_individual",
           });
 
@@ -697,15 +798,19 @@ serve(async (req) => {
           throw updateError;
         }
 
+        const { data: firstTestNC } = await supabase
+          .from("tests").select("id").eq("active", true).limit(1).single();
+
         const { error: purchaseError } = await supabase
           .from("test_purchases")
           .insert({
             user_id: userId,
-            test_id: null,
+            test_id: firstTestNC?.id || "00000000-0000-0000-0000-000000000000",
             payment_status: "completed",
-            amount_paid: (session.amount_total || 0) / 100,
+            payment_method: "stripe",
+            price_paid: (session.amount_total || 0) / 100,
             currency: session.metadata?.currency?.toUpperCase() || "BRL",
-            stripe_session_id: session.id,
+            transaction_id: session.payment_intent as string,
             purchase_category: "nello_couple",
           });
 
@@ -743,15 +848,19 @@ serve(async (req) => {
           throw updateError;
         }
 
+        const { data: firstTestACpl } = await supabase
+          .from("tests").select("id").eq("active", true).limit(1).single();
+
         const { error: purchaseError } = await supabase
           .from("test_purchases")
           .insert({
             user_id: userId,
-            test_id: null,
+            test_id: firstTestACpl?.id || "00000000-0000-0000-0000-000000000000",
             payment_status: "completed",
-            amount_paid: (session.amount_total || 0) / 100,
+            payment_method: "stripe",
+            price_paid: (session.amount_total || 0) / 100,
             currency: session.metadata?.currency?.toUpperCase() || "BRL",
-            stripe_session_id: session.id,
+            transaction_id: session.payment_intent as string,
             purchase_category: "activation_couple",
           });
 
@@ -794,15 +903,19 @@ serve(async (req) => {
           throw updateError;
         }
 
+        const { data: firstTestICP } = await supabase
+          .from("tests").select("id").eq("active", true).limit(1).single();
+
         const { error: purchaseError } = await supabase
           .from("test_purchases")
           .insert({
             user_id: userId,
-            test_id: null,
+            test_id: firstTestICP?.id || "00000000-0000-0000-0000-000000000000",
             payment_status: "completed",
-            amount_paid: (session.amount_total || 0) / 100,
+            payment_method: "stripe",
+            price_paid: (session.amount_total || 0) / 100,
             currency: session.metadata?.currency?.toUpperCase() || "BRL",
-            stripe_session_id: session.id,
+            transaction_id: session.payment_intent as string,
             purchase_category: "identity_couple_premium",
           });
 
