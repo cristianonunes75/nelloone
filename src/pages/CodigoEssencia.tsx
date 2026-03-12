@@ -394,7 +394,16 @@ const CodigoEssenciaInner = () => {
   }, [isJourneyComplete, hasSavedCodigo, hasGenerated, isGenerating, isLoading, user?.id, isViewingOtherUser]);
 
   const handleRequestGenerate = useCallback(() => {
-    if (!user?.id) return;
+    const effectiveTargetUserId = targetUserId || user?.id;
+    if (!effectiveTargetUserId) return;
+
+    // In impersonation/admin-view mode, don't reuse admin demographics.
+    // Let backend read demographics from the target user's profile.
+    if (isViewingOtherUser) {
+      handleGenerateCodigo();
+      return;
+    }
+
     const gender = profile?.gender || demoGender;
     const ageRange = (profile as any)?.age_range || demoAgeRange;
     if (!gender || !ageRange) {
@@ -404,26 +413,27 @@ const CodigoEssenciaInner = () => {
       return;
     }
     handleGenerateCodigo(gender, ageRange);
-  }, [user, profile, demoGender, demoAgeRange]);
+  }, [targetUserId, user?.id, isViewingOtherUser, profile, demoGender, demoAgeRange]);
 
   const handleDemographicsConfirm = async () => {
     if (!demoGender || !demoAgeRange || !user?.id) return;
     setShowDemographicsModal(false);
-    // Save to profile
+    // Save only for the logged-in user profile
     await supabase.from("profiles").update({ gender: demoGender, age_range: demoAgeRange } as any).eq("id", user.id);
     handleGenerateCodigo(demoGender, demoAgeRange);
   };
 
   const handleGenerateCodigo = async (gender?: string, ageRange?: string) => {
-    if (!user?.id) return;
+    const effectiveTargetUserId = targetUserId || user?.id;
+    if (!effectiveTargetUserId) return;
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('nello-codigo-essencia', {
         body: {
-          user_id: user.id,
+          user_id: effectiveTargetUserId,
           locale: lang === 'en' ? 'en' : lang === 'pt-pt' ? 'pt-pt' : 'pt-br',
-          gender: gender || profile?.gender || undefined,
-          age_range: ageRange || (profile as any)?.age_range || undefined,
+          gender: isViewingOtherUser ? undefined : (gender || profile?.gender || undefined),
+          age_range: isViewingOtherUser ? undefined : (ageRange || (profile as any)?.age_range || undefined),
         }
       });
 
