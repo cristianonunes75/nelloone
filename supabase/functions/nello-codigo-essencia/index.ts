@@ -2097,8 +2097,15 @@ serve(async (req) => {
     const clientIp = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
     const userAgent = req.headers.get("user-agent") || "unknown";
 
-    // SECURITY CHECK: Validate ownership
-    if (!mock && callerId !== user_id) {
+    // SECURITY CHECK: Validate ownership OR admin role
+    let isAdmin = false;
+    if (callerId && callerId !== user_id) {
+      // Check if caller is an admin
+      const { data: adminCheck } = await supabase.rpc('is_admin_user', { _user_id: callerId });
+      isAdmin = !!adminCheck;
+    }
+
+    if (!mock && callerId !== user_id && !isAdmin) {
       console.error(`SECURITY: Unauthorized access attempt. Caller: ${callerId}, Target: ${user_id}, IP: ${clientIp}`);
       
       // Log the unauthorized attempt
@@ -2120,6 +2127,10 @@ serve(async (req) => {
         JSON.stringify({ error: "unauthorized", message: "You can only generate your own Código da Essência" }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    if (isAdmin) {
+      console.log(`[CE] Admin bypass: caller ${callerId} generating for target ${user_id}`);
     }
 
     // 1. Get user profile
