@@ -38,10 +38,11 @@ import { useAtivacaoCodigoFlag } from "@/hooks/useFeatureFlag";
 import { useAtivacaoCodigoAccess } from "@/hooks/useAtivacaoCodigoAccess";
 import { PurchaseAtivacaoDialog } from "@/components/cliente/PurchaseAtivacaoDialog";
 import { PurchaseJornadaDialog } from "@/components/cliente/PurchaseJornadaDialog";
-import { 
+import {
   DashboardStageJourney,
   DashboardStageRevelation,
-  DashboardStagePotency
+  DashboardStagePotency,
+  EssenceDashboardV2
 } from "@/components/cliente/dashboard";
 import { TestInsightScreen, getProvisionalInsight, getMirrorPhrase } from "@/components/tests/TestInsightScreen";
 import { StrategicCheckpoint, generateCheckpointContent } from "@/components/tests/StrategicCheckpoint";
@@ -63,6 +64,19 @@ const Cliente = () => {
   const [stepToReset, setStepToReset] = useState<any>(null);
   const [ativacaoPurchaseOpen, setAtivacaoPurchaseOpen] = useState(false);
   const [jornadaPurchaseOpen, setJornadaPurchaseOpen] = useState(false);
+
+  // Admin-only: dashboard version toggle (persisted)
+  const isAdmin = userRole === "admin";
+  const [dashboardVersion, setDashboardVersion] = useState<"v1" | "v2">(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("nello_dashboard_version") as "v1" | "v2") || "v1";
+    }
+    return "v1";
+  });
+  const toggleDashboardVersion = (v: "v1" | "v2") => {
+    setDashboardVersion(v);
+    localStorage.setItem("nello_dashboard_version", v);
+  };
   
   // Celebration modal state for product purchases
   const [celebrationModalOpen, setCelebrationModalOpen] = useState(false);
@@ -743,6 +757,31 @@ const Cliente = () => {
         <div className="container px-4 py-3 md:py-4 flex items-center justify-between">
           <LogoText className="text-xl md:text-2xl" variant="solid" />
           <div className="flex items-center gap-2 md:gap-4">
+            {/* Admin-only V2 dashboard toggle */}
+            {isAdmin && (
+              <div className="hidden sm:flex items-center gap-1 rounded-lg border border-border bg-muted p-0.5 text-xs">
+                <button
+                  onClick={() => toggleDashboardVersion("v1")}
+                  className={`px-2.5 py-1 rounded-md font-medium transition-colors ${
+                    dashboardVersion === "v1"
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  V1
+                </button>
+                <button
+                  onClick={() => toggleDashboardVersion("v2")}
+                  className={`px-2.5 py-1 rounded-md font-medium transition-colors ${
+                    dashboardVersion === "v2"
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  V2 ✦
+                </button>
+              </div>
+            )}
             <RoleSwitcher />
             <Button
               variant="ghost"
@@ -774,7 +813,15 @@ const Cliente = () => {
 
       <main className="container px-4 py-6 md:py-12">
         <div className="max-w-3xl mx-auto">
-          {/* Evolutionary Dashboard - 3 Stages */}
+          {/* Admin V2 Preview */}
+          {isAdmin && dashboardVersion === "v2" ? (
+            <EssenceDashboardV2
+              displayName={displayName}
+              userTests={userTests ?? []}
+            />
+          ) : (
+          /* Evolutionary Dashboard - 3 Stages */
+          <>
           {(() => {
             // Stage C: Potency (Post-purchase Ativação) - only if all tests still completed
             if (isJourneyComplete && hasSavedCodigo && hasAtivacaoPurchased && !needsAtivacaoPurchase) {
@@ -896,6 +943,8 @@ const Cliente = () => {
               Eles não representam verdade absoluta, nem substituem oração, discernimento espiritual ou aconselhamento pessoal.
             </p>
           </div>
+          </>
+          )}
         </div>
       </main>
 
