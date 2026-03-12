@@ -2421,6 +2421,13 @@ serve(async (req) => {
         );
       }
 
+      if (status) {
+        return new Response(
+          JSON.stringify({ error: "ai_generation_failed", details }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       console.error("Failed to generate/parse AI response:", aiError);
       console.log("Raw AI response (first 2000 chars):", generatedContent.substring(0, 2000));
 
