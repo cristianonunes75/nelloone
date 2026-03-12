@@ -324,6 +324,9 @@ serve(async (req) => {
     // Check for Código do Casal purchase
     const isCodigoCasal = body.productType === "codigo_casal";
     
+    // Check for Nello Couple (Código do Casal via ProductPaywallModal with priceId)
+    const isNelloCouple = body.productType === "nello_couple";
+    
     // Check for Activation Individual (Professional Direction) purchase
     const isActivationIndividual = body.productType === "activation_individual";
     
