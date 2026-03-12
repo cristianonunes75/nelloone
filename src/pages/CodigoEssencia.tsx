@@ -245,6 +245,7 @@ const CodigoEssenciaInner = () => {
   const basePath = language === 'en' ? '/en' : language === 'pt-pt' ? '/pt-pt' : '';
   
   // Use target profile name when viewing as admin, otherwise use current user's profile
+  console.log('[CodigoEssencia] Name debug:', { isViewingOtherUser, targetProfile, isImpersonating, targetUserId, impersonatedUserId, profileName: profile?.full_name });
   const displayName = isViewingOtherUser && targetProfile?.full_name 
     ? targetProfile.full_name 
     : (profile?.full_name || (lang === 'en' ? "Traveler" : "Viajante"));
