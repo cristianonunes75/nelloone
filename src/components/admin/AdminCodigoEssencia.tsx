@@ -61,14 +61,15 @@ export const AdminCodigoEssencia = () => {
     try {
       setLoading(true);
       
-      const { data: profiles, error } = await supabase
-        .from("profiles")
+      // Use admin_profiles_view which has LEFT JOIN with mapa_essencia (bypasses RLS)
+      const { data: adminProfiles, error } = await supabase
+        .from("admin_profiles_view")
         .select("*")
+        .eq("journey_status", "completed")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      const { data: mapas } = await supabase.from("mapa_essencia").select("id, user_id, created_at, version");
       const { data: purchases } = await supabase
         .from("test_purchases")
         .select("user_id, purchased_at, metadata")
@@ -79,7 +80,6 @@ export const AdminCodigoEssencia = () => {
       const { data: ativacoesPro } = await supabase.from("ativacao_profissional").select("user_id, created_at");
       const { data: cruzamentos } = await supabase.from("codigo_cruzamentos").select("user_a_id, user_b_id, created_at, status");
 
-      const mapaMap = new Map((mapas || []).map(m => [m.user_id, m]));
       const ativacaoMap = new Map((ativacoes || []).map(a => [a.user_id, a.created_at]));
       const ativacaoProMap = new Map((ativacoesPro || []).map(a => [a.user_id, a.created_at]));
       
@@ -97,10 +97,8 @@ export const AdminCodigoEssencia = () => {
       });
       const purchaseMap = new Map(codigoPurchases.map(p => [p.user_id, p.purchased_at]));
 
-      const enrichedUsers: CodigoEssenciaUser[] = (profiles || [])
-        .filter(p => p.journey_status === 'completed')
+      const enrichedUsers: CodigoEssenciaUser[] = (adminProfiles || [])
         .map(profile => {
-          const mapa = mapaMap.get(profile.id);
           return {
             id: profile.id,
             full_name: profile.full_name,
@@ -108,9 +106,9 @@ export const AdminCodigoEssencia = () => {
             journey_status: profile.journey_status || 'not_started',
             created_at: profile.created_at,
             purchase_date: purchaseMap.get(profile.id),
-            has_mapa: !!mapa,
-            mapa_id: mapa?.id,
-            mapa_version: mapa?.version ?? undefined,
+            has_mapa: !!profile.has_mapa,
+            mapa_id: undefined,
+            mapa_version: profile.mapa_version ?? undefined,
             locale: 'pt',
             has_ativacao_codigo: ativacaoMap.has(profile.id),
             ativacao_codigo_date: ativacaoMap.get(profile.id),
