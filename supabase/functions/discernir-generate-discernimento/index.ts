@@ -170,7 +170,7 @@ Retorne APENAS JSON válido sem markdown:
         relatorio_texto: relatorioTexto,
         generated_at: new Date().toISOString(),
         version: newVersion,
-        generation_metadata: { model: "gemini", generated_at: new Date().toISOString() },
+        generation_metadata: { model, generated_at: new Date().toISOString() },
       }, { onConflict: "user_id" })
       .select()
       .single();
