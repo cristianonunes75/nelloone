@@ -368,11 +368,11 @@ serve(async (req) => {
       }
     }
     
-    if (testIds.length === 0 && !isBundle && !isFundadores && !isAtivacaoCodigo && !isCodigoCasal && !isActivationIndividual && !isIdentityCouplePremium && !isCodigoEssenciaExpress) {
+    if (testIds.length === 0 && !isBundle && !isFundadores && !isAtivacaoCodigo && !isCodigoCasal && !isNelloCouple && !isActivationIndividual && !isIdentityCouplePremium && !isCodigoEssenciaExpress) {
       throw new Error("At least one test ID is required, or a valid productType must be specified");
     }
     
-    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, isAtivacaoCodigo, isCodigoCasal, isActivationIndividual, isIdentityCouplePremium, isCodigoEssenciaExpress, language, currency, couponCode });
+    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, isAtivacaoCodigo, isCodigoCasal, isNelloCouple, isActivationIndividual, isIdentityCouplePremium, isCodigoEssenciaExpress, language, currency, couponCode });
 
     // Get user (optional - supports guest checkout)
     let user = null;
