@@ -157,36 +157,44 @@ const insightsData: Record<TestType, Record<SupportedLanguage, GrowthInsight>> =
   }
 };
 
+const defaultInsights: Record<SupportedLanguage, GrowthInsight> = {
+  pt: {
+    limitingPattern: "Padrões inconscientes podem estar limitando seu crescimento.",
+    balancingStrength: "Sua capacidade de autoconhecimento é uma força fundamental.",
+    immediateAction: "Reflita sobre como você pode aplicar os insights deste teste hoje.",
+    recommendedEvolution: "Continue explorando suas dimensões internas com curiosidade e compaixão."
+  },
+  'pt-pt': {
+    limitingPattern: "Padrões inconscientes podem estar a limitar o seu crescimento.",
+    balancingStrength: "A sua capacidade de autoconhecimento é uma força fundamental.",
+    immediateAction: "Reflita sobre como pode aplicar os insights deste teste hoje.",
+    recommendedEvolution: "Continue a explorar as suas dimensões internas com curiosidade e compaixão."
+  },
+  en: {
+    limitingPattern: "Unconscious patterns may be limiting your growth.",
+    balancingStrength: "Your self-awareness capacity is a fundamental strength.",
+    immediateAction: "Reflect on how you can apply the insights from this test today.",
+    recommendedEvolution: "Keep exploring your inner dimensions with curiosity and compassion."
+  }
+};
+
+const TEST_TYPE_ALIASES: Partial<Record<TestType, TestType>> = {
+  linguagens_amor: "estilos_conexao_afetiva",
+  nello16: "mbti",
+};
+
 export function getGrowthInsights(testType: string, language: 'pt' | 'pt-pt' | 'en'): GrowthInsight {
   const type = testType as TestType;
-  const data = insightsData[type];
-  
+
   // Normalize language - use 'pt' as fallback for unsupported variants
   const normalizedLang: SupportedLanguage = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
-  
-  if (!data) {
-    const defaultInsights: Record<SupportedLanguage, GrowthInsight> = {
-      pt: {
-        limitingPattern: "Padrões inconscientes podem estar limitando seu crescimento.",
-        balancingStrength: "Sua capacidade de autoconhecimento é uma força fundamental.",
-        immediateAction: "Reflita sobre como você pode aplicar os insights deste teste hoje.",
-        recommendedEvolution: "Continue explorando suas dimensões internas com curiosidade e compaixão."
-      },
-      'pt-pt': {
-        limitingPattern: "Padrões inconscientes podem estar a limitar o seu crescimento.",
-        balancingStrength: "A sua capacidade de autoconhecimento é uma força fundamental.",
-        immediateAction: "Reflita sobre como pode aplicar os insights deste teste hoje.",
-        recommendedEvolution: "Continue a explorar as suas dimensões internas com curiosidade e compaixão."
-      },
-      en: {
-        limitingPattern: "Unconscious patterns may be limiting your growth.",
-        balancingStrength: "Your self-awareness capacity is a fundamental strength.",
-        immediateAction: "Reflect on how you can apply the insights from this test today.",
-        recommendedEvolution: "Keep exploring your inner dimensions with curiosity and compassion."
-      }
-    };
+
+  const canonicalType = TEST_TYPE_ALIASES[type] ?? type;
+  const data = insightsData[canonicalType];
+
+  if (!data || !data[normalizedLang]) {
     return defaultInsights[normalizedLang];
   }
-  
+
   return data[normalizedLang];
 }

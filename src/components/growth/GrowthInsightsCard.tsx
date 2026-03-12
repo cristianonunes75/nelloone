@@ -63,6 +63,7 @@ export const GrowthInsightsCard = ({ insights, className }: GrowthInsightsCardPr
   const { language } = useLanguage();
   const lang = language === 'en' ? 'en' : language === 'pt-pt' ? 'pt-pt' : 'pt';
   const t = content[lang];
+  const safeInsights = insights ?? {};
   
   return (
     <div className={cn(
@@ -80,7 +81,7 @@ export const GrowthInsightsCard = ({ insights, className }: GrowthInsightsCardPr
       
       <div className="grid sm:grid-cols-2 gap-4">
         {insightConfig.map(({ key, icon: Icon, color, bg }) => {
-          const value = insights[key as keyof GrowthInsight];
+          const value = safeInsights[key as keyof GrowthInsight];
           if (!value) return null;
           
           return (
