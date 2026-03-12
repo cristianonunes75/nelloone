@@ -2136,7 +2136,7 @@ serve(async (req) => {
     // 1. Get user profile
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("journey_status, full_name, gender, age_range")
+      .select("journey_status, full_name, gender")
       .eq("id", user_id)
       .single();
 
