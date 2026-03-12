@@ -374,8 +374,23 @@ const CodigoEssenciaInner = () => {
     }
   }, [savedCodigo, hasGenerated]);
 
-  // REMOVED: Auto-generation removed to prevent unwanted credit consumption
-  // Users must now click "Generate Code" button explicitly
+  // Auto-generate on first visit when journey is complete but no code exists yet
+  useEffect(() => {
+    if (
+      isJourneyComplete &&
+      !hasSavedCodigo &&
+      !hasGenerated &&
+      !isGenerating &&
+      !autoGenAttemptedRef.current &&
+      !isLoading &&
+      user?.id &&
+      !isViewingOtherUser
+    ) {
+      autoGenAttemptedRef.current = true;
+      console.log('[CodigoEssencia] Auto-generating first code for user:', user.id);
+      handleRequestGenerate();
+    }
+  }, [isJourneyComplete, hasSavedCodigo, hasGenerated, isGenerating, isLoading, user?.id, isViewingOtherUser]);
 
   const handleRequestGenerate = useCallback(() => {
     if (!user?.id) return;
