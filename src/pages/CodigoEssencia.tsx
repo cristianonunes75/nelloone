@@ -215,10 +215,10 @@ const CodigoEssenciaInner = () => {
   // Import impersonation context to check if we're in a valid impersonation session
   const { impersonatedUserId, isImpersonating } = useImpersonate();
   
-  // Only allow viewing another user's data if:
-  // 1. We're in a valid impersonation session AND
-  // 2. The URL target matches the impersonated user (prevents URL manipulation)
-  const targetUserId = isImpersonating && impersonatedUserId && urlTargetUserId === impersonatedUserId 
+  // Allow viewing another user's data if:
+  // 1. We're in a valid impersonation session (with or without URL param)
+  // 2. If URL param exists, it must match the impersonated user (prevents URL manipulation)
+  const targetUserId = isImpersonating && impersonatedUserId && (!urlTargetUserId || urlTargetUserId === impersonatedUserId) 
     ? impersonatedUserId 
     : undefined;
   
