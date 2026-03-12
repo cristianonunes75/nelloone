@@ -2249,10 +2249,10 @@ serve(async (req) => {
     // userName already defined above, no need to redeclare
 
     // 3. Call AI to generate the Código da Essência using Lovable AI Gateway
-    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
-    if (!OPENROUTER_API_KEY) {
-      console.error("OPENROUTER_API_KEY not configured");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "ai_not_configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -2273,19 +2273,19 @@ serve(async (req) => {
 
     console.log("Calling Lovable AI Gateway to generate Código da Essência for user:", user_id);
 
-    const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // Using google/gemini-2.5-flash for good quality
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
+        max_tokens: 8192,
       }),
     });
 
