@@ -371,11 +371,14 @@ serve(async (req) => {
         .eq("id", userId2);
 
       // Record the purchase
+      const { data: firstTestICP } = await supabase
+        .from("tests").select("id").eq("active", true).limit(1).single();
+
       await supabase
         .from("test_purchases")
         .insert({
           user_id: userId2,
-          test_id: null,
+          test_id: firstTestICP?.id || "00000000-0000-0000-0000-000000000000",
           price_paid: (session.amount_total || 0) / 100,
           payment_status: "completed",
           payment_method: "stripe",
