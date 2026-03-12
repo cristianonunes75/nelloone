@@ -324,6 +324,9 @@ serve(async (req) => {
     // Check for Código do Casal purchase
     const isCodigoCasal = body.productType === "codigo_casal";
     
+    // Check for Nello Couple (Código do Casal via ProductPaywallModal with priceId)
+    const isNelloCouple = body.productType === "nello_couple";
+    
     // Check for Activation Individual (Professional Direction) purchase
     const isActivationIndividual = body.productType === "activation_individual";
     
@@ -365,11 +368,11 @@ serve(async (req) => {
       }
     }
     
-    if (testIds.length === 0 && !isBundle && !isFundadores && !isAtivacaoCodigo && !isCodigoCasal && !isActivationIndividual && !isIdentityCouplePremium && !isCodigoEssenciaExpress) {
+    if (testIds.length === 0 && !isBundle && !isFundadores && !isAtivacaoCodigo && !isCodigoCasal && !isNelloCouple && !isActivationIndividual && !isIdentityCouplePremium && !isCodigoEssenciaExpress) {
       throw new Error("At least one test ID is required, or a valid productType must be specified");
     }
     
-    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, isAtivacaoCodigo, isCodigoCasal, isActivationIndividual, isIdentityCouplePremium, isCodigoEssenciaExpress, language, currency, couponCode });
+    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, isAtivacaoCodigo, isCodigoCasal, isNelloCouple, isActivationIndividual, isIdentityCouplePremium, isCodigoEssenciaExpress, language, currency, couponCode });
 
     // Get user (optional - supports guest checkout)
     let user = null;
@@ -501,6 +504,22 @@ serve(async (req) => {
         quantity: 1,
       }];
       logStep("Activation Individual line item created with Price ID", { currency, priceId: activationPriceIds[currency] });
+    } else if (isNelloCouple) {
+      // Nello Couple (Código do Casal) - Uses priceId from productCatalog
+      const nelloCouplePriceIds: Record<string, string> = {
+        brl: liveBrlPrices.nello_couple || "price_1SvfhZDjhZZxZELMDKUinSpJ",
+        usd: liveUsdPrices.nello_couple || "price_1SvfiPDjhZZxZELMjTrJTTLB",
+        eur: liveEurPrices.nello_couple || "price_1SvfjiDjhZZxZELMgYvA4BQY",
+      };
+      
+      // Also accept priceId from frontend as override
+      const finalPriceId = body.priceId || nelloCouplePriceIds[currency] || nelloCouplePriceIds.brl;
+      
+      lineItems = [{
+        price: finalPriceId,
+        quantity: 1,
+      }];
+      logStep("Nello Couple line item created with Price ID", { currency, priceId: finalPriceId });
     } else if (isIdentityCouplePremium) {
       // Identity Couple Premium - Mapa Definitivo do Casal (High Ticket)
       const identityCouplePriceIds: Record<string, string> = {
@@ -688,11 +707,12 @@ serve(async (req) => {
         is_fundadores: isFundadores ? "true" : "false",
         is_ativacao_codigo: isAtivacaoCodigo ? "true" : "false",
         is_codigo_casal: isCodigoCasal ? "true" : "false",
+        is_nello_couple: isNelloCouple ? "true" : "false",
         is_activation_individual: isActivationIndividual ? "true" : "false",
         is_identity_couple_premium: isIdentityCouplePremium ? "true" : "false",
-        product_type: isCodigoEssenciaExpress ? "jornada_completa" : isIdentityCouplePremium ? "identity_couple_premium" : isActivationIndividual ? "activation_individual" : isCodigoCasal ? "codigo_casal" : isAtivacaoCodigo ? "ativacao_codigo" : isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
+        product_type: isCodigoEssenciaExpress ? "jornada_completa" : isIdentityCouplePremium ? "identity_couple_premium" : isActivationIndividual ? "activation_individual" : isNelloCouple ? "nello_couple" : isCodigoCasal ? "codigo_casal" : isAtivacaoCodigo ? "ativacao_codigo" : isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
         affiliate_code: affiliateCode || "",
-        purchase_origin: isCodigoCasal ? "couple_paywall" : "",
+        purchase_origin: (isCodigoCasal || isNelloCouple) ? "couple_paywall" : "",
       },
       customer_creation: customerId ? undefined : "always",
     };
