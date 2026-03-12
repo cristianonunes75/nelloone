@@ -106,23 +106,34 @@ serve(async (req) => {
       // Validate an impersonation session token
       const { data: session, error } = await supabaseAdmin
         .from("impersonation_sessions")
-        .select("*, profiles:target_user_id(full_name)")
+        .select("id, admin_id, target_user_id, is_active, session_token")
         .eq("session_token", sessionToken)
         .eq("is_active", true)
         .single();
 
       if (error || !session) {
+        console.error("Validate session error:", error?.message || "Session not found", { sessionToken });
         return new Response(
-          JSON.stringify({ valid: false }),
+          JSON.stringify({ valid: false, reason: error?.message || "not_found" }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+
+      // Fetch target user name separately to avoid FK join issues
+      const { data: profileData } = await supabaseAdmin
+        .from("profiles")
+        .select("full_name")
+        .eq("id", session.target_user_id)
+        .single();
+
+      console.log(`Validated impersonation session for target ${session.target_user_id} by admin ${session.admin_id}`);
 
       return new Response(
         JSON.stringify({ 
           valid: true, 
           targetUserId: session.target_user_id,
-          adminId: session.admin_id
+          adminId: session.admin_id,
+          targetUserName: profileData?.full_name || "Usuário"
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );

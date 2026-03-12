@@ -154,14 +154,7 @@ const Cliente = () => {
         }
 
         const targetUserId = data.targetUserId as string;
-
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("full_name")
-          .eq("id", targetUserId)
-          .single();
-
-        const targetUserName = profileData?.full_name || "Usuário";
+        const targetUserName = (data.targetUserName as string) || "Usuário";
 
         setImpersonation(targetUserId, targetUserName, impersonateToken);
 
