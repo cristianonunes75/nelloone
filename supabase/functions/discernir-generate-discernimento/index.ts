@@ -84,22 +84,31 @@ ${contextText || "Pessoa em busca de discernimento espiritual"}
 Retorne APENAS JSON válido sem markdown:
 {"apresentacao":"texto 2-3 frases sobre a pessoa","tendencias_personalidade":["item1","item2","item3"],"tensoes_interiores":["item1","item2","item3"],"riscos_espirituais":["item1","item2","item3"],"potenciais_vocacao":["item1","item2","item3"],"perguntas_direcao":["p1","p2","p3","p4","p5"]}`;
 
-    // 5. Chamar IA via OpenRouter
-    const lovableApiKey = Deno.env.get("OPENROUTER_API_KEY");
-    console.log(`[DISC] lovableApiKey present: ${!!lovableApiKey}`);
+    // 5. Chamar IA via Lovable AI Gateway
+    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+    const model = "google/gemini-3-flash-preview";
+    console.log(`[DISC] LOVABLE_API_KEY present: ${!!lovableApiKey}`);
     console.log(`[DISC] contextText length: ${contextText.length}`);
+
+    if (!lovableApiKey) {
+      console.error("[DISC] LOVABLE_API_KEY ausente");
+      return new Response(JSON.stringify({ error: "Serviço de IA indisponível no momento." }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     let aiResponse: any = null;
 
     try {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${lovableApiKey}`,
         },
         body: JSON.stringify({
-          model: "google/gemini-2.0-flash",
+          model,
           messages: [{ role: "user", content: prompt }],
           temperature: 0.7,
           max_tokens: 1500,
