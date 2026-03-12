@@ -458,18 +458,26 @@ serve(async (req) => {
           });
         }
 
+        // Get a test_id for the purchase record (required column)
+        const { data: firstTestCC } = await supabase
+          .from("tests")
+          .select("id")
+          .eq("active", true)
+          .limit(1)
+          .single();
+
         // Record purchase in test_purchases
         const { error: purchaseError } = await supabase
           .from("test_purchases")
           .insert({
             user_id: userId,
-            test_id: null,
+            test_id: firstTestCC?.id || "00000000-0000-0000-0000-000000000000",
             payment_status: "completed",
-            amount_paid: (session.amount_total || 0) / 100,
+            payment_method: "stripe",
+            price_paid: (session.amount_total || 0) / 100,
             currency: session.metadata?.currency?.toUpperCase() || "BRL",
-            stripe_session_id: session.id,
-            purchase_category: "codigo_casal",
             transaction_id: session.payment_intent as string,
+            purchase_category: "codigo_casal",
             metadata: {
               session_id: session.id,
               product_type: "codigo_casal",
