@@ -31,6 +31,7 @@ import { downloadNello16PremiumPDF } from "@/lib/pdfNello16Personality";
 import { generateEstilosConexaoPremiumPDF } from "@/lib/pdfEstilosConexaoAfetiva";
 import { calculateEstilosConexaoAfetiva } from "@/lib/estilosConexaoAfetiva";
 import { useAuth } from "@/hooks/useAuth";
+import { useImpersonate } from "@/contexts/ImpersonateContext";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useTests } from "@/hooks/useTests";
 import { GrowthInsightsCard } from "@/components/growth/GrowthInsightsCard";
@@ -185,6 +186,7 @@ function TestResultsInner() {
   const queryClient = useQueryClient();
   const resultsRef = useRef<HTMLDivElement>(null);
   const { user, userRole } = useAuth();
+  const { isImpersonating, impersonatedUserId } = useImpersonate();
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   const { sendPDFByEmail, isSending: isSendingEmail } = usePDFEmail();
   const { resetTest, tests, userTests } = useTests();
@@ -202,10 +204,11 @@ function TestResultsInner() {
   };
 
   // Check if user is founder and get profile data (including full_name)
+  // When impersonating, we first get the admin's profile, then override name with the test owner's
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["profile-data", user?.id],
     enabled: !!user?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
@@ -217,12 +220,32 @@ function TestResultsInner() {
     },
   });
 
+  // When impersonating, fetch the impersonated user's profile for name display
+  const { data: impersonatedProfile } = useQuery({
+    queryKey: ["impersonated-profile", impersonatedUserId],
+    enabled: isImpersonating && !!impersonatedUserId,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", impersonatedUserId!)
+        .maybeSingle();
+      if (error) return null;
+      return data;
+    },
+  });
+
   const isFounder = profile?.is_founder || false;
   
-  // Extract first name from full_name (prioritize) or email
+  // Extract first name - use impersonated user's name when impersonating
   const getUserFirstName = () => {
-    if (profile?.full_name) {
-      const firstName = profile.full_name.split(' ')[0];
+    const nameSource = isImpersonating && impersonatedProfile?.full_name 
+      ? impersonatedProfile.full_name 
+      : profile?.full_name;
+    
+    if (nameSource) {
+      const firstName = nameSource.split(' ')[0];
       return firstName || 'Você';
     }
     if (user?.email) {
