@@ -504,6 +504,22 @@ serve(async (req) => {
         quantity: 1,
       }];
       logStep("Activation Individual line item created with Price ID", { currency, priceId: activationPriceIds[currency] });
+    } else if (isNelloCouple) {
+      // Nello Couple (Código do Casal) - Uses priceId from productCatalog
+      const nelloCouplePriceIds: Record<string, string> = {
+        brl: liveBrlPrices.nello_couple || "price_1SvfhZDjhZZxZELMDKUinSpJ",
+        usd: liveUsdPrices.nello_couple || "price_1SvfiPDjhZZxZELMjTrJTTLB",
+        eur: liveEurPrices.nello_couple || "price_1SvfjiDjhZZxZELMgYvA4BQY",
+      };
+      
+      // Also accept priceId from frontend as override
+      const finalPriceId = body.priceId || nelloCouplePriceIds[currency] || nelloCouplePriceIds.brl;
+      
+      lineItems = [{
+        price: finalPriceId,
+        quantity: 1,
+      }];
+      logStep("Nello Couple line item created with Price ID", { currency, priceId: finalPriceId });
     } else if (isIdentityCouplePremium) {
       // Identity Couple Premium - Mapa Definitivo do Casal (High Ticket)
       const identityCouplePriceIds: Record<string, string> = {
