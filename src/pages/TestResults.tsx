@@ -31,6 +31,7 @@ import { downloadNello16PremiumPDF } from "@/lib/pdfNello16Personality";
 import { generateEstilosConexaoPremiumPDF } from "@/lib/pdfEstilosConexaoAfetiva";
 import { calculateEstilosConexaoAfetiva } from "@/lib/estilosConexaoAfetiva";
 import { useAuth } from "@/hooks/useAuth";
+import { useImpersonate } from "@/contexts/ImpersonateContext";
 import { PurchaseTestDialog } from "@/components/cliente/PurchaseTestDialog";
 import { useTests } from "@/hooks/useTests";
 import { GrowthInsightsCard } from "@/components/growth/GrowthInsightsCard";
