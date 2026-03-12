@@ -368,7 +368,7 @@ export function EssenceDashboardV2({ displayName, userTests = [] }: EssenceDashb
 
             {tresforcas.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-4">
-                {tresorcas.map((f, i) => (
+                {tresforcas.map((f, i) => (
                   <span key={i} className="text-xs bg-amber-400/10 border border-amber-400/30 text-amber-300 rounded-full px-3 py-1">
                     {f}
                   </span>
