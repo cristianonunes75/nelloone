@@ -2382,7 +2382,7 @@ serve(async (req) => {
 
       try {
         parsedReport = parseJsonReport(generatedContent);
-      } catch (primaryParseError) {
+      } catch {
         console.warn("[CE] Primary parse failed, retrying with compact output instructions...");
 
         const compactPrompt = `${userPrompt}\n\nINSTRUÇÕES CRÍTICAS DE SAÍDA:\n- Responda SOMENTE JSON válido (sem markdown)\n- Mantenha EXATAMENTE as mesmas chaves e estrutura solicitadas\n- Limite cada campo textual a no máximo 2 frases curtas\n- Limite listas a no máximo 3 itens por bloco\n- Priorize objetividade para caber sem truncar`;
