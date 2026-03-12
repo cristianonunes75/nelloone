@@ -302,10 +302,30 @@ function TestResultsInner() {
     },
   });
 
+  // MUST be before early returns to respect React hooks rules
+  const { data: hasPurchased } = useQuery({
+    queryKey: ["test-purchase", user?.id, userTest?.test_id],
+    enabled: !!user && !!userTest && !userTest.tests?.is_free,
+    queryFn: async () => {
+      if (!user || !userTest) return false;
+      
+      const { data, error } = await supabase
+        .from("test_purchases")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("test_id", userTest.test_id)
+        .eq("payment_status", "completed")
+        .single();
+
+      if (error) return false;
+      return !!data;
+    },
+  });
+
   // Determine if we're still in initial loading phase
   const isInitialLoading = userTestLoading || (!!userTest && userTest.status === 'completed' && answersLoading);
   
-  // Show skeleton during initial loading - this is the FIRST check to avoid any rendering with incomplete data
+  // Show skeleton during initial loading
   if (isInitialLoading) {
     const loadingStage = userTestLoading ? "test" : "answers";
     return <TestResultsSkeleton stage={loadingStage} />;
@@ -339,25 +359,6 @@ function TestResultsInner() {
       </div>
     );
   }
-
-  const { data: hasPurchased } = useQuery({
-    queryKey: ["test-purchase", user?.id, userTest?.test_id],
-    enabled: !!user && !!userTest && !userTest.tests?.is_free,
-    queryFn: async () => {
-      if (!user || !userTest) return false;
-      
-      const { data, error } = await supabase
-        .from("test_purchases")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("test_id", userTest.test_id)
-        .eq("payment_status", "completed")
-        .single();
-
-      if (error) return false;
-      return !!data;
-    },
-  });
 
   const handleDownloadPDF = async () => {
     if (!resultsRef.current) {
