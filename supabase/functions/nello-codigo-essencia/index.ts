@@ -2316,54 +2316,72 @@ serve(async (req) => {
 
     const aiData = await aiResponse.json();
     const generatedContent = aiData.choices?.[0]?.message?.content;
+    const finishReason = aiData.choices?.[0]?.finish_reason;
+
+    console.log(`[CE] finish_reason: ${finishReason}, content length: ${generatedContent?.length || 0}`);
 
     if (!generatedContent) {
+      console.error("[CE] Empty AI response. Full aiData:", JSON.stringify(aiData).slice(0, 500));
       return new Response(
         JSON.stringify({ error: "empty_ai_response" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Parse the JSON from AI response
+    if (finishReason === 'length' || finishReason === 'MAX_TOKENS') {
+      console.warn("[CE] AI response was TRUNCATED (finish_reason:", finishReason, "). Content length:", generatedContent.length);
+    }
+
+    // Parse the JSON from AI response with robust extraction
     let parsedReport;
     try {
-      // Clean the response - remove markdown code blocks more robustly
+      // Clean the response - remove markdown code blocks
       let cleanContent = generatedContent.trim();
+      cleanContent = cleanContent.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+
+      // Find JSON boundaries
+      const jsonStart = cleanContent.indexOf("{");
+      const jsonEnd = cleanContent.lastIndexOf("}");
       
-      // Remove opening markdown
-      if (cleanContent.startsWith("```json")) {
-        cleanContent = cleanContent.slice(7);
-      } else if (cleanContent.startsWith("```")) {
-        cleanContent = cleanContent.slice(3);
+      if (jsonStart === -1 || jsonEnd === -1 || jsonEnd <= jsonStart) {
+        throw new Error("No JSON object found in response");
       }
       
-      // Remove closing markdown - find last occurrence
-      const lastBackticks = cleanContent.lastIndexOf("```");
-      if (lastBackticks !== -1) {
-        cleanContent = cleanContent.slice(0, lastBackticks);
-      }
+      cleanContent = cleanContent.substring(jsonStart, jsonEnd + 1);
+
+      // Check for truncation (unbalanced braces)
+      const openBraces = (cleanContent.match(/{/g) || []).length;
+      const closeBraces = (cleanContent.match(/}/g) || []).length;
       
-      cleanContent = cleanContent.trim();
-      
-      // Attempt to fix truncated JSON by finding the last complete object
-      if (!cleanContent.endsWith("}")) {
-        console.log("JSON appears truncated, attempting repair...");
-        // Find last valid closing brace
-        let braceCount = 0;
-        let lastValidIndex = -1;
-        for (let i = 0; i < cleanContent.length; i++) {
-          if (cleanContent[i] === '{') braceCount++;
-          if (cleanContent[i] === '}') {
-            braceCount--;
-            if (braceCount === 0) lastValidIndex = i;
-          }
+      if (openBraces !== closeBraces) {
+        console.warn(`[CE] JSON truncated: ${openBraces} open braces vs ${closeBraces} close braces. Attempting repair...`);
+        // Add missing closing braces
+        for (let i = 0; i < openBraces - closeBraces; i++) {
+          cleanContent += "}";
         }
-        if (lastValidIndex > 0) {
-          cleanContent = cleanContent.slice(0, lastValidIndex + 1);
+        // Also close any open arrays
+        const openBrackets = (cleanContent.match(/\[/g) || []).length;
+        const closeBrackets = (cleanContent.match(/\]/g) || []).length;
+        for (let i = 0; i < openBrackets - closeBrackets; i++) {
+          // Insert before the last closing brace
+          const lastBrace = cleanContent.lastIndexOf("}");
+          cleanContent = cleanContent.slice(0, lastBrace) + "]" + cleanContent.slice(lastBrace);
         }
       }
+
+      // Attempt parse
+      try {
+        parsedReport = JSON.parse(cleanContent);
+      } catch {
+        // Fix common issues: trailing commas, control characters
+        cleanContent = cleanContent
+          .replace(/,\s*}/g, "}")
+          .replace(/,\s*]/g, "]")
+          .replace(/[\x00-\x1F\x7F]/g, "");
+        parsedReport = JSON.parse(cleanContent);
+      }
       
-      parsedReport = JSON.parse(cleanContent);
+      console.log("[CE] Parsed report keys:", Object.keys(parsedReport).join(", "));
     } catch (parseError) {
       console.error("Failed to parse AI response as JSON:", parseError);
       console.log("Raw AI response (first 2000 chars):", generatedContent.substring(0, 2000));
