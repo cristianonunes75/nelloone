@@ -2284,118 +2284,146 @@ serve(async (req) => {
 
     console.log("Calling Lovable AI Gateway to generate Código da Essência for user:", user_id);
 
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        max_tokens: 8192,
-      }),
-    });
+    const requestAiCompletion = async (prompt: string, maxTokens: number, label: string) => {
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: prompt },
+          ],
+          max_tokens: maxTokens,
+        }),
+      });
 
-    if (!aiResponse.ok) {
-      const errorText = await aiResponse.text();
-      console.error("AI API error:", aiResponse.status, errorText);
-
-      // Bubble up billing / quota errors so the frontend can show a clear message.
-      if (aiResponse.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "ai_credits_insufficient", details: errorText }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+      if (!response.ok) {
+        const errorText = await response.text();
+        const err = new Error(`AI API error: ${response.status}`);
+        (err as any).status = response.status;
+        (err as any).details = errorText;
+        throw err;
       }
 
-      if (aiResponse.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "ai_rate_limited", details: errorText }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
+      const aiData = await response.json();
+      const content = aiData.choices?.[0]?.message?.content as string | undefined;
+      const reason = aiData.choices?.[0]?.finish_reason as string | undefined;
 
-      return new Response(
-        JSON.stringify({ error: "ai_generation_failed", details: errorText }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+      console.log(`[CE] ${label} finish_reason: ${reason}, content length: ${content?.length || 0}`);
+      return { content, reason };
+    };
 
-    const aiData = await aiResponse.json();
-    const generatedContent = aiData.choices?.[0]?.message?.content;
-    const finishReason = aiData.choices?.[0]?.finish_reason;
-
-    console.log(`[CE] finish_reason: ${finishReason}, content length: ${generatedContent?.length || 0}`);
-
-    if (!generatedContent) {
-      console.error("[CE] Empty AI response. Full aiData:", JSON.stringify(aiData).slice(0, 500));
-      return new Response(
-        JSON.stringify({ error: "empty_ai_response" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    if (finishReason === 'length' || finishReason === 'MAX_TOKENS') {
-      console.warn("[CE] AI response was TRUNCATED (finish_reason:", finishReason, "). Content length:", generatedContent.length);
-    }
-
-    // Parse the JSON from AI response with robust extraction
-    let parsedReport;
-    try {
-      // Clean the response - remove markdown code blocks
-      let cleanContent = generatedContent.trim();
+    const parseJsonReport = (rawContent: string) => {
+      let cleanContent = rawContent.trim();
       cleanContent = cleanContent.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
 
-      // Find JSON boundaries
       const jsonStart = cleanContent.indexOf("{");
       const jsonEnd = cleanContent.lastIndexOf("}");
-      
+
       if (jsonStart === -1 || jsonEnd === -1 || jsonEnd <= jsonStart) {
         throw new Error("No JSON object found in response");
       }
-      
+
       cleanContent = cleanContent.substring(jsonStart, jsonEnd + 1);
 
-      // Check for truncation (unbalanced braces)
       const openBraces = (cleanContent.match(/{/g) || []).length;
       const closeBraces = (cleanContent.match(/}/g) || []).length;
-      
+
       if (openBraces !== closeBraces) {
         console.warn(`[CE] JSON truncated: ${openBraces} open braces vs ${closeBraces} close braces. Attempting repair...`);
-        // Add missing closing braces
         for (let i = 0; i < openBraces - closeBraces; i++) {
           cleanContent += "}";
         }
-        // Also close any open arrays
+
         const openBrackets = (cleanContent.match(/\[/g) || []).length;
         const closeBrackets = (cleanContent.match(/\]/g) || []).length;
         for (let i = 0; i < openBrackets - closeBrackets; i++) {
-          // Insert before the last closing brace
           const lastBrace = cleanContent.lastIndexOf("}");
           cleanContent = cleanContent.slice(0, lastBrace) + "]" + cleanContent.slice(lastBrace);
         }
       }
 
-      // Attempt parse
       try {
-        parsedReport = JSON.parse(cleanContent);
+        return JSON.parse(cleanContent);
       } catch {
-        // Fix common issues: trailing commas, control characters
         cleanContent = cleanContent
           .replace(/,\s*}/g, "}")
           .replace(/,\s*]/g, "]")
           .replace(/[\x00-\x1F\x7F]/g, "");
-        parsedReport = JSON.parse(cleanContent);
+
+        return JSON.parse(cleanContent);
       }
-      
+    };
+
+    let generatedContent = "";
+    let finishReason: string | undefined;
+    let parsedReport: any;
+
+    try {
+      const primary = await requestAiCompletion(userPrompt, 12288, "primary");
+      generatedContent = primary.content || "";
+      finishReason = primary.reason;
+
+      if (!generatedContent) {
+        console.error("[CE] Empty AI response on primary attempt");
+        return new Response(
+          JSON.stringify({ error: "empty_ai_response" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      if (finishReason === 'length' || finishReason === 'MAX_TOKENS') {
+        console.warn("[CE] AI response was TRUNCATED (finish_reason:", finishReason, "). Content length:", generatedContent.length);
+      }
+
+      try {
+        parsedReport = parseJsonReport(generatedContent);
+      } catch (primaryParseError) {
+        console.warn("[CE] Primary parse failed, retrying with compact output instructions...");
+
+        const compactPrompt = `${userPrompt}\n\nINSTRUÇÕES CRÍTICAS DE SAÍDA:\n- Responda SOMENTE JSON válido (sem markdown)\n- Mantenha EXATAMENTE as mesmas chaves e estrutura solicitadas\n- Limite cada campo textual a no máximo 2 frases curtas\n- Limite listas a no máximo 3 itens por bloco\n- Priorize objetividade para caber sem truncar`;
+
+        const retry = await requestAiCompletion(compactPrompt, 8192, "retry");
+        generatedContent = retry.content || "";
+        finishReason = retry.reason;
+
+        if (!generatedContent) {
+          throw new Error("empty_ai_response_retry");
+        }
+
+        if (finishReason === 'length' || finishReason === 'MAX_TOKENS') {
+          console.warn("[CE] Retry response still truncated (finish_reason:", finishReason, "). Content length:", generatedContent.length);
+        }
+
+        parsedReport = parseJsonReport(generatedContent);
+      }
+
       console.log("[CE] Parsed report keys:", Object.keys(parsedReport).join(", "));
-    } catch (parseError) {
-      console.error("Failed to parse AI response as JSON:", parseError);
+    } catch (aiError) {
+      const status = (aiError as any)?.status;
+      const details = (aiError as any)?.details;
+
+      if (status === 402) {
+        return new Response(
+          JSON.stringify({ error: "ai_credits_insufficient", details }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      if (status === 429) {
+        return new Response(
+          JSON.stringify({ error: "ai_rate_limited", details }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      console.error("Failed to generate/parse AI response:", aiError);
       console.log("Raw AI response (first 2000 chars):", generatedContent.substring(0, 2000));
+
       return new Response(
         JSON.stringify({ error: "invalid_ai_response", message: "A IA gerou uma resposta incompleta. Tente novamente." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
