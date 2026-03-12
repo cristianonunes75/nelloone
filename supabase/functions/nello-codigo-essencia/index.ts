@@ -2448,7 +2448,7 @@ serve(async (req) => {
     const generationMetadata = {
       generated_at: new Date().toISOString(),
       locale,
-      model: "gpt-4o-mini",
+      model: "google/gemini-2.5-flash",
       tests_used: Object.keys(results),
     };
 
