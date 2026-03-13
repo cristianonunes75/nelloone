@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest'
 import {
   testPrices,
   bundlePrices,
-  identityCouplePremiumPrices,
   getCurrencyForLanguage,
   validateCurrencyMatch,
   getPriceForLanguage,
