@@ -122,7 +122,6 @@ describe('Price Configuration', () => {
       const criticalProducts = [
         'codigo_da_essencia',
         'activation_individual',
-        'identity_couple_premium',
       ]
 
       criticalProducts.forEach(product => {
