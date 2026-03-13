@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest'
 import {
   testPrices,
   bundlePrices,
-  identityCouplePremiumPrices,
   getCurrencyForLanguage,
   validateCurrencyMatch,
   getPriceForLanguage,
@@ -22,8 +21,6 @@ describe('Price Configuration', () => {
         'inteligencias_multiplas',
         'codigo_da_essencia',
         'ativacao_codigo',
-        'activation_individual',
-        'identity_couple_premium',
       ]
 
       requiredProducts.forEach(product => {
@@ -73,18 +70,6 @@ describe('Price Configuration', () => {
     })
   })
 
-  describe('Identity Couple Premium Prices', () => {
-    it('should have correct high-ticket pricing', () => {
-      expect(identityCouplePremiumPrices.brl.price).toBe(997)
-      expect(identityCouplePremiumPrices.usd.price).toBe(297)
-      expect(identityCouplePremiumPrices.eur.price).toBe(247)
-    })
-
-    it('should have installment options', () => {
-      expect(identityCouplePremiumPrices.brl.installments).toBe(12)
-      expect(identityCouplePremiumPrices.brl.installmentPrice).toBe(99)
-    })
-  })
 
   describe('Anti-Crosstrade Currency Functions', () => {
     it('should return correct currency for each language', () => {
@@ -137,7 +122,6 @@ describe('Price Configuration', () => {
       const criticalProducts = [
         'codigo_da_essencia',
         'activation_individual',
-        'identity_couple_premium',
       ]
 
       criticalProducts.forEach(product => {

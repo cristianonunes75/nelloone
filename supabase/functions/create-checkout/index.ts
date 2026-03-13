@@ -324,14 +324,11 @@ serve(async (req) => {
     // Check for Código do Casal purchase
     const isCodigoCasal = body.productType === "codigo_casal";
     
-    // Check for Nello Couple (Código do Casal via ProductPaywallModal with priceId)
-    const isNelloCouple = body.productType === "nello_couple";
-    
+    // Check for Activation Couple purchase
+    const isActivationCouple = body.productType === "activation_couple";
     // Check for Activation Individual (Professional Direction) purchase
     const isActivationIndividual = body.productType === "activation_individual";
-    
-    // Check for Identity Couple Premium purchase
-    const isIdentityCouplePremium = body.productType === "identity_couple_premium";
+
     
     // Check for Código da Essência Express purchase (R$99 upsell from Código Inicial)
     const isCodigoEssenciaExpress = body.productType === "codigo_essencia_express";
@@ -368,11 +365,11 @@ serve(async (req) => {
       }
     }
     
-    if (testIds.length === 0 && !isBundle && !isFundadores && !isAtivacaoCodigo && !isCodigoCasal && !isNelloCouple && !isActivationIndividual && !isIdentityCouplePremium && !isCodigoEssenciaExpress) {
+    if (testIds.length === 0 && !isBundle && !isFundadores && !isAtivacaoCodigo && !isCodigoCasal && !isActivationIndividual && !isActivationCouple && !isCodigoEssenciaExpress) {
       throw new Error("At least one test ID is required, or a valid productType must be specified");
     }
     
-    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, isAtivacaoCodigo, isCodigoCasal, isNelloCouple, isActivationIndividual, isIdentityCouplePremium, isCodigoEssenciaExpress, language, currency, couponCode });
+    logStep("Request data", { testIds, count: testIds.length, isBundle, isFundadores, isAtivacaoCodigo, isCodigoCasal, isActivationIndividual, isActivationCouple, isCodigoEssenciaExpress, language, currency, couponCode });
 
     // Get user (optional - supports guest checkout)
     let user = null;
@@ -504,35 +501,19 @@ serve(async (req) => {
         quantity: 1,
       }];
       logStep("Activation Individual line item created with Price ID", { currency, priceId: activationPriceIds[currency] });
-    } else if (isNelloCouple) {
-      // Nello Couple (Código do Casal) - Uses priceId from productCatalog
-      const nelloCouplePriceIds: Record<string, string> = {
-        brl: liveBrlPrices.nello_couple || "price_1SvfhZDjhZZxZELMDKUinSpJ",
-        usd: liveUsdPrices.nello_couple || "price_1SvfiPDjhZZxZELMjTrJTTLB",
-        eur: liveEurPrices.nello_couple || "price_1SvfjiDjhZZxZELMgYvA4BQY",
-      };
-      
-      // Also accept priceId from frontend as override
-      const finalPriceId = body.priceId || nelloCouplePriceIds[currency] || nelloCouplePriceIds.brl;
-      
-      lineItems = [{
-        price: finalPriceId,
-        quantity: 1,
-      }];
-      logStep("Nello Couple line item created with Price ID", { currency, priceId: finalPriceId });
-    } else if (isIdentityCouplePremium) {
-      // Identity Couple Premium - Mapa Definitivo do Casal (High Ticket)
-      const identityCouplePriceIds: Record<string, string> = {
-        brl: liveBrlPrices.identity_couple_premium || "price_1StyMcDjhZZxZELM5IVwqfhV",
-        usd: liveUsdPrices.identity_couple_premium || "price_1SvfdXDjhZZxZELMaNDfVXox",
-        eur: liveEurPrices.identity_couple_premium || "price_1SvfdoDjhZZxZELMLaONPhR5",
+    } else if (isActivationCouple) {
+      // Activation Couple purchase - Use real Stripe Price IDs from productCatalog
+      const activationCouplePriceIds: Record<string, string> = {
+        brl: liveBrlPrices.activation_couple || "price_1SvfkCDjhZZxZELMoL8Larml",
+        usd: liveUsdPrices.activation_couple || "price_1SvfkQDjhZZxZELMQofkLGjG",
+        eur: liveEurPrices.activation_couple || "price_1SvfkeDjhZZxZELMCyZ5YLXK",
       };
       
       lineItems = [{
-        price: identityCouplePriceIds[currency] || identityCouplePriceIds.brl,
+        price: activationCouplePriceIds[currency] || activationCouplePriceIds.brl,
         quantity: 1,
       }];
-      logStep("Identity Couple Premium line item created with Price ID", { currency, priceId: identityCouplePriceIds[currency] });
+      logStep("Activation Couple line item created with Price ID", { currency, priceId: activationCouplePriceIds[currency] });
     } else if (isFundadores) {
       // Fundadores purchase - R$197 BRL ONLY (restricted to Brazilian market)
       if (currency !== "brl") {
@@ -658,15 +639,6 @@ serve(async (req) => {
       });
     }
 
-    // Calculate discount based on quantity (only for individual tests)
-    let discountPercentage = 0;
-    if (!isBundle && testIds.length >= 5) {
-      discountPercentage = 10;
-    } else if (!isBundle && testIds.length >= 3) {
-      discountPercentage = 5;
-    }
-    
-    logStep("Discount calculated", { quantity: testIds.length, discount: discountPercentage });
 
     // Set success/cancel URLs based on language - use verify-checkout page for reliability
     const origin = req.headers.get("origin") || "";
@@ -707,12 +679,11 @@ serve(async (req) => {
         is_fundadores: isFundadores ? "true" : "false",
         is_ativacao_codigo: isAtivacaoCodigo ? "true" : "false",
         is_codigo_casal: isCodigoCasal ? "true" : "false",
-        is_nello_couple: isNelloCouple ? "true" : "false",
         is_activation_individual: isActivationIndividual ? "true" : "false",
-        is_identity_couple_premium: isIdentityCouplePremium ? "true" : "false",
-        product_type: isCodigoEssenciaExpress ? "jornada_completa" : isIdentityCouplePremium ? "identity_couple_premium" : isActivationIndividual ? "activation_individual" : isNelloCouple ? "nello_couple" : isCodigoCasal ? "codigo_casal" : isAtivacaoCodigo ? "ativacao_codigo" : isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
+        is_activation_couple: isActivationCouple ? "true" : "false",
+        product_type: isCodigoEssenciaExpress ? "jornada_completa" : isActivationCouple ? "activation_couple" : isActivationIndividual ? "activation_individual" : isCodigoCasal ? "codigo_casal" : isAtivacaoCodigo ? "ativacao_codigo" : isFundadores ? "fundadores" : isBundle ? "jornada_completa" : "test_avulso",
         affiliate_code: affiliateCode || "",
-        purchase_origin: (isCodigoCasal || isNelloCouple) ? "couple_paywall" : "",
+        purchase_origin: isCodigoCasal ? "couple_paywall" : "",
       },
       customer_creation: customerId ? undefined : "always",
     };
@@ -863,43 +834,11 @@ serve(async (req) => {
       }
     }
     
-    // REMOVED: Auto-apply LANCAMENTO50 block - was preventing coupon field from showing
-    // Users should enter LANCAMENTO50 manually in the Stripe checkout promo code field
-    
-    if (!couponCode && discountPercentage > 0) {
-      // Add quantity-based discount if applicable (only for individual tests without coupon)
-      const couponNames: Record<string, string> = {
-        pt: `Desconto ${discountPercentage}% - ${testIds.length} testes`,
-        en: `${discountPercentage}% Off - ${testIds.length} tests`,
-        "pt-pt": `Desconto ${discountPercentage}% - ${testIds.length} testes`,
-      };
-      
-      const coupon = await stripe.coupons.create({
-        percent_off: discountPercentage,
-        duration: "once",
-        name: couponNames[language] || couponNames.en,
-      });
-      
-      // Create promotion code to show the discount visibly
-      const promoCode = await stripe.promotionCodes.create({
-        coupon: coupon.id,
-        code: `COMBO${testIds.length}`,
-      });
-      
-      sessionParams.discounts = [{ promotion_code: promoCode.id }];
-      logStep("Quantity discount promotion code created", { promoCodeId: promoCode.id, discount: discountPercentage });
-    }
-
     // Allow users to enter promo codes on the Stripe Checkout page
-    // When user provided a coupon via frontend, it's already in discounts - don't enable promo field
-    // Otherwise, always show the promo code field so users can enter LANCAMENTO50 or any other code
     if (!couponCode) {
-      // Remove any auto-applied discounts to enable the promo code field
-      delete sessionParams.discounts;
       sessionParams.allow_promotion_codes = true;
       logStep("Enabled promotion code field (no user coupon provided)");
     } else if (sessionParams.discounts && sessionParams.discounts.length > 0) {
-      // User coupon was applied via discounts, don't enable promo field
       logStep("User coupon applied via discounts, promo field disabled");
     } else {
       sessionParams.allow_promotion_codes = true;
