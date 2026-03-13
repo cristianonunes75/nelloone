@@ -639,15 +639,6 @@ serve(async (req) => {
       });
     }
 
-    // Calculate discount based on quantity (only for individual tests)
-    let discountPercentage = 0;
-    if (!isBundle && testIds.length >= 5) {
-      discountPercentage = 10;
-    } else if (!isBundle && testIds.length >= 3) {
-      discountPercentage = 5;
-    }
-    
-    logStep("Discount calculated", { quantity: testIds.length, discount: discountPercentage });
 
     // Set success/cancel URLs based on language - use verify-checkout page for reliability
     const origin = req.headers.get("origin") || "";
