@@ -139,22 +139,6 @@ export const testPrices: Record<string, TestPrice> = {
     usd: { price: 19, priceId: "price_1T4nKmDjhZZxZELMKy13VF6R" },
     eur: { price: 19, priceId: "price_1T4nLGDjhZZxZELMSEOF1Yjg" },
   },
-  // Identity Couple Premium - Mapa Definitivo do Casal (7 Pilares) HIGH TICKET
-  identity_couple_premium: {
-    testType: "identity_couple_premium",
-    brl: { 
-      price: 997, 
-      priceId: "price_1StyMcDjhZZxZELM5IVwqfhV" // R$997 (12x R$99)
-    },
-    usd: { 
-      price: 297, 
-      priceId: "price_1SvfdXDjhZZxZELMaNDfVXox" 
-    },
-    eur: { 
-      price: 247, 
-      priceId: "price_1SvfdoDjhZZxZELMLaONPhR5" 
-    },
-  },
 };
 
 // Identity Couple Premium - High Ticket product (R$ 997 / 12x R$ 99)
