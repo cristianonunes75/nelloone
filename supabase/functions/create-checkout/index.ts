@@ -501,35 +501,19 @@ serve(async (req) => {
         quantity: 1,
       }];
       logStep("Activation Individual line item created with Price ID", { currency, priceId: activationPriceIds[currency] });
-    } else if (isNelloCouple) {
-      // Nello Couple (Código do Casal) - Uses priceId from productCatalog
-      const nelloCouplePriceIds: Record<string, string> = {
-        brl: liveBrlPrices.nello_couple || "price_1SvfhZDjhZZxZELMDKUinSpJ",
-        usd: liveUsdPrices.nello_couple || "price_1SvfiPDjhZZxZELMjTrJTTLB",
-        eur: liveEurPrices.nello_couple || "price_1SvfjiDjhZZxZELMgYvA4BQY",
-      };
-      
-      // Also accept priceId from frontend as override
-      const finalPriceId = body.priceId || nelloCouplePriceIds[currency] || nelloCouplePriceIds.brl;
-      
-      lineItems = [{
-        price: finalPriceId,
-        quantity: 1,
-      }];
-      logStep("Nello Couple line item created with Price ID", { currency, priceId: finalPriceId });
-    } else if (isIdentityCouplePremium) {
-      // Identity Couple Premium - Mapa Definitivo do Casal (High Ticket)
-      const identityCouplePriceIds: Record<string, string> = {
-        brl: liveBrlPrices.identity_couple_premium || "price_1StyMcDjhZZxZELM5IVwqfhV",
-        usd: liveUsdPrices.identity_couple_premium || "price_1SvfdXDjhZZxZELMaNDfVXox",
-        eur: liveEurPrices.identity_couple_premium || "price_1SvfdoDjhZZxZELMLaONPhR5",
+    } else if (isActivationCouple) {
+      // Activation Couple purchase - Use real Stripe Price IDs from productCatalog
+      const activationCouplePriceIds: Record<string, string> = {
+        brl: liveBrlPrices.activation_couple || "price_1SvfkCDjhZZxZELMoL8Larml",
+        usd: liveUsdPrices.activation_couple || "price_1SvfkQDjhZZxZELMQofkLGjG",
+        eur: liveEurPrices.activation_couple || "price_1SvfkeDjhZZxZELMCyZ5YLXK",
       };
       
       lineItems = [{
-        price: identityCouplePriceIds[currency] || identityCouplePriceIds.brl,
+        price: activationCouplePriceIds[currency] || activationCouplePriceIds.brl,
         quantity: 1,
       }];
-      logStep("Identity Couple Premium line item created with Price ID", { currency, priceId: identityCouplePriceIds[currency] });
+      logStep("Activation Couple line item created with Price ID", { currency, priceId: activationCouplePriceIds[currency] });
     } else if (isFundadores) {
       // Fundadores purchase - R$197 BRL ONLY (restricted to Brazilian market)
       if (currency !== "brl") {
