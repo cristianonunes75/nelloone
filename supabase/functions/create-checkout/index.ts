@@ -834,43 +834,11 @@ serve(async (req) => {
       }
     }
     
-    // REMOVED: Auto-apply LANCAMENTO50 block - was preventing coupon field from showing
-    // Users should enter LANCAMENTO50 manually in the Stripe checkout promo code field
-    
-    if (!couponCode && discountPercentage > 0) {
-      // Add quantity-based discount if applicable (only for individual tests without coupon)
-      const couponNames: Record<string, string> = {
-        pt: `Desconto ${discountPercentage}% - ${testIds.length} testes`,
-        en: `${discountPercentage}% Off - ${testIds.length} tests`,
-        "pt-pt": `Desconto ${discountPercentage}% - ${testIds.length} testes`,
-      };
-      
-      const coupon = await stripe.coupons.create({
-        percent_off: discountPercentage,
-        duration: "once",
-        name: couponNames[language] || couponNames.en,
-      });
-      
-      // Create promotion code to show the discount visibly
-      const promoCode = await stripe.promotionCodes.create({
-        coupon: coupon.id,
-        code: `COMBO${testIds.length}`,
-      });
-      
-      sessionParams.discounts = [{ promotion_code: promoCode.id }];
-      logStep("Quantity discount promotion code created", { promoCodeId: promoCode.id, discount: discountPercentage });
-    }
-
     // Allow users to enter promo codes on the Stripe Checkout page
-    // When user provided a coupon via frontend, it's already in discounts - don't enable promo field
-    // Otherwise, always show the promo code field so users can enter LANCAMENTO50 or any other code
     if (!couponCode) {
-      // Remove any auto-applied discounts to enable the promo code field
-      delete sessionParams.discounts;
       sessionParams.allow_promotion_codes = true;
       logStep("Enabled promotion code field (no user coupon provided)");
     } else if (sessionParams.discounts && sessionParams.discounts.length > 0) {
-      // User coupon was applied via discounts, don't enable promo field
       logStep("User coupon applied via discounts, promo field disabled");
     } else {
       sessionParams.allow_promotion_codes = true;
