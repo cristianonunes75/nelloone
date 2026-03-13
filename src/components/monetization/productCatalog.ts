@@ -62,42 +62,6 @@ export const PRODUCT_CATALOG: Record<string, ProductInfo> = {
     badge: "Casal",
   },
 
-  identity_couple_premium: {
-    id: "identity_couple_premium",
-    name: "Identity Couple Premium",
-    nameEn: "Identity Couple Premium",
-    description: "O Mapa Definitivo do Casal. 7 pilares de inteligência cruzada em 15-20 páginas.",
-    descriptionEn: "The Definitive Couple's Map. 7 pillars of crossed intelligence in 15-20 pages.",
-    benefits: [
-      "15-20 páginas de análise profunda",
-      "Protocolo de Ritmo (Temperamentos)",
-      "Sinergia de Talentos (Inteligências Múltiplas)",
-      "Mito do Casal (Arquétipos)",
-      "Plano de Abastecimento Emocional",
-      "Tomada de Decisão Conjunta (Nello 16)",
-      "Seção de Ativações para recorrência",
-    ],
-    benefitsEn: [
-      "15-20 pages of deep analysis",
-      "Rhythm Protocol (Temperaments)",
-      "Talent Synergy (Multiple Intelligences)",
-      "Couple's Myth (Archetypes)",
-      "Emotional Supply Plan",
-      "Joint Decision Making (Nello 16)",
-      "Activations section for recurrence",
-    ],
-    priceBRL: 997,
-    priceUSD: 297,
-    priceEUR: 247,
-    priceIdBRL: "price_1StyMcDjhZZxZELM5IVwqfhV",
-    priceIdUSD: "price_1SvfdXDjhZZxZELMaNDfVXox",
-    priceIdEUR: "price_1SvfdoDjhZZxZELMLaONPhR5",
-    installments: 12,
-    installmentPrice: 99,
-    originalPrice: 1497,
-    productType: "identity_couple_premium",
-    badge: "Premium",
-  },
 };
 
 // Helper to get product by type

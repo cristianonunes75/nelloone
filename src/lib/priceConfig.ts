@@ -141,48 +141,9 @@ export const testPrices: Record<string, TestPrice> = {
   },
 };
 
-// Identity Couple Premium - High Ticket product (R$ 997 / 12x R$ 99)
-export const identityCouplePremiumPrices = {
-  name: "Identity Couple Premium - Mapa Definitivo do Casal",
-  productType: "identity_couple_premium",
-  description: "Relatório completo de 7 pilares: DISC, Eneagrama, Temperamentos, Inteligências Múltiplas, Arquétipos, Estilos de Conexão e Nello 16. O livro definitivo da identidade do seu relacionamento.",
-  features: [
-    "15-20 páginas de análise profunda",
-    "Protocolo de Ritmo do Casal (Temperamentos)",
-    "Sinergia de Talentos (Inteligências Múltiplas)",
-    "Mito do Casal (Arquétipos)",
-    "Plano de Abastecimento Emocional (Linguagens de Amor)",
-    "Tomada de Decisão Conjunta (Nello 16)",
-    "Seção de Ativações para recorrência",
-  ],
-  brl: {
-    price: 997,
-    installments: 12,
-    installmentPrice: 99,
-    originalPrice: 1497,
-    priceId: "price_1StyMcDjhZZxZELM5IVwqfhV",
-    currency: "BRL" as Currency,
-    symbol: "R$",
-  },
-  usd: {
-    price: 297,
-    installments: 12,
-    installmentPrice: 29,
-    originalPrice: 447,
-    priceId: "price_1SvfdXDjhZZxZELMaNDfVXox",
-    currency: "USD" as Currency,
-    symbol: "$",
-  },
-  eur: {
-    price: 247,
-    installments: 12,
-    installmentPrice: 24,
-    originalPrice: 397,
-    priceId: "price_1SvfdoDjhZZxZELMLaONPhR5",
-    currency: "EUR" as Currency,
-    symbol: "€",
-  },
-};
+// NOTE: Individual test prices in Stripe (DISC R$29, MBTI R$29, Eneagrama R$29) differ from
+// legacy frontend display values (R$97, R$197, R$177). Individual tests are DISCONTINUED —
+// users purchase via Jornada Completa bundle. These IDs are kept for reference only.
 
 // Fundadores - Special launch tier with complete access
 export const fundadoresPrices = {
