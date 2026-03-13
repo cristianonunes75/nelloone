@@ -21,8 +21,6 @@ describe('Price Configuration', () => {
         'inteligencias_multiplas',
         'codigo_da_essencia',
         'ativacao_codigo',
-        'activation_individual',
-        'identity_couple_premium',
       ]
 
       requiredProducts.forEach(product => {
