@@ -324,14 +324,9 @@ serve(async (req) => {
     // Check for Código do Casal purchase
     const isCodigoCasal = body.productType === "codigo_casal";
     
-    // Check for Nello Couple (Código do Casal via ProductPaywallModal with priceId)
-    const isNelloCouple = body.productType === "nello_couple";
+    // Check for Activation Couple purchase
+    const isActivationCouple = body.productType === "activation_couple";
     
-    // Check for Activation Individual (Professional Direction) purchase
-    const isActivationIndividual = body.productType === "activation_individual";
-    
-    // Check for Identity Couple Premium purchase
-    const isIdentityCouplePremium = body.productType === "identity_couple_premium";
     
     // Check for Código da Essência Express purchase (R$99 upsell from Código Inicial)
     const isCodigoEssenciaExpress = body.productType === "codigo_essencia_express";
