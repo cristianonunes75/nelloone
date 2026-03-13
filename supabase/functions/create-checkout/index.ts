@@ -326,7 +326,9 @@ serve(async (req) => {
     
     // Check for Activation Couple purchase
     const isActivationCouple = body.productType === "activation_couple";
-    
+    // Check for Activation Individual (Professional Direction) purchase
+    const isActivationIndividual = body.productType === "activation_individual";
+
     
     // Check for Código da Essência Express purchase (R$99 upsell from Código Inicial)
     const isCodigoEssenciaExpress = body.productType === "codigo_essencia_express";
