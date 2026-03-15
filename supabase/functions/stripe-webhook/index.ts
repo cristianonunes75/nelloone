@@ -834,60 +834,7 @@ serve(async (req) => {
         });
       }
 
-      // ====== IDENTITY COUPLE PREMIUM PURCHASE (HIGH TICKET R$997) ======
-      if (productType === "identity_couple_premium") {
-        logStep("Processing Identity Couple Premium purchase (R$997)", { userId });
-        
-        if (!userId || userId === "guest") {
-          logStep("ERROR: Identity Couple Premium requires authenticated user");
-          return new Response(JSON.stringify({ error: "User authentication required" }), {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          });
-        }
-
-        // Premium includes all couple features
-        const { error: updateError } = await supabase
-          .from("profiles")
-          .update({ 
-            has_identity_couple_premium: true,
-            has_nello_couple: true,
-            has_activation_couple: true,
-          })
-          .eq("id", userId);
-
-        if (updateError) {
-          logStep("ERROR: Failed to unlock Identity Couple Premium", { error: updateError });
-          throw updateError;
-        }
-
-        const { data: firstTestICP } = await supabase
-          .from("tests").select("id").eq("active", true).limit(1).single();
-
-        const { error: purchaseError } = await supabase
-          .from("test_purchases")
-          .insert({
-            user_id: userId,
-            test_id: firstTestICP?.id || "00000000-0000-0000-0000-000000000000",
-            payment_status: "completed",
-            payment_method: "stripe",
-            price_paid: (session.amount_total || 0) / 100,
-            currency: session.metadata?.currency?.toUpperCase() || "BRL",
-            transaction_id: session.payment_intent as string,
-            purchase_category: "identity_couple_premium",
-          });
-
-        if (purchaseError) {
-          logStep("ERROR: Failed to record purchase", { error: purchaseError });
-        }
-
-        logStep("Identity Couple Premium unlocked (includes all couple features)", { userId });
-
-        return new Response(JSON.stringify({ received: true, product: "identity_couple_premium" }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
+      // identity_couple_premium — DESCONTINUADO (removido)
 
       // ====== JORNADA COMPLETA PURCHASE (also handles codigo_essencia_express) ======
       // VALIDATION PHASE: Jornada Completa now includes Código da Essência
