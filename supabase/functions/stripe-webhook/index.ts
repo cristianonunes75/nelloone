@@ -328,7 +328,13 @@ serve(async (req) => {
 
     let event;
     try {
-      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      event = await stripe.webhooks.constructEventAsync(
+        body,
+        signature,
+        webhookSecret,
+        undefined,
+        Stripe.createSubtleCryptoProvider()
+      );
     } catch (err) {
       logStep("ERROR: Webhook signature verification failed", { 
         error: err instanceof Error ? err.message : String(err) 
