@@ -782,55 +782,7 @@ serve(async (req) => {
         });
       }
 
-      // ====== NELLO COUPLE PURCHASE ======
-      if (productType === "nello_couple") {
-        logStep("Processing Nello Couple purchase", { userId });
-        
-        if (!userId || userId === "guest") {
-          logStep("ERROR: Nello Couple requires authenticated user");
-          return new Response(JSON.stringify({ error: "User authentication required" }), {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          });
-        }
-
-        const { error: updateError } = await supabase
-          .from("profiles")
-          .update({ has_nello_couple: true })
-          .eq("id", userId);
-
-        if (updateError) {
-          logStep("ERROR: Failed to unlock Nello Couple", { error: updateError });
-          throw updateError;
-        }
-
-        const { data: firstTestNC } = await supabase
-          .from("tests").select("id").eq("active", true).limit(1).single();
-
-        const { error: purchaseError } = await supabase
-          .from("test_purchases")
-          .insert({
-            user_id: userId,
-            test_id: firstTestNC?.id || "00000000-0000-0000-0000-000000000000",
-            payment_status: "completed",
-            payment_method: "stripe",
-            price_paid: (session.amount_total || 0) / 100,
-            currency: session.metadata?.currency?.toUpperCase() || "BRL",
-            transaction_id: session.payment_intent as string,
-            purchase_category: "nello_couple",
-          });
-
-        if (purchaseError) {
-          logStep("ERROR: Failed to record purchase", { error: purchaseError });
-        }
-
-        logStep("Nello Couple unlocked successfully", { userId });
-
-        return new Response(JSON.stringify({ received: true, product: "nello_couple" }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
+      // nello_couple — DESCONTINUADO (removido)
 
       // ====== ACTIVATION COUPLE PURCHASE ======
       if (productType === "activation_couple") {
