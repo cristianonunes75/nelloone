@@ -1,43 +1,43 @@
 
 
-## Diagnóstico
+## Diagnóstico: Webhook Stripe Falhando
 
-A tabela `company_users` atualmente **não possui** um campo de cargo/posição. Os campos existentes são apenas administrativos (role, consent, sharing, etc.). O campo `role` é o papel no sistema (admin/collaborator), **não** o cargo na empresa (ex: "Gerente de Marketing", "Analista de RH").
+### Problema Identificado
 
-Para permitir edição do cargo de cada colaborador na aba Equipe, precisamos:
+Na **linha 331** do `stripe-webhook/index.ts`, a verificação de assinatura usa o método **síncrono** `constructEvent()`:
 
-## Plano
-
-### 1. Adicionar coluna `job_title` na tabela `company_users`
-- Migration: `ALTER TABLE company_users ADD COLUMN job_title TEXT DEFAULT NULL`
-- Sem impacto em dados existentes (nullable, sem breaking changes)
-
-### 2. Adicionar coluna `department` (opcional, mas recomendado)
-- `ALTER TABLE company_users ADD COLUMN department TEXT DEFAULT NULL`
-- Permite agrupar por área futuramente (People Strategy, filtros, etc.)
-
-### 3. Tornar o cargo editável na tabela de Membros (`TeamMembersTab`)
-- Exibir coluna "Cargo" na tabela (entre Nome e Função)
-- No dropdown de ações (menu `...`), adicionar opção "Editar cargo"
-- Ao clicar, abrir um Dialog simples com campos:
-  - **Cargo** (ex: "Gerente de Vendas")
-  - **Departamento** (ex: "Comercial") — opcional
-- Salvar via `supabase.from('company_users').update({ job_title, department })`
-
-### 4. Atualizar a busca
-- Incluir `job_title` e `department` no filtro de busca existente
-
-### Resultado visual na tabela
-
-```text
-Nome              | Cargo                | Função      | Status    | Progresso | Desde
-Maria Silva       | Gerente de Marketing | Colaborador | Concluído | 7/7 mapas | 01 Jan 2025
-João Santos       | Analista de RH       | Admin       | Em andamento | 3/7 mapas | 15 Fev 2025
-Ana Costa         | —                    | Colaborador | Não iniciado | -         | 01 Mar 2025
+```typescript
+event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
 ```
 
-### Arquivos afetados
-- **Migration SQL**: adicionar `job_title` e `department` em `company_users`
-- **`TeamMembersTab.tsx`**: nova coluna, dialog de edição, busca atualizada
-- **`TeamMembersSection.tsx`**: exibir cargo na versão resumida (se aplicável)
+Em Edge Functions (Deno), o Node.js crypto **não está disponível**. O método correto é o **assíncrono** `constructEventAsync()` com `Stripe.createSubtleCryptoProvider()`, que usa a Web Crypto API disponível no Deno.
+
+Este é um problema conhecido que causa falhas silenciosas — o Stripe recebe um erro 400/500 de volta e começa a reportar falhas no webhook.
+
+### Plano de Correção
+
+1. **Corrigir a verificação de assinatura** no `stripe-webhook/index.ts` (linha 331):
+   - Trocar `stripe.webhooks.constructEvent(body, signature, webhookSecret)` por `await stripe.webhooks.constructEventAsync(body, signature, webhookSecret, undefined, Stripe.createSubtleCryptoProvider())`
+
+2. **Limpar handlers de produtos descontinuados** no mesmo arquivo:
+   - Remover o bloco `nello_couple` (linhas 779-827) — produto descontinuado
+   - Remover o bloco `identity_couple_premium` (linhas 879-932) — produto descontinuado
+
+3. **Redeploy** da edge function `stripe-webhook`
+
+### Detalhes Técnicos
+
+A correção principal é uma única linha:
+
+```typescript
+// ANTES (falha no Deno):
+event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+
+// DEPOIS (funciona no Deno):
+event = await stripe.webhooks.constructEventAsync(
+  body, signature, webhookSecret,
+  undefined,
+  Stripe.createSubtleCryptoProvider()
+);
+```
 
