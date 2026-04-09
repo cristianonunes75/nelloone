@@ -19,7 +19,8 @@ type EmailType =
   | "new_testimonial"
   | "testimonial_response"
   | "support_reply"
-  | "results_updated";
+  | "results_updated"
+  | "hotmart_welcome";
 
 interface EmailRequest {
   type: EmailType;
@@ -496,6 +497,53 @@ ${data.message || "Obrigado pelo seu feedback!"}
           </div>
         `,
       },
+      hotmart_welcome: {
+        subject: "Seu acesso à Jornada Identity está pronto!",
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">O caminho começa dentro.</p>
+            </div>
+
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Olá, ${name}!</h2>
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Sua compra foi confirmada e seu acesso à <strong>Jornada Identity Completa</strong> já está liberado!
+              </p>
+
+              <div style="background: #F8F9FA; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                <p style="color: #666; font-size: 14px; margin: 0 0 8px;">O que você recebeu:</p>
+                <ul style="color: #1A1A1A; font-size: 15px; margin: 0; padding-left: 20px; line-height: 1.8;">
+                  <li>7 Mapas de Autoconhecimento</li>
+                  <li>Código da Essência (relatório integrado por IA)</li>
+                  <li>Ativação de Direção Profissional</li>
+                  <li>Acesso vitalício</li>
+                </ul>
+              </div>
+
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Clique no botão abaixo para acessar sua jornada:
+              </p>
+
+              <div style="text-align: center; margin-top: 24px;">
+                <a href="https://identity.nello.one/auth?mode=login"
+                   style="display: inline-block; background: linear-gradient(135deg, #1F2E4B 0%, #2D4A7A 100%); color: white; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600;">
+                  Acessar Minha Jornada
+                </a>
+              </div>
+
+              <p style="color: #888; font-size: 13px; margin-top: 24px; text-align: center;">
+                Use o email <strong>${data.userEmail || ""}</strong> para fazer login.
+              </p>
+            </div>
+
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. Todos os direitos reservados.
+            </p>
+          </div>
+        `,
+      },
     },
     en: {
       purchase_confirmation: {
@@ -937,6 +985,45 @@ ${data.message || "Thank you for your feedback!"}
               </a>
             </div>
             
+            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
+              © 2025 NELLO ONE. All rights reserved.
+            </p>
+          </div>
+        `,
+      },
+      hotmart_welcome: {
+        subject: "Your Identity Journey access is ready!",
+        html: `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FCFCFC;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1A1A1A; font-size: 28px; margin: 0;">NELLO ONE</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 8px;">The path begins within.</p>
+            </div>
+
+            <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <h2 style="color: #1A1A1A; font-size: 22px; margin: 0 0 16px;">Hello, ${name}!</h2>
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                Your purchase has been confirmed and your access to the <strong>Complete Identity Journey</strong> is ready!
+              </p>
+
+              <div style="background: #F8F9FA; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                <p style="color: #666; font-size: 14px; margin: 0 0 8px;">What you received:</p>
+                <ul style="color: #1A1A1A; font-size: 15px; margin: 0; padding-left: 20px; line-height: 1.8;">
+                  <li>7 Self-Knowledge Maps</li>
+                  <li>Essence Code (AI-integrated report)</li>
+                  <li>Professional Direction Activation</li>
+                  <li>Lifetime access</li>
+                </ul>
+              </div>
+
+              <div style="text-align: center; margin-top: 24px;">
+                <a href="https://identity.nello.one/en/auth?mode=login"
+                   style="display: inline-block; background: linear-gradient(135deg, #1F2E4B 0%, #2D4A7A 100%); color: white; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600;">
+                  Access My Journey
+                </a>
+              </div>
+            </div>
+
             <p style="color: #999; font-size: 12px; text-align: center; margin-top: 32px;">
               © 2025 NELLO ONE. All rights reserved.
             </p>
