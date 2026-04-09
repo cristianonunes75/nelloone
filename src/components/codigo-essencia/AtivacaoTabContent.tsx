@@ -41,7 +41,7 @@ const translations = {
       { icon: MessageCircle, title: "Declaração de Ativação", desc: "Sua frase de poder personalizada" },
     ],
     
-    price: "Por apenas R$ 97",
+    price: "Por apenas R$ 197",
     cta: "QUERO ATIVAR MEU CÓDIGO AGORA",
     ctaUnlocked: "Acessar minha Ativação",
     

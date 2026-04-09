@@ -211,12 +211,8 @@ const Checkout = () => {
 
   // Process zero-value purchase directly in database
   const processZeroValuePurchase = async () => {
-    console.log("[ZERO-VALUE] Starting zero-value purchase for user:", user?.id);
-    
     try {
       // Step 1: Update profile to grant journey access
-      // IMPORTANT: Using correct column name 'ativacao_codigo_unlocked' (not 'codigo_essencia_unlocked')
-      console.log("[ZERO-VALUE] Step 1: Updating profile...");
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
@@ -230,10 +226,7 @@ const Checkout = () => {
         console.error("[ZERO-VALUE] Profile update error:", profileError);
         throw new Error(`Profile update failed: ${profileError.message}`);
       }
-      console.log("[ZERO-VALUE] Profile updated successfully");
-
       // Step 2: Get all active tests
-      console.log("[ZERO-VALUE] Step 2: Fetching tests...");
       const { data: allTests, error: testsError } = await supabase
         .from("tests")
         .select("id, name, type")
@@ -243,11 +236,8 @@ const Checkout = () => {
         console.error("[ZERO-VALUE] Tests fetch error:", testsError);
         throw new Error(`Tests fetch failed: ${testsError.message}`);
       }
-      console.log("[ZERO-VALUE] Found tests:", allTests?.length || 0);
-
       // Step 3: Create purchase records for each test
       if (allTests && allTests.length > 0) {
-        console.log("[ZERO-VALUE] Step 3: Creating purchase records...");
         const transactionId = `coupon_${appliedCoupon?.code || 'free'}_${Date.now()}`;
         
         for (const test of allTests) {
@@ -276,19 +266,17 @@ const Checkout = () => {
           if (insertError) {
             if (insertError.code === '23505') {
               // User already has access to this test - this is OK, just skip
-              console.log(`[ZERO-VALUE] User already has access to test ${test.id} - skipping`);
+              // User already has access - skip
             } else {
               // Log other errors but don't block the purchase
               console.warn(`[ZERO-VALUE] Insert warning for test ${test.id}:`, insertError);
             }
           }
         }
-        console.log("[ZERO-VALUE] Purchase records created");
       }
 
       // Step 4: Update coupon usage via Edge Function (bypasses RLS)
       if (appliedCoupon?.code) {
-        console.log("[ZERO-VALUE] Step 4: Updating coupon usage via Edge Function...");
         try {
           const { error: couponError } = await supabase.functions.invoke("update-coupon-usage", {
             body: { couponCode: appliedCoupon.code },
@@ -297,21 +285,13 @@ const Checkout = () => {
           if (couponError) {
             // Don't block the purchase if coupon update fails
             console.warn("[ZERO-VALUE] Coupon usage update failed (non-blocking):", couponError);
-          } else {
-            console.log("[ZERO-VALUE] Coupon usage updated successfully");
           }
         } catch (couponErr) {
           console.warn("[ZERO-VALUE] Coupon usage update exception (non-blocking):", couponErr);
         }
       }
 
-      // Step 5: Log completed (skipping audit_logs INSERT due to RLS restrictions)
-      console.log("[ZERO-VALUE] Purchase completed successfully!");
-
-      console.log("[ZERO-VALUE] Purchase completed successfully!");
-      
-      // CRITICAL: Invalidate caches to ensure UI shows access immediately
-      console.log("[ZERO-VALUE] Invalidating query caches...");
+      // Invalidate caches to ensure UI shows access immediately
       await queryClient.invalidateQueries({ queryKey: ["test-purchases"] });
       await queryClient.invalidateQueries({ queryKey: ["user-tests"] });
       await queryClient.invalidateQueries({ queryKey: ["profile-ativacao-unlocked"] });
@@ -340,8 +320,6 @@ const Checkout = () => {
 
   // Process payment
   const handleCheckout = async () => {
-   console.log("=== HANDLECHECKOUT STARTED ===");
-   
    // STEP 0: Check consent
    if (!checkoutConsent) {
      setConsentError(true);
@@ -355,7 +333,6 @@ const Checkout = () => {
    
    // STEP 1: Check if user is logged in
     if (!user) {
-     console.log("No user found, showing login toast");
       toast({
         title: texts.loginRequired,
         variant: "destructive",
@@ -375,16 +352,11 @@ const Checkout = () => {
     
    // STEP 2: Calculate final price FIRST
    const finalPriceValue = calculateFinalPrice();
-   console.log("Final price calculated:", finalPriceValue);
-   console.log("Applied coupon:", appliedCoupon);
-   console.log("Base price:", priceInfo.price);
    
    // STEP 3: IMMEDIATELY check if price is zero - NO API CALLS BEFORE THIS
    if (finalPriceValue === 0 || finalPriceValue < 0.01) {
-     console.log("=== ZERO VALUE DETECTED - PROCESSING LOCALLY ===");
      try {
        await processZeroValuePurchase();
-       console.log("Zero value purchase completed successfully");
      } catch (error) {
        console.error("Zero value purchase failed:", error);
        setIsProcessing(false);
@@ -393,7 +365,6 @@ const Checkout = () => {
    }
    
    // STEP 4: Only if price is NOT zero, proceed with Stripe
-   console.log("=== NON-ZERO VALUE - PROCEEDING WITH STRIPE ===");
    try {
      const affiliateCode = getAffiliateCode();
      

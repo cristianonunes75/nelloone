@@ -35,7 +35,7 @@ async function getCountryFromIP(ip: string): Promise<string | null> {
   }
   
   try {
-    const response = await fetch(`http://ip-api.com/json/${ip}?fields=status,countryCode`);
+    const response = await fetch(`https://pro.ip-api.com/json/${ip}?fields=status,countryCode&key=${Deno.env.get("IP_API_KEY") || ""}`);
     const data = await response.json();
     
     if (data.status === "success") {
@@ -87,7 +87,7 @@ const USD_PRICES: Record<string, string> = {
   codigo_da_essencia: "price_1Sc2RfDjhZZxZELMbZP1CvLO", // $97 USD
   ativacao_codigo: "price_1Sw6F6DjhZZxZELMfBW3pn5q", // $57 USD - Ativação do Código da Essência
   activation_individual: "price_1SxRhuDjhZZxZELMsAYBZqUP", // $57 USD - Ativação de Direção Profissional (UNIQUE)
-  codigo_casal: "price_placeholder_codigo_casal_usd", // $9 USD - Couple's Code
+  codigo_casal: "price_1SvfiPDjhZZxZELMjTrJTTLB", // $59 USD - Couple's Code
   fundadores: "price_1ScWglDjhZZxZELM3tQocxgu", // R$197 (BRL only)
 };
 
@@ -105,7 +105,7 @@ const BRL_PRICES: Record<string, string> = {
   codigo_da_essencia: "price_1Sc2RRDjhZZxZELMPxAnu0I5", // R$397 BRL
   ativacao_codigo: "price_1Sw6EEDjhZZxZELMSmPNECig", // R$197 BRL - Ativação do Código da Essência
   activation_individual: "price_1SxRhHDjhZZxZELMuoj7N1CN", // R$197 BRL - Ativação de Direção Profissional (UNIQUE)
-  codigo_casal: "price_placeholder_codigo_casal_brl", // R$47 BRL - Couple's Code
+  codigo_casal: "price_1SvfhZDjhZZxZELMDKUinSpJ", // R$297 BRL - Couple's Code
   fundadores: "price_1ScWglDjhZZxZELM3tQocxgu", // R$197 (BRL only)
 };
 
@@ -123,7 +123,7 @@ const EUR_PRICES: Record<string, string> = {
   codigo_da_essencia: "price_1Sc2TRDjhZZxZELMr66uJZZm", // €97 EUR
   ativacao_codigo: "price_1Sw6FiDjhZZxZELMXDH1ACdx", // €47 EUR - Ativação do Código da Essência
   activation_individual: "price_1SxRjKDjhZZxZELMAqWHQKbm", // €47 EUR - Ativação de Direção Profissional (UNIQUE)
-  codigo_casal: "price_placeholder_codigo_casal_eur", // €12 EUR - Couple's Code
+  codigo_casal: "price_1SvfjiDjhZZxZELMgYvA4BQY", // €55 EUR - Couple's Code
   fundadores: "price_1ScWglDjhZZxZELM3tQocxgu", // R$197 (BRL only - not available in EUR)
 };
 

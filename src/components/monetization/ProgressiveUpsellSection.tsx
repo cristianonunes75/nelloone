@@ -3,18 +3,23 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Lock, 
-  Sparkles, 
-  Heart, 
-  Users, 
-  Target, 
+import {
+  Lock,
+  Sparkles,
+  Heart,
+  Users,
+  Target,
   ChevronRight,
   Check,
+  Crown,
+  Compass,
+  ExternalLink
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ProductPaywallModal } from "./ProductPaywallModal";
+import { IdentityCouplePremiumModal } from "./IdentityCouplePremiumModal";
 import { PRODUCT_CATALOG } from "./productCatalog";
 
 interface ProgressiveUpsellSectionProps {
@@ -40,6 +45,9 @@ interface UpsellCard {
   visible: boolean;
   unlocked: boolean;
   productKey?: keyof typeof PRODUCT_CATALOG;
+  isPremium?: boolean;
+  isExternal?: boolean;
+  externalHref?: string;
   onView?: () => void;
 }
 
@@ -57,19 +65,21 @@ export function ProgressiveUpsellSection({
 }: ProgressiveUpsellSectionProps) {
   const { language } = useLanguage();
   const isEn = language === "en";
-  
+  const navigate = useNavigate();
+
   const [selectedProduct, setSelectedProduct] = useState<keyof typeof PRODUCT_CATALOG | null>(null);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const upsellCards: UpsellCard[] = [
     {
       id: "activation_individual",
-      name: isEn ? "Essence Code Activation" : "Ativação do Código",
-      description: isEn 
-        ? "Transform self-knowledge into action with your personalized 90-day plan."
-        : "Transforme autoconhecimento em ação com seu plano personalizado de 90 dias.",
-      icon: Target,
-      gradient: "from-amber-500/20 via-orange-400/10 to-transparent",
-      iconBg: "from-amber-500 to-orange-500",
+      name: isEn ? "Professional Direction Activation" : "Ativação de Direção Profissional",
+      description: isEn
+        ? "Discover your professional direction based on your essence. Career guidance aligned with who you truly are."
+        : "Descubra sua direção profissional com base na sua essência. Orientação de carreira alinhada com quem você realmente é.",
+      icon: Compass,
+      gradient: "from-teal-500/20 via-cyan-400/10 to-transparent",
+      iconBg: "from-teal-500 to-cyan-500",
       visible: journeyCompleted && hasSavedCodigo,
       unlocked: hasActivationIndividual,
       productKey: "activation_individual",
@@ -78,7 +88,7 @@ export function ProgressiveUpsellSection({
     {
       id: "activation_couple",
       name: isEn ? "Couple's Code Activation" : "Ativação do Casal",
-      description: isEn 
+      description: isEn
         ? "Personalized actions and rituals to strengthen your connection."
         : "Ações e rituais personalizados para fortalecer a conexão do casal.",
       icon: Users,
@@ -88,6 +98,34 @@ export function ProgressiveUpsellSection({
       unlocked: hasActivationCouple || hasIdentityCouplePremium,
       productKey: "activation_couple",
       onView: onViewActivationCouple,
+    },
+    {
+      id: "identity_couple_premium",
+      name: isEn ? "Identity Couple Premium" : "Identity Couple Premium",
+      description: isEn
+        ? "The definitive couple's map. 7 pillars of crossed intelligence in 15-20 pages."
+        : "O Mapa Definitivo do Casal. 7 pilares de inteligência cruzada em 15-20 páginas.",
+      icon: Crown,
+      gradient: "from-gold/30 via-amber-500/15 to-transparent",
+      iconBg: "from-gold to-amber-500",
+      visible: hasNelloCouple && !hasIdentityCouplePremium,
+      unlocked: hasIdentityCouplePremium,
+      isPremium: true,
+      productKey: "identity_couple_premium",
+    },
+    {
+      id: "imersao_casal",
+      name: isEn ? "Couple Immersion" : "Imersão Código do Casal",
+      description: isEn
+        ? "A transformative couples experience: 3 live sessions with personalized guidance."
+        : "Uma experiência transformadora a dois: 3 sessões ao vivo com orientação personalizada.",
+      icon: Heart,
+      gradient: "from-pink-500/20 via-rose-400/10 to-transparent",
+      iconBg: "from-pink-500 to-rose-600",
+      visible: hasSavedCodigo,
+      unlocked: false,
+      isExternal: true,
+      externalHref: "/imersao-casal",
     },
   ];
 
@@ -101,14 +139,18 @@ export function ProgressiveUpsellSection({
   };
 
   const handleUnlock = (card: UpsellCard) => {
-    if (card.productKey) {
+    if (card.isExternal && card.externalHref) {
+      navigate(card.externalHref);
+    } else if (card.isPremium) {
+      setShowPremiumModal(true);
+    } else if (card.productKey) {
       setSelectedProduct(card.productKey);
     }
   };
 
   return (
     <>
-      <motion.div 
+      <motion.div
         variants={itemVariants}
         className="space-y-4"
       >
@@ -119,13 +161,14 @@ export function ProgressiveUpsellSection({
 
         <div className="grid gap-4">
           {visibleCards.map((card) => (
-            <Card 
+            <Card
               key={card.id}
               className={cn(
                 "relative overflow-hidden transition-all duration-300",
-                card.unlocked 
-                  ? "border-green-500/30 bg-green-500/5" 
+                card.unlocked
+                  ? "border-green-500/30 bg-green-500/5"
                   : "border-dashed border-2 border-muted-foreground/30 opacity-90 hover:opacity-100",
+                card.isPremium && !card.unlocked && "border-gold/50 bg-gradient-to-br from-gold/5 to-transparent"
               )}
             >
               <div className={cn(
@@ -144,7 +187,16 @@ export function ProgressiveUpsellSection({
                 )}
               </div>
 
-              <CardHeader className="pb-3">
+              {card.isPremium && (
+                <Badge
+                  className="absolute top-4 left-4 bg-gradient-to-r from-gold to-amber-500 text-black border-0"
+                >
+                  <Crown className="w-3 h-3 mr-1" />
+                  Premium
+                </Badge>
+              )}
+
+              <CardHeader className={cn("pb-3", card.isPremium && "pt-12")}>
                 <div className="flex items-start gap-3">
                   <div className={cn(
                     "w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-lg",
@@ -175,11 +227,22 @@ export function ProgressiveUpsellSection({
                   </Button>
                 ) : (
                   <Button
-                    className="w-full gap-2"
+                    className={cn(
+                      "w-full gap-2",
+                      card.isPremium
+                        ? "bg-gradient-to-r from-gold to-amber-500 hover:from-amber-500 hover:to-gold text-black font-semibold"
+                        : ""
+                    )}
                     onClick={() => handleUnlock(card)}
                   >
-                    <Lock className="w-4 h-4" />
-                    {isEn ? "Unlock Now" : "Desbloquear Agora"}
+                    {card.isExternal ? (
+                      <ExternalLink className="w-4 h-4" />
+                    ) : (
+                      <Lock className="w-4 h-4" />
+                    )}
+                    {card.isExternal
+                      ? (isEn ? "Learn More" : "Saiba Mais")
+                      : (isEn ? "Unlock Now" : "Desbloquear Agora")}
                     <ChevronRight className="w-4 h-4 ml-auto" />
                   </Button>
                 )}
@@ -196,6 +259,11 @@ export function ProgressiveUpsellSection({
           product={PRODUCT_CATALOG[selectedProduct]}
         />
       )}
+
+      <IdentityCouplePremiumModal
+        open={showPremiumModal}
+        onOpenChange={setShowPremiumModal}
+      />
     </>
   );
 }

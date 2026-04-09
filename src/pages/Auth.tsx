@@ -236,6 +236,20 @@ const Auth = () => {
             return;
           }
 
+          // Link express lead to newly created account (merge guest → user)
+          const expressLeadId = sessionStorage.getItem("expressLeadId");
+          if (expressLeadId) {
+            const currentUser = (await supabase.auth.getUser()).data.user;
+            if (currentUser) {
+              await supabase
+                .from("codigo_inicial_leads" as any)
+                .update({ user_id: currentUser.id } as any)
+                .eq("id", expressLeadId);
+            }
+            sessionStorage.removeItem("expressLeadId");
+            sessionStorage.removeItem("expressLeadName");
+          }
+
           // If there's a pending checkout session (guest paid then created account)
           const pendingSession = sessionStorage.getItem("pendingCheckoutSession");
           if (pendingSession) {

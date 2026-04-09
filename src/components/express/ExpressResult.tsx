@@ -10,7 +10,8 @@ import EssenceUpsell from "./EssenceUpsell";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
-import { pixel } from "@/lib/metaPixel";
+import { pixel, generateEventId } from "@/lib/metaPixel";
+import { capi } from "@/lib/metaCapi";
 
 interface Props {
   prediction: ExpressPrediction;
@@ -93,7 +94,9 @@ export default function ExpressResult({ prediction, answers, onDeepen, refCode }
               });
               if (error) throw error;
               if (data?.url) {
-                pixel.initiateCheckout(99, "BRL");
+                const eid = generateEventId();
+                pixel.initiateCheckout(99, "BRL", eid);
+                capi.initiateCheckout(email || undefined, 99, "BRL", eid);
                 window.location.href = data.url;
               } else {
                 throw new Error("URL de checkout não retornada");

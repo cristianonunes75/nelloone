@@ -257,7 +257,7 @@ export function DashboardStageRevelation({
             </div>
             
             <div className="flex flex-col items-start md:items-end gap-2">
-              <span className="text-2xl font-bold text-amber-600">R$ 97</span>
+              <span className="text-2xl font-bold text-amber-600">R$ 197</span>
               <Button 
                 onClick={onPurchaseAtivacao}
                 className="gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/30"

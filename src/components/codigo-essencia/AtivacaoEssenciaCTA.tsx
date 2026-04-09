@@ -29,7 +29,7 @@ const translations = {
       { icon: Flame, text: "Compromisso real com sua própria vida" },
     ],
     
-    price: "Por apenas R$ 97",
+    price: "Por apenas R$ 197",
     cta: "Ativar meu Código da Essência",
     ctaUnlocked: "Acessar minha Ativação",
     

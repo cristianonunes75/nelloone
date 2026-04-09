@@ -100,21 +100,35 @@ serve(async (req) => {
       });
     }
 
-    // Check if email exists in auth.users - using admin client
-    const { data: authUsers, error: authUsersError } = await supabaseAdmin.auth.admin.listUsers({
-      page: 1,
-      perPage: 1000,
-    });
-
-    if (authUsersError) {
-      logStep("Error listing users", { error: authUsersError.message });
-      throw authUsersError;
-    }
-
+    // Check if email exists in auth.users - query directly via SQL (scalable)
     const emailLower = email.toLowerCase().trim();
-    const existingAuthUser = authUsers.users.find(
-      (u) => u.email?.toLowerCase() === emailLower
-    );
+
+    // Use service role to query auth.users directly by email (indexed, O(1))
+    const { data: authLookup, error: authLookupError } = await supabaseAdmin
+      .rpc("get_auth_user_by_email" as any, { lookup_email: emailLower })
+      .maybeSingle();
+
+    let existingAuthUser: { id: string; email: string } | null = null;
+
+    if (!authLookupError && authLookup?.id) {
+      existingAuthUser = { id: authLookup.id, email: emailLower };
+    } else {
+      // Fallback: paginated search (works without the RPC function)
+      let page = 1;
+      const perPage = 500;
+      let found = false;
+      while (!found) {
+        const { data: batch, error: listError } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
+        if (listError) { logStep("Error listing users", { error: listError.message }); throw listError; }
+        const match = batch.users.find((u) => u.email?.toLowerCase() === emailLower);
+        if (match) {
+          existingAuthUser = { id: match.id, email: match.email || emailLower };
+          found = true;
+        }
+        if (batch.users.length < perPage) break;
+        page++;
+      }
+    }
 
     if (!existingAuthUser) {
       // User doesn't exist in the system

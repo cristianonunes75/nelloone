@@ -71,7 +71,7 @@ export default function BusinessLanding() {
               <BarChart3 className="w-3.5 h-3.5" /> Insights
             </span>
             <span className="flex items-center gap-1.5 whitespace-nowrap">
-              <FileText className="w-3.5 h-3.5" /> Billing
+              <FileText className="w-3.5 h-3.5" /> Faturamento
             </span>
           </div>
         </div>

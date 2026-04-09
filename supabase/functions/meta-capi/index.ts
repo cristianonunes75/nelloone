@@ -30,7 +30,7 @@ serve(async (req) => {
     if (!capiToken) throw new Error("META_CAPI_TOKEN is not set");
 
     const body = await req.json();
-    const { event_name, event_time, email, phone, value, currency, event_source_url, client_ip_address, client_user_agent, fbc, fbp } = body;
+    const { event_name, event_id, event_time, email, phone, value, currency, event_source_url, client_ip_address, client_user_agent, fbc, fbp } = body;
 
     if (!event_name) throw new Error("event_name is required");
 
@@ -51,6 +51,7 @@ serve(async (req) => {
       data: [
         {
           event_name,
+          event_id: event_id || crypto.randomUUID(),
           event_time: event_time || Math.floor(Date.now() / 1000),
           action_source: "website",
           event_source_url: event_source_url || "https://identity.nello.one",
