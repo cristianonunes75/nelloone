@@ -168,15 +168,6 @@ export function ProgressiveUpsellSection({
                 )}
               </div>
 
-              {card.isPremium && (
-                <Badge
-                  className="absolute top-4 left-4 bg-gradient-to-r from-gold to-amber-500 text-black border-0"
-                >
-                  <Crown className="w-3 h-3 mr-1" />
-                  Premium
-                </Badge>
-              )}
-
               <CardHeader className={cn("pb-3", card.isPremium && "pt-12")}>
                 <div className="flex items-start gap-3">
                   <div className={cn(
