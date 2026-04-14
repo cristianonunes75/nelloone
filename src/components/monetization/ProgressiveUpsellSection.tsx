@@ -11,7 +11,6 @@ import {
   Target,
   ChevronRight,
   Check,
-  Crown,
   Compass,
   ExternalLink
 } from "lucide-react";
@@ -19,7 +18,6 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ProductPaywallModal } from "./ProductPaywallModal";
-import { IdentityCouplePremiumModal } from "./IdentityCouplePremiumModal";
 import { PRODUCT_CATALOG } from "./productCatalog";
 
 interface ProgressiveUpsellSectionProps {
@@ -68,7 +66,6 @@ export function ProgressiveUpsellSection({
   const navigate = useNavigate();
 
   const [selectedProduct, setSelectedProduct] = useState<keyof typeof PRODUCT_CATALOG | null>(null);
-  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const upsellCards: UpsellCard[] = [
     {
@@ -100,20 +97,6 @@ export function ProgressiveUpsellSection({
       onView: onViewActivationCouple,
     },
     {
-      id: "identity_couple_premium",
-      name: isEn ? "Identity Couple Premium" : "Identity Couple Premium",
-      description: isEn
-        ? "The definitive couple's map. 7 pillars of crossed intelligence in 15-20 pages."
-        : "O Mapa Definitivo do Casal. 7 pilares de inteligência cruzada em 15-20 páginas.",
-      icon: Crown,
-      gradient: "from-gold/30 via-amber-500/15 to-transparent",
-      iconBg: "from-gold to-amber-500",
-      visible: hasNelloCouple && !hasIdentityCouplePremium,
-      unlocked: hasIdentityCouplePremium,
-      isPremium: true,
-      productKey: "identity_couple_premium",
-    },
-    {
       id: "imersao_casal",
       name: isEn ? "Couple Immersion" : "Imersão Código do Casal",
       description: isEn
@@ -141,8 +124,6 @@ export function ProgressiveUpsellSection({
   const handleUnlock = (card: UpsellCard) => {
     if (card.isExternal && card.externalHref) {
       navigate(card.externalHref);
-    } else if (card.isPremium) {
-      setShowPremiumModal(true);
     } else if (card.productKey) {
       setSelectedProduct(card.productKey);
     }
@@ -186,15 +167,6 @@ export function ProgressiveUpsellSection({
                   <Lock className="w-5 h-5 text-primary" />
                 )}
               </div>
-
-              {card.isPremium && (
-                <Badge
-                  className="absolute top-4 left-4 bg-gradient-to-r from-gold to-amber-500 text-black border-0"
-                >
-                  <Crown className="w-3 h-3 mr-1" />
-                  Premium
-                </Badge>
-              )}
 
               <CardHeader className={cn("pb-3", card.isPremium && "pt-12")}>
                 <div className="flex items-start gap-3">
@@ -259,11 +231,6 @@ export function ProgressiveUpsellSection({
           product={PRODUCT_CATALOG[selectedProduct]}
         />
       )}
-
-      <IdentityCouplePremiumModal
-        open={showPremiumModal}
-        onOpenChange={setShowPremiumModal}
-      />
     </>
   );
 }
