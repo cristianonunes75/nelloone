@@ -226,6 +226,7 @@ export default function BusinessHiringResults() {
       console.error("Error fetching candidate:", error);
     } finally {
       setLoading(false);
+      initialLoadDone.current = true;
     }
   }, [candidateId]);
 
@@ -251,8 +252,8 @@ export default function BusinessHiringResults() {
           filter: `candidate_id=eq.${candidateId}`,
         },
         () => {
-          console.log('Assessment updated, refreshing data...');
-          fetchCandidateData();
+          console.log('Assessment updated, refreshing data silently...');
+          fetchCandidateData(true);
         }
       )
       .subscribe();
