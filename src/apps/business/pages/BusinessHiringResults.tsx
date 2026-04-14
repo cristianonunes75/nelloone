@@ -124,9 +124,13 @@ export default function BusinessHiringResults() {
     setSearchParams({ view: mode });
   };
 
-  const fetchCandidateData = useCallback(async () => {
+  const initialLoadDone = useRef(false);
+
+  const fetchCandidateData = useCallback(async (silent = false) => {
     if (!candidateId) return;
-    setLoading(true);
+    if (!silent && !initialLoadDone.current) {
+      setLoading(true);
+    }
     try {
       const { data: candidateData, error: candidateError } = await supabase
         .from("hiring_candidates")
