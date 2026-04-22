@@ -231,10 +231,6 @@ export function ProgressiveUpsellSection({
           product={PRODUCT_CATALOG[selectedProduct]}
         />
       )}
-<<<<<<< HEAD
-
-=======
->>>>>>> 2e70ad49e9e9dd062cf6fc6d8919836f40933b62
     </>
   );
 }
