@@ -21,6 +21,7 @@ import BusinessCandidates from './pages/BusinessCandidates';
 import BusinessBilling from './pages/BusinessBilling';
 import BusinessWhatsApp from './pages/BusinessWhatsApp';
 import BusinessPeopleStrategy from './pages/BusinessPeopleStrategy';
+import BusinessTalentPoolPublic from './pages/BusinessTalentPoolPublic';
 import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
 import { isFeatureEnabled } from './config/featureFlags';
 
@@ -49,6 +50,7 @@ export default function BusinessApp() {
       
       {/* Public job routes */}
       <Route path="/vaga/:slug" element={<BusinessJobPublic />} />
+      <Route path="/talentos/:slug" element={<BusinessTalentPoolPublic />} />
       <Route path="/confirmar/:token" element={<BusinessApplicationConfirm />} />
       
       {/* Billing / Paywall */}

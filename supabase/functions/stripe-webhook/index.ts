@@ -55,6 +55,7 @@ async function notifyAdminNewPurchase(
       codigo_casal: "Código do Casal",
       ativacao_codigo: "Ativação do Código",
       fundadores: "NELLO ONE Completo",
+      talent_pool_assessment: "Banco de Talentos - Avaliação",
     };
     
     const productName = productNames[productType] || productType;
@@ -968,6 +969,208 @@ serve(async (req) => {
         }
 
         return new Response(JSON.stringify({ received: true, product: "jornada_completa", includes_codigo_essencia: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // ====== TALENT POOL ASSESSMENT PURCHASE ======
+      if (productType === "talent_pool_assessment") {
+        logStep("Processing Talent Pool Assessment purchase", { metadata: session.metadata });
+
+        const tpJobId = session.metadata?.job_id;
+        const tpCompanyId = session.metadata?.company_id;
+        const tpFullName = session.metadata?.full_name;
+        const tpEmail = session.metadata?.email;
+        const tpPhone = session.metadata?.phone;
+        const tpCity = session.metadata?.city;
+        const tpAreaOfInterest = session.metadata?.area_of_interest;
+        const tpResumeUrl = session.metadata?.resume_url;
+        const tpResumeFilename = session.metadata?.resume_filename;
+
+        if (!tpJobId || !tpCompanyId || !tpFullName || !tpEmail) {
+          logStep("ERROR: Missing talent pool metadata");
+          return new Response(JSON.stringify({ error: "Missing metadata" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        // Check for duplicate application
+        const { data: existingTpApp } = await supabase
+          .from("job_applications")
+          .select("id")
+          .eq("job_id", tpJobId)
+          .eq("email", tpEmail)
+          .maybeSingle();
+
+        if (existingTpApp) {
+          logStep("WARN: Duplicate talent pool application, skipping", { email: tpEmail });
+          return new Response(JSON.stringify({ received: true, duplicate: true }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        // 1. Create job_application
+        const { data: tpApplication, error: tpAppError } = await supabase
+          .from("job_applications")
+          .insert({
+            job_id: tpJobId,
+            company_id: tpCompanyId,
+            status: "active_candidate",
+            source: "talent_pool",
+            full_name: tpFullName,
+            email: tpEmail,
+            phone: tpPhone || null,
+            city: tpCity || null,
+            resume_url: tpResumeUrl || null,
+            resume_filename: tpResumeFilename || null,
+            lgpd_consent: true,
+            lgpd_consent_at: new Date().toISOString(),
+            lgpd_consent_text_version: "v1.0",
+            confirmed_at: new Date().toISOString(),
+            pipeline_stage: "assessment",
+          })
+          .select()
+          .single();
+
+        if (tpAppError || !tpApplication) {
+          logStep("ERROR: Failed to create talent pool application", { error: tpAppError?.message });
+          return new Response(JSON.stringify({ error: "Failed to create application" }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        logStep("Talent pool application created", { applicationId: tpApplication.id });
+
+        // 2. Create hiring_candidate (triggers auto-create assessments)
+        const tpInviteToken = crypto.randomUUID();
+        const tpExpiresAt = new Date();
+        tpExpiresAt.setDate(tpExpiresAt.getDate() + 14);
+
+        const { data: tpHiringCandidate, error: tpHcError } = await supabase
+          .from("hiring_candidates")
+          .insert({
+            company_id: tpCompanyId,
+            full_name: tpFullName,
+            email: tpEmail,
+            phone: tpPhone || null,
+            position_applied: tpAreaOfInterest || "Banco de Talentos",
+            invite_token: tpInviteToken,
+            invite_sent_at: new Date().toISOString(),
+            invite_expires_at: tpExpiresAt.toISOString(),
+            status: "pending",
+            notes: `Banco de Talentos (pago R$29,90) - ${tpAreaOfInterest || "Área não especificada"}${tpCity ? ` | ${tpCity}` : ""}`,
+          })
+          .select()
+          .single();
+
+        if (tpHcError || !tpHiringCandidate) {
+          logStep("ERROR: Failed to create hiring candidate", { error: tpHcError?.message });
+          return new Response(JSON.stringify({ error: "Failed to create candidate" }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        logStep("Hiring candidate created", { hiringCandidateId: tpHiringCandidate.id });
+
+        // 3. Link application to hiring_candidate
+        await supabase
+          .from("job_applications")
+          .update({ hiring_candidate_id: tpHiringCandidate.id })
+          .eq("id", tpApplication.id);
+
+        // 4. Send assessment email via Resend
+        const tpAssessmentUrl = `https://business.nello.one/assessment/${tpInviteToken}`;
+
+        const { data: tpJob } = await supabase
+          .from("job_postings")
+          .select("title, companies(name)")
+          .eq("id", tpJobId)
+          .single();
+
+        const tpCompanyName = (tpJob?.companies as any)?.name || "Empresa";
+
+        try {
+          const { Resend } = await import("npm:resend@2.0.0");
+          const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+          await resend.emails.send({
+            from: "Nello One Business <noreply@nello.one>",
+            to: [tpEmail],
+            subject: `${tpFullName}, sua avaliação está liberada! - ${tpCompanyName}`,
+            html: `
+              <!DOCTYPE html>
+              <html>
+              <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+              <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f9fafb; padding: 40px 20px;">
+                <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; padding: 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                  <h1 style="color: #111827; font-size: 24px; margin-bottom: 16px;">
+                    Pagamento confirmado!
+                  </h1>
+                  <p style="color: #6b7280; font-size: 16px; line-height: 1.6;">
+                    Olá, <strong>${tpFullName}</strong>! Seu pagamento foi confirmado e sua avaliação de perfil comportamental já está disponível.
+                  </p>
+                  <p style="color: #6b7280; font-size: 16px; line-height: 1.6;">
+                    Complete os testes abaixo para que a <strong>${tpCompanyName}</strong> possa conhecer melhor o seu perfil profissional.
+                  </p>
+                  <div style="background: #f3f4f6; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                    <h3 style="color: #374151; font-size: 16px; margin: 0 0 12px;">Seus testes:</h3>
+                    <ul style="color: #6b7280; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                      <li><strong>Teste DISC</strong> — Seu estilo de trabalho (10-15 min)</li>
+                      <li><strong>Teste de Temperamentos</strong> — Suas tendências naturais (10-15 min)</li>
+                      <li>Não existem respostas certas ou erradas</li>
+                    </ul>
+                  </div>
+                  <div style="text-align: center; margin: 32px 0;">
+                    <a href="${tpAssessmentUrl}" style="display: inline-block; background: #2563eb; color: white; font-size: 16px; font-weight: 600; padding: 14px 32px; border-radius: 8px; text-decoration: none;">
+                      Iniciar Avaliação
+                    </a>
+                  </div>
+                  <p style="color: #9ca3af; font-size: 13px; text-align: center;">
+                    Este link expira em 14 dias.
+                  </p>
+                </div>
+              </body>
+              </html>
+            `,
+          });
+
+          logStep("Assessment email sent", { email: tpEmail });
+        } catch (emailError) {
+          logStep("WARN: Failed to send assessment email", { error: String(emailError) });
+        }
+
+        // 5. Audit log
+        await supabase.from("company_audit_logs").insert({
+          company_id: tpCompanyId,
+          action: "talent_pool_paid_application",
+          details: {
+            application_id: tpApplication.id,
+            hiring_candidate_id: tpHiringCandidate.id,
+            candidate_email: tpEmail,
+            candidate_name: tpFullName,
+            amount_paid: (session.amount_total || 0) / 100,
+          },
+        });
+
+        // 6. Notify admin
+        await notifyAdminNewPurchase(
+          tpFullName,
+          tpEmail,
+          (session.amount_total || 0) / 100,
+          "BRL",
+          "talent_pool_assessment"
+        );
+
+        return new Response(JSON.stringify({
+          received: true,
+          product: "talent_pool_assessment",
+          assessment_url: tpAssessmentUrl,
+        }), {
           status: 200,
           headers: { "Content-Type": "application/json" },
         });

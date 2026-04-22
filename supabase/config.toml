@@ -189,3 +189,9 @@ verify_jwt = true
 
 [functions.people-pdi-generator]
 verify_jwt = true
+
+[functions.business-talent-pool-apply]
+verify_jwt = false
+
+[functions.business-talent-pool-checkout]
+verify_jwt = false

@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ProductPaywallModal } from "./ProductPaywallModal";
-import { IdentityCouplePremiumModal } from "./IdentityCouplePremiumModal";
+
 import { PRODUCT_CATALOG } from "./productCatalog";
 
 interface ProgressiveUpsellSectionProps {
@@ -68,7 +68,6 @@ export function ProgressiveUpsellSection({
   const navigate = useNavigate();
 
   const [selectedProduct, setSelectedProduct] = useState<keyof typeof PRODUCT_CATALOG | null>(null);
-  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const upsellCards: UpsellCard[] = [
     {
@@ -142,7 +141,7 @@ export function ProgressiveUpsellSection({
     if (card.isExternal && card.externalHref) {
       navigate(card.externalHref);
     } else if (card.isPremium) {
-      setShowPremiumModal(true);
+      // IdentityCouplePremiumModal removed (Nello Couple discontinued)
     } else if (card.productKey) {
       setSelectedProduct(card.productKey);
     }
@@ -260,10 +259,6 @@ export function ProgressiveUpsellSection({
         />
       )}
 
-      <IdentityCouplePremiumModal
-        open={showPremiumModal}
-        onOpenChange={setShowPremiumModal}
-      />
     </>
   );
 }
