@@ -48,10 +48,12 @@ export function useBusinessSubscription() {
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-  const checkSubscription = useCallback(async () => {
+  const checkSubscription = useCallback(async ({ silent = false }: { silent?: boolean } = {}) => {
     if (!company?.id) return;
     
-    setIsLoading(true);
+    if (!silent) {
+      setIsLoading(true);
+    }
     try {
       const { data, error } = await supabase.functions.invoke('business-check-subscription', {
         body: { companyId: company.id },
@@ -85,7 +87,9 @@ export function useBusinessSubscription() {
         seatsAvailable: 10,
       });
     } finally {
-      setIsLoading(false);
+      if (!silent) {
+        setIsLoading(false);
+      }
     }
   }, [company?.id]);
 
@@ -148,7 +152,10 @@ export function useBusinessSubscription() {
   useEffect(() => {
     if (!company?.id) return;
 
-    const interval = setInterval(checkSubscription, 60000); // every minute
+    const interval = setInterval(() => {
+      checkSubscription({ silent: true });
+    }, 60000);
+
     return () => clearInterval(interval);
   }, [company?.id, checkSubscription]);
 

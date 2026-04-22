@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useBusinessAuth } from "../hooks/useBusinessAuth";
@@ -124,9 +124,13 @@ export default function BusinessHiringResults() {
     setSearchParams({ view: mode });
   };
 
-  const fetchCandidateData = useCallback(async () => {
+  const initialLoadDone = useRef(false);
+
+  const fetchCandidateData = useCallback(async (silent = false) => {
     if (!candidateId) return;
-    setLoading(true);
+    if (!silent && !initialLoadDone.current) {
+      setLoading(true);
+    }
     try {
       const { data: candidateData, error: candidateError } = await supabase
         .from("hiring_candidates")
@@ -222,6 +226,7 @@ export default function BusinessHiringResults() {
       console.error("Error fetching candidate:", error);
     } finally {
       setLoading(false);
+      initialLoadDone.current = true;
     }
   }, [candidateId]);
 
@@ -247,8 +252,8 @@ export default function BusinessHiringResults() {
           filter: `candidate_id=eq.${candidateId}`,
         },
         () => {
-          console.log('Assessment updated, refreshing data...');
-          fetchCandidateData();
+          console.log('Assessment updated, refreshing data silently...');
+          fetchCandidateData(true);
         }
       )
       .subscribe();
