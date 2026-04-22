@@ -6,6 +6,7 @@ import BusinessApp from '@/apps/business/BusinessApp';
 import MainApp from '@/apps/main/MainApp';
 import DiscernirApp from '@/apps/discernir/DiscernirApp';
 import { BusinessAuthProvider } from '@/apps/business/hooks/useBusinessAuth';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface NelloAppRouterProps {
   children: ReactNode; // Nello One routes (default)
@@ -35,9 +36,11 @@ export function NelloAppRouter({ children }: NelloAppRouterProps) {
       return <LifeApp />;
     case 'business':
       return (
-        <BusinessAuthProvider>
-          <BusinessApp />
-        </BusinessAuthProvider>
+        <ErrorBoundary fallbackTitle="Erro no Nello Business">
+          <BusinessAuthProvider>
+            <BusinessApp />
+          </BusinessAuthProvider>
+        </ErrorBoundary>
       );
     case 'discernir':
       return <DiscernirApp />;
