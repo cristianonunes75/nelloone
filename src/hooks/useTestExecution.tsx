@@ -171,7 +171,19 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
             }
           );
         
-        queryClient.invalidateQueries({ queryKey: ["test-answers", userTestId] });
+        // Silent cache update — no invalidate, so no global isLoading flash
+        queryClient.setQueryData(["test-answers", userTestId], (old: any[] | undefined) => {
+          const list = Array.isArray(old) ? [...old] : [];
+          const idx = list.findIndex((a) => a.question_id === pendingAnswer.questionId);
+          const next = {
+            user_test_id: userTestId,
+            question_id: pendingAnswer.questionId,
+            answer: pendingAnswer.answer,
+          };
+          if (idx >= 0) list[idx] = { ...list[idx], ...next };
+          else list.push(next);
+          return list;
+        });
       } catch (error) {
         console.error("Auto-save failed:", error);
       } finally {
