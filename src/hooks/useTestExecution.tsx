@@ -133,7 +133,15 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
     }
     
     setHasRestoredPosition(true);
+    setHasInitiallyLoaded(true);
   }, [questions, answers, answersLoading, hasRestoredPosition]);
+
+  // Mark initial load complete even when there are no prior answers
+  useEffect(() => {
+    if (!hasInitiallyLoaded && questions && questions.length > 0 && !answersLoading) {
+      setHasInitiallyLoaded(true);
+    }
+  }, [hasInitiallyLoaded, questions, answersLoading]);
 
   // Auto-save effect: debounce saves with 1.5 second delay
   useEffect(() => {
