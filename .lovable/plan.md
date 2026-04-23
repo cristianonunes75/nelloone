@@ -1,43 +1,53 @@
 
+Objetivo: remover o “refresh/flash” que interrompe a execução dos testes no meio do fluxo, sem perder salvamento automático nem retomada de progresso.
 
-## Diagnóstico
+1. Estabilizar o estado do teste
+- Refatorar `src/hooks/useTestExecution.tsx` para separar:
+  - carregamento inicial do teste
+  - sincronização de respostas em segundo plano
+- O loading de tela cheia ficará disponível apenas no primeiro carregamento.
+- Depois que as perguntas e respostas iniciais forem carregadas, qualquer atualização futura passará a ser silenciosa.
 
-A tabela `company_users` atualmente **não possui** um campo de cargo/posição. Os campos existentes são apenas administrativos (role, consent, sharing, etc.). O campo `role` é o papel no sistema (admin/collaborator), **não** o cargo na empresa (ex: "Gerente de Marketing", "Analista de RH").
+2. Parar de forçar refetch intrusivo a cada resposta
+- Revisar o salvamento de respostas em `useTestExecution`.
+- Trocar a estratégia de `invalidateQueries(["test-answers", userTestId])` em toda resposta por atualização direta de cache/local state.
+- Manter o dado atual visível enquanto a resposta é persistida, para que a UI não “pisque” nem pareça recarregar a página.
 
-Para permitir edição do cargo de cada colaborador na aba Equipe, precisamos:
+3. Blindar a tela de execução contra reset visual
+- Ajustar `src/pages/TestExecution.tsx` para não depender de um `isLoading` global durante o teste já iniciado.
+- Preservar `currentQuestionIndex`, `selectedAnswer`, `showWelcome` e demais estados locais mesmo quando houver sync em background.
+- Substituir qualquer sensação de “reload” por feedback discreto, como “salvo automaticamente”, sem desmontar a tela.
 
-## Plano
+4. Aplicar o padrão de “silent updates”
+- Seguir o mesmo padrão já adotado em outras áreas do projeto:
+  - `initialLoadDone`/flag equivalente
+  - background updates sem spinner global
+- Garantir que a lógica de restaurar posição rode só uma vez por teste, e não toda vez que respostas/cache mudarem.
 
-### 1. Adicionar coluna `job_title` na tabela `company_users`
-- Migration: `ALTER TABLE company_users ADD COLUMN job_title TEXT DEFAULT NULL`
-- Sem impacto em dados existentes (nullable, sem breaking changes)
+5. Auditar dependências que podem re-renderizar o fluxo
+- Revisar os hooks consumidos pela tela (`useJourneyProgress`, `useTestAccess`, e o que mais influencia a execução) para evitar que consultas auxiliares provoquem interrupções visuais no fluxo principal.
+- Se necessário, limitar refetches não essenciais enquanto o usuário está respondendo.
 
-### 2. Adicionar coluna `department` (opcional, mas recomendado)
-- `ALTER TABLE company_users ADD COLUMN department TEXT DEFAULT NULL`
-- Permite agrupar por área futuramente (People Strategy, filtros, etc.)
+6. Validar os cenários críticos
+- Testar:
+  - início do teste
+  - resposta com autoavançar
+  - voltar pergunta
+  - retomada de teste incompleto
+  - teste gratuito/freemium
+  - conclusão do teste
+- Confirmar que não há mais tela “Carregando teste...” aparecendo no meio da execução.
 
-### 3. Tornar o cargo editável na tabela de Membros (`TeamMembersTab`)
-- Exibir coluna "Cargo" na tabela (entre Nome e Função)
-- No dropdown de ações (menu `...`), adicionar opção "Editar cargo"
-- Ao clicar, abrir um Dialog simples com campos:
-  - **Cargo** (ex: "Gerente de Vendas")
-  - **Departamento** (ex: "Comercial") — opcional
-- Salvar via `supabase.from('company_users').update({ job_title, department })`
+Detalhes técnicos
+- Arquivos principais:
+  - `src/hooks/useTestExecution.tsx`
+  - `src/pages/TestExecution.tsx`
+- Ajustes prováveis:
+  - criar `isInitialLoading` separado de sync em background
+  - usar `queryClient.setQueryData` para `["test-answers", userTestId]`
+  - reduzir/remover invalidations por resposta
+  - proteger o efeito de restore para executar apenas uma vez
+  - manter a UI montada durante persistência assíncrona
 
-### 4. Atualizar a busca
-- Incluir `job_title` e `department` no filtro de busca existente
-
-### Resultado visual na tabela
-
-```text
-Nome              | Cargo                | Função      | Status    | Progresso | Desde
-Maria Silva       | Gerente de Marketing | Colaborador | Concluído | 7/7 mapas | 01 Jan 2025
-João Santos       | Analista de RH       | Admin       | Em andamento | 3/7 mapas | 15 Fev 2025
-Ana Costa         | —                    | Colaborador | Não iniciado | -         | 01 Mar 2025
-```
-
-### Arquivos afetados
-- **Migration SQL**: adicionar `job_title` e `department` em `company_users`
-- **`TeamMembersTab.tsx`**: nova coluna, dialog de edição, busca atualizada
-- **`TeamMembersSection.tsx`**: exibir cargo na versão resumida (se aplicável)
-
+Observação de validação
+- Se o build final continuar bloqueado pelo erro do `business-resend-assessment` com `npm:resend@2.0.0`, esse ponto precisará ser corrigido junto para permitir verificação completa da solução em produção.
