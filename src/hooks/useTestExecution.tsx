@@ -240,8 +240,17 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["test-answers", userTestId] });
+    onSuccess: (data) => {
+      // Optimistic cache update — silent, no global loader flash
+      if (data) {
+        queryClient.setQueryData(["test-answers", userTestId], (old: any[] | undefined) => {
+          const list = Array.isArray(old) ? [...old] : [];
+          const idx = list.findIndex((a) => a.question_id === (data as any).question_id);
+          if (idx >= 0) list[idx] = { ...list[idx], ...data };
+          else list.push(data);
+          return list;
+        });
+      }
       setPendingAnswer(null);
     },
     onError: (error: any) => {
