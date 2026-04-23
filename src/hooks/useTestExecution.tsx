@@ -84,6 +84,11 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   const { data: answers, isLoading: answersLoading } = useQuery({
     queryKey: ["test-answers", userTestId],
     enabled: !!userTestId,
+    // Silent background sync: avoid refetch storms that would flash the loader mid-test
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
     queryFn: async () => {
       if (!userTestId) return [];
 
