@@ -326,7 +326,9 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
     allQuestions, // Export all questions for reference
     currentQuestion: questions?.[currentQuestionIndex],
     currentQuestionIndex,
-    isLoading: questionsLoading || answersLoading,
+    // Only show the global loader on the very first load — subsequent
+    // background refetches must NOT remount the test screen.
+    isLoading: !hasInitiallyLoaded && (questionsLoading || answersLoading),
     saveAnswer: saveAnswer.mutate,
     completeTest: completeTest.mutate,
     nextQuestion,
