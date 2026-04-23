@@ -14,6 +14,7 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   const navigate = useNavigate();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [hasRestoredPosition, setHasRestoredPosition] = useState(false);
+  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
   const { hasPurchased } = useTestAccess();
   const { language } = useLanguage();
   
@@ -29,6 +30,7 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   useEffect(() => {
     setCurrentQuestionIndex(0);
     setHasRestoredPosition(false);
+    setHasInitiallyLoaded(false);
     setPendingAnswer(null);
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current);
