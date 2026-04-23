@@ -14,6 +14,7 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   const navigate = useNavigate();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [hasRestoredPosition, setHasRestoredPosition] = useState(false);
+  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
   const { hasPurchased } = useTestAccess();
   const { language } = useLanguage();
   
@@ -29,6 +30,7 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   useEffect(() => {
     setCurrentQuestionIndex(0);
     setHasRestoredPosition(false);
+    setHasInitiallyLoaded(false);
     setPendingAnswer(null);
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current);
@@ -82,6 +84,11 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
   const { data: answers, isLoading: answersLoading } = useQuery({
     queryKey: ["test-answers", userTestId],
     enabled: !!userTestId,
+    // Silent background sync: avoid refetch storms that would flash the loader mid-test
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
     queryFn: async () => {
       if (!userTestId) return [];
 
@@ -126,7 +133,15 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
     }
     
     setHasRestoredPosition(true);
+    setHasInitiallyLoaded(true);
   }, [questions, answers, answersLoading, hasRestoredPosition]);
+
+  // Mark initial load complete even when there are no prior answers
+  useEffect(() => {
+    if (!hasInitiallyLoaded && questions && questions.length > 0 && !answersLoading) {
+      setHasInitiallyLoaded(true);
+    }
+  }, [hasInitiallyLoaded, questions, answersLoading]);
 
   // Auto-save effect: debounce saves with 1.5 second delay
   useEffect(() => {
@@ -156,7 +171,19 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
             }
           );
         
-        queryClient.invalidateQueries({ queryKey: ["test-answers", userTestId] });
+        // Silent cache update — no invalidate, so no global isLoading flash
+        queryClient.setQueryData(["test-answers", userTestId], (old: any[] | undefined) => {
+          const list = Array.isArray(old) ? [...old] : [];
+          const idx = list.findIndex((a) => a.question_id === pendingAnswer.questionId);
+          const next = {
+            user_test_id: userTestId,
+            question_id: pendingAnswer.questionId,
+            answer: pendingAnswer.answer,
+          };
+          if (idx >= 0) list[idx] = { ...list[idx], ...next };
+          else list.push(next);
+          return list;
+        });
       } catch (error) {
         console.error("Auto-save failed:", error);
       } finally {
@@ -213,8 +240,17 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["test-answers", userTestId] });
+    onSuccess: (data) => {
+      // Optimistic cache update — silent, no global loader flash
+      if (data) {
+        queryClient.setQueryData(["test-answers", userTestId], (old: any[] | undefined) => {
+          const list = Array.isArray(old) ? [...old] : [];
+          const idx = list.findIndex((a) => a.question_id === (data as any).question_id);
+          if (idx >= 0) list[idx] = { ...list[idx], ...data };
+          else list.push(data);
+          return list;
+        });
+      }
       setPendingAnswer(null);
     },
     onError: (error: any) => {
@@ -290,7 +326,9 @@ export const useTestExecution = (testId: string, userTestId?: string) => {
     allQuestions, // Export all questions for reference
     currentQuestion: questions?.[currentQuestionIndex],
     currentQuestionIndex,
-    isLoading: questionsLoading || answersLoading,
+    // Only show the global loader on the very first load — subsequent
+    // background refetches must NOT remount the test screen.
+    isLoading: !hasInitiallyLoaded && (questionsLoading || answersLoading),
     saveAnswer: saveAnswer.mutate,
     completeTest: completeTest.mutate,
     nextQuestion,
