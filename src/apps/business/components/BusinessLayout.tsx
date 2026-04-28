@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, type ElementType } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -37,7 +37,7 @@ interface BusinessLayoutProps {
 
 interface NavSection {
   label: string;
-  items: { href: string; label: string; icon: any }[];
+  items: { href: string; label: string; icon: ElementType }[];
 }
 
 const adminNavSections: NavSection[] = [
