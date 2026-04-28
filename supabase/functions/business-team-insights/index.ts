@@ -311,6 +311,8 @@ function calculateTeamInsights(results: TestResult[], memberCount: number) {
         }
         break;
       case "estilos_conexao":
+      case "estilos_conexao_afetiva":
+      case "linguagens_amor":
         if (result.primary_result) {
           communicationStyles[result.primary_result] = (communicationStyles[result.primary_result] || 0) + 1;
         }
