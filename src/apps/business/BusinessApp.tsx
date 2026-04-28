@@ -21,6 +21,7 @@ import BusinessCandidates from './pages/BusinessCandidates';
 import BusinessBilling from './pages/BusinessBilling';
 import BusinessWhatsApp from './pages/BusinessWhatsApp';
 import BusinessPeopleStrategy from './pages/BusinessPeopleStrategy';
+import BusinessTeamComparison from './pages/BusinessTeamComparison';
 import BusinessTalentPoolPublic from './pages/BusinessTalentPoolPublic';
 import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
 import { isFeatureEnabled } from './config/featureFlags';
@@ -128,6 +129,12 @@ export default function BusinessApp() {
       <Route path="/people-strategy" element={
         <BusinessProtectedRoute requiredRole="company_admin">
           <BusinessPeopleStrategy />
+        </BusinessProtectedRoute>
+      } />
+
+      <Route path="/team-comparison" element={
+        <BusinessProtectedRoute requiredRole="company_admin">
+          <BusinessTeamComparison />
         </BusinessProtectedRoute>
       } />
       

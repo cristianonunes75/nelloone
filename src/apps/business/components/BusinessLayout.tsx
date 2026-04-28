@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, type ElementType } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -12,6 +12,7 @@ import {
   Target,
   MessageCircle,
   BarChart3,
+  Scale,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -36,7 +37,7 @@ interface BusinessLayoutProps {
 
 interface NavSection {
   label: string;
-  items: { href: string; label: string; icon: any }[];
+  items: { href: string; label: string; icon: ElementType }[];
 }
 
 const adminNavSections: NavSection[] = [
@@ -45,6 +46,7 @@ const adminNavSections: NavSection[] = [
     items: [
       { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { href: '/people-strategy', label: 'People Strategy', icon: BarChart3 },
+      { href: '/team-comparison', label: 'Comparar Equipe', icon: Scale },
     ],
   },
   {

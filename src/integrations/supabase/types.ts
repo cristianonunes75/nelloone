@@ -7484,6 +7484,25 @@ export type Database = {
           status: string
         }[]
       }
+      get_company_behavioral_comparison: {
+        Args: { p_company_id: string }
+        Returns: {
+          department: string
+          disc_completed_at: string
+          disc_percentages: Json
+          disc_profile: string
+          disc_scores: Json
+          disc_secondary: string
+          full_name: string
+          job_title: string
+          temperament_completed_at: string
+          temperament_profile: string
+          temperament_ranking: Json
+          temperament_scores: Json
+          temperament_secondary: string
+          user_id: string
+        }[]
+      }
       get_company_invite_by_token: {
         Args: { _token: string }
         Returns: {
