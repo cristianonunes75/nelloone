@@ -2854,6 +2854,7 @@ export type Database = {
           created_at: string
           disc_distribution: Json | null
           enneagram_distribution: Json | null
+          essence_code: Json | null
           id: string
           last_calculated_at: string | null
           leadership_potential_indicators: Json | null
@@ -2874,6 +2875,7 @@ export type Database = {
           created_at?: string
           disc_distribution?: Json | null
           enneagram_distribution?: Json | null
+          essence_code?: Json | null
           id?: string
           last_calculated_at?: string | null
           leadership_potential_indicators?: Json | null
@@ -2894,6 +2896,7 @@ export type Database = {
           created_at?: string
           disc_distribution?: Json | null
           enneagram_distribution?: Json | null
+          essence_code?: Json | null
           id?: string
           last_calculated_at?: string | null
           leadership_potential_indicators?: Json | null
