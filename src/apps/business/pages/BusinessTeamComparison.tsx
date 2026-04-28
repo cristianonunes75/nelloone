@@ -12,6 +12,13 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 
+type BehavioralComparisonRpc = {
+  rpc: (
+    name: 'get_company_behavioral_comparison',
+    args: { p_company_id: string }
+  ) => Promise<{ data: ComparisonRow[] | null; error: { message: string } | null }>;
+};
+
 type ComparisonRow = {
   user_id: string;
   full_name: string;
@@ -262,7 +269,7 @@ export default function BusinessTeamComparison() {
   const loadData = useCallback(async () => {
     if (!company?.id) return;
     setIsLoading(true);
-    const { data, error } = await (supabase as any).rpc('get_company_behavioral_comparison', { p_company_id: company.id });
+    const { data, error } = await (supabase as unknown as BehavioralComparisonRpc).rpc('get_company_behavioral_comparison', { p_company_id: company.id });
     if (error) {
       console.error('Erro ao carregar comparação comportamental:', error);
       toast.error('Erro ao carregar comparação da equipe');
