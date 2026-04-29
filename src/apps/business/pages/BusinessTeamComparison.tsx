@@ -489,9 +489,11 @@ function CrossingsPanel({ rows }: { rows: MemberProfile[] }) {
 function CollaboratorCard({ row }: { row: MemberProfile }) {
   const completedMaps = row.available_maps || [];
   const statusLabel = row.completeness === 'codigo_completo' ? 'Código completo' : row.completeness === 'jornada_sem_codigo' ? 'Jornada completa' : 'Dados parciais';
+  const dataNotice = getDataNotice(row);
+  const actionItems = getActionReading(row);
 
   return (
-    <Card>
+    <Card className={row.business_role === 'candidate' ? 'border-primary/25' : undefined}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -510,11 +512,36 @@ function CollaboratorCard({ row }: { row: MemberProfile }) {
           <InfoTile label="Estilo de conexão" value={row.connectionStyle || 'Não mapeado'} />
           <InfoTile label="Eneagrama / nello16" value={[row.enneagramType && `E${row.enneagramType}`, row.nello16Type].filter(Boolean).join(' · ') || 'Não mapeado'} />
         </div>
+        {dataNotice && (
+          <div className="flex items-start gap-2 rounded-lg border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <span>{dataNotice}</span>
+          </div>
+        )}
+        <div className="grid gap-3 lg:grid-cols-3">
+          <ReadingBlock icon={HeartHandshake} title="Como ela tende a agir e reagir" text={getBehaviorReading(row)} />
+          <ReadingBlock icon={Target} title="Como ela pode ser melhor na empresa" text={getGrowthReading(row)} />
+          <div className="rounded-lg border p-3">
+            <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><ClipboardCheck className="h-4 w-4 text-primary" /> Ações de gestão</div>
+            <ul className="space-y-1.5 text-sm text-muted-foreground">
+              {actionItems.map((item) => <li key={item} className="leading-relaxed">• {item}</li>)}
+            </ul>
+          </div>
+        </div>
         <div className="flex flex-wrap gap-2">
           {completedMaps.map((map) => <Badge key={map} variant="outline">{MAP_LABELS[map] || map}</Badge>)}
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function ReadingBlock({ icon: Icon, title, text }: { icon: typeof HeartHandshake; title: string; text: string }) {
+  return (
+    <div className="rounded-lg border p-3">
+      <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><Icon className="h-4 w-4 text-primary" /> {title}</div>
+      <p className="text-sm leading-relaxed text-muted-foreground">{text}</p>
+    </div>
   );
 }
 
