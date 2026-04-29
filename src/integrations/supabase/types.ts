@@ -7503,6 +7503,22 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_company_identity_team_crossing: {
+        Args: { p_company_id: string }
+        Returns: {
+          available_maps: string[]
+          business_role: string
+          department: string
+          essence_visual_data: Json
+          full_name: string
+          has_essence_code: boolean
+          job_title: string
+          journey_completed_tests: number
+          journey_status: string
+          tests_data: Json
+          user_id: string
+        }[]
+      }
       get_company_invite_by_token: {
         Args: { _token: string }
         Returns: {
