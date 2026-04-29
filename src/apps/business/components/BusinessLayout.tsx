@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
-  UserPlus, 
   Settings, 
   LogOut,
   Menu,
@@ -11,7 +10,6 @@ import {
   ClipboardList,
   Target,
   MessageCircle,
-  BarChart3,
   Scale,
   ChevronLeft,
   ChevronRight
@@ -45,7 +43,6 @@ const adminNavSections: NavSection[] = [
     label: 'Estratégia',
     items: [
       { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { href: '/people-strategy', label: 'People Strategy', icon: BarChart3 },
       { href: '/team-comparison', label: 'Cruzamento da Equipe', icon: Scale },
     ],
   },
