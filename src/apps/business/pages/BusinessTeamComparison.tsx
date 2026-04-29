@@ -378,16 +378,18 @@ function TeamRadar({ title, data }: { title: string; data: RadarItem[] }) {
 function ExecutiveSummary({ rows }: { rows: MemberProfile[] }) {
   const fullCodes = rows.filter((row) => row.has_essence_code).length;
   const partial = rows.length - fullCodes;
+  const pending = rows.filter((row) => row.journey_status === 'pending_invite').length;
   const supervisor = rows.find((row) => normalizeKey(row.job_title).includes('supervisor'));
   const modes = buildDistribution(rows, (row) => row.leadershipMode);
   const topMode = [...modes].sort((a, b) => b.count - a.count)[0];
   const topDisc = [...buildDistribution(rows, (row) => row.discProfile, DISC_LABELS)].sort((a, b) => b.count - a.count)[0];
   const topTemp = [...buildDistribution(rows, (row) => row.temperamentProfile, TEMPERAMENT_LABELS)].sort((a, b) => b.count - a.count)[0];
 
-  const summary = `A equipe mostra maior força em ${topMode?.label || 'perfis ainda indefinidos'}, com predominância comportamental em ${topDisc?.label || 'DISC parcial'} e ${topTemp?.label || 'temperamentos parciais'}. A leitura considera Código completo quando existe e reaproveita os mapas individuais das colaboradoras que ainda têm dados parciais.`;
+  const summary = `A equipe mostra maior força em ${topMode?.label || 'perfis ainda indefinidos'}, com predominância comportamental em ${topDisc?.label || 'DISC parcial'} e ${topTemp?.label || 'temperamentos parciais'}. Esta leitura usa somente pessoas vinculadas à equipe e dados do Nello Identity; convites pendentes aparecem apenas como ausência de informação.`;
   const leadership = supervisor
     ? `${supervisor.full_name} foi incluída como supervisora. A leitura dela funciona como ponto de coordenação entre direção, rotina e comunicação da equipe.`
     : 'Ainda não há supervisora identificada pelo cargo; a leitura está organizada pela equipe geral.';
+  const management = `Para ação na empresa, conduza a equipe cruzando três perguntas: quem acelera decisões, quem preserva constância e quem percebe detalhes. Assim você delega venda, rotina, atendimento, conferência e supervisão sem exigir que todas funcionem do mesmo jeito.`;
 
   return (
     <Card className="border-primary/20 bg-primary/5">
@@ -399,11 +401,12 @@ function ExecutiveSummary({ rows }: { rows: MemberProfile[] }) {
         <div className="space-y-3 text-sm leading-relaxed">
           <p>{summary}</p>
           <p className="text-muted-foreground">{leadership}</p>
+          <p className="text-muted-foreground">{management}</p>
           <p className="text-muted-foreground">O Identity Nello One é uma ferramenta de autoconhecimento e educação comportamental. Não substitui diagnóstico, avaliação clínica ou decisão profissional isolada.</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Metric label="Pessoas" value={rows.length} />
-          <Metric label="Códigos completos" value={fullCodes} detail={`${partial} com dados parciais`} />
+          <Metric label="Códigos completos" value={fullCodes} detail={`${partial} sem código completo · ${pending} convite(s) pendente(s)`} />
           <Metric label="Supervisão" value={supervisor ? 'Incluída' : '—'} />
           <Metric label="Força central" value={topMode?.label || '—'} />
         </div>
@@ -443,7 +446,7 @@ function TeamGroups({ rows }: { rows: MemberProfile[] }) {
                 <p><strong className="text-foreground">Gestão recomendada:</strong> combine clareza de prioridade, rituais simples de acompanhamento e delegação alinhada ao modo natural de cada pessoa.</p>
               </div>
               <div className="flex flex-wrap gap-2">
-                {members.map((member) => <Badge key={member.user_id} variant="secondary">{member.full_name.split(' ')[0]} · {member.leadershipMode}</Badge>)}
+                {members.map((member) => <Badge key={member.user_id || member.full_name} variant="secondary">{member.full_name.split(' ')[0]} · {member.leadershipMode}</Badge>)}
               </div>
             </CardContent>
           </Card>
@@ -472,8 +475,8 @@ function CrossingsPanel({ rows }: { rows: MemberProfile[] }) {
               <p><strong>{supervisor.full_name}</strong> aparece como força de <strong>{supervisor.leadershipMode}</strong>. No papel de supervisão, isso indica como ela tende a organizar ritmo, comunicação e tomada de decisão.</p>
               <p className="text-muted-foreground">Com a equipe, o melhor uso é combinar a força dela com perfis complementares: quem sustenta rotina, quem conecta clientes e quem traz critério para detalhes.</p>
               <div className="flex flex-wrap gap-2">
-                {complementary.map((member) => <Badge key={member.user_id} variant="outline">Complementar: {member.full_name.split(' ')[0]} · {member.leadershipMode}</Badge>)}
-                {samePattern.map((member) => <Badge key={member.user_id} variant="secondary">Mesmo modo: {member.full_name.split(' ')[0]}</Badge>)}
+                {complementary.map((member) => <Badge key={member.user_id || member.full_name} variant="outline">Complementar: {member.full_name.split(' ')[0]} · {member.leadershipMode}</Badge>)}
+                {samePattern.map((member) => <Badge key={member.user_id || member.full_name} variant="secondary">Mesmo modo: {member.full_name.split(' ')[0]}</Badge>)}
               </div>
             </>
           ) : <p className="text-muted-foreground">Cadastre ou ajuste o cargo de supervisão para ativar esta leitura específica.</p>}
