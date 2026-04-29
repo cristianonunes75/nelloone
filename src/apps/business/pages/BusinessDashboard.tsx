@@ -529,10 +529,9 @@ export default function BusinessDashboard() {
         supabase.from('company_invites').select('*', { count: 'exact', head: true }).eq('company_id', company.id).eq('status', 'pending'),
       ]);
       const userIds = (teamData || []).map((item) => item.user_id).filter(Boolean);
-      const { count: essenceCount } = userIds.length
-        ? await supabase.from('mapa_essencia').select('*', { count: 'exact', head: true }).in('user_id', userIds)
-        : { count: 0 };
-      setStats({ activeJobs: jobsCount || 0, totalCandidates: candidatesCount || 0, teamMembers: userIds.length, pendingInvites: pendingCount || 0, essenceCodes: essenceCount || 0 });
+      const { data: crossingData } = await (supabase as any).rpc('get_company_identity_team_crossing', { p_company_id: company.id });
+      const essenceCodes = (crossingData || []).filter((row: any) => row.has_essence_code).length;
+      setStats({ activeJobs: jobsCount || 0, totalCandidates: candidatesCount || 0, teamMembers: userIds.length, pendingInvites: pendingCount || 0, essenceCodes });
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
