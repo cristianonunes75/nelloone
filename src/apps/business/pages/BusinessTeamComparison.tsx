@@ -2,10 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft,
+  AlertTriangle,
   Brain,
   CheckCircle2,
+  ClipboardCheck,
   Compass,
   GitCompare,
+  HeartHandshake,
   Network,
   RefreshCw,
   Shield,
@@ -82,6 +85,7 @@ const MAP_LABELS: Record<string, string> = {
   estilos_conexao_afetiva: 'Estilos de conexão',
   nello16: 'nello16',
 };
+const EXPECTED_MAPS = ['disc', 'temperamentos', 'arquetipos_proposito', 'inteligencias_multiplas', 'estilos_conexao_afetiva', 'eneagrama', 'nello16'];
 
 function asRecord(value: unknown): JsonRecord {
   return value && typeof value === 'object' && !Array.isArray(value) ? (value as JsonRecord) : {};
@@ -190,6 +194,67 @@ function getLeadershipMode(profile: Pick<MemberProfile, 'discProfile' | 'tempera
   if (profile.discProfile === 'I' || profile.temperamentProfile === 'sanguineo') return 'Conexão';
   if (profile.discProfile === 'S' || profile.temperamentProfile === 'fleumatico') return 'Sustentação';
   return 'Critério';
+}
+
+function getFirstName(name: string) {
+  return name.split(' ')[0] || name;
+}
+
+function hasMap(row: MemberProfile, map: string) {
+  return (row.available_maps || []).includes(map);
+}
+
+function missingMaps(row: MemberProfile) {
+  return EXPECTED_MAPS.filter((map) => !hasMap(row, map));
+}
+
+function getBehaviorReading(row: MemberProfile) {
+  const disc = row.discProfile;
+  const temp = row.temperamentProfile;
+  const first = getFirstName(row.full_name);
+
+  if (disc === 'D' || temp === 'colerico') {
+    return `${first} tende a responder melhor quando entende a prioridade, o prazo e o resultado esperado. Em momentos de pressão, pode acelerar, cobrar objetividade e perder paciência com explicações longas. Dentro da empresa, ela pode render mais quando recebe autonomia com critérios claros de entrega.`;
+  }
+  if (disc === 'I' || temp === 'sanguineo') {
+    return `${first} tende a influenciar o ambiente pela comunicação, presença e capacidade de criar vínculo. Em dias de pressão, pode reagir emocionalmente ao clima do time, oscilar foco ou buscar validação antes de executar. Na empresa, cresce quando sua energia relacional é direcionada para atendimento, acolhimento, vendas e integração.`;
+  }
+  if (disc === 'S' || temp === 'fleumatico') {
+    return `${first} tende a preservar estabilidade, confiança e continuidade. Pode evitar conflito direto, demorar a verbalizar incômodos e preferir rotinas previsíveis. Na empresa, melhora quando recebe segurança, combinados constantes e espaço para se posicionar sem confronto.`;
+  }
+  if (disc === 'C' || temp === 'melancolico') {
+    return `${first} tende a agir com critério, observação e cuidado com detalhes. Em pressão, pode travar diante de ambiguidade, preocupar-se com erro ou precisar de mais contexto antes de decidir. Na empresa, entrega melhor quando há padrão, checklist, referência de qualidade e tempo adequado para organizar.`;
+  }
+  return `${first} ainda tem dados limitados para uma leitura profunda de comportamento atual. Use os mapas disponíveis como sinal inicial e complete a jornada para entender reações, motivações e forma de contribuição com mais segurança.`;
+}
+
+function getActionReading(row: MemberProfile) {
+  const actions: string[] = [];
+  if (row.discProfile === 'D') actions.push('delegue metas com indicador, prazo e liberdade para decidir o caminho');
+  if (row.discProfile === 'I') actions.push('posicione em interações com cliente, relacionamento, acolhimento e apresentação de ideias');
+  if (row.discProfile === 'S') actions.push('use em rotinas que exigem constância, paciência, pós-venda e manutenção da confiança');
+  if (row.discProfile === 'C') actions.push('envolva em conferência, organização, estoque, padrão de atendimento e redução de erros');
+  if (row.temperamentProfile === 'colerico') actions.push('evite microgerenciar; faça alinhamentos curtos e objetivos');
+  if (row.temperamentProfile === 'sanguineo') actions.push('dê feedback frequente e ajude a transformar entusiasmo em execução concreta');
+  if (row.temperamentProfile === 'fleumatico') actions.push('não pressione apenas no impulso; combine mudanças com antecedência');
+  if (row.temperamentProfile === 'melancolico') actions.push('não deixe expectativas implícitas; documente padrões e prioridades');
+  if (row.connectionStyle) actions.push(`observe que o estilo de conexão predominante (${row.connectionStyle}) influencia como ela percebe reconhecimento, confiança e pertencimento`);
+  if (row.topIntelligence) actions.push(`aproveite sua inteligência predominante (${row.topIntelligence}) como porta de entrada para treinamento e evolução`);
+  return actions.slice(0, 5);
+}
+
+function getGrowthReading(row: MemberProfile) {
+  if (row.leadershipMode === 'Direção') return 'Pode ser melhor aproveitada quando assume pequenas frentes, metas de venda, resolução de gargalos e decisões rápidas — desde que acompanhada por rituais de escuta para não atropelar o ritmo das outras.';
+  if (row.leadershipMode === 'Conexão') return 'Pode crescer quando sua sensibilidade ao ambiente vira ponte com clientes e colegas — com metas simples, acompanhamento próximo e fechamento claro das tarefas iniciadas.';
+  if (row.leadershipMode === 'Sustentação') return 'Pode evoluir quando vira referência de constância, atendimento cuidadoso e preservação de processos — com incentivo para comunicar desconfortos antes que eles acumulem.';
+  return 'Pode contribuir mais quando vira guardiã de qualidade, organização e critério — com cuidado para que perfeccionismo ou excesso de análise não atrasem decisões simples.';
+}
+
+function getDataNotice(row: MemberProfile) {
+  const missing = missingMaps(row);
+  if (!missing.length) return null;
+  const missingLabels = missing.map((map) => MAP_LABELS[map] || map).join(', ');
+  return `Não há informação suficiente sobre ${getFirstName(row.full_name)} em: ${missingLabels}. A leitura abaixo usa apenas ${row.available_maps?.map((map) => MAP_LABELS[map] || map).join(', ') || 'os dados disponíveis'}.`;
 }
 
 function enrichRow(row: TeamMemberRow): MemberProfile {
