@@ -201,7 +201,17 @@ function getFirstName(name: string) {
 }
 
 function hasMap(row: MemberProfile, map: string) {
-  if (row.has_essence_code && row.essence_visual_data && Object.keys(row.essence_visual_data).length > 0) return true;
+  const visualKeys: Record<string, string> = {
+    disc: 'disc',
+    temperamentos: 'temperament',
+    arquetipos_proposito: 'archetypes',
+    inteligencias_multiplas: 'intelligences',
+    estilos_conexao_afetiva: 'connection_style',
+    eneagrama: 'enneagram',
+    nello16: 'nello16',
+  };
+  const visual = asRecord(row.essence_visual_data?.[visualKeys[map]]);
+  if (row.has_essence_code && Object.keys(visual).length > 0) return true;
   return (row.available_maps || []).includes(map);
 }
 
