@@ -461,9 +461,6 @@ export default function BusinessDashboard() {
   const [allCompanies, setAllCompanies] = useState<Array<{ id: string; name: string; slug: string }>>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Strategic data hooks
-  const enps = useENPS();
-  const climate = useClimate();
   const { insights: teamInsights, fetchInsights: fetchTeamInsights } = useTeamInsights();
 
   const [journeyData, setJourneyData] = useState<JourneyData>({
@@ -542,24 +539,6 @@ export default function BusinessDashboard() {
       setIsLoading(false);
     }
   };
-
-  // Derived strategic values
-  const displayEnps = enps.activeCycle || enps.cycles.find(c => c.status === 'closed' && c.enps_score !== null) || null;
-  const displayClimate = climate.activeCycle || climate.cycles.find(c => c.status === 'closed' && c.overall_score !== null) || null;
-
-  const climateDimensions = displayClimate?.dimension_scores || {};
-  const worstDimEntry = Object.entries(climateDimensions).sort((a, b) => a[1] - b[1])[0] || null;
-  const worstClimateDimension = worstDimEntry ? worstDimEntry[0] : null;
-  const worstClimateScore = worstDimEntry ? worstDimEntry[1] : null;
-
-  const healthIndex = calculateHealthIndex(
-    displayEnps?.enps_score ?? null,
-    displayClimate?.overall_score ?? null,
-    null, // performance avg - not yet on dashboard
-    null, // adherence avg - not yet on dashboard
-  );
-
-  const hasStrategicData = displayEnps !== null || displayClimate !== null || (teamInsights?.completed_assessments ?? 0) > 0;
 
   // Super admin without company
   if (isNelloOneSuperAdmin && !company) {
