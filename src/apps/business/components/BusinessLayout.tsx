@@ -46,7 +46,7 @@ const adminNavSections: NavSection[] = [
     items: [
       { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { href: '/people-strategy', label: 'People Strategy', icon: BarChart3 },
-      { href: '/team-comparison', label: 'Comparar Equipe', icon: Scale },
+      { href: '/team-comparison', label: 'Cruzamento da Equipe', icon: Scale },
     ],
   },
   {
