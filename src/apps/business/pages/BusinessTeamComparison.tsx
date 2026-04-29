@@ -257,6 +257,9 @@ function getGrowthReading(row: MemberProfile) {
 }
 
 function getDataNotice(row: MemberProfile) {
+  if (row.journey_status === 'pending_invite') {
+    return `Não há Código da Essência disponível para ${getFirstName(row.full_name)} no Identity. Ela ainda não acessou ou aceitou o convite da equipe, por isso não há dados corporativos compartilhados.`;
+  }
   const missing = missingMaps(row);
   if (!missing.length) return null;
   const missingLabels = missing.map((map) => MAP_LABELS[map] || map).join(', ');
@@ -493,13 +496,13 @@ function CrossingsPanel({ rows }: { rows: MemberProfile[] }) {
 }
 
 function CollaboratorCard({ row }: { row: MemberProfile }) {
-  const completedMaps = row.available_maps || [];
-  const statusLabel = row.business_role === 'candidate' ? 'Processo seletivo · dados parciais' : row.completeness === 'codigo_completo' ? 'Código completo' : row.completeness === 'jornada_sem_codigo' ? 'Jornada completa' : 'Dados parciais';
+  const completedMaps = row.has_essence_code ? ['codigo_essencia', ...(row.available_maps || [])] : row.available_maps || [];
+  const statusLabel = row.journey_status === 'pending_invite' ? 'Convite pendente' : row.completeness === 'codigo_completo' ? 'Código completo' : row.completeness === 'jornada_sem_codigo' ? 'Jornada completa' : 'Dados parciais';
   const dataNotice = getDataNotice(row);
   const actionItems = getActionReading(row);
 
   return (
-    <Card className={row.business_role === 'candidate' ? 'border-primary/25' : undefined}>
+    <Card className={row.journey_status === 'pending_invite' ? 'border-dashed' : undefined}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -535,7 +538,7 @@ function CollaboratorCard({ row }: { row: MemberProfile }) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {completedMaps.map((map) => <Badge key={map} variant="outline">{MAP_LABELS[map] || map}</Badge>)}
+          {completedMaps.map((map) => <Badge key={map} variant="outline">{map === 'codigo_essencia' ? 'Código da Essência' : MAP_LABELS[map] || map}</Badge>)}
         </div>
       </CardContent>
     </Card>
