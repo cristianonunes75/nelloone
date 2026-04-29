@@ -321,6 +321,10 @@ function buildDistribution<T extends string>(rows: MemberProfile[], getter: (row
   })).filter((item) => labels || item.count > 0);
 }
 
+function rowsWithCode(rows: MemberProfile[]) {
+  return rows.filter((row) => row.has_essence_code);
+}
+
 function getAverageRadar(rows: MemberProfile[], kind: 'disc' | 'temperament'): RadarItem[] {
   const labels = kind === 'disc' ? DISC_LABELS : TEMPERAMENT_LABELS;
   return Object.entries(labels).map(([key, label]) => {
@@ -601,12 +605,13 @@ export default function BusinessTeamComparison() {
     if (enforcement.canViewInsights) loadData();
   }, [enforcement.canViewInsights, loadData]);
 
-  const discData = useMemo(() => buildDistribution(rows, (row) => row.discProfile, DISC_LABELS), [rows]);
-  const temperamentData = useMemo(() => buildDistribution(rows, (row) => row.temperamentProfile, TEMPERAMENT_LABELS), [rows]);
-  const archetypeData = useMemo(() => buildDistribution(rows, (row) => row.archetypePrimary), [rows]);
-  const contributionData = useMemo(() => buildDistribution(rows, (row) => row.leadershipMode), [rows]);
-  const discRadar = useMemo(() => getAverageRadar(rows, 'disc'), [rows]);
-  const temperamentRadar = useMemo(() => getAverageRadar(rows, 'temperament'), [rows]);
+  const codedRows = useMemo(() => rowsWithCode(rows), [rows]);
+  const discData = useMemo(() => buildDistribution(codedRows, (row) => row.discProfile, DISC_LABELS), [codedRows]);
+  const temperamentData = useMemo(() => buildDistribution(codedRows, (row) => row.temperamentProfile, TEMPERAMENT_LABELS), [codedRows]);
+  const archetypeData = useMemo(() => buildDistribution(codedRows, (row) => row.archetypePrimary), [codedRows]);
+  const contributionData = useMemo(() => buildDistribution(codedRows, (row) => row.leadershipMode), [codedRows]);
+  const discRadar = useMemo(() => getAverageRadar(codedRows, 'disc'), [codedRows]);
+  const temperamentRadar = useMemo(() => getAverageRadar(codedRows, 'temperament'), [codedRows]);
 
   if (!enforcement.canViewInsights) {
     return (
