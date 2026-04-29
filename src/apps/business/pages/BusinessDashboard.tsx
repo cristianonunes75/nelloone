@@ -228,7 +228,7 @@ function ExecutiveEmptyState() {
         <div className="text-center sm:text-left flex-1">
           <h3 className="font-semibold text-foreground">Configure sua Inteligência Organizacional</h3>
           <p className="text-sm text-muted-foreground mt-1">
-            Convide sua equipe e rode ciclos de eNPS e Clima para ativar a visão executiva completa.
+            Convide sua equipe e acompanhe os Códigos da Essência compartilhados no Identity.
           </p>
         </div>
         <div className="flex gap-2">
@@ -237,9 +237,9 @@ function ExecutiveEmptyState() {
               <Users className="w-3.5 h-3.5" /> Convidar equipe
             </Button>
           </Link>
-          <Link to="/people-strategy">
+          <Link to="/team-comparison">
             <Button size="sm" className="gap-1.5">
-              <BarChart3 className="w-3.5 h-3.5" /> People Strategy
+              <BarChart3 className="w-3.5 h-3.5" /> Cruzamento da Equipe
             </Button>
           </Link>
         </div>
