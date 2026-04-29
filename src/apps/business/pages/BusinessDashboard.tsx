@@ -25,6 +25,9 @@ import { calculateHealthIndex } from '../components/strategy/OrganizationalHealt
 interface DashboardStats {
   activeJobs: number;
   totalCandidates: number;
+  teamMembers: number;
+  pendingInvites: number;
+  essenceCodes: number;
 }
 
 interface JourneyData {
@@ -398,8 +401,6 @@ function OrgProgressChecklist({ data }: { data: JourneyData }) {
     { id: 'ideal', label: 'Perfil ideal definido', done: data.hasIdealProfiles, link: '/jobs' },
     { id: 'team', label: 'Equipe convidada', done: data.hasTeamMembers, link: '/team?tab=invite' },
     { id: 'assess', label: 'Avaliações concluídas', done: data.hasAssessments, link: '/team' },
-    { id: 'climate', label: 'Ciclo de clima ativo', done: data.hasClimateCycle, link: '/people-strategy' },
-    { id: 'enps', label: 'Ciclo eNPS ativo', done: data.hasENPSCycle, link: '/people-strategy' },
   ];
 
   const completedCount = steps.filter(s => s.done).length;
