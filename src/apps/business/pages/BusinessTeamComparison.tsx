@@ -677,13 +677,13 @@ export default function BusinessTeamComparison() {
 
               <TabsContent value="individual" className="space-y-4">
                 <div className="flex items-center gap-2"><Brain className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Mapa por colaboradora</h2></div>
-                <div className="grid gap-4 xl:grid-cols-2">{rows.map((row) => <CollaboratorCard key={row.user_id} row={row} />)}</div>
+                <div className="grid gap-4 xl:grid-cols-2">{rows.map((row) => <CollaboratorCard key={row.user_id || row.full_name} row={row} />)}</div>
               </TabsContent>
             </Tabs>
 
             <div className="flex items-start gap-2 rounded-lg border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground">
               <Shield className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>Esta página exibe dados individuais apenas das pessoas ativas que autorizaram o compartilhamento com a empresa e candidatas com consentimento no processo seletivo. O acesso é restrito aos administradores da empresa.</span>
+            <span>Esta página exibe somente pessoas vinculadas à equipe e dados do Nello Identity compartilhados com a empresa. Convites pendentes aparecem sem leitura comportamental até o acesso ser concluído. O acesso é restrito aos administradores da empresa.</span>
             </div>
           </>
         )}
