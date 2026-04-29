@@ -386,14 +386,15 @@ function TeamRadar({ title, data }: { title: string; data: RadarItem[] }) {
 }
 
 function ExecutiveSummary({ rows }: { rows: MemberProfile[] }) {
+  const analyzableRows = rows.filter((row) => row.has_essence_code);
   const fullCodes = rows.filter((row) => row.has_essence_code).length;
   const partial = rows.length - fullCodes;
   const pending = rows.filter((row) => row.journey_status === 'pending_invite').length;
-  const supervisor = rows.find((row) => normalizeKey(row.job_title).includes('supervisor'));
-  const modes = buildDistribution(rows, (row) => row.leadershipMode);
+  const supervisor = analyzableRows.find((row) => normalizeKey(row.job_title).includes('supervisor'));
+  const modes = buildDistribution(analyzableRows, (row) => row.leadershipMode);
   const topMode = [...modes].sort((a, b) => b.count - a.count)[0];
-  const topDisc = [...buildDistribution(rows, (row) => row.discProfile, DISC_LABELS)].sort((a, b) => b.count - a.count)[0];
-  const topTemp = [...buildDistribution(rows, (row) => row.temperamentProfile, TEMPERAMENT_LABELS)].sort((a, b) => b.count - a.count)[0];
+  const topDisc = [...buildDistribution(analyzableRows, (row) => row.discProfile, DISC_LABELS)].sort((a, b) => b.count - a.count)[0];
+  const topTemp = [...buildDistribution(analyzableRows, (row) => row.temperamentProfile, TEMPERAMENT_LABELS)].sort((a, b) => b.count - a.count)[0];
 
   const summary = `A equipe mostra maior força em ${topMode?.label || 'perfis ainda indefinidos'}, com predominância comportamental em ${topDisc?.label || 'DISC parcial'} e ${topTemp?.label || 'temperamentos parciais'}. Esta leitura usa somente pessoas vinculadas à equipe e dados do Nello Identity; convites pendentes aparecem apenas como ausência de informação.`;
   const leadership = supervisor
