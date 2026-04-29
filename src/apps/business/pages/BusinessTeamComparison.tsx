@@ -488,7 +488,7 @@ function CrossingsPanel({ rows }: { rows: MemberProfile[] }) {
 
 function CollaboratorCard({ row }: { row: MemberProfile }) {
   const completedMaps = row.available_maps || [];
-  const statusLabel = row.completeness === 'codigo_completo' ? 'Código completo' : row.completeness === 'jornada_sem_codigo' ? 'Jornada completa' : 'Dados parciais';
+  const statusLabel = row.business_role === 'candidate' ? 'Processo seletivo · dados parciais' : row.completeness === 'codigo_completo' ? 'Código completo' : row.completeness === 'jornada_sem_codigo' ? 'Jornada completa' : 'Dados parciais';
   const dataNotice = getDataNotice(row);
   const actionItems = getActionReading(row);
 
@@ -671,7 +671,7 @@ export default function BusinessTeamComparison() {
 
             <div className="flex items-start gap-2 rounded-lg border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground">
               <Shield className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>Esta página exibe dados individuais apenas das pessoas ativas que autorizaram o compartilhamento com a empresa. O acesso é restrito aos administradores da empresa.</span>
+            <span>Esta página exibe dados individuais apenas das pessoas ativas que autorizaram o compartilhamento com a empresa e candidatas com consentimento no processo seletivo. O acesso é restrito aos administradores da empresa.</span>
             </div>
           </>
         )}
