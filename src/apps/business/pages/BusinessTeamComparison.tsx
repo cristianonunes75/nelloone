@@ -214,17 +214,21 @@ function getBehaviorReading(row: MemberProfile) {
   const temp = row.temperamentProfile;
   const first = getFirstName(row.full_name);
 
+  if (row.journey_status === 'pending_invite') {
+    return `${first} ainda não aceitou o convite da equipe. Não há Código da Essência disponível no Identity para interpretar comportamento, reações, motivadores ou pontos de desenvolvimento dentro da empresa.`;
+  }
+
   if (disc === 'D' || temp === 'colerico') {
-    return `${first} tende a responder melhor quando entende a prioridade, o prazo e o resultado esperado. Em momentos de pressão, pode acelerar, cobrar objetividade e perder paciência com explicações longas. Dentro da empresa, ela pode render mais quando recebe autonomia com critérios claros de entrega.`;
+    return `${first} tende a entrar no ambiente com foco em solução, decisão e avanço. Quando percebe lentidão, falta de prioridade ou excesso de conversa sem encaminhamento, pode ficar mais direta, impaciente ou assumir o controle da situação. Em pressão, a reação provável é acelerar, cobrar definição e reduzir a tolerância a detalhes que pareçam secundários. Essa força é útil para metas, vendas, resolução de gargalos e momentos que exigem firmeza, mas precisa de combinados claros para que a objetividade não seja percebida pela equipe como dureza.`;
   }
   if (disc === 'I' || temp === 'sanguineo') {
-    return `${first} tende a influenciar o ambiente pela comunicação, presença e capacidade de criar vínculo. Em dias de pressão, pode reagir emocionalmente ao clima do time, oscilar foco ou buscar validação antes de executar. Na empresa, cresce quando sua energia relacional é direcionada para atendimento, acolhimento, vendas e integração.`;
+    return `${first} tende a sentir o ambiente e influenciar pessoas por presença, comunicação e vínculo. Costuma reagir melhor quando percebe abertura, reconhecimento e espaço para participar. Em pressão, pode absorver o clima emocional do time, falar antes de organizar tudo, oscilar foco ou buscar validação para se sentir segura. Essa energia é valiosa em atendimento, acolhimento, relacionamento com clientes e integração da equipe, desde que acompanhada por prioridades simples, fechamento das tarefas e retorno frequente.`;
   }
   if (disc === 'S' || temp === 'fleumatico') {
-    return `${first} tende a preservar estabilidade, confiança e continuidade. Pode evitar conflito direto, demorar a verbalizar incômodos e preferir rotinas previsíveis. Na empresa, melhora quando recebe segurança, combinados constantes e espaço para se posicionar sem confronto.`;
+    return `${first} tende a preservar estabilidade, continuidade e confiança. Geralmente prefere entender o ritmo antes de mudar, sustenta rotinas com paciência e evita conflitos desnecessários. Em pressão, pode silenciar, ceder para manter a paz, demorar a verbalizar incômodos ou travar quando mudanças chegam sem contexto. Dentro da empresa, sua contribuição aparece em constância, cuidado no atendimento, pós-venda, manutenção de processos e suporte à supervisão. Precisa de segurança, previsibilidade e espaço para dizer o que pensa antes que o desconforto acumule.`;
   }
   if (disc === 'C' || temp === 'melancolico') {
-    return `${first} tende a agir com critério, observação e cuidado com detalhes. Em pressão, pode travar diante de ambiguidade, preocupar-se com erro ou precisar de mais contexto antes de decidir. Na empresa, entrega melhor quando há padrão, checklist, referência de qualidade e tempo adequado para organizar.`;
+    return `${first} tende a observar, comparar, organizar e buscar o jeito certo de fazer. Pode perceber falhas que outras pessoas não veem e se incomodar com improviso, retrabalho ou ausência de padrão. Em pressão, pode ficar mais crítica, preocupada com erro, sensível a cobranças vagas ou lenta para decidir quando falta informação. Na empresa, entrega muito valor em conferência, estoque, organização, qualidade, processos e tarefas que exigem precisão. Para crescer, precisa de clareza de expectativa, checklist, referência do padrão desejado e feedback específico.`;
   }
   return `${first} ainda tem dados limitados para uma leitura profunda de comportamento atual. Use os mapas disponíveis como sinal inicial e complete a jornada para entender reações, motivações e forma de contribuição com mais segurança.`;
 }
@@ -245,10 +249,11 @@ function getActionReading(row: MemberProfile) {
 }
 
 function getGrowthReading(row: MemberProfile) {
-  if (row.leadershipMode === 'Direção') return 'Pode ser melhor aproveitada quando assume pequenas frentes, metas de venda, resolução de gargalos e decisões rápidas — desde que acompanhada por rituais de escuta para não atropelar o ritmo das outras.';
-  if (row.leadershipMode === 'Conexão') return 'Pode crescer quando sua sensibilidade ao ambiente vira ponte com clientes e colegas — com metas simples, acompanhamento próximo e fechamento claro das tarefas iniciadas.';
-  if (row.leadershipMode === 'Sustentação') return 'Pode evoluir quando vira referência de constância, atendimento cuidadoso e preservação de processos — com incentivo para comunicar desconfortos antes que eles acumulem.';
-  return 'Pode contribuir mais quando vira guardiã de qualidade, organização e critério — com cuidado para que perfeccionismo ou excesso de análise não atrasem decisões simples.';
+  if (row.journey_status === 'pending_invite') return 'Neste momento, a melhor ação é concluir o acesso ao Business e autorizar o compartilhamento dos dados do Identity. Sem isso, qualquer leitura seria incompleta e injusta para a colaboradora.';
+  if (row.leadershipMode === 'Direção') return 'Pode ser melhor aproveitada com pequenas frentes de responsabilidade: meta do dia, solução de gargalos, condução de uma ação comercial ou decisão operacional com prazo. O cuidado é equilibrar autonomia com escuta: combine indicadores objetivos e também peça que valide o impacto nas colegas antes de mudar o ritmo do time.';
+  if (row.leadershipMode === 'Conexão') return 'Pode crescer quando sua sensibilidade ao ambiente vira ponte concreta com clientes e colegas. Funciona bem em acolhimento, vendas consultivas, reconquista de cliente, integração e comunicação interna. Para performar melhor, precisa transformar entusiasmo em execução: tarefa curta, prioridade visível, prazo e retorno sobre o que foi bem feito.';
+  if (row.leadershipMode === 'Sustentação') return 'Pode evoluir como referência de constância, confiança e cuidado. É uma boa força para rotinas, atendimento contínuo, pós-venda, organização de fluxo e suporte à supervisão. Para não ficar apenas “segurando tudo”, precisa ser incentivada a se posicionar, pedir ajuda cedo e nomear incômodos antes de aceitar sobrecarga.';
+  return 'Pode contribuir mais como guardiã de qualidade, organização e critério. É útil para conferir processos, reduzir erros, estruturar padrão de atendimento, cuidar de detalhes e preservar consistência. O ponto de desenvolvimento é não deixar excesso de análise, medo de errar ou perfeccionismo atrasarem decisões simples.';
 }
 
 function getDataNotice(row: MemberProfile) {
