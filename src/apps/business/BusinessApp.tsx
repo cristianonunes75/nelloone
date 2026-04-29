@@ -20,7 +20,6 @@ import BusinessApplicationConfirm from './pages/BusinessApplicationConfirm';
 import BusinessCandidates from './pages/BusinessCandidates';
 import BusinessBilling from './pages/BusinessBilling';
 import BusinessWhatsApp from './pages/BusinessWhatsApp';
-import BusinessPeopleStrategy from './pages/BusinessPeopleStrategy';
 import BusinessTeamComparison from './pages/BusinessTeamComparison';
 import BusinessTalentPoolPublic from './pages/BusinessTalentPoolPublic';
 import { BusinessProtectedRoute } from './components/BusinessProtectedRoute';
@@ -125,12 +124,8 @@ export default function BusinessApp() {
         </BusinessProtectedRoute>
       } />
       
-      {/* People Strategy - CEO View */}
-      <Route path="/people-strategy" element={
-        <BusinessProtectedRoute requiredRole="company_admin">
-          <BusinessPeopleStrategy />
-        </BusinessProtectedRoute>
-      } />
+      {/* People Strategy hidden while climate/eNPS modules are not active */}
+      <Route path="/people-strategy" element={<Navigate to="/team-comparison" replace />} />
 
       <Route path="/team-comparison" element={
         <BusinessProtectedRoute requiredRole="company_admin">
