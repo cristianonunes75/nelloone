@@ -39,7 +39,7 @@ type TeamCrossingRpc = {
 };
 
 type TeamMemberRow = {
-  user_id: string;
+  user_id: string | null;
   full_name: string;
   job_title: string | null;
   department: string | null;
@@ -136,7 +136,7 @@ function pickPrimaryFromObject(value: unknown) {
 function extractDisc(row: TeamMemberRow) {
   const visual = visualData(row, 'disc');
   const test = testData(row, 'disc');
-  const primary = getString(visual.primary) || getString(visual.profile) || getString(test.primary) || getString(test.dominantProfile) || getString(test.primaryProfile);
+  const primary = getString(visual.primary) || getString(visual.dominant) || getString(visual.profile) || getString(test.primary) || getString(test.dominantProfile) || getString(test.primaryProfile);
   const secondary = getString(visual.secondary) || getString(test.secondary) || getString(test.secondaryProfile);
   const scores = asNumberMap(visual.scores && Object.keys(asRecord(visual.scores)).length ? visual.scores : test.percentages || test.scores);
   return { primary: normalizeDisc(primary), secondary: normalizeDisc(secondary), scores };
@@ -145,7 +145,7 @@ function extractDisc(row: TeamMemberRow) {
 function extractTemperament(row: TeamMemberRow) {
   const visual = visualData(row, 'temperament');
   const test = testData(row, 'temperamentos');
-  const primary = getString(visual.primary) || pickPrimaryFromObject(test.primary) || getString(test.dominantTemperament);
+  const primary = getString(visual.primary) || getString(visual.dominant) || pickPrimaryFromObject(test.primary) || getString(test.dominantTemperament);
   const secondary = getString(visual.secondary) || pickPrimaryFromObject(test.secondary) || getString(test.secondaryTemperament);
   const scores = asNumberMap(visual.scores && Object.keys(asRecord(visual.scores)).length ? visual.scores : test.percentages || test.scores);
   return { primary: normalizeTemperament(primary), secondary: normalizeTemperament(secondary), scores };
@@ -201,6 +201,17 @@ function getFirstName(name: string) {
 }
 
 function hasMap(row: MemberProfile, map: string) {
+  const visualKeys: Record<string, string> = {
+    disc: 'disc',
+    temperamentos: 'temperament',
+    arquetipos_proposito: 'archetypes',
+    inteligencias_multiplas: 'intelligences',
+    estilos_conexao_afetiva: 'connection_style',
+    eneagrama: 'enneagram',
+    nello16: 'nello16',
+  };
+  const visual = asRecord(row.essence_visual_data?.[visualKeys[map]]);
+  if (row.has_essence_code && Object.keys(visual).length > 0) return true;
   return (row.available_maps || []).includes(map);
 }
 
@@ -213,17 +224,21 @@ function getBehaviorReading(row: MemberProfile) {
   const temp = row.temperamentProfile;
   const first = getFirstName(row.full_name);
 
+  if (row.journey_status === 'pending_invite') {
+    return `${first} ainda não aceitou o convite da equipe. Não há Código da Essência disponível no Identity para interpretar comportamento, reações, motivadores ou pontos de desenvolvimento dentro da empresa.`;
+  }
+
   if (disc === 'D' || temp === 'colerico') {
-    return `${first} tende a responder melhor quando entende a prioridade, o prazo e o resultado esperado. Em momentos de pressão, pode acelerar, cobrar objetividade e perder paciência com explicações longas. Dentro da empresa, ela pode render mais quando recebe autonomia com critérios claros de entrega.`;
+    return `${first} tende a entrar no ambiente com foco em solução, decisão e avanço. Quando percebe lentidão, falta de prioridade ou excesso de conversa sem encaminhamento, pode ficar mais direta, impaciente ou assumir o controle da situação. Em pressão, a reação provável é acelerar, cobrar definição e reduzir a tolerância a detalhes que pareçam secundários. Essa força é útil para metas, vendas, resolução de gargalos e momentos que exigem firmeza, mas precisa de combinados claros para que a objetividade não seja percebida pela equipe como dureza.`;
   }
   if (disc === 'I' || temp === 'sanguineo') {
-    return `${first} tende a influenciar o ambiente pela comunicação, presença e capacidade de criar vínculo. Em dias de pressão, pode reagir emocionalmente ao clima do time, oscilar foco ou buscar validação antes de executar. Na empresa, cresce quando sua energia relacional é direcionada para atendimento, acolhimento, vendas e integração.`;
+    return `${first} tende a sentir o ambiente e influenciar pessoas por presença, comunicação e vínculo. Costuma reagir melhor quando percebe abertura, reconhecimento e espaço para participar. Em pressão, pode absorver o clima emocional do time, falar antes de organizar tudo, oscilar foco ou buscar validação para se sentir segura. Essa energia é valiosa em atendimento, acolhimento, relacionamento com clientes e integração da equipe, desde que acompanhada por prioridades simples, fechamento das tarefas e retorno frequente.`;
   }
   if (disc === 'S' || temp === 'fleumatico') {
-    return `${first} tende a preservar estabilidade, confiança e continuidade. Pode evitar conflito direto, demorar a verbalizar incômodos e preferir rotinas previsíveis. Na empresa, melhora quando recebe segurança, combinados constantes e espaço para se posicionar sem confronto.`;
+    return `${first} tende a preservar estabilidade, continuidade e confiança. Geralmente prefere entender o ritmo antes de mudar, sustenta rotinas com paciência e evita conflitos desnecessários. Em pressão, pode silenciar, ceder para manter a paz, demorar a verbalizar incômodos ou travar quando mudanças chegam sem contexto. Dentro da empresa, sua contribuição aparece em constância, cuidado no atendimento, pós-venda, manutenção de processos e suporte à supervisão. Precisa de segurança, previsibilidade e espaço para dizer o que pensa antes que o desconforto acumule.`;
   }
   if (disc === 'C' || temp === 'melancolico') {
-    return `${first} tende a agir com critério, observação e cuidado com detalhes. Em pressão, pode travar diante de ambiguidade, preocupar-se com erro ou precisar de mais contexto antes de decidir. Na empresa, entrega melhor quando há padrão, checklist, referência de qualidade e tempo adequado para organizar.`;
+    return `${first} tende a observar, comparar, organizar e buscar o jeito certo de fazer. Pode perceber falhas que outras pessoas não veem e se incomodar com improviso, retrabalho ou ausência de padrão. Em pressão, pode ficar mais crítica, preocupada com erro, sensível a cobranças vagas ou lenta para decidir quando falta informação. Na empresa, entrega muito valor em conferência, estoque, organização, qualidade, processos e tarefas que exigem precisão. Para crescer, precisa de clareza de expectativa, checklist, referência do padrão desejado e feedback específico.`;
   }
   return `${first} ainda tem dados limitados para uma leitura profunda de comportamento atual. Use os mapas disponíveis como sinal inicial e complete a jornada para entender reações, motivações e forma de contribuição com mais segurança.`;
 }
@@ -244,13 +259,17 @@ function getActionReading(row: MemberProfile) {
 }
 
 function getGrowthReading(row: MemberProfile) {
-  if (row.leadershipMode === 'Direção') return 'Pode ser melhor aproveitada quando assume pequenas frentes, metas de venda, resolução de gargalos e decisões rápidas — desde que acompanhada por rituais de escuta para não atropelar o ritmo das outras.';
-  if (row.leadershipMode === 'Conexão') return 'Pode crescer quando sua sensibilidade ao ambiente vira ponte com clientes e colegas — com metas simples, acompanhamento próximo e fechamento claro das tarefas iniciadas.';
-  if (row.leadershipMode === 'Sustentação') return 'Pode evoluir quando vira referência de constância, atendimento cuidadoso e preservação de processos — com incentivo para comunicar desconfortos antes que eles acumulem.';
-  return 'Pode contribuir mais quando vira guardiã de qualidade, organização e critério — com cuidado para que perfeccionismo ou excesso de análise não atrasem decisões simples.';
+  if (row.journey_status === 'pending_invite') return 'Neste momento, a melhor ação é concluir o acesso ao Business e autorizar o compartilhamento dos dados do Identity. Sem isso, qualquer leitura seria incompleta e injusta para a colaboradora.';
+  if (row.leadershipMode === 'Direção') return 'Pode ser melhor aproveitada com pequenas frentes de responsabilidade: meta do dia, solução de gargalos, condução de uma ação comercial ou decisão operacional com prazo. O cuidado é equilibrar autonomia com escuta: combine indicadores objetivos e também peça que valide o impacto nas colegas antes de mudar o ritmo do time.';
+  if (row.leadershipMode === 'Conexão') return 'Pode crescer quando sua sensibilidade ao ambiente vira ponte concreta com clientes e colegas. Funciona bem em acolhimento, vendas consultivas, reconquista de cliente, integração e comunicação interna. Para performar melhor, precisa transformar entusiasmo em execução: tarefa curta, prioridade visível, prazo e retorno sobre o que foi bem feito.';
+  if (row.leadershipMode === 'Sustentação') return 'Pode evoluir como referência de constância, confiança e cuidado. É uma boa força para rotinas, atendimento contínuo, pós-venda, organização de fluxo e suporte à supervisão. Para não ficar apenas “segurando tudo”, precisa ser incentivada a se posicionar, pedir ajuda cedo e nomear incômodos antes de aceitar sobrecarga.';
+  return 'Pode contribuir mais como guardiã de qualidade, organização e critério. É útil para conferir processos, reduzir erros, estruturar padrão de atendimento, cuidar de detalhes e preservar consistência. O ponto de desenvolvimento é não deixar excesso de análise, medo de errar ou perfeccionismo atrasarem decisões simples.';
 }
 
 function getDataNotice(row: MemberProfile) {
+  if (row.journey_status === 'pending_invite') {
+    return `Não há Código da Essência disponível para ${getFirstName(row.full_name)} no Identity. Ela ainda não acessou ou aceitou o convite da equipe, por isso não há dados corporativos compartilhados.`;
+  }
   const missing = missingMaps(row);
   if (!missing.length) return null;
   const missingLabels = missing.map((map) => MAP_LABELS[map] || map).join(', ');
@@ -300,6 +319,10 @@ function buildDistribution<T extends string>(rows: MemberProfile[], getter: (row
     percent: total > 0 ? Math.round(((counts[key] || 0) / total) * 100) : 0,
     fill: CHART_FILLS[index % CHART_FILLS.length],
   })).filter((item) => labels || item.count > 0);
+}
+
+function rowsWithCode(rows: MemberProfile[]) {
+  return rows.filter((row) => row.has_essence_code);
 }
 
 function getAverageRadar(rows: MemberProfile[], kind: 'disc' | 'temperament'): RadarItem[] {
@@ -367,18 +390,21 @@ function TeamRadar({ title, data }: { title: string; data: RadarItem[] }) {
 }
 
 function ExecutiveSummary({ rows }: { rows: MemberProfile[] }) {
+  const analyzableRows = rows.filter((row) => row.has_essence_code);
   const fullCodes = rows.filter((row) => row.has_essence_code).length;
   const partial = rows.length - fullCodes;
-  const supervisor = rows.find((row) => normalizeKey(row.job_title).includes('supervisor'));
-  const modes = buildDistribution(rows, (row) => row.leadershipMode);
+  const pending = rows.filter((row) => row.journey_status === 'pending_invite').length;
+  const supervisor = analyzableRows.find((row) => normalizeKey(row.job_title).includes('supervisor'));
+  const modes = buildDistribution(analyzableRows, (row) => row.leadershipMode);
   const topMode = [...modes].sort((a, b) => b.count - a.count)[0];
-  const topDisc = [...buildDistribution(rows, (row) => row.discProfile, DISC_LABELS)].sort((a, b) => b.count - a.count)[0];
-  const topTemp = [...buildDistribution(rows, (row) => row.temperamentProfile, TEMPERAMENT_LABELS)].sort((a, b) => b.count - a.count)[0];
+  const topDisc = [...buildDistribution(analyzableRows, (row) => row.discProfile, DISC_LABELS)].sort((a, b) => b.count - a.count)[0];
+  const topTemp = [...buildDistribution(analyzableRows, (row) => row.temperamentProfile, TEMPERAMENT_LABELS)].sort((a, b) => b.count - a.count)[0];
 
-  const summary = `A equipe mostra maior força em ${topMode?.label || 'perfis ainda indefinidos'}, com predominância comportamental em ${topDisc?.label || 'DISC parcial'} e ${topTemp?.label || 'temperamentos parciais'}. A leitura considera Código completo quando existe e reaproveita os mapas individuais das colaboradoras que ainda têm dados parciais.`;
+  const summary = `A equipe mostra maior força em ${topMode?.label || 'perfis ainda indefinidos'}, com predominância comportamental em ${topDisc?.label || 'DISC parcial'} e ${topTemp?.label || 'temperamentos parciais'}. Esta leitura usa somente pessoas vinculadas à equipe e dados do Nello Identity; convites pendentes aparecem apenas como ausência de informação.`;
   const leadership = supervisor
     ? `${supervisor.full_name} foi incluída como supervisora. A leitura dela funciona como ponto de coordenação entre direção, rotina e comunicação da equipe.`
     : 'Ainda não há supervisora identificada pelo cargo; a leitura está organizada pela equipe geral.';
+  const management = `Para ação na empresa, conduza a equipe cruzando três perguntas: quem acelera decisões, quem preserva constância e quem percebe detalhes. Assim você delega venda, rotina, atendimento, conferência e supervisão sem exigir que todas funcionem do mesmo jeito.`;
 
   return (
     <Card className="border-primary/20 bg-primary/5">
@@ -390,11 +416,12 @@ function ExecutiveSummary({ rows }: { rows: MemberProfile[] }) {
         <div className="space-y-3 text-sm leading-relaxed">
           <p>{summary}</p>
           <p className="text-muted-foreground">{leadership}</p>
+          <p className="text-muted-foreground">{management}</p>
           <p className="text-muted-foreground">O Identity Nello One é uma ferramenta de autoconhecimento e educação comportamental. Não substitui diagnóstico, avaliação clínica ou decisão profissional isolada.</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Metric label="Pessoas" value={rows.length} />
-          <Metric label="Códigos completos" value={fullCodes} detail={`${partial} com dados parciais`} />
+          <Metric label="Códigos completos" value={fullCodes} detail={`${partial} sem código completo · ${pending} convite(s) pendente(s)`} />
           <Metric label="Supervisão" value={supervisor ? 'Incluída' : '—'} />
           <Metric label="Força central" value={topMode?.label || '—'} />
         </div>
@@ -434,7 +461,7 @@ function TeamGroups({ rows }: { rows: MemberProfile[] }) {
                 <p><strong className="text-foreground">Gestão recomendada:</strong> combine clareza de prioridade, rituais simples de acompanhamento e delegação alinhada ao modo natural de cada pessoa.</p>
               </div>
               <div className="flex flex-wrap gap-2">
-                {members.map((member) => <Badge key={member.user_id} variant="secondary">{member.full_name.split(' ')[0]} · {member.leadershipMode}</Badge>)}
+                {members.map((member) => <Badge key={member.user_id || member.full_name} variant="secondary">{member.full_name.split(' ')[0]} · {member.leadershipMode}</Badge>)}
               </div>
             </CardContent>
           </Card>
@@ -463,8 +490,8 @@ function CrossingsPanel({ rows }: { rows: MemberProfile[] }) {
               <p><strong>{supervisor.full_name}</strong> aparece como força de <strong>{supervisor.leadershipMode}</strong>. No papel de supervisão, isso indica como ela tende a organizar ritmo, comunicação e tomada de decisão.</p>
               <p className="text-muted-foreground">Com a equipe, o melhor uso é combinar a força dela com perfis complementares: quem sustenta rotina, quem conecta clientes e quem traz critério para detalhes.</p>
               <div className="flex flex-wrap gap-2">
-                {complementary.map((member) => <Badge key={member.user_id} variant="outline">Complementar: {member.full_name.split(' ')[0]} · {member.leadershipMode}</Badge>)}
-                {samePattern.map((member) => <Badge key={member.user_id} variant="secondary">Mesmo modo: {member.full_name.split(' ')[0]}</Badge>)}
+                {complementary.map((member) => <Badge key={member.user_id || member.full_name} variant="outline">Complementar: {member.full_name.split(' ')[0]} · {member.leadershipMode}</Badge>)}
+                {samePattern.map((member) => <Badge key={member.user_id || member.full_name} variant="secondary">Mesmo modo: {member.full_name.split(' ')[0]}</Badge>)}
               </div>
             </>
           ) : <p className="text-muted-foreground">Cadastre ou ajuste o cargo de supervisão para ativar esta leitura específica.</p>}
@@ -487,13 +514,13 @@ function CrossingsPanel({ rows }: { rows: MemberProfile[] }) {
 }
 
 function CollaboratorCard({ row }: { row: MemberProfile }) {
-  const completedMaps = row.available_maps || [];
-  const statusLabel = row.business_role === 'candidate' ? 'Processo seletivo · dados parciais' : row.completeness === 'codigo_completo' ? 'Código completo' : row.completeness === 'jornada_sem_codigo' ? 'Jornada completa' : 'Dados parciais';
+  const completedMaps = row.has_essence_code ? ['codigo_essencia', ...(row.available_maps || [])] : row.available_maps || [];
+  const statusLabel = row.journey_status === 'pending_invite' ? 'Convite pendente' : row.completeness === 'codigo_completo' ? 'Código completo' : row.completeness === 'jornada_sem_codigo' ? 'Jornada completa' : 'Dados parciais';
   const dataNotice = getDataNotice(row);
   const actionItems = getActionReading(row);
 
   return (
-    <Card className={row.business_role === 'candidate' ? 'border-primary/25' : undefined}>
+    <Card className={row.journey_status === 'pending_invite' ? 'border-dashed' : undefined}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -529,7 +556,7 @@ function CollaboratorCard({ row }: { row: MemberProfile }) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {completedMaps.map((map) => <Badge key={map} variant="outline">{MAP_LABELS[map] || map}</Badge>)}
+          {completedMaps.map((map) => <Badge key={map} variant="outline">{map === 'codigo_essencia' ? 'Código da Essência' : MAP_LABELS[map] || map}</Badge>)}
         </div>
       </CardContent>
     </Card>
@@ -578,12 +605,13 @@ export default function BusinessTeamComparison() {
     if (enforcement.canViewInsights) loadData();
   }, [enforcement.canViewInsights, loadData]);
 
-  const discData = useMemo(() => buildDistribution(rows, (row) => row.discProfile, DISC_LABELS), [rows]);
-  const temperamentData = useMemo(() => buildDistribution(rows, (row) => row.temperamentProfile, TEMPERAMENT_LABELS), [rows]);
-  const archetypeData = useMemo(() => buildDistribution(rows, (row) => row.archetypePrimary), [rows]);
-  const contributionData = useMemo(() => buildDistribution(rows, (row) => row.leadershipMode), [rows]);
-  const discRadar = useMemo(() => getAverageRadar(rows, 'disc'), [rows]);
-  const temperamentRadar = useMemo(() => getAverageRadar(rows, 'temperament'), [rows]);
+  const codedRows = useMemo(() => rowsWithCode(rows), [rows]);
+  const discData = useMemo(() => buildDistribution(codedRows, (row) => row.discProfile, DISC_LABELS), [codedRows]);
+  const temperamentData = useMemo(() => buildDistribution(codedRows, (row) => row.temperamentProfile, TEMPERAMENT_LABELS), [codedRows]);
+  const archetypeData = useMemo(() => buildDistribution(codedRows, (row) => row.archetypePrimary), [codedRows]);
+  const contributionData = useMemo(() => buildDistribution(codedRows, (row) => row.leadershipMode), [codedRows]);
+  const discRadar = useMemo(() => getAverageRadar(codedRows, 'disc'), [codedRows]);
+  const temperamentRadar = useMemo(() => getAverageRadar(codedRows, 'temperament'), [codedRows]);
 
   if (!enforcement.canViewInsights) {
     return (
@@ -665,13 +693,13 @@ export default function BusinessTeamComparison() {
 
               <TabsContent value="individual" className="space-y-4">
                 <div className="flex items-center gap-2"><Brain className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Mapa por colaboradora</h2></div>
-                <div className="grid gap-4 xl:grid-cols-2">{rows.map((row) => <CollaboratorCard key={row.user_id} row={row} />)}</div>
+                <div className="grid gap-4 xl:grid-cols-2">{rows.map((row) => <CollaboratorCard key={row.user_id || row.full_name} row={row} />)}</div>
               </TabsContent>
             </Tabs>
 
             <div className="flex items-start gap-2 rounded-lg border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground">
               <Shield className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>Esta página exibe dados individuais apenas das pessoas ativas que autorizaram o compartilhamento com a empresa e candidatas com consentimento no processo seletivo. O acesso é restrito aos administradores da empresa.</span>
+            <span>Esta página exibe somente pessoas vinculadas à equipe e dados do Nello Identity compartilhados com a empresa. Convites pendentes aparecem sem leitura comportamental até o acesso ser concluído. O acesso é restrito aos administradores da empresa.</span>
             </div>
           </>
         )}
