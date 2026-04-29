@@ -457,7 +457,7 @@ function OrgProgressChecklist({ data }: { data: JourneyData }) {
 
 export default function BusinessDashboard() {
   const { company, isNelloOneSuperAdmin } = useBusinessAuth();
-  const [stats, setStats] = useState<DashboardStats>({ activeJobs: 0, totalCandidates: 0 });
+  const [stats, setStats] = useState<DashboardStats>({ activeJobs: 0, totalCandidates: 0, teamMembers: 0, pendingInvites: 0, essenceCodes: 0 });
   const [allCompanies, setAllCompanies] = useState<Array<{ id: string; name: string; slug: string }>>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -529,11 +529,17 @@ export default function BusinessDashboard() {
   const fetchStats = async () => {
     if (!company) return;
     try {
-      const [{ count: jobsCount }, { count: candidatesCount }] = await Promise.all([
+      const [{ count: jobsCount }, { count: candidatesCount }, { data: teamData }, { count: pendingCount }] = await Promise.all([
         supabase.from('job_postings').select('*', { count: 'exact', head: true }).eq('company_id', company.id).eq('status', 'published'),
         supabase.from('hiring_candidates').select('*', { count: 'exact', head: true }).eq('company_id', company.id),
+        supabase.from('company_users').select('user_id').eq('company_id', company.id).eq('is_active', true),
+        supabase.from('company_invites').select('*', { count: 'exact', head: true }).eq('company_id', company.id).eq('status', 'pending'),
       ]);
-      setStats({ activeJobs: jobsCount || 0, totalCandidates: candidatesCount || 0 });
+      const userIds = (teamData || []).map((item) => item.user_id).filter(Boolean);
+      const { count: essenceCount } = userIds.length
+        ? await supabase.from('mapa_essencia').select('*', { count: 'exact', head: true }).in('user_id', userIds)
+        : { count: 0 };
+      setStats({ activeJobs: jobsCount || 0, totalCandidates: candidatesCount || 0, teamMembers: userIds.length, pendingInvites: pendingCount || 0, essenceCodes: essenceCount || 0 });
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
