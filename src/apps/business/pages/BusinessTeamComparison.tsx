@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft,
-  BarChart3,
   Brain,
   CheckCircle2,
   Compass,
