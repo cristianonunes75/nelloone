@@ -475,8 +475,6 @@ export default function BusinessDashboard() {
   // Fetch strategic data
   useEffect(() => {
     if (company) {
-      enps.fetchCycles();
-      climate.fetchCycles();
       fetchTeamInsights();
     }
   }, [company]);
@@ -485,11 +483,9 @@ export default function BusinessDashboard() {
   useEffect(() => {
     if (!company?.id) return;
     const fetchJourney = async () => {
-      const [jobs, team, enpsC, climC] = await Promise.all([
+      const [jobs, team] = await Promise.all([
         supabase.from('job_postings').select('id, ideal_profile').eq('company_id', company.id).limit(5),
         supabase.from('company_users').select('id').eq('company_id', company.id).eq('is_active', true).limit(5),
-        supabase.from('company_enps_cycles').select('id').eq('company_id', company.id).limit(1),
-        supabase.from('company_climate_cycles').select('id').eq('company_id', company.id).limit(1),
       ]);
       const jobData = jobs.data || [];
       setJourneyData({
@@ -498,8 +494,8 @@ export default function BusinessDashboard() {
         hasAssessments: (teamInsights?.completed_assessments ?? 0) > 0,
         hasEssenceCodes: (teamInsights?.essence_code?.total_with_essence_code ?? 0) > 0,
         hasIdealProfiles: jobData.some((j: any) => j.ideal_profile !== null),
-        hasENPSCycle: (enpsC.data || []).length > 0,
-        hasClimateCycle: (climC.data || []).length > 0,
+        hasENPSCycle: false,
+        hasClimateCycle: false,
       });
     };
     fetchJourney();
