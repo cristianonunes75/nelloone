@@ -165,7 +165,7 @@ function extractTopIntelligence(row: TeamMemberRow) {
   const explicit = pickPrimaryFromObject(test.dominant) || getString(test.top1);
   if (explicit) return explicit;
   const top = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
-  return top?.[0]?.replaceAll('_', ' ') || null;
+  return top?.[0]?.replace(/_/g, ' ') || null;
 }
 
 function extractConnection(row: TeamMemberRow) {
@@ -198,7 +198,7 @@ function enrichRow(row: TeamMemberRow): MemberProfile {
   const temperament = extractTemperament(row);
   const archetypes = extractArchetypes(row);
   const maps = row.available_maps || [];
-  const completeness = row.has_essence_code ? 'codigo_completo' : row.journey_status === 'completed' ? 'jornada_sem_codigo' : 'parcial';
+  const completeness: MemberProfile['completeness'] = row.has_essence_code ? 'codigo_completo' : row.journey_status === 'completed' ? 'jornada_sem_codigo' : 'parcial';
   const groupName = row.department?.trim() || (row.job_title?.toLowerCase().includes('vended') ? 'Vendas' : 'Equipe geral');
   const base = {
     ...row,
