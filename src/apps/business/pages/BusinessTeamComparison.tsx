@@ -39,7 +39,7 @@ type TeamCrossingRpc = {
 };
 
 type TeamMemberRow = {
-  user_id: string;
+  user_id: string | null;
   full_name: string;
   job_title: string | null;
   department: string | null;
@@ -136,7 +136,7 @@ function pickPrimaryFromObject(value: unknown) {
 function extractDisc(row: TeamMemberRow) {
   const visual = visualData(row, 'disc');
   const test = testData(row, 'disc');
-  const primary = getString(visual.primary) || getString(visual.profile) || getString(test.primary) || getString(test.dominantProfile) || getString(test.primaryProfile);
+  const primary = getString(visual.primary) || getString(visual.dominant) || getString(visual.profile) || getString(test.primary) || getString(test.dominantProfile) || getString(test.primaryProfile);
   const secondary = getString(visual.secondary) || getString(test.secondary) || getString(test.secondaryProfile);
   const scores = asNumberMap(visual.scores && Object.keys(asRecord(visual.scores)).length ? visual.scores : test.percentages || test.scores);
   return { primary: normalizeDisc(primary), secondary: normalizeDisc(secondary), scores };
@@ -201,6 +201,7 @@ function getFirstName(name: string) {
 }
 
 function hasMap(row: MemberProfile, map: string) {
+  if (row.has_essence_code && row.essence_visual_data && Object.keys(row.essence_visual_data).length > 0) return true;
   return (row.available_maps || []).includes(map);
 }
 
