@@ -615,53 +615,61 @@ export default function BusinessDashboard() {
             <p className="text-muted-foreground text-sm">{PRODUCT_IDENTITY.tagline}</p>
           </div>
 
-          {/* ═══════ CAMADA 1 — VISÃO EXECUTIVA ═══════ */}
+          {/* ═══════ VISÃO SIMPLIFICADA DA EQUIPE ═══════ */}
           <section className="space-y-3">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
               <Shield className="w-4 h-4" />
-              Visão Executiva
-              <InfoTip text="Painel estratégico com os 4 indicadores-chave da saúde organizacional. Clique em qualquer card para acessar os detalhes no módulo People Strategy." />
+              Equipe e Código da Essência
+              <InfoTip text="Visão simplificada usando somente pessoas vinculadas à equipe e dados compartilhados do Identity." />
             </h2>
 
-            {hasStrategicData ? (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
-                  <HealthIndexCard index={healthIndex} />
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardDescription>Pessoas na equipe</CardDescription>
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.teamMembers}</div>
+                  <p className="text-xs text-muted-foreground mt-1">membros ativos</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardDescription>Códigos disponíveis</CardDescription>
+                  <Map className="w-4 h-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.essenceCodes}</div>
+                  <p className="text-xs text-muted-foreground mt-1">no Nello Identity</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardDescription>Convites pendentes</CardDescription>
+                  <Circle className="w-4 h-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.pendingInvites}</div>
+                  <p className="text-xs text-muted-foreground mt-1">sem dados compartilhados</p>
+                </CardContent>
+              </Card>
+              <Card className="hover:border-primary/50 transition-colors cursor-pointer">
+                <Link to="/team-comparison" className="block h-full">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <Compass className="w-5 h-5 text-primary" />
+                      <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="font-medium text-sm">Cruzamento da equipe</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Ler e comparar códigos</p>
+                  </CardContent>
                 </Link>
-                <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
-                  <ENPSCard
-                    score={displayEnps?.enps_score ?? null}
-                    promoters={displayEnps?.promoters_count ?? 0}
-                    neutrals={displayEnps?.neutrals_count ?? 0}
-                    detractors={displayEnps?.detractors_count ?? 0}
-                    cycleStatus={displayEnps?.status ?? null}
-                  />
-                </Link>
-                <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
-                  <ClimateCard
-                    score={displayClimate?.overall_score ?? null}
-                    worstDimension={worstClimateDimension}
-                    worstScore={worstClimateScore}
-                    cycleStatus={displayClimate?.status ?? null}
-                  />
-                </Link>
-                <Link to="/people-strategy" className="hover:ring-2 hover:ring-primary/30 rounded-lg transition-all">
-                  <AdherenceCard avgAdherence={null} totalEvaluated={0} />
-                </Link>
-              </div>
-            ) : (
-              <ExecutiveEmptyState />
-            )}
+              </Card>
+            </div>
           </section>
-
-          {/* ═══════ CAMADA 2 — MAPA ORGANIZACIONAL ═══════ */}
-          <OrganizationalMapSection
-            discDistribution={teamInsights?.disc_distribution || {}}
-            totalMembers={teamInsights?.total_members ?? 0}
-            completedAssessments={teamInsights?.completed_assessments ?? 0}
-            worstClimateDimension={worstClimateDimension}
-            worstClimateScore={worstClimateScore}
-          />
 
           {/* ═══════ CAMADA 3 — RECRUTAMENTO E SELEÇÃO ═══════ */}
           <section className="space-y-3">
