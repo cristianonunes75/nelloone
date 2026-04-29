@@ -145,7 +145,7 @@ function extractDisc(row: TeamMemberRow) {
 function extractTemperament(row: TeamMemberRow) {
   const visual = visualData(row, 'temperament');
   const test = testData(row, 'temperamentos');
-  const primary = getString(visual.primary) || pickPrimaryFromObject(test.primary) || getString(test.dominantTemperament);
+  const primary = getString(visual.primary) || getString(visual.dominant) || pickPrimaryFromObject(test.primary) || getString(test.dominantTemperament);
   const secondary = getString(visual.secondary) || pickPrimaryFromObject(test.secondary) || getString(test.secondaryTemperament);
   const scores = asNumberMap(visual.scores && Object.keys(asRecord(visual.scores)).length ? visual.scores : test.percentages || test.scores);
   return { primary: normalizeTemperament(primary), secondary: normalizeTemperament(secondary), scores };
