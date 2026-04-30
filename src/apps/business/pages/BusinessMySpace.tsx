@@ -32,7 +32,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   buildWorkLens,
   buildTeammateDeepConnect,
+  buildLeaderOneOnOneLens,
   type EssenceSnapshot,
+  type LeaderOneOnOneLens,
 } from '../lib/essenceLens';
 import { GENTLE_VOCABULARY } from '../lib/gentleVocabulary';
 
