@@ -77,7 +77,7 @@ const bottomNavItems = [
 
 const collaboratorNavItems = [
   { href: '/my-space', label: 'Meu espaço', icon: Sparkles },
-  { href: '/cliente', label: 'Meu Identity', icon: ExternalLink, external: true as const },
+  { href: '/cliente', label: 'Meu Identity', icon: ExternalLink },
 ];
 
 export function BusinessLayout({ children }: BusinessLayoutProps) {
