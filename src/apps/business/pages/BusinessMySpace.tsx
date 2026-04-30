@@ -36,7 +36,7 @@ import {
   type EssenceSnapshot,
   type LeaderOneOnOneLens,
 } from '../lib/essenceLens';
-import { GENTLE_VOCABULARY } from '../lib/gentleVocabulary';
+import { GENTLE_VOCABULARY, getLeadershipRank } from '../lib/gentleVocabulary';
 
 function getFirstName(name: string) {
   return name.split(' ')[0] || name;
