@@ -801,7 +801,7 @@ function PairBuilder({ rows }: { rows: MemberProfile[] }) {
 }
 
 
-  const { company } = useBusinessAuth();
+  export default function BusinessTeamComparison() {
   const enforcement = useBusinessEnforcement();
   const [rows, setRows] = useState<MemberProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
