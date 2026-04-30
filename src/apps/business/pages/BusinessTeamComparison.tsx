@@ -700,81 +700,102 @@ function InfoTile({ label, value, detail }: { label: string; value: string; deta
   );
 }
 
-function PairBuilder({ rows }: { rows: MemberProfile[] }) {
+function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
   const eligible = rows.filter((row) => row.journey_status !== 'pending_invite');
-  const [pairs, setPairs] = useState<Array<{ a: string; b: string }>>([]);
-  const [aId, setAId] = useState<string>('');
-  const [bId, setBId] = useState<string>('');
-
   const keyOf = (row: MemberProfile) => row.user_id || row.full_name;
-  const findRow = (key: string) => eligible.find((row) => keyOf(row) === key);
 
-  const addPair = () => {
-    if (!aId || !bId || aId === bId) {
-      toast.error('Selecione duas colaboradoras diferentes');
-      return;
-    }
-    if (pairs.some((p) => (p.a === aId && p.b === bId) || (p.a === bId && p.b === aId))) {
-      toast.info('Esse cruzamento já está montado');
-      return;
-    }
-    setPairs((prev) => [...prev, { a: aId, b: bId }]);
-    setAId('');
-    setBId('');
+  const [selected, setSelected] = useState<string[]>([]);
+  const [groups, setGroups] = useState<Array<{ id: string; memberKeys: string[] }>>([]);
+
+  const toggle = (key: string) => {
+    setSelected((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
   };
 
-  const removePair = (index: number) => setPairs((prev) => prev.filter((_, i) => i !== index));
+  const selectAll = () => setSelected(eligible.map(keyOf));
+  const clearSelection = () => setSelected([]);
+
+  const buildGroup = () => {
+    if (selected.length < 2) {
+      toast.error('Selecione pelo menos duas colaboradoras');
+      return;
+    }
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    setGroups((prev) => [{ id, memberKeys: [...selected] }, ...prev]);
+    setSelected([]);
+  };
+
+  const removeGroup = (id: string) => setGroups((prev) => prev.filter((g) => g.id !== id));
+
+  const findRow = (key: string) => eligible.find((row) => keyOf(row) === key);
 
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base"><UserPlus className="h-4 w-4 text-primary" /> Montar cruzamento entre colaboradoras</CardTitle>
-          <CardDescription>Combine duas pessoas da equipe e veja como elas podem trabalhar juntas, onde se complementam e onde podem atritar.</CardDescription>
+          <CardDescription>Selecione quantas colaboradoras quiser (sem limite) e veja como esse grupo funciona junto: onde se complementam, onde podem atritar e como devem se organizar.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
-            <Select value={aId} onValueChange={setAId}>
-              <SelectTrigger><SelectValue placeholder="Colaboradora 1" /></SelectTrigger>
-              <SelectContent>
-                {eligible.map((row) => <SelectItem key={keyOf(row)} value={keyOf(row)}>{row.full_name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Select value={bId} onValueChange={setBId}>
-              <SelectTrigger><SelectValue placeholder="Colaboradora 2" /></SelectTrigger>
-              <SelectContent>
-                {eligible.filter((row) => keyOf(row) !== aId).map((row) => <SelectItem key={keyOf(row)} value={keyOf(row)}>{row.full_name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Button onClick={addPair} className="gap-2"><GitCompare className="h-4 w-4" /> Cruzar</Button>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <Button variant="outline" size="sm" onClick={selectAll} disabled={!eligible.length}>Selecionar todas</Button>
+            <Button variant="ghost" size="sm" onClick={clearSelection} disabled={!selected.length}>Limpar</Button>
+            <span className="text-muted-foreground">{selected.length} selecionada(s)</span>
+          </div>
+
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {eligible.map((row) => {
+              const k = keyOf(row);
+              const isOn = selected.includes(k);
+              return (
+                <button
+                  type="button"
+                  key={k}
+                  onClick={() => toggle(k)}
+                  className={`flex items-start gap-2 rounded-lg border p-2 text-left text-sm transition-colors ${isOn ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/40'}`}
+                >
+                  <div className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${isOn ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40'}`}>
+                    {isOn && <CheckCircle2 className="h-3 w-3" />}
+                  </div>
+                  <div>
+                    <p className="font-medium leading-tight">{row.full_name}</p>
+                    <p className="text-xs text-muted-foreground">{row.leadershipMode || 'Sem modo definido'}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center justify-end">
+            <Button onClick={buildGroup} className="gap-2" disabled={selected.length < 2}><GitCompare className="h-4 w-4" /> Cruzar grupo ({selected.length})</Button>
           </div>
           {eligible.length < 2 && <p className="text-xs text-muted-foreground">É necessário ter pelo menos duas colaboradoras com dados disponíveis.</p>}
         </CardContent>
       </Card>
 
-      {pairs.map((pair, index) => {
-        const a = findRow(pair.a);
-        const b = findRow(pair.b);
-        if (!a || !b) return null;
-        const synergy = getPairSynergy(a, b);
+      {groups.map((group) => {
+        const members = group.memberKeys.map(findRow).filter(Boolean) as MemberProfile[];
+        if (members.length < 2) return null;
+        const synergy = getGroupSynergy(members);
         return (
-          <Card key={`${pair.a}-${pair.b}-${index}`} className="border-primary/20">
+          <Card key={group.id} className="border-primary/20">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <Sparkles className="h-4 w-4 text-primary" /> {a.full_name} <span className="text-muted-foreground">×</span> {b.full_name}
+                    <Sparkles className="h-4 w-4 text-primary" /> Grupo de {members.length} colaboradoras
                   </CardTitle>
-                  <CardDescription>{a.leadershipMode} + {b.leadershipMode}</CardDescription>
+                  <CardDescription className="mt-1">
+                    {members.map((m) => m.full_name).join(' • ')}
+                  </CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => removePair(index)} className="gap-1 text-muted-foreground"><X className="h-3 w-3" /> Remover</Button>
+                <Button variant="ghost" size="sm" onClick={() => removeGroup(group.id)} className="gap-1 text-muted-foreground"><X className="h-3 w-3" /> Remover</Button>
               </div>
             </CardHeader>
             <CardContent className="grid gap-3 lg:grid-cols-3">
               <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
                 <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Onde se fortalecem</div>
                 <ul className="space-y-1.5 text-sm text-muted-foreground">
-                  {synergy.strengths.map((item) => <li key={item} className="leading-relaxed">• {item}</li>)}
+                  {synergy.strengths.length ? synergy.strengths.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Sem sinergia clara identificada nos dados disponíveis.</li>}
                 </ul>
               </div>
               <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
@@ -786,7 +807,7 @@ function PairBuilder({ rows }: { rows: MemberProfile[] }) {
               <div className="rounded-lg border p-3">
                 <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><HeartHandshake className="h-4 w-4 text-primary" /> Como podem trabalhar juntas</div>
                 <ul className="space-y-1.5 text-sm text-muted-foreground">
-                  {synergy.howToWork.length ? synergy.howToWork.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Combine papéis claros e revisem juntas a cada semana.</li>}
+                  {synergy.howToWork.length ? synergy.howToWork.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Combinem papéis claros e revisem juntas a cada semana.</li>}
                 </ul>
               </div>
             </CardContent>
