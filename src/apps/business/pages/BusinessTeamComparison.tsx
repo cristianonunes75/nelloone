@@ -799,9 +799,8 @@ function PairBuilder({ rows }: { rows: MemberProfile[] }) {
     </div>
   );
 }
-
-
-  export default function BusinessTeamComparison() {
+export default function BusinessTeamComparison() {
+  const { company } = useBusinessAuth();
   const enforcement = useBusinessEnforcement();
   const [rows, setRows] = useState<MemberProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
