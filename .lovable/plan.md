@@ -1,172 +1,86 @@
-Vou corrigir isso em duas frentes: primeiro a auditoria/filtro de dados para a página não buscar pessoas fora da equipe; depois a simplificação da navegação e dos módulos visíveis no Business.
 
-## O que encontrei na auditoria inicial
+# Área da colaboradora no Business — simples, pessoal e respeitosa
 
-A equipe ativa exibida no print corresponde aos registros ativos em `company_users` da empresa **Da Imaculada Artigos Religiosos**:
+## Princípios (não-negociáveis)
 
-- Larissa Martins Nascimento — Supervisora — colaboradora
-- Agatha Maria Figueiredo da Paixão — Vendedora — colaboradora
-- Hanna Emanuelle — Vendedora — colaboradora
-- Rayssa Samara — Vendedora — colaboradora
-- Lisa Marini Ferreira dos Santos — Sócia Administrativa — admin
-- Cristiano — Sócio — admin
-- Lisa Marini Ferreira dos Santos — registro antigo inativo/não iniciado
-- Suzanne/suzannelandim@gmail.com — convite pendente, ainda não acessou
+- Linguagem **fase, não identidade**: "hoje você tende a…", "neste momento…". Nada de "você é assim", "tem um problema", "errado".
+- Sem rótulos clínicos, sem laudo, sem julgamento. Reaproveita o disclaimer já existente (`RESULTS_DISCLAIMER_PHASE_NOT_IDENTITY`).
+- O **Identity continua sendo o lar do pessoal** (Código da Essência mora lá). O **Business só adiciona a lente da empresa** sobre esse mesmo código — nunca duplica teste nem reescreve o código pessoal.
+- Vocabulário substituto para "pontos de atenção": **"Onde você brilha"**, **"O que pode pesar para você no dia a dia"**, **"Como o time pode te apoiar"**, **"Como você pode apoiar o time"**. Nada de "fraquezas", "riscos", "problemas".
 
-O problema principal está na função de cruzamento criada antes: ela passou a unir `company_users` com `hiring_candidates`. Isso trouxe candidatas do processo seletivo que **não fazem parte da equipe atual**, como Ketlin, Jakeline, Barbara, Dariane etc. Isso será removido.
+## O que muda hoje
 
-Também vi que o Business está misturando muita coisa na tela e no menu: People Strategy, eNPS, pesquisa de clima, saúde organizacional, PDI, performance e IA estratégica aparecem como se já estivessem implantados. Vou esconder isso por enquanto e deixar o Business mais simples.
+Hoje, ao logar como colaboradora no Business, ela é **redirecionada para `/cliente`** (Identity). Ela não tem nenhuma tela própria dentro do Business. Isso vai mudar: ela passa a ter **uma área enxuta dentro do Business**, com no máximo **3 abas**, e o Identity continua acessível por um link claro.
 
-## Plano de correção
-
-### 1. Corrigir a origem dos dados do “Cruzamento da Equipe”
-
-Vou alterar a função `get_company_identity_team_crossing` para retornar **somente pessoas vinculadas à equipe da empresa**, usando `company_users` como fonte oficial.
-
-Regras novas:
-
-- Não puxar mais `hiring_candidates` para a leitura da equipe.
-- Considerar apenas membros da empresa, ativos ou exibidos na tela de equipe conforme necessário.
-- Usar `profiles` + `company_users` para nome, cargo, função, status e compartilhamento.
-- Usar apenas dados do Identity: `mapa_essencia` e, se necessário, os mapas já concluídos em `user_tests` da própria pessoa.
-- Não usar dados de processo seletivo para leitura de equipe.
-
-### 2. Tratar a Suzanne corretamente
-
-Como a Suzanne aparece no print como **convite pendente / ainda não acessou**, ela não tem `user_id` ativo em `company_users` nessa tela. Então vou tratar assim:
-
-- Ela poderá aparecer na leitura como “convite pendente”/“sem dados de Identity disponíveis”, se a página for pensada como espelho da equipe exibida.
-- Não vou puxar os testes dela do Hiring para completar a leitura da equipe, porque você pediu para usar apenas os dados do Nello Identity.
-- Onde não houver Código da Essência ou mapas Identity, o sistema mostrará aviso claro:
-  - “Não há Código da Essência disponível para Suzanne no Identity.”
-  - “Ela ainda não acessou/aceitou o convite da equipe, por isso não há dados corporativos compartilhados.”
-
-### 3. Fazer a página espelhar a equipe do print
-
-Vou ajustar a página “Cruzamento da Equipe” para considerar a lista real de membros/convites da empresa, e não uma lista misturada com candidatos.
-
-A tela ficará organizada assim:
+## Estrutura proposta da área da colaboradora (3 abas, nada além)
 
 ```text
-Cruzamento de Códigos da Equipe
-
-1. Resumo executivo simples
-   - Quantas pessoas na equipe
-   - Quantas têm Código da Essência disponível
-   - Quantas estão sem dados Identity
-   - Avisos de dados ausentes
-
-2. Leitura da equipe
-   - Como o time funciona hoje
-   - Pontos de força
-   - Riscos de comunicação/ritmo
-   - Como liderar a equipe no dia a dia
-
-3. Leitura individual
-   - Larissa
-   - Agatha
-   - Hanna
-   - Rayssa
-   - Lisa
-   - Cristiano
-   - Suzanne, com aviso de ausência de dados Identity
+┌─────────────────────────────────────────────────────────┐
+│  Olá, Larissa  ·  [Empresa: Loja X]    [Ver meu Identity]│
+├─────────────────────────────────────────────────────────┤
+│  [Meu Código]  [No trabalho]  [Minha equipe]            │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### 4. Aprofundar a leitura sem inventar dados
+### Aba 1 — "Meu Código" (resumo pessoal)
+- Mostra o **Código da Essência** já gerado no Identity (resumo curto: arquétipo, modo de liderança, temperamento, estilo de conexão).
+- Se ainda não tem código → CTA único: "Gerar meu Código no Nello Identity" (abre `/cliente`).
+- Botão "Ver meu relatório completo" → abre Identity.
+- **Não duplica conteúdo**, só espelha o resumo.
 
-Para quem tiver Código da Essência no Identity, vou usar os dados disponíveis no `mapa_essencia`, incluindo:
+### Aba 2 — "No trabalho" (a lente nova, a parte que ela não tem hoje)
+A leitura do mesmo código, **aplicada ao contexto da empresa e ao cargo dela** (`job_title` de `company_users`). Estrutura em 4 blocos curtos:
 
-- DISC
-- Temperamento
-- Arquétipos
-- Estilo de conexão afetiva
-- Inteligências
-- Eneagrama, se existir
-- nello16, exibido somente no padrão protegido do projeto, sem termos de marcas externas
+1. **Onde você brilha aqui** — 2 a 3 frases sobre forças naturais aplicadas ao cargo dela (ex: vendedora + perfil acolhedor → "tende a criar vínculo rápido com a cliente").
+2. **O que pode pesar para você** — em vez de "pontos de atenção". Tom: "neste momento, situações X podem te cansar mais que o normal". Ex: "metas muito agressivas sem espaço de respiro podem te tirar do seu eixo natural".
+3. **O que costuma te ajudar** — micro-práticas concretas para o dia a dia (1 frase cada, 3 itens).
+4. **O que pedir do time/gestor** — frases prontas que ela pode usar ("preciso de clareza no início da semana", "funciono melhor quando…").
 
-A leitura individual será mais prática e empresarial, incluindo:
+Cada bloco abre com a frase-âncora: *"Esta é uma leitura da sua fase atual de trabalho, não um julgamento sobre quem você é."*
 
-- Como a pessoa tende a agir no ambiente de trabalho
-- Como reage sob pressão
-- O que costuma motivar ou travar essa pessoa
-- Onde ela pode contribuir melhor na empresa
-- Como o gestor deve conduzir, cobrar e reconhecer
-- Riscos de comunicação
-- Recomendações de função/rotina
-- Pontos de desenvolvimento
-- Aviso quando faltar informação
+### Aba 3 — "Minha equipe" (visão suave, opcional)
+- Lista das colegas com **arquétipo + uma frase de "como se conectar com ela"**. Ex: *"A Maria tende a funcionar melhor com combinações claras e prazos definidos."*
+- **Não mostra** "pontos fracos" das colegas, **não mostra** scores, **não mostra** insights da empresa.
+- Só ajuda ela a se conectar melhor com quem está do lado.
+- Se o consentimento de compartilhar (`BusinessSharingToggle`) de alguma colega está desligado, aparece só nome + "perfil privado".
 
-Importante: manterei a linguagem não clínica e educativa, sem prometer diagnóstico.
+## Sidebar da colaboradora — o que aparece
 
-### 5. Simplificar o menu do Nello Business
+Hoje a colaboradora tem só 1 item ("Minha Jornada", que é redirect). Passa a ter:
 
-Vou esconder do menu, por enquanto:
+```text
+Sidebar (colaboradora)
+├─ Meu espaço         ← nova rota /my-space (3 abas acima)
+├─ Meu Identity       ← link externo p/ /cliente (o pessoal mora lá)
+└─ Configurações      ← só perfil + sair
+```
 
-- People Strategy
-- Pesquisa de clima
-- eNPS
-- Saúde organizacional baseada em clima/eNPS
-- Performance/PDI/IA Chat, se estiverem dentro desse fluxo confuso
+A sidebar da admin (Estratégia, Pessoas, Recrutamento, Comunicação) **continua escondida** dela. Garantia visual de que ela não vê nada da gestão.
 
-O menu principal ficará mais simples, priorizando o que já faz sentido hoje:
+## Garantias de privacidade (importante para confiança dela)
 
-- Dashboard
-- Equipe
-- Cruzamento da Equipe
-- Vagas
-- Candidatos
-- WhatsApp, se você quiser manter visível
-- Configurações
+Card fixo no rodapé da Aba 1:
+> "Seu Código pessoal completo só você vê. A empresa só recebe a versão de equipe agregada e apenas se você tiver autorizado o compartilhamento."
 
-### 6. Simplificar o Dashboard
+Reaproveita o `BusinessSharingToggle` que já existe.
 
-Vou remover/ocultar cards que dependem de módulos não implantados:
+## Detalhes técnicos
 
-- eNPS
-- Clima Geral
-- Saúde Organizacional composta
-- Aderência média se depender de perfil ideal/performance ainda incompleto
-- Checklist pedindo ciclo de clima/eNPS
+- **Nova rota** `/my-space` em `src/apps/business/BusinessApp.tsx` (substitui o redirect cego de `/my-journey`; mantém `/my-journey` redirecionando para `/my-space` para não quebrar links).
+- **Nova página** `src/apps/business/pages/BusinessMySpace.tsx` com `Tabs` shadcn (Meu Código / No Trabalho / Minha Equipe).
+- **`BusinessLayout.tsx`**: trocar `collaboratorNavItems` para os 3 itens acima. Sidebar admin permanece intocada.
+- **Hook novo** `useMyEssenceLens(userId, companyId)`:
+  - Busca `mapa_essencia` do próprio user (RLS já permite).
+  - Busca `company_users.job_title` da empresa atual.
+  - Reusa `ROLE_HINTS` já criado em `BusinessTeamComparison.tsx` (extrair para `src/apps/business/lib/roleLens.ts` para compartilhar).
+  - Gera os 4 blocos da aba "No trabalho" via funções puras (sem IA neste primeiro corte — texto determinístico baseado em arquétipo + cargo, igual ao padrão atual de `getLeaderToMemberReading`).
+- **Aba "Minha equipe"**: query em `company_users` + `mapa_essencia` filtrada pelos colegas com `share_with_company = true`. Para os outros, mostra só o nome com badge "perfil privado".
+- **Disclaimers**: importar de `src/lib/compliance/phaseDisclaimers.ts` em todos os blocos.
+- **Vocabulário**: criar `src/apps/business/lib/gentleVocabulary.ts` centralizando as substituições ("Onde você brilha", "O que pode pesar", etc.) para garantir consistência e fácil revisão.
+- **Sem novas tabelas, sem migração de banco.** Usa o que já existe.
 
-No lugar, o dashboard pode mostrar uma visão mais limpa:
+## Fora de escopo (deixar para depois)
 
-- Pessoas na equipe
-- Códigos da Essência disponíveis
-- Convites pendentes
-- Atalho para “Cruzamento da Equipe”
-- Vagas/candidatos, se o módulo de recrutamento continuar ativo
-
-### 7. Redirecionar ou esconder a rota People Strategy
-
-Para evitar confusão:
-
-- Removerei o link do menu.
-- A rota `/people-strategy` poderá redirecionar para `/team-comparison` ou `/dashboard`, para não ficar acessível por acidente.
-- Não vou apagar os arquivos nem o banco desses módulos agora; apenas esconder da experiência principal. Assim preservamos o que já foi construído para reativar depois quando estiver pronto.
-
-## Arquivos/funções que serão alterados
-
-- `src/apps/business/pages/BusinessTeamComparison.tsx`
-  - refatorar a leitura para ser mais profunda, empresarial e baseada apenas na equipe real + Identity.
-
-- `src/apps/business/components/BusinessLayout.tsx`
-  - simplificar o menu e esconder People Strategy.
-
-- `src/apps/business/BusinessApp.tsx`
-  - redirecionar/ocultar rota de People Strategy.
-
-- `src/apps/business/pages/BusinessDashboard.tsx`
-  - remover ou esconder cards de eNPS, clima, saúde organizacional, checklist de clima/eNPS.
-
-- Nova migração de banco
-  - atualizar `get_company_identity_team_crossing` para não unir com candidatas do Hiring e usar somente equipe/Identity.
-
-## Critério de aceite
-
-Depois da alteração:
-
-- A página de cruzamento não deverá mostrar candidatas fora da equipe.
-- A leitura deverá bater com a equipe do print.
-- Suzanne aparecerá apenas como pendente/sem dados Identity, sem reaproveitar dados do processo seletivo.
-- People Strategy, clima e eNPS ficarão escondidos por enquanto.
-- O Business ficará mais claro e focado em equipe + Código da Essência.
+- Pesquisa de clima e eNPS (continuam escondidos como combinado).
+- IA generativa na aba "No trabalho" (primeiro entregamos texto determinístico curado; IA pode entrar numa v2).
+- Edição do `job_title` pela própria colaboradora (continua sendo a admin que define).
