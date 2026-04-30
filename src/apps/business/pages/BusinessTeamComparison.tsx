@@ -909,6 +909,12 @@ export default function BusinessTeamComparison() {
                 <CrossingsPanel rows={rows} />
               </TabsContent>
 
+              <TabsContent value="combinar" className="space-y-4">
+                <div className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Combinar duplas da equipe</h2></div>
+                <p className="text-sm text-muted-foreground">Monte cruzamentos personalizados para entender como duas colaboradoras podem trabalhar juntas, se conhecer melhor e cobrir os pontos cegos uma da outra.</p>
+                <PairBuilder rows={rows} />
+              </TabsContent>
+
               <TabsContent value="individual" className="space-y-4">
                 <div className="flex items-center gap-2"><Brain className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Mapa por colaboradora</h2></div>
                 <div className="grid gap-4 xl:grid-cols-2">{rows.map((row) => <CollaboratorCard key={row.user_id || row.full_name} row={row} />)}</div>
