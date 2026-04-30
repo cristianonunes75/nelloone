@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   ClipboardCheck,
   Compass,
+  Crown,
   GitCompare,
   HeartHandshake,
   Network,
@@ -376,6 +377,102 @@ function getGroupSynergy(members: MemberProfile[]) {
   return { strengths, tensions, howToWork };
 }
 
+const ROLE_HINTS: Array<{ test: RegExp; label: string; tone: string }> = [
+  { test: /(ce[oa]|fundador|s[oó]ci|owner|diretor|head|gerente|gestor|supervisor|coordenador|l[ií]der)/i, label: 'gestão / liderança', tone: 'Como líder, sua leitura sobre o time vira decisão: contratação, alocação, feedback e clima.' },
+  { test: /(vended|comerc|consultor de vendas|atend)/i, label: 'vendas / atendimento', tone: 'O foco está no cliente, na meta e no ritmo do salão/loja.' },
+  { test: /(financ|administ|backoffice|fiscal|contas)/i, label: 'administrativo / financeiro', tone: 'Aqui pesa precisão, prazo e controle.' },
+  { test: /(operac|estoque|log[ií]stica|produç|manuten)/i, label: 'operação / rotina', tone: 'Aqui pesa constância, processo e cuidado com o detalhe.' },
+  { test: /(marketing|m[ií]dia|conte[uú]do|social)/i, label: 'marketing / comunicação', tone: 'Aqui pesa criatividade, vínculo com público e clareza de mensagem.' },
+];
+
+function describeRole(jobTitle: string | null) {
+  if (!jobTitle) return null;
+  const hit = ROLE_HINTS.find((r) => r.test.test(jobTitle));
+  return hit ? { label: hit.label, tone: hit.tone, raw: jobTitle } : { label: jobTitle.toLowerCase(), tone: '', raw: jobTitle };
+}
+
+function getLeaderToMemberReading(leader: MemberProfile, member: MemberProfile) {
+  const leaderFirst = getFirstName(leader.full_name);
+  const memberFirst = getFirstName(member.full_name);
+  const leaderRole = describeRole(leader.job_title);
+  const memberRole = describeRole(member.job_title);
+
+  const result = {
+    accessing: '' as string,
+    delegating: '' as string,
+    feedback: '' as string,
+    avoid: '' as string,
+    roleNote: null as string | null,
+    leaderNotice: null as string | null,
+    memberNotice: null as string | null,
+  };
+
+  if (!leader.job_title) {
+    result.leaderNotice = `Não há cargo cadastrado para ${leaderFirst}. A leitura abaixo considera apenas o perfil comportamental dela como gestora.`;
+  }
+  if (!member.job_title) {
+    result.memberNotice = `Não há cargo cadastrado para ${memberFirst}. A leitura abaixo considera apenas o perfil comportamental, sem ajustar por função.`;
+  } else if (leaderRole && memberRole) {
+    result.roleNote = `${leaderFirst} (${leaderRole.raw}) acessando ${memberFirst} (${memberRole.raw}). ${leaderRole.tone} ${memberRole.tone}`.trim();
+  }
+
+  if (member.journey_status === 'pending_invite') {
+    result.accessing = `${memberFirst} ainda não tem Código da Essência disponível. Por enquanto, ${leaderFirst} acessa ${memberFirst} pelo cargo e pelo histórico do dia a dia, sem leitura comportamental confirmada.`;
+    result.delegating = 'Use combinados explícitos e por escrito até que o Identity esteja completo.';
+    result.feedback = 'Faça check-ins curtos e observe reações para começar a mapear padrão.';
+    result.avoid = 'Evite supor estilo dela com base em uma única situação — peça que conclua a jornada para liberar a leitura completa.';
+    return result;
+  }
+
+  // ACCESSING — como a líder se aproxima dessa colaboradora específica
+  const lDisc = leader.discProfile;
+  const mDisc = member.discProfile;
+  const mTemp = member.temperamentProfile;
+
+  if (mDisc === 'D' || mTemp === 'colerico') {
+    result.accessing = `${memberFirst} responde melhor a quem chega direto, com objetivo claro e respeito à autonomia dela. ${leaderFirst}, vá ao ponto: contexto curto, decisão esperada, prazo. Ela perde paciência com rodeios e preâmbulos longos.`;
+    result.delegating = 'Delegue resultado, não passo a passo. Defina o quê e até quando; deixe o como com ela. Peça retorno por exceção (só se algo travar).';
+    result.feedback = 'Feedback objetivo, com fato + impacto + próximo passo. Evite suavizar demais — ela interpreta como falta de clareza. Reconheça resultado, não esforço genérico.';
+    result.avoid = 'Não microgerencie e não decida no lugar dela. Não chame para reuniões longas sem pauta. Não dê feedback emocional sem dado concreto.';
+  } else if (mDisc === 'I' || mTemp === 'sanguineo') {
+    result.accessing = `${memberFirst} responde a vínculo, presença e reconhecimento. ${leaderFirst}, abra a conversa pelo lado humano antes de entrar na tarefa. Ela rende mais quando se sente vista e parte do time.`;
+    result.delegating = 'Delegue mostrando o impacto da entrega nas pessoas (cliente, equipe). Combine prioridade clara e prazo curto, porque ela tende a abrir várias frentes ao mesmo tempo.';
+    result.feedback = 'Feedback frequente e específico. Reconheça em público quando puder; corrija em particular. Use exemplos concretos, evite generalizar ("você sempre…").';
+    result.avoid = 'Não a deixe muito tempo sem retorno — o silêncio dela vira insegurança. Não corrija em frente à equipe. Não a coloque só em tarefa solitária e repetitiva.';
+  } else if (mDisc === 'S' || mTemp === 'fleumatico') {
+    result.accessing = `${memberFirst} responde a estabilidade, segurança e previsibilidade. ${leaderFirst}, fale com calma, dê contexto antes de pedir mudança e dê tempo para ela processar. Ela costuma silenciar em vez de discordar — pergunte o que está pensando.`;
+    result.delegating = 'Delegue com clareza de processo e prazo realista. Mudanças bruscas travam o ritmo dela; antecipe combinados. Reforce que ela pode pedir ajuda sem julgamento.';
+    result.feedback = 'Feedback em ambiente reservado, com tom firme mas acolhedor. Pergunte o que ela pensa antes de concluir. Reconheça a constância dela, não só os picos.';
+    result.avoid = 'Não pressione no impulso, não mude regra do dia para a noite, não interprete o silêncio como concordância. Evite expor publicamente.';
+  } else if (mDisc === 'C' || mTemp === 'melancolico') {
+    result.accessing = `${memberFirst} responde a clareza, padrão e justiça. ${leaderFirst}, traga referência do que se espera ("o padrão é assim, com este nível de detalhe"). Ela precisa entender o critério antes de executar.`;
+    result.delegating = 'Delegue com checklist, exemplo do resultado esperado e prazo. Evite ambiguidade. Permita perguntas — ela costuma ter muitas no início e poucas depois.';
+    result.feedback = 'Feedback específico, com fato e dado. Crítica genérica é interpretada como ataque pessoal. Reconheça precisão e zelo, não só velocidade.';
+    result.avoid = 'Não dê feedback vago, não mude o critério no meio do caminho, não a apresse em decisões sem informação. Cuidado com piadas sobre perfeccionismo.';
+  } else {
+    result.accessing = `${memberFirst} ainda tem dados parciais no Identity. ${leaderFirst}, use os mapas disponíveis como sinal e observe o dia a dia para ajustar a abordagem.`;
+    result.delegating = 'Combine objetivo claro e prazo, e ajuste depois conforme o retorno dela.';
+    result.feedback = 'Faça feedback frequente e curto até ter mais leitura comportamental.';
+    result.avoid = 'Evite assumir estilo sem dado — peça que conclua os mapas que faltam.';
+  }
+
+  // Camada da líder — ajuste pelo perfil DELA
+  if (lDisc === 'D' && (mDisc === 'S' || mDisc === 'C')) {
+    result.avoid += ` Cuidado: como ${leaderFirst} é mais direta, o tom pode soar duro para ${memberFirst}. Reduza ritmo no início da conversa.`;
+  }
+  if (lDisc === 'I' && (mDisc === 'C' || mTemp === 'melancolico')) {
+    result.avoid += ` Cuidado: o estilo mais expansivo de ${leaderFirst} pode parecer pouco estruturado para ${memberFirst}. Traga dado e exemplo, não só entusiasmo.`;
+  }
+  if (lDisc === 'C' && (mDisc === 'I' || mTemp === 'sanguineo')) {
+    result.avoid += ` Cuidado: ${leaderFirst} tende a focar no padrão; ${memberFirst} precisa também de vínculo. Reserve espaço para conversa humana antes da correção.`;
+  }
+  if (lDisc === 'S' && (mDisc === 'D' || mTemp === 'colerico')) {
+    result.avoid += ` Cuidado: ${leaderFirst} costuma evitar conflito; ${memberFirst} precisa de posicionamento claro. Não suavize a ponto de virar ambiguidade.`;
+  }
+
+  return result;
+}
+
 function getDataNotice(row: MemberProfile) {
   if (row.journey_status === 'pending_invite') {
     return `Não há Código da Essência disponível para ${getFirstName(row.full_name)} no Identity. Ela ainda não acessou ou aceitou o convite da equipe, por isso não há dados corporativos compartilhados.`;
@@ -700,19 +797,120 @@ function InfoTile({ label, value, detail }: { label: string; value: string; deta
   );
 }
 
+function OneOnOneCard({ leader, member }: { leader: MemberProfile; member: MemberProfile }) {
+  const reading = getLeaderToMemberReading(leader, member);
+  return (
+    <Card className={member.journey_status === 'pending_invite' ? 'border-dashed' : undefined}>
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <CardTitle className="text-base">{getFirstName(leader.full_name)} → {member.full_name}</CardTitle>
+            <CardDescription>
+              {[member.job_title || 'Sem cargo cadastrado', member.leadershipMode].filter(Boolean).join(' · ')}
+            </CardDescription>
+          </div>
+          <Badge variant="outline" className="gap-1">
+            {member.discProfile ? `DISC ${member.discProfile}` : 'Sem DISC'}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3 text-sm">
+        {(reading.leaderNotice || reading.memberNotice) && (
+          <div className="rounded-lg border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground space-y-1">
+            {reading.leaderNotice && <p className="flex items-start gap-2"><AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" /> {reading.leaderNotice}</p>}
+            {reading.memberNotice && <p className="flex items-start gap-2"><AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" /> {reading.memberNotice}</p>}
+          </div>
+        )}
+        {reading.roleNote && (
+          <div className="rounded-lg border bg-muted/20 p-3 text-xs text-muted-foreground">
+            <span className="font-semibold text-foreground">Cargo no cruzamento: </span>{reading.roleNote}
+          </div>
+        )}
+        <ReadingBlock icon={HeartHandshake} title="Como acessar" text={reading.accessing} />
+        <div className="grid gap-3 lg:grid-cols-2">
+          <ReadingBlock icon={Target} title="Como delegar" text={reading.delegating} />
+          <ReadingBlock icon={ClipboardCheck} title="Como dar feedback" text={reading.feedback} />
+        </div>
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+          <div className="mb-1 flex items-center gap-2 text-sm font-semibold text-foreground">
+            <AlertCircle className="h-4 w-4 text-amber-600" /> O que evitar
+          </div>
+          <p className="text-sm leading-relaxed text-muted-foreground">{reading.avoid}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function LeadershipOneOnOne({ rows }: { rows: MemberProfile[] }) {
+  const eligible = rows.filter((r) => r.user_id || r.full_name);
+  const keyOf = (r: MemberProfile) => r.user_id || r.full_name;
+  const [leaderKey, setLeaderKey] = useState<string>(() => {
+    const presumed = eligible.find((r) => /(ce[oa]|fundador|s[oó]ci|owner|diretor|head|gerente|gestor|supervisor|coordenador|l[ií]der)/i.test(r.job_title || '') || r.business_role === 'company_admin' || r.business_role === 'super_admin');
+    return presumed ? keyOf(presumed) : (eligible[0] ? keyOf(eligible[0]) : '');
+  });
+
+  const leader = eligible.find((r) => keyOf(r) === leaderKey);
+  const liderados = eligible.filter((r) => keyOf(r) !== leaderKey);
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base"><Crown className="h-4 w-4 text-primary" /> Quem está liderando?</CardTitle>
+          <CardDescription>Escolha a gestora (Lisa, você ou outra liderança). O sistema gera uma leitura individual de como ela acessa cada uma das outras colaboradoras, considerando perfil + cargo cadastrado em company_users.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-2 lg:max-w-md">
+            <Select value={leaderKey} onValueChange={setLeaderKey}>
+              <SelectTrigger><SelectValue placeholder="Selecionar gestora" /></SelectTrigger>
+              <SelectContent>
+                {eligible.map((r) => (
+                  <SelectItem key={keyOf(r)} value={keyOf(r)}>
+                    {r.full_name}{r.job_title ? ` · ${r.job_title}` : ' · sem cargo'}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {leader && !leader.job_title && (
+            <div className="flex items-start gap-2 rounded-lg border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>Não há cargo cadastrado para <strong>{leader.full_name}</strong> em company_users. A leitura usará apenas o perfil comportamental. Cadastre o cargo (ex: "Gerente", "CEO", "Supervisora") para refinar a análise gestor → liderado.</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {leader && (
+        <div className="grid gap-4 xl:grid-cols-2">
+          {liderados.map((m) => (
+            <OneOnOneCard key={keyOf(m)} leader={leader} member={m} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
   const eligible = rows.filter((row) => row.journey_status !== 'pending_invite');
   const keyOf = (row: MemberProfile) => row.user_id || row.full_name;
 
   const [selected, setSelected] = useState<string[]>([]);
-  const [groups, setGroups] = useState<Array<{ id: string; memberKeys: string[] }>>([]);
+  const [leaderKey, setLeaderKey] = useState<string>('');
+  const [groups, setGroups] = useState<Array<{ id: string; memberKeys: string[]; leaderKey: string | null }>>([]);
 
   const toggle = (key: string) => {
-    setSelected((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
+    setSelected((prev) => {
+      const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
+      if (!next.includes(leaderKey)) setLeaderKey('');
+      return next;
+    });
   };
 
   const selectAll = () => setSelected(eligible.map(keyOf));
-  const clearSelection = () => setSelected([]);
+  const clearSelection = () => { setSelected([]); setLeaderKey(''); };
 
   const buildGroup = () => {
     if (selected.length < 2) {
@@ -720,12 +918,11 @@ function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
       return;
     }
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    setGroups((prev) => [{ id, memberKeys: [...selected] }, ...prev]);
-    setSelected([]);
+    setGroups((prev) => [{ id, memberKeys: [...selected], leaderKey: leaderKey || null }, ...prev]);
+    setSelected([]); setLeaderKey('');
   };
 
   const removeGroup = (id: string) => setGroups((prev) => prev.filter((g) => g.id !== id));
-
   const findRow = (key: string) => eligible.find((row) => keyOf(row) === key);
 
   return (
@@ -733,34 +930,42 @@ function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base"><UserPlus className="h-4 w-4 text-primary" /> Montar cruzamento entre colaboradoras</CardTitle>
-          <CardDescription>Selecione quantas colaboradoras quiser (sem limite) e veja como esse grupo funciona junto: onde se complementam, onde podem atritar e como devem se organizar.</CardDescription>
+          <CardDescription>Selecione quantas colaboradoras quiser (sem limite). Opcionalmente, marque uma delas como líder do grupo — o sistema gera leitura individual de como ela acessa cada uma das outras.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <Button variant="outline" size="sm" onClick={selectAll} disabled={!eligible.length}>Selecionar todas</Button>
             <Button variant="ghost" size="sm" onClick={clearSelection} disabled={!selected.length}>Limpar</Button>
-            <span className="text-muted-foreground">{selected.length} selecionada(s)</span>
+            <span className="text-muted-foreground">{selected.length} selecionada(s){leaderKey && findRow(leaderKey) ? ` · líder: ${getFirstName(findRow(leaderKey)!.full_name)}` : ''}</span>
           </div>
 
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {eligible.map((row) => {
               const k = keyOf(row);
               const isOn = selected.includes(k);
+              const isLeader = leaderKey === k;
               return (
-                <button
-                  type="button"
-                  key={k}
-                  onClick={() => toggle(k)}
-                  className={`flex items-start gap-2 rounded-lg border p-2 text-left text-sm transition-colors ${isOn ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/40'}`}
-                >
-                  <div className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${isOn ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40'}`}>
-                    {isOn && <CheckCircle2 className="h-3 w-3" />}
-                  </div>
-                  <div>
-                    <p className="font-medium leading-tight">{row.full_name}</p>
-                    <p className="text-xs text-muted-foreground">{row.leadershipMode || 'Sem modo definido'}</p>
-                  </div>
-                </button>
+                <div key={k} className={`flex items-start gap-2 rounded-lg border p-2 text-sm transition-colors ${isOn ? 'border-primary bg-primary/5' : 'border-border'}`}>
+                  <button type="button" onClick={() => toggle(k)} className="flex flex-1 items-start gap-2 text-left">
+                    <div className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${isOn ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40'}`}>
+                      {isOn && <CheckCircle2 className="h-3 w-3" />}
+                    </div>
+                    <div>
+                      <p className="font-medium leading-tight">{row.full_name}</p>
+                      <p className="text-xs text-muted-foreground">{row.job_title || row.leadershipMode || 'Sem cargo'}</p>
+                    </div>
+                  </button>
+                  {isOn && (
+                    <button
+                      type="button"
+                      onClick={() => setLeaderKey(isLeader ? '' : k)}
+                      title={isLeader ? 'Remover como líder' : 'Marcar como líder do grupo'}
+                      className={`shrink-0 rounded-md border p-1 transition-colors ${isLeader ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30 text-muted-foreground hover:bg-muted/50'}`}
+                    >
+                      <Crown className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
               );
             })}
           </div>
@@ -775,6 +980,8 @@ function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
       {groups.map((group) => {
         const members = group.memberKeys.map(findRow).filter(Boolean) as MemberProfile[];
         if (members.length < 2) return null;
+        const leader = group.leaderKey ? members.find((m) => keyOf(m) === group.leaderKey) || null : null;
+        const liderados = leader ? members.filter((m) => keyOf(m) !== keyOf(leader)) : [];
         const synergy = getGroupSynergy(members);
         return (
           <Card key={group.id} className="border-primary/20">
@@ -782,34 +989,50 @@ function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <Sparkles className="h-4 w-4 text-primary" /> Grupo de {members.length} colaboradoras
+                    <Sparkles className="h-4 w-4 text-primary" /> {leader ? `${getFirstName(leader.full_name)} liderando ${members.length - 1}` : `Grupo de ${members.length} colaboradoras`}
                   </CardTitle>
                   <CardDescription className="mt-1">
-                    {members.map((m) => m.full_name).join(' • ')}
+                    {leader && <span className="font-medium text-foreground">👑 {leader.full_name}{leader.job_title ? ` (${leader.job_title})` : ''} → </span>}
+                    {(leader ? liderados : members).map((m) => m.full_name).join(' • ')}
                   </CardDescription>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => removeGroup(group.id)} className="gap-1 text-muted-foreground"><X className="h-3 w-3" /> Remover</Button>
               </div>
             </CardHeader>
-            <CardContent className="grid gap-3 lg:grid-cols-3">
-              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
-                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Onde se fortalecem</div>
-                <ul className="space-y-1.5 text-sm text-muted-foreground">
-                  {synergy.strengths.length ? synergy.strengths.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Sem sinergia clara identificada nos dados disponíveis.</li>}
-                </ul>
+            <CardContent className="space-y-4">
+              <div className="grid gap-3 lg:grid-cols-3">
+                <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
+                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Onde se fortalecem</div>
+                  <ul className="space-y-1.5 text-sm text-muted-foreground">
+                    {synergy.strengths.length ? synergy.strengths.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Sem sinergia clara identificada nos dados disponíveis.</li>}
+                  </ul>
+                </div>
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><AlertCircle className="h-4 w-4 text-amber-600" /> Pontos de atrito</div>
+                  <ul className="space-y-1.5 text-sm text-muted-foreground">
+                    {synergy.tensions.length ? synergy.tensions.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Sem pontos críticos identificados nos dados disponíveis.</li>}
+                  </ul>
+                </div>
+                <div className="rounded-lg border p-3">
+                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><HeartHandshake className="h-4 w-4 text-primary" /> Como podem trabalhar juntas</div>
+                  <ul className="space-y-1.5 text-sm text-muted-foreground">
+                    {synergy.howToWork.length ? synergy.howToWork.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Combinem papéis claros e revisem juntas a cada semana.</li>}
+                  </ul>
+                </div>
               </div>
-              <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
-                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><AlertCircle className="h-4 w-4 text-amber-600" /> Pontos de atrito</div>
-                <ul className="space-y-1.5 text-sm text-muted-foreground">
-                  {synergy.tensions.length ? synergy.tensions.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Sem pontos críticos identificados nos dados disponíveis.</li>}
-                </ul>
-              </div>
-              <div className="rounded-lg border p-3">
-                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><HeartHandshake className="h-4 w-4 text-primary" /> Como podem trabalhar juntas</div>
-                <ul className="space-y-1.5 text-sm text-muted-foreground">
-                  {synergy.howToWork.length ? synergy.howToWork.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Combinem papéis claros e revisem juntas a cada semana.</li>}
-                </ul>
-              </div>
+
+              {leader && liderados.length > 0 && (
+                <div className="space-y-3 rounded-lg border border-primary/30 bg-primary/5 p-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                    <Crown className="h-4 w-4 text-primary" /> Liderança 1:1 — como {getFirstName(leader.full_name)} acessa cada uma
+                  </div>
+                  <div className="grid gap-3 xl:grid-cols-2">
+                    {liderados.map((m) => (
+                      <OneOnOneCard key={keyOf(m)} leader={leader} member={m} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         );
@@ -896,10 +1119,11 @@ export default function BusinessTeamComparison() {
             <ExecutiveSummary rows={rows} />
 
             <Tabs defaultValue="resumo" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
                 <TabsTrigger value="resumo">Resumo</TabsTrigger>
                 <TabsTrigger value="times">Times</TabsTrigger>
                 <TabsTrigger value="cruzamentos">Cruzamentos</TabsTrigger>
+                <TabsTrigger value="lideranca">Liderança 1:1</TabsTrigger>
                 <TabsTrigger value="combinar">Combinar grupos</TabsTrigger>
                 <TabsTrigger value="individual">Individual</TabsTrigger>
               </TabsList>
@@ -925,6 +1149,13 @@ export default function BusinessTeamComparison() {
               <TabsContent value="cruzamentos" className="space-y-4">
                 <div className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Cruzamentos de funcionamento</h2></div>
                 <CrossingsPanel rows={rows} />
+              </TabsContent>
+
+
+              <TabsContent value="lideranca" className="space-y-4">
+                <div className="flex items-center gap-2"><Crown className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Leitura Gestor → Liderado (1:1)</h2></div>
+                <p className="text-sm text-muted-foreground">Escolha quem está liderando (Lisa, você, Larissa…). O sistema gera, para cada uma das outras colaboradoras, uma leitura individual de como acessá-la, como delegar, como dar feedback e o que evitar — cruzando perfil + cargo cadastrado.</p>
+                <LeadershipOneOnOne rows={rows} />
               </TabsContent>
 
               <TabsContent value="combinar" className="space-y-4">
