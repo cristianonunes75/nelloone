@@ -273,6 +273,17 @@ export default function BusinessMySpace() {
                 )}
 
                 <LensBlock
+                  icon={<Store className="w-4 h-4 text-indigo-500" />}
+                  title={GENTLE_VOCABULARY.storeDay}
+                  items={lens.storeDayScenes}
+                />
+                <LensBlock
+                  icon={<Eye className="w-4 h-4 text-amber-600" />}
+                  title={GENTLE_VOCABULARY.awarenessScenes}
+                  items={lens.awarenessScenes}
+                />
+
+                <LensBlock
                   icon={<Compass className="w-4 h-4 text-blue-500" />}
                   title={GENTLE_VOCABULARY.weight}
                   items={lens.weight}
@@ -282,12 +293,19 @@ export default function BusinessMySpace() {
                   title={GENTLE_VOCABULARY.helpYou}
                   items={lens.helpYou}
                 />
-                <LensBlock
-                  icon={<Users className="w-4 h-4 text-emerald-500" />}
-                  title={GENTLE_VOCABULARY.askTeam}
-                  items={lens.askTeam}
-                />
-
+                {lens.isLeadership && lens.leadershipActions.length > 0 ? (
+                  <LensBlock
+                    icon={<Crown className="w-4 h-4 text-amber-500" />}
+                    title={GENTLE_VOCABULARY.leadershipActions}
+                    items={lens.leadershipActions}
+                  />
+                ) : (
+                  <LensBlock
+                    icon={<Users className="w-4 h-4 text-emerald-500" />}
+                    title={GENTLE_VOCABULARY.askTeam}
+                    items={lens.askTeam}
+                  />
+                )}
                 <PrivacyCard />
                 <EthicalFooter />
               </>
