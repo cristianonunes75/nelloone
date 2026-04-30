@@ -1,9 +1,11 @@
 /**
- * Lente pessoal: gera, a partir do mapa_essencia.sections (essence_visual_data)
- * e do cargo da colaboradora, uma leitura "fase, não identidade" para a aba
- * "No trabalho" do BusinessMySpace.
+ * Lente pessoal aprofundada: cruza os 7 mapas (DISC, Temperamento, Eneagrama,
+ * Nello16, Inteligências Múltiplas, Estilos de Conexão Afetiva, Arquétipos)
+ * com o cargo da colaboradora e gera a leitura "fase, não identidade" para
+ * o BusinessMySpace.
  *
  * Tudo na 2ª pessoa, sem rótulo definitivo, sem termo clínico.
+ * Trabalho aqui = dar o seu melhor + presença ativa (cuidar e ser cuidado).
  */
 import { categorizeRole, type RoleCategory } from './gentleVocabulary';
 
@@ -16,9 +18,17 @@ function getString(v: unknown): string | null {
   if (typeof v === 'string' && v.trim()) return v.trim();
   return null;
 }
+function getNumber(v: unknown): number | null {
+  if (typeof v === 'number' && Number.isFinite(v)) return v;
+  if (typeof v === 'string' && v.trim() && !Number.isNaN(Number(v))) return Number(v);
+  return null;
+}
+
+// =================== Tipos normalizados ===================
 
 export type DiscKey = 'D' | 'I' | 'S' | 'C' | null;
 export type TempKey = 'sanguineo' | 'colerico' | 'melancolico' | 'fleumatico' | null;
+export type EneaKey = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | null;
 
 function normDisc(v?: string | null): DiscKey {
   const k = v?.trim().toUpperCase().charAt(0);
@@ -32,13 +42,32 @@ function normTemp(v?: string | null): TempKey {
   if (k.startsWith('fle')) return 'fleumatico';
   return null;
 }
+function normEnea(v: unknown): EneaKey {
+  const n = getNumber(v);
+  if (n && n >= 1 && n <= 9) return Math.round(n) as EneaKey;
+  // tentativa string "tipo 5" / "5w4"
+  const s = typeof v === 'string' ? v.match(/[1-9]/) : null;
+  if (s) return Number(s[0]) as EneaKey;
+  return null;
+}
 
 export type EssenceSnapshot = {
+  // núcleo
   disc: DiscKey;
   temperament: TempKey;
+  eneagramType: EneaKey;
+  eneagramWing: number | null;
+  nello16Code: string | null; // 4 letras Nello16
+  // expressão
   archetypePrimary: string | null;
-  connectionStyle: string | null;
-  topIntelligence: string | null;
+  archetypeSecondary: string | null;
+  archetypeShadow: string | null;
+  // conexão e cognição
+  connectionStylePrimary: string | null;
+  connectionStyleSecondary: string | null;
+  intelligencesTop3: string[];
+  topIntelligence: string | null; // legado
+  // sintese
   leadershipMode: 'Direção' | 'Conexão' | 'Sustentação' | 'Critério' | null;
 };
 
@@ -46,22 +75,38 @@ export function extractEssenceSnapshot(sections: unknown): EssenceSnapshot {
   const s = asRecord(sections);
   const disc = asRecord(s.disc);
   const temp = asRecord(s.temperament);
-  const arche = asRecord(s.archetypes);
-  const conn = asRecord(s.connection_style);
-  const intel = asRecord(s.intelligences);
+  const enea = asRecord(s.eneagram ?? s.eneagrama);
+  const n16 = asRecord(s.nello16 ?? s.mbti ?? s.cognition);
+  const arche = asRecord(s.archetypes ?? s.arquetipos);
+  const conn = asRecord(s.connection_style ?? s.estilos_conexao_afetiva ?? s.estilos);
+  const intel = asRecord(s.intelligences ?? s.inteligencias);
   const intelScores = asRecord((intel.scores as AnyRecord) || intel);
 
   const discKey = normDisc(
     getString(disc.primary) || getString(disc.dominant) || getString(disc.profile),
   );
   const tempKey = normTemp(getString(temp.primary) || getString(temp.dominant));
+  const eneaType = normEnea(enea.type ?? enea.primary ?? enea.dominant);
+  const eneaWing = getNumber(enea.wing);
 
-  let topIntel: string | null = null;
+  const nelloRaw =
+    getString(n16.code) || getString(n16.nello16) || getString(n16.primary) || getString(n16.type);
+  const nello16Code = nelloRaw ? nelloRaw.toUpperCase().slice(0, 4) : null;
+
+  // inteligências — top 3
   const entries = Object.entries(intelScores).filter(([, v]) => typeof v === 'number') as Array<[string, number]>;
-  if (entries.length) {
-    entries.sort((a, b) => b[1] - a[1]);
-    topIntel = entries[0][0].replace(/_/g, ' ');
-  }
+  entries.sort((a, b) => b[1] - a[1]);
+  const intelligencesTop3 = entries.slice(0, 3).map(([k]) => k.replace(/_/g, ' '));
+  const topIntel = intelligencesTop3[0] || null;
+
+  // conexão afetiva — primária e secundária
+  const connPrimary = getString(conn.primary) || getString(conn.dominant);
+  const connSecondary = getString(conn.secondary);
+
+  // arquétipos
+  const archetypePrimary = getString(arche.primary) || getString(arche.dominant) || null;
+  const archetypeSecondary = getString(arche.secondary) || null;
+  const archetypeShadow = getString(arche.shadow) || null;
 
   const leadership: EssenceSnapshot['leadershipMode'] =
     discKey === 'D' || tempKey === 'colerico' ? 'Direção'
@@ -73,14 +118,21 @@ export function extractEssenceSnapshot(sections: unknown): EssenceSnapshot {
   return {
     disc: discKey,
     temperament: tempKey,
-    archetypePrimary: getString(arche.primary) || null,
-    connectionStyle: getString(conn.primary) || null,
+    eneagramType: eneaType,
+    eneagramWing: eneaWing,
+    nello16Code,
+    archetypePrimary,
+    archetypeSecondary,
+    archetypeShadow,
+    connectionStylePrimary: connPrimary,
+    connectionStyleSecondary: connSecondary,
+    intelligencesTop3,
     topIntelligence: topIntel,
     leadershipMode: leadership,
   };
 }
 
-// ======== Geradores dos 4 blocos ("você") ========
+// =================== Bibliotecas internas ===================
 
 const ROLE_CONTEXT: Record<RoleCategory, string> = {
   leadership: 'na sua função de liderança',
@@ -91,98 +143,348 @@ const ROLE_CONTEXT: Record<RoleCategory, string> = {
   unknown: 'no seu dia a dia',
 };
 
+// Eneagrama — leitura curta de "dom" e "zona de cuidado" (sem rótulo clínico)
+const ENEA_DOM: Record<number, string> = {
+  1: 'cuidado com o detalhe e com o que é justo',
+  2: 'sensibilidade ao que o outro precisa',
+  3: 'capacidade de transformar visão em entrega',
+  4: 'profundidade emocional e estética própria',
+  5: 'observação aguda e síntese de informação',
+  6: 'lealdade e antecipação de risco',
+  7: 'energia de explorar caminhos novos',
+  8: 'firmeza para proteger e abrir caminho',
+  9: 'capacidade de pacificar e ouvir todos os lados',
+};
+const ENEA_PESO: Record<number, string> = {
+  1: 'cobrar perfeição de você mesma e dos outros',
+  2: 'cuidar tanto que esquece de pedir ajuda',
+  3: 'medir seu valor pelas entregas e cansar em silêncio',
+  4: 'sentir que ninguém entende seu jeito de ver as coisas',
+  5: 'isolar-se quando o ambiente fica intenso demais',
+  6: 'antecipar problemas que talvez não venham',
+  7: 'abrir muitas frentes e ter dificuldade de fechar',
+  8: 'aparecer mais dura do que você gostaria',
+  9: 'silenciar o seu próprio incômodo para manter a paz',
+};
+
+// Estilos de conexão afetiva → linguagem de cuidado profissional
+function caringByStyle(style: string | null): { receive: string; give: string } | null {
+  if (!style) return null;
+  const k = style.toLowerCase();
+  if (k.includes('palav') || k.includes('verb')) {
+    return {
+      receive: 'palavras de reconhecimento sinceras — um “vi seu esforço aqui” faz diferença pra você.',
+      give: 'oferecendo retorno verbal claro: elogio específico, agradecimento nominal, feedback acolhedor.',
+    };
+  }
+  if (k.includes('tempo') || k.includes('quality') || k.includes('presen')) {
+    return {
+      receive: 'tempo de qualidade — uma conversa sem pressa com gestor ou colega te recarrega.',
+      give: 'estando presente de verdade: olhar nos olhos, escuta sem interromper, presença inteira no atendimento.',
+    };
+  }
+  if (k.includes('servi') || k.includes('atos') || k.includes('act')) {
+    return {
+      receive: 'gestos práticos — quando alguém adianta uma tarefa sua, isso te chega como cuidado.',
+      give: 'fazendo algo concreto pelo outro: resolver, adiantar, facilitar a vida do colega ou do cliente.',
+    };
+  }
+  if (k.includes('toque') || k.includes('físic') || k.includes('toch') || k.includes('phys')) {
+    return {
+      receive: 'proximidade respeitosa — um aperto de mão firme, uma celebração com o time presente.',
+      give: 'gerando proximidade simbólica: estar perto, comemorar junto, marcar o momento de quem entrega.',
+    };
+  }
+  if (k.includes('present') || k.includes('gift') || k.includes('presen')) {
+    return {
+      receive: 'lembrancinhas e gestos simbólicos — algo pensado especialmente pra você.',
+      give: 'lembrando datas, marcando conquistas com pequenos gestos simbólicos para clientes e colegas.',
+    };
+  }
+  return null;
+}
+
+// Arquétipos: afinidade no atendimento ao cliente
+const ARCH_FLOW: Record<string, string[]> = {
+  cuidador: ['Cuidador', 'Inocente', 'Amante'],
+  amante: ['Amante', 'Cuidador', 'Bobo'],
+  heroi: ['Herói', 'Governante', 'Mago'],
+  governante: ['Governante', 'Herói', 'Sábio'],
+  sabio: ['Sábio', 'Mago', 'Explorador'],
+  mago: ['Mago', 'Sábio', 'Criador'],
+  explorador: ['Explorador', 'Mago', 'Bobo'],
+  criador: ['Criador', 'Mago', 'Sábio'],
+  bobo: ['Bobo', 'Amante', 'Explorador'],
+  inocente: ['Inocente', 'Cuidador', 'Amante'],
+  forajido: ['Forajido', 'Mago', 'Explorador'],
+  caracomum: ['Cara-comum', 'Cuidador', 'Inocente'],
+};
+const ARCH_AWARENESS: Record<string, string[]> = {
+  cuidador: ['Forajido', 'Governante'],
+  amante: ['Sábio', 'Forajido'],
+  heroi: ['Inocente', 'Bobo'],
+  governante: ['Bobo', 'Forajido'],
+  sabio: ['Bobo', 'Amante'],
+  mago: ['Cara-comum', 'Inocente'],
+  explorador: ['Governante', 'Cuidador'],
+  criador: ['Cara-comum', 'Governante'],
+  bobo: ['Governante', 'Sábio'],
+  inocente: ['Forajido', 'Sábio'],
+  forajido: ['Cuidador', 'Inocente'],
+  caracomum: ['Mago', 'Criador'],
+};
+function archKey(name: string | null): string | null {
+  if (!name) return null;
+  return name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z]/g, '');
+}
+
+// Inteligências → como você produz/aprende
+function intelligenceTip(top: string | null): string | null {
+  if (!top) return null;
+  const k = top.toLowerCase();
+  if (k.includes('linguíst') || k.includes('lingu')) return 'Você tende a aprender e ensinar com palavras — escrever, contar histórias e explicar ajudam você a pensar.';
+  if (k.includes('lógica') || k.includes('logic') || k.includes('matem')) return 'Você costuma render melhor quando há lógica, número e padrão visíveis — peça os dados antes de decidir.';
+  if (k.includes('espacial') || k.includes('visual')) return 'Você processa melhor com imagem e referência visual — mood, exemplo, foto ajudam mais que descrição longa.';
+  if (k.includes('corporal') || k.includes('cinest')) return 'Seu corpo participa do raciocínio — pausas, movimento e fazer com as mãos te ajudam a fechar ideias.';
+  if (k.includes('musical') || k.includes('sonora')) return 'Você capta nuances de tom e ritmo — usar isso no atendimento te diferencia.';
+  if (k.includes('interpess')) return 'Sua força aparece no contato humano — entrevistar, mediar, acolher.';
+  if (k.includes('intrap')) return 'Você precisa de espaço de reflexão antes de decidir — proteja isso na rotina.';
+  if (k.includes('natur')) return 'Você lê padrões finos no ambiente — costuma perceber coisas que outros não veem.';
+  if (k.includes('exist') || k.includes('espirit')) return 'Você dá sentido às coisas — quando o trabalho conecta com propósito, sua entrega muda de patamar.';
+  return null;
+}
+
+// =================== Blocos da leitura ===================
+
 export type WorkLensBlocks = {
+  // legado
   shine: string[];
   weight: string[];
   helpYou: string[];
   askTeam: string[];
+  // novos
+  presentation: string[];
+  flourish: string[];
+  clientConnection: string[];
+  activePresence: { receive: string[]; give: string[] };
+  clientAffinity: { flowsWith: string[]; asksAwareness: string[] };
 };
+
+function buildPresentation(snap: EssenceSnapshot, ctx: string): string[] {
+  const out: string[] = [];
+  const lead = snap.leadershipMode ? `Modo de contribuição **${snap.leadershipMode}**` : null;
+  const temp = snap.temperament ? `temperamento **${snap.temperament}**` : null;
+  const enea = snap.eneagramType ? `tipo **${snap.eneagramType}** do Eneagrama` : null;
+  const n16 = snap.nello16Code ? `código **${snap.nello16Code}** (Nello16)` : null;
+  const arch = snap.archetypePrimary ? `arquétipo **${snap.archetypePrimary}**` : null;
+
+  const parts = [lead, temp, enea, n16, arch].filter(Boolean) as string[];
+  if (parts.length) {
+    out.push(`Hoje, ${ctx}, você se apresenta como ${parts.join(' · ')}.`);
+  }
+  out.push('Esses são pontos de partida da sua fase atual — não rótulos fixos. Eles ajudam você (e quem trabalha com você) a se conhecer melhor.');
+  return out;
+}
+
+function buildFlourish(snap: EssenceSnapshot, ctx: string): string[] {
+  const out: string[] = [];
+  if (snap.disc === 'D' || snap.temperament === 'colerico') {
+    out.push(`Você floresce ${ctx} quando aparece um problema para resolver, uma decisão para tomar ou uma meta clara para perseguir.`);
+  } else if (snap.disc === 'I' || snap.temperament === 'sanguineo') {
+    out.push(`Você floresce ${ctx} quando há gente para se conectar — você cria vínculo rápido, lê o clima e traz energia para o time.`);
+  } else if (snap.disc === 'S' || snap.temperament === 'fleumatico') {
+    out.push(`Você floresce ${ctx} na constância: sustenta rotina, gera segurança em volta, baixa a temperatura quando o ambiente esquenta.`);
+  } else if (snap.disc === 'C' || snap.temperament === 'melancolico') {
+    out.push(`Você floresce ${ctx} quando há critério, padrão e atenção ao detalhe — você enxerga o que outras pessoas não veem.`);
+  }
+  if (snap.eneagramType && ENEA_DOM[snap.eneagramType]) {
+    out.push(`Seu dom natural neste momento aparece como: **${ENEA_DOM[snap.eneagramType]}**.`);
+  }
+  if (snap.archetypePrimary) {
+    out.push(`Seu arquétipo de propósito hoje é **${snap.archetypePrimary}** — uma forma natural sua de contribuir e se posicionar no trabalho.`);
+  }
+  const it = intelligenceTip(snap.topIntelligence);
+  if (it) out.push(it);
+  return out;
+}
+
+function buildClientConnection(snap: EssenceSnapshot, ctx: string): string[] {
+  const out: string[] = [];
+  if (snap.disc === 'D' || snap.disc === 'C') {
+    out.push(`No contato com o cliente ${ctx}, você tende a ser mais direta e objetiva. Isso resolve, mas pedir ao cliente como ele se sente antes de fechar costuma multiplicar sua taxa de conexão.`);
+  } else if (snap.disc === 'I' || snap.disc === 'S') {
+    out.push(`No contato com o cliente ${ctx}, você cria vínculo com facilidade. Seu desafio costuma ser **fechar com firmeza** sem sentir que está “forçando”.`);
+  }
+  if (snap.connectionStylePrimary) {
+    out.push(`Seu estilo de conexão afetiva primário é **${snap.connectionStylePrimary}** — leve isso para a forma de receber o cliente: é por ali que sai o seu melhor.`);
+  }
+  if (snap.archetypePrimary) {
+    out.push(`Como **${snap.archetypePrimary}**, você comunica uma atmosfera específica. Use isso a favor: nem todo cliente responde ao mesmo tom, e está tudo bem.`);
+  }
+  return out;
+}
+
+function buildActivePresence(snap: EssenceSnapshot): { receive: string[]; give: string[] } {
+  const receive: string[] = [];
+  const give: string[] = [];
+  const primary = caringByStyle(snap.connectionStylePrimary);
+  const secondary = caringByStyle(snap.connectionStyleSecondary);
+  if (primary) {
+    receive.push(`Você costuma se sentir cuidada por ${primary.receive}`);
+    give.push(`Você costuma cuidar do outro ${primary.give}`);
+  }
+  if (secondary) {
+    receive.push(`Em segunda linha, ${secondary.receive}`);
+    give.push(`E também ${secondary.give}`);
+  }
+  if (!primary && !secondary) {
+    receive.push('Conforme você finalizar o mapa de Estilos de Conexão Afetiva no Identity, esta leitura fica mais precisa.');
+  }
+  receive.push('No trabalho, dar o seu melhor também é uma forma de **amar e ser amado** — pelo cliente, pelo time e por você mesma.');
+  return { receive, give };
+}
+
+function buildClientAffinity(snap: EssenceSnapshot): { flowsWith: string[]; asksAwareness: string[] } {
+  const k = archKey(snap.archetypePrimary);
+  if (!k || !ARCH_FLOW[k]) return { flowsWith: [], asksAwareness: [] };
+  return { flowsWith: ARCH_FLOW[k] || [], asksAwareness: ARCH_AWARENESS[k] || [] };
+}
+
+function buildWeight(snap: EssenceSnapshot): string[] {
+  const out: string[] = [];
+  if (snap.disc === 'D' || snap.temperament === 'colerico') {
+    out.push('Reuniões longas sem decisão, processos sem clareza ou pessoas que não respondem podem te tirar do eixo mais rápido do que com outras pessoas.');
+  } else if (snap.disc === 'I' || snap.temperament === 'sanguineo') {
+    out.push('Trabalho muito solitário, ambiente seco ou ficar muito tempo sem retorno do gestor podem te esvaziar de energia.');
+  } else if (snap.disc === 'S' || snap.temperament === 'fleumatico') {
+    out.push('Mudanças de regra do dia para a noite, conflito direto ou cobrança no impulso costumam pesar mais para você do que para o time.');
+  } else if (snap.disc === 'C' || snap.temperament === 'melancolico') {
+    out.push('Falta de critério, instruções vagas e crítica genérica podem soar como ataque pessoal, mesmo quando não é a intenção.');
+  }
+  if (snap.eneagramType && ENEA_PESO[snap.eneagramType]) {
+    out.push(`Sob pressão, sua zona de cuidado costuma ser **${ENEA_PESO[snap.eneagramType]}**.`);
+  }
+  if (snap.archetypeShadow) {
+    out.push(`Quando você cansa, o lado **${snap.archetypeShadow}** do seu arquétipo pode aparecer mais — isso é fase, não defeito.`);
+  }
+  out.push('Nada disso é problema seu — é uma fase de funcionamento. Reconhecer ajuda você a se cuidar.');
+  return out;
+}
+
+function buildHelpYou(snap: EssenceSnapshot): string[] {
+  const out: string[] = [];
+  if (snap.disc === 'D' || snap.temperament === 'colerico') {
+    out.push('Começar o dia com 1 ou 2 prioridades claras, não com a lista inteira.');
+    out.push('Combinar feedback objetivo com seu gestor, sem rodeios.');
+  } else if (snap.disc === 'I' || snap.temperament === 'sanguineo') {
+    out.push('Conversar com o gestor antes de tarefas longas — ajuda você a focar.');
+    out.push('Ter momentos de troca com colegas ao longo do dia — você recarrega no contato.');
+  } else if (snap.disc === 'S' || snap.temperament === 'fleumatico') {
+    out.push('Saber com antecedência o que vai mudar na semana.');
+    out.push('Ter um espaço seguro para dizer o que está incomodando antes de virar peso.');
+  } else if (snap.disc === 'C' || snap.temperament === 'melancolico') {
+    out.push('Pedir o critério antes de começar (“como vocês esperam que isso fique pronto?”).');
+    out.push('Usar checklist e referência visual sempre que possível.');
+  }
+  const it = intelligenceTip(snap.topIntelligence);
+  if (it) out.push(it);
+  if (snap.intelligencesTop3.length > 1) {
+    out.push(`Suas três inteligências mais fortes hoje: **${snap.intelligencesTop3.join(', ')}**. Procure tarefas que ativem pelo menos uma delas todo dia.`);
+  }
+  return out;
+}
+
+function buildAskTeam(snap: EssenceSnapshot): string[] {
+  const out: string[] = [];
+  if (snap.disc === 'D' || snap.temperament === 'colerico') {
+    out.push('“Quando puder, me dá a meta e o prazo — o caminho eu defino.”');
+    out.push('“Se for me corrigir, fala direto. Eu prefiro saber rápido.”');
+  } else if (snap.disc === 'I' || snap.temperament === 'sanguineo') {
+    out.push('“Posso ter um check curto com você uma ou duas vezes por semana?”');
+    out.push('“Quando algo for bem feito, me avisa — me ajuda a saber que estou no caminho.”');
+  } else if (snap.disc === 'S' || snap.temperament === 'fleumatico') {
+    out.push('“Quando algo for mudar, me avisa antes — eu preciso de tempo para me organizar.”');
+    out.push('“Se eu estiver quieta demais, me pergunta o que estou pensando.”');
+  } else if (snap.disc === 'C' || snap.temperament === 'melancolico') {
+    out.push('“Pode me mostrar um exemplo do que vocês esperam? Ajuda muito.”');
+    out.push('“Quando for me dar feedback, traz um caso específico — funciona melhor para mim.”');
+  }
+  if (snap.connectionStylePrimary) {
+    const c = caringByStyle(snap.connectionStylePrimary);
+    if (c) out.push(`“Para mim, reconhecimento chega melhor por ${snap.connectionStylePrimary.toLowerCase()}.”`);
+  }
+  return out;
+}
 
 export function buildWorkLens(snap: EssenceSnapshot, jobTitle: string | null): WorkLensBlocks {
   const role = categorizeRole(jobTitle);
   const ctx = ROLE_CONTEXT[role];
-  const blocks: WorkLensBlocks = { shine: [], weight: [], helpYou: [], askTeam: [] };
 
-  // ---- Onde você brilha ----
-  if (snap.disc === 'D' || snap.temperament === 'colerico') {
-    blocks.shine.push(`Hoje, você tende a brilhar quando ${ctx} aparece um problema para resolver, uma decisão para tomar ou uma meta clara para perseguir.`);
-    blocks.shine.push('Costuma ter facilidade para cortar caminho e fazer acontecer quando o objetivo está nítido.');
-  } else if (snap.disc === 'I' || snap.temperament === 'sanguineo') {
-    blocks.shine.push(`Neste momento, você se conecta com facilidade ${ctx} — cria vínculo rápido, lê o clima e traz energia para o time.`);
-    blocks.shine.push('Costuma ser quem aproxima as pessoas e segura o astral nos momentos mais pesados.');
-  } else if (snap.disc === 'S' || snap.temperament === 'fleumatico') {
-    blocks.shine.push(`Hoje, sua força aparece ${ctx} na constância: você sustenta rotina, cuida do que precisa continuar funcionando e gera segurança em volta.`);
-    blocks.shine.push('Quando o time está agitado, sua presença ajuda a baixar a temperatura.');
-  } else if (snap.disc === 'C' || snap.temperament === 'melancolico') {
-    blocks.shine.push(`Neste momento, você tende a brilhar ${ctx} quando precisa de critério, padrão e atenção ao detalhe — você enxerga o que outras pessoas não veem.`);
-    blocks.shine.push('Costuma ser referência de qualidade e organização.');
-  } else {
-    blocks.shine.push(`Você ainda está construindo seu Código completo. Conforme finalizar a jornada no Identity, esta leitura fica mais precisa para o seu dia a dia ${ctx}.`);
-  }
+  const flourish = buildFlourish(snap, ctx);
+  const weight = buildWeight(snap);
+  const helpYou = buildHelpYou(snap);
+  const askTeam = buildAskTeam(snap);
 
-  if (snap.archetypePrimary) {
-    blocks.shine.push(`Seu arquétipo de propósito hoje aparece como **${snap.archetypePrimary}** — uma forma natural sua de contribuir e se posicionar.`);
-  }
-
-  // ---- O que pode pesar para você ----
-  if (snap.disc === 'D' || snap.temperament === 'colerico') {
-    blocks.weight.push('Reuniões longas sem decisão, processos sem clareza ou pessoas que não respondem podem te tirar do eixo mais rápido do que com outras pessoas.');
-    blocks.weight.push('Sob pressão, você pode acelerar demais e o time pode sentir como dureza, mesmo quando sua intenção é só resolver.');
-  } else if (snap.disc === 'I' || snap.temperament === 'sanguineo') {
-    blocks.weight.push('Trabalho muito solitário, ambiente seco ou ficar muito tempo sem retorno do gestor podem te esvaziar de energia.');
-    blocks.weight.push('Sob pressão, você pode abrir várias frentes e ter dificuldade para fechar o que começou.');
-  } else if (snap.disc === 'S' || snap.temperament === 'fleumatico') {
-    blocks.weight.push('Mudanças de regra do dia para a noite, conflito direto ou cobrança no impulso costumam pesar mais para você do que para o time.');
-    blocks.weight.push('Sob pressão, você pode silenciar incômodos para preservar a paz, e isso acumula.');
-  } else if (snap.disc === 'C' || snap.temperament === 'melancolico') {
-    blocks.weight.push('Falta de critério, instruções vagas e crítica genérica podem soar como ataque pessoal, mesmo quando não é a intenção.');
-    blocks.weight.push('Sob pressão, você pode demorar a decidir esperando informação que talvez não venha.');
-  }
-  blocks.weight.push('Nada disso é defeito — é só uma fase de funcionamento. Reconhecer ajuda você a se cuidar.');
-
-  // ---- O que costuma te ajudar ----
-  if (snap.disc === 'D' || snap.temperament === 'colerico') {
-    blocks.helpYou.push('Começar o dia com 1 ou 2 prioridades claras, não com a lista inteira.');
-    blocks.helpYou.push('Combinar feedback objetivo com seu gestor, sem rodeios.');
-    blocks.helpYou.push('Reservar momentos curtos de pausa real — você cansa rápido se não respira.');
-  } else if (snap.disc === 'I' || snap.temperament === 'sanguineo') {
-    blocks.helpYou.push('Conversar com o gestor antes de começar tarefas longas — ajuda você a focar.');
-    blocks.helpYou.push('Listar as 3 entregas do dia em algum lugar visível e ir riscando.');
-    blocks.helpYou.push('Ter momentos de troca com colegas ao longo do dia — você recarrega no contato.');
-  } else if (snap.disc === 'S' || snap.temperament === 'fleumatico') {
-    blocks.helpYou.push('Saber com antecedência o que vai mudar na semana.');
-    blocks.helpYou.push('Ter um espaço seguro para dizer o que está incomodando antes de virar peso.');
-    blocks.helpYou.push('Manter rotinas simples que te dão previsibilidade.');
-  } else if (snap.disc === 'C' || snap.temperament === 'melancolico') {
-    blocks.helpYou.push('Pedir o critério antes de começar (“como vocês esperam que isso fique pronto?”).');
-    blocks.helpYou.push('Usar checklist e referência visual sempre que possível.');
-    blocks.helpYou.push('Lembrar que “bom o suficiente” entregue vale mais que “perfeito” adiado.');
-  } else {
-    blocks.helpYou.push('Completar sua jornada no Identity para destravar uma leitura mais específica.');
-  }
-
-  // ---- O que pedir ao time / gestor ----
-  if (snap.disc === 'D' || snap.temperament === 'colerico') {
-    blocks.askTeam.push('“Quando puder, me dá a meta e o prazo — o caminho eu defino.”');
-    blocks.askTeam.push('“Se for me corrigir, fala direto. Eu prefiro saber rápido.”');
-  } else if (snap.disc === 'I' || snap.temperament === 'sanguineo') {
-    blocks.askTeam.push('“Posso ter um check curto com você uma ou duas vezes por semana?”');
-    blocks.askTeam.push('“Quando algo for bem feito, me avisa — me ajuda a saber que estou no caminho.”');
-  } else if (snap.disc === 'S' || snap.temperament === 'fleumatico') {
-    blocks.askTeam.push('“Quando algo for mudar, me avisa antes — eu preciso de um tempo para me organizar.”');
-    blocks.askTeam.push('“Se eu estiver quieta demais, me pergunta o que estou pensando. Nem sempre vou falar primeiro.”');
-  } else if (snap.disc === 'C' || snap.temperament === 'melancolico') {
-    blocks.askTeam.push('“Pode me mostrar um exemplo do que vocês esperam? Ajuda muito.”');
-    blocks.askTeam.push('“Quando for me dar feedback, traz um caso específico — funciona melhor para mim.”');
-  } else {
-    blocks.askTeam.push('“Vou completar minha jornada no Identity e voltamos a conversar sobre meu funcionamento ideal.”');
-  }
-
-  return blocks;
+  return {
+    presentation: buildPresentation(snap, ctx),
+    flourish,
+    clientConnection: buildClientConnection(snap, ctx),
+    activePresence: buildActivePresence(snap),
+    clientAffinity: buildClientAffinity(snap),
+    weight,
+    helpYou,
+    askTeam,
+    // legado: shine espelha flourish para qualquer consumidor antigo
+    shine: flourish,
+  };
 }
 
-// ======== Aba "Minha equipe" — frase de "como se conectar com fulana" ========
+// =================== Aba "Minha equipe" ===================
 
+export type TeammateConnect = {
+  openConversation: string;
+  showCare: string;
+  avoidEarly: string;
+  bridge: string;
+};
+
+export function buildTeammateDeepConnect(other: EssenceSnapshot, self?: EssenceSnapshot | null): TeammateConnect {
+  // Como abrir conversa
+  let openConversation = 'Comece pelo dia a dia, sem pressa.';
+  if (other.disc === 'D' || other.temperament === 'colerico')
+    openConversation = 'Vá direto ao ponto — diga o que você precisa e o prazo. Ela responde melhor a clareza.';
+  else if (other.disc === 'I' || other.temperament === 'sanguineo')
+    openConversation = 'Abra pelo lado humano: cumprimento, um “como você está?” real antes da tarefa.';
+  else if (other.disc === 'S' || other.temperament === 'fleumatico')
+    openConversation = 'Fale com calma e dê tempo para ela responder — silêncio dela não é desinteresse.';
+  else if (other.disc === 'C' || other.temperament === 'melancolico')
+    openConversation = 'Traga referência ou exemplo do que se espera — clareza de critério acolhe esse perfil.';
+
+  // Como demonstrar cuidado (estilo de conexão afetiva)
+  let showCare = 'Reconheça o esforço dela com palavras simples e sinceras.';
+  const c = caringByStyle(other.connectionStylePrimary);
+  if (c) showCare = `Cuide dela ${c.give}`;
+
+  // O que evitar
+  let avoidEarly = 'Evite julgamentos rápidos sobre o jeito dela.';
+  if (other.eneagramType && ENEA_PESO[other.eneagramType]) {
+    avoidEarly = `Evite tocar de cara em pontos que ativem ${ENEA_PESO[other.eneagramType]}. Construa confiança primeiro.`;
+  } else if (other.archetypeShadow) {
+    avoidEarly = `Em momentos de cansaço, ela pode aparecer mais ${other.archetypeShadow.toLowerCase()} — não trate como definição dela.`;
+  }
+
+  // Ponte natural com você
+  let bridge = 'Com convivência, a forma natural de vocês se complementarem aparece.';
+  if (self?.archetypePrimary && other.archetypePrimary) {
+    bridge = `Seu **${self.archetypePrimary}** com o **${other.archetypePrimary}** dela costuma criar uma ponte natural quando ambas respeitam o ritmo da outra.`;
+  } else if (self?.disc && other.disc) {
+    bridge = `Seu perfil **${self.disc}** com o **${other.disc}** dela funciona melhor quando vocês combinam, no início da semana, o que cada uma precisa para render bem.`;
+  }
+
+  return { openConversation, showCare, avoidEarly, bridge };
+}
+
+// Frase curta legada (mantida para compatibilidade com chamadas existentes)
 export function buildConnectFrase(otherFirstName: string, snap: EssenceSnapshot): string {
   if (snap.disc === 'D' || snap.temperament === 'colerico')
     return `${otherFirstName} tende a funcionar melhor quando você vai direto ao ponto, com objetivo claro e prazo.`;
@@ -192,5 +494,5 @@ export function buildConnectFrase(otherFirstName: string, snap: EssenceSnapshot)
     return `${otherFirstName} costuma render mais com previsibilidade — fale com calma e dê tempo para ela processar.`;
   if (snap.disc === 'C' || snap.temperament === 'melancolico')
     return `${otherFirstName} aprecia clareza e critério — traga referência do que se espera e dê espaço para perguntas.`;
-  return `${otherFirstName} ainda está construindo o Código dela. Por enquanto, se conectar pelo dia a dia.`;
+  return `${otherFirstName} ainda está construindo o Código dela. Por enquanto, se conectem pelo dia a dia.`;
 }
