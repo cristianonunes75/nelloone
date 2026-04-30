@@ -19,6 +19,12 @@ export const GENTLE_VOCABULARY = {
   clientFlow: 'Clientes com quem você flui naturalmente',
   clientAwareness: 'Clientes que pedem mais consciência sua',
 
+  // cenas e gestão
+  storeDay: 'Um dia comum na loja com você',
+  awarenessScenes: 'Cenas que pedem mais consciência sua',
+  leadershipActions: 'Como você lidera melhor a equipe',
+  managementTip: 'Ação prática de gestão',
+
   // colega
   openConversation: 'Como abrir conversa',
   showCare: 'Como demonstrar cuidado',
