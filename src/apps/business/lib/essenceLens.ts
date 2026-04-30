@@ -268,6 +268,11 @@ export type WorkLensBlocks = {
   clientConnection: string[];
   activePresence: { receive: string[]; give: string[] };
   clientAffinity: { flowsWith: string[]; asksAwareness: string[] };
+  // cenas e liderança
+  storeDayScenes: string[];
+  awarenessScenes: string[];
+  leadershipActions: string[]; // só preenchido se cargo = liderança
+  isLeadership: boolean;
 };
 
 function buildPresentation(snap: EssenceSnapshot, ctx: string): string[] {
@@ -416,14 +421,132 @@ function buildAskTeam(snap: EssenceSnapshot): string[] {
   return out;
 }
 
+// =================== Cenas de loja ===================
+
+const SALES_SCENES: Record<'D' | 'I' | 'S' | 'C', string[]> = {
+  D: [
+    'Quando o cliente chega decidido, você fecha rápido e bem — esse é seu momento de brilho.',
+    'Já o cliente que precisa **pensar em voz alta** tende a te cansar. Combine com você mesma uma respiração antes de responder.',
+    'Na devolução difícil, sua tendência é resolver no automático. Pause 5 segundos e valide o sentimento do cliente antes de explicar a regra — a venda seguinte agradece.',
+    'No final do dia, em vez de fechar tudo sozinha, **delegue uma tarefa pequena** para uma colega. Você descansa e ela cresce.',
+  ],
+  I: [
+    'Você é a primeira a notar quando alguém entra na loja sem rumo — seu sorriso já abre venda.',
+    'Seu desafio costuma ser **manter o foco no fechamento** depois de criar vínculo. Um lembrete simples no balcão (“pergunta da forma de pagamento”) ajuda muito.',
+    'Em dia de movimento baixo, você pode esvaziar de energia. Use esse tempo para mandar mensagem de pós-venda — você rende muito ali.',
+    'Cliente bravo te abala mais do que você admite. Combine com a gestora: nesses casos, vocês trocam por 2 minutos.',
+  ],
+  S: [
+    'Quando a fila aumenta, você é quem mantém a calma do time — isso vale ouro num dia cheio.',
+    'Você costuma **silenciar incômodos** para manter o clima. Combine um momento na semana para falar o que está pesando.',
+    'Em mudanças de promoção, peça que te avisem com antecedência — não no meio do expediente. Seu rendimento depende de previsibilidade.',
+    'No atendimento longo, você dá segurança ao cliente. Esse é seu superpoder em peças de maior valor.',
+  ],
+  C: [
+    'Você nota detalhes na vitrine, no estoque e no atendimento que ninguém mais vê.',
+    'Não tente corrigir tudo de uma vez. Escolha **1 ponto por semana** e fale com a gestora — assim sua leitura vira melhoria de verdade.',
+    'Quando o cliente faz pergunta técnica, você brilha. Quando ele quer só conversar, lembre: nem toda venda começa pelo produto.',
+    'Pedir o critério antes de uma tarefa nova ("como vocês esperam que isso fique pronto?") evita retrabalho e ansiedade.',
+  ],
+};
+
+const LEADERSHIP_SCENES: Record<'D' | 'I' | 'S' | 'C', string[]> = {
+  D: [
+    'Na abertura da loja, você já chega com a meta na cabeça. Comece a conversa do dia perguntando à equipe **como elas estão**, não só o que vão fazer.',
+    'Quando uma vendedora trava num cliente difícil, sua tendência é assumir. Tente primeiro: “me conta o que você já tentou?”',
+    'No fechamento do mês, você acelera. Lembre que sua equipe não acompanha seu ritmo natural — antecipe pressão com clareza, não com cobrança.',
+  ],
+  I: [
+    'Você cria um clima leve na loja — isso é parte do seu valor como líder.',
+    'Em dia de meta apertada, sua tendência é puxar a energia, mas pode esquecer o detalhe. Combine com alguém do time o controle de números do dia.',
+    'Reuniões longas te cansam. Faça reuniões curtas, em pé, com 1 decisão clara cada — combina mais com você.',
+  ],
+  S: [
+    'Sua presença estável é o que segura a equipe em mês difícil. Torne isso visível: diga em voz alta "estou aqui, vamos juntas".',
+    'Conflito direto te custa — mas evitar custa mais. Combine consigo: 1 conversa difícil por semana, 15 minutos, com começo, meio e fim.',
+    'Reconhecimento individual é seu canal mais forte. Marque 15 min 1:1 por semana com cada vendedora — vale mais que reunião grande.',
+  ],
+  C: [
+    'Você enxerga padrão e melhoria que ninguém vê. Cuidado para o critério não virar **cobrança silenciosa** — verbalize o que está bom também.',
+    'Quando trouxer um padrão novo, mostre o **exemplo bom e o exemplo a evitar**. Sua equipe aprende muito mais com referência visual do que com regra escrita.',
+    'Feedback genérico não funciona com você nem para você. Use casos concretos: "naquela venda de quinta, quando você fez X..."',
+  ],
+};
+
+const ADMIN_OPS_SCENES: string[] = [
+  'No início do dia, separe 10 minutos para alinhar prioridades antes de abrir o sistema.',
+  'Quando a equipe da loja te procura no meio de uma tarefa, combine um sinal: "me dá 5 min e eu te respondo certinho".',
+  'Erro de sistema ou divergência de caixa pesa mais em quem tem perfil de critério — peça apoio antes de virar sobrecarga.',
+];
+
+function buildStoreDayScenes(snap: EssenceSnapshot, role: RoleCategory): string[] {
+  const key = (snap.disc || (
+    snap.temperament === 'colerico' ? 'D'
+    : snap.temperament === 'sanguineo' ? 'I'
+    : snap.temperament === 'fleumatico' ? 'S'
+    : snap.temperament === 'melancolico' ? 'C'
+    : null
+  )) as 'D' | 'I' | 'S' | 'C' | null;
+
+  if (!key) return [];
+  if (role === 'leadership') return LEADERSHIP_SCENES[key];
+  if (role === 'admin' || role === 'ops') return [...ADMIN_OPS_SCENES, ...SALES_SCENES[key].slice(0, 1)];
+  return SALES_SCENES[key];
+}
+
+function buildAwarenessScenes(snap: EssenceSnapshot, _role: RoleCategory): string[] {
+  const out: string[] = [];
+  if (snap.disc === 'D' || snap.temperament === 'colerico') {
+    out.push('**Devolução difícil com cliente irritado** → respira, valida o que ele sente antes de explicar a regra.');
+    out.push('**Reunião rápida no início do dia** → escreva 1 ou 2 prioridades suas no celular antes de começar.');
+  } else if (snap.disc === 'I' || snap.temperament === 'sanguineo') {
+    out.push('**Final de mês com pressão de meta** → combine com a gestora um check de 5 min, não uma cobrança longa.');
+    out.push('**Cliente silencioso ou frio** → em vez de forçar conversa, ofereça uma escolha simples ("prefere ver primeiro X ou Y?").');
+  } else if (snap.disc === 'S' || snap.temperament === 'fleumatico') {
+    out.push('**Mudança de promoção sem aviso** → peça por escrito antes do turno; isso protege seu rendimento, não é resistência.');
+    out.push('**Conflito entre colegas** → você quer pacificar, mas às vezes precisa só escutar. Não carregue o que não é seu.');
+  } else if (snap.disc === 'C' || snap.temperament === 'melancolico') {
+    out.push('**Tarefa nova sem critério claro** → pergunte um exemplo do que se espera antes de começar.');
+    out.push('**Crítica genérica** → peça um caso concreto. Você processa muito melhor com exemplo do que com adjetivo.');
+  }
+  out.push('Lembre: cada cena é uma **fase de funcionamento**, não a sua definição.');
+  return out;
+}
+
+// =================== Ações de liderança ===================
+
+function buildLeadershipActions(snap: EssenceSnapshot): string[] {
+  const out: string[] = [];
+  if (snap.disc === 'D' || snap.temperament === 'colerico') {
+    out.push('**Feedback:** comece pelo ponto direto, mas pergunte *"faz sentido pra você?"* antes de fechar a conversa.');
+    out.push('**Delegação:** em vez de assumir a venda difícil, delegue com confiança e fique por perto. Sua equipe cresce assim.');
+    out.push('**Reconhecimento:** você costuma esquecer de elogiar o que já é "obrigação". Reserve 2 elogios específicos por dia.');
+  } else if (snap.disc === 'I' || snap.temperament === 'sanguineo') {
+    out.push('**Reunião de segunda:** comece pela energia da equipe antes da meta — você lê clima como ninguém, use isso.');
+    out.push('**Reconhecimento:** crie um pequeno ritual semanal de elogio nominal. Funciona muito com quem você lidera.');
+    out.push('**Decisão difícil:** evite decidir só pelo afeto — peça um número antes de fechar.');
+  } else if (snap.disc === 'S' || snap.temperament === 'fleumatico') {
+    out.push('**Conversa difícil:** marque 15 min, com horário definido. Conversa curta com começo e fim te custa menos do que adiar.');
+    out.push('**1:1 semanal:** marque 15 min individuais com cada pessoa. É o seu canal mais forte de cuidado.');
+    out.push('**Mudança importante:** comunique com antecedência E por escrito — sua equipe te imita: ela também precisa de previsibilidade.');
+  } else if (snap.disc === 'C' || snap.temperament === 'melancolico') {
+    out.push('**Treinamento:** mostre o exemplo bom **e** o exemplo a evitar. Referência visual ensina mais do que regra escrita.');
+    out.push('**Feedback positivo:** verbalize o que está bom. Para o time, seu silêncio costuma ser interpretado como insatisfação.');
+    out.push('**Padrão novo:** introduza 1 mudança por vez. Sobrecarga de critério desmotiva mesmo perfis dedicados.');
+  }
+  return out;
+}
+
 export function buildWorkLens(snap: EssenceSnapshot, jobTitle: string | null): WorkLensBlocks {
   const role = categorizeRole(jobTitle);
   const ctx = ROLE_CONTEXT[role];
+  const isLeadership = role === 'leadership';
 
   const flourish = buildFlourish(snap, ctx);
   const weight = buildWeight(snap);
   const helpYou = buildHelpYou(snap);
   const askTeam = buildAskTeam(snap);
+  const leadershipActions = isLeadership ? buildLeadershipActions(snap) : [];
 
   return {
     presentation: buildPresentation(snap, ctx),
@@ -431,6 +554,10 @@ export function buildWorkLens(snap: EssenceSnapshot, jobTitle: string | null): W
     clientConnection: buildClientConnection(snap, ctx),
     activePresence: buildActivePresence(snap),
     clientAffinity: buildClientAffinity(snap),
+    storeDayScenes: buildStoreDayScenes(snap, role),
+    awarenessScenes: buildAwarenessScenes(snap, role),
+    leadershipActions,
+    isLeadership,
     weight,
     helpYou,
     askTeam,
@@ -446,9 +573,27 @@ export type TeammateConnect = {
   showCare: string;
   avoidEarly: string;
   bridge: string;
+  managementTip?: string;
 };
 
-export function buildTeammateDeepConnect(other: EssenceSnapshot, self?: EssenceSnapshot | null): TeammateConnect {
+function managementTipFor(other: EssenceSnapshot, otherFirstName?: string): string {
+  const name = otherFirstName ? `Com ${otherFirstName}` : 'Com ela';
+  if (other.disc === 'D' || other.temperament === 'colerico')
+    return `${name}, dê **objetivo claro + prazo + autonomia**. Evite microgerenciar — peça resultado, não passo a passo.`;
+  if (other.disc === 'I' || other.temperament === 'sanguineo')
+    return `${name}, abra a delegação pelo "porquê" e reconheça publicamente quando ela entrega. Cobre métrica de forma leve, em conversa.`;
+  if (other.disc === 'S' || other.temperament === 'fleumatico')
+    return `${name}, evite delegar tarefa nova de última hora. Combine na sexta o que vem na segunda — ela rende muito mais com previsibilidade.`;
+  if (other.disc === 'C' || other.temperament === 'melancolico')
+    return `${name}, traga o critério escrito ou um exemplo visual antes de pedir a tarefa. Feedback dela merece ser ouvido — costuma ser preciso.`;
+  return `${name}, comece pequeno: 1 tarefa combinada de cada vez, com retorno curto no fim do dia.`;
+}
+
+export function buildTeammateDeepConnect(
+  other: EssenceSnapshot,
+  self?: EssenceSnapshot | null,
+  opts?: { selfIsLeadership?: boolean; otherFirstName?: string },
+): TeammateConnect {
   // Como abrir conversa
   let openConversation = 'Comece pelo dia a dia, sem pressa.';
   if (other.disc === 'D' || other.temperament === 'colerico')
@@ -481,7 +626,11 @@ export function buildTeammateDeepConnect(other: EssenceSnapshot, self?: EssenceS
     bridge = `Seu perfil **${self.disc}** com o **${other.disc}** dela funciona melhor quando vocês combinam, no início da semana, o que cada uma precisa para render bem.`;
   }
 
-  return { openConversation, showCare, avoidEarly, bridge };
+  const managementTip = opts?.selfIsLeadership
+    ? managementTipFor(other, opts.otherFirstName)
+    : undefined;
+
+  return { openConversation, showCare, avoidEarly, bridge, managementTip };
 }
 
 // Frase curta legada (mantida para compatibilidade com chamadas existentes)

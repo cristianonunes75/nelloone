@@ -14,6 +14,10 @@ import {
   AlertCircle,
   ArrowDownToLine,
   ArrowUpFromLine,
+  Store,
+  Eye,
+  Crown,
+  Briefcase,
 } from 'lucide-react';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
@@ -269,6 +273,17 @@ export default function BusinessMySpace() {
                 )}
 
                 <LensBlock
+                  icon={<Store className="w-4 h-4 text-indigo-500" />}
+                  title={GENTLE_VOCABULARY.storeDay}
+                  items={lens.storeDayScenes}
+                />
+                <LensBlock
+                  icon={<Eye className="w-4 h-4 text-amber-600" />}
+                  title={GENTLE_VOCABULARY.awarenessScenes}
+                  items={lens.awarenessScenes}
+                />
+
+                <LensBlock
                   icon={<Compass className="w-4 h-4 text-blue-500" />}
                   title={GENTLE_VOCABULARY.weight}
                   items={lens.weight}
@@ -278,12 +293,19 @@ export default function BusinessMySpace() {
                   title={GENTLE_VOCABULARY.helpYou}
                   items={lens.helpYou}
                 />
-                <LensBlock
-                  icon={<Users className="w-4 h-4 text-emerald-500" />}
-                  title={GENTLE_VOCABULARY.askTeam}
-                  items={lens.askTeam}
-                />
-
+                {lens.isLeadership && lens.leadershipActions.length > 0 ? (
+                  <LensBlock
+                    icon={<Crown className="w-4 h-4 text-amber-500" />}
+                    title={GENTLE_VOCABULARY.leadershipActions}
+                    items={lens.leadershipActions}
+                  />
+                ) : (
+                  <LensBlock
+                    icon={<Users className="w-4 h-4 text-emerald-500" />}
+                    title={GENTLE_VOCABULARY.askTeam}
+                    items={lens.askTeam}
+                  />
+                )}
                 <PrivacyCard />
                 <EthicalFooter />
               </>
@@ -311,6 +333,7 @@ export default function BusinessMySpace() {
                     hasCode={c.has_essence_code}
                     snapshot={c.snapshot}
                     selfSnapshot={self?.snapshot ?? null}
+                    selfIsLeadership={lens?.isLeadership ?? false}
                   />
                 ))}
               </div>
@@ -377,6 +400,7 @@ function ColleagueCard({
   hasCode,
   snapshot,
   selfSnapshot,
+  selfIsLeadership,
 }: {
   name: string;
   jobTitle: string | null;
@@ -384,10 +408,17 @@ function ColleagueCard({
   hasCode: boolean;
   snapshot: EssenceSnapshot;
   selfSnapshot: EssenceSnapshot | null;
+  selfIsLeadership: boolean;
 }) {
   const connect = useMemo(
-    () => (!isPrivate && hasCode ? buildTeammateDeepConnect(snapshot, selfSnapshot) : null),
-    [snapshot, selfSnapshot, isPrivate, hasCode],
+    () =>
+      !isPrivate && hasCode
+        ? buildTeammateDeepConnect(snapshot, selfSnapshot, {
+            selfIsLeadership,
+            otherFirstName: getFirstName(name),
+          })
+        : null,
+    [snapshot, selfSnapshot, isPrivate, hasCode, selfIsLeadership, name],
   );
 
   return (
@@ -419,6 +450,15 @@ function ColleagueCard({
           <div className="pt-2 border-t">
             <ConnectLine icon={<Sparkles className="w-3.5 h-3.5 text-primary" />} label={GENTLE_VOCABULARY.bridge} text={connect.bridge} />
           </div>
+          {connect.managementTip && (
+            <div className="pt-2 border-t bg-amber-50/40 dark:bg-amber-900/10 -mx-6 px-6 py-2.5">
+              <ConnectLine
+                icon={<Briefcase className="w-3.5 h-3.5 text-amber-600" />}
+                label={GENTLE_VOCABULARY.managementTip}
+                text={connect.managementTip}
+              />
+            </div>
+          )}
         </CardContent>
       )}
     </Card>

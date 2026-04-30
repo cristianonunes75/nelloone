@@ -1,68 +1,77 @@
-## Aprofundar a leitura do Meu Espaço com os 7 mapas
+## Objetivo
 
-Hoje a aba "No trabalho" usa basicamente DISC + Temperamento, com o arquétipo aparecendo só como rótulo. Os outros mapas (Eneagrama, Nello16, Inteligências Múltiplas, Estilos de Conexão Afetiva, Arquétipos completos) não entram na leitura. O plano é trazer **os sete mapas** para dentro do Meu Espaço da colaboradora, com tom de fase, sem julgamento, e com foco em "como você dá e recebe presença no trabalho".
+Tornar a leitura do **Meu Espaço** (Nello Business) mais palpável: em vez de afirmações genéricas, mostrar **cenas reais do dia a dia da loja** ("cliente entra indeciso", "fila no caixa", "devolução difícil") e, para o gestor/CEO, **exemplos concretos de ações de gestão** por perfil (como dar feedback, como delegar, como reconhecer).
 
-### Princípios (linguagem)
+A linguagem continua de **fase, não rótulo**, sem termos clínicos, sempre em 2ª pessoa.
 
-- Nunca dizer "você é", sempre "neste momento, você costuma…"
-- Nada de "fraqueza" / "defeito" / "problema": usar **"o que pode pesar"**, **"onde você pede mais cuidado"**, **"o que floresce em você"**.
-- Trabalhar é também **dar o seu melhor, amar e ser amado** no contato com cliente e colega — esse fio conduz toda a leitura.
-- Sem rótulos clínicos, sem laudo, sem MBTI/Chapman — só Nello16 / estilos de conexão afetiva.
+---
 
-### Estrutura nova da aba "No trabalho" (substitui os 4 blocos atuais)
+## O que a colaboradora vai passar a ver
 
-1. **Como você se apresenta hoje** — síntese curta cruzando DISC + Temperamento + Nello16 + Arquétipo principal.
-2. **Onde você floresce** (era "Onde você brilha") — usa DISC + Inteligência mais alta + Arquétipo + Eneagrama (dom).
-3. **Como você se conecta com o cliente** (NOVO) — usa Estilos de Conexão Afetiva + Arquétipo + DISC. Mostra **arquétipos de cliente que fluem com você** e **arquétipos de cliente que pedem mais consciência**, com 1 frase prática para cada.
-4. **Sua presença ativa: como você dá e recebe cuidado no trabalho** (NOVO) — usa Estilos de Conexão Afetiva como linguagem de carinho profissional (ex.: "você se sente reconhecida quando…"; "você cuida do outro oferecendo…").
-5. **O que pode pesar para você nesta fase** — DISC + Eneagrama (zona de estresse) + Temperamento, sempre fechando com "isso é fase, não defeito".
-6. **O que costuma te ajudar** — Inteligências (como você aprende/produz melhor) + Temperamento.
-7. **O que pedir ao time / gestor** — frases prontas combinando DISC + Eneagrama + Estilo de Conexão Afetiva.
+Na aba **No trabalho**, dois novos blocos serão acrescentados (após "Como você se conecta com o cliente" e antes de "Pontos de atenção"):
 
-### Aba "Minha equipe" — também ganha profundidade
+### 1. "Um dia comum na loja com você"
+3–4 micro-cenas curtas, escolhidas pelo perfil DISC + Temperamento + Arquétipo. Exemplos:
 
-Para cada colega que autorizou compartilhar, em vez de uma frase única, mostrar 3 linhas curtas:
-- **Como abrir conversa** (DISC + Temperamento)
-- **Como demonstrar cuidado** (Estilo de Conexão Afetiva)
-- **O que evitar nos primeiros contatos** (Eneagrama + arquétipo)
+- **Perfil D / Colérico (vendedora):** "Quando o cliente chega decidido, você fecha rápido e bem. Já o cliente que precisa pensar em voz alta tende a te cansar — combine com você mesma uma respiração antes de responder."
+- **Perfil I / Sanguíneo:** "Você é a primeira a notar quando alguém entra na loja sem rumo. Seu desafio costuma ser **manter o foco no fechamento** depois de criar vínculo — ter um lembrete simples no balcão ajuda."
+- **Perfil S / Fleumático:** "Quando a fila aumenta, você mantém a calma do time. Em troca, peça que avisem mudanças de promoção com antecedência — não no meio do expediente."
+- **Perfil C / Melancólico:** "Você nota detalhes na vitrine, no estoque e no atendimento que ninguém mais vê. Não tente corrigir tudo de uma vez — escolha 1 ponto por semana."
 
-E uma frase de fechamento "compatibilidade do dia": como o seu mapa e o dela costumam combinar (cruzando os arquétipos, sem dizer "match" — usar "ponte natural" / "ponto de atenção").
+### 2. "Cenas que pedem mais consciência sua"
+2–3 situações típicas onde o perfil costuma ter mais dificuldade, com sugestão prática:
 
-### Mudanças técnicas
+- "Devolução difícil com cliente irritado → respira, valida o que ele sente antes de explicar a regra."
+- "Reunião rápida no início do dia → escreve as 2 metas suas no celular antes."
+- "Final de mês com pressão de meta → combine com a gestora um check de 5 min, não cobrança longa."
 
-**`src/apps/business/lib/essenceLens.ts`**
-- Expandir `EssenceSnapshot` para incluir:
-  - `eneagramType` (1–9) e `eneagramWing`
-  - `nello16Code` (4 letras Nello16, sem MBTI no UI)
-  - `intelligencesTop3: string[]` (não só a top 1)
-  - `connectionStylePrimary` e `connectionStyleSecondary` (estilos de conexão afetiva)
-  - `archetypePrimary`, `archetypeSecondary`, `archetypeShadow`
-- Adicionar leitores robustos em `extractEssenceSnapshot` para os campos novos do `essence_visual_data`.
-- Refatorar `buildWorkLens` em **funções menores por bloco** (`buildFlourish`, `buildClientConnection`, `buildActivePresence`, `buildWeight`, `buildHelpYou`, `buildAskTeam`) — fica mais fácil de evoluir.
-- Criar `buildClientArchetypeAffinity(snap)` retornando `{ flowsWith: string[], asksAwareness: string[], tip: Record<string,string> }`.
-- Criar `buildTeammateDeepConnect(otherSnap)` retornando `{ openConversation, showCare, avoidEarly, bridge }`.
+---
 
-**`src/apps/business/lib/gentleVocabulary.ts`**
-- Adicionar novas chaves: `flourish`, `clientConnection`, `activePresence`, `clientFlow`, `clientAwareness`.
-- Manter `phaseAnchor` reforçado: "leitura de fase, não rótulo".
+## O que muda na aba "No trabalho" para perfis de **liderança**
 
-**`src/apps/business/pages/BusinessMySpace.tsx`**
-- Aba "Meu Código" ganha mais 2 tiles (Eneagrama, Nello16) — total 6 tiles, grid responsivo.
-- Aba "No trabalho": substituir os 4 blocos por **7 blocos** acima, com ícones e ordem narrativa (apresentação → florescer → cliente → presença ativa → o que pesa → o que ajuda → o que pedir).
-- Aba "Minha equipe": cada card de colega passa a ter os 3 mini-blocos + frase ponte.
-- Adicionar `PhaseAnchor` no topo de cada aba e **rodapé suave** com a frase: *"Tudo aqui é uma leitura da sua fase atual de trabalho. Não é diagnóstico, não é definição da sua pessoa."*
+Quando `categorizeRole(jobTitle) === 'leadership'` (Lisa, Larissa, etc.), o bloco **"O que pedir ao time / gestor"** é substituído por **"Como você lidera melhor a equipe"**, com **exemplos concretos de ação de gestão** por perfil:
 
-**`useMySpaceTeam.tsx` e RPC `get_company_team_for_member`**
-- A RPC já devolve `essence_visual_data` cru — só precisamos garantir que ela inclua as seções `eneagram`, `nello16`, `intelligences`, `connection_style` e `archetypes` (verificar e, se faltar campo, ajustar a função SQL). **Sem mudança de RLS** — só seleção de mais campos do JSON existente.
+- **Líder D/Colérico:** 
+  - "Quando for dar feedback, comece pelo ponto direto, mas pergunte: *'faz sentido pra você?'* antes de fechar."
+  - "Em vez de assumir a venda difícil sozinha, **delegue com confiança e esteja por perto** — sua equipe cresce assim."
+- **Líder I/Sanguíneo:**
+  - "Use seu dom de leitura de clima nas reuniões de segunda — comece pela energia da equipe antes da meta."
+  - "Crie um pequeno ritual semanal de reconhecimento nominal — funciona muito com quem você lidera."
+- **Líder S/Fleumático:**
+  - "Sua presença estável é o que segura o time em mês difícil. Torne isso visível: diga em voz alta 'estou aqui'."
+  - "Marque 15 min individuais por semana com cada vendedora — você cuida melhor 1:1 do que em grupo."
+- **Líder C/Melancólico:**
+  - "Quando trouxer um padrão novo, mostre o **exemplo bom e o exemplo ruim** — sua equipe aprende mais com referência visual."
+  - "Cuidado para o critério não virar cobrança silenciosa. Verbalize o que está bom também."
 
-### Compliance
+Adicionalmente: **micro-exemplos de gestão cruzando o perfil da líder com o perfil de cada colega** já aparecem na aba "Minha equipe" (campo "ponte natural") — esse texto será enriquecido com 1 ação prática por par (ex.: "Com a Larissa (perfil S), evite delegar tarefa nova de última hora — combine na sexta o que vem na segunda").
 
-- Nada de "MBTI", "INFP", "linguagens do amor", "Gary Chapman", "Chapman" — só Nello16 e Estilos de Conexão Afetiva (regra do projeto).
-- Disclaimer ético padrão no rodapé das abas "No trabalho" e "Minha equipe".
-- "Amar e ser amado" só aparece como **metáfora de cuidado profissional** (presença ativa, escuta, reconhecimento) — nunca como recomendação afetiva entre colegas.
+---
 
-### Fora do escopo
+## Detalhes técnicos
 
-- Não toca em PDF, e-mail, ou no Identity em si.
-- Não muda a área administrativa (Lisa continua vendo o que já vê).
-- Não cria novas tabelas — só lê o JSON `essence_visual_data` que já existe.
+Arquivos a modificar:
+
+1. **`src/apps/business/lib/essenceLens.ts`**
+   - Adicionar `storeDayScenes: string[]` e `awarenessScenes: string[]` em `WorkLensBlocks`.
+   - Nova função `buildStoreDayScenes(snap, role)` com bibliotecas internas indexadas por DISC + categoria de cargo (`sales` vs `leadership` vs `admin`/`ops`/`marketing`).
+   - Nova função `buildAwarenessScenes(snap, role)`.
+   - Para liderança: novo `buildLeadershipActions(snap)` que substitui `askTeam` quando `role === 'leadership'`. Manter `askTeam` original para os demais cargos.
+   - Enriquecer `buildTeammateDeepConnect` adicionando 1 frase de **ação de gestão prática** quando `self` for liderança (campo extra `managementTip` em `TeammateConnect`).
+
+2. **`src/apps/business/lib/gentleVocabulary.ts`**
+   - Novas chaves: `storeDay: 'Um dia comum na loja com você'`, `awarenessScenes: 'Cenas que pedem mais consciência sua'`, `leadershipActions: 'Como você lidera melhor a equipe'`, `managementTip: 'Ação prática de gestão'`.
+
+3. **`src/apps/business/pages/BusinessMySpace.tsx`**
+   - Renderizar `lens.storeDayScenes` e `lens.awarenessScenes` como dois novos `LensBlock` na aba "No trabalho" (entre `clientConnection` e `weight`).
+   - Quando o usuário for liderança, trocar o título do bloco final de `askTeam` para `leadershipActions`.
+   - No `ColleagueCard`, exibir `connect.managementTip` em uma 5ª linha (apenas quando presente, ou seja, quando o próprio usuário for líder).
+
+4. Sem mudanças em RPC, RLS ou tipos do banco — toda a leitura é construída no cliente a partir do `essence_visual_data` já trazido por `get_company_team_for_member`.
+
+## Compliance / linguagem
+
+- Toda cena começa com verbo de tendência ("você costuma", "tende a", "quando...").
+- Nenhuma menção a MBTI, "linguagens do amor", ou termos clínicos. Mantém Nello16 e Estilos de Conexão Afetiva.
+- Encerramento de cada bloco reforça: *"isto descreve uma fase, não quem você é"*.
+- O `EthicalFooter` e o `PhaseAnchor` continuam em todos os blocos.
