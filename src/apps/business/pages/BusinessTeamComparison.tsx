@@ -489,7 +489,9 @@ function enrichRow(row: TeamMemberRow): MemberProfile {
   const archetypes = extractArchetypes(row);
   const maps = row.available_maps || [];
   const completeness: MemberProfile['completeness'] = row.has_essence_code ? 'codigo_completo' : row.journey_status === 'completed' ? 'jornada_sem_codigo' : 'parcial';
-  const groupName = row.department?.trim() || (row.job_title?.toLowerCase().includes('vended') ? 'Vendas' : 'Equipe geral');
+  // Sempre considerar a equipe inteira como um único grupo, exceto quando o admin
+  // tiver definido manualmente um departamento (e houver mais de um departamento real).
+  const groupName = row.department?.trim() || 'Equipe completa';
   const base = {
     ...row,
     groupName,
