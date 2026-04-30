@@ -928,9 +928,9 @@ export default function BusinessTeamComparison() {
               </TabsContent>
 
               <TabsContent value="combinar" className="space-y-4">
-                <div className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Combinar duplas da equipe</h2></div>
-                <p className="text-sm text-muted-foreground">Monte cruzamentos personalizados para entender como duas colaboradoras podem trabalhar juntas, se conhecer melhor e cobrir os pontos cegos uma da outra.</p>
-                <PairBuilder rows={rows} />
+                <div className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Combinar grupos da equipe</h2></div>
+                <p className="text-sm text-muted-foreground">Monte cruzamentos personalizados com quantas colaboradoras quiser (sem limite). Veja como o grupo se complementa, onde pode atritar e como devem se organizar para trabalhar juntas.</p>
+                <GroupBuilder rows={rows} />
               </TabsContent>
 
               <TabsContent value="individual" className="space-y-4">
