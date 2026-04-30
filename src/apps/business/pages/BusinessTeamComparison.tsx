@@ -305,75 +305,72 @@ function getRiskReading(row: MemberProfile): string[] {
   return risks.slice(0, 5);
 }
 
-function getPairSynergy(a: MemberProfile, b: MemberProfile) {
-  const firstA = getFirstName(a.full_name);
-  const firstB = getFirstName(b.full_name);
-  const modeA = a.leadershipMode;
-  const modeB = b.leadershipMode;
-  const sameMode = modeA === modeB;
-
+function getGroupSynergy(members: MemberProfile[]) {
   const strengths: string[] = [];
   const tensions: string[] = [];
   const howToWork: string[] = [];
 
-  if (sameMode) {
-    strengths.push(`${firstA} e ${firstB} compartilham o modo "${modeA}", o que gera linguagem comum e velocidade de decisão entre elas.`);
-    tensions.push(`O risco é reforçarem o mesmo ponto cego: ambas tendem a reagir do mesmo jeito sob pressão e podem deixar lacunas que outra dupla cobriria naturalmente.`);
+  if (members.length < 2) {
+    return { strengths, tensions, howToWork };
+  }
+
+  const names = members.map((m) => getFirstName(m.full_name));
+  const namesList = names.length === 2
+    ? `${names[0]} e ${names[1]}`
+    : `${names.slice(0, -1).join(', ')} e ${names[names.length - 1]}`;
+
+  // Distribuição de modos de liderança
+  const modeCount: Record<string, string[]> = {};
+  members.forEach((m) => {
+    if (!m.leadershipMode) return;
+    if (!modeCount[m.leadershipMode]) modeCount[m.leadershipMode] = [];
+    modeCount[m.leadershipMode].push(getFirstName(m.full_name));
+  });
+  const modes = Object.keys(modeCount);
+  const allModes = ['Direção', 'Conexão', 'Sustentação', 'Critério'];
+  const missingModes = allModes.filter((mode) => !modes.includes(mode));
+
+  if (modes.length === 1) {
+    strengths.push(`${namesList} compartilham o modo "${modes[0]}", o que cria linguagem comum e velocidade de decisão.`);
+    tensions.push(`O grupo tende a reforçar o mesmo ponto cego: todas reagem do mesmo jeito sob pressão. Faltam contrapontos naturais.`);
+    howToWork.push(`Defina papéis distintos por área (meta, processo, cliente, qualidade) para evitar competição pela mesma decisão.`);
+  } else if (modes.length === allModes.length) {
+    strengths.push(`O grupo cobre os 4 modos (Direção, Conexão, Sustentação e Critério). É uma combinação completa de funcionamento.`);
+    howToWork.push(`Aproveite a complementaridade: Direção decide, Conexão envolve, Sustentação executa e Critério valida. Crie um ritual semanal curto para alinhar essas frentes.`);
   } else {
-    strengths.push(`A combinação ${modeA} + ${modeB} é complementar: uma puxa o que a outra não vê primeiro.`);
+    strengths.push(`O grupo combina os modos: ${modes.join(' + ')}. Há complementaridade real entre as participantes.`);
+    if (missingModes.length) {
+      tensions.push(`O grupo não tem ninguém em "${missingModes.join(', ')}". Cuidado com lacunas: ${missingModes.includes('Direção') ? 'pode faltar quem decide e fecha; ' : ''}${missingModes.includes('Conexão') ? 'pode faltar quem cuida do vínculo com o cliente; ' : ''}${missingModes.includes('Sustentação') ? 'pode faltar quem garante constância e rotina; ' : ''}${missingModes.includes('Critério') ? 'pode faltar quem revisa qualidade antes de entregar.' : ''}`);
+    }
   }
 
-  // Specific pair logic
-  const pair = `${modeA}|${modeB}`;
-  const inverse = `${modeB}|${modeA}`;
-  const has = (p: string) => pair === p || inverse === p;
+  // Detalhe por modo presente
+  Object.entries(modeCount).forEach(([mode, people]) => {
+    if (people.length > 1) {
+      tensions.push(`${people.join(' e ')} têm o mesmo modo (${mode}). Risco de disputa pelo mesmo papel — combinem áreas distintas.`);
+    }
+  });
 
-  if (has('Direção|Conexão')) {
-    strengths.push('Direção fecha venda e bate meta; Conexão acolhe cliente e mantém vínculo após a compra.');
-    tensions.push('Direção pode atropelar o tempo de Conexão; Conexão pode achar Direção fria ou apressada.');
-    howToWork.push(`${firstA === a.full_name.split(' ')[0] && modeA === 'Direção' ? firstA : firstB} abre a abordagem com objetividade e propõe a oferta; a outra cuida do vínculo, da escuta e do pós-venda.`);
-    howToWork.push('Combinem um sinal simples para "freia" e "avança" durante o atendimento, evitando atrito na frente do cliente.');
-  }
-  if (has('Direção|Sustentação')) {
-    strengths.push('Direção decide e move; Sustentação garante constância, rotina e qualidade do que ficou combinado.');
-    tensions.push('Sustentação pode ser sobrecarregada por Direção; pode silenciar o incômodo até estourar.');
-    howToWork.push('Direção define a meta da semana; Sustentação organiza o passo a passo e marca check-in para validar ritmo real.');
-  }
-  if (has('Direção|Critério')) {
-    strengths.push('Direção quer resultado rápido; Critério garante que o resultado tenha qualidade e consistência.');
-    tensions.push('Direção pode achar Critério lenta; Critério pode achar Direção descuidada com detalhes que afetam cliente.');
-    howToWork.push('Direção define o "o quê" e o prazo; Critério define o padrão mínimo aceitável antes de entregar.');
-  }
-  if (has('Conexão|Sustentação')) {
-    strengths.push('Conexão atrai cliente e gera energia no time; Sustentação mantém constância e cuidado contínuo.');
-    tensions.push('Conexão pode dispersar; Sustentação pode se cansar de "segurar" o que a outra começa e não termina.');
-    howToWork.push('Conexão abre o atendimento e cria vínculo; Sustentação fecha a tarefa e cuida do follow-up.');
-  }
-  if (has('Conexão|Critério')) {
-    strengths.push('Conexão humaniza a interação; Critério garante que a promessa feita seja cumprida no detalhe.');
-    tensions.push('Conexão pode prometer demais; Critério pode soar excessivamente técnica ao revisar a colega.');
-    howToWork.push('Conexão fala com cliente; Critério valida estoque, condição e padrão antes de confirmar a venda.');
-  }
-  if (has('Sustentação|Critério')) {
-    strengths.push('Dupla altamente confiável em rotina, organização, conferência e qualidade do atendimento contínuo.');
-    tensions.push('Pode faltar iniciativa para mudanças rápidas; ambas tendem a evitar conflito e ruptura.');
-    howToWork.push('Combinem revisão semanal curta para decidir o que precisa mudar, em vez de apenas manter o que já existe.');
-  }
-  if (sameMode) {
-    if (modeA === 'Direção') howToWork.push('Dividam responsabilidade por área (uma cuida de meta, outra de processo) para não competirem pela mesma decisão.');
-    if (modeA === 'Conexão') howToWork.push('Combinem quem fala com qual cliente para não duplicarem contato e disputarem foco.');
-    if (modeA === 'Sustentação') howToWork.push('Tragam alguém de Direção ou Critério para destravar decisões; juntas tendem a adiar mudanças.');
-    if (modeA === 'Critério') howToWork.push('Definam um prazo de decisão antes de entrar em análise; juntas podem travar em busca de perfeição.');
+  // Recomendações práticas por modo presente
+  if (modeCount['Direção']) howToWork.push(`${modeCount['Direção'].join(' / ')} (Direção): assuma a definição de meta e prazos do grupo.`);
+  if (modeCount['Conexão']) howToWork.push(`${modeCount['Conexão'].join(' / ')} (Conexão): cuide do clima do grupo e do vínculo com cliente.`);
+  if (modeCount['Sustentação']) howToWork.push(`${modeCount['Sustentação'].join(' / ')} (Sustentação): garanta o passo a passo, follow-up e ritmo constante.`);
+  if (modeCount['Critério']) howToWork.push(`${modeCount['Critério'].join(' / ')} (Critério): valide qualidade e padrão antes da entrega final.`);
+
+  // Distribuição de temperamentos
+  const tempSet = new Set(members.map((m) => m.temperamentProfile).filter(Boolean));
+  if (tempSet.size > 1) {
+    const labels = Array.from(tempSet).map((t) => TEMPERAMENT_LABELS[t as string] || t).join(', ');
+    strengths.push(`Mistura de temperamentos (${labels}): equilibra emoção, ritmo e energia no grupo.`);
+  } else if (tempSet.size === 1) {
+    const only = Array.from(tempSet)[0];
+    tensions.push(`Todas com temperamento ${TEMPERAMENT_LABELS[only as string] || only}: o grupo tende ao mesmo ritmo emocional. Atenção para não amplificar o mesmo gatilho.`);
   }
 
-  // Temperament-level extra read
-  if (a.temperamentProfile && b.temperamentProfile && a.temperamentProfile !== b.temperamentProfile) {
-    strengths.push(`Os temperamentos ${TEMPERAMENT_LABELS[a.temperamentProfile]} e ${TEMPERAMENT_LABELS[b.temperamentProfile]} se equilibram em emoção e ritmo.`);
-  }
-
-  // Connection-style read
-  if (a.connectionStyle && b.connectionStyle && a.connectionStyle !== b.connectionStyle) {
-    howToWork.push(`Estilos de conexão diferentes (${a.connectionStyle} x ${b.connectionStyle}): cada uma percebe reconhecimento de um jeito. Combinem como vão sinalizar apoio uma à outra.`);
+  // Estilos de conexão
+  const styleSet = new Set(members.map((m) => m.connectionStyle).filter(Boolean));
+  if (styleSet.size > 1) {
+    howToWork.push(`Estilos de conexão diferentes no grupo (${Array.from(styleSet).join(', ')}): cada uma percebe reconhecimento e apoio de um jeito. Combinem como vão sinalizar suporte umas às outras.`);
   }
 
   return { strengths, tensions, howToWork };
@@ -703,81 +700,102 @@ function InfoTile({ label, value, detail }: { label: string; value: string; deta
   );
 }
 
-function PairBuilder({ rows }: { rows: MemberProfile[] }) {
+function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
   const eligible = rows.filter((row) => row.journey_status !== 'pending_invite');
-  const [pairs, setPairs] = useState<Array<{ a: string; b: string }>>([]);
-  const [aId, setAId] = useState<string>('');
-  const [bId, setBId] = useState<string>('');
-
   const keyOf = (row: MemberProfile) => row.user_id || row.full_name;
-  const findRow = (key: string) => eligible.find((row) => keyOf(row) === key);
 
-  const addPair = () => {
-    if (!aId || !bId || aId === bId) {
-      toast.error('Selecione duas colaboradoras diferentes');
-      return;
-    }
-    if (pairs.some((p) => (p.a === aId && p.b === bId) || (p.a === bId && p.b === aId))) {
-      toast.info('Esse cruzamento já está montado');
-      return;
-    }
-    setPairs((prev) => [...prev, { a: aId, b: bId }]);
-    setAId('');
-    setBId('');
+  const [selected, setSelected] = useState<string[]>([]);
+  const [groups, setGroups] = useState<Array<{ id: string; memberKeys: string[] }>>([]);
+
+  const toggle = (key: string) => {
+    setSelected((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
   };
 
-  const removePair = (index: number) => setPairs((prev) => prev.filter((_, i) => i !== index));
+  const selectAll = () => setSelected(eligible.map(keyOf));
+  const clearSelection = () => setSelected([]);
+
+  const buildGroup = () => {
+    if (selected.length < 2) {
+      toast.error('Selecione pelo menos duas colaboradoras');
+      return;
+    }
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    setGroups((prev) => [{ id, memberKeys: [...selected] }, ...prev]);
+    setSelected([]);
+  };
+
+  const removeGroup = (id: string) => setGroups((prev) => prev.filter((g) => g.id !== id));
+
+  const findRow = (key: string) => eligible.find((row) => keyOf(row) === key);
 
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base"><UserPlus className="h-4 w-4 text-primary" /> Montar cruzamento entre colaboradoras</CardTitle>
-          <CardDescription>Combine duas pessoas da equipe e veja como elas podem trabalhar juntas, onde se complementam e onde podem atritar.</CardDescription>
+          <CardDescription>Selecione quantas colaboradoras quiser (sem limite) e veja como esse grupo funciona junto: onde se complementam, onde podem atritar e como devem se organizar.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
-            <Select value={aId} onValueChange={setAId}>
-              <SelectTrigger><SelectValue placeholder="Colaboradora 1" /></SelectTrigger>
-              <SelectContent>
-                {eligible.map((row) => <SelectItem key={keyOf(row)} value={keyOf(row)}>{row.full_name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Select value={bId} onValueChange={setBId}>
-              <SelectTrigger><SelectValue placeholder="Colaboradora 2" /></SelectTrigger>
-              <SelectContent>
-                {eligible.filter((row) => keyOf(row) !== aId).map((row) => <SelectItem key={keyOf(row)} value={keyOf(row)}>{row.full_name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Button onClick={addPair} className="gap-2"><GitCompare className="h-4 w-4" /> Cruzar</Button>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <Button variant="outline" size="sm" onClick={selectAll} disabled={!eligible.length}>Selecionar todas</Button>
+            <Button variant="ghost" size="sm" onClick={clearSelection} disabled={!selected.length}>Limpar</Button>
+            <span className="text-muted-foreground">{selected.length} selecionada(s)</span>
+          </div>
+
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {eligible.map((row) => {
+              const k = keyOf(row);
+              const isOn = selected.includes(k);
+              return (
+                <button
+                  type="button"
+                  key={k}
+                  onClick={() => toggle(k)}
+                  className={`flex items-start gap-2 rounded-lg border p-2 text-left text-sm transition-colors ${isOn ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/40'}`}
+                >
+                  <div className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${isOn ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40'}`}>
+                    {isOn && <CheckCircle2 className="h-3 w-3" />}
+                  </div>
+                  <div>
+                    <p className="font-medium leading-tight">{row.full_name}</p>
+                    <p className="text-xs text-muted-foreground">{row.leadershipMode || 'Sem modo definido'}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center justify-end">
+            <Button onClick={buildGroup} className="gap-2" disabled={selected.length < 2}><GitCompare className="h-4 w-4" /> Cruzar grupo ({selected.length})</Button>
           </div>
           {eligible.length < 2 && <p className="text-xs text-muted-foreground">É necessário ter pelo menos duas colaboradoras com dados disponíveis.</p>}
         </CardContent>
       </Card>
 
-      {pairs.map((pair, index) => {
-        const a = findRow(pair.a);
-        const b = findRow(pair.b);
-        if (!a || !b) return null;
-        const synergy = getPairSynergy(a, b);
+      {groups.map((group) => {
+        const members = group.memberKeys.map(findRow).filter(Boolean) as MemberProfile[];
+        if (members.length < 2) return null;
+        const synergy = getGroupSynergy(members);
         return (
-          <Card key={`${pair.a}-${pair.b}-${index}`} className="border-primary/20">
+          <Card key={group.id} className="border-primary/20">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <Sparkles className="h-4 w-4 text-primary" /> {a.full_name} <span className="text-muted-foreground">×</span> {b.full_name}
+                    <Sparkles className="h-4 w-4 text-primary" /> Grupo de {members.length} colaboradoras
                   </CardTitle>
-                  <CardDescription>{a.leadershipMode} + {b.leadershipMode}</CardDescription>
+                  <CardDescription className="mt-1">
+                    {members.map((m) => m.full_name).join(' • ')}
+                  </CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => removePair(index)} className="gap-1 text-muted-foreground"><X className="h-3 w-3" /> Remover</Button>
+                <Button variant="ghost" size="sm" onClick={() => removeGroup(group.id)} className="gap-1 text-muted-foreground"><X className="h-3 w-3" /> Remover</Button>
               </div>
             </CardHeader>
             <CardContent className="grid gap-3 lg:grid-cols-3">
               <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
                 <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Onde se fortalecem</div>
                 <ul className="space-y-1.5 text-sm text-muted-foreground">
-                  {synergy.strengths.map((item) => <li key={item} className="leading-relaxed">• {item}</li>)}
+                  {synergy.strengths.length ? synergy.strengths.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Sem sinergia clara identificada nos dados disponíveis.</li>}
                 </ul>
               </div>
               <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
@@ -789,7 +807,7 @@ function PairBuilder({ rows }: { rows: MemberProfile[] }) {
               <div className="rounded-lg border p-3">
                 <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><HeartHandshake className="h-4 w-4 text-primary" /> Como podem trabalhar juntas</div>
                 <ul className="space-y-1.5 text-sm text-muted-foreground">
-                  {synergy.howToWork.length ? synergy.howToWork.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Combine papéis claros e revisem juntas a cada semana.</li>}
+                  {synergy.howToWork.length ? synergy.howToWork.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Combinem papéis claros e revisem juntas a cada semana.</li>}
                 </ul>
               </div>
             </CardContent>
@@ -882,7 +900,7 @@ export default function BusinessTeamComparison() {
                 <TabsTrigger value="resumo">Resumo</TabsTrigger>
                 <TabsTrigger value="times">Times</TabsTrigger>
                 <TabsTrigger value="cruzamentos">Cruzamentos</TabsTrigger>
-                <TabsTrigger value="combinar">Combinar duplas</TabsTrigger>
+                <TabsTrigger value="combinar">Combinar grupos</TabsTrigger>
                 <TabsTrigger value="individual">Individual</TabsTrigger>
               </TabsList>
 
@@ -910,9 +928,9 @@ export default function BusinessTeamComparison() {
               </TabsContent>
 
               <TabsContent value="combinar" className="space-y-4">
-                <div className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Combinar duplas da equipe</h2></div>
-                <p className="text-sm text-muted-foreground">Monte cruzamentos personalizados para entender como duas colaboradoras podem trabalhar juntas, se conhecer melhor e cobrir os pontos cegos uma da outra.</p>
-                <PairBuilder rows={rows} />
+                <div className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Combinar grupos da equipe</h2></div>
+                <p className="text-sm text-muted-foreground">Monte cruzamentos personalizados com quantas colaboradoras quiser (sem limite). Veja como o grupo se complementa, onde pode atritar e como devem se organizar para trabalhar juntas.</p>
+                <GroupBuilder rows={rows} />
               </TabsContent>
 
               <TabsContent value="individual" className="space-y-4">
