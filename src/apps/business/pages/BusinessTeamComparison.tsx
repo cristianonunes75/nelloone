@@ -378,6 +378,102 @@ function getGroupSynergy(members: MemberProfile[]) {
   return { strengths, tensions, howToWork };
 }
 
+const ROLE_HINTS: Array<{ test: RegExp; label: string; tone: string }> = [
+  { test: /(ce[oa]|fundador|s[oó]ci|owner|diretor|head|gerente|gestor|supervisor|coordenador|l[ií]der)/i, label: 'gestão / liderança', tone: 'Como líder, sua leitura sobre o time vira decisão: contratação, alocação, feedback e clima.' },
+  { test: /(vended|comerc|consultor de vendas|atend)/i, label: 'vendas / atendimento', tone: 'O foco está no cliente, na meta e no ritmo do salão/loja.' },
+  { test: /(financ|administ|backoffice|fiscal|contas)/i, label: 'administrativo / financeiro', tone: 'Aqui pesa precisão, prazo e controle.' },
+  { test: /(operac|estoque|log[ií]stica|produç|manuten)/i, label: 'operação / rotina', tone: 'Aqui pesa constância, processo e cuidado com o detalhe.' },
+  { test: /(marketing|m[ií]dia|conte[uú]do|social)/i, label: 'marketing / comunicação', tone: 'Aqui pesa criatividade, vínculo com público e clareza de mensagem.' },
+];
+
+function describeRole(jobTitle: string | null) {
+  if (!jobTitle) return null;
+  const hit = ROLE_HINTS.find((r) => r.test.test(jobTitle));
+  return hit ? { label: hit.label, tone: hit.tone, raw: jobTitle } : { label: jobTitle.toLowerCase(), tone: '', raw: jobTitle };
+}
+
+function getLeaderToMemberReading(leader: MemberProfile, member: MemberProfile) {
+  const leaderFirst = getFirstName(leader.full_name);
+  const memberFirst = getFirstName(member.full_name);
+  const leaderRole = describeRole(leader.job_title);
+  const memberRole = describeRole(member.job_title);
+
+  const result = {
+    accessing: '' as string,
+    delegating: '' as string,
+    feedback: '' as string,
+    avoid: '' as string,
+    roleNote: null as string | null,
+    leaderNotice: null as string | null,
+    memberNotice: null as string | null,
+  };
+
+  if (!leader.job_title) {
+    result.leaderNotice = `Não há cargo cadastrado para ${leaderFirst}. A leitura abaixo considera apenas o perfil comportamental dela como gestora.`;
+  }
+  if (!member.job_title) {
+    result.memberNotice = `Não há cargo cadastrado para ${memberFirst}. A leitura abaixo considera apenas o perfil comportamental, sem ajustar por função.`;
+  } else if (leaderRole && memberRole) {
+    result.roleNote = `${leaderFirst} (${leaderRole.raw}) acessando ${memberFirst} (${memberRole.raw}). ${leaderRole.tone} ${memberRole.tone}`.trim();
+  }
+
+  if (member.journey_status === 'pending_invite') {
+    result.accessing = `${memberFirst} ainda não tem Código da Essência disponível. Por enquanto, ${leaderFirst} acessa ${memberFirst} pelo cargo e pelo histórico do dia a dia, sem leitura comportamental confirmada.`;
+    result.delegating = 'Use combinados explícitos e por escrito até que o Identity esteja completo.';
+    result.feedback = 'Faça check-ins curtos e observe reações para começar a mapear padrão.';
+    result.avoid = 'Evite supor estilo dela com base em uma única situação — peça que conclua a jornada para liberar a leitura completa.';
+    return result;
+  }
+
+  // ACCESSING — como a líder se aproxima dessa colaboradora específica
+  const lDisc = leader.discProfile;
+  const mDisc = member.discProfile;
+  const mTemp = member.temperamentProfile;
+
+  if (mDisc === 'D' || mTemp === 'colerico') {
+    result.accessing = `${memberFirst} responde melhor a quem chega direto, com objetivo claro e respeito à autonomia dela. ${leaderFirst}, vá ao ponto: contexto curto, decisão esperada, prazo. Ela perde paciência com rodeios e preâmbulos longos.`;
+    result.delegating = 'Delegue resultado, não passo a passo. Defina o quê e até quando; deixe o como com ela. Peça retorno por exceção (só se algo travar).';
+    result.feedback = 'Feedback objetivo, com fato + impacto + próximo passo. Evite suavizar demais — ela interpreta como falta de clareza. Reconheça resultado, não esforço genérico.';
+    result.avoid = 'Não microgerencie e não decida no lugar dela. Não chame para reuniões longas sem pauta. Não dê feedback emocional sem dado concreto.';
+  } else if (mDisc === 'I' || mTemp === 'sanguineo') {
+    result.accessing = `${memberFirst} responde a vínculo, presença e reconhecimento. ${leaderFirst}, abra a conversa pelo lado humano antes de entrar na tarefa. Ela rende mais quando se sente vista e parte do time.`;
+    result.delegating = 'Delegue mostrando o impacto da entrega nas pessoas (cliente, equipe). Combine prioridade clara e prazo curto, porque ela tende a abrir várias frentes ao mesmo tempo.';
+    result.feedback = 'Feedback frequente e específico. Reconheça em público quando puder; corrija em particular. Use exemplos concretos, evite generalizar ("você sempre…").';
+    result.avoid = 'Não a deixe muito tempo sem retorno — o silêncio dela vira insegurança. Não corrija em frente à equipe. Não a coloque só em tarefa solitária e repetitiva.';
+  } else if (mDisc === 'S' || mTemp === 'fleumatico') {
+    result.accessing = `${memberFirst} responde a estabilidade, segurança e previsibilidade. ${leaderFirst}, fale com calma, dê contexto antes de pedir mudança e dê tempo para ela processar. Ela costuma silenciar em vez de discordar — pergunte o que está pensando.`;
+    result.delegating = 'Delegue com clareza de processo e prazo realista. Mudanças bruscas travam o ritmo dela; antecipe combinados. Reforce que ela pode pedir ajuda sem julgamento.';
+    result.feedback = 'Feedback em ambiente reservado, com tom firme mas acolhedor. Pergunte o que ela pensa antes de concluir. Reconheça a constância dela, não só os picos.';
+    result.avoid = 'Não pressione no impulso, não mude regra do dia para a noite, não interprete o silêncio como concordância. Evite expor publicamente.';
+  } else if (mDisc === 'C' || mTemp === 'melancolico') {
+    result.accessing = `${memberFirst} responde a clareza, padrão e justiça. ${leaderFirst}, traga referência do que se espera ("o padrão é assim, com este nível de detalhe"). Ela precisa entender o critério antes de executar.`;
+    result.delegating = 'Delegue com checklist, exemplo do resultado esperado e prazo. Evite ambiguidade. Permita perguntas — ela costuma ter muitas no início e poucas depois.';
+    result.feedback = 'Feedback específico, com fato e dado. Crítica genérica é interpretada como ataque pessoal. Reconheça precisão e zelo, não só velocidade.';
+    result.avoid = 'Não dê feedback vago, não mude o critério no meio do caminho, não a apresse em decisões sem informação. Cuidado com piadas sobre perfeccionismo.';
+  } else {
+    result.accessing = `${memberFirst} ainda tem dados parciais no Identity. ${leaderFirst}, use os mapas disponíveis como sinal e observe o dia a dia para ajustar a abordagem.`;
+    result.delegating = 'Combine objetivo claro e prazo, e ajuste depois conforme o retorno dela.';
+    result.feedback = 'Faça feedback frequente e curto até ter mais leitura comportamental.';
+    result.avoid = 'Evite assumir estilo sem dado — peça que conclua os mapas que faltam.';
+  }
+
+  // Camada da líder — ajuste pelo perfil DELA
+  if (lDisc === 'D' && (mDisc === 'S' || mDisc === 'C')) {
+    result.avoid += ` Cuidado: como ${leaderFirst} é mais direta, o tom pode soar duro para ${memberFirst}. Reduza ritmo no início da conversa.`;
+  }
+  if (lDisc === 'I' && (mDisc === 'C' || mTemp === 'melancolico')) {
+    result.avoid += ` Cuidado: o estilo mais expansivo de ${leaderFirst} pode parecer pouco estruturado para ${memberFirst}. Traga dado e exemplo, não só entusiasmo.`;
+  }
+  if (lDisc === 'C' && (mDisc === 'I' || mTemp === 'sanguineo')) {
+    result.avoid += ` Cuidado: ${leaderFirst} tende a focar no padrão; ${memberFirst} precisa também de vínculo. Reserve espaço para conversa humana antes da correção.`;
+  }
+  if (lDisc === 'S' && (mDisc === 'D' || mTemp === 'colerico')) {
+    result.avoid += ` Cuidado: ${leaderFirst} costuma evitar conflito; ${memberFirst} precisa de posicionamento claro. Não suavize a ponto de virar ambiguidade.`;
+  }
+
+  return result;
+}
+
 function getDataNotice(row: MemberProfile) {
   if (row.journey_status === 'pending_invite') {
     return `Não há Código da Essência disponível para ${getFirstName(row.full_name)} no Identity. Ela ainda não acessou ou aceitou o convite da equipe, por isso não há dados corporativos compartilhados.`;
