@@ -899,14 +899,19 @@ function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
   const keyOf = (row: MemberProfile) => row.user_id || row.full_name;
 
   const [selected, setSelected] = useState<string[]>([]);
-  const [groups, setGroups] = useState<Array<{ id: string; memberKeys: string[] }>>([]);
+  const [leaderKey, setLeaderKey] = useState<string>('');
+  const [groups, setGroups] = useState<Array<{ id: string; memberKeys: string[]; leaderKey: string | null }>>([]);
 
   const toggle = (key: string) => {
-    setSelected((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
+    setSelected((prev) => {
+      const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
+      if (!next.includes(leaderKey)) setLeaderKey('');
+      return next;
+    });
   };
 
   const selectAll = () => setSelected(eligible.map(keyOf));
-  const clearSelection = () => setSelected([]);
+  const clearSelection = () => { setSelected([]); setLeaderKey(''); };
 
   const buildGroup = () => {
     if (selected.length < 2) {
@@ -914,12 +919,11 @@ function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
       return;
     }
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    setGroups((prev) => [{ id, memberKeys: [...selected] }, ...prev]);
-    setSelected([]);
+    setGroups((prev) => [{ id, memberKeys: [...selected], leaderKey: leaderKey || null }, ...prev]);
+    setSelected([]); setLeaderKey('');
   };
 
   const removeGroup = (id: string) => setGroups((prev) => prev.filter((g) => g.id !== id));
-
   const findRow = (key: string) => eligible.find((row) => keyOf(row) === key);
 
   return (
@@ -927,34 +931,42 @@ function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base"><UserPlus className="h-4 w-4 text-primary" /> Montar cruzamento entre colaboradoras</CardTitle>
-          <CardDescription>Selecione quantas colaboradoras quiser (sem limite) e veja como esse grupo funciona junto: onde se complementam, onde podem atritar e como devem se organizar.</CardDescription>
+          <CardDescription>Selecione quantas colaboradoras quiser (sem limite). Opcionalmente, marque uma delas como líder do grupo — o sistema gera leitura individual de como ela acessa cada uma das outras.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <Button variant="outline" size="sm" onClick={selectAll} disabled={!eligible.length}>Selecionar todas</Button>
             <Button variant="ghost" size="sm" onClick={clearSelection} disabled={!selected.length}>Limpar</Button>
-            <span className="text-muted-foreground">{selected.length} selecionada(s)</span>
+            <span className="text-muted-foreground">{selected.length} selecionada(s){leaderKey && findRow(leaderKey) ? ` · líder: ${getFirstName(findRow(leaderKey)!.full_name)}` : ''}</span>
           </div>
 
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {eligible.map((row) => {
               const k = keyOf(row);
               const isOn = selected.includes(k);
+              const isLeader = leaderKey === k;
               return (
-                <button
-                  type="button"
-                  key={k}
-                  onClick={() => toggle(k)}
-                  className={`flex items-start gap-2 rounded-lg border p-2 text-left text-sm transition-colors ${isOn ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/40'}`}
-                >
-                  <div className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${isOn ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40'}`}>
-                    {isOn && <CheckCircle2 className="h-3 w-3" />}
-                  </div>
-                  <div>
-                    <p className="font-medium leading-tight">{row.full_name}</p>
-                    <p className="text-xs text-muted-foreground">{row.leadershipMode || 'Sem modo definido'}</p>
-                  </div>
-                </button>
+                <div key={k} className={`flex items-start gap-2 rounded-lg border p-2 text-sm transition-colors ${isOn ? 'border-primary bg-primary/5' : 'border-border'}`}>
+                  <button type="button" onClick={() => toggle(k)} className="flex flex-1 items-start gap-2 text-left">
+                    <div className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${isOn ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40'}`}>
+                      {isOn && <CheckCircle2 className="h-3 w-3" />}
+                    </div>
+                    <div>
+                      <p className="font-medium leading-tight">{row.full_name}</p>
+                      <p className="text-xs text-muted-foreground">{row.job_title || row.leadershipMode || 'Sem cargo'}</p>
+                    </div>
+                  </button>
+                  {isOn && (
+                    <button
+                      type="button"
+                      onClick={() => setLeaderKey(isLeader ? '' : k)}
+                      title={isLeader ? 'Remover como líder' : 'Marcar como líder do grupo'}
+                      className={`shrink-0 rounded-md border p-1 transition-colors ${isLeader ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30 text-muted-foreground hover:bg-muted/50'}`}
+                    >
+                      <Crown className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
               );
             })}
           </div>
@@ -969,6 +981,8 @@ function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
       {groups.map((group) => {
         const members = group.memberKeys.map(findRow).filter(Boolean) as MemberProfile[];
         if (members.length < 2) return null;
+        const leader = group.leaderKey ? members.find((m) => keyOf(m) === group.leaderKey) || null : null;
+        const liderados = leader ? members.filter((m) => keyOf(m) !== keyOf(leader)) : [];
         const synergy = getGroupSynergy(members);
         return (
           <Card key={group.id} className="border-primary/20">
@@ -976,34 +990,50 @@ function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <Sparkles className="h-4 w-4 text-primary" /> Grupo de {members.length} colaboradoras
+                    <Sparkles className="h-4 w-4 text-primary" /> {leader ? `${getFirstName(leader.full_name)} liderando ${members.length - 1}` : `Grupo de ${members.length} colaboradoras`}
                   </CardTitle>
                   <CardDescription className="mt-1">
-                    {members.map((m) => m.full_name).join(' • ')}
+                    {leader && <span className="font-medium text-foreground">👑 {leader.full_name}{leader.job_title ? ` (${leader.job_title})` : ''} → </span>}
+                    {(leader ? liderados : members).map((m) => m.full_name).join(' • ')}
                   </CardDescription>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => removeGroup(group.id)} className="gap-1 text-muted-foreground"><X className="h-3 w-3" /> Remover</Button>
               </div>
             </CardHeader>
-            <CardContent className="grid gap-3 lg:grid-cols-3">
-              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
-                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Onde se fortalecem</div>
-                <ul className="space-y-1.5 text-sm text-muted-foreground">
-                  {synergy.strengths.length ? synergy.strengths.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Sem sinergia clara identificada nos dados disponíveis.</li>}
-                </ul>
+            <CardContent className="space-y-4">
+              <div className="grid gap-3 lg:grid-cols-3">
+                <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
+                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Onde se fortalecem</div>
+                  <ul className="space-y-1.5 text-sm text-muted-foreground">
+                    {synergy.strengths.length ? synergy.strengths.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Sem sinergia clara identificada nos dados disponíveis.</li>}
+                  </ul>
+                </div>
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><AlertCircle className="h-4 w-4 text-amber-600" /> Pontos de atrito</div>
+                  <ul className="space-y-1.5 text-sm text-muted-foreground">
+                    {synergy.tensions.length ? synergy.tensions.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Sem pontos críticos identificados nos dados disponíveis.</li>}
+                  </ul>
+                </div>
+                <div className="rounded-lg border p-3">
+                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><HeartHandshake className="h-4 w-4 text-primary" /> Como podem trabalhar juntas</div>
+                  <ul className="space-y-1.5 text-sm text-muted-foreground">
+                    {synergy.howToWork.length ? synergy.howToWork.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Combinem papéis claros e revisem juntas a cada semana.</li>}
+                  </ul>
+                </div>
               </div>
-              <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
-                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><AlertCircle className="h-4 w-4 text-amber-600" /> Pontos de atrito</div>
-                <ul className="space-y-1.5 text-sm text-muted-foreground">
-                  {synergy.tensions.length ? synergy.tensions.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Sem pontos críticos identificados nos dados disponíveis.</li>}
-                </ul>
-              </div>
-              <div className="rounded-lg border p-3">
-                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><HeartHandshake className="h-4 w-4 text-primary" /> Como podem trabalhar juntas</div>
-                <ul className="space-y-1.5 text-sm text-muted-foreground">
-                  {synergy.howToWork.length ? synergy.howToWork.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Combinem papéis claros e revisem juntas a cada semana.</li>}
-                </ul>
-              </div>
+
+              {leader && liderados.length > 0 && (
+                <div className="space-y-3 rounded-lg border border-primary/30 bg-primary/5 p-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                    <Crown className="h-4 w-4 text-primary" /> Liderança 1:1 — como {getFirstName(leader.full_name)} acessa cada uma
+                  </div>
+                  <div className="grid gap-3 xl:grid-cols-2">
+                    {liderados.map((m) => (
+                      <OneOnOneCard key={keyOf(m)} leader={leader} member={m} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         );
