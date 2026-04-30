@@ -305,6 +305,47 @@ export function TeamMembersSection() {
           </div>
         )}
       </CardContent>
+
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar dados de {editing?.profile?.full_name || 'membro'}</DialogTitle>
+            <DialogDescription>
+              Atualize manualmente o cargo e o departamento. Quando a pessoa concluir o mapa de essência, esses dados continuam sendo respeitados.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-job-title">Cargo</Label>
+              <Input
+                id="edit-job-title"
+                value={editJobTitle}
+                onChange={(e) => setEditJobTitle(e.target.value.slice(0, 120))}
+                placeholder="Ex: Vendedora, Supervisora, Sócio"
+                maxLength={120}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-department">Departamento</Label>
+              <Input
+                id="edit-department"
+                value={editDepartment}
+                onChange={(e) => setEditDepartment(e.target.value.slice(0, 120))}
+                placeholder="Ex: Vendas, Operações, Diretoria"
+                maxLength={120}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setEditing(null)} disabled={isSaving}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveEdit} disabled={isSaving}>
+              {isSaving ? 'Salvando...' : 'Salvar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
