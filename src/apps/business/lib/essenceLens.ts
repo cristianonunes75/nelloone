@@ -268,6 +268,11 @@ export type WorkLensBlocks = {
   clientConnection: string[];
   activePresence: { receive: string[]; give: string[] };
   clientAffinity: { flowsWith: string[]; asksAwareness: string[] };
+  // cenas e liderança
+  storeDayScenes: string[];
+  awarenessScenes: string[];
+  leadershipActions: string[]; // só preenchido se cargo = liderança
+  isLeadership: boolean;
 };
 
 function buildPresentation(snap: EssenceSnapshot, ctx: string): string[] {
