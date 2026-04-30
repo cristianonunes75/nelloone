@@ -135,6 +135,33 @@ export function TeamMembersSection() {
     }
   };
 
+  const openEdit = (member: TeamMember) => {
+    setEditing(member);
+    setEditJobTitle(member.job_title ?? '');
+    setEditDepartment(member.department ?? '');
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editing) return;
+    setIsSaving(true);
+    try {
+      const { error } = await supabase.rpc('update_company_user_basics', {
+        _company_user_id: editing.id,
+        _job_title: editJobTitle,
+        _department: editDepartment,
+      });
+      if (error) throw error;
+      toast.success('Dados atualizados');
+      setEditing(null);
+      fetchMembers();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || 'Erro ao salvar');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const filteredMembers = members.filter(member =>
     member.profile?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     member.role.toLowerCase().includes(searchTerm.toLowerCase())
