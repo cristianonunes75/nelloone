@@ -31,6 +31,14 @@ export const GENTLE_VOCABULARY = {
   avoidEarly: 'O que evitar nos primeiros contatos',
   bridge: 'Ponte natural entre vocês',
 
+  // 1:1 cruzado gestor ↔ colaboradora
+  leaderOneOnOne: 'Gestor 1:1 — como VOCÊ acessa melhor esta pessoa',
+  leaderBridge: 'Onde o seu jeito encontra o dela',
+  leaderFriction: 'Onde o seu jeito pode pegar nela',
+  leaderAdaptPresence: 'Como adaptar a sua presença com ela',
+  leaderHowFeedback: 'Como dar feedback pra ela (do seu jeito)',
+  leaderHowRecognize: 'Como reconhecer e cuidar dela no trabalho',
+
   // estados
   privateProfile: 'Perfil privado',
   phaseAnchor:

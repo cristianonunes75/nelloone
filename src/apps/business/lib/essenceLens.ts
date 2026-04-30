@@ -633,6 +633,160 @@ export function buildTeammateDeepConnect(
   return { openConversation, showCare, avoidEarly, bridge, managementTip };
 }
 
+// =================== Leitura cruzada Gestor ↔ Colaboradora ===================
+
+export type LeaderOneOnOneLens = {
+  bridge: string;        // onde o jeito de vocês se encontra
+  friction: string;      // onde o seu jeito naturalmente colide com o dela
+  adaptPresence: string[]; // 2-3 ajustes concretos de presença
+  howFeedback: string;   // feedback cruzado: seu DISC + estilo de conexão dela
+  howRecognize: string;  // como reconhecer/cuidar usando o estilo dela filtrado pelo seu
+};
+
+const DISC_LABEL: Record<'D' | 'I' | 'S' | 'C', string> = {
+  D: 'direção e ritmo rápido',
+  I: 'vínculo e energia',
+  S: 'constância e cuidado estável',
+  C: 'critério e precisão',
+};
+
+function discBridgeNote(self: 'D' | 'I' | 'S' | 'C', other: 'D' | 'I' | 'S' | 'C'): string {
+  if (self === other) {
+    return `Vocês duas funcionam por ${DISC_LABEL[self]}. Isso facilita entender, mas pode amplificar pontos cegos comuns — combine quem segura o lado oposto.`;
+  }
+  // pares clássicos
+  const pair = `${self}${other}`;
+  switch (pair) {
+    case 'DI': case 'ID':
+      return 'Você (direção) com ela (vínculo) formam um par natural: você abre caminho, ela abre porta com cliente. A ponte aparece quando você freia 1 instante para ela contar como leu o ambiente.';
+    case 'DS': case 'SD':
+      return 'Seu ritmo (rápido, decidido) é muito mais alto que o dela (estável, cuidadosa). A ponte é dar **previsibilidade**: ela rende o seu melhor sabendo o que vem antes de acontecer.';
+    case 'DC': case 'CD':
+      return 'Vocês têm objetivo em comum (entrega), mas caminhos opostos: você quer rápido, ela quer certo. A ponte é combinar **o critério antes**, não corrigir depois.';
+    case 'IS': case 'SI':
+      return 'Vocês têm o eixo do cuidado em comum — você no calor, ela na constância. A ponte é você não confundir o silêncio dela com desinteresse.';
+    case 'IC': case 'CI':
+      return 'Sua energia abre a sala; o critério dela ancora a entrega. A ponte é você trazer a ideia, e dar a ela tempo de revisar antes de decidir junto.';
+    case 'SC': case 'CS':
+      return 'Vocês compartilham o cuidado e a profundidade. A ponte é não deixar nenhuma das duas silenciar incômodo — combinem 1 momento na semana só para falar o que está pesando.';
+    default:
+      return 'Com convivência, a forma natural de vocês se complementarem aparece.';
+  }
+}
+
+function discFrictionNote(self: 'D' | 'I' | 'S' | 'C', other: 'D' | 'I' | 'S' | 'C'): string {
+  if (self === 'D' && (other === 'S' || other === 'C'))
+    return 'Seu ritmo direto pode chegar como **pressão** ou **dureza** pra ela, mesmo que essa não seja sua intenção. O que pra você é eficiência, pra ela pode soar como falta de cuidado.';
+  if (self === 'D' && other === 'I')
+    return 'Você tende a cortar a conversa pra ir ao ponto — e ela precisa do vínculo antes do tema. Quando você atropela isso, ela perde energia.';
+  if (self === 'I' && (other === 'C' || other === 'S'))
+    return 'Sua energia alta e o jeito espontâneo podem invadir o espaço dela de processar. Ela pode ficar quieta — não é desinteresse, é **excesso de estímulo**.';
+  if (self === 'S' && (other === 'D' || other === 'I'))
+    return 'Sua tendência de evitar atrito pode atrasar uma conversa difícil que ela já está pedindo. Para ela, falta de retorno costuma pesar mais que feedback duro.';
+  if (self === 'C' && (other === 'I' || other === 'D'))
+    return 'Seu olhar de critério pode ser lido como **insatisfação silenciosa**. Quando você só aponta o que falta, ela ouve "nunca está bom".';
+  if (self === other)
+    return 'Por funcionarem parecido, vocês podem reforçar o mesmo ponto cego — combinem quem traz a perspectiva oposta nas decisões.';
+  return 'Quando vocês cansam, cada uma volta para o seu modo natural — e o que era complementar vira atrito. Pausa breve resolve a maioria.';
+}
+
+function adaptPresenceFor(self: 'D' | 'I' | 'S' | 'C', other: EssenceSnapshot): string[] {
+  const out: string[] = [];
+  const otherDisc = other.disc;
+  // Foco: o que VOCÊ (líder) precisa fazer diferente do seu padrão natural
+  if (self === 'D') {
+    if (otherDisc === 'S' || otherDisc === 'C')
+      out.push('**Desacelere o início** da conversa: 30 segundos de "como você está hoje?" reais, antes do tema.');
+    if (otherDisc === 'I')
+      out.push('**Abra pelo vínculo**, não pela tarefa. Pergunte de uma venda boa da semana antes de pedir a próxima.');
+    out.push('**Antes de corrigir, pergunte**: "me conta o que você já tentou?" — isso devolve protagonismo a ela.');
+    out.push('Troque "faz isso" por "como você faria isso?" — vai parecer pequeno pra você, mas muda o como ela escuta.');
+  } else if (self === 'I') {
+    if (otherDisc === 'C' || otherDisc === 'S')
+      out.push('**Baixe o volume e o ritmo**. Dê espaço de silêncio depois de perguntar — ela precisa de tempo para pensar.');
+    out.push('**Traga 1 dado concreto** quando for elogiar ou cobrar — sua energia já chega, a precisão é o que ela guarda.');
+    out.push('Resista à tentação de **decidir no impulso da conversa**. Combine: "vou pensar e te respondo amanhã."');
+  } else if (self === 'S') {
+    if (otherDisc === 'D')
+      out.push('**Seja mais direta** do que seu instinto pede. Para ela, rodeio é falta de respeito ao tempo.');
+    if (otherDisc === 'I')
+      out.push('Marque **conversa curta com horário definido** — evita que vocês duas posterguem o tema.');
+    out.push('**Não silencie incômodo seu**. Sua equipe te imita: se você adia, ela também adia.');
+    out.push('Comece pelo ponto difícil e termine pelo cuidado — não o contrário.');
+  } else if (self === 'C') {
+    if (otherDisc === 'I')
+      out.push('**Verbalize o que está bom** antes de apontar o que pode melhorar. Para ela, seu silêncio = insatisfação.');
+    if (otherDisc === 'S')
+      out.push('Traga **1 melhoria por vez**, não a lista inteira. Sobrecarga de critério apaga mesmo quem é dedicada.');
+    out.push('**Use exemplo concreto** ("naquela venda de quinta..."): seu jeito analítico precisa virar caso para ela aproveitar.');
+    out.push('Cuidado para o critério não virar **régua silenciosa**. Diga em voz alta o que você está observando.');
+  }
+  return out.slice(0, 3);
+}
+
+function howFeedbackFor(self: 'D' | 'I' | 'S' | 'C', other: EssenceSnapshot): string {
+  const otherStyle = (other.connectionStylePrimary || '').toLowerCase();
+  const otherDisc = other.disc;
+  const wantsWords = otherStyle.includes('palav') || otherStyle.includes('verb');
+  const wantsTime = otherStyle.includes('tempo') || otherStyle.includes('presen');
+  const wantsActs = otherStyle.includes('servi') || otherStyle.includes('atos') || otherStyle.includes('act');
+
+  let base = '';
+  if (self === 'D')
+    base = 'Você é direta — bom. Mas para ela, comece pelo **fato**, não pelo julgamento ("vi que na venda X aconteceu Y") e termine perguntando "como você viu isso?".';
+  else if (self === 'I')
+    base = 'Você naturalmente suaviza tudo. Para o feedback funcionar, **nomeie o ponto com clareza** uma vez, sem 5 elogios envolvendo, e depois sim acolha.';
+  else if (self === 'S')
+    base = 'Você adia o desconforto. Marque **horário curto e definido** (15 min), e abra direto: "vamos falar de uma coisa que precisa ajuste."';
+  else
+    base = 'Você tende a listar tudo o que viu. Para ela funcionar, escolha **1 ponto por conversa** com 1 exemplo concreto — não a auditoria.';
+
+  // ajuste pelo estilo de conexão dela
+  if (wantsWords) base += ' Use **palavras nominais e específicas** ("foi muito bom como você...") — é assim que reconhecimento chega nela.';
+  else if (wantsTime) base += ' Faça presencial, com tempo dedicado — não no corredor, não por mensagem.';
+  else if (wantsActs) base += ' Combine no mesmo encontro **um próximo passo concreto** — ela ouve o cuidado pelo gesto que vem depois.';
+
+  // ajuste pelo DISC dela
+  if (otherDisc === 'S' || otherDisc === 'C')
+    base += ' Dê espaço para ela processar — a resposta dela talvez chegue no dia seguinte, não na hora.';
+  return base;
+}
+
+function howRecognizeFor(self: 'D' | 'I' | 'S' | 'C', other: EssenceSnapshot, otherName: string): string {
+  const otherStyle = (other.connectionStylePrimary || '').toLowerCase();
+  const c = caringByStyle(other.connectionStylePrimary);
+  const baseGive = c
+    ? c.give
+    : 'reconhecendo o esforço dela com palavras simples e sinceras.';
+
+  let leaderPiece = '';
+  if (self === 'D')
+    leaderPiece = `Para você (que costuma esquecer de elogiar o que "já é obrigação"), reserve um momento na semana para falar com ${otherName} sobre algo específico que ela fez bem.`;
+  else if (self === 'I')
+    leaderPiece = `Você reconhece com naturalidade — só cuide para o elogio sair **nominal e específico**, não genérico ("equipe arrasou").`;
+  else if (self === 'S')
+    leaderPiece = `Seu canal mais forte é o 1:1. Marque 15 min individuais com ${otherName} por semana — é onde seu cuidado chega inteiro.`;
+  else
+    leaderPiece = `Você tende a só falar quando há ajuste. Faça o caminho contrário também: nomeie em voz alta o que ela faz bem, com a mesma precisão com que aponta o que falta.`;
+
+  return `${leaderPiece} O canal dela é cuidado ${baseGive}`;
+}
+
+export function buildLeaderOneOnOneLens(
+  self: EssenceSnapshot,
+  other: EssenceSnapshot,
+  otherFirstName: string,
+): LeaderOneOnOneLens | null {
+  if (!self.disc || !other.disc) return null; // precisa pelo menos do DISC dos dois
+  return {
+    bridge: discBridgeNote(self.disc, other.disc),
+    friction: discFrictionNote(self.disc, other.disc),
+    adaptPresence: adaptPresenceFor(self.disc, other),
+    howFeedback: howFeedbackFor(self.disc, other),
+    howRecognize: howRecognizeFor(self.disc, other, otherFirstName),
+  };
+}
+
 // Frase curta legada (mantida para compatibilidade com chamadas existentes)
 export function buildConnectFrase(otherFirstName: string, snap: EssenceSnapshot): string {
   if (snap.disc === 'D' || snap.temperament === 'colerico')
@@ -645,3 +799,4 @@ export function buildConnectFrase(otherFirstName: string, snap: EssenceSnapshot)
     return `${otherFirstName} aprecia clareza e critério — traga referência do que se espera e dê espaço para perguntas.`;
   return `${otherFirstName} ainda está construindo o Código dela. Por enquanto, se conectem pelo dia a dia.`;
 }
+

@@ -32,7 +32,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   buildWorkLens,
   buildTeammateDeepConnect,
+  buildLeaderOneOnOneLens,
   type EssenceSnapshot,
+  type LeaderOneOnOneLens,
 } from '../lib/essenceLens';
 import { GENTLE_VOCABULARY } from '../lib/gentleVocabulary';
 
@@ -421,6 +423,11 @@ function ColleagueCard({
     [snapshot, selfSnapshot, isPrivate, hasCode, selfIsLeadership, name],
   );
 
+  const leader1on1: LeaderOneOnOneLens | null = useMemo(() => {
+    if (!selfIsLeadership || !hasCode || isPrivate || !selfSnapshot) return null;
+    return buildLeaderOneOnOneLens(selfSnapshot, snapshot, getFirstName(name));
+  }, [selfIsLeadership, hasCode, isPrivate, selfSnapshot, snapshot, name]);
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -456,6 +463,59 @@ function ColleagueCard({
                 icon={<Briefcase className="w-3.5 h-3.5 text-amber-600" />}
                 label={GENTLE_VOCABULARY.managementTip}
                 text={connect.managementTip}
+              />
+            </div>
+          )}
+
+          {leader1on1 && (
+            <div className="mt-3 -mx-6 px-6 py-4 border-t bg-primary/5 space-y-3">
+              <div className="flex items-center gap-2">
+                <Crown className="w-4 h-4 text-primary" />
+                <p className="text-xs uppercase tracking-wider font-medium text-primary">
+                  {GENTLE_VOCABULARY.leaderOneOnOne}
+                </p>
+              </div>
+              <ConnectLine
+                icon={<Sparkles className="w-3.5 h-3.5 text-emerald-600" />}
+                label={GENTLE_VOCABULARY.leaderBridge}
+                text={leader1on1.bridge}
+              />
+              <ConnectLine
+                icon={<AlertCircle className="w-3.5 h-3.5 text-amber-600" />}
+                label={GENTLE_VOCABULARY.leaderFriction}
+                text={leader1on1.friction}
+              />
+              {leader1on1.adaptPresence.length > 0 && (
+                <div className="flex gap-2">
+                  <div className="mt-0.5 shrink-0">
+                    <Compass className="w-3.5 h-3.5 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
+                      {GENTLE_VOCABULARY.leaderAdaptPresence}
+                    </p>
+                    <ul className="space-y-1.5">
+                      {leader1on1.adaptPresence.map((item, i) => (
+                        <li
+                          key={i}
+                          dangerouslySetInnerHTML={{
+                            __html: '• ' + item.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'),
+                          }}
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+              <ConnectLine
+                icon={<Briefcase className="w-3.5 h-3.5 text-indigo-600" />}
+                label={GENTLE_VOCABULARY.leaderHowFeedback}
+                text={leader1on1.howFeedback}
+              />
+              <ConnectLine
+                icon={<HandHeart className="w-3.5 h-3.5 text-pink-500" />}
+                label={GENTLE_VOCABULARY.leaderHowRecognize}
+                text={leader1on1.howRecognize}
               />
             </div>
           )}
