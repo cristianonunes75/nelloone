@@ -798,6 +798,102 @@ function InfoTile({ label, value, detail }: { label: string; value: string; deta
   );
 }
 
+function OneOnOneCard({ leader, member }: { leader: MemberProfile; member: MemberProfile }) {
+  const reading = getLeaderToMemberReading(leader, member);
+  return (
+    <Card className={member.journey_status === 'pending_invite' ? 'border-dashed' : undefined}>
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <CardTitle className="text-base">{getFirstName(leader.full_name)} → {member.full_name}</CardTitle>
+            <CardDescription>
+              {[member.job_title || 'Sem cargo cadastrado', member.leadershipMode].filter(Boolean).join(' · ')}
+            </CardDescription>
+          </div>
+          <Badge variant="outline" className="gap-1">
+            {member.discProfile ? `DISC ${member.discProfile}` : 'Sem DISC'}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3 text-sm">
+        {(reading.leaderNotice || reading.memberNotice) && (
+          <div className="rounded-lg border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground space-y-1">
+            {reading.leaderNotice && <p className="flex items-start gap-2"><AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" /> {reading.leaderNotice}</p>}
+            {reading.memberNotice && <p className="flex items-start gap-2"><AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" /> {reading.memberNotice}</p>}
+          </div>
+        )}
+        {reading.roleNote && (
+          <div className="rounded-lg border bg-muted/20 p-3 text-xs text-muted-foreground">
+            <span className="font-semibold text-foreground">Cargo no cruzamento: </span>{reading.roleNote}
+          </div>
+        )}
+        <ReadingBlock icon={HeartHandshake} title="Como acessar" text={reading.accessing} />
+        <div className="grid gap-3 lg:grid-cols-2">
+          <ReadingBlock icon={Target} title="Como delegar" text={reading.delegating} />
+          <ReadingBlock icon={ClipboardCheck} title="Como dar feedback" text={reading.feedback} />
+        </div>
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+          <div className="mb-1 flex items-center gap-2 text-sm font-semibold text-foreground">
+            <AlertCircle className="h-4 w-4 text-amber-600" /> O que evitar
+          </div>
+          <p className="text-sm leading-relaxed text-muted-foreground">{reading.avoid}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function LeadershipOneOnOne({ rows }: { rows: MemberProfile[] }) {
+  const eligible = rows.filter((r) => r.user_id || r.full_name);
+  const keyOf = (r: MemberProfile) => r.user_id || r.full_name;
+  const [leaderKey, setLeaderKey] = useState<string>(() => {
+    const presumed = eligible.find((r) => /(ce[oa]|fundador|s[oó]ci|owner|diretor|head|gerente|gestor|supervisor|coordenador|l[ií]der)/i.test(r.job_title || '') || r.business_role === 'company_admin' || r.business_role === 'super_admin');
+    return presumed ? keyOf(presumed) : (eligible[0] ? keyOf(eligible[0]) : '');
+  });
+
+  const leader = eligible.find((r) => keyOf(r) === leaderKey);
+  const liderados = eligible.filter((r) => keyOf(r) !== leaderKey);
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base"><Crown className="h-4 w-4 text-primary" /> Quem está liderando?</CardTitle>
+          <CardDescription>Escolha a gestora (Lisa, você ou outra liderança). O sistema gera uma leitura individual de como ela acessa cada uma das outras colaboradoras, considerando perfil + cargo cadastrado em company_users.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-2 lg:max-w-md">
+            <Select value={leaderKey} onValueChange={setLeaderKey}>
+              <SelectTrigger><SelectValue placeholder="Selecionar gestora" /></SelectTrigger>
+              <SelectContent>
+                {eligible.map((r) => (
+                  <SelectItem key={keyOf(r)} value={keyOf(r)}>
+                    {r.full_name}{r.job_title ? ` · ${r.job_title}` : ' · sem cargo'}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {leader && !leader.job_title && (
+            <div className="flex items-start gap-2 rounded-lg border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>Não há cargo cadastrado para <strong>{leader.full_name}</strong> em company_users. A leitura usará apenas o perfil comportamental. Cadastre o cargo (ex: "Gerente", "CEO", "Supervisora") para refinar a análise gestor → liderado.</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {leader && (
+        <div className="grid gap-4 xl:grid-cols-2">
+          {liderados.map((m) => (
+            <OneOnOneCard key={keyOf(m)} leader={leader} member={m} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
   const eligible = rows.filter((row) => row.journey_status !== 'pending_invite');
   const keyOf = (row: MemberProfile) => row.user_id || row.full_name;
