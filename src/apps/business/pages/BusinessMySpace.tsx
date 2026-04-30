@@ -14,6 +14,10 @@ import {
   AlertCircle,
   ArrowDownToLine,
   ArrowUpFromLine,
+  Store,
+  Eye,
+  Crown,
+  Briefcase,
 } from 'lucide-react';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
