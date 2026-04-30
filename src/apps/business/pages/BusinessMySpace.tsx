@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { ExternalLink, Lock, Sparkles, Heart, Compass, Users, Shield } from 'lucide-react';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
+import { useAuth } from '@/hooks/useAuth';
 import { useMySpaceTeam } from '../hooks/useMySpaceTeam';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -36,7 +37,8 @@ function PrivacyCard() {
 }
 
 export default function BusinessMySpace() {
-  const { user, company } = useBusinessAuth();
+  const { company } = useBusinessAuth();
+  const { user } = useAuth();
   const { rows, self, isLoading } = useMySpaceTeam(company?.id);
 
   const firstName = useMemo(() => {
