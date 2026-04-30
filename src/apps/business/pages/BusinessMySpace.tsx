@@ -333,6 +333,7 @@ export default function BusinessMySpace() {
                     hasCode={c.has_essence_code}
                     snapshot={c.snapshot}
                     selfSnapshot={self?.snapshot ?? null}
+                    selfIsLeadership={lens?.isLeadership ?? false}
                   />
                 ))}
               </div>
