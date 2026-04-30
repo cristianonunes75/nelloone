@@ -10,6 +10,7 @@ import BusinessTeam from './pages/BusinessTeam';
 import BusinessSettings from './pages/BusinessSettings';
 import BusinessAcceptInvite from './pages/BusinessAcceptInvite';
 import BusinessCollaboratorRedirect from './pages/BusinessCollaboratorRedirect';
+import BusinessMySpace from './pages/BusinessMySpace';
 
 import BusinessHiringResults from './pages/BusinessHiringResults';
 import BusinessHiringAssessment from './pages/BusinessHiringAssessment';
@@ -140,7 +141,15 @@ export default function BusinessApp() {
       <Route path="/assessment/:token" element={<BusinessHiringAssessment />} />
       
       {/* Collaborator routes */}
-      <Route path="/my-journey" element={
+      <Route path="/my-space" element={
+        <BusinessProtectedRoute requiredRole="collaborator">
+          <BusinessMySpace />
+        </BusinessProtectedRoute>
+      } />
+      {/* Legacy redirect */}
+      <Route path="/my-journey" element={<Navigate to="/my-space" replace />} />
+      {/* Old fallback (kept for users that still need to redirect to /cliente) */}
+      <Route path="/identity-redirect" element={
         <BusinessProtectedRoute requiredRole="collaborator">
           <BusinessCollaboratorRedirect />
         </BusinessProtectedRoute>
