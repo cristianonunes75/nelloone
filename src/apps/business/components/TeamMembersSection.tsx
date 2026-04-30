@@ -8,8 +8,18 @@ import {
   MoreHorizontal,
   Mail,
   Trash2,
-  UserPlus
+  UserPlus,
+  Pencil
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,10 +63,14 @@ interface TeamMember {
 }
 
 export function TeamMembersSection() {
-  const { company } = useBusinessAuth();
+  const { company, isCompanyAdmin } = useBusinessAuth();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [editing, setEditing] = useState<TeamMember | null>(null);
+  const [editJobTitle, setEditJobTitle] = useState('');
+  const [editDepartment, setEditDepartment] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (company) {
@@ -118,6 +132,33 @@ export function TeamMembersSection() {
       fetchMembers();
     } catch (error) {
       toast.error('Erro ao remover membro');
+    }
+  };
+
+  const openEdit = (member: TeamMember) => {
+    setEditing(member);
+    setEditJobTitle(member.job_title ?? '');
+    setEditDepartment(member.department ?? '');
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editing) return;
+    setIsSaving(true);
+    try {
+      const { error } = await supabase.rpc('update_company_user_basics', {
+        _company_user_id: editing.id,
+        _job_title: editJobTitle,
+        _department: editDepartment,
+      });
+      if (error) throw error;
+      toast.success('Dados atualizados');
+      setEditing(null);
+      fetchMembers();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || 'Erro ao salvar');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -205,6 +246,8 @@ export function TeamMembersSection() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome</TableHead>
+                  <TableHead>Cargo</TableHead>
+                  <TableHead>Departamento</TableHead>
                   <TableHead>Função</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Desde</TableHead>
@@ -216,6 +259,12 @@ export function TeamMembersSection() {
                   <TableRow key={member.id}>
                     <TableCell className="font-medium">
                       {member.profile?.full_name || 'Nome não disponível'}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {member.job_title || <span className="text-muted-foreground">—</span>}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {member.department || <span className="text-muted-foreground">—</span>}
                     </TableCell>
                     <TableCell>{getRoleBadge(member.role)}</TableCell>
                     <TableCell>{getStatusBadge(member)}</TableCell>
@@ -233,6 +282,12 @@ export function TeamMembersSection() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          {isCompanyAdmin && (
+                            <DropdownMenuItem onClick={() => openEdit(member)}>
+                              <Pencil className="w-4 h-4 mr-2" />
+                              Editar cargo / departamento
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem 
                             onClick={() => handleRemoveMember(member.id)}
                             className="text-destructive"
@@ -250,6 +305,47 @@ export function TeamMembersSection() {
           </div>
         )}
       </CardContent>
+
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar dados de {editing?.profile?.full_name || 'membro'}</DialogTitle>
+            <DialogDescription>
+              Atualize manualmente o cargo e o departamento. Quando a pessoa concluir o mapa de essência, esses dados continuam sendo respeitados.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-job-title">Cargo</Label>
+              <Input
+                id="edit-job-title"
+                value={editJobTitle}
+                onChange={(e) => setEditJobTitle(e.target.value.slice(0, 120))}
+                placeholder="Ex: Vendedora, Supervisora, Sócio"
+                maxLength={120}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-department">Departamento</Label>
+              <Input
+                id="edit-department"
+                value={editDepartment}
+                onChange={(e) => setEditDepartment(e.target.value.slice(0, 120))}
+                placeholder="Ex: Vendas, Operações, Diretoria"
+                maxLength={120}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setEditing(null)} disabled={isSaving}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveEdit} disabled={isSaving}>
+              {isSaving ? 'Salvando...' : 'Salvar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

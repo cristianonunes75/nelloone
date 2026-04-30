@@ -7699,6 +7699,14 @@ export type Database = {
         Args: { _token: string }
         Returns: boolean
       }
+      update_company_user_basics: {
+        Args: {
+          _company_user_id: string
+          _department: string
+          _job_title: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       admin_permission_level:
