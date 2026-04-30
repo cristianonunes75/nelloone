@@ -900,7 +900,7 @@ export default function BusinessTeamComparison() {
                 <TabsTrigger value="resumo">Resumo</TabsTrigger>
                 <TabsTrigger value="times">Times</TabsTrigger>
                 <TabsTrigger value="cruzamentos">Cruzamentos</TabsTrigger>
-                <TabsTrigger value="combinar">Combinar duplas</TabsTrigger>
+                <TabsTrigger value="combinar">Combinar grupos</TabsTrigger>
                 <TabsTrigger value="individual">Individual</TabsTrigger>
               </TabsList>
 
