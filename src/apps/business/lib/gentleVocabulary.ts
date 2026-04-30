@@ -71,3 +71,24 @@ export function categorizeRole(jobTitle: string | null | undefined): RoleCategor
   if (/(marketing|m[ií]dia|conte[uú]do|social)/i.test(t)) return 'marketing';
   return 'unknown';
 }
+
+/**
+ * Hierarquia leve para decidir quem pode ler 1:1 sobre quem.
+ * Quanto maior o número, mais sênior.
+ *
+ * - 3 = sócio/CEO/fundador/diretor (topo da empresa)
+ * - 2 = gerente/gestor/head/coordenador (liderança intermediária)
+ * - 1 = supervisor/líder de equipe
+ * - 0 = colaborador / sem cargo informado
+ *
+ * Regra: o card "Gestor 1:1" só aparece quando o leitor tem rank
+ * ESTRITAMENTE maior que o colega que ele está olhando.
+ */
+export function getLeadershipRank(jobTitle: string | null | undefined): number {
+  if (!jobTitle) return 0;
+  const t = jobTitle.toLowerCase();
+  if (/(ce[oa]|fundador|s[oó]ci|owner|presidente|diretor)/i.test(t)) return 3;
+  if (/(head|gerente|gestor|coordenador)/i.test(t)) return 2;
+  if (/(supervisor|l[ií]der)/i.test(t)) return 1;
+  return 0;
+}
