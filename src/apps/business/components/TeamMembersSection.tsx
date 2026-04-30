@@ -246,6 +246,8 @@ export function TeamMembersSection() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome</TableHead>
+                  <TableHead>Cargo</TableHead>
+                  <TableHead>Departamento</TableHead>
                   <TableHead>Função</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Desde</TableHead>
@@ -257,6 +259,12 @@ export function TeamMembersSection() {
                   <TableRow key={member.id}>
                     <TableCell className="font-medium">
                       {member.profile?.full_name || 'Nome não disponível'}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {member.job_title || <span className="text-muted-foreground">—</span>}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {member.department || <span className="text-muted-foreground">—</span>}
                     </TableCell>
                     <TableCell>{getRoleBadge(member.role)}</TableCell>
                     <TableCell>{getStatusBadge(member)}</TableCell>
@@ -274,6 +282,12 @@ export function TeamMembersSection() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          {isCompanyAdmin && (
+                            <DropdownMenuItem onClick={() => openEdit(member)}>
+                              <Pencil className="w-4 h-4 mr-2" />
+                              Editar cargo / departamento
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem 
                             onClick={() => handleRemoveMember(member.id)}
                             className="text-destructive"
