@@ -63,10 +63,14 @@ interface TeamMember {
 }
 
 export function TeamMembersSection() {
-  const { company } = useBusinessAuth();
+  const { company, isCompanyAdmin } = useBusinessAuth();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [editing, setEditing] = useState<TeamMember | null>(null);
+  const [editJobTitle, setEditJobTitle] = useState('');
+  const [editDepartment, setEditDepartment] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (company) {
