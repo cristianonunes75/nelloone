@@ -36,7 +36,7 @@ import {
   type EssenceSnapshot,
   type LeaderOneOnOneLens,
 } from '../lib/essenceLens';
-import { GENTLE_VOCABULARY } from '../lib/gentleVocabulary';
+import { GENTLE_VOCABULARY, getLeadershipRank } from '../lib/gentleVocabulary';
 
 function getFirstName(name: string) {
   return name.split(' ')[0] || name;
@@ -335,7 +335,7 @@ export default function BusinessMySpace() {
                     hasCode={c.has_essence_code}
                     snapshot={c.snapshot}
                     selfSnapshot={self?.snapshot ?? null}
-                    selfIsLeadership={lens?.isLeadership ?? false}
+                    selfJobTitle={self?.job_title ?? null}
                   />
                 ))}
               </div>
@@ -402,7 +402,7 @@ function ColleagueCard({
   hasCode,
   snapshot,
   selfSnapshot,
-  selfIsLeadership,
+  selfJobTitle,
 }: {
   name: string;
   jobTitle: string | null;
@@ -410,23 +410,30 @@ function ColleagueCard({
   hasCode: boolean;
   snapshot: EssenceSnapshot;
   selfSnapshot: EssenceSnapshot | null;
-  selfIsLeadership: boolean;
+  selfJobTitle: string | null;
 }) {
+  // Hierarquia real: o card 1:1 só aparece se o leitor for ESTRITAMENTE
+  // mais sênior que o colega (ex.: Sócia lendo Supervisora ✓; Supervisora
+  // lendo Sócia ✗; Supervisora lendo Vendedora ✓).
+  const selfRank = getLeadershipRank(selfJobTitle);
+  const otherRank = getLeadershipRank(jobTitle);
+  const canRead1on1 = selfRank > 0 && selfRank > otherRank;
+
   const connect = useMemo(
     () =>
       !isPrivate && hasCode
         ? buildTeammateDeepConnect(snapshot, selfSnapshot, {
-            selfIsLeadership,
+            selfIsLeadership: canRead1on1,
             otherFirstName: getFirstName(name),
           })
         : null,
-    [snapshot, selfSnapshot, isPrivate, hasCode, selfIsLeadership, name],
+    [snapshot, selfSnapshot, isPrivate, hasCode, canRead1on1, name],
   );
 
   const leader1on1: LeaderOneOnOneLens | null = useMemo(() => {
-    if (!selfIsLeadership || !hasCode || isPrivate || !selfSnapshot) return null;
+    if (!canRead1on1 || !hasCode || isPrivate || !selfSnapshot) return null;
     return buildLeaderOneOnOneLens(selfSnapshot, snapshot, getFirstName(name));
-  }, [selfIsLeadership, hasCode, isPrivate, selfSnapshot, snapshot, name]);
+  }, [canRead1on1, hasCode, isPrivate, selfSnapshot, snapshot, name]);
 
   return (
     <Card>
