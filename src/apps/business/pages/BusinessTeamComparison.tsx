@@ -270,6 +270,115 @@ function getGrowthReading(row: MemberProfile) {
   return 'Pode contribuir mais como guardiã de qualidade, organização e critério. É útil para conferir processos, reduzir erros, estruturar padrão de atendimento, cuidar de detalhes e preservar consistência. O ponto de desenvolvimento é não deixar excesso de análise, medo de errar ou perfeccionismo atrasarem decisões simples.';
 }
 
+function getRiskReading(row: MemberProfile): string[] {
+  const first = getFirstName(row.full_name);
+  const risks: string[] = [];
+  if (row.journey_status === 'pending_invite') {
+    return [`Sem dados do Identity, qualquer leitura de risco para ${first} seria suposição. Conclua o acesso para liberar essa análise.`];
+  }
+  if (row.discProfile === 'D' || row.temperamentProfile === 'colerico') {
+    risks.push('Pode ser percebida como dura, impaciente ou autoritária quando cobra ritmo sem cuidar do tom.');
+    risks.push('Tende a passar por cima de combinados quando sente que a decisão está demorando.');
+    risks.push('Pode entrar em conflito com colegas mais lentas ou mais detalhistas se não houver mediação.');
+  }
+  if (row.discProfile === 'I' || row.temperamentProfile === 'sanguineo') {
+    risks.push('Pode dispersar foco, começar várias tarefas e não fechar o que é prioridade.');
+    risks.push('Tende a oscilar humor conforme o clima da equipe e a precisar de muito reconhecimento.');
+    risks.push('Pode falar demais em momentos sensíveis ou compartilhar informação sem filtro.');
+  }
+  if (row.discProfile === 'S' || row.temperamentProfile === 'fleumatico') {
+    risks.push('Pode silenciar incômodos até acumular ressentimento ou pedir desligamento sem aviso prévio.');
+    risks.push('Resiste a mudanças repentinas; pode travar quando o processo muda sem explicação.');
+    risks.push('Tende a aceitar sobrecarga para evitar conflito, o que afeta saúde e qualidade no longo prazo.');
+  }
+  if (row.discProfile === 'C' || row.temperamentProfile === 'melancolico') {
+    risks.push('Perfeccionismo pode travar entregas e gerar autocrítica excessiva diante de erros.');
+    risks.push('Sensível a cobranças vagas; interpreta feedback genérico como crítica pessoal.');
+    risks.push('Pode adiar decisões esperando 100% de informação e atrasar respostas a clientes.');
+  }
+  if (row.enneagramType) {
+    risks.push(`Eneagrama tipo ${row.enneagramType}: observe os gatilhos típicos desse padrão (medo central e mecanismo de defesa) em momentos de pressão.`);
+  }
+  if (!risks.length) {
+    risks.push(`Há poucos dados sobre ${first} para mapear pontos de atenção com segurança. Use o que já existe como sinal e complete a jornada para uma leitura mais precisa.`);
+  }
+  return risks.slice(0, 5);
+}
+
+function getPairSynergy(a: MemberProfile, b: MemberProfile) {
+  const firstA = getFirstName(a.full_name);
+  const firstB = getFirstName(b.full_name);
+  const modeA = a.leadershipMode;
+  const modeB = b.leadershipMode;
+  const sameMode = modeA === modeB;
+
+  const strengths: string[] = [];
+  const tensions: string[] = [];
+  const howToWork: string[] = [];
+
+  if (sameMode) {
+    strengths.push(`${firstA} e ${firstB} compartilham o modo "${modeA}", o que gera linguagem comum e velocidade de decisão entre elas.`);
+    tensions.push(`O risco é reforçarem o mesmo ponto cego: ambas tendem a reagir do mesmo jeito sob pressão e podem deixar lacunas que outra dupla cobriria naturalmente.`);
+  } else {
+    strengths.push(`A combinação ${modeA} + ${modeB} é complementar: uma puxa o que a outra não vê primeiro.`);
+  }
+
+  // Specific pair logic
+  const pair = `${modeA}|${modeB}`;
+  const inverse = `${modeB}|${modeA}`;
+  const has = (p: string) => pair === p || inverse === p;
+
+  if (has('Direção|Conexão')) {
+    strengths.push('Direção fecha venda e bate meta; Conexão acolhe cliente e mantém vínculo após a compra.');
+    tensions.push('Direção pode atropelar o tempo de Conexão; Conexão pode achar Direção fria ou apressada.');
+    howToWork.push(`${firstA === a.full_name.split(' ')[0] && modeA === 'Direção' ? firstA : firstB} abre a abordagem com objetividade e propõe a oferta; a outra cuida do vínculo, da escuta e do pós-venda.`);
+    howToWork.push('Combinem um sinal simples para "freia" e "avança" durante o atendimento, evitando atrito na frente do cliente.');
+  }
+  if (has('Direção|Sustentação')) {
+    strengths.push('Direção decide e move; Sustentação garante constância, rotina e qualidade do que ficou combinado.');
+    tensions.push('Sustentação pode ser sobrecarregada por Direção; pode silenciar o incômodo até estourar.');
+    howToWork.push('Direção define a meta da semana; Sustentação organiza o passo a passo e marca check-in para validar ritmo real.');
+  }
+  if (has('Direção|Critério')) {
+    strengths.push('Direção quer resultado rápido; Critério garante que o resultado tenha qualidade e consistência.');
+    tensions.push('Direção pode achar Critério lenta; Critério pode achar Direção descuidada com detalhes que afetam cliente.');
+    howToWork.push('Direção define o "o quê" e o prazo; Critério define o padrão mínimo aceitável antes de entregar.');
+  }
+  if (has('Conexão|Sustentação')) {
+    strengths.push('Conexão atrai cliente e gera energia no time; Sustentação mantém constância e cuidado contínuo.');
+    tensions.push('Conexão pode dispersar; Sustentação pode se cansar de "segurar" o que a outra começa e não termina.');
+    howToWork.push('Conexão abre o atendimento e cria vínculo; Sustentação fecha a tarefa e cuida do follow-up.');
+  }
+  if (has('Conexão|Critério')) {
+    strengths.push('Conexão humaniza a interação; Critério garante que a promessa feita seja cumprida no detalhe.');
+    tensions.push('Conexão pode prometer demais; Critério pode soar excessivamente técnica ao revisar a colega.');
+    howToWork.push('Conexão fala com cliente; Critério valida estoque, condição e padrão antes de confirmar a venda.');
+  }
+  if (has('Sustentação|Critério')) {
+    strengths.push('Dupla altamente confiável em rotina, organização, conferência e qualidade do atendimento contínuo.');
+    tensions.push('Pode faltar iniciativa para mudanças rápidas; ambas tendem a evitar conflito e ruptura.');
+    howToWork.push('Combinem revisão semanal curta para decidir o que precisa mudar, em vez de apenas manter o que já existe.');
+  }
+  if (sameMode) {
+    if (modeA === 'Direção') howToWork.push('Dividam responsabilidade por área (uma cuida de meta, outra de processo) para não competirem pela mesma decisão.');
+    if (modeA === 'Conexão') howToWork.push('Combinem quem fala com qual cliente para não duplicarem contato e disputarem foco.');
+    if (modeA === 'Sustentação') howToWork.push('Tragam alguém de Direção ou Critério para destravar decisões; juntas tendem a adiar mudanças.');
+    if (modeA === 'Critério') howToWork.push('Definam um prazo de decisão antes de entrar em análise; juntas podem travar em busca de perfeição.');
+  }
+
+  // Temperament-level extra read
+  if (a.temperamentProfile && b.temperamentProfile && a.temperamentProfile !== b.temperamentProfile) {
+    strengths.push(`Os temperamentos ${TEMPERAMENT_LABELS[a.temperamentProfile]} e ${TEMPERAMENT_LABELS[b.temperamentProfile]} se equilibram em emoção e ritmo.`);
+  }
+
+  // Connection-style read
+  if (a.connectionStyle && b.connectionStyle && a.connectionStyle !== b.connectionStyle) {
+    howToWork.push(`Estilos de conexão diferentes (${a.connectionStyle} x ${b.connectionStyle}): cada uma percebe reconhecimento de um jeito. Combinem como vão sinalizar apoio uma à outra.`);
+  }
+
+  return { strengths, tensions, howToWork };
+}
+
 function getDataNotice(row: MemberProfile) {
   if (row.journey_status === 'pending_invite') {
     return `Não há Código da Essência disponível para ${getFirstName(row.full_name)} no Identity. Ela ainda não acessou ou aceitou o convite da equipe, por isso não há dados corporativos compartilhados.`;
