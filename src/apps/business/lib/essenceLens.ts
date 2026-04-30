@@ -573,9 +573,27 @@ export type TeammateConnect = {
   showCare: string;
   avoidEarly: string;
   bridge: string;
+  managementTip?: string;
 };
 
-export function buildTeammateDeepConnect(other: EssenceSnapshot, self?: EssenceSnapshot | null): TeammateConnect {
+function managementTipFor(other: EssenceSnapshot, otherFirstName?: string): string {
+  const name = otherFirstName ? `Com ${otherFirstName}` : 'Com ela';
+  if (other.disc === 'D' || other.temperament === 'colerico')
+    return `${name}, dê **objetivo claro + prazo + autonomia**. Evite microgerenciar — peça resultado, não passo a passo.`;
+  if (other.disc === 'I' || other.temperament === 'sanguineo')
+    return `${name}, abra a delegação pelo "porquê" e reconheça publicamente quando ela entrega. Cobre métrica de forma leve, em conversa.`;
+  if (other.disc === 'S' || other.temperament === 'fleumatico')
+    return `${name}, evite delegar tarefa nova de última hora. Combine na sexta o que vem na segunda — ela rende muito mais com previsibilidade.`;
+  if (other.disc === 'C' || other.temperament === 'melancolico')
+    return `${name}, traga o critério escrito ou um exemplo visual antes de pedir a tarefa. Feedback dela merece ser ouvido — costuma ser preciso.`;
+  return `${name}, comece pequeno: 1 tarefa combinada de cada vez, com retorno curto no fim do dia.`;
+}
+
+export function buildTeammateDeepConnect(
+  other: EssenceSnapshot,
+  self?: EssenceSnapshot | null,
+  opts?: { selfIsLeadership?: boolean; otherFirstName?: string },
+): TeammateConnect {
   // Como abrir conversa
   let openConversation = 'Comece pelo dia a dia, sem pressa.';
   if (other.disc === 'D' || other.temperament === 'colerico')
@@ -608,7 +626,11 @@ export function buildTeammateDeepConnect(other: EssenceSnapshot, self?: EssenceS
     bridge = `Seu perfil **${self.disc}** com o **${other.disc}** dela funciona melhor quando vocês combinam, no início da semana, o que cada uma precisa para render bem.`;
   }
 
-  return { openConversation, showCare, avoidEarly, bridge };
+  const managementTip = opts?.selfIsLeadership
+    ? managementTipFor(other, opts.otherFirstName)
+    : undefined;
+
+  return { openConversation, showCare, avoidEarly, bridge, managementTip };
 }
 
 // Frase curta legada (mantida para compatibilidade com chamadas existentes)
