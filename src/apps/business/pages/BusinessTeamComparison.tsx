@@ -658,9 +658,17 @@ function CollaboratorCard({ row }: { row: MemberProfile }) {
             <span>{dataNotice}</span>
           </div>
         )}
-        <div className="grid gap-3 lg:grid-cols-3">
+        <div className="grid gap-3 lg:grid-cols-2">
           <ReadingBlock icon={HeartHandshake} title="Como ela tende a agir e reagir" text={getBehaviorReading(row)} />
           <ReadingBlock icon={Target} title="Como ela pode ser melhor na empresa" text={getGrowthReading(row)} />
+        </div>
+        <div className="grid gap-3 lg:grid-cols-2">
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+            <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><AlertCircle className="h-4 w-4 text-amber-600" /> Pontos de atenção para o empreendedor</div>
+            <ul className="space-y-1.5 text-sm text-muted-foreground">
+              {getRiskReading(row).map((item) => <li key={item} className="leading-relaxed">• {item}</li>)}
+            </ul>
+          </div>
           <div className="rounded-lg border p-3">
             <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><ClipboardCheck className="h-4 w-4 text-primary" /> Ações de gestão</div>
             <ul className="space-y-1.5 text-sm text-muted-foreground">
