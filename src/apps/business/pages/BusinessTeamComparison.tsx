@@ -703,7 +703,104 @@ function InfoTile({ label, value, detail }: { label: string; value: string; deta
   );
 }
 
-export default function BusinessTeamComparison() {
+function PairBuilder({ rows }: { rows: MemberProfile[] }) {
+  const eligible = rows.filter((row) => row.journey_status !== 'pending_invite');
+  const [pairs, setPairs] = useState<Array<{ a: string; b: string }>>([]);
+  const [aId, setAId] = useState<string>('');
+  const [bId, setBId] = useState<string>('');
+
+  const keyOf = (row: MemberProfile) => row.user_id || row.full_name;
+  const findRow = (key: string) => eligible.find((row) => keyOf(row) === key);
+
+  const addPair = () => {
+    if (!aId || !bId || aId === bId) {
+      toast.error('Selecione duas colaboradoras diferentes');
+      return;
+    }
+    if (pairs.some((p) => (p.a === aId && p.b === bId) || (p.a === bId && p.b === aId))) {
+      toast.info('Esse cruzamento já está montado');
+      return;
+    }
+    setPairs((prev) => [...prev, { a: aId, b: bId }]);
+    setAId('');
+    setBId('');
+  };
+
+  const removePair = (index: number) => setPairs((prev) => prev.filter((_, i) => i !== index));
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base"><UserPlus className="h-4 w-4 text-primary" /> Montar cruzamento entre colaboradoras</CardTitle>
+          <CardDescription>Combine duas pessoas da equipe e veja como elas podem trabalhar juntas, onde se complementam e onde podem atritar.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+            <Select value={aId} onValueChange={setAId}>
+              <SelectTrigger><SelectValue placeholder="Colaboradora 1" /></SelectTrigger>
+              <SelectContent>
+                {eligible.map((row) => <SelectItem key={keyOf(row)} value={keyOf(row)}>{row.full_name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={bId} onValueChange={setBId}>
+              <SelectTrigger><SelectValue placeholder="Colaboradora 2" /></SelectTrigger>
+              <SelectContent>
+                {eligible.filter((row) => keyOf(row) !== aId).map((row) => <SelectItem key={keyOf(row)} value={keyOf(row)}>{row.full_name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Button onClick={addPair} className="gap-2"><GitCompare className="h-4 w-4" /> Cruzar</Button>
+          </div>
+          {eligible.length < 2 && <p className="text-xs text-muted-foreground">É necessário ter pelo menos duas colaboradoras com dados disponíveis.</p>}
+        </CardContent>
+      </Card>
+
+      {pairs.map((pair, index) => {
+        const a = findRow(pair.a);
+        const b = findRow(pair.b);
+        if (!a || !b) return null;
+        const synergy = getPairSynergy(a, b);
+        return (
+          <Card key={`${pair.a}-${pair.b}-${index}`} className="border-primary/20">
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Sparkles className="h-4 w-4 text-primary" /> {a.full_name} <span className="text-muted-foreground">×</span> {b.full_name}
+                  </CardTitle>
+                  <CardDescription>{a.leadershipMode} + {b.leadershipMode}</CardDescription>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => removePair(index)} className="gap-1 text-muted-foreground"><X className="h-3 w-3" /> Remover</Button>
+              </div>
+            </CardHeader>
+            <CardContent className="grid gap-3 lg:grid-cols-3">
+              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
+                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Onde se fortalecem</div>
+                <ul className="space-y-1.5 text-sm text-muted-foreground">
+                  {synergy.strengths.map((item) => <li key={item} className="leading-relaxed">• {item}</li>)}
+                </ul>
+              </div>
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><AlertCircle className="h-4 w-4 text-amber-600" /> Pontos de atrito</div>
+                <ul className="space-y-1.5 text-sm text-muted-foreground">
+                  {synergy.tensions.length ? synergy.tensions.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Sem pontos críticos identificados nos dados disponíveis.</li>}
+                </ul>
+              </div>
+              <div className="rounded-lg border p-3">
+                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><HeartHandshake className="h-4 w-4 text-primary" /> Como podem trabalhar juntas</div>
+                <ul className="space-y-1.5 text-sm text-muted-foreground">
+                  {synergy.howToWork.length ? synergy.howToWork.map((item) => <li key={item} className="leading-relaxed">• {item}</li>) : <li className="leading-relaxed">• Combine papéis claros e revisem juntas a cada semana.</li>}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
+
   const { company } = useBusinessAuth();
   const enforcement = useBusinessEnforcement();
   const [rows, setRows] = useState<MemberProfile[]>([]);
