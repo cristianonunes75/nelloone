@@ -1120,10 +1120,11 @@ export default function BusinessTeamComparison() {
             <ExecutiveSummary rows={rows} />
 
             <Tabs defaultValue="resumo" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
                 <TabsTrigger value="resumo">Resumo</TabsTrigger>
                 <TabsTrigger value="times">Times</TabsTrigger>
                 <TabsTrigger value="cruzamentos">Cruzamentos</TabsTrigger>
+                <TabsTrigger value="lideranca">Liderança 1:1</TabsTrigger>
                 <TabsTrigger value="combinar">Combinar grupos</TabsTrigger>
                 <TabsTrigger value="individual">Individual</TabsTrigger>
               </TabsList>
