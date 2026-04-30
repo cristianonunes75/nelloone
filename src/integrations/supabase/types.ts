@@ -7532,6 +7532,18 @@ export type Database = {
           status: string
         }[]
       }
+      get_company_team_for_member: {
+        Args: { p_company_id: string }
+        Returns: {
+          essence_visual_data: Json
+          full_name: string
+          has_essence_code: boolean
+          is_private: boolean
+          is_self: boolean
+          job_title: string
+          user_id: string
+        }[]
+      }
       get_contextual_report_by_token: {
         Args: { _token: string }
         Returns: {

@@ -100,7 +100,7 @@ export function BusinessProtectedRoute({
     
     // Collaborator can't access admin routes
     if (requiredRole === 'company_admin' && businessRole === 'collaborator') {
-      return <Navigate to="/my-journey" replace />;
+      return <Navigate to="/my-space" replace />;
     }
   }
 

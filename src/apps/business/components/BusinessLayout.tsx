@@ -12,7 +12,9 @@ import {
   MessageCircle,
   Scale,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Sparkles,
+  ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -74,7 +76,8 @@ const bottomNavItems = [
 ];
 
 const collaboratorNavItems = [
-  { href: '/my-journey', label: 'Minha Jornada', icon: LayoutDashboard },
+  { href: '/my-space', label: 'Meu espaço', icon: Sparkles },
+  { href: '/cliente', label: 'Meu Identity', icon: ExternalLink },
 ];
 
 export function BusinessLayout({ children }: BusinessLayoutProps) {
@@ -87,7 +90,7 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
 
   const navSections = isCompanyAdmin ? adminNavSections : [{ label: '', items: collaboratorNavItems }];
   const navItems = isCompanyAdmin ? adminNavItems : collaboratorNavItems;
-  const bottomItems = isCompanyAdmin ? bottomNavItems : [];
+  const bottomItems = bottomNavItems;
 
   const handleSignOut = async () => {
     await signOut();
