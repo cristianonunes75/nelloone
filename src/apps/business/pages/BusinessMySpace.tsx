@@ -400,6 +400,7 @@ function ColleagueCard({
   hasCode,
   snapshot,
   selfSnapshot,
+  selfIsLeadership,
 }: {
   name: string;
   jobTitle: string | null;
@@ -407,10 +408,17 @@ function ColleagueCard({
   hasCode: boolean;
   snapshot: EssenceSnapshot;
   selfSnapshot: EssenceSnapshot | null;
+  selfIsLeadership: boolean;
 }) {
   const connect = useMemo(
-    () => (!isPrivate && hasCode ? buildTeammateDeepConnect(snapshot, selfSnapshot) : null),
-    [snapshot, selfSnapshot, isPrivate, hasCode],
+    () =>
+      !isPrivate && hasCode
+        ? buildTeammateDeepConnect(snapshot, selfSnapshot, {
+            selfIsLeadership,
+            otherFirstName: getFirstName(name),
+          })
+        : null,
+    [snapshot, selfSnapshot, isPrivate, hasCode, selfIsLeadership, name],
   );
 
   return (
@@ -442,6 +450,15 @@ function ColleagueCard({
           <div className="pt-2 border-t">
             <ConnectLine icon={<Sparkles className="w-3.5 h-3.5 text-primary" />} label={GENTLE_VOCABULARY.bridge} text={connect.bridge} />
           </div>
+          {connect.managementTip && (
+            <div className="pt-2 border-t bg-amber-50/40 dark:bg-amber-900/10 -mx-6 px-6 py-2.5">
+              <ConnectLine
+                icon={<Briefcase className="w-3.5 h-3.5 text-amber-600" />}
+                label={GENTLE_VOCABULARY.managementTip}
+                text={connect.managementTip}
+              />
+            </div>
+          )}
         </CardContent>
       )}
     </Card>
