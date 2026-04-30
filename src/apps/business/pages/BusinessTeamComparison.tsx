@@ -1152,6 +1152,13 @@ export default function BusinessTeamComparison() {
                 <CrossingsPanel rows={rows} />
               </TabsContent>
 
+
+              <TabsContent value="lideranca" className="space-y-4">
+                <div className="flex items-center gap-2"><Crown className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Leitura Gestor → Liderado (1:1)</h2></div>
+                <p className="text-sm text-muted-foreground">Escolha quem está liderando (Lisa, você, Larissa…). O sistema gera, para cada uma das outras colaboradoras, uma leitura individual de como acessá-la, como delegar, como dar feedback e o que evitar — cruzando perfil + cargo cadastrado.</p>
+                <LeadershipOneOnOne rows={rows} />
+              </TabsContent>
+
               <TabsContent value="combinar" className="space-y-4">
                 <div className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Combinar grupos da equipe</h2></div>
                 <p className="text-sm text-muted-foreground">Monte cruzamentos personalizados com quantas colaboradoras quiser (sem limite). Veja como o grupo se complementa, onde pode atritar e como devem se organizar para trabalhar juntas.</p>
