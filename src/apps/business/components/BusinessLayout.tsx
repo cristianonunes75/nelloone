@@ -90,7 +90,7 @@ export function BusinessLayout({ children }: BusinessLayoutProps) {
 
   const navSections = isCompanyAdmin ? adminNavSections : [{ label: '', items: collaboratorNavItems }];
   const navItems = isCompanyAdmin ? adminNavItems : collaboratorNavItems;
-  const bottomItems = isCompanyAdmin ? bottomNavItems : [];
+  const bottomItems = bottomNavItems;
 
   const handleSignOut = async () => {
     await signOut();
