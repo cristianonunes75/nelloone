@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   ClipboardCheck,
   Compass,
+  Crown,
   GitCompare,
   HeartHandshake,
   Network,
@@ -18,6 +19,7 @@ import {
   TrendingUp,
   Users,
   UserPlus,
+  UserCog,
   X,
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
