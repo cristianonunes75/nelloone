@@ -70,6 +70,20 @@ interface TeamProfile {
   created_at: string;
 }
 
+interface MovementRow {
+  user_id: string;
+  display_name: string;
+  email: string;
+  journey_status: 'cadastrado' | 'em_andamento' | 'concluido';
+  registered_at: string;
+  started_at: string | null;
+  completed_at: string | null;
+  last_activity_at: string;
+  profile_id: string | null;
+  primary_role: string | null;
+  participant_type: string | null;
+}
+
 const ROLE_COLORS: Record<string, string> = {
   'Condutor': 'bg-amber-100 text-amber-900 border-amber-300',
   'Pastor do Círculo': 'bg-rose-100 text-rose-900 border-rose-300',
