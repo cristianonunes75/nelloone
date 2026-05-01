@@ -785,6 +785,13 @@ function LeituraPastoralBlock({
             <p className="text-muted-foreground">{leitura.encaixe}</p>
           </div>
 
+          <div className="rounded-md bg-emerald-50/60 border border-emerald-200 px-2.5 py-2">
+            <p className="text-[11px] font-semibold text-emerald-900 mb-0.5">
+              Quem complementa este perfil
+            </p>
+            <p className="text-muted-foreground">{leitura.complementa}</p>
+          </div>
+
           <Button
             type="button"
             variant="ghost"
