@@ -34,6 +34,8 @@ import {
   Check,
   ClipboardCopy,
   ChevronDown,
+  Brain,
+  RefreshCw,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
