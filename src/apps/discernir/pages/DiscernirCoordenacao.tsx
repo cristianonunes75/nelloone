@@ -111,13 +111,22 @@ export function DiscernirCoordenacao() {
 
   const loadProfiles = async () => {
     try {
-      const { data, error } = await supabase
-        .from('discernir_circle_profiles_team_view' as any)
-        .select('*')
-        .order('created_at', { ascending: false });
+      const [profilesRes, movementRes] = await Promise.all([
+        supabase
+          .from('discernir_circle_profiles_team_view' as any)
+          .select('*')
+          .order('created_at', { ascending: false }),
+        supabase.rpc('get_discernir_team_movement' as any),
+      ]);
 
-      if (error) throw error;
-      setProfiles((data || []) as unknown as TeamProfile[]);
+      if (profilesRes.error) throw profilesRes.error;
+      setProfiles((profilesRes.data || []) as unknown as TeamProfile[]);
+
+      if (movementRes.error) {
+        console.warn('Movement load failed:', movementRes.error);
+      } else {
+        setMovement((movementRes.data || []) as unknown as MovementRow[]);
+      }
     } catch (err: any) {
       console.error('Error loading team profiles:', err);
       toast({
