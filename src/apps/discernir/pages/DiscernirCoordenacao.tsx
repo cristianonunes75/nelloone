@@ -1000,3 +1000,131 @@ function LeituraIACirculoBlock({ members }: { members: TeamProfile[] }) {
     </div>
   );
 }
+
+// =====================================================
+// Sub-componente: Cadastros / Movimento da equipe
+// Mostra TODOS os usuários cadastrados no Discernir,
+// não só os que terminaram o teste.
+// =====================================================
+function MovementBoard({ rows }: { rows: MovementRow[] }) {
+  const cadastrados = rows.filter((r) => r.journey_status === 'cadastrado');
+  const emAndamento = rows.filter((r) => r.journey_status === 'em_andamento');
+  const concluidos = rows.filter((r) => r.journey_status === 'concluido');
+
+  const formatDate = (iso: string | null) => {
+    if (!iso) return '—';
+    try {
+      return new Date(iso).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      });
+    } catch {
+      return '—';
+    }
+  };
+
+  if (rows.length === 0) {
+    return (
+      <Card>
+        <CardContent className="py-12 text-center text-muted-foreground">
+          Ninguém se cadastrou no Discernir ainda.
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Resumo */}
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Card className="border-amber-200 bg-amber-50/40">
+          <CardContent className="py-4 text-center">
+            <CircleDot className="w-5 h-5 text-amber-700 mx-auto mb-1" />
+            <div className="text-2xl font-bold text-amber-900">{cadastrados.length}</div>
+            <div className="text-xs text-muted-foreground">Cadastrados, ainda não começaram</div>
+          </CardContent>
+        </Card>
+        <Card className="border-sky-200 bg-sky-50/40">
+          <CardContent className="py-4 text-center">
+            <Activity className="w-5 h-5 text-sky-700 mx-auto mb-1" />
+            <div className="text-2xl font-bold text-sky-900">{emAndamento.length}</div>
+            <div className="text-xs text-muted-foreground">Em andamento</div>
+          </CardContent>
+        </Card>
+        <Card className="border-emerald-200 bg-emerald-50/40">
+          <CardContent className="py-4 text-center">
+            <CheckCircle2 className="w-5 h-5 text-emerald-700 mx-auto mb-1" />
+            <div className="text-2xl font-bold text-emerald-900">{concluidos.length}</div>
+            <div className="text-xs text-muted-foreground">Perfil concluído</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Lista */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm">Movimento da equipe</CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Todos os participantes que se cadastraram, do mais novo para o mais antigo.
+          </p>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="divide-y">
+            {rows.map((r) => {
+              const statusBadge =
+                r.journey_status === 'concluido' ? (
+                  <Badge variant="outline" className="bg-emerald-100 text-emerald-900 border-emerald-300 gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> Concluído
+                  </Badge>
+                ) : r.journey_status === 'em_andamento' ? (
+                  <Badge variant="outline" className="bg-sky-100 text-sky-900 border-sky-300 gap-1">
+                    <Activity className="w-3 h-3" /> Em andamento
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="bg-amber-100 text-amber-900 border-amber-300 gap-1">
+                    <CircleDot className="w-3 h-3" /> Cadastrado
+                  </Badge>
+                );
+              return (
+                <div
+                  key={r.user_id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3 hover:bg-muted/40"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-medium text-sm truncate">{r.display_name}</p>
+                      {statusBadge}
+                      {r.primary_role && (
+                        <Badge
+                          variant="outline"
+                          className={cn('text-[10px]', ROLE_COLORS[r.primary_role])}
+                        >
+                          {r.primary_role}
+                        </Badge>
+                      )}
+                    </div>
+                    {r.email && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <Mail className="w-3 h-3" /> {r.email}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-col sm:items-end text-[11px] text-muted-foreground shrink-0">
+                    <span>Cadastro: {formatDate(r.registered_at)}</span>
+                    {r.completed_at && (
+                      <span className="text-emerald-700">Concluiu: {formatDate(r.completed_at)}</span>
+                    )}
+                    {!r.completed_at && r.started_at && (
+                      <span className="text-sky-700">Começou: {formatDate(r.started_at)}</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
