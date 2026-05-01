@@ -684,6 +684,8 @@ export function DiscernirCoordenacao() {
                             </div>
                           </div>
                         )}
+
+                        <LeituraIACirculoBlock members={circle} />
                       </CardContent>
                     </Card>
                   );
