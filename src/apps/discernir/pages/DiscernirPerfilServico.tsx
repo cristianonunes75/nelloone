@@ -509,3 +509,80 @@ function ResultView({
     </div>
   );
 }
+
+// =====================================================
+// Sub-componente: Leitura combinada do próprio perfil
+// =====================================================
+function LeituraCombinadaCard({
+  percentages,
+  primaryRole,
+  secondaryRole,
+  userName,
+}: {
+  percentages: CircleProfileResult['percentages'];
+  primaryRole: string;
+  secondaryRole: string;
+  userName?: string;
+}) {
+  const { toast } = useToast();
+  const leitura = gerarLeituraPerfilServico(percentages, primaryRole, secondaryRole);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(leituraToText(leitura, userName));
+      toast({ title: 'Leitura copiada', description: 'Cole onde quiser compartilhar.' });
+    } catch {
+      toast({ title: 'Não foi possível copiar', variant: 'destructive' });
+    }
+  };
+
+  return (
+    <Card className="border-amber-300 bg-amber-50/40">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2 text-amber-900">
+          ✦ Leitura combinada do seu perfil
+        </CardTitle>
+        <CardDescription className="text-xs">
+          Específica para a sua combinação de percentuais — não é genérica por papel.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4 text-sm leading-relaxed">
+        <p className="italic text-foreground">{leitura.abertura}</p>
+
+        <div>
+          <p className="font-semibold text-emerald-800 mb-1.5">O que você agrega ao círculo</p>
+          <ul className="space-y-1.5 text-muted-foreground pl-4 list-disc marker:text-emerald-700">
+            {leitura.agrega.map((a, i) => (
+              <li key={i}>{a}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <p className="font-semibold text-amber-900 mb-1.5">Pontos de atenção</p>
+          <ul className="space-y-1.5 text-muted-foreground pl-4 list-disc marker:text-amber-700">
+            {leitura.atencao.map((a, i) => (
+              <li key={i}>{a}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="rounded-md bg-white/70 border border-amber-200 px-3 py-2.5">
+          <p className="text-xs font-semibold text-amber-900 mb-1">Melhor encaixe no círculo</p>
+          <p className="text-sm text-foreground">{leitura.encaixe}</p>
+        </div>
+
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={handleCopy}
+          className="w-full gap-2 text-amber-800"
+        >
+          <Copy className="w-3.5 h-3.5" />
+          Copiar leitura
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
