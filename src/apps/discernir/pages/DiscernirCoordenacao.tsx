@@ -541,16 +541,19 @@ export function DiscernirCoordenacao() {
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-6 h-6 animate-spin text-amber-700" />
         </div>
-      ) : profiles.length === 0 ? (
+      ) : profiles.length === 0 && movement.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            Ninguém da equipe completou o Perfil de Serviço ainda.
+            Ninguém se cadastrou no Discernir ainda.
           </CardContent>
         </Card>
       ) : (
-        <Tabs defaultValue="todos" className="space-y-4">
+        <Tabs defaultValue="cadastros" className="space-y-4">
           <TabsList className="flex flex-wrap h-auto">
-            <TabsTrigger value="todos">Todos ({filtered.length})</TabsTrigger>
+            <TabsTrigger value="cadastros" className="gap-1">
+              <Activity className="w-3 h-3" /> Cadastros ({movement.length})
+            </TabsTrigger>
+            <TabsTrigger value="todos">Concluídos ({filtered.length})</TabsTrigger>
             <TabsTrigger value="casais" className="gap-1">
               <Heart className="w-3 h-3" /> Casais ({couples.length})
             </TabsTrigger>
@@ -564,6 +567,10 @@ export function DiscernirCoordenacao() {
               <Wand2 className="w-3 h-3" /> Sugestão de círculos
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="cadastros">
+            <MovementBoard rows={movement} />
+          </TabsContent>
 
           <TabsContent value="todos">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
