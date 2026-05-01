@@ -423,6 +423,14 @@ export function DiscernirCoordenacao() {
             )}
           </div>
 
+          {/* Leitura pastoral combinada (específica deste perfil) */}
+          <LeituraPastoralBlock
+            percentages={p.percentages}
+            primaryRole={p.primary_role}
+            secondaryRole={p.secondary_role}
+            displayName={p.display_name}
+          />
+
           <Button
             variant="outline"
             size="sm"
