@@ -7620,6 +7620,22 @@ export type Database = {
           user_b_id: string
         }[]
       }
+      get_discernir_team_movement: {
+        Args: never
+        Returns: {
+          completed_at: string
+          display_name: string
+          email: string
+          journey_status: string
+          last_activity_at: string
+          participant_type: string
+          primary_role: string
+          profile_id: string
+          registered_at: string
+          started_at: string
+          user_id: string
+        }[]
+      }
       get_hiring_answers_by_token: {
         Args: { _assessment_id: string; _token: string }
         Returns: {

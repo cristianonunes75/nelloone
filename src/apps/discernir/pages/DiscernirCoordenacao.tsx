@@ -36,6 +36,10 @@ import {
   ChevronDown,
   Brain,
   RefreshCw,
+  Activity,
+  Mail,
+  CircleDot,
+  CheckCircle2,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -66,6 +70,20 @@ interface TeamProfile {
   created_at: string;
 }
 
+interface MovementRow {
+  user_id: string;
+  display_name: string;
+  email: string;
+  journey_status: 'cadastrado' | 'em_andamento' | 'concluido';
+  registered_at: string;
+  started_at: string | null;
+  completed_at: string | null;
+  last_activity_at: string;
+  profile_id: string | null;
+  primary_role: string | null;
+  participant_type: string | null;
+}
+
 const ROLE_COLORS: Record<string, string> = {
   'Condutor': 'bg-amber-100 text-amber-900 border-amber-300',
   'Pastor do Círculo': 'bg-rose-100 text-rose-900 border-rose-300',
@@ -83,6 +101,7 @@ export function DiscernirCoordenacao() {
   const { toast } = useToast();
 
   const [profiles, setProfiles] = useState<TeamProfile[]>([]);
+  const [movement, setMovement] = useState<MovementRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -92,13 +111,22 @@ export function DiscernirCoordenacao() {
 
   const loadProfiles = async () => {
     try {
-      const { data, error } = await supabase
-        .from('discernir_circle_profiles_team_view' as any)
-        .select('*')
-        .order('created_at', { ascending: false });
+      const [profilesRes, movementRes] = await Promise.all([
+        supabase
+          .from('discernir_circle_profiles_team_view' as any)
+          .select('*')
+          .order('created_at', { ascending: false }),
+        supabase.rpc('get_discernir_team_movement' as any),
+      ]);
 
-      if (error) throw error;
-      setProfiles((data || []) as unknown as TeamProfile[]);
+      if (profilesRes.error) throw profilesRes.error;
+      setProfiles((profilesRes.data || []) as unknown as TeamProfile[]);
+
+      if (movementRes.error) {
+        console.warn('Movement load failed:', movementRes.error);
+      } else {
+        setMovement((movementRes.data || []) as unknown as MovementRow[]);
+      }
     } catch (err: any) {
       console.error('Error loading team profiles:', err);
       toast({
@@ -513,16 +541,19 @@ export function DiscernirCoordenacao() {
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-6 h-6 animate-spin text-amber-700" />
         </div>
-      ) : profiles.length === 0 ? (
+      ) : profiles.length === 0 && movement.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            Ninguém da equipe completou o Perfil de Serviço ainda.
+            Ninguém se cadastrou no Discernir ainda.
           </CardContent>
         </Card>
       ) : (
-        <Tabs defaultValue="todos" className="space-y-4">
+        <Tabs defaultValue="cadastros" className="space-y-4">
           <TabsList className="flex flex-wrap h-auto">
-            <TabsTrigger value="todos">Todos ({filtered.length})</TabsTrigger>
+            <TabsTrigger value="cadastros" className="gap-1">
+              <Activity className="w-3 h-3" /> Cadastros ({movement.length})
+            </TabsTrigger>
+            <TabsTrigger value="todos">Concluídos ({filtered.length})</TabsTrigger>
             <TabsTrigger value="casais" className="gap-1">
               <Heart className="w-3 h-3" /> Casais ({couples.length})
             </TabsTrigger>
@@ -536,6 +567,10 @@ export function DiscernirCoordenacao() {
               <Wand2 className="w-3 h-3" /> Sugestão de círculos
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="cadastros">
+            <MovementBoard rows={movement} />
+          </TabsContent>
 
           <TabsContent value="todos">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -962,6 +997,134 @@ function LeituraIACirculoBlock({ members }: { members: TeamProfile[] }) {
           <p className="text-muted-foreground">{result.recomendacao_pratica}</p>
         </div>
       </div>
+    </div>
+  );
+}
+
+// =====================================================
+// Sub-componente: Cadastros / Movimento da equipe
+// Mostra TODOS os usuários cadastrados no Discernir,
+// não só os que terminaram o teste.
+// =====================================================
+function MovementBoard({ rows }: { rows: MovementRow[] }) {
+  const cadastrados = rows.filter((r) => r.journey_status === 'cadastrado');
+  const emAndamento = rows.filter((r) => r.journey_status === 'em_andamento');
+  const concluidos = rows.filter((r) => r.journey_status === 'concluido');
+
+  const formatDate = (iso: string | null) => {
+    if (!iso) return '—';
+    try {
+      return new Date(iso).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      });
+    } catch {
+      return '—';
+    }
+  };
+
+  if (rows.length === 0) {
+    return (
+      <Card>
+        <CardContent className="py-12 text-center text-muted-foreground">
+          Ninguém se cadastrou no Discernir ainda.
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Resumo */}
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Card className="border-amber-200 bg-amber-50/40">
+          <CardContent className="py-4 text-center">
+            <CircleDot className="w-5 h-5 text-amber-700 mx-auto mb-1" />
+            <div className="text-2xl font-bold text-amber-900">{cadastrados.length}</div>
+            <div className="text-xs text-muted-foreground">Cadastrados, ainda não começaram</div>
+          </CardContent>
+        </Card>
+        <Card className="border-sky-200 bg-sky-50/40">
+          <CardContent className="py-4 text-center">
+            <Activity className="w-5 h-5 text-sky-700 mx-auto mb-1" />
+            <div className="text-2xl font-bold text-sky-900">{emAndamento.length}</div>
+            <div className="text-xs text-muted-foreground">Em andamento</div>
+          </CardContent>
+        </Card>
+        <Card className="border-emerald-200 bg-emerald-50/40">
+          <CardContent className="py-4 text-center">
+            <CheckCircle2 className="w-5 h-5 text-emerald-700 mx-auto mb-1" />
+            <div className="text-2xl font-bold text-emerald-900">{concluidos.length}</div>
+            <div className="text-xs text-muted-foreground">Perfil concluído</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Lista */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm">Movimento da equipe</CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Todos os participantes que se cadastraram, do mais novo para o mais antigo.
+          </p>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="divide-y">
+            {rows.map((r) => {
+              const statusBadge =
+                r.journey_status === 'concluido' ? (
+                  <Badge variant="outline" className="bg-emerald-100 text-emerald-900 border-emerald-300 gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> Concluído
+                  </Badge>
+                ) : r.journey_status === 'em_andamento' ? (
+                  <Badge variant="outline" className="bg-sky-100 text-sky-900 border-sky-300 gap-1">
+                    <Activity className="w-3 h-3" /> Em andamento
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="bg-amber-100 text-amber-900 border-amber-300 gap-1">
+                    <CircleDot className="w-3 h-3" /> Cadastrado
+                  </Badge>
+                );
+              return (
+                <div
+                  key={r.user_id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3 hover:bg-muted/40"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-medium text-sm truncate">{r.display_name}</p>
+                      {statusBadge}
+                      {r.primary_role && (
+                        <Badge
+                          variant="outline"
+                          className={cn('text-[10px]', ROLE_COLORS[r.primary_role])}
+                        >
+                          {r.primary_role}
+                        </Badge>
+                      )}
+                    </div>
+                    {r.email && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <Mail className="w-3 h-3" /> {r.email}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-col sm:items-end text-[11px] text-muted-foreground shrink-0">
+                    <span>Cadastro: {formatDate(r.registered_at)}</span>
+                    {r.completed_at && (
+                      <span className="text-emerald-700">Concluiu: {formatDate(r.completed_at)}</span>
+                    )}
+                    {!r.completed_at && r.started_at && (
+                      <span className="text-sky-700">Começou: {formatDate(r.started_at)}</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
