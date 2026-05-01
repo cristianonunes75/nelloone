@@ -3434,6 +3434,33 @@ export type Database = {
           },
         ]
       }
+      discernir_circle_combinations: {
+        Row: {
+          created_at: string
+          generated_by: string
+          id: string
+          member_user_ids: string[]
+          result_json: Json
+          signature_hash: string
+        }
+        Insert: {
+          created_at?: string
+          generated_by: string
+          id?: string
+          member_user_ids: string[]
+          result_json: Json
+          signature_hash: string
+        }
+        Update: {
+          created_at?: string
+          generated_by?: string
+          id?: string
+          member_user_ids?: string[]
+          result_json?: Json
+          signature_hash?: string
+        }
+        Relationships: []
+      }
       discernir_circle_profile_questions: {
         Row: {
           block: string
@@ -7670,6 +7697,7 @@ export type Database = {
         Args: { check_company_id: string; check_user_id: string }
         Returns: boolean
       }
+      is_discernir_coordinator: { Args: { _user_id: string }; Returns: boolean }
       is_discernir_priest: {
         Args: { check_parish_id: string; check_user_id: string }
         Returns: boolean

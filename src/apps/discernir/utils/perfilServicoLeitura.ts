@@ -16,6 +16,7 @@ export interface LeituraPerfilServico {
   agrega: string[];
   atencao: string[];
   encaixe: string;
+  complementa: string;
 }
 
 const ALTO = 75;
@@ -245,6 +246,44 @@ const ENCAIXE_PAPEL_SEGUNDO: Record<string, Partial<Record<BlockKey, string>>> =
   },
 };
 
+// ============ COMPLEMENTA: BLOCO BAIXO -> PERFIL QUE EQUILIBRA ============
+// Quem é o tipo de pessoa que, no mesmo círculo, ajudaria a equilibrar
+// um bloco em faixa baixa (< 50%) deste participante.
+const COMPLEMENTA_BLOCO_BAIXO: Record<BlockKey, string> = {
+  lideranca:
+    'alguém com Liderança alta (Condutor) — para puxar direção quando a decisão precisa sair',
+  acolhimento:
+    'alguém com Acolhimento alto (Pastor do Círculo ou Guardião do Clima) — para temperar com escuta cuidadosa de quem é mais quieto',
+  comunicacao:
+    'alguém com Comunicação alta (Facilitador) — para traduzir o que esta pessoa sente mas pode travar para nomear',
+  equipe:
+    'alguém com Equipe alta (Guardião do Clima) — para tecer os vínculos e cuidar do clima entre os membros',
+  espiritualidade:
+    'alguém com Espiritualidade alta (Intercessor) — para ancorar o grupo em oração e propósito, e não só em agenda',
+  conducao:
+    'alguém com Condução alta (Condutor) — para trazer energia visível e manter o encontro com ritmo',
+};
+
+function complementaPara(percentages: CircleProfilePercentages): string {
+  // Pega blocos baixos, ordenados pelo mais baixo primeiro
+  const baixos = BLOCOS
+    .filter((b) => (percentages[b] || 0) < BAIXO)
+    .sort((a, b) => (percentages[a] || 0) - (percentages[b] || 0));
+
+  if (baixos.length === 0) {
+    return 'Perfil bastante equilibrado — combina bem com qualquer composição. Como bônus, círculos sempre ganham com pelo menos um Intercessor (oração) e um Pastor (cuidado pessoal) na mistura.';
+  }
+
+  if (baixos.length === 1) {
+    return `Combina bem com ${COMPLEMENTA_BLOCO_BAIXO[baixos[0]]}. Esse encontro tende a equilibrar o que aqui está mais discreto.`;
+  }
+
+  // 2 ou mais baixos: mostra os 2 mais baixos
+  const a = COMPLEMENTA_BLOCO_BAIXO[baixos[0]];
+  const b = COMPLEMENTA_BLOCO_BAIXO[baixos[1]];
+  return `Combina bem com ${a}. Idealmente também com ${b}. Esses encontros tendem a equilibrar o que aqui está mais discreto.`;
+}
+
 // ============ FUNÇÃO PRINCIPAL ============
 export function gerarLeituraPerfilServico(
   percentages: CircleProfilePercentages,
@@ -311,6 +350,7 @@ export function gerarLeituraPerfilServico(
     agrega,
     atencao: atencaoFinal,
     encaixe,
+    complementa: complementaPara(percentages),
   };
 }
 
@@ -329,5 +369,6 @@ export function leituraToText(
   linhas.push('', 'Pontos de atenção:');
   leitura.atencao.forEach((a) => linhas.push(`• ${a}`));
   linhas.push('', `Melhor encaixe: ${leitura.encaixe}`);
+  linhas.push('', `Quem complementa este perfil: ${leitura.complementa}`);
   return linhas.join('\n');
 }
