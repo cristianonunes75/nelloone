@@ -24,6 +24,7 @@ interface DiscernirLayoutProps {
 export function DiscernirLayout({ isPriest = false }: DiscernirLayoutProps) {
   const { user, signOut } = useAuth();
   const { role, couple, priest } = useDiscernirAuth();
+  const isCoordinator = role === 'priest' || role === 'coordinator';
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isPilotMode = useDiscernirPilotMode();
