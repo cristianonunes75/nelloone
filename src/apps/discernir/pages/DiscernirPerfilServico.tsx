@@ -431,6 +431,14 @@ function ResultView({
         ))}
       </div>
 
+      {/* Leitura combinada — específica para esta combinação de percentuais */}
+      <LeituraCombinadaCard
+        percentages={result.percentages}
+        primaryRole={result.primary_role}
+        secondaryRole={result.secondary_role}
+        userName={userName}
+      />
+
       {/* All Blocks Chart */}
       <Card>
         <CardHeader>
