@@ -279,6 +279,19 @@ export function generatePerfilServicoPDF(
   doc.setFontSize(9);
   doc.setTextColor(...TEXT_DARK);
   y = addWrappedText(doc, leitura.encaixe, MARGIN_X + 2, y, CONTENT_W - 2, 4.5);
+  y += 4;
+
+  // Quem complementa
+  if (y > 250) { doc.addPage(); y = 20; }
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(...AMBER_MID);
+  doc.text('Quem complementa o seu perfil', MARGIN_X, y);
+  y += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(...TEXT_DARK);
+  y = addWrappedText(doc, leitura.complementa, MARGIN_X + 2, y, CONTENT_W - 2, 4.5);
 
   // ==== DISCLAIMER ====
   if (y > 255) { doc.addPage(); y = 20; }
