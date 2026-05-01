@@ -8,7 +8,31 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Loader2, Users, Download, Search, Sparkles } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from '@/components/ui/tabs';
+import {
+  Loader2,
+  Users,
+  Download,
+  Search,
+  Sparkles,
+  Heart,
+  User as UserIcon,
+  Wand2,
+  Save,
+  Check,
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   type CircleProfileResult,
@@ -20,6 +44,8 @@ import {
 import { downloadPerfilServicoPDF } from '../utils/perfilServicoPDF';
 import { cn } from '@/lib/utils';
 
+type ParticipantType = 'casal' | 'jovem' | null;
+
 interface TeamProfile {
   id: string;
   user_id: string;
@@ -29,6 +55,9 @@ interface TeamProfile {
   tertiary_role: string | null;
   percentages: CircleProfilePercentages;
   ranking: CircleProfileRanking[];
+  participant_type: ParticipantType;
+  spouse_user_id: string | null;
+  coordinator_notes: string | null;
   created_at: string;
 }
 
@@ -40,6 +69,8 @@ const ROLE_COLORS: Record<string, string> = {
   'Intercessor': 'bg-violet-100 text-violet-900 border-violet-300',
 };
 
+const ALL_ROLES = ['Condutor', 'Pastor do Círculo', 'Facilitador', 'Guardião do Clima', 'Intercessor'];
+
 export function DiscernirCoordenacao() {
   const { user, isLoading: authLoading } = useAuth();
   const { role, isLoading: discernirLoading } = useDiscernirAuth();
@@ -49,8 +80,31 @@ export function DiscernirCoordenacao() {
   const [profiles, setProfiles] = useState<TeamProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const [suggestedCircles, setSuggestedCircles] = useState<TeamProfile[][] | null>(null);
 
   const isCoordinator = role === 'priest' || role === 'coordinator' || isSuperAdmin;
+
+  const loadProfiles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('discernir_circle_profiles_team_view' as any)
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setProfiles((data || []) as unknown as TeamProfile[]);
+    } catch (err: any) {
+      console.error('Error loading team profiles:', err);
+      toast({
+        title: 'Erro ao carregar perfis',
+        description: err?.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (authLoading || discernirLoading || adminLoading) return;
@@ -58,28 +112,66 @@ export function DiscernirCoordenacao() {
       setLoading(false);
       return;
     }
+    loadProfiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, discernirLoading, adminLoading, isCoordinator]);
 
-    (async () => {
-      try {
-        const { data, error } = await supabase
-          .from('discernir_circle_profiles_team_view' as any)
-          .select('*')
-          .order('created_at', { ascending: false });
+  const updateProfileMarker = async (
+    profileId: string,
+    patch: Partial<Pick<TeamProfile, 'participant_type' | 'spouse_user_id'>>,
+  ) => {
+    setSavingId(profileId);
+    try {
+      const { error } = await supabase
+        .from('discernir_circle_profiles')
+        .update(patch)
+        .eq('id', profileId);
+      if (error) throw error;
 
-        if (error) throw error;
-        setProfiles((data || []) as unknown as TeamProfile[]);
-      } catch (err: any) {
-        console.error('Error loading team profiles:', err);
-        toast({
-          title: 'Erro ao carregar perfis',
-          description: err?.message,
-          variant: 'destructive',
-        });
-      } finally {
-        setLoading(false);
+      // Reciprocal spouse link: if setting a spouse, also set the reverse
+      if ('spouse_user_id' in patch) {
+        const target = profiles.find((p) => p.id === profileId);
+        if (target) {
+          // Clear any other person who currently points to target.user_id (except new spouse)
+          const others = profiles.filter(
+            (p) =>
+              p.spouse_user_id === target.user_id &&
+              p.user_id !== patch.spouse_user_id,
+          );
+          for (const o of others) {
+            await supabase
+              .from('discernir_circle_profiles')
+              .update({ spouse_user_id: null })
+              .eq('id', o.id);
+          }
+          // Set reverse link on the new spouse
+          if (patch.spouse_user_id) {
+            const spouseProfile = profiles.find((p) => p.user_id === patch.spouse_user_id);
+            if (spouseProfile) {
+              await supabase
+                .from('discernir_circle_profiles')
+                .update({
+                  spouse_user_id: target.user_id,
+                  participant_type: 'casal',
+                })
+                .eq('id', spouseProfile.id);
+            }
+          }
+        }
       }
-    })();
-  }, [authLoading, discernirLoading, adminLoading, isCoordinator, toast]);
+
+      await loadProfiles();
+      setSuggestedCircles(null);
+    } catch (err: any) {
+      toast({
+        title: 'Erro ao salvar',
+        description: err?.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setSavingId(null);
+    }
+  };
 
   const filtered = useMemo(() => {
     if (!search.trim()) return profiles;
@@ -91,7 +183,26 @@ export function DiscernirCoordenacao() {
     );
   }, [profiles, search]);
 
-  // Distribution summary
+  const couples = useMemo(() => filtered.filter((p) => p.participant_type === 'casal'), [filtered]);
+  const youth = useMemo(() => filtered.filter((p) => p.participant_type === 'jovem'), [filtered]);
+  const unset = useMemo(() => filtered.filter((p) => !p.participant_type), [filtered]);
+
+  // Group couples into pairs (avoid duplicates)
+  const couplePairs = useMemo(() => {
+    const seen = new Set<string>();
+    const pairs: { a: TeamProfile; b: TeamProfile | null }[] = [];
+    for (const p of couples) {
+      if (seen.has(p.user_id)) continue;
+      const partner = p.spouse_user_id
+        ? couples.find((c) => c.user_id === p.spouse_user_id) || null
+        : null;
+      pairs.push({ a: p, b: partner });
+      seen.add(p.user_id);
+      if (partner) seen.add(partner.user_id);
+    }
+    return pairs;
+  }, [couples]);
+
   const roleCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     profiles.forEach((p) => {
@@ -99,17 +210,6 @@ export function DiscernirCoordenacao() {
     });
     return counts;
   }, [profiles]);
-
-  if (authLoading || discernirLoading || adminLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-amber-700" />
-      </div>
-    );
-  }
-
-  if (!user) return <Navigate to="/auth" replace />;
-  if (!isCoordinator) return <Navigate to="/dashboard" replace />;
 
   const handleDownload = (p: TeamProfile) => {
     const result: CircleProfileResult = {
@@ -125,6 +225,217 @@ export function DiscernirCoordenacao() {
     downloadPerfilServicoPDF(result, p.display_name);
   };
 
+  /**
+   * Build balanced circles: each circle = 1 couple + N youth
+   * Uses greedy algorithm to maximize role diversity per circle.
+   */
+  const buildSuggestedCircles = () => {
+    const linkedPairs = couplePairs.filter((p) => p.b !== null) as {
+      a: TeamProfile;
+      b: TeamProfile;
+    }[];
+
+    if (linkedPairs.length === 0) {
+      toast({
+        title: 'Nenhum casal vinculado',
+        description: 'Marque os casais e ligue cada cônjuge para gerar a sugestão.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (youth.length === 0) {
+      toast({
+        title: 'Nenhum jovem marcado',
+        description: 'Marque pelo menos uma pessoa como "jovem" para gerar círculos.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const numCircles = linkedPairs.length;
+    const circles: TeamProfile[][] = linkedPairs.map(({ a, b }) => [a, b]);
+    const youthPool = [...youth].sort(() => Math.random() - 0.5);
+
+    // Distribute youth one by one, placing each in the circle that most needs their primary role
+    for (const j of youthPool) {
+      let bestIdx = 0;
+      let bestScore = -Infinity;
+      circles.forEach((circle, idx) => {
+        const rolesPresent = new Set(circle.map((m) => m.primary_role));
+        const sizeScore = -circle.length * 2; // prefer smaller circles
+        const diversityScore = rolesPresent.has(j.primary_role) ? 0 : 3; // reward new role
+        const total = sizeScore + diversityScore;
+        if (total > bestScore) {
+          bestScore = total;
+          bestIdx = idx;
+        }
+      });
+      circles[bestIdx].push(j);
+    }
+
+    setSuggestedCircles(circles);
+  };
+
+  if (authLoading || discernirLoading || adminLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-amber-700" />
+      </div>
+    );
+  }
+
+  if (!user) return <Navigate to="/auth" replace />;
+  if (!isCoordinator) return <Navigate to="/dashboard" replace />;
+
+  const renderProfileCard = (p: TeamProfile, opts?: { compact?: boolean }) => {
+    const compact = opts?.compact;
+    const spouseOptions = profiles.filter(
+      (o) => o.user_id !== p.user_id && (o.participant_type === 'casal' || !o.participant_type),
+    );
+
+    return (
+      <Card key={p.id} className="hover:shadow-md transition-shadow">
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <CardTitle className="text-base font-semibold text-foreground truncate">
+                {p.display_name}
+              </CardTitle>
+              <Badge
+                variant="outline"
+                className={cn('text-xs w-fit mt-1', ROLE_COLORS[p.primary_role] || '')}
+              >
+                {p.primary_role}
+              </Badge>
+            </div>
+            {p.participant_type && (
+              <Badge variant="secondary" className="text-xs gap-1 shrink-0">
+                {p.participant_type === 'casal' ? (
+                  <Heart className="w-3 h-3" />
+                ) : (
+                  <UserIcon className="w-3 h-3" />
+                )}
+                {p.participant_type === 'casal' ? 'Casal' : 'Jovem'}
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {!compact && (
+            <>
+              <div className="space-y-1.5">
+                {p.ranking.slice(0, 3).map((r, i) => (
+                  <div key={r.role} className="flex items-center justify-between text-xs">
+                    <span
+                      className={cn(
+                        'truncate',
+                        i === 0 ? 'font-medium text-foreground' : 'text-muted-foreground',
+                      )}
+                    >
+                      {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'} {r.role}
+                    </span>
+                    <span className="font-medium text-amber-800">{r.percentage}%</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-2 border-t space-y-1">
+                {(['lideranca', 'acolhimento', 'comunicacao', 'equipe', 'espiritualidade', 'conducao'] as BlockKey[]).map(
+                  (b) => (
+                    <div key={b} className="flex items-center gap-2">
+                      <span className="text-[10px] text-muted-foreground w-24 truncate">
+                        {getBlockLabel(b)}
+                      </span>
+                      <div className="flex-1 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-amber-600 rounded-full"
+                          style={{ width: `${p.percentages[b] || 0}%` }}
+                        />
+                      </div>
+                      <span className="text-[10px] text-muted-foreground w-7 text-right">
+                        {p.percentages[b] || 0}%
+                      </span>
+                    </div>
+                  ),
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Coordinator markers */}
+          <div className="pt-3 border-t space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-muted-foreground w-14">Tipo:</span>
+              <Select
+                value={p.participant_type || 'none'}
+                onValueChange={(v) =>
+                  updateProfileMarker(p.id, {
+                    participant_type: v === 'none' ? null : (v as ParticipantType),
+                    ...(v !== 'casal' ? { spouse_user_id: null } : {}),
+                  })
+                }
+                disabled={savingId === p.id}
+              >
+                <SelectTrigger className="h-8 text-xs flex-1">
+                  <SelectValue placeholder="Selecionar..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— Não marcado —</SelectItem>
+                  <SelectItem value="casal">Casal</SelectItem>
+                  <SelectItem value="jovem">Jovem</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {p.participant_type === 'casal' && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-muted-foreground w-14">Cônjuge:</span>
+                <Select
+                  value={p.spouse_user_id || 'none'}
+                  onValueChange={(v) =>
+                    updateProfileMarker(p.id, {
+                      spouse_user_id: v === 'none' ? null : v,
+                    })
+                  }
+                  disabled={savingId === p.id}
+                >
+                  <SelectTrigger className="h-8 text-xs flex-1">
+                    <SelectValue placeholder="Vincular..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">— Sem vínculo —</SelectItem>
+                    {spouseOptions.map((o) => (
+                      <SelectItem key={o.user_id} value={o.user_id}>
+                        {o.display_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {savingId === p.id && (
+              <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                <Loader2 className="w-3 h-3 animate-spin" /> Salvando...
+              </p>
+            )}
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleDownload(p)}
+            className="w-full gap-2 mt-1"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Baixar PDF
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6 px-4 sm:px-0">
       {/* Header */}
@@ -136,7 +447,7 @@ export function DiscernirCoordenacao() {
           </h1>
         </div>
         <p className="text-sm text-muted-foreground">
-          Veja o Perfil de Serviço da equipe lado a lado para montar círculos equilibrados.
+          Marque casais e jovens, vincule os cônjuges e gere círculos equilibrados automaticamente.
         </p>
       </div>
 
@@ -149,17 +460,26 @@ export function DiscernirCoordenacao() {
               Distribuição da equipe ({profiles.length} {profiles.length === 1 ? 'pessoa' : 'pessoas'})
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
             <div className="flex flex-wrap gap-2">
-              {Object.entries(roleCounts).map(([role, count]) => (
-                <Badge
-                  key={role}
-                  variant="outline"
-                  className={cn('text-xs px-3 py-1', ROLE_COLORS[role] || '')}
-                >
-                  {role}: {count}
+              {Object.entries(roleCounts).map(([r, count]) => (
+                <Badge key={r} variant="outline" className={cn('text-xs px-3 py-1', ROLE_COLORS[r] || '')}>
+                  {r}: {count}
                 </Badge>
               ))}
+            </div>
+            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Heart className="w-3 h-3" /> Casais marcados: {couples.length}
+              </span>
+              <span className="flex items-center gap-1">
+                <UserIcon className="w-3 h-3" /> Jovens marcados: {youth.length}
+              </span>
+              {unset.length > 0 && (
+                <span className="text-amber-700">
+                  • {unset.length} sem marcação
+                </span>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -176,93 +496,192 @@ export function DiscernirCoordenacao() {
         />
       </div>
 
-      {/* Profiles grid */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-6 h-6 animate-spin text-amber-700" />
         </div>
-      ) : filtered.length === 0 ? (
+      ) : profiles.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            {profiles.length === 0
-              ? 'Ninguém da equipe completou o Perfil de Serviço ainda.'
-              : 'Nenhum resultado para sua busca.'}
+            Ninguém da equipe completou o Perfil de Serviço ainda.
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((p) => (
-            <Card key={p.id} className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold text-foreground">
-                  {p.display_name}
-                </CardTitle>
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    'text-xs w-fit mt-1',
-                    ROLE_COLORS[p.primary_role] || '',
-                  )}
-                >
-                  {p.primary_role}
-                </Badge>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {/* Top 3 mini */}
-                <div className="space-y-1.5">
-                  {p.ranking.slice(0, 3).map((r, i) => (
-                    <div
-                      key={r.role}
-                      className="flex items-center justify-between text-xs"
-                    >
-                      <span
-                        className={cn(
-                          'truncate',
-                          i === 0 ? 'font-medium text-foreground' : 'text-muted-foreground',
-                        )}
-                      >
-                        {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'} {r.role}
-                      </span>
-                      <span className="font-medium text-amber-800">{r.percentage}%</span>
-                    </div>
-                  ))}
-                </div>
+        <Tabs defaultValue="todos" className="space-y-4">
+          <TabsList className="flex flex-wrap h-auto">
+            <TabsTrigger value="todos">Todos ({filtered.length})</TabsTrigger>
+            <TabsTrigger value="casais" className="gap-1">
+              <Heart className="w-3 h-3" /> Casais ({couples.length})
+            </TabsTrigger>
+            <TabsTrigger value="jovens" className="gap-1">
+              <UserIcon className="w-3 h-3" /> Jovens ({youth.length})
+            </TabsTrigger>
+            {unset.length > 0 && (
+              <TabsTrigger value="pendentes">Sem marcação ({unset.length})</TabsTrigger>
+            )}
+            <TabsTrigger value="circulos" className="gap-1">
+              <Wand2 className="w-3 h-3" /> Sugestão de círculos
+            </TabsTrigger>
+          </TabsList>
 
-                {/* Mini bars per dimension */}
-                <div className="pt-2 border-t space-y-1">
-                  {(['lideranca', 'acolhimento', 'comunicacao', 'equipe', 'espiritualidade', 'conducao'] as BlockKey[]).map(
-                    (b) => (
-                      <div key={b} className="flex items-center gap-2">
-                        <span className="text-[10px] text-muted-foreground w-24 truncate">
-                          {getBlockLabel(b)}
-                        </span>
-                        <div className="flex-1 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-amber-600 rounded-full"
-                            style={{ width: `${p.percentages[b] || 0}%` }}
-                          />
-                        </div>
-                        <span className="text-[10px] text-muted-foreground w-7 text-right">
-                          {p.percentages[b] || 0}%
-                        </span>
-                      </div>
-                    ),
-                  )}
-                </div>
+          <TabsContent value="todos">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((p) => renderProfileCard(p))}
+            </div>
+          </TabsContent>
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDownload(p)}
-                  className="w-full gap-2 mt-2"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  Baixar PDF
-                </Button>
+          <TabsContent value="casais" className="space-y-6">
+            {couplePairs.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center text-muted-foreground">
+                  Nenhum casal marcado ainda. Vá em "Todos" e marque o tipo de cada pessoa.
+                </CardContent>
+              </Card>
+            ) : (
+              couplePairs.map(({ a, b }, idx) => (
+                <div key={a.id} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-rose-600" />
+                    <h3 className="text-sm font-semibold text-foreground">
+                      Casal {idx + 1}
+                      {!b && <span className="text-amber-700 ml-2 text-xs font-normal">(cônjuge não vinculado)</span>}
+                    </h3>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {renderProfileCard(a)}
+                    {b && renderProfileCard(b)}
+                  </div>
+                </div>
+              ))
+            )}
+          </TabsContent>
+
+          <TabsContent value="jovens">
+            {youth.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center text-muted-foreground">
+                  Nenhum jovem marcado ainda.
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {youth.map((p) => renderProfileCard(p))}
+              </div>
+            )}
+          </TabsContent>
+
+          {unset.length > 0 && (
+            <TabsContent value="pendentes">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {unset.map((p) => renderProfileCard(p))}
+              </div>
+            </TabsContent>
+          )}
+
+          <TabsContent value="circulos" className="space-y-4">
+            <Card>
+              <CardContent className="py-6 space-y-4">
+                <div className="flex items-start gap-3">
+                  <Wand2 className="w-5 h-5 text-amber-700 mt-0.5" />
+                  <div className="flex-1 space-y-1">
+                    <h3 className="text-sm font-semibold">Sugestão automática</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Cada círculo terá <strong>1 casal + N jovens</strong>, distribuídos para que
+                      os papéis de serviço se complementem dentro de cada grupo.
+                    </p>
+                  </div>
+                  <Button onClick={buildSuggestedCircles} className="gap-2">
+                    <Wand2 className="w-4 h-4" />
+                    Gerar sugestão
+                  </Button>
+                </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
+
+            {suggestedCircles && (
+              <div className="space-y-6">
+                {suggestedCircles.map((circle, idx) => {
+                  const rolesPresent = new Set(circle.map((m) => m.primary_role));
+                  const couple = circle.filter((m) => m.participant_type === 'casal');
+                  const jovens = circle.filter((m) => m.participant_type === 'jovem');
+                  return (
+                    <Card key={idx} className="border-amber-200">
+                      <CardHeader className="pb-3 bg-amber-50/40">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-amber-700" />
+                            Círculo {idx + 1}
+                            <span className="text-xs font-normal text-muted-foreground">
+                              ({circle.length} pessoas)
+                            </span>
+                          </CardTitle>
+                          <div className="flex flex-wrap gap-1">
+                            {ALL_ROLES.map((r) => (
+                              <Badge
+                                key={r}
+                                variant="outline"
+                                className={cn(
+                                  'text-[10px] px-2',
+                                  rolesPresent.has(r)
+                                    ? ROLE_COLORS[r]
+                                    : 'opacity-30 line-through',
+                                )}
+                              >
+                                {rolesPresent.has(r) && <Check className="w-2.5 h-2.5 mr-0.5" />}
+                                {r}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-4 space-y-4">
+                        {couple.length > 0 && (
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 text-xs font-medium text-rose-700">
+                              <Heart className="w-3 h-3" /> Casal
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {couple.map((m) => (
+                                <Badge
+                                  key={m.id}
+                                  variant="outline"
+                                  className={cn('text-xs py-1.5 px-3', ROLE_COLORS[m.primary_role])}
+                                >
+                                  {m.display_name} · {m.primary_role}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {jovens.length > 0 && (
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 text-xs font-medium text-sky-700">
+                              <UserIcon className="w-3 h-3" /> Jovens ({jovens.length})
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {jovens.map((m) => (
+                                <Badge
+                                  key={m.id}
+                                  variant="outline"
+                                  className={cn('text-xs py-1.5 px-3', ROLE_COLORS[m.primary_role])}
+                                >
+                                  {m.display_name} · {m.primary_role}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+                <p className="text-xs text-muted-foreground italic text-center">
+                  Esta é uma sugestão baseada nos perfis. Ajuste conforme o seu discernimento pastoral.
+                </p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       )}
     </div>
   );
