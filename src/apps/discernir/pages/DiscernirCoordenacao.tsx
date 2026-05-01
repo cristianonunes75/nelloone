@@ -32,6 +32,8 @@ import {
   Wand2,
   Save,
   Check,
+  ClipboardCopy,
+  ChevronDown,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
