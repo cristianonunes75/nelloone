@@ -818,3 +818,150 @@ function LeituraPastoralBlock({
     </div>
   );
 }
+
+// =====================================================
+// Sub-componente: Leitura de combinação do círculo por IA
+// Sob demanda — só dispara IA quando o coordenador clica.
+// =====================================================
+interface LeituraIACirculoResult {
+  forcas_do_grupo: string[];
+  riscos_do_grupo: string[];
+  quem_puxa_o_que: { nome: string; papel_no_grupo: string }[];
+  recomendacao_pratica: string;
+}
+
+function LeituraIACirculoBlock({ members }: { members: TeamProfile[] }) {
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<LeituraIACirculoResult | null>(null);
+  const [cached, setCached] = useState(false);
+
+  const generate = async (force = false) => {
+    setLoading(true);
+    try {
+      const payload = {
+        force,
+        members: members.map((m) => ({
+          user_id: m.user_id,
+          display_name: m.display_name,
+          primary_role: m.primary_role,
+          secondary_role: m.secondary_role,
+          percentages: m.percentages,
+        })),
+      };
+      const { data, error } = await supabase.functions.invoke(
+        'discernir-generate-circle-combination',
+        { body: payload },
+      );
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      setResult((data as any).result);
+      setCached(!!(data as any).cached);
+    } catch (e: any) {
+      toast({
+        title: 'Não foi possível gerar a leitura',
+        description: e?.message || 'Tente novamente em instantes.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!result) {
+    return (
+      <div className="pt-3 border-t">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => generate(false)}
+          disabled={loading}
+          className="w-full gap-2 border-violet-300 text-violet-800 hover:bg-violet-50"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              Gerando leitura combinada do círculo...
+            </>
+          ) : (
+            <>
+              <Brain className="w-3.5 h-3.5" />
+              Gerar leitura de combinação por IA
+            </>
+          )}
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pt-3 border-t space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-violet-900 flex items-center gap-1.5">
+          <Brain className="w-3.5 h-3.5" />
+          Leitura combinada do círculo
+          {cached && (
+            <span className="text-[10px] font-normal text-muted-foreground">(em cache)</span>
+          )}
+        </p>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => generate(true)}
+          disabled={loading}
+          className="h-6 px-2 text-[11px] text-violet-700 hover:text-violet-900"
+        >
+          {loading ? (
+            <Loader2 className="w-3 h-3 animate-spin" />
+          ) : (
+            <>
+              <RefreshCw className="w-3 h-3 mr-1" /> Regenerar
+            </>
+          )}
+        </Button>
+      </div>
+
+      <div className="space-y-2.5 text-xs leading-relaxed bg-violet-50/40 rounded-md border border-violet-200 p-3">
+        <div>
+          <p className="font-semibold text-emerald-800 mb-1">Forças do grupo</p>
+          <ul className="space-y-1 text-muted-foreground pl-3">
+            {result.forcas_do_grupo.map((f, i) => (
+              <li key={i} className="relative before:content-['•'] before:absolute before:-left-3 before:text-emerald-700">
+                {f}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <p className="font-semibold text-amber-900 mb-1">Riscos coletivos</p>
+          <ul className="space-y-1 text-muted-foreground pl-3">
+            {result.riscos_do_grupo.map((r, i) => (
+              <li key={i} className="relative before:content-['•'] before:absolute before:-left-3 before:text-amber-700">
+                {r}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <p className="font-semibold text-violet-900 mb-1">Quem puxa o quê neste círculo</p>
+          <ul className="space-y-1 text-muted-foreground pl-3">
+            {result.quem_puxa_o_que.map((q, i) => (
+              <li key={i} className="relative before:content-['•'] before:absolute before:-left-3 before:text-violet-700">
+                <strong className="text-foreground">{q.nome}:</strong> {q.papel_no_grupo}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="rounded-md bg-white/70 border border-violet-200 px-2.5 py-2">
+          <p className="text-[11px] font-semibold text-violet-900 mb-0.5">Recomendação prática</p>
+          <p className="text-muted-foreground">{result.recomendacao_pratica}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
