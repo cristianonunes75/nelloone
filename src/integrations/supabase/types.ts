@@ -7419,6 +7419,23 @@ export type Database = {
         }
         Relationships: []
       }
+      discernir_circle_profiles_team_view: {
+        Row: {
+          created_at: string | null
+          display_name: string | null
+          id: string | null
+          percentages: Json | null
+          primary_role: string | null
+          ranking: Json | null
+          secondary_role: string | null
+          status: string | null
+          tertiary_role: string | null
+          updated_at: string | null
+          user_id: string | null
+          version: string | null
+        }
+        Relationships: []
+      }
       nello_user_profile_summary: {
         Row: {
           essence_created_at: string | null
