@@ -350,6 +350,7 @@ export function gerarLeituraPerfilServico(
     agrega,
     atencao: atencaoFinal,
     encaixe,
+    complementa: complementaPara(percentages),
   };
 }
 
