@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -52,6 +52,7 @@ export function DiscernirAuthProvider({ children }: DiscernirAuthProviderProps) 
   const [priest, setPriest] = useState<DiscernirPriest | null>(null);
   const [consents, setConsents] = useState<DiscernirConsent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const lastFetchedUserId = useRef<string | null>(null);
 
   const fetchData = async () => {
     if (!user) {
@@ -60,6 +61,7 @@ export function DiscernirAuthProvider({ children }: DiscernirAuthProviderProps) 
       setPriest(null);
       setConsents([]);
       setIsLoading(false);
+      lastFetchedUserId.current = null;
       return;
     }
 
@@ -100,6 +102,7 @@ export function DiscernirAuthProvider({ children }: DiscernirAuthProviderProps) 
         .is('revoked_at', null);
 
       setConsents(consentsData || []);
+      lastFetchedUserId.current = user.id;
     } catch (error) {
       console.error('Error fetching Discernir data:', error);
     } finally {
@@ -108,10 +111,15 @@ export function DiscernirAuthProvider({ children }: DiscernirAuthProviderProps) 
   };
 
   useEffect(() => {
-    if (!authLoading) {
-      fetchData();
+    if (authLoading) return;
+    // Only refetch if the actual user identity changed (not just a token refresh / new object reference)
+    if (lastFetchedUserId.current === (user?.id ?? null)) {
+      // Same user (or still no user) — no need to refetch
+      if (!user && isLoading) setIsLoading(false);
+      return;
     }
-  }, [user, authLoading]);
+    fetchData();
+  }, [user?.id, authLoading]);
 
   const hasIndividualConsent = consents.some(c => c.consent_type === 'individual');
   const hasConjugalConsent = consents.some(c => c.consent_type === 'conjugal');
