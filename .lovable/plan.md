@@ -1,77 +1,86 @@
 ## Objetivo
 
-Tornar a leitura do **Meu Espaço** (Nello Business) mais palpável: em vez de afirmações genéricas, mostrar **cenas reais do dia a dia da loja** ("cliente entra indeciso", "fila no caixa", "devolução difícil") e, para o gestor/CEO, **exemplos concretos de ações de gestão** por perfil (como dar feedback, como delegar, como reconhecer).
+Adicionar, no painel de **Coordenação** (e no card de cada participante), uma **leitura individual e específica** — gerada a partir da combinação real dos 6 percentuais do Perfil de Serviço de cada pessoa. Nunca um texto genérico por papel principal: dois "Condutores" com perfis diferentes recebem leituras diferentes.
 
-A linguagem continua de **fase, não rótulo**, sem termos clínicos, sempre em 2ª pessoa.
+## Como a leitura é montada (regra determinística, sem IA)
 
----
+Para cada participante, usamos os 6 percentuais já calculados:
+`lideranca`, `acolhimento`, `comunicacao`, `equipe`, `espiritualidade`, `conducao`.
 
-## O que a colaboradora vai passar a ver
+1. **Classificação dos blocos** em três faixas:
+   - **Alto:** ≥ 75%
+   - **Médio:** 50–74%
+   - **Baixo:** < 50%
 
-Na aba **No trabalho**, dois novos blocos serão acrescentados (após "Como você se conecta com o cliente" e antes de "Pontos de atenção"):
+2. **Leitura compõe 4 partes**, todas dependentes da combinação real:
 
-### 1. "Um dia comum na loja com você"
-3–4 micro-cenas curtas, escolhidas pelo perfil DISC + Temperamento + Arquétipo. Exemplos:
+   **a) Linha de abertura — assinatura do perfil**
+   Combina os 2 blocos mais altos (não só o top 1). Ex.:
+   - Liderança alto + Acolhimento alto → "Conduz pelo cuidado: dá direção sem perder a escuta."
+   - Liderança alto + Espiritualidade alto → "Lidera com âncora de oração: puxa o grupo a partir do propósito."
+   - Comunicação alto + Equipe alto → "Faz o grupo conversar: traduz o conteúdo e tece os vínculos."
+   - (15 combinações possíveis dos 6 blocos 2 a 2 — todas mapeadas.)
 
-- **Perfil D / Colérico (vendedora):** "Quando o cliente chega decidido, você fecha rápido e bem. Já o cliente que precisa pensar em voz alta tende a te cansar — combine com você mesma uma respiração antes de responder."
-- **Perfil I / Sanguíneo:** "Você é a primeira a notar quando alguém entra na loja sem rumo. Seu desafio costuma ser **manter o foco no fechamento** depois de criar vínculo — ter um lembrete simples no balcão ajuda."
-- **Perfil S / Fleumático:** "Quando a fila aumenta, você mantém a calma do time. Em troca, peça que avisem mudanças de promoção com antecedência — não no meio do expediente."
-- **Perfil C / Melancólico:** "Você nota detalhes na vitrine, no estoque e no atendimento que ninguém mais vê. Não tente corrigir tudo de uma vez — escolha 1 ponto por semana."
+   **b) O que essa pessoa agrega ao círculo (pontos positivos)**
+   Lista derivada de **cada bloco em faixa Alta**. Cada bloco tem uma frase específica de contribuição. Se a pessoa tem 3 blocos altos, aparecem 3 contribuições; se tem só 1, aparece 1.
 
-### 2. "Cenas que pedem mais consciência sua"
-2–3 situações típicas onde o perfil costuma ter mais dificuldade, com sugestão prática:
+   **c) Pontos de atenção**
+   Derivados por **dois caminhos combinados**:
+   - **Bloco baixo isolado quando o oposto é alto** (gera tensão real). Ex.: Liderança alta + Acolhimento baixo → "Pode atropelar quem é mais quieto; checar se todos foram ouvidos antes de decidir."
+   - **Bloco baixo crítico para o papel principal**. Ex.: papel principal Pastor do Círculo + Comunicação baixa → "Cuida bem 1 a 1, mas pode travar quando precisa puxar fala do grupo."
+   - Mapeamento cobre os 5 papéis × 5 blocos baixos relevantes.
 
-- "Devolução difícil com cliente irritado → respira, valida o que ele sente antes de explicar a regra."
-- "Reunião rápida no início do dia → escreve as 2 metas suas no celular antes."
-- "Final de mês com pressão de meta → combine com a gestora um check de 5 min, não cobrança longa."
+   **d) Como melhor encaixar no círculo (recomendação prática)**
+   Derivada da combinação papel principal + 2º bloco mais alto. Ex.:
+   - Condutor + Espiritualidade 2º → "Bom para abrir e fechar encontros com oração curta e firme."
+   - Facilitador + Acolhimento 2º → "Bom para receber jovem novo e fazer a primeira ponte."
+   - Pastor + Equipe 2º → "Bom para mediar quando há atrito entre membros."
 
----
+3. **Resultado:** texto curto (4–6 linhas), 100% específico àquela combinação de percentuais. Mesmo papel principal, percentuais diferentes → leitura diferente.
 
-## O que muda na aba "No trabalho" para perfis de **liderança**
+## Onde aparece
 
-Quando `categorizeRole(jobTitle) === 'leadership'` (Lisa, Larissa, etc.), o bloco **"O que pedir ao time / gestor"** é substituído por **"Como você lidera melhor a equipe"**, com **exemplos concretos de ação de gestão** por perfil:
+1. **Painel de Coordenação** (`DiscernirCoordenacao.tsx`):
+   - Cada card de participante (em todas as abas: Todos, Casais, Jovens, Pendentes) ganha um bloco recolhível **"Leitura pastoral"** com as 4 partes acima.
+   - Botão "Copiar leitura" em cada card (texto puro pronto para colar em mensagem/WhatsApp).
 
-- **Líder D/Colérico:** 
-  - "Quando for dar feedback, comece pelo ponto direto, mas pergunte: *'faz sentido pra você?'* antes de fechar."
-  - "Em vez de assumir a venda difícil sozinha, **delegue com confiança e esteja por perto** — sua equipe cresce assim."
-- **Líder I/Sanguíneo:**
-  - "Use seu dom de leitura de clima nas reuniões de segunda — comece pela energia da equipe antes da meta."
-  - "Crie um pequeno ritual semanal de reconhecimento nominal — funciona muito com quem você lidera."
-- **Líder S/Fleumático:**
-  - "Sua presença estável é o que segura o time em mês difícil. Torne isso visível: diga em voz alta 'estou aqui'."
-  - "Marque 15 min individuais por semana com cada vendedora — você cuida melhor 1:1 do que em grupo."
-- **Líder C/Melancólico:**
-  - "Quando trouxer um padrão novo, mostre o **exemplo bom e o exemplo ruim** — sua equipe aprende mais com referência visual."
-  - "Cuidado para o critério não virar cobrança silenciosa. Verbalize o que está bom também."
+2. **PDF do participante** (`perfilServicoPDF.ts`):
+   - Adicionar uma página/seção "Leitura combinada do seu perfil" com o mesmo texto, antes do disclaimer final.
 
-Adicionalmente: **micro-exemplos de gestão cruzando o perfil da líder com o perfil de cada colega** já aparecem na aba "Minha equipe" (campo "ponte natural") — esse texto será enriquecido com 1 ação prática por par (ex.: "Com a Larissa (perfil S), evite delegar tarefa nova de última hora — combine na sexta o que vem na segunda").
+3. **Tela de resultado do próprio participante** (`DiscernirPerfilServico.tsx`):
+   - Mostrar a mesma leitura logo abaixo do top 3 de papéis, para que cada pessoa veja sua leitura específica.
 
----
+## Arquivos a criar / editar
+
+**Criar:**
+- `src/apps/discernir/utils/perfilServicoLeitura.ts`
+  - Função pura `gerarLeituraPerfilServico(percentages, primaryRole, secondaryRole) → { abertura, agrega: string[], atencao: string[], encaixe: string }`.
+  - Tabelas internas:
+    - `ABERTURAS_PAR_BLOCOS` (15 combinações 2 a 2).
+    - `CONTRIBUICAO_POR_BLOCO_ALTO` (6 frases).
+    - `TENSAO_BLOCO_OPOSTO` (mapeamento de pares opostos).
+    - `ATENCAO_PAPEL_X_BLOCO_BAIXO` (5 papéis × blocos críticos).
+    - `ENCAIXE_PAPEL_X_SEGUNDO_BLOCO` (5 × 6 combinações).
+
+**Editar:**
+- `src/apps/discernir/pages/DiscernirCoordenacao.tsx`
+  - Importar `gerarLeituraPerfilServico` e renderizar a seção em cada card (componente novo `LeituraPastoralCard` interno ao arquivo ou em `components/`).
+  - Botão "Copiar leitura" usando `navigator.clipboard`.
+- `src/apps/discernir/pages/DiscernirPerfilServico.tsx`
+  - Renderizar a leitura na tela de resultado individual.
+- `src/apps/discernir/utils/perfilServicoPDF.ts`
+  - Adicionar seção "Leitura combinada" no PDF.
 
 ## Detalhes técnicos
 
-Arquivos a modificar:
+- **Sem mudanças no banco** — todos os dados necessários já estão em `discernir_circle_profiles.percentages` e `primary_role` / `secondary_role`.
+- **Sem chamadas de IA / edge function** — geração 100% client-side, sincrona, gratuita e instantânea.
+- **Determinístico:** o mesmo perfil sempre gera o mesmo texto (importante para confiança pastoral).
+- **Não diagnóstico:** a leitura mantém a linguagem pastoral já usada ("tende a", "pode ajudar", "cuidar para"). Nada de "você é" / "você não consegue".
+- **i18n:** PT-BR, alinhado ao tom do app Discernir (você, equipe, círculo).
 
-1. **`src/apps/business/lib/essenceLens.ts`**
-   - Adicionar `storeDayScenes: string[]` e `awarenessScenes: string[]` em `WorkLensBlocks`.
-   - Nova função `buildStoreDayScenes(snap, role)` com bibliotecas internas indexadas por DISC + categoria de cargo (`sales` vs `leadership` vs `admin`/`ops`/`marketing`).
-   - Nova função `buildAwarenessScenes(snap, role)`.
-   - Para liderança: novo `buildLeadershipActions(snap)` que substitui `askTeam` quando `role === 'leadership'`. Manter `askTeam` original para os demais cargos.
-   - Enriquecer `buildTeammateDeepConnect` adicionando 1 frase de **ação de gestão prática** quando `self` for liderança (campo extra `managementTip` em `TeammateConnect`).
+## Fora do escopo (intencionalmente)
 
-2. **`src/apps/business/lib/gentleVocabulary.ts`**
-   - Novas chaves: `storeDay: 'Um dia comum na loja com você'`, `awarenessScenes: 'Cenas que pedem mais consciência sua'`, `leadershipActions: 'Como você lidera melhor a equipe'`, `managementTip: 'Ação prática de gestão'`.
-
-3. **`src/apps/business/pages/BusinessMySpace.tsx`**
-   - Renderizar `lens.storeDayScenes` e `lens.awarenessScenes` como dois novos `LensBlock` na aba "No trabalho" (entre `clientConnection` e `weight`).
-   - Quando o usuário for liderança, trocar o título do bloco final de `askTeam` para `leadershipActions`.
-   - No `ColleagueCard`, exibir `connect.managementTip` em uma 5ª linha (apenas quando presente, ou seja, quando o próprio usuário for líder).
-
-4. Sem mudanças em RPC, RLS ou tipos do banco — toda a leitura é construída no cliente a partir do `essence_visual_data` já trazido por `get_company_team_for_member`.
-
-## Compliance / linguagem
-
-- Toda cena começa com verbo de tendência ("você costuma", "tende a", "quando...").
-- Nenhuma menção a MBTI, "linguagens do amor", ou termos clínicos. Mantém Nello16 e Estilos de Conexão Afetiva.
-- Encerramento de cada bloco reforça: *"isto descreve uma fase, não quem você é"*.
-- O `EthicalFooter` e o `PhaseAnchor` continuam em todos os blocos.
+- Afinidade entre membros / matriz de afinidade.
+- Sugestão automática de círculos com base na leitura (a sugestão atual continua igual).
+- Edição manual da leitura pelo coordenador (pode virar próximo passo se precisar).

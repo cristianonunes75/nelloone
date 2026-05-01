@@ -32,6 +32,8 @@ import {
   Wand2,
   Save,
   Check,
+  ClipboardCopy,
+  ChevronDown,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -42,6 +44,7 @@ import {
   getBlockLabel,
 } from '../utils/circleProfileCalculation';
 import { downloadPerfilServicoPDF } from '../utils/perfilServicoPDF';
+import { gerarLeituraPerfilServico, leituraToText } from '../utils/perfilServicoLeitura';
 import { cn } from '@/lib/utils';
 
 type ParticipantType = 'casal' | 'jovem' | null;
@@ -422,6 +425,14 @@ export function DiscernirCoordenacao() {
             )}
           </div>
 
+          {/* Leitura pastoral combinada (específica deste perfil) */}
+          <LeituraPastoralBlock
+            percentages={p.percentages}
+            primaryRole={p.primary_role}
+            secondaryRole={p.secondary_role}
+            displayName={p.display_name}
+          />
+
           <Button
             variant="outline"
             size="sm"
@@ -682,6 +693,116 @@ export function DiscernirCoordenacao() {
             )}
           </TabsContent>
         </Tabs>
+      )}
+    </div>
+  );
+}
+
+// =====================================================
+// Sub-componente: Leitura pastoral combinada do perfil
+// Específico para cada participante (não genérico por papel).
+// =====================================================
+interface LeituraPastoralBlockProps {
+  percentages: CircleProfilePercentages;
+  primaryRole: string;
+  secondaryRole: string | null;
+  displayName: string;
+}
+
+function LeituraPastoralBlock({
+  percentages,
+  primaryRole,
+  secondaryRole,
+  displayName,
+}: LeituraPastoralBlockProps) {
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const leitura = useMemo(
+    () => gerarLeituraPerfilServico(percentages, primaryRole, secondaryRole),
+    [percentages, primaryRole, secondaryRole],
+  );
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(leituraToText(leitura, displayName));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast({ title: 'Leitura copiada', description: 'Cole onde quiser compartilhar.' });
+    } catch {
+      toast({ title: 'Não foi possível copiar', variant: 'destructive' });
+    }
+  };
+
+  return (
+    <div className="pt-3 border-t">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between text-left text-xs font-medium text-amber-800 hover:text-amber-900 transition-colors"
+      >
+        <span className="flex items-center gap-1.5">
+          <Sparkles className="w-3 h-3" />
+          Leitura pastoral combinada
+        </span>
+        <ChevronDown
+          className={cn('w-3.5 h-3.5 transition-transform', open && 'rotate-180')}
+        />
+      </button>
+
+      {open && (
+        <div className="mt-2 space-y-2.5 text-xs leading-relaxed">
+          <p className="italic text-foreground">{leitura.abertura}</p>
+
+          <div>
+            <p className="font-semibold text-emerald-800 mb-1">O que agrega ao círculo</p>
+            <ul className="space-y-1 text-muted-foreground pl-3">
+              {leitura.agrega.map((a, i) => (
+                <li key={i} className="relative before:content-['•'] before:absolute before:-left-3 before:text-emerald-700">
+                  {a}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="font-semibold text-amber-900 mb-1">Pontos de atenção</p>
+            <ul className="space-y-1 text-muted-foreground pl-3">
+              {leitura.atencao.map((a, i) => (
+                <li key={i} className="relative before:content-['•'] before:absolute before:-left-3 before:text-amber-700">
+                  {a}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-md bg-amber-50/60 border border-amber-200 px-2.5 py-2">
+            <p className="text-[11px] font-semibold text-amber-900 mb-0.5">
+              Melhor encaixe no círculo
+            </p>
+            <p className="text-muted-foreground">{leitura.encaixe}</p>
+          </div>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleCopy}
+            className="w-full gap-1.5 h-7 text-[11px] text-amber-800 hover:text-amber-900"
+          >
+            {copied ? (
+              <>
+                <Check className="w-3 h-3" /> Copiado
+              </>
+            ) : (
+              <>
+                <ClipboardCopy className="w-3 h-3" /> Copiar leitura
+              </>
+            )}
+          </Button>
+        </div>
       )}
     </div>
   );

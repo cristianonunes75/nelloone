@@ -10,6 +10,7 @@ import {
   getBlockLabel,
   getRoleDescription,
 } from './circleProfileCalculation';
+import { gerarLeituraPerfilServico } from './perfilServicoLeitura';
 
 const AMBER_DARK: [number, number, number] = [146, 64, 14];   // amber-900
 const AMBER_MID: [number, number, number] = [180, 83, 9];     // amber-700
@@ -206,8 +207,82 @@ export function generatePerfilServicoPDF(
     y += 9;
   }
 
-  // ==== DISCLAIMER ====
+  // ==== LEITURA COMBINADA (específica) ====
+  const leitura = gerarLeituraPerfilServico(
+    result.percentages,
+    result.primary_role,
+    result.secondary_role,
+  );
+
+  // Quebra de página se faltar espaço
+  if (y > 200) {
+    doc.addPage();
+    y = 20;
+  } else {
+    y += 6;
+  }
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(...AMBER_DARK);
+  doc.text('Leitura combinada do seu perfil', MARGIN_X, y);
+  y += 6;
+
+  // Abertura
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(10);
+  doc.setTextColor(...TEXT_DARK);
+  y = addWrappedText(doc, leitura.abertura, MARGIN_X, y, CONTENT_W, 5);
   y += 4;
+
+  // O que agrega
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(...AMBER_MID);
+  doc.text('O que voce agrega ao circulo', MARGIN_X, y);
+  y += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(...TEXT_DARK);
+  for (const item of leitura.agrega) {
+    if (y > 275) { doc.addPage(); y = 20; }
+    y = addWrappedText(doc, '- ' + item, MARGIN_X + 2, y, CONTENT_W - 2, 4.5);
+    y += 1;
+  }
+  y += 3;
+
+  // Pontos de atenção
+  if (y > 250) { doc.addPage(); y = 20; }
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(...AMBER_MID);
+  doc.text('Pontos de atencao', MARGIN_X, y);
+  y += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(...TEXT_DARK);
+  for (const item of leitura.atencao) {
+    if (y > 275) { doc.addPage(); y = 20; }
+    y = addWrappedText(doc, '- ' + item, MARGIN_X + 2, y, CONTENT_W - 2, 4.5);
+    y += 1;
+  }
+  y += 3;
+
+  // Encaixe
+  if (y > 255) { doc.addPage(); y = 20; }
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(...AMBER_MID);
+  doc.text('Melhor encaixe no circulo', MARGIN_X, y);
+  y += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(...TEXT_DARK);
+  y = addWrappedText(doc, leitura.encaixe, MARGIN_X + 2, y, CONTENT_W - 2, 4.5);
+
+  // ==== DISCLAIMER ====
+  if (y > 255) { doc.addPage(); y = 20; }
+  y += 6;
   doc.setFillColor(...AMBER_BG);
   doc.setDrawColor(...AMBER_BORDER);
   doc.setLineWidth(0.3);
