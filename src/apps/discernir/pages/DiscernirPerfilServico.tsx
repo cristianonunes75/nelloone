@@ -572,6 +572,14 @@ function LeituraCombinadaCard({
           <p className="text-sm text-foreground">{leitura.encaixe}</p>
         </div>
 
+        <div className="rounded-md bg-emerald-50/70 border border-emerald-200 px-3 py-2.5">
+          <p className="text-xs font-semibold text-emerald-900 mb-1">Quem complementa o seu perfil</p>
+          <p className="text-sm text-foreground">{leitura.complementa}</p>
+          <p className="text-[11px] text-muted-foreground mt-1.5 italic">
+            Útil para a coordenação na hora de montar o seu círculo.
+          </p>
+        </div>
+
         <Button
           type="button"
           variant="ghost"
