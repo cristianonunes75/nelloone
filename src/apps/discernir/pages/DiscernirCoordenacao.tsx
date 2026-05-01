@@ -87,6 +87,7 @@ export function DiscernirCoordenacao() {
   const { toast } = useToast();
 
   const [profiles, setProfiles] = useState<TeamProfile[]>([]);
+  const [movement, setMovement] = useState<MovementRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [savingId, setSavingId] = useState<string | null>(null);
