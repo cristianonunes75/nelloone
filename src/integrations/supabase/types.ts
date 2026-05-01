@@ -3464,14 +3464,17 @@ export type Database = {
       discernir_circle_profiles: {
         Row: {
           answers: Json
+          coordinator_notes: string | null
           created_at: string
           id: string
           notes: string | null
+          participant_type: string | null
           percentages: Json
           primary_role: string
           ranking: Json
           scores: Json
           secondary_role: string | null
+          spouse_user_id: string | null
           status: string
           tertiary_role: string | null
           updated_at: string
@@ -3480,14 +3483,17 @@ export type Database = {
         }
         Insert: {
           answers: Json
+          coordinator_notes?: string | null
           created_at?: string
           id?: string
           notes?: string | null
+          participant_type?: string | null
           percentages: Json
           primary_role: string
           ranking: Json
           scores: Json
           secondary_role?: string | null
+          spouse_user_id?: string | null
           status?: string
           tertiary_role?: string | null
           updated_at?: string
@@ -3496,14 +3502,17 @@ export type Database = {
         }
         Update: {
           answers?: Json
+          coordinator_notes?: string | null
           created_at?: string
           id?: string
           notes?: string | null
+          participant_type?: string | null
           percentages?: Json
           primary_role?: string
           ranking?: Json
           scores?: Json
           secondary_role?: string | null
+          spouse_user_id?: string | null
           status?: string
           tertiary_role?: string | null
           updated_at?: string
@@ -7421,18 +7430,18 @@ export type Database = {
       }
       discernir_circle_profiles_team_view: {
         Row: {
+          coordinator_notes: string | null
           created_at: string | null
           display_name: string | null
           id: string | null
+          participant_type: string | null
           percentages: Json | null
           primary_role: string | null
           ranking: Json | null
           secondary_role: string | null
-          status: string | null
+          spouse_user_id: string | null
           tertiary_role: string | null
-          updated_at: string | null
           user_id: string | null
-          version: string | null
         }
         Relationships: []
       }
