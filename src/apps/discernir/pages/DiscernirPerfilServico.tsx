@@ -250,7 +250,8 @@ export function DiscernirPerfilServico() {
 
   // RESULT PHASE
   if (phase === 'result' && result) {
-    return <ResultView result={result} onCopy={handleCopy} copied={copied} onRetake={handleRetake} />;
+    const userName = (user?.user_metadata as any)?.full_name || user?.email || undefined;
+    return <ResultView result={result} onCopy={handleCopy} copied={copied} onRetake={handleRetake} userName={userName} />;
   }
 
   // QUESTIONNAIRE PHASE
