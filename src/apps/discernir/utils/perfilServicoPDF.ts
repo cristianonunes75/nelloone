@@ -10,6 +10,7 @@ import {
   getBlockLabel,
   getRoleDescription,
 } from './circleProfileCalculation';
+import { gerarLeituraPerfilServico } from './perfilServicoLeitura';
 
 const AMBER_DARK: [number, number, number] = [146, 64, 14];   // amber-900
 const AMBER_MID: [number, number, number] = [180, 83, 9];     // amber-700
