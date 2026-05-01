@@ -42,6 +42,7 @@ import {
   getBlockLabel,
 } from '../utils/circleProfileCalculation';
 import { downloadPerfilServicoPDF } from '../utils/perfilServicoPDF';
+import { gerarLeituraPerfilServico, leituraToText } from '../utils/perfilServicoLeitura';
 import { cn } from '@/lib/utils';
 
 type ParticipantType = 'casal' | 'jovem' | null;
