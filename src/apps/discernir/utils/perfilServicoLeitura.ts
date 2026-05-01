@@ -369,5 +369,6 @@ export function leituraToText(
   linhas.push('', 'Pontos de atenção:');
   leitura.atencao.forEach((a) => linhas.push(`• ${a}`));
   linhas.push('', `Melhor encaixe: ${leitura.encaixe}`);
+  linhas.push('', `Quem complementa este perfil: ${leitura.complementa}`);
   return linhas.join('\n');
 }
