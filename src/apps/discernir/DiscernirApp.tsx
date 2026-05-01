@@ -68,6 +68,14 @@ export default function DiscernirApp() {
               </DiscernirProtectedRoute>
             }
           />
+          <Route
+            path="/coordenacao"
+            element={
+              <DiscernirProtectedRoute>
+                <DiscernirCoordenacao />
+              </DiscernirProtectedRoute>
+            }
+          />
 
           {/* Routes behind pilot gate */}
           <Route 
