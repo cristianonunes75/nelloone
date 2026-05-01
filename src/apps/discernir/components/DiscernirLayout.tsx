@@ -11,7 +11,8 @@ import {
   Menu,
   X,
   Church,
-  Send
+  Send,
+  ClipboardList
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,7 @@ interface DiscernirLayoutProps {
 export function DiscernirLayout({ isPriest = false }: DiscernirLayoutProps) {
   const { user, signOut } = useAuth();
   const { role, couple, priest } = useDiscernirAuth();
+  const isCoordinator = role === 'priest' || role === 'coordinator';
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isPilotMode = useDiscernirPilotMode();
@@ -53,7 +55,11 @@ export function DiscernirLayout({ isPriest = false }: DiscernirLayoutProps) {
         { path: '/padre/convites', label: 'Convites', icon: Send },
       ];
 
-  const navItems = isPriest ? priestNavItems : coupleNavItems;
+  const navItems = isPriest
+    ? priestNavItems
+    : isCoordinator
+      ? [...coupleNavItems, { path: '/coordenacao', label: 'Coordenação', icon: ClipboardList }]
+      : coupleNavItems;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50/30 to-background">

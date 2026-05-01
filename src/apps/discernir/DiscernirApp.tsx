@@ -15,6 +15,7 @@ import { DiscernirProtectedRoute } from './components/DiscernirProtectedRoute';
 import { IdentityEssencialJourney } from './pages/IdentityEssencialJourney';
 import { DiscernirPerfilServico } from './pages/DiscernirPerfilServico';
 import { DiscernirDiscernimento } from './pages/DiscernirDiscernimento';
+import { DiscernirCoordenacao } from './pages/DiscernirCoordenacao';
 import { useDiscernirPilotMode } from './hooks/useDiscernirPilotMode';
 import { DiscernirPilotStandby } from './components/DiscernirPilotStandby';
 
@@ -64,6 +65,14 @@ export default function DiscernirApp() {
             element={
               <DiscernirProtectedRoute>
                 <DiscernirDiscernimento />
+              </DiscernirProtectedRoute>
+            }
+          />
+          <Route
+            path="/coordenacao"
+            element={
+              <DiscernirProtectedRoute>
+                <DiscernirCoordenacao />
               </DiscernirProtectedRoute>
             }
           />
