@@ -16,6 +16,7 @@ export interface LeituraPerfilServico {
   agrega: string[];
   atencao: string[];
   encaixe: string;
+  complementa: string;
 }
 
 const ALTO = 75;
