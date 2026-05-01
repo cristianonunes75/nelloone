@@ -43,16 +43,26 @@ export function DiscernirAuth() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error, data: signUpData } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPassword,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
             full_name: signupName,
+            entry_path: 'discernir',
           }
         }
       });
+      // Marca o entry_path no profile para acompanhamento na Coordenação
+      if (!error && signUpData?.user?.id) {
+        try {
+          await supabase
+            .from('profiles')
+            .update({ entry_path: 'discernir' as any })
+            .eq('id', signUpData.user.id);
+        } catch (_) { /* não bloqueia o signup */ }
+      }
       if (error) {
         toast.error('Erro ao criar conta', { description: error.message });
       } else {
