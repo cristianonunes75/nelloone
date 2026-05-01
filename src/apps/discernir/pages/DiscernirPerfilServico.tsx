@@ -17,6 +17,7 @@ import {
   type CircleProfileResult,
 } from '../utils/circleProfileCalculation';
 import { downloadPerfilServicoPDF } from '../utils/perfilServicoPDF';
+import { gerarLeituraPerfilServico, leituraToText } from '../utils/perfilServicoLeitura';
 import { cn } from '@/lib/utils';
 
 interface Question {
