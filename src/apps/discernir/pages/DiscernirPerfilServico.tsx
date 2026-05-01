@@ -346,16 +346,53 @@ function ResultView({
   onCopy,
   copied,
   onRetake,
+  userName,
 }: {
   result: CircleProfileResult;
   onCopy: (type: 'text' | 'json') => void;
   copied: string | null;
   onRetake: () => void;
+  userName?: string;
 }) {
+  const { toast } = useToast();
   const blocks: BlockKey[] = ['lideranca', 'acolhimento', 'comunicacao', 'equipe', 'espiritualidade', 'conducao'];
   const top3 = result.ranking.slice(0, 3);
 
   const medalEmoji = ['🥇', '🥈', '🥉'];
+
+  const handleDownloadPDF = () => {
+    try {
+      downloadPerfilServicoPDF(result, userName);
+      toast({ title: 'PDF baixado', description: 'Seu Perfil de Serviço foi salvo.' });
+    } catch (err: any) {
+      console.error('PDF error:', err);
+      toast({ title: 'Erro ao gerar PDF', description: err?.message, variant: 'destructive' });
+    }
+  };
+
+  const handleShare = async () => {
+    const text = `Meu Perfil de Serviço (Discernir):\n\n` +
+      `🥇 ${result.primary_role} (${result.ranking[0]?.percentage}%)\n` +
+      `🥈 ${result.secondary_role} (${result.ranking[1]?.percentage}%)\n` +
+      `🥉 ${result.tertiary_role} (${result.ranking[2]?.percentage}%)\n\n` +
+      `Conheça o Discernir: https://discernir.nello.one`;
+
+    // Try native share (mobile), else fallback to clipboard
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Meu Perfil de Serviço',
+          text,
+        });
+        return;
+      } catch {
+        // user cancelled — silent
+        return;
+      }
+    }
+    await navigator.clipboard.writeText(text);
+    toast({ title: 'Texto copiado!', description: 'Cole no WhatsApp ou onde quiser compartilhar.' });
+  };
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -419,26 +456,41 @@ function ResultView({
         </p>
       </div>
 
-      {/* Actions */}
+      {/* Actions — primary */}
       <div className="flex flex-wrap gap-3 justify-center">
-        <Button
-          variant="gold-outline"
-          onClick={() => onCopy('text')}
-          className="gap-2"
-        >
-          <Copy className="w-4 h-4" />
-          {copied === 'text' ? 'Copiado!' : 'Copiar resultado'}
+        <Button variant="gold" onClick={handleDownloadPDF} className="gap-2">
+          <Download className="w-4 h-4" />
+          Baixar PDF
         </Button>
+        <Button variant="gold-outline" onClick={handleShare} className="gap-2">
+          <Share2 className="w-4 h-4" />
+          Compartilhar
+        </Button>
+      </div>
+
+      {/* Actions — secondary */}
+      <div className="flex flex-wrap gap-3 justify-center pt-1">
         <Button
-          variant="outline"
-          onClick={() => onCopy('json')}
-          className="gap-2"
+          variant="ghost"
+          size="sm"
+          onClick={() => onCopy('text')}
+          className="gap-2 text-muted-foreground"
         >
-          <ClipboardList className="w-4 h-4" />
-          {copied === 'json' ? 'Copiado!' : 'Copiar para Noticer'}
+          <Copy className="w-3.5 h-3.5" />
+          {copied === 'text' ? 'Copiado!' : 'Copiar texto'}
         </Button>
         <Button
           variant="ghost"
+          size="sm"
+          onClick={() => onCopy('json')}
+          className="gap-2 text-muted-foreground"
+        >
+          <ClipboardList className="w-3.5 h-3.5" />
+          {copied === 'json' ? 'Copiado!' : 'Copiar JSON'}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={onRetake}
           className="text-muted-foreground"
         >
