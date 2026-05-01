@@ -36,6 +36,10 @@ import {
   ChevronDown,
   Brain,
   RefreshCw,
+  Activity,
+  Mail,
+  CircleDot,
+  CheckCircle2,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
