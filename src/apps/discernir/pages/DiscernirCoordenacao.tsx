@@ -43,7 +43,7 @@ const ROLE_COLORS: Record<string, string> = {
 export function DiscernirCoordenacao() {
   const { user, isLoading: authLoading } = useAuth();
   const { role, isLoading: discernirLoading } = useDiscernirAuth();
-  const { isSuperAdmin, loading: adminLoading } = useAdminPermissions();
+  const { isSuperAdmin, isLoading: adminLoading } = useAdminPermissions();
   const { toast } = useToast();
 
   const [profiles, setProfiles] = useState<TeamProfile[]>([]);
