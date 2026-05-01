@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ChevronRight, ChevronLeft, Copy, Check, ClipboardList, Church } from 'lucide-react';
+import { Loader2, ChevronRight, ChevronLeft, Copy, Check, ClipboardList, Church, Download, Share2 } from 'lucide-react';
 import {
   calculateCircleProfile,
   getBlockLabel,
@@ -16,6 +16,7 @@ import {
   type BlockKey,
   type CircleProfileResult,
 } from '../utils/circleProfileCalculation';
+import { downloadPerfilServicoPDF } from '../utils/perfilServicoPDF';
 import { cn } from '@/lib/utils';
 
 interface Question {
