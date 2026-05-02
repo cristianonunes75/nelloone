@@ -72,6 +72,7 @@ interface TeamProfile {
   ranking: CircleProfileRanking[];
   participant_type: ParticipantType;
   spouse_user_id: string | null;
+  gender: 'masculino' | 'feminino' | null;
   coordinator_notes: string | null;
   created_at: string;
 }
