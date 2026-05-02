@@ -266,17 +266,14 @@ export function DiscernirCoordenacao() {
   };
 
   /**
-   * Build balanced circles: each circle = 1 couple + N youth
-   * Uses greedy algorithm to maximize role diversity per circle.
+   * Build balanced circles: each circle = 1 couple + 1 young man + 1 young woman + extras.
+   * Garante alternância de sexo entre os jovens (M/F) por círculo.
    */
   const buildSuggestedCircles = () => {
     const linkedPairs = couplePairs.filter((p) => p.b !== null) as {
       a: TeamProfile;
       b: TeamProfile;
     }[];
-    // Casais "solo" — pessoa marcada como casal cujo cônjuge ainda não fez
-    // o Perfil de Serviço. Entram no círculo mesmo assim, representando o
-    // par. A IA recebe um sinal de cônjuge pendente para citá-lo com respeito.
     const soloCouples = couplePairs.filter((p) => p.b === null).map((p) => p.a);
 
     if (linkedPairs.length === 0 && soloCouples.length === 0) {
@@ -297,31 +294,60 @@ export function DiscernirCoordenacao() {
       return;
     }
 
-    // Cada casal (vinculado ou solo) ancora um círculo.
     const circles: TeamProfile[][] = [
       ...linkedPairs.map(({ a, b }) => [a, b]),
       ...soloCouples.map((a) => [a]),
     ];
-    const youthPool = [...youth].sort(() => Math.random() - 0.5);
 
-    // Distribute youth one by one, placing each in the circle that most needs their primary role
-    for (const j of youthPool) {
+    // Separa jovens por sexo (sem sexo marcado vai para "outros")
+    const shuffle = <T,>(arr: T[]) => [...arr].sort(() => Math.random() - 0.5);
+    const youngMen = shuffle(youth.filter((y) => y.gender === 'masculino'));
+    const youngWomen = shuffle(youth.filter((y) => y.gender === 'feminino'));
+    const youngUnknown = shuffle(youth.filter((y) => !y.gender));
+
+    let unknownWarn = youngUnknown.length;
+
+    // Distribuidor por gênero: dá prioridade a círculos que ainda não têm
+    // jovem do sexo em questão e cuja diversidade de papel é maior.
+    const placeOne = (j: TeamProfile, genderHint: 'masculino' | 'feminino' | null) => {
       let bestIdx = 0;
       let bestScore = -Infinity;
       circles.forEach((circle, idx) => {
         const rolesPresent = new Set(circle.map((m) => m.primary_role));
-        const sizeScore = -circle.length * 2; // prefer smaller circles
-        const diversityScore = rolesPresent.has(j.primary_role) ? 0 : 3; // reward new role
-        const total = sizeScore + diversityScore;
+        const youthInCircle = circle.filter((m) => m.participant_type === 'jovem');
+        const sameGenderCount = genderHint
+          ? youthInCircle.filter((m) => m.gender === genderHint).length
+          : 0;
+        // Penaliza fortemente repetir o mesmo sexo antes de cobrir o oposto
+        const genderScore = genderHint ? -sameGenderCount * 5 : 0;
+        const sizeScore = -circle.length * 2;
+        const diversityScore = rolesPresent.has(j.primary_role) ? 0 : 3;
+        const total = sizeScore + diversityScore + genderScore;
         if (total > bestScore) {
           bestScore = total;
           bestIdx = idx;
         }
       });
       circles[bestIdx].push(j);
+    };
+
+    // 1ª passagem: garante 1 homem e 1 mulher por círculo, alternando.
+    const maxFirstPass = Math.max(youngMen.length, youngWomen.length);
+    for (let i = 0; i < maxFirstPass; i++) {
+      if (i < youngWomen.length) placeOne(youngWomen[i], 'feminino');
+      if (i < youngMen.length) placeOne(youngMen[i], 'masculino');
     }
+    // Jovens sem sexo marcado entram por último
+    youngUnknown.forEach((j) => placeOne(j, null));
 
     setSuggestedCircles(circles);
+
+    if (unknownWarn > 0) {
+      toast({
+        title: `${unknownWarn} jovem(ns) sem sexo marcado`,
+        description: 'Marque o sexo (Masculino/Feminino) para garantir o equilíbrio H/M nos círculos.',
+      });
+    }
   };
 
   if (authLoading || discernirLoading || adminLoading) {
