@@ -713,8 +713,8 @@ export function DiscernirCoordenacao() {
                   <div className="flex-1 space-y-1">
                     <h3 className="text-sm font-semibold">Sugestão automática</h3>
                     <p className="text-xs text-muted-foreground">
-                      Cada círculo terá <strong>1 casal + N jovens</strong>, distribuídos para que
-                      os papéis de serviço se complementem dentro de cada grupo.
+                      Cada círculo terá <strong>1 casal + 1 jovem (homem) + 1 jovem (mulher)</strong>,
+                      e os jovens extras são distribuídos mantendo o equilíbrio H/M e a complementaridade de papéis.
                     </p>
                   </div>
                   <Button onClick={buildSuggestedCircles} className="gap-2">
