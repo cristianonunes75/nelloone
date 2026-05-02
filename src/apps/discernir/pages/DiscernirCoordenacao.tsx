@@ -937,6 +937,7 @@ interface LeituraIACirculoResult {
   forcas_do_grupo: string[];
   riscos_do_grupo: string[];
   quem_puxa_o_que: { nome: string; papel_no_grupo: string }[];
+  dinamicas_de_par?: { membros: string[]; tipo: string; observacao: string }[];
   recomendacao_pratica: string;
 }
 
@@ -956,6 +957,8 @@ function LeituraIACirculoBlock({ members }: { members: TeamProfile[] }) {
           display_name: m.display_name,
           primary_role: m.primary_role,
           secondary_role: m.secondary_role,
+          participant_type: m.participant_type,
+          spouse_user_id: m.spouse_user_id,
           percentages: m.percentages,
         })),
       };
