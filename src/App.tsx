@@ -54,6 +54,9 @@ import ParaProfissionais from "./pages/ParaProfissionais";
 import CentralAjuda from "./pages/CentralAjuda";
 import ImersaoCasalLanding from "./pages/ImersaoCasalLanding";
 import ConvitePessoal from "./pages/ConvitePessoal";
+import LandingMudancaCarreira from "./pages/landings/LandingMudancaCarreira";
+import LandingEscolhaVocacional from "./pages/landings/LandingEscolhaVocacional";
+import LandingCrise30 from "./pages/landings/LandingCrise30";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -143,6 +146,11 @@ const AppRoutes = () => (
     
     {/* Imersão Código do Casal - Landing page */}
     <Route path="/imersao-casal" element={<ImersaoCasalLanding />} />
+
+    {/* Landings temáticas por dor (mesmo produto Identity, copy diferente) */}
+    <Route path="/mudanca-de-carreira" element={<LandingMudancaCarreira />} />
+    <Route path="/escolha-vocacional" element={<LandingEscolhaVocacional />} />
+    <Route path="/crise-dos-30" element={<LandingCrise30 />} />
 
     {/* Convite Pessoal - Página emotiva para amigos */}
     <Route path="/convite" element={<ConvitePessoal />} />
