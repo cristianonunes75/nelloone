@@ -51,6 +51,11 @@ import {
 } from '../utils/circleProfileCalculation';
 import { downloadPerfilServicoPDF } from '../utils/perfilServicoPDF';
 import { gerarLeituraPerfilServico, leituraToText } from '../utils/perfilServicoLeitura';
+import {
+  calcCompatibilitiesFor,
+  type PairMember,
+  type PairCompatibility,
+} from '../utils/circleCompatibility';
 import { cn } from '@/lib/utils';
 
 type ParticipantType = 'casal' | 'jovem' | null;
