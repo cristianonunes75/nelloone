@@ -1070,6 +1070,38 @@ function LeituraIACirculoBlock({ members }: { members: TeamProfile[] }) {
           </ul>
         </div>
 
+        {result.dinamicas_de_par && result.dinamicas_de_par.length > 0 && (
+          <div>
+            <p className="font-semibold text-indigo-900 mb-1">Dinâmicas de par</p>
+            <ul className="space-y-1.5 text-muted-foreground pl-3">
+              {result.dinamicas_de_par.map((d, i) => {
+                const tipoColor =
+                  d.tipo === 'complementar'
+                    ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                    : d.tipo === 'tensao'
+                    ? 'text-amber-800 bg-amber-50 border-amber-200'
+                    : 'text-indigo-700 bg-indigo-50 border-indigo-200';
+                return (
+                  <li
+                    key={i}
+                    className="relative before:content-['•'] before:absolute before:-left-3 before:text-indigo-700"
+                  >
+                    <span className="text-foreground font-medium">
+                      {d.membros.join(' × ')}
+                    </span>{' '}
+                    <span
+                      className={`inline-block text-[10px] font-semibold uppercase tracking-wide border rounded px-1.5 py-0.5 ml-1 ${tipoColor}`}
+                    >
+                      {d.tipo === 'tensao' ? 'tensão' : d.tipo}
+                    </span>
+                    <p className="mt-0.5">{d.observacao}</p>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+
         <div className="rounded-md bg-white/70 border border-violet-200 px-2.5 py-2">
           <p className="text-[11px] font-semibold text-violet-900 mb-0.5">Recomendação prática</p>
           <p className="text-muted-foreground">{result.recomendacao_pratica}</p>
