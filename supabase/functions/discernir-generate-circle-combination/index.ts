@@ -413,7 +413,8 @@ Regras inegociáveis:
 - Não invente dados além dos percentuais, papéis, vínculos e scores informados.
 - Português do Brasil, tratamento "você", curto e direto.
 - PROIBIDO genérico: cada frase deve citar pelo menos UM nome próprio OU UM bloco com percentual real OU um par específico (ex.: "Arthur + Rafael"). Frases que caberiam em qualquer outro círculo devem ser reescritas.
-- Use os scores da matriz par a par fornecida — não invente compatibilidades.`;
+- Use os scores da matriz par a par fornecida — não invente compatibilidades.
+- CASAL É UNIDADE INDIVISÍVEL: quando citar um cônjuge em "dinamicas_de_par", sempre use os DOIS nomes juntos (ex.: "Fabio e Juliana") como UM lado do par. NUNCA crie uma dinâmica entre marido e esposa entre si, e NUNCA sugira "match" ou recombinação de cônjuge com outro membro como se fossem solteiros. Os pares de cônjuge↔cônjuge já foram intencionalmente removidos da matriz.`;
 
     const userPrompt = `Aqui está a composição de um círculo. Para cada membro temos o papel principal, o secundário, o tipo (casal/jovem) e os 6 percentuais do Perfil de Serviço.
 
