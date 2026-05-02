@@ -1,106 +1,61 @@
-## O que está acontecendo hoje (e por que parece genérico)
+## Problema
 
-A tela de Coordenação do Discernir tem **dois tipos de leitura**, e elas não conversam entre si:
+Hoje os "Top encaixes" de cada participante listam qualquer outro membro do círculo, inclusive o próprio cônjuge — e a IA pode falar do casal como duas pessoas separadas. Você quer:
 
-1. **Leitura combinada do círculo (IA)** — o card grande no topo ("Forças do grupo / Riscos coletivos / Quem puxa o quê / Recomendação prática"). Esta é a IA. Ela já recebe **todos os 6 percentuais de todos os membros** e **só descreve o grupo como um todo** — não compara ninguém com ninguém. Ela faz uma frase curta de "papel no grupo" para cada membro, mas não diz o quanto cada perfil combina com os outros.
-2. **Leitura pastoral combinada (individual, por pessoa)** — o accordion dentro de cada participante (Arthur, Rafael etc.). Essa **não usa IA**. É um motor de regras determinístico (`perfilServicoLeitura.ts`) que monta o texto a partir de templates por papel + bloco alto/baixo. Por isso pessoas com o mesmo papel principal acabam recebendo textos muito parecidos — ele só olha o **próprio perfil** da pessoa, não enxerga os outros membros do círculo nem os percentuais relativos.
-
-Resumindo a sua pergunta: **a IA não cruzou ninguém com ninguém**. Ela leu o grupo inteiro como um bloco. E o accordion individual também não cruza — só relê o perfil daquela pessoa isolado.
-
-## O que você está pedindo
-
-Você quer um **terceiro nível**: dentro de cada participante (especialmente os jovens), ver **com quais outros membros do mesmo círculo aquele perfil combina mais**, com **percentual de compatibilidade** e justificativa que use os 6 quesitos individuais — não só o papel principal.
+1. **Cônjuges não devem aparecer como "match" um do outro** nos Top encaixes individuais — eles já são par por definição.
+2. **Casal é indivisível**: nas dinâmicas e nos cálculos do círculo, marido e esposa são uma unidade só, não dois encaixes separados.
 
 ## Plano
 
-### 1. Calcular compatibilidade par a par dentro do círculo (determinístico, sem IA)
+### 1. Excluir cônjuge dos Top encaixes individuais
 
-Criar `src/apps/discernir/utils/circleCompatibility.ts` que, dado um membro e a lista dos outros membros do círculo, retorna para cada par um objeto:
+No `LeituraPastoralBlock` dentro de `DiscernirCoordenacao.tsx`, antes de chamar `calcCompatibilitiesFor(member, others)`, filtrar a lista `others` removendo o `spouse_user_id` do membro atual (quando ele for `participant_type === 'casal'` e tiver cônjuge vinculado).
 
-```text
-{
-  outro_membro: "Rafael Botelho Rangel",
-  score: 86,                    // 0–100
-  tipo: "complementar" | "espelho" | "tensao",
-  forcas_do_par: [ "..." , "..." ],
-  cuidados_do_par: [ "..." ]
-}
-```
+Resultado: na lista de "Encaixes dentro deste círculo" do Fabio, a Juliana não aparece (e vice-versa). Para os jovens, nada muda — eles continuam vendo todos os outros do círculo.
 
-Como o score é calculado (transparente, baseado nos 6 quesitos):
-- **Complementaridade** (peso maior): para cada bloco em que o membro está baixo (<50%), soma pontos se o outro está alto (≥75%) naquele bloco. E vice-versa.
-- **Eixo espiritual compartilhado**: bônus se ambos têm Espiritualidade ≥ 60% (núcleo de oração comum).
-- **Risco de espelhamento**: penalidade se os dois têm exatamente os mesmos blocos altos e os mesmos baixos (grupo fica enviesado).
-- **Tensão produtiva vs destrutiva**: par Liderança alta + Acolhimento baixo encontrando outro igual = tensão; encontrando o oposto = complementar.
-- Resultado normalizado 0–100, com classificação:
-  - ≥ 75 → "complementar"
-  - 55–74 → "bom encaixe"
-  - 40–54 → "encaixe parcial"
-  - < 40 → "tensão a cuidar"
+### 2. Bloco fixo "Vínculo conjugal" no lugar do match
 
-A justificativa de cada par é **gerada a partir dos blocos reais que se complementam ou colidem**, citando os blocos por nome (ex.: "Você baixo em Comunicação (45%) + Rafael alto em Comunicação (88%) — ele tende a traduzir o que você sente mas trava de nomear").
-
-### 2. Mostrar os "Top 3 encaixes neste círculo" dentro de cada participante
-
-No accordion `LeituraPastoralBlock` de cada membro, adicionar uma nova seção abaixo de "Quem complementa este perfil":
+Para quem é casal, acima dos Top encaixes individuais, mostrar um bloco curto separado:
 
 ```text
-Encaixes dentro deste círculo
-1. Rafael Botelho Rangel — 86% complementar
-   Você é forte em Acolhimento (97%); ele é forte em Liderança (88%) e Espiritualidade (88%) — ele puxa direção e oração onde você sustenta o clima.
-2. Tiago Leão Buson — 72% bom encaixe
-   ...
-3. Sofia Gonçalves — 58% encaixe parcial
-   ...
+Vínculo conjugal
+Fabio + Juliana — par fixo neste círculo.
+Combinação: ambos altos em Acolhimento (92% e 88%); Fabio puxa Condução (80%), Juliana puxa Comunicação (85%).
 ```
 
-Ordena do maior para o menor score, mostra os 3 melhores. Cada item tem:
-- nome
-- percentual + rótulo
-- 1 frase de justificativa que **cita os percentuais reais** dos blocos relevantes
-- (opcional, expansível) 1 frase de cuidado se houver
+Esse texto sai do mesmo motor `calcPairCompatibility`, mas é apresentado como **par fixo**, não como "score" comparável aos jovens — sem percentual de match no título, só a leitura dos blocos. Assim fica claro que casal não é um encaixe que se escolhe.
 
-Para isso, o `LeituraPastoralBlock` passa a receber também `allMembers: TeamProfile[]` para enxergar o círculo todo.
+### 3. Tratar o casal como unidade nas estatísticas e dinâmicas do círculo
 
-### 3. Reescrever a IA da leitura combinada do círculo para usar os percentuais com profundidade
+No utilitário `circleCompatibility.ts`, adicionar uma função `groupMembersAsUnits(members)` que devolve uma lista onde cada cônjuge vinculado vira **uma unidade só** (média dos 6 percentuais do par, nome composto "Fabio + Juliana"). Jovens ficam como unidades individuais.
 
-Atualizar `supabase/functions/discernir-generate-circle-combination/index.ts`:
+Usar essa lista de unidades em:
 
-- **Enriquecer o prompt**: além da lista de membros com 6 percentuais cada, passar para a IA:
-  - a **matriz de complementaridade** já calculada no passo 1 (par a par, com score e blocos que se complementam) — assim a IA não precisa adivinhar, ela ancora as frases nos números reais;
-  - médias do grupo nos 6 blocos e desvio padrão (para detectar concentração ou lacuna real, ex.: "ninguém acima de 50% em Espiritualidade");
-  - blocos em que o grupo está saturado (>3 pessoas altas) e blocos em que ninguém está alto.
-- **Endurecer as regras anti-genérico** no system prompt: "cada frase deve citar pelo menos um nome OU um bloco com percentual real. Proibido frases que caberiam em qualquer outro círculo."
-- **Expandir o schema da resposta** com um novo campo:
-  - `dinamicas_de_par`: 2 a 4 pares dentro do círculo que merecem destaque (quem-com-quem, por quê, e o que vigiar).
-- Manter `forcas_do_grupo`, `riscos_do_grupo`, `quem_puxa_o_que`, `recomendacao_pratica`, mas exigir que `quem_puxa_o_que` cite o bloco percentualmente mais alto da pessoa **em comparação ao grupo**, não em abstrato.
-- Atualizar a `signature_hash` para invalidar o cache quando a estrutura nova rodar (mudar versão no hash).
+- **`topPairsOfCircle`** (dinâmicas de par mostradas no card da IA): pares passam a ser entre **unidades**, então nunca vai aparecer "Fabio × Juliana" como dinâmica — só "Casal Fabio+Juliana × Arthur", "Casal Fabio+Juliana × Rafael", "Arthur × Rafael" etc.
+- **`calcCircleStats`** (médias, saturação, lacunas): o casal entra como uma única observação, evitando que um par com perfil parecido enviese a média do círculo (hoje conta como duas pessoas).
 
-### 4. Renderizar o novo campo `dinamicas_de_par` no card de leitura combinada
+### 4. Atualizar a Edge Function `discernir-generate-circle-combination`
 
-No `LeituraIACirculoBlock`, adicionar uma seção entre "Quem puxa o quê" e "Recomendação prática":
+- Passar para a IA tanto a lista bruta de membros (para citar nomes individuais quando fizer sentido) **quanto** a lista de unidades (com a flag `is_casal: true` e os dois nomes).
+- Reforçar no system prompt: *"O casal é uma unidade indivisível. Quando citar o casal, use 'Fabio e Juliana' juntos. Não trate cônjuges como dois encaixes separados nem sugira recombinar cônjuges com outros membros."*
+- A matriz de compatibilidade enviada à IA passa a ser entre **unidades** (mesmo critério da seção 3), eliminando da raiz o par cônjuge-cônjuge.
+- Bumpar a versão da `signature_hash` (ex.: `v3:`) para invalidar cache antigo.
 
-```text
-Dinâmicas de par neste círculo
-• JULIANA + Fabio (casal): ambos altos em Acolhimento — risco de o casal se isolar no cuidado mútuo. Vale provocar partilha aberta.
-• Arthur (Guardião do Clima 97%) + Rafael Botelho (Intercessor 88%): combinação rara — clima leve sustentado por oração silenciosa. Bom para retiros.
-• ...
-```
+### 5. Ajuste cosmético
 
-### 5. (Pequeno ajuste de UX)
-
-- Renomear o accordion individual de "Leitura pastoral combinada" para algo menos ambíguo (ex.: "Leitura deste participante no círculo"), porque hoje o nome dele e o do bloco geral se confundem — foi parte da sua confusão sobre "o que ele cruzou".
+No accordion individual de quem é cônjuge, o subtítulo dos Top encaixes muda de "Encaixes dentro deste círculo" para **"Encaixes além do casal neste círculo"** — deixa explícito por que o cônjuge não aparece.
 
 ## Detalhes técnicos
 
-- Tudo que é par a par roda **no cliente** (sem custo de IA) e é determinístico — você consegue auditar cada percentual.
-- Só a leitura geral do círculo (passo 3) chama IA, e ela passa a receber os scores já calculados — fica muito mais difícil ela ser genérica.
-- Cache da função: bumpar versão da `signature_hash` (ex.: prefixar `v2:`) para que combinações já geradas sejam regeradas com o novo schema na próxima vez que clicar em Gerar/Regenerar.
-- Tipos: nova interface `PairCompatibility` exportada de `circleCompatibility.ts`; schema da edge function ganha `dinamicas_de_par: { membros: string[]; tipo: string; observacao: string }[]` (1 a 5 itens).
-- Sem mudança de banco. Sem nova tabela.
+- `groupMembersAsUnits` detecta par por `spouse_user_id` recíproco; cônjuge sem vínculo recíproco é tratado como individual (fallback seguro).
+- Unidade-casal recebe `user_id` sintético `"couple:{idA}:{idB}"` (ordenado) para deduplicação estável; nome `"<nomeA> + <nomeB>"`; percentuais = média aritmética dos dois.
+- Filtro no `LeituraPastoralBlock`: `others.filter(o => o.user_id !== member.spouse_user_id)`.
+- Bump `signature_hash` na edge function para forçar regeneração.
+- Sem mudança de banco, sem nova tabela, sem migração.
 
-## O que muda para você na tela
+## O que muda na tela
 
-- Cada jovem (Arthur, Rafael etc.) passa a mostrar **com quais outros 3 membros daquele círculo ele tem o melhor encaixe, com %**, e a justificativa cita os blocos com números reais.
-- A leitura geral por IA passa a falar de **pares específicos** ("Arthur + Rafael", "Juliana + Fabio") em vez de só descrever o grupo em bloco.
-- Some a sensação de "todo Pastor do Círculo recebe o mesmo texto" — porque os textos passam a usar os percentuais relativos ao círculo, não só o papel.
+- Fabio não vê Juliana nos Top encaixes (e vice-versa) — vê os jovens do círculo.
+- Card de "Vínculo conjugal" aparece para ambos os cônjuges, com leitura específica do par.
+- Nas "Dinâmicas de par" geradas pela IA, o casal entra como bloco único ("Fabio e Juliana × Arthur"), nunca quebrado.
+- Médias e lacunas do círculo passam a contar o casal como uma observação só, ficando mais fiéis à realidade do encontro.
