@@ -3493,6 +3493,7 @@ export type Database = {
           answers: Json
           coordinator_notes: string | null
           created_at: string
+          gender: string | null
           id: string
           notes: string | null
           participant_type: string | null
@@ -3512,6 +3513,7 @@ export type Database = {
           answers: Json
           coordinator_notes?: string | null
           created_at?: string
+          gender?: string | null
           id?: string
           notes?: string | null
           participant_type?: string | null
@@ -3531,6 +3533,7 @@ export type Database = {
           answers?: Json
           coordinator_notes?: string | null
           created_at?: string
+          gender?: string | null
           id?: string
           notes?: string | null
           participant_type?: string | null
@@ -7460,6 +7463,7 @@ export type Database = {
           coordinator_notes: string | null
           created_at: string | null
           display_name: string | null
+          gender: string | null
           id: string | null
           participant_type: string | null
           percentages: Json | null
