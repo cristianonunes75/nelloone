@@ -472,12 +472,16 @@ export function DiscernirCoordenacao() {
               display_name: p.display_name,
               primary_role: p.primary_role,
               percentages: p.percentages,
+              spouse_user_id: p.spouse_user_id,
+              participant_type: p.participant_type,
             }}
             poolMembers={profiles.map((o) => ({
               user_id: o.user_id,
               display_name: o.display_name,
               primary_role: o.primary_role,
               percentages: o.percentages,
+              spouse_user_id: o.spouse_user_id,
+              participant_type: o.participant_type,
             }))}
             poolLabel="na equipe"
           />
