@@ -789,6 +789,16 @@ export function DiscernirCoordenacao() {
                           <div className="space-y-1">
                             <div className="flex items-center gap-1.5 text-xs font-medium text-sky-700">
                               <UserIcon className="w-3 h-3" /> Jovens ({jovens.length})
+                              {(() => {
+                                const m = jovens.filter((j) => j.gender === 'masculino').length;
+                                const f = jovens.filter((j) => j.gender === 'feminino').length;
+                                const u = jovens.filter((j) => !j.gender).length;
+                                return (
+                                  <span className="text-[10px] font-normal text-muted-foreground">
+                                    · {m}H / {f}M{u > 0 ? ` · ${u} sem sexo` : ''}
+                                  </span>
+                                );
+                              })()}
                             </div>
                             <div className="flex flex-wrap gap-2">
                               {jovens.map((m) => (
@@ -797,7 +807,12 @@ export function DiscernirCoordenacao() {
                                   variant="outline"
                                   className={cn('text-xs py-1.5 px-3', ROLE_COLORS[m.primary_role])}
                                 >
-                                  {m.display_name} · {m.primary_role}
+                                  {m.display_name}
+                                  {m.gender && (
+                                    <span className="ml-1 opacity-70">({m.gender === 'masculino' ? 'H' : 'M'})</span>
+                                  )}
+                                  {' · '}
+                                  {m.primary_role}
                                 </Badge>
                               ))}
                             </div>
