@@ -896,10 +896,29 @@ function LeituraPastoralBlock({
             <p className="text-muted-foreground">{leitura.complementa}</p>
           </div>
 
+          {vinculoConjugal && spouse && (
+            <div className="rounded-md bg-rose-50/60 border border-rose-200 px-2.5 py-2 space-y-1">
+              <p className="text-[11px] font-semibold text-rose-900 flex items-center gap-1">
+                <Heart className="w-3 h-3" /> Vínculo conjugal
+              </p>
+              <p className="text-[11px] text-foreground">
+                <strong>{displayName.split(' ')[0]} + {spouse.display_name.split(' ')[0]}</strong> — par fixo neste círculo.
+              </p>
+              <p className="text-[11px] text-muted-foreground leading-snug">
+                {vinculoConjugal.resumo}
+              </p>
+              {vinculoConjugal.cuidado && (
+                <p className="text-[10px] text-amber-800 italic leading-snug">
+                  ⚠ {vinculoConjugal.cuidado}
+                </p>
+              )}
+            </div>
+          )}
+
           {encaixes.length > 0 && (
             <div className="rounded-md bg-violet-50/60 border border-violet-200 px-2.5 py-2 space-y-2">
               <p className="text-[11px] font-semibold text-violet-900">
-                Top encaixes {poolLabel || ''}
+                {spouse ? `Encaixes além do casal ${poolLabel || ''}` : `Top encaixes ${poolLabel || ''}`}
               </p>
               <ol className="space-y-2">
                 {encaixes.map((c, i) => (
