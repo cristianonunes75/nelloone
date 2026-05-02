@@ -792,10 +792,28 @@ function LeituraPastoralBlock({
     [percentages, primaryRole, secondaryRole],
   );
 
+  const spouse: PairMember | null = useMemo(() => {
+    if (!self?.spouse_user_id || !poolMembers) return null;
+    const sp = poolMembers.find((o) => o.user_id === self.spouse_user_id);
+    if (!sp) return null;
+    // Vínculo recíproco
+    if (sp.spouse_user_id && sp.spouse_user_id !== self.user_id) return null;
+    return sp;
+  }, [self, poolMembers]);
+
   const encaixes: PairCompatibility[] = useMemo(() => {
     if (!self || !poolMembers || poolMembers.length < 2) return [];
-    return calcCompatibilitiesFor(self, poolMembers).slice(0, 3);
+    // Excluir cônjuge dos top encaixes — casal é par fixo, não match
+    const filtered = poolMembers.filter(
+      (o) => o.user_id !== self.user_id && o.user_id !== self.spouse_user_id,
+    );
+    return calcCompatibilitiesFor(self, filtered).slice(0, 3);
   }, [self, poolMembers]);
+
+  const vinculoConjugal = useMemo(() => {
+    if (!self || !spouse) return null;
+    return calcSpouseBondReading(self, spouse);
+  }, [self, spouse]);
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
