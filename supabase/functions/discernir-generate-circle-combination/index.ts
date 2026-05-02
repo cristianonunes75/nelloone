@@ -19,6 +19,7 @@ interface MemberInput {
   secondary_role: string | null;
   participant_type?: string | null;
   spouse_user_id?: string | null;
+  gender?: "masculino" | "feminino" | null;
   percentages: {
     lideranca: number;
     acolhimento: number;
