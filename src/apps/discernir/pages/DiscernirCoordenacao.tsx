@@ -170,7 +170,7 @@ export function DiscernirCoordenacao() {
 
   const updateProfileMarker = async (
     profileId: string,
-    patch: Partial<Pick<TeamProfile, 'participant_type' | 'spouse_user_id' | 'gender'>>,
+    patch: Partial<Pick<TeamProfile, 'participant_type' | 'spouse_user_id' | 'gender' | 'birth_date'>>,
   ) => {
     setSavingId(profileId);
     try {
