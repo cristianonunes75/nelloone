@@ -1,69 +1,106 @@
-## Resposta às suas duas perguntas
+## O que está acontecendo hoje (e por que parece genérico)
 
-**1) "Que tipo de pessoa acrescentaria essa pessoa?"** — ainda **não existe**. A leitura pastoral atual mostra só o que a pessoa agrega, pontos de atenção e melhor encaixe. Faz total sentido adicionar uma 5ª seção: **"Quem complementa este perfil"**, listando o tipo de companheiro de círculo que equilibraria os pontos baixos dela.
+A tela de Coordenação do Discernir tem **dois tipos de leitura**, e elas não conversam entre si:
 
-**2) Cruzamento por IA já programado?** Existe um edge function `discernir-generate-cruzamento`, mas ele é para **cruzamento de casal** (eixos ritmo/família/decisão, com convite e consentimento). **Não há** cruzamento por IA para combinar membros do mesmo círculo. Hoje o painel de Coordenação usa apenas a "Sugestão automática de círculos" determinística (sem IA).
+1. **Leitura combinada do círculo (IA)** — o card grande no topo ("Forças do grupo / Riscos coletivos / Quem puxa o quê / Recomendação prática"). Esta é a IA. Ela já recebe **todos os 6 percentuais de todos os membros** e **só descreve o grupo como um todo** — não compara ninguém com ninguém. Ela faz uma frase curta de "papel no grupo" para cada membro, mas não diz o quanto cada perfil combina com os outros.
+2. **Leitura pastoral combinada (individual, por pessoa)** — o accordion dentro de cada participante (Arthur, Rafael etc.). Essa **não usa IA**. É um motor de regras determinístico (`perfilServicoLeitura.ts`) que monta o texto a partir de templates por papel + bloco alto/baixo. Por isso pessoas com o mesmo papel principal acabam recebendo textos muito parecidos — ele só olha o **próprio perfil** da pessoa, não enxerga os outros membros do círculo nem os percentuais relativos.
 
-Proponho fazer as duas coisas, mantendo o que já é determinístico de graça e usando IA só onde agrega de verdade.
+Resumindo a sua pergunta: **a IA não cruzou ninguém com ninguém**. Ela leu o grupo inteiro como um bloco. E o accordion individual também não cruza — só relê o perfil daquela pessoa isolado.
 
----
+## O que você está pedindo
 
-## O que vou implementar
+Você quer um **terceiro nível**: dentro de cada participante (especialmente os jovens), ver **com quais outros membros do mesmo círculo aquele perfil combina mais**, com **percentual de compatibilidade** e justificativa que use os 6 quesitos individuais — não só o papel principal.
 
-### Parte A — "Quem complementa este perfil" (determinístico, grátis, instantâneo)
+## Plano
 
-Adicionar à `gerarLeituraPerfilServico` uma 5ª saída: `complementa: string`.
+### 1. Calcular compatibilidade par a par dentro do círculo (determinístico, sem IA)
 
-**Regra:** identificar os 1–2 blocos mais baixos da pessoa (< 50%) e descrever qual perfil de companheiro equilibraria. Exemplos:
-- Liderança alta + Acolhimento baixo → "Combina bem com alguém de **Acolhimento alto** (Pastor do Círculo ou Guardião do Clima): para que a direção forte seja temperada por escuta cuidadosa."
-- Comunicação alta + Espiritualidade baixa → "Combina bem com um **Intercessor** ou alguém com Espiritualidade alta: para ancorar a fala bonita em oração."
-- Perfil sem blocos críticos → "Perfil equilibrado — combina bem com qualquer composição, especialmente perfis que tenham pelo menos um Intercessor ou Pastor."
+Criar `src/apps/discernir/utils/circleCompatibility.ts` que, dado um membro e a lista dos outros membros do círculo, retorna para cada par um objeto:
 
-Tabela `COMPLEMENTA_BLOCO_BAIXO` (6 frases, uma por bloco baixo) + lógica de combinar até 2 blocos baixos numa única recomendação.
+```text
+{
+  outro_membro: "Rafael Botelho Rangel",
+  score: 86,                    // 0–100
+  tipo: "complementar" | "espelho" | "tensao",
+  forcas_do_par: [ "..." , "..." ],
+  cuidados_do_par: [ "..." ]
+}
+```
 
-**Onde aparece:** mesmo lugar que a leitura atual já aparece — card de Coordenação, tela de resultado pessoal e PDF. Entra como última seção da leitura, antes do disclaimer.
+Como o score é calculado (transparente, baseado nos 6 quesitos):
+- **Complementaridade** (peso maior): para cada bloco em que o membro está baixo (<50%), soma pontos se o outro está alto (≥75%) naquele bloco. E vice-versa.
+- **Eixo espiritual compartilhado**: bônus se ambos têm Espiritualidade ≥ 60% (núcleo de oração comum).
+- **Risco de espelhamento**: penalidade se os dois têm exatamente os mesmos blocos altos e os mesmos baixos (grupo fica enviesado).
+- **Tensão produtiva vs destrutiva**: par Liderança alta + Acolhimento baixo encontrando outro igual = tensão; encontrando o oposto = complementar.
+- Resultado normalizado 0–100, com classificação:
+  - ≥ 75 → "complementar"
+  - 55–74 → "bom encaixe"
+  - 40–54 → "encaixe parcial"
+  - < 40 → "tensão a cuidar"
 
-### Parte B — Cruzamento por IA no painel de Coordenação (opcional, sob demanda)
+A justificativa de cada par é **gerada a partir dos blocos reais que se complementam ou colidem**, citando os blocos por nome (ex.: "Você baixo em Comunicação (45%) + Rafael alto em Comunicação (88%) — ele tende a traduzir o que você sente mas trava de nomear").
 
-No painel `DiscernirCoordenacao`, em cada **círculo sugerido** (ou par/trio que você selecionar), botão **"Gerar leitura de combinação por IA"**.
+### 2. Mostrar os "Top 3 encaixes neste círculo" dentro de cada participante
 
-- **Edge function nova:** `discernir-generate-circle-combination`
-- **Modelo:** `google/gemini-3-flash-preview` via Lovable AI Gateway (`LOVABLE_API_KEY`, sem custo extra de chave para você)
-- **Input:** lista de membros do círculo com nome, papel principal/secundário e os 6 percentuais
-- **Output (JSON via tool calling):**
-  - `forcas_do_grupo`: 2–3 pontos do que esse círculo, juntos, terá de bom
-  - `riscos_do_grupo`: 1–2 pontos cegos coletivos (ex.: "ninguém com Espiritualidade alta — risco de virar grupo de amigos sem âncora")
-  - `recomendacao_pratica`: 1 frase sobre como esse círculo deveria funcionar dado o perfil somado
-  - `quem_puxa_o_que`: lista por pessoa de qual papel concreto ela tende a ocupar nesse círculo específico (ex.: "Maria abre os encontros com oração", "João media conflitos")
-- **Linguagem:** pastoral, não-clínica, "tende a" / "pode ajudar". Mesmo padrão da leitura atual.
-- **Cache:** salvo em nova tabela `discernir_circle_combinations` (círculo → resultado IA), para não regerar a cada visita. Botão "Regenerar" disponível.
-- **Tratamento de erros:** 429 e 402 retornam toast amigável; o painel continua funcional sem a leitura IA.
+No accordion `LeituraPastoralBlock` de cada membro, adicionar uma nova seção abaixo de "Quem complementa este perfil":
 
-### Parte C — Disponibilidade
+```text
+Encaixes dentro deste círculo
+1. Rafael Botelho Rangel — 86% complementar
+   Você é forte em Acolhimento (97%); ele é forte em Liderança (88%) e Espiritualidade (88%) — ele puxa direção e oração onde você sustenta o clima.
+2. Tiago Leão Buson — 72% bom encaixe
+   ...
+3. Sofia Gonçalves — 58% encaixe parcial
+   ...
+```
 
-- Parte A entra automaticamente para todo mundo (é só recálculo client-side).
-- Parte B fica como **opção** do coordenador: o botão só dispara IA quando você clica. Sem custo passivo.
+Ordena do maior para o menor score, mostra os 3 melhores. Cada item tem:
+- nome
+- percentual + rótulo
+- 1 frase de justificativa que **cita os percentuais reais** dos blocos relevantes
+- (opcional, expansível) 1 frase de cuidado se houver
 
----
+Para isso, o `LeituraPastoralBlock` passa a receber também `allMembers: TeamProfile[]` para enxergar o círculo todo.
+
+### 3. Reescrever a IA da leitura combinada do círculo para usar os percentuais com profundidade
+
+Atualizar `supabase/functions/discernir-generate-circle-combination/index.ts`:
+
+- **Enriquecer o prompt**: além da lista de membros com 6 percentuais cada, passar para a IA:
+  - a **matriz de complementaridade** já calculada no passo 1 (par a par, com score e blocos que se complementam) — assim a IA não precisa adivinhar, ela ancora as frases nos números reais;
+  - médias do grupo nos 6 blocos e desvio padrão (para detectar concentração ou lacuna real, ex.: "ninguém acima de 50% em Espiritualidade");
+  - blocos em que o grupo está saturado (>3 pessoas altas) e blocos em que ninguém está alto.
+- **Endurecer as regras anti-genérico** no system prompt: "cada frase deve citar pelo menos um nome OU um bloco com percentual real. Proibido frases que caberiam em qualquer outro círculo."
+- **Expandir o schema da resposta** com um novo campo:
+  - `dinamicas_de_par`: 2 a 4 pares dentro do círculo que merecem destaque (quem-com-quem, por quê, e o que vigiar).
+- Manter `forcas_do_grupo`, `riscos_do_grupo`, `quem_puxa_o_que`, `recomendacao_pratica`, mas exigir que `quem_puxa_o_que` cite o bloco percentualmente mais alto da pessoa **em comparação ao grupo**, não em abstrato.
+- Atualizar a `signature_hash` para invalidar o cache quando a estrutura nova rodar (mudar versão no hash).
+
+### 4. Renderizar o novo campo `dinamicas_de_par` no card de leitura combinada
+
+No `LeituraIACirculoBlock`, adicionar uma seção entre "Quem puxa o quê" e "Recomendação prática":
+
+```text
+Dinâmicas de par neste círculo
+• JULIANA + Fabio (casal): ambos altos em Acolhimento — risco de o casal se isolar no cuidado mútuo. Vale provocar partilha aberta.
+• Arthur (Guardião do Clima 97%) + Rafael Botelho (Intercessor 88%): combinação rara — clima leve sustentado por oração silenciosa. Bom para retiros.
+• ...
+```
+
+### 5. (Pequeno ajuste de UX)
+
+- Renomear o accordion individual de "Leitura pastoral combinada" para algo menos ambíguo (ex.: "Leitura deste participante no círculo"), porque hoje o nome dele e o do bloco geral se confundem — foi parte da sua confusão sobre "o que ele cruzou".
 
 ## Detalhes técnicos
 
-**Arquivos a editar:**
-- `src/apps/discernir/utils/perfilServicoLeitura.ts` — adicionar tabela `COMPLEMENTA_BLOCO_BAIXO`, expandir `LeituraPerfilServico` com `complementa`, atualizar `leituraToText`.
-- `src/apps/discernir/pages/DiscernirCoordenacao.tsx` — renderizar a nova seção "Quem complementa" no `LeituraPastoralBlock`; adicionar botão e modal "Leitura de combinação por IA" por círculo sugerido.
-- `src/apps/discernir/pages/DiscernirPerfilServico.tsx` — renderizar "Quem complementa" na tela individual.
-- `src/apps/discernir/utils/perfilServicoPDF.ts` — incluir "Quem complementa" no PDF.
+- Tudo que é par a par roda **no cliente** (sem custo de IA) e é determinístico — você consegue auditar cada percentual.
+- Só a leitura geral do círculo (passo 3) chama IA, e ela passa a receber os scores já calculados — fica muito mais difícil ela ser genérica.
+- Cache da função: bumpar versão da `signature_hash` (ex.: prefixar `v2:`) para que combinações já geradas sejam regeradas com o novo schema na próxima vez que clicar em Gerar/Regenerar.
+- Tipos: nova interface `PairCompatibility` exportada de `circleCompatibility.ts`; schema da edge function ganha `dinamicas_de_par: { membros: string[]; tipo: string; observacao: string }[]` (1 a 5 itens).
+- Sem mudança de banco. Sem nova tabela.
 
-**Arquivos a criar:**
-- `supabase/functions/discernir-generate-circle-combination/index.ts` — edge function com Lovable AI Gateway, tool calling para JSON estruturado, tratamento de 429/402.
-- Migration para tabela `discernir_circle_combinations` (id, circle_signature_hash, member_user_ids[], result_json, generated_by, created_at) com RLS restrita à coordenação.
+## O que muda para você na tela
 
-**Sem mudanças** em banco para a Parte A. Sem novas dependências.
-
----
-
-## Fora do escopo
-
-- Geração automática (sem clique) da leitura IA — fica sob demanda para controlar custo.
-- Reescrever a sugestão automática de círculos — continua determinística como hoje.
-- Editar manualmente a leitura IA — pode virar próximo passo.
+- Cada jovem (Arthur, Rafael etc.) passa a mostrar **com quais outros 3 membros daquele círculo ele tem o melhor encaixe, com %**, e a justificativa cita os blocos com números reais.
+- A leitura geral por IA passa a falar de **pares específicos** ("Arthur + Rafael", "Juliana + Fabio") em vez de só descrever o grupo em bloco.
+- Some a sensação de "todo Pastor do Círculo recebe o mesmo texto" — porque os textos passam a usar os percentuais relativos ao círculo, não só o papel.
