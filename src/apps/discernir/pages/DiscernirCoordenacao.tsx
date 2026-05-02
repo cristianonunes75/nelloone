@@ -273,11 +273,15 @@ export function DiscernirCoordenacao() {
       a: TeamProfile;
       b: TeamProfile;
     }[];
+    // Casais "solo" — pessoa marcada como casal cujo cônjuge ainda não fez
+    // o Perfil de Serviço. Entram no círculo mesmo assim, representando o
+    // par. A IA recebe um sinal de cônjuge pendente para citá-lo com respeito.
+    const soloCouples = couplePairs.filter((p) => p.b === null).map((p) => p.a);
 
-    if (linkedPairs.length === 0) {
+    if (linkedPairs.length === 0 && soloCouples.length === 0) {
       toast({
-        title: 'Nenhum casal vinculado',
-        description: 'Marque os casais e ligue cada cônjuge para gerar a sugestão.',
+        title: 'Nenhum casal cadastrado',
+        description: 'Marque ao menos uma pessoa como "casal" para gerar a sugestão.',
         variant: 'destructive',
       });
       return;
@@ -292,8 +296,11 @@ export function DiscernirCoordenacao() {
       return;
     }
 
-    const numCircles = linkedPairs.length;
-    const circles: TeamProfile[][] = linkedPairs.map(({ a, b }) => [a, b]);
+    // Cada casal (vinculado ou solo) ancora um círculo.
+    const circles: TeamProfile[][] = [
+      ...linkedPairs.map(({ a, b }) => [a, b]),
+      ...soloCouples.map((a) => [a]),
+    ];
     const youthPool = [...youth].sort(() => Math.random() - 0.5);
 
     // Distribute youth one by one, placing each in the circle that most needs their primary role
@@ -722,6 +729,11 @@ export function DiscernirCoordenacao() {
                                 </Badge>
                               ))}
                             </div>
+                            {couple.some((m) => !m.spouse_user_id) && (
+                              <p className="text-[11px] text-amber-800 italic mt-1">
+                                ⚠ O cônjuge ainda não fez o Perfil de Serviço — a IA fará a leitura considerando o que se tem hoje.
+                              </p>
+                            )}
                           </div>
                         )}
                         {jovens.length > 0 && (
@@ -1115,6 +1127,17 @@ function LeituraIACirculoBlock({ members }: { members: TeamProfile[] }) {
         {result.dinamicas_de_par && result.dinamicas_de_par.length > 0 && (
           <div>
             <p className="font-semibold text-indigo-900 mb-1">Dinâmicas de par</p>
+            <div className="flex flex-wrap gap-1.5 mb-2 text-[10px]">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-emerald-200 bg-emerald-50 text-emerald-800">
+                <strong>Complementar</strong> · perfis diferentes que se equilibram
+              </span>
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-indigo-200 bg-indigo-50 text-indigo-800">
+                <strong>Bom encaixe</strong> · combinam bem, com sobreposições saudáveis
+              </span>
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-amber-200 bg-amber-50 text-amber-900">
+                <strong>Tensão a cuidar</strong> · perfis distantes — pedem mediação
+              </span>
+            </div>
             <ul className="space-y-1.5 text-muted-foreground pl-3">
               {result.dinamicas_de_par.map((d, i) => {
                 const tipoColor =
