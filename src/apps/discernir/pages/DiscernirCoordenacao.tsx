@@ -1077,6 +1077,7 @@ function LeituraIACirculoBlock({ members }: { members: TeamProfile[] }) {
           secondary_role: m.secondary_role,
           participant_type: m.participant_type,
           spouse_user_id: m.spouse_user_id,
+          gender: m.gender,
           percentages: m.percentages,
         })),
       };
