@@ -1127,6 +1127,17 @@ function LeituraIACirculoBlock({ members }: { members: TeamProfile[] }) {
         {result.dinamicas_de_par && result.dinamicas_de_par.length > 0 && (
           <div>
             <p className="font-semibold text-indigo-900 mb-1">Dinâmicas de par</p>
+            <div className="flex flex-wrap gap-1.5 mb-2 text-[10px]">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-emerald-200 bg-emerald-50 text-emerald-800">
+                <strong>Complementar</strong> · perfis diferentes que se equilibram
+              </span>
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-indigo-200 bg-indigo-50 text-indigo-800">
+                <strong>Bom encaixe</strong> · combinam bem, com sobreposições saudáveis
+              </span>
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-amber-200 bg-amber-50 text-amber-900">
+                <strong>Tensão a cuidar</strong> · perfis distantes — pedem mediação
+              </span>
+            </div>
             <ul className="space-y-1.5 text-muted-foreground pl-3">
               {result.dinamicas_de_par.map((d, i) => {
                 const tipoColor =
