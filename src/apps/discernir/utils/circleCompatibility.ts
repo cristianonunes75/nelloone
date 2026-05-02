@@ -18,6 +18,12 @@ export interface PairMember {
   display_name: string;
   primary_role: string;
   percentages: CircleProfilePercentages;
+  spouse_user_id?: string | null;
+  participant_type?: 'casal' | 'jovem' | null;
+  /** True when this PairMember represents a married couple grouped as one unit. */
+  is_couple_unit?: boolean;
+  /** When is_couple_unit is true, the user_ids of both spouses. */
+  member_user_ids?: string[];
 }
 
 export interface PairCompatibility {
