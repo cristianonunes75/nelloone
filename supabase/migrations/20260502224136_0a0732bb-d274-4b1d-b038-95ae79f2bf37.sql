@@ -1,0 +1,1 @@
+ALTER TABLE public.discernir_circle_profiles ADD COLUMN IF NOT EXISTS gender TEXT CHECK (gender IN ('masculino','feminino'));
