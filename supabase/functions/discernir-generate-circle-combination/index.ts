@@ -409,7 +409,10 @@ Deno.serve(async (req: Request) => {
       couples.length > 0
         ? `Casais no círculo: ${couples.join("; ")}.`
         : `Sem casais marcados.`,
-    ].join("\n");
+      soloSpouses.length > 0
+        ? `Cônjuges presentes sem o par testado (representam o casal mesmo assim): ${soloSpouses.join("; ")}.`
+        : ``,
+    ].filter(Boolean).join("\n");
 
     const systemPrompt = `Você é um auxiliar pastoral que ajuda coordenadores de círculos jovens católicos a entender como um grupo específico tende a funcionar quando reunido.
 
