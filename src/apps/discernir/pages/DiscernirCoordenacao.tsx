@@ -764,6 +764,9 @@ interface LeituraPastoralBlockProps {
   primaryRole: string;
   secondaryRole: string | null;
   displayName: string;
+  self?: PairMember;
+  poolMembers?: PairMember[];
+  poolLabel?: string; // ex.: "neste círculo", "na equipe"
 }
 
 function LeituraPastoralBlock({
@@ -771,6 +774,9 @@ function LeituraPastoralBlock({
   primaryRole,
   secondaryRole,
   displayName,
+  self,
+  poolMembers,
+  poolLabel,
 }: LeituraPastoralBlockProps) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -780,6 +786,11 @@ function LeituraPastoralBlock({
     () => gerarLeituraPerfilServico(percentages, primaryRole, secondaryRole),
     [percentages, primaryRole, secondaryRole],
   );
+
+  const encaixes: PairCompatibility[] = useMemo(() => {
+    if (!self || !poolMembers || poolMembers.length < 2) return [];
+    return calcCompatibilitiesFor(self, poolMembers).slice(0, 3);
+  }, [self, poolMembers]);
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -793,6 +804,19 @@ function LeituraPastoralBlock({
     }
   };
 
+  const tipoColor = (tipo: PairCompatibility['tipo']) => {
+    switch (tipo) {
+      case 'complementar':
+        return 'bg-emerald-100 text-emerald-900 border-emerald-300';
+      case 'bom_encaixe':
+        return 'bg-sky-100 text-sky-900 border-sky-300';
+      case 'encaixe_parcial':
+        return 'bg-amber-100 text-amber-900 border-amber-300';
+      case 'tensao':
+        return 'bg-rose-100 text-rose-900 border-rose-300';
+    }
+  };
+
   return (
     <div className="pt-3 border-t">
       <button
@@ -802,7 +826,7 @@ function LeituraPastoralBlock({
       >
         <span className="flex items-center gap-1.5">
           <Sparkles className="w-3 h-3" />
-          Leitura pastoral combinada
+          Leitura individual + encaixes
         </span>
         <ChevronDown
           className={cn('w-3.5 h-3.5 transition-transform', open && 'rotate-180')}
@@ -848,6 +872,39 @@ function LeituraPastoralBlock({
             </p>
             <p className="text-muted-foreground">{leitura.complementa}</p>
           </div>
+
+          {encaixes.length > 0 && (
+            <div className="rounded-md bg-violet-50/60 border border-violet-200 px-2.5 py-2 space-y-2">
+              <p className="text-[11px] font-semibold text-violet-900">
+                Top encaixes {poolLabel || ''}
+              </p>
+              <ol className="space-y-2">
+                {encaixes.map((c, i) => (
+                  <li key={c.outro_user_id} className="space-y-0.5">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[11px] font-semibold text-foreground">
+                        {i + 1}. {c.outro_nome}
+                      </span>
+                      <Badge
+                        variant="outline"
+                        className={cn('text-[10px] px-1.5 py-0', tipoColor(c.tipo))}
+                      >
+                        {c.score}% · {c.rotulo}
+                      </Badge>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-snug">
+                      {c.justificativa}
+                    </p>
+                    {c.cuidado && (
+                      <p className="text-[10px] text-amber-800 italic leading-snug">
+                        ⚠ {c.cuidado}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
 
           <Button
             type="button"
