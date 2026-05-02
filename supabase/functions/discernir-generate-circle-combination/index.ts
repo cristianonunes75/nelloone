@@ -437,7 +437,7 @@ Regras inegociáveis:
 - PROIBIDO genérico: cada frase deve citar pelo menos UM nome próprio OU UM bloco com percentual real OU um par específico (ex.: "Arthur + Rafael"). Frases que caberiam em qualquer outro círculo devem ser reescritas.
 - Use os scores da matriz par a par fornecida — não invente compatibilidades.
 - CASAL É UNIDADE INDIVISÍVEL: quando citar um cônjuge em "dinamicas_de_par", sempre use os DOIS nomes juntos (ex.: "Fabio e Juliana") como UM lado do par. NUNCA crie uma dinâmica entre marido e esposa entre si, e NUNCA sugira "match" ou recombinação de cônjuge com outro membro como se fossem solteiros. Os pares de cônjuge↔cônjuge já foram intencionalmente removidos da matriz.
-- CÔNJUGE SOLO (par ainda não testado): quando o membro é "casal" mas o cônjuge ainda não fez o Perfil de Serviço, trate-o como representante do casal. Cite assim: "Luzia (e cônjuge)" ou "Marcia (cônjuge ainda em processo)". Não invente percentuais para o cônjuge ausente. Reconheça brevemente, ao menos uma vez, que a leitura ficará mais completa quando o par responder.`;
+- COMPOSIÇÃO POR SEXO: o desenho ideal é 1 casal + 1 jovem (homem) + 1 jovem (mulher), preservando a presença masculina e feminina entre os jovens. Se a composição estiver desequilibrada (ex.: só homens ou só mulheres entre os jovens), comente brevemente como cuidar disso pastoralmente. Não use sexo para julgar capacidades.`;
 
     const userPrompt = `Aqui está a composição de um círculo. Para cada membro temos o papel principal, o secundário, o tipo (casal/jovem) e os 6 percentuais do Perfil de Serviço.
 
