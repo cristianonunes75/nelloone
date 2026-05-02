@@ -813,8 +813,12 @@ export function DiscernirCoordenacao() {
                   <div className="flex-1 space-y-1">
                     <h3 className="text-sm font-semibold">Sugestão automática</h3>
                     <p className="text-xs text-muted-foreground">
-                      Cada círculo terá <strong>1 casal + 1 jovem (homem) + 1 jovem (mulher)</strong>,
-                      e os jovens extras são distribuídos mantendo o equilíbrio H/M e a complementaridade de papéis.
+                      Composição <strong>determinística</strong>: cada casal âncora um círculo
+                      e os jovens são alocados ao círculo que <strong>mais soma</strong> em
+                      compatibilidade, equilíbrio de gênero (H/M), diversidade de papéis e
+                      proximidade de idade. Mesma entrada → mesmo resultado.
+                      Você pode <strong>trocar jovens entre círculos</strong> e a leitura da IA
+                      se atualiza automaticamente.
                     </p>
                   </div>
                   <Button onClick={buildSuggestedCircles} className="gap-2">
