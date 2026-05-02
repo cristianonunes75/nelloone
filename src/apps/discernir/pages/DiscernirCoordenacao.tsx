@@ -488,6 +488,28 @@ export function DiscernirCoordenacao() {
               </div>
             )}
 
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-muted-foreground w-14">Sexo:</span>
+              <Select
+                value={p.gender || 'none'}
+                onValueChange={(v) =>
+                  updateProfileMarker(p.id, {
+                    gender: v === 'none' ? null : (v as 'masculino' | 'feminino'),
+                  })
+                }
+                disabled={savingId === p.id}
+              >
+                <SelectTrigger className="h-8 text-xs flex-1">
+                  <SelectValue placeholder="Selecionar..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— Não informado —</SelectItem>
+                  <SelectItem value="masculino">Masculino</SelectItem>
+                  <SelectItem value="feminino">Feminino</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {savingId === p.id && (
               <p className="text-[10px] text-muted-foreground flex items-center gap-1">
                 <Loader2 className="w-3 h-3 animate-spin" /> Salvando...
