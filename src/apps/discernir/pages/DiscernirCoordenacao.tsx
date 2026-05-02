@@ -729,6 +729,11 @@ export function DiscernirCoordenacao() {
                                 </Badge>
                               ))}
                             </div>
+                            {couple.some((m) => !m.spouse_user_id) && (
+                              <p className="text-[11px] text-amber-800 italic mt-1">
+                                ⚠ O cônjuge ainda não fez o Perfil de Serviço — a IA fará a leitura considerando o que se tem hoje.
+                              </p>
+                            )}
                           </div>
                         )}
                         {jovens.length > 0 && (
