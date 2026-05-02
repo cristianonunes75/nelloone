@@ -53,6 +53,7 @@ import { downloadPerfilServicoPDF } from '../utils/perfilServicoPDF';
 import { gerarLeituraPerfilServico, leituraToText } from '../utils/perfilServicoLeitura';
 import {
   calcCompatibilitiesFor,
+  calcSpouseBondReading,
   type PairMember,
   type PairCompatibility,
 } from '../utils/circleCompatibility';
