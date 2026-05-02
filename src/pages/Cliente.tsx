@@ -947,6 +947,7 @@ const Cliente = () => {
           </div>
           </>
           )}
+          </ErrorBoundary>
         </div>
       </main>
 
