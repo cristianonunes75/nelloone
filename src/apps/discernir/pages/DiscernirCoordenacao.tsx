@@ -460,12 +460,25 @@ export function DiscernirCoordenacao() {
             )}
           </div>
 
-          {/* Leitura pastoral combinada (específica deste perfil) */}
+          {/* Leitura pastoral individual + encaixes na equipe */}
           <LeituraPastoralBlock
             percentages={p.percentages}
             primaryRole={p.primary_role}
             secondaryRole={p.secondary_role}
             displayName={p.display_name}
+            self={{
+              user_id: p.user_id,
+              display_name: p.display_name,
+              primary_role: p.primary_role,
+              percentages: p.percentages,
+            }}
+            poolMembers={profiles.map((o) => ({
+              user_id: o.user_id,
+              display_name: o.display_name,
+              primary_role: o.primary_role,
+              percentages: o.percentages,
+            }))}
+            poolLabel="na equipe"
           />
 
           <Button
