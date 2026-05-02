@@ -273,11 +273,15 @@ export function DiscernirCoordenacao() {
       a: TeamProfile;
       b: TeamProfile;
     }[];
+    // Casais "solo" — pessoa marcada como casal cujo cônjuge ainda não fez
+    // o Perfil de Serviço. Entram no círculo mesmo assim, representando o
+    // par. A IA recebe um sinal de cônjuge pendente para citá-lo com respeito.
+    const soloCouples = couplePairs.filter((p) => p.b === null).map((p) => p.a);
 
-    if (linkedPairs.length === 0) {
+    if (linkedPairs.length === 0 && soloCouples.length === 0) {
       toast({
-        title: 'Nenhum casal vinculado',
-        description: 'Marque os casais e ligue cada cônjuge para gerar a sugestão.',
+        title: 'Nenhum casal cadastrado',
+        description: 'Marque ao menos uma pessoa como "casal" para gerar a sugestão.',
         variant: 'destructive',
       });
       return;
@@ -292,8 +296,11 @@ export function DiscernirCoordenacao() {
       return;
     }
 
-    const numCircles = linkedPairs.length;
-    const circles: TeamProfile[][] = linkedPairs.map(({ a, b }) => [a, b]);
+    // Cada casal (vinculado ou solo) ancora um círculo.
+    const circles: TeamProfile[][] = [
+      ...linkedPairs.map(({ a, b }) => [a, b]),
+      ...soloCouples.map((a) => [a]),
+    ];
     const youthPool = [...youth].sort(() => Math.random() - 0.5);
 
     // Distribute youth one by one, placing each in the circle that most needs their primary role
