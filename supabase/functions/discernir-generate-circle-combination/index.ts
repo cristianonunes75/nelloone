@@ -350,6 +350,12 @@ Deno.serve(async (req: Request) => {
       }
     }
 
+    // Cônjuges presentes mas com par ainda não testado — entram na leitura
+    // representando a unidade-casal mesmo sem dados do cônjuge.
+    const soloSpouses: string[] = members
+      .filter((m) => m.participant_type === "casal" && !m.spouse_user_id)
+      .map((m) => `${m.display_name} (cônjuge ainda não fez o Perfil de Serviço)`);
+
     // Helper: dois membros são cônjuges (vínculo recíproco)?
     const isSpousePair = (a: MemberInput, b: MemberInput): boolean => {
       return (
