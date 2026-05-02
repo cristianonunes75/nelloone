@@ -900,21 +900,43 @@ export function DiscernirCoordenacao() {
                                 );
                               })()}
                             </div>
-                            <div className="flex flex-wrap gap-2">
-                              {jovens.map((m) => (
-                                <Badge
-                                  key={m.id}
-                                  variant="outline"
-                                  className={cn('text-xs py-1.5 px-3', ROLE_COLORS[m.primary_role])}
-                                >
-                                  {m.display_name}
-                                  {m.gender && (
-                                    <span className="ml-1 opacity-70">({m.gender === 'masculino' ? 'H' : 'M'})</span>
-                                  )}
-                                  {' · '}
-                                  {m.primary_role}
-                                </Badge>
-                              ))}
+                            <div className="flex flex-col gap-1.5">
+                              {jovens.map((m) => {
+                                const age = calcAge(m.birth_date);
+                                return (
+                                  <div key={m.id} className="flex items-center gap-2 flex-wrap">
+                                    <Badge
+                                      variant="outline"
+                                      className={cn('text-xs py-1.5 px-3', ROLE_COLORS[m.primary_role])}
+                                    >
+                                      {m.display_name}
+                                      {m.gender && (
+                                        <span className="ml-1 opacity-70">({m.gender === 'masculino' ? 'H' : 'M'})</span>
+                                      )}
+                                      {age !== null && (
+                                        <span className="ml-1 opacity-70">· {age}a</span>
+                                      )}
+                                      {' · '}
+                                      {m.primary_role}
+                                    </Badge>
+                                    <Select
+                                      value={String(idx)}
+                                      onValueChange={(v) => moveMember(m.id, Number(v))}
+                                    >
+                                      <SelectTrigger className="h-7 text-[10px] w-auto px-2 gap-1">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {suggestedCircles!.map((_, ci) => (
+                                          <SelectItem key={ci} value={String(ci)} className="text-xs">
+                                            Mover para Círculo {ci + 1}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
                         )}
