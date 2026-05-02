@@ -941,7 +941,10 @@ export function DiscernirCoordenacao() {
                           </div>
                         )}
 
-                        <LeituraIACirculoBlock members={circle} />
+                        <LeituraIACirculoBlock
+                          key={circle.map((m) => m.id).sort().join('|')}
+                          members={circle}
+                        />
                       </CardContent>
                     </Card>
                   );
