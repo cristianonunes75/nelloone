@@ -73,8 +73,20 @@ interface TeamProfile {
   participant_type: ParticipantType;
   spouse_user_id: string | null;
   gender: 'masculino' | 'feminino' | null;
+  birth_date: string | null;
   coordinator_notes: string | null;
   created_at: string;
+}
+
+function calcAge(birth: string | null): number | null {
+  if (!birth) return null;
+  const d = new Date(birth);
+  if (isNaN(d.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - d.getFullYear();
+  const m = now.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age -= 1;
+  return age;
 }
 
 interface MovementRow {
