@@ -327,7 +327,10 @@ Deno.serve(async (req: Request) => {
         const tipo = m.participant_type
           ? ` [${m.participant_type === "casal" ? "casal" : "jovem"}]`
           : "";
-        return `- ${m.display_name}${tipo} | papel principal: ${m.primary_role}${
+        const sexo = m.gender
+          ? ` (${m.gender === "masculino" ? "homem" : "mulher"})`
+          : "";
+        return `- ${m.display_name}${tipo}${sexo} | papel principal: ${m.primary_role}${
           m.secondary_role ? ` | secundário: ${m.secondary_role}` : ""
         } | Liderança ${Math.round(p.lideranca)}% • Acolhimento ${Math.round(
           p.acolhimento,
