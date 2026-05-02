@@ -73,8 +73,20 @@ interface TeamProfile {
   participant_type: ParticipantType;
   spouse_user_id: string | null;
   gender: 'masculino' | 'feminino' | null;
+  birth_date: string | null;
   coordinator_notes: string | null;
   created_at: string;
+}
+
+function calcAge(birth: string | null): number | null {
+  if (!birth) return null;
+  const d = new Date(birth);
+  if (isNaN(d.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - d.getFullYear();
+  const m = now.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age -= 1;
+  return age;
 }
 
 interface MovementRow {
@@ -158,7 +170,7 @@ export function DiscernirCoordenacao() {
 
   const updateProfileMarker = async (
     profileId: string,
-    patch: Partial<Pick<TeamProfile, 'participant_type' | 'spouse_user_id' | 'gender'>>,
+    patch: Partial<Pick<TeamProfile, 'participant_type' | 'spouse_user_id' | 'gender' | 'birth_date'>>,
   ) => {
     setSavingId(profileId);
     try {
@@ -266,8 +278,14 @@ export function DiscernirCoordenacao() {
   };
 
   /**
-   * Build balanced circles: each circle = 1 couple + 1 young man + 1 young woman + extras.
-   * Garante alternância de sexo entre os jovens (M/F) por círculo.
+   * Constrói círculos balanceados de forma DETERMINÍSTICA — mesma entrada,
+   * mesma saída. Sem aleatoriedade. Best-fit por compatibilidade real:
+   *  1. Cada casal âncora um círculo (ordem fixa por user_id).
+   *  2. Para cada vaga restante, escolhe o jovem que MAIS soma ao círculo
+   *     (média de score de compatibilidade com os já presentes), respeitando:
+   *      - alternância de sexo (1H + 1M no mínimo);
+   *      - diversidade de papel pastoral;
+   *      - proximidade de idade entre os jovens do mesmo círculo.
    */
   const buildSuggestedCircles = () => {
     const linkedPairs = couplePairs.filter((p) => p.b !== null) as {
@@ -294,61 +312,123 @@ export function DiscernirCoordenacao() {
       return;
     }
 
+    // Ordem determinística dos círculos: pelo menor user_id do casal âncora
+    const sortedLinked = [...linkedPairs].sort((x, y) =>
+      x.a.user_id.localeCompare(y.a.user_id),
+    );
+    const sortedSolo = [...soloCouples].sort((x, y) =>
+      x.user_id.localeCompare(y.user_id),
+    );
     const circles: TeamProfile[][] = [
-      ...linkedPairs.map(({ a, b }) => [a, b]),
-      ...soloCouples.map((a) => [a]),
+      ...sortedLinked.map(({ a, b }) => [a, b]),
+      ...sortedSolo.map((a) => [a]),
     ];
 
-    // Separa jovens por sexo (sem sexo marcado vai para "outros")
-    const shuffle = <T,>(arr: T[]) => [...arr].sort(() => Math.random() - 0.5);
-    const youngMen = shuffle(youth.filter((y) => y.gender === 'masculino'));
-    const youngWomen = shuffle(youth.filter((y) => y.gender === 'feminino'));
-    const youngUnknown = shuffle(youth.filter((y) => !y.gender));
+    const toPair = (p: TeamProfile): PairMember => ({
+      user_id: p.user_id,
+      display_name: p.display_name,
+      primary_role: p.primary_role,
+      percentages: p.percentages,
+      spouse_user_id: p.spouse_user_id,
+      participant_type: p.participant_type,
+    });
 
-    let unknownWarn = youngUnknown.length;
-
-    // Distribuidor por gênero: dá prioridade a círculos que ainda não têm
-    // jovem do sexo em questão e cuja diversidade de papel é maior.
-    const placeOne = (j: TeamProfile, genderHint: 'masculino' | 'feminino' | null) => {
-      let bestIdx = 0;
-      let bestScore = -Infinity;
-      circles.forEach((circle, idx) => {
-        const rolesPresent = new Set(circle.map((m) => m.primary_role));
-        const youthInCircle = circle.filter((m) => m.participant_type === 'jovem');
-        const sameGenderCount = genderHint
-          ? youthInCircle.filter((m) => m.gender === genderHint).length
-          : 0;
-        // Penaliza fortemente repetir o mesmo sexo antes de cobrir o oposto
-        const genderScore = genderHint ? -sameGenderCount * 5 : 0;
-        const sizeScore = -circle.length * 2;
-        const diversityScore = rolesPresent.has(j.primary_role) ? 0 : 3;
-        const total = sizeScore + diversityScore + genderScore;
-        if (total > bestScore) {
-          bestScore = total;
-          bestIdx = idx;
-        }
+    /** Score do jovem em relação a um círculo já parcial. */
+    const scoreFit = (j: TeamProfile, circle: TeamProfile[]): number => {
+      const jPair = toPair(j);
+      // 1) Compatibilidade média com membros atuais (0–100)
+      const compats = circle.map((m) => {
+        const list = calcCompatibilitiesFor(jPair, [toPair(m)]);
+        return list[0]?.score ?? 50;
       });
-      circles[bestIdx].push(j);
+      const avgCompat = compats.length
+        ? compats.reduce((s, v) => s + v, 0) / compats.length
+        : 50;
+
+      // 2) Bônus por equilíbrio de gênero (priorizar o sexo faltante entre jovens)
+      const youthInCircle = circle.filter((m) => m.participant_type === 'jovem');
+      const men = youthInCircle.filter((m) => m.gender === 'masculino').length;
+      const women = youthInCircle.filter((m) => m.gender === 'feminino').length;
+      let genderBonus = 0;
+      if (j.gender === 'masculino' && men < women) genderBonus = 20;
+      else if (j.gender === 'feminino' && women < men) genderBonus = 20;
+      else if (j.gender && men === women) genderBonus = 10;
+      else if (!j.gender) genderBonus = -5;
+
+      // 3) Bônus por diversidade de papel pastoral
+      const rolesPresent = new Set(circle.map((m) => m.primary_role));
+      const roleBonus = rolesPresent.has(j.primary_role) ? 0 : 8;
+
+      // 4) Proximidade de idade entre jovens (penaliza diferença grande)
+      const jAge = calcAge(j.birth_date);
+      const youthAges = youthInCircle
+        .map((m) => calcAge(m.birth_date))
+        .filter((a): a is number => a !== null);
+      let ageBonus = 0;
+      if (jAge !== null && youthAges.length > 0) {
+        const avgAge = youthAges.reduce((s, v) => s + v, 0) / youthAges.length;
+        const diff = Math.abs(jAge - avgAge);
+        // 0 anos => +12, 5 anos => +2, 10+ anos => -3
+        ageBonus = Math.max(-3, 12 - diff * 2);
+      }
+
+      // 5) Penalidade por círculo cheio (incentivar distribuição)
+      const sizePenalty = -circle.length * 1.5;
+
+      return avgCompat + genderBonus + roleBonus + ageBonus + sizePenalty;
     };
 
-    // 1ª passagem: garante 1 homem e 1 mulher por círculo, alternando.
-    const maxFirstPass = Math.max(youngMen.length, youngWomen.length);
-    for (let i = 0; i < maxFirstPass; i++) {
-      if (i < youngWomen.length) placeOne(youngWomen[i], 'feminino');
-      if (i < youngMen.length) placeOne(youngMen[i], 'masculino');
+    // Distribui jovens um a um, sempre escolhendo o (jovem, círculo) com maior score
+    const remaining = [...youth].sort((a, b) => a.user_id.localeCompare(b.user_id));
+    while (remaining.length > 0) {
+      let bestJ = -1;
+      let bestC = -1;
+      let bestScore = -Infinity;
+      for (let ji = 0; ji < remaining.length; ji++) {
+        for (let ci = 0; ci < circles.length; ci++) {
+          const s = scoreFit(remaining[ji], circles[ci]);
+          if (s > bestScore) {
+            bestScore = s;
+            bestJ = ji;
+            bestC = ci;
+          }
+        }
+      }
+      if (bestJ < 0) break;
+      circles[bestC].push(remaining[bestJ]);
+      remaining.splice(bestJ, 1);
     }
-    // Jovens sem sexo marcado entram por último
-    youngUnknown.forEach((j) => placeOne(j, null));
 
     setSuggestedCircles(circles);
 
-    if (unknownWarn > 0) {
+    const unknownGender = youth.filter((y) => !y.gender).length;
+    if (unknownGender > 0) {
       toast({
-        title: `${unknownWarn} jovem(ns) sem sexo marcado`,
-        description: 'Marque o sexo (Masculino/Feminino) para garantir o equilíbrio H/M nos círculos.',
+        title: `${unknownGender} jovem(ns) sem sexo marcado`,
+        description: 'Marque o sexo (Masculino/Feminino) para garantir o equilíbrio H/M.',
       });
     }
   };
+
+  /** Move um membro (jovem) entre círculos. Casais não podem ser movidos. */
+  const moveMember = (memberId: string, targetCircleIdx: number) => {
+    if (!suggestedCircles) return;
+    const newCircles = suggestedCircles.map((c) => [...c]);
+    let found: TeamProfile | null = null;
+    for (const circle of newCircles) {
+      const idx = circle.findIndex((m) => m.id === memberId);
+      if (idx >= 0) {
+        if (circle[idx].participant_type === 'casal') return; // casais fixos
+        found = circle.splice(idx, 1)[0];
+        break;
+      }
+    }
+    if (!found) return;
+    if (targetCircleIdx < 0 || targetCircleIdx >= newCircles.length) return;
+    newCircles[targetCircleIdx].push(found);
+    setSuggestedCircles(newCircles);
+  };
+
 
   if (authLoading || discernirLoading || adminLoading) {
     return (
@@ -509,6 +589,26 @@ export function DiscernirCoordenacao() {
                 </SelectContent>
               </Select>
             </div>
+
+            {p.participant_type === 'jovem' && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-muted-foreground w-14">Nasc.:</span>
+                <Input
+                  type="date"
+                  value={p.birth_date || ''}
+                  onChange={(e) =>
+                    updateProfileMarker(p.id, { birth_date: e.target.value || null })
+                  }
+                  disabled={savingId === p.id}
+                  className="h-8 text-xs flex-1"
+                />
+                {p.birth_date && (
+                  <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                    {calcAge(p.birth_date)} anos
+                  </span>
+                )}
+              </div>
+            )}
 
             {savingId === p.id && (
               <p className="text-[10px] text-muted-foreground flex items-center gap-1">
@@ -713,8 +813,12 @@ export function DiscernirCoordenacao() {
                   <div className="flex-1 space-y-1">
                     <h3 className="text-sm font-semibold">Sugestão automática</h3>
                     <p className="text-xs text-muted-foreground">
-                      Cada círculo terá <strong>1 casal + 1 jovem (homem) + 1 jovem (mulher)</strong>,
-                      e os jovens extras são distribuídos mantendo o equilíbrio H/M e a complementaridade de papéis.
+                      Composição <strong>determinística</strong>: cada casal âncora um círculo
+                      e os jovens são alocados ao círculo que <strong>mais soma</strong> em
+                      compatibilidade, equilíbrio de gênero (H/M), diversidade de papéis e
+                      proximidade de idade. Mesma entrada → mesmo resultado.
+                      Você pode <strong>trocar jovens entre círculos</strong> e a leitura da IA
+                      se atualiza automaticamente.
                     </p>
                   </div>
                   <Button onClick={buildSuggestedCircles} className="gap-2">
@@ -800,26 +904,51 @@ export function DiscernirCoordenacao() {
                                 );
                               })()}
                             </div>
-                            <div className="flex flex-wrap gap-2">
-                              {jovens.map((m) => (
-                                <Badge
-                                  key={m.id}
-                                  variant="outline"
-                                  className={cn('text-xs py-1.5 px-3', ROLE_COLORS[m.primary_role])}
-                                >
-                                  {m.display_name}
-                                  {m.gender && (
-                                    <span className="ml-1 opacity-70">({m.gender === 'masculino' ? 'H' : 'M'})</span>
-                                  )}
-                                  {' · '}
-                                  {m.primary_role}
-                                </Badge>
-                              ))}
+                            <div className="flex flex-col gap-1.5">
+                              {jovens.map((m) => {
+                                const age = calcAge(m.birth_date);
+                                return (
+                                  <div key={m.id} className="flex items-center gap-2 flex-wrap">
+                                    <Badge
+                                      variant="outline"
+                                      className={cn('text-xs py-1.5 px-3', ROLE_COLORS[m.primary_role])}
+                                    >
+                                      {m.display_name}
+                                      {m.gender && (
+                                        <span className="ml-1 opacity-70">({m.gender === 'masculino' ? 'H' : 'M'})</span>
+                                      )}
+                                      {age !== null && (
+                                        <span className="ml-1 opacity-70">· {age}a</span>
+                                      )}
+                                      {' · '}
+                                      {m.primary_role}
+                                    </Badge>
+                                    <Select
+                                      value={String(idx)}
+                                      onValueChange={(v) => moveMember(m.id, Number(v))}
+                                    >
+                                      <SelectTrigger className="h-7 text-[10px] w-auto px-2 gap-1">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {suggestedCircles!.map((_, ci) => (
+                                          <SelectItem key={ci} value={String(ci)} className="text-xs">
+                                            Mover para Círculo {ci + 1}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
                         )}
 
-                        <LeituraIACirculoBlock members={circle} />
+                        <LeituraIACirculoBlock
+                          key={circle.map((m) => m.id).sort().join('|')}
+                          members={circle}
+                        />
                       </CardContent>
                     </Card>
                   );

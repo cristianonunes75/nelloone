@@ -3491,6 +3491,7 @@ export type Database = {
       discernir_circle_profiles: {
         Row: {
           answers: Json
+          birth_date: string | null
           coordinator_notes: string | null
           created_at: string
           gender: string | null
@@ -3511,6 +3512,7 @@ export type Database = {
         }
         Insert: {
           answers: Json
+          birth_date?: string | null
           coordinator_notes?: string | null
           created_at?: string
           gender?: string | null
@@ -3531,6 +3533,7 @@ export type Database = {
         }
         Update: {
           answers?: Json
+          birth_date?: string | null
           coordinator_notes?: string | null
           created_at?: string
           gender?: string | null
@@ -7460,6 +7463,7 @@ export type Database = {
       }
       discernir_circle_profiles_team_view: {
         Row: {
+          birth_date: string | null
           coordinator_notes: string | null
           created_at: string | null
           display_name: string | null
