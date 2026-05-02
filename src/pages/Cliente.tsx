@@ -47,6 +47,7 @@ import {
 import { TestInsightScreen, getProvisionalInsight, getMirrorPhrase } from "@/components/tests/TestInsightScreen";
 import { StrategicCheckpoint, generateCheckpointContent } from "@/components/tests/StrategicCheckpoint";
 import { CelebrationModal, PRODUCT_CATALOG } from "@/components/monetization";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const Cliente = () => {
   const { user, profile, signOut, userRole, isLoading: isAuthLoading } = useAuth();
@@ -813,6 +814,7 @@ const Cliente = () => {
 
       <main className="container px-4 py-6 md:py-12">
         <div className="max-w-3xl mx-auto">
+          <ErrorBoundary fallbackTitle="Não conseguimos carregar seu painel">
           {/* Admin V2 Preview */}
           {isAdmin && dashboardVersion === "v2" ? (
             <EssenceDashboardV2
@@ -945,6 +947,7 @@ const Cliente = () => {
           </div>
           </>
           )}
+          </ErrorBoundary>
         </div>
       </main>
 
