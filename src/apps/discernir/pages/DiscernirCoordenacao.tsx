@@ -590,6 +590,26 @@ export function DiscernirCoordenacao() {
               </Select>
             </div>
 
+            {p.participant_type === 'jovem' && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-muted-foreground w-14">Nasc.:</span>
+                <Input
+                  type="date"
+                  value={p.birth_date || ''}
+                  onChange={(e) =>
+                    updateProfileMarker(p.id, { birth_date: e.target.value || null })
+                  }
+                  disabled={savingId === p.id}
+                  className="h-8 text-xs flex-1"
+                />
+                {p.birth_date && (
+                  <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                    {calcAge(p.birth_date)} anos
+                  </span>
+                )}
+              </div>
+            )}
+
             {savingId === p.id && (
               <p className="text-[10px] text-muted-foreground flex items-center gap-1">
                 <Loader2 className="w-3 h-3 animate-spin" /> Salvando...
