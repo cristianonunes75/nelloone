@@ -81,6 +81,7 @@ function buildSignature(members: MemberInput[]): {
           m.secondary_role || "",
           m.participant_type || "",
           m.spouse_user_id || "",
+          m.gender || "",
           Math.round(p.lideranca),
           Math.round(p.acolhimento),
           Math.round(p.comunicacao),
