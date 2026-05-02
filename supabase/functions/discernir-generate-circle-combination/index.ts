@@ -51,7 +51,7 @@ const BLOCO_LABEL: Record<BlockKey, string> = {
 const ALTO = 75;
 const BAIXO = 50;
 
-const SCHEMA_VERSION = "v2";
+const SCHEMA_VERSION = "v3";
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
@@ -350,13 +350,26 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    // Matriz de pares (todos contra todos)
+    // Helper: dois membros são cônjuges (vínculo recíproco)?
+    const isSpousePair = (a: MemberInput, b: MemberInput): boolean => {
+      return (
+        a.participant_type === "casal" &&
+        b.participant_type === "casal" &&
+        a.spouse_user_id === b.user_id &&
+        b.spouse_user_id === a.user_id
+      );
+    };
+
+    // Matriz de pares (todos contra todos) — exclui pares cônjuge↔cônjuge,
+    // pois o casal é unidade indivisível e não deve ser tratado como
+    // possível "match" recombinável.
     const pairMatrix: string[] = [];
     const topPairs: { ab: string; score: number; tipo: string; obs: string }[] = [];
     for (let i = 0; i < members.length; i += 1) {
       for (let j = i + 1; j < members.length; j += 1) {
         const a = members[i];
         const b = members[j];
+        if (isSpousePair(a, b)) continue; // casal nunca entra como par recombinável
         const r = pairScore(a, b);
         const compl = r.blocos_que_se_complementam
           .map((x) => `${x.bloco} suprido por ${x.quem_supre}`)
@@ -400,7 +413,8 @@ Regras inegociáveis:
 - Não invente dados além dos percentuais, papéis, vínculos e scores informados.
 - Português do Brasil, tratamento "você", curto e direto.
 - PROIBIDO genérico: cada frase deve citar pelo menos UM nome próprio OU UM bloco com percentual real OU um par específico (ex.: "Arthur + Rafael"). Frases que caberiam em qualquer outro círculo devem ser reescritas.
-- Use os scores da matriz par a par fornecida — não invente compatibilidades.`;
+- Use os scores da matriz par a par fornecida — não invente compatibilidades.
+- CASAL É UNIDADE INDIVISÍVEL: quando citar um cônjuge em "dinamicas_de_par", sempre use os DOIS nomes juntos (ex.: "Fabio e Juliana") como UM lado do par. NUNCA crie uma dinâmica entre marido e esposa entre si, e NUNCA sugira "match" ou recombinação de cônjuge com outro membro como se fossem solteiros. Os pares de cônjuge↔cônjuge já foram intencionalmente removidos da matriz.`;
 
     const userPrompt = `Aqui está a composição de um círculo. Para cada membro temos o papel principal, o secundário, o tipo (casal/jovem) e os 6 percentuais do Perfil de Serviço.
 

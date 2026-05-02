@@ -18,6 +18,12 @@ export interface PairMember {
   display_name: string;
   primary_role: string;
   percentages: CircleProfilePercentages;
+  spouse_user_id?: string | null;
+  participant_type?: 'casal' | 'jovem' | null;
+  /** True when this PairMember represents a married couple grouped as one unit. */
+  is_couple_unit?: boolean;
+  /** When is_couple_unit is true, the user_ids of both spouses. */
+  member_user_ids?: string[];
 }
 
 export interface PairCompatibility {
@@ -312,3 +318,60 @@ export function topPairsOfCircle(members: PairMember[], n = 4): TopPair[] {
   pairs.sort((x, y) => y.compat.score - x.compat.score);
   return pairs.slice(0, n);
 }
+
+/**
+ * Agrupa cônjuges (vínculo recíproco via spouse_user_id) em uma única
+ * unidade-casal. Membros sem cônjuge ou com vínculo unilateral ficam como
+ * unidades individuais (fallback seguro).
+ */
+export function groupMembersAsUnits(members: PairMember[]): PairMember[] {
+  const byId = new Map(members.map((m) => [m.user_id, m]));
+  const consumed = new Set<string>();
+  const units: PairMember[] = [];
+
+  for (const m of members) {
+    if (consumed.has(m.user_id)) continue;
+    const spouseId = m.spouse_user_id || null;
+    const spouse = spouseId ? byId.get(spouseId) : null;
+    const reciprocal = !!(spouse && spouse.spouse_user_id === m.user_id);
+
+    if (m.participant_type === 'casal' && spouse && reciprocal) {
+      consumed.add(m.user_id);
+      consumed.add(spouse.user_id);
+      const ids = [m.user_id, spouse.user_id].sort();
+      const avg = {} as CircleProfilePercentages;
+      for (const blk of BLOCOS) {
+        avg[blk] = Math.round((pct(m.percentages, blk) + pct(spouse.percentages, blk)) / 2);
+      }
+      const firstA = m.display_name.split(' ')[0];
+      const firstB = spouse.display_name.split(' ')[0];
+      units.push({
+        user_id: `couple:${ids[0]}:${ids[1]}`,
+        display_name: `${firstA} e ${firstB}`,
+        primary_role: 'Casal',
+        percentages: avg,
+        is_couple_unit: true,
+        member_user_ids: ids,
+        participant_type: 'casal',
+        spouse_user_id: null,
+      });
+    } else {
+      consumed.add(m.user_id);
+      units.push(m);
+    }
+  }
+  return units;
+}
+
+/**
+ * Compatibilidade do par fixo (cônjuges). Mesmo motor, mas apresentado sem
+ * score competitivo — é vínculo, não match escolhível.
+ */
+export function calcSpouseBondReading(
+  a: PairMember,
+  b: PairMember,
+): { resumo: string; cuidado: string | null } {
+  const compat = calcPairCompatibility(a, b);
+  return { resumo: compat.justificativa, cuidado: compat.cuidado };
+}
+

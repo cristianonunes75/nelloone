@@ -53,6 +53,7 @@ import { downloadPerfilServicoPDF } from '../utils/perfilServicoPDF';
 import { gerarLeituraPerfilServico, leituraToText } from '../utils/perfilServicoLeitura';
 import {
   calcCompatibilitiesFor,
+  calcSpouseBondReading,
   type PairMember,
   type PairCompatibility,
 } from '../utils/circleCompatibility';
@@ -471,12 +472,16 @@ export function DiscernirCoordenacao() {
               display_name: p.display_name,
               primary_role: p.primary_role,
               percentages: p.percentages,
+              spouse_user_id: p.spouse_user_id,
+              participant_type: p.participant_type,
             }}
             poolMembers={profiles.map((o) => ({
               user_id: o.user_id,
               display_name: o.display_name,
               primary_role: o.primary_role,
               percentages: o.percentages,
+              spouse_user_id: o.spouse_user_id,
+              participant_type: o.participant_type,
             }))}
             poolLabel="na equipe"
           />
@@ -787,10 +792,28 @@ function LeituraPastoralBlock({
     [percentages, primaryRole, secondaryRole],
   );
 
+  const spouse: PairMember | null = useMemo(() => {
+    if (!self?.spouse_user_id || !poolMembers) return null;
+    const sp = poolMembers.find((o) => o.user_id === self.spouse_user_id);
+    if (!sp) return null;
+    // Vínculo recíproco
+    if (sp.spouse_user_id && sp.spouse_user_id !== self.user_id) return null;
+    return sp;
+  }, [self, poolMembers]);
+
   const encaixes: PairCompatibility[] = useMemo(() => {
     if (!self || !poolMembers || poolMembers.length < 2) return [];
-    return calcCompatibilitiesFor(self, poolMembers).slice(0, 3);
+    // Excluir cônjuge dos top encaixes — casal é par fixo, não match
+    const filtered = poolMembers.filter(
+      (o) => o.user_id !== self.user_id && o.user_id !== self.spouse_user_id,
+    );
+    return calcCompatibilitiesFor(self, filtered).slice(0, 3);
   }, [self, poolMembers]);
+
+  const vinculoConjugal = useMemo(() => {
+    if (!self || !spouse) return null;
+    return calcSpouseBondReading(self, spouse);
+  }, [self, spouse]);
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -873,10 +896,29 @@ function LeituraPastoralBlock({
             <p className="text-muted-foreground">{leitura.complementa}</p>
           </div>
 
+          {vinculoConjugal && spouse && (
+            <div className="rounded-md bg-rose-50/60 border border-rose-200 px-2.5 py-2 space-y-1">
+              <p className="text-[11px] font-semibold text-rose-900 flex items-center gap-1">
+                <Heart className="w-3 h-3" /> Vínculo conjugal
+              </p>
+              <p className="text-[11px] text-foreground">
+                <strong>{displayName.split(' ')[0]} + {spouse.display_name.split(' ')[0]}</strong> — par fixo neste círculo.
+              </p>
+              <p className="text-[11px] text-muted-foreground leading-snug">
+                {vinculoConjugal.resumo}
+              </p>
+              {vinculoConjugal.cuidado && (
+                <p className="text-[10px] text-amber-800 italic leading-snug">
+                  ⚠ {vinculoConjugal.cuidado}
+                </p>
+              )}
+            </div>
+          )}
+
           {encaixes.length > 0 && (
             <div className="rounded-md bg-violet-50/60 border border-violet-200 px-2.5 py-2 space-y-2">
               <p className="text-[11px] font-semibold text-violet-900">
-                Top encaixes {poolLabel || ''}
+                {spouse ? `Encaixes além do casal ${poolLabel || ''}` : `Top encaixes ${poolLabel || ''}`}
               </p>
               <ol className="space-y-2">
                 {encaixes.map((c, i) => (
