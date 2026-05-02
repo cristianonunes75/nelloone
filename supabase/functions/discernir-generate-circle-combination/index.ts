@@ -417,6 +417,14 @@ Deno.serve(async (req: Request) => {
       soloSpouses.length > 0
         ? `Cônjuges presentes sem o par testado (representam o casal mesmo assim): ${soloSpouses.join("; ")}.`
         : ``,
+      (() => {
+        const youths = members.filter((m) => m.participant_type === "jovem");
+        if (youths.length === 0) return "";
+        const homens = youths.filter((y) => y.gender === "masculino").length;
+        const mulheres = youths.filter((y) => y.gender === "feminino").length;
+        const sem = youths.filter((y) => !y.gender).length;
+        return `Composição de jovens neste círculo: ${homens} homem(ns), ${mulheres} mulher(es)${sem > 0 ? `, ${sem} sem sexo informado` : ""}.`;
+      })(),
     ].filter(Boolean).join("\n");
 
     const systemPrompt = `Você é um auxiliar pastoral que ajuda coordenadores de círculos jovens católicos a entender como um grupo específico tende a funcionar quando reunido.
