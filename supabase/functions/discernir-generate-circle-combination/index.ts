@@ -52,7 +52,7 @@ const BLOCO_LABEL: Record<BlockKey, string> = {
 const ALTO = 75;
 const BAIXO = 50;
 
-const SCHEMA_VERSION = "v4";
+const SCHEMA_VERSION = "v5";
 
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
