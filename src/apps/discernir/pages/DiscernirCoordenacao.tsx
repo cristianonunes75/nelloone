@@ -54,6 +54,8 @@ import { gerarLeituraPerfilServico, leituraToText } from '../utils/perfilServico
 import {
   calcCompatibilitiesFor,
   calcSpouseBondReading,
+  calcPairCompatibility,
+  topPairsOfCircle,
   type PairMember,
   type PairCompatibility,
 } from '../utils/circleCompatibility';
