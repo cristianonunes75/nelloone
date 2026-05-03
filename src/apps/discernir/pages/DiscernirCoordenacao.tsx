@@ -303,10 +303,12 @@ export function DiscernirCoordenacao() {
       return;
     }
 
-    if (youth.length === 0) {
+    const totalCouples = linkedPairs.length + soloCouples.length;
+    const minYouthNeeded = totalCouples * 2;
+    if (youth.length < minYouthNeeded) {
       toast({
-        title: 'Nenhum jovem marcado',
-        description: 'Marque pelo menos uma pessoa como "jovem" para gerar círculos.',
+        title: 'Jovens insuficientes',
+        description: `Cada círculo precisa de 1 casal + 2 jovens. Você tem ${totalCouples} casal(is) e ${youth.length} jovem(ns) — faltam ${minYouthNeeded - youth.length}.`,
         variant: 'destructive',
       });
       return;
@@ -378,8 +380,29 @@ export function DiscernirCoordenacao() {
       return avgCompat + genderBonus + roleBonus + ageBonus + sizePenalty;
     };
 
-    // Distribui jovens um a um, sempre escolhendo o (jovem, círculo) com maior score
+    // FASE 1: garantir mínimo de 2 jovens por círculo (1 casal + 2 jovens).
+    // Round-robin best-fit: para cada círculo (em ordem), aloca o melhor jovem disponível.
     const remaining = [...youth].sort((a, b) => a.user_id.localeCompare(b.user_id));
+    for (let pass = 0; pass < 2; pass++) {
+      for (let ci = 0; ci < circles.length; ci++) {
+        if (remaining.length === 0) break;
+        let bestJ = -1;
+        let bestScore = -Infinity;
+        for (let ji = 0; ji < remaining.length; ji++) {
+          const s = scoreFit(remaining[ji], circles[ci]);
+          if (s > bestScore) {
+            bestScore = s;
+            bestJ = ji;
+          }
+        }
+        if (bestJ >= 0) {
+          circles[ci].push(remaining[bestJ]);
+          remaining.splice(bestJ, 1);
+        }
+      }
+    }
+
+    // FASE 2: distribui jovens restantes pelo melhor (jovem, círculo).
     while (remaining.length > 0) {
       let bestJ = -1;
       let bestC = -1;
@@ -410,15 +433,28 @@ export function DiscernirCoordenacao() {
     }
   };
 
-  /** Move um membro (jovem) entre círculos. Casais não podem ser movidos. */
+  /** Move um membro (jovem) entre círculos. Casais não podem ser movidos.
+   *  Bloqueia movimentos que deixariam o círculo de origem com menos de 2 jovens. */
   const moveMember = (memberId: string, targetCircleIdx: number) => {
     if (!suggestedCircles) return;
     const newCircles = suggestedCircles.map((c) => [...c]);
     let found: TeamProfile | null = null;
-    for (const circle of newCircles) {
+    for (let ci = 0; ci < newCircles.length; ci++) {
+      const circle = newCircles[ci];
       const idx = circle.findIndex((m) => m.id === memberId);
       if (idx >= 0) {
         if (circle[idx].participant_type === 'casal') return; // casais fixos
+        if (ci !== targetCircleIdx) {
+          const youthCount = circle.filter((m) => m.participant_type === 'jovem').length;
+          if (youthCount <= 2) {
+            toast({
+              title: 'Movimento bloqueado',
+              description: 'Cada círculo precisa ter no mínimo 2 jovens. Faça uma troca direta com um jovem do outro círculo.',
+              variant: 'destructive',
+            });
+            return;
+          }
+        }
         found = circle.splice(idx, 1)[0];
         break;
       }
