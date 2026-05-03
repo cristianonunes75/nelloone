@@ -433,15 +433,28 @@ export function DiscernirCoordenacao() {
     }
   };
 
-  /** Move um membro (jovem) entre círculos. Casais não podem ser movidos. */
+  /** Move um membro (jovem) entre círculos. Casais não podem ser movidos.
+   *  Bloqueia movimentos que deixariam o círculo de origem com menos de 2 jovens. */
   const moveMember = (memberId: string, targetCircleIdx: number) => {
     if (!suggestedCircles) return;
     const newCircles = suggestedCircles.map((c) => [...c]);
     let found: TeamProfile | null = null;
-    for (const circle of newCircles) {
+    for (let ci = 0; ci < newCircles.length; ci++) {
+      const circle = newCircles[ci];
       const idx = circle.findIndex((m) => m.id === memberId);
       if (idx >= 0) {
         if (circle[idx].participant_type === 'casal') return; // casais fixos
+        if (ci !== targetCircleIdx) {
+          const youthCount = circle.filter((m) => m.participant_type === 'jovem').length;
+          if (youthCount <= 2) {
+            toast({
+              title: 'Movimento bloqueado',
+              description: 'Cada círculo precisa ter no mínimo 2 jovens. Faça uma troca direta com um jovem do outro círculo.',
+              variant: 'destructive',
+            });
+            return;
+          }
+        }
         found = circle.splice(idx, 1)[0];
         break;
       }
