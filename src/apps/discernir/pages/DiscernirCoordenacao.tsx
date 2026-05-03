@@ -305,14 +305,15 @@ export function DiscernirCoordenacao() {
 
     const totalCouples = linkedPairs.length + soloCouples.length;
     const minYouthNeeded = totalCouples * 2;
-    if (youth.length < minYouthNeeded) {
+    if (youth.length === 0) {
       toast({
-        title: 'Jovens insuficientes',
-        description: `Cada círculo precisa de 1 casal + 2 jovens. Você tem ${totalCouples} casal(is) e ${youth.length} jovem(ns) — faltam ${minYouthNeeded - youth.length}.`,
+        title: 'Nenhum jovem marcado',
+        description: 'Marque pelo menos uma pessoa como "jovem" para gerar círculos.',
         variant: 'destructive',
       });
       return;
     }
+    const youthShortage = Math.max(0, minYouthNeeded - youth.length);
 
     // Ordem determinística dos círculos: pelo menor user_id do casal âncora
     const sortedLinked = [...linkedPairs].sort((x, y) =>
@@ -424,6 +425,13 @@ export function DiscernirCoordenacao() {
 
     setSuggestedCircles(circles);
 
+    if (youthShortage > 0) {
+      toast({
+        title: `Faltam ${youthShortage} jovem(ns)`,
+        description: `O ideal é 2 jovens por círculo (${minYouthNeeded} no total). Algum círculo ficará com apenas 1 jovem — adicione mais quando puder.`,
+      });
+    }
+
     const unknownGender = youth.filter((y) => !y.gender).length;
     if (unknownGender > 0) {
       toast({
@@ -446,10 +454,10 @@ export function DiscernirCoordenacao() {
         if (circle[idx].participant_type === 'casal') return; // casais fixos
         if (ci !== targetCircleIdx) {
           const youthCount = circle.filter((m) => m.participant_type === 'jovem').length;
-          if (youthCount <= 2) {
+          if (youthCount <= 1) {
             toast({
               title: 'Movimento bloqueado',
-              description: 'Cada círculo precisa ter no mínimo 2 jovens. Faça uma troca direta com um jovem do outro círculo.',
+              description: 'Nenhum círculo pode ficar sem jovens. Faça uma troca direta com um jovem do outro círculo.',
               variant: 'destructive',
             });
             return;
