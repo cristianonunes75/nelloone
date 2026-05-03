@@ -303,10 +303,12 @@ export function DiscernirCoordenacao() {
       return;
     }
 
-    if (youth.length === 0) {
+    const totalCouples = linkedPairs.length + soloCouples.length;
+    const minYouthNeeded = totalCouples * 2;
+    if (youth.length < minYouthNeeded) {
       toast({
-        title: 'Nenhum jovem marcado',
-        description: 'Marque pelo menos uma pessoa como "jovem" para gerar círculos.',
+        title: 'Jovens insuficientes',
+        description: `Cada círculo precisa de 1 casal + 2 jovens. Você tem ${totalCouples} casal(is) e ${youth.length} jovem(ns) — faltam ${minYouthNeeded - youth.length}.`,
         variant: 'destructive',
       });
       return;
