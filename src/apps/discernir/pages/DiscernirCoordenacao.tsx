@@ -912,6 +912,7 @@ export function DiscernirCoordenacao() {
                         </div>
                       </CardHeader>
                       <CardContent className="pt-4 space-y-4">
+                        <CircleAffinityBlock members={circle} />
                         {couple.length > 0 && (
                           <div className="space-y-1">
                             <div className="flex items-center gap-1.5 text-xs font-medium text-rose-700">
