@@ -425,6 +425,13 @@ export function DiscernirCoordenacao() {
 
     setSuggestedCircles(circles);
 
+    if (youthShortage > 0) {
+      toast({
+        title: `Faltam ${youthShortage} jovem(ns)`,
+        description: `O ideal é 2 jovens por círculo (${minYouthNeeded} no total). Algum círculo ficará com apenas 1 jovem — adicione mais quando puder.`,
+      });
+    }
+
     const unknownGender = youth.filter((y) => !y.gender).length;
     if (unknownGender > 0) {
       toast({
