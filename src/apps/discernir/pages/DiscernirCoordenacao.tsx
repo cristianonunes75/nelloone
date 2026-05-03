@@ -54,6 +54,8 @@ import { gerarLeituraPerfilServico, leituraToText } from '../utils/perfilServico
 import {
   calcCompatibilitiesFor,
   calcSpouseBondReading,
+  calcPairCompatibility,
+  topPairsOfCircle,
   type PairMember,
   type PairCompatibility,
 } from '../utils/circleCompatibility';
@@ -910,6 +912,7 @@ export function DiscernirCoordenacao() {
                         </div>
                       </CardHeader>
                       <CardContent className="pt-4 space-y-4">
+                        <CircleAffinityBlock members={circle} />
                         {couple.length > 0 && (
                           <div className="space-y-1">
                             <div className="flex items-center gap-1.5 text-xs font-medium text-rose-700">
@@ -1004,6 +1007,133 @@ export function DiscernirCoordenacao() {
             )}
           </TabsContent>
         </Tabs>
+      )}
+    </div>
+  );
+}
+
+// =====================================================
+// Sub-componente: Índice de afinidade do círculo
+// =====================================================
+interface CircleAffinityBlockProps {
+  members: TeamProfile[];
+}
+
+function CircleAffinityBlock({ members }: CircleAffinityBlockProps) {
+  const [open, setOpen] = useState(false);
+
+  const toPair = (p: TeamProfile): PairMember => ({
+    user_id: p.user_id,
+    display_name: p.display_name,
+    primary_role: p.primary_role,
+    percentages: p.percentages,
+    spouse_user_id: p.spouse_user_id,
+    participant_type: p.participant_type,
+  });
+
+  const pairs = members.map(toPair);
+  const couple = pairs.filter((m) => m.participant_type === 'casal');
+  const jovens = pairs.filter((m) => m.participant_type === 'jovem');
+
+  const allScores: number[] = [];
+  for (let i = 0; i < pairs.length; i++) {
+    for (let j = i + 1; j < pairs.length; j++) {
+      allScores.push(calcPairCompatibility(pairs[i], pairs[j]).score);
+    }
+  }
+  const overall = allScores.length
+    ? Math.round(allScores.reduce((s, v) => s + v, 0) / allScores.length)
+    : 0;
+
+  const cjScores: number[] = [];
+  for (const c of couple) {
+    for (const j of jovens) {
+      cjScores.push(calcPairCompatibility(c, j).score);
+    }
+  }
+  const coupleYouth = cjScores.length
+    ? Math.round(cjScores.reduce((s, v) => s + v, 0) / cjScores.length)
+    : null;
+
+  const jjScores: number[] = [];
+  for (let i = 0; i < jovens.length; i++) {
+    for (let j = i + 1; j < jovens.length; j++) {
+      jjScores.push(calcPairCompatibility(jovens[i], jovens[j]).score);
+    }
+  }
+  const youthYouth = jjScores.length
+    ? Math.round(jjScores.reduce((s, v) => s + v, 0) / jjScores.length)
+    : null;
+
+  const labelFor = (s: number) => {
+    if (s >= 70) return { label: 'Forte', cls: 'bg-emerald-50 text-emerald-700 border-emerald-300' };
+    if (s >= 55) return { label: 'Boa', cls: 'bg-amber-50 text-amber-800 border-amber-300' };
+    if (s >= 40) return { label: 'Mediana', cls: 'bg-muted text-muted-foreground border-border' };
+    return { label: 'A cuidar', cls: 'bg-rose-50 text-rose-700 border-rose-300' };
+  };
+
+  const overallLabel = labelFor(overall);
+  const top = topPairsOfCircle(pairs, 3);
+
+  const tipoCls: Record<string, string> = {
+    complementar: 'bg-emerald-50 text-emerald-700 border-emerald-300',
+    bom_encaixe: 'bg-sky-50 text-sky-700 border-sky-300',
+    encaixe_parcial: 'bg-amber-50 text-amber-800 border-amber-300',
+    tensao: 'bg-rose-50 text-rose-700 border-rose-300',
+  };
+
+  return (
+    <div className="rounded-md border border-border/60 bg-muted/30 p-3 space-y-2">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">Afinidade do círculo</span>
+          <Badge variant="outline" className={cn('text-xs', overallLabel.cls)}>
+            {overallLabel.label} · {overall}
+          </Badge>
+        </div>
+        <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+          {coupleYouth !== null && (
+            <span>Casal ↔ Jovens: <strong className="text-foreground">{coupleYouth}</strong></span>
+          )}
+          {youthYouth !== null && (
+            <span>Jovens entre si: <strong className="text-foreground">{youthYouth}</strong></span>
+          )}
+        </div>
+      </div>
+
+      {top.length > 0 && (
+        <div>
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            className="text-[11px] text-amber-800 hover:underline"
+          >
+            {open ? '− Ocultar' : '+ Ver'} top encaixes deste círculo
+          </button>
+          {open && (
+            <div className="mt-2 space-y-2">
+              {top.map((tp, i) => {
+                const tipo = tp.compat.tipo;
+                return (
+                  <div key={i} className="text-[11px] space-y-0.5 rounded bg-background/60 border border-border/40 p-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium text-foreground">
+                        {tp.a.display_name.split(' ')[0]} ↔ {tp.b.display_name.split(' ')[0]}
+                      </span>
+                      <Badge variant="outline" className={cn('text-[10px] py-0 px-1.5', tipoCls[tipo])}>
+                        {tp.compat.rotulo} · {tp.compat.score}
+                      </Badge>
+                    </div>
+                    <p className="text-muted-foreground leading-snug">{tp.compat.justificativa}</p>
+                    {tp.compat.cuidado && (
+                      <p className="italic text-amber-800/80 leading-snug">{tp.compat.cuidado}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
