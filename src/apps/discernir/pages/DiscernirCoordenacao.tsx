@@ -305,14 +305,15 @@ export function DiscernirCoordenacao() {
 
     const totalCouples = linkedPairs.length + soloCouples.length;
     const minYouthNeeded = totalCouples * 2;
-    if (youth.length < minYouthNeeded) {
+    if (youth.length === 0) {
       toast({
-        title: 'Jovens insuficientes',
-        description: `Cada círculo precisa de 1 casal + 2 jovens. Você tem ${totalCouples} casal(is) e ${youth.length} jovem(ns) — faltam ${minYouthNeeded - youth.length}.`,
+        title: 'Nenhum jovem marcado',
+        description: 'Marque pelo menos uma pessoa como "jovem" para gerar círculos.',
         variant: 'destructive',
       });
       return;
     }
+    const youthShortage = Math.max(0, minYouthNeeded - youth.length);
 
     // Ordem determinística dos círculos: pelo menor user_id do casal âncora
     const sortedLinked = [...linkedPairs].sort((x, y) =>
