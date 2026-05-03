@@ -454,10 +454,10 @@ export function DiscernirCoordenacao() {
         if (circle[idx].participant_type === 'casal') return; // casais fixos
         if (ci !== targetCircleIdx) {
           const youthCount = circle.filter((m) => m.participant_type === 'jovem').length;
-          if (youthCount <= 2) {
+          if (youthCount <= 1) {
             toast({
               title: 'Movimento bloqueado',
-              description: 'Cada círculo precisa ter no mínimo 2 jovens. Faça uma troca direta com um jovem do outro círculo.',
+              description: 'Nenhum círculo pode ficar sem jovens. Faça uma troca direta com um jovem do outro círculo.',
               variant: 'destructive',
             });
             return;
