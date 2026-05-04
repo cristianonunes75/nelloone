@@ -26,9 +26,34 @@ interface Props {
   domId?: string;
 }
 
+// Particulas portuguesas que nao contam como "sobrenome principal".
+const PARTICLES = new Set(["de", "da", "do", "dos", "das", "e"]);
+
+/** "JOAQUIM pedro" → "Joaquim Pedro". Preserva acentos. */
+const titleCase = (s: string): string =>
+  s
+    .toLowerCase()
+    .replace(/(^|\s|-)([a-záàâãéèêíïóôõöúüçñ])/g, (_, sep, ch) => sep + ch.toUpperCase());
+
+/** Pega so o primeiro nome em Title Case. */
+const firstNameOnly = (full: string): string => {
+  const first = (full || "").trim().split(/\s+/)[0] || full;
+  return titleCase(first);
+};
+
+/** Pega "Primeiro Ultimo" em Title Case, ignorando particulas (de/da/dos/etc). */
+const firstAndLast = (full: string): string => {
+  const parts = (full || "").trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return full;
+  if (parts.length === 1) return titleCase(parts[0]);
+  let lastIdx = parts.length - 1;
+  while (lastIdx > 0 && PARTICLES.has(parts[lastIdx].toLowerCase())) lastIdx--;
+  return titleCase(`${parts[0]} ${parts[lastIdx]}`);
+};
+
 /**
  * Agrupa um casal numa linha unica "Joaquim e Luzia · casal" e mantem
- * jovens separados. Ordem: casal primeiro, jovens depois.
+ * jovens separados (com 1 sobrenome). Ordem: casal primeiro, jovens depois.
  */
 const buildRows = (members: CircleCardMember[]): { label: string; tag: string }[] => {
   const rows: { label: string; tag: string }[] = [];
@@ -42,21 +67,21 @@ const buildRows = (members: CircleCardMember[]): { label: string; tag: string }[
       (s) => s.user_id !== m.user_id && (s.user_id === m.spouse_user_id || m.user_id === s.spouse_user_id),
     );
     if (spouse && !used.has(spouse.user_id)) {
-      const a = m.display_name.split(" ")[0];
-      const b = spouse.display_name.split(" ")[0];
+      const a = firstNameOnly(m.display_name);
+      const b = firstNameOnly(spouse.display_name);
       rows.push({ label: `${a} e ${b}`, tag: "casal" });
       used.add(m.user_id);
       used.add(spouse.user_id);
     } else {
-      rows.push({ label: m.display_name, tag: "casal" });
+      rows.push({ label: firstNameOnly(m.display_name), tag: "casal" });
       used.add(m.user_id);
     }
   }
 
-  // Jovens depois
+  // Jovens depois (primeiro nome + 1 sobrenome)
   const jovens = members.filter((m) => m.participant_type === "jovem");
   for (const j of jovens) {
-    rows.push({ label: j.display_name, tag: "jovem" });
+    rows.push({ label: firstAndLast(j.display_name), tag: "jovem" });
   }
 
   // Quem ficou sem marcacao
@@ -64,7 +89,7 @@ const buildRows = (members: CircleCardMember[]): { label: string; tag: string }[
     (m) => !used.has(m.user_id) && m.participant_type !== "casal" && m.participant_type !== "jovem",
   );
   for (const o of outros) {
-    rows.push({ label: o.display_name, tag: "membro" });
+    rows.push({ label: firstAndLast(o.display_name), tag: "membro" });
   }
 
   return rows;
