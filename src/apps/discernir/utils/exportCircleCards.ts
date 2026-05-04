@@ -98,12 +98,20 @@ export async function exportCardsAsPDF(circles: CircleForExport[]): Promise<void
     const canvas = await captureCard(c.idx);
     const imgData = canvas.toDataURL("image/png");
 
-    // Card eh quadrado 1080x1080. Encaixa no maior quadrado possivel
-    // dentro de A4 retrato (210x297), centralizado horizontal e vertical.
-    const cardSize = Math.min(pageW - 30, pageH - 60); // margem 15mm cada lado
-    const x = (pageW - cardSize) / 2;
-    const y = (pageH - cardSize) / 2;
-    pdf.addImage(imgData, "PNG", x, y, cardSize, cardSize);
+    // Card eh retrato 2:3 (1080x1620). Encaixa centralizado em A4 retrato.
+    // A4 = 210x297mm. Margens: 15mm laterais, 30mm topo/base.
+    const maxWidth = pageW - 30;
+    const maxHeight = pageH - 60;
+    const ratio = 1620 / 1080; // 1.5
+    let cardWidth = maxWidth;
+    let cardHeight = cardWidth * ratio;
+    if (cardHeight > maxHeight) {
+      cardHeight = maxHeight;
+      cardWidth = cardHeight / ratio;
+    }
+    const x = (pageW - cardWidth) / 2;
+    const y = (pageH - cardHeight) / 2;
+    pdf.addImage(imgData, "PNG", x, y, cardWidth, cardHeight);
 
     // Numeracao discreta no rodape
     pdf.setTextColor(140, 118, 86);

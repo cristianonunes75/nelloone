@@ -63,6 +63,8 @@ import {
 import { cn } from '@/lib/utils';
 import { CircleCompositionCard, buildRows as buildCardRows, type CircleCardMember } from '../components/coordenacao/CircleCompositionCard';
 import { exportCardsAsPNGs, exportCardsAsPDF } from '../utils/exportCircleCards';
+import { getCircleMotorPhrase } from '../utils/circleMotorPhrase';
+import { getCircleTone } from '../utils/circleTone';
 import {
   Dialog,
   DialogContent,
@@ -71,6 +73,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { Pencil, RotateCcw } from 'lucide-react';
 
 type ParticipantType = 'casal' | 'jovem' | null;
@@ -143,6 +146,10 @@ export function DiscernirCoordenacao() {
   const [editNamesOpen, setEditNamesOpen] = useState(false);
   // labelOverrides[circleIdx][rowIdx] = nome editado. Vazio = usa o automatico.
   const [labelOverrides, setLabelOverrides] = useState<Record<number, string[]>>({});
+  // toneOverrides[circleIdx] = paragrafo de tom editado. Vazio = usa o automatico.
+  const [toneOverrides, setToneOverrides] = useState<Record<number, string>>({});
+  // motorPhraseOverrides[circleIdx] = frase-motor editada. Vazio = usa a automatica.
+  const [motorPhraseOverrides, setMotorPhraseOverrides] = useState<Record<number, string>>({});
 
   const isCoordinator = role === 'priest' || role === 'coordinator' || isSuperAdmin;
 
@@ -1070,7 +1077,7 @@ export function DiscernirCoordenacao() {
                         className="gap-2"
                       >
                         <Pencil className="w-4 h-4" />
-                        Editar nomes
+                        Editar conteúdo
                       </Button>
                       <Button
                         variant="outline"
@@ -1096,42 +1103,77 @@ export function DiscernirCoordenacao() {
                   </CardContent>
                 </Card>
 
-                {/* Dialog de edicao dos nomes que aparecem nos cards */}
+                {/* Dialog de edicao do conteudo dos cards: nomes, frase-motor, tom */}
                 <Dialog open={editNamesOpen} onOpenChange={setEditNamesOpen}>
-                  <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
+                  <DialogContent className="max-w-2xl max-h-[88vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle>Editar nomes dos cards</DialogTitle>
+                      <DialogTitle>Editar conteúdo dos cards</DialogTitle>
                       <DialogDescription>
-                        Os nomes que aparecem nos cards (PNG e PDF) podem ser ajustados aqui. Deixe vazio para usar o nome automático.
+                        Ajuste os nomes, a frase-motor e o tom de cada círculo. Os campos vazios usam o conteúdo automático.
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-6 py-2">
+                    <div className="space-y-8 py-2">
                       {suggestedCircles.map((circle, cIdx) => {
-                        const rows = buildCardRows(circle as unknown as CircleCardMember[]);
+                        const members = circle as unknown as CircleCardMember[];
+                        const rows = buildCardRows(members);
+                        const autoMotor = getCircleMotorPhrase(members);
+                        const autoTone = getCircleTone(members);
                         return (
-                          <div key={`edit-${cIdx}`} className="space-y-2">
-                            <p className="text-sm font-semibold text-amber-700">Círculo {cIdx + 1}</p>
-                            {rows.map((row, rIdx) => (
-                              <div key={`edit-${cIdx}-${rIdx}`} className="flex items-center gap-2">
-                                <span className="text-[10px] uppercase tracking-widest text-muted-foreground w-12 shrink-0">
-                                  {row.tag}
-                                </span>
-                                <Input
-                                  value={labelOverrides[cIdx]?.[rIdx] ?? row.label}
-                                  placeholder={row.label}
-                                  onChange={(e) => {
-                                    const v = e.target.value;
-                                    setLabelOverrides((prev) => {
-                                      const next = { ...prev };
-                                      const arr = [...(next[cIdx] || [])];
-                                      arr[rIdx] = v;
-                                      next[cIdx] = arr;
-                                      return next;
-                                    });
-                                  }}
-                                />
-                              </div>
-                            ))}
+                          <div key={`edit-${cIdx}`} className="space-y-4 border-l-2 border-amber-300 pl-4">
+                            <p className="text-sm font-bold text-amber-700">Círculo {cIdx + 1}</p>
+
+                            <div className="space-y-2">
+                              <p className="text-xs uppercase tracking-widest text-muted-foreground">Nomes</p>
+                              {rows.map((row, rIdx) => (
+                                <div key={`edit-${cIdx}-${rIdx}`} className="flex items-center gap-2">
+                                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground w-12 shrink-0">
+                                    {row.tag}
+                                  </span>
+                                  <Input
+                                    value={labelOverrides[cIdx]?.[rIdx] ?? row.label}
+                                    placeholder={row.label}
+                                    onChange={(e) => {
+                                      const v = e.target.value;
+                                      setLabelOverrides((prev) => {
+                                        const next = { ...prev };
+                                        const arr = [...(next[cIdx] || [])];
+                                        arr[rIdx] = v;
+                                        next[cIdx] = arr;
+                                        return next;
+                                      });
+                                    }}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="space-y-2">
+                              <p className="text-xs uppercase tracking-widest text-muted-foreground">Frase-motor (1 linha em itálico)</p>
+                              <Input
+                                value={motorPhraseOverrides[cIdx] ?? autoMotor}
+                                placeholder={autoMotor}
+                                onChange={(e) => {
+                                  const v = e.target.value;
+                                  setMotorPhraseOverrides((prev) => ({ ...prev, [cIdx]: v }));
+                                }}
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <p className="text-xs uppercase tracking-widest text-muted-foreground">Tom do círculo (parágrafo)</p>
+                              <Textarea
+                                value={toneOverrides[cIdx] ?? autoTone}
+                                placeholder={autoTone}
+                                rows={6}
+                                onChange={(e) => {
+                                  const v = e.target.value;
+                                  setToneOverrides((prev) => ({ ...prev, [cIdx]: v }));
+                                }}
+                              />
+                              <p className="text-[10px] text-muted-foreground italic">
+                                Dica: você pode colar aqui o texto do "Tom desse círculo" do material .md.
+                              </p>
+                            </div>
                           </div>
                         );
                       })}
@@ -1139,11 +1181,15 @@ export function DiscernirCoordenacao() {
                     <DialogFooter className="gap-2 sm:gap-2">
                       <Button
                         variant="ghost"
-                        onClick={() => setLabelOverrides({})}
+                        onClick={() => {
+                          setLabelOverrides({});
+                          setMotorPhraseOverrides({});
+                          setToneOverrides({});
+                        }}
                         className="gap-2"
                       >
                         <RotateCcw className="w-4 h-4" />
-                        Restaurar automáticos
+                        Restaurar tudo
                       </Button>
                       <Button onClick={() => setEditNamesOpen(false)}>Concluir</Button>
                     </DialogFooter>
@@ -1162,6 +1208,8 @@ export function DiscernirCoordenacao() {
                       members={circle as unknown as CircleCardMember[]}
                       domId={`circle-card-${idx}`}
                       labelOverrides={labelOverrides[idx]}
+                      toneOverride={toneOverrides[idx]}
+                      motorPhraseOverride={motorPhraseOverrides[idx]}
                     />
                   ))}
                 </div>
