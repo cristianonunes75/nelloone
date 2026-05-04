@@ -61,8 +61,17 @@ import {
   type PairCompatibility,
 } from '../utils/circleCompatibility';
 import { cn } from '@/lib/utils';
-import { CircleCompositionCard, type CircleCardMember } from '../components/coordenacao/CircleCompositionCard';
+import { CircleCompositionCard, buildRows as buildCardRows, type CircleCardMember } from '../components/coordenacao/CircleCompositionCard';
 import { exportCardsAsPNGs, exportCardsAsPDF } from '../utils/exportCircleCards';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Pencil, RotateCcw } from 'lucide-react';
 
 type ParticipantType = 'casal' | 'jovem' | null;
 
@@ -131,6 +140,9 @@ export function DiscernirCoordenacao() {
   const [savingId, setSavingId] = useState<string | null>(null);
   const [suggestedCircles, setSuggestedCircles] = useState<TeamProfile[][] | null>(null);
   const [exporting, setExporting] = useState<'png' | 'pdf' | null>(null);
+  const [editNamesOpen, setEditNamesOpen] = useState(false);
+  // labelOverrides[circleIdx][rowIdx] = nome editado. Vazio = usa o automatico.
+  const [labelOverrides, setLabelOverrides] = useState<Record<number, string[]>>({});
 
   const isCoordinator = role === 'priest' || role === 'coordinator' || isSuperAdmin;
 
@@ -1053,6 +1065,16 @@ export function DiscernirCoordenacao() {
                       <Button
                         variant="outline"
                         size="sm"
+                        onClick={() => setEditNamesOpen(true)}
+                        disabled={exporting !== null}
+                        className="gap-2"
+                      >
+                        <Pencil className="w-4 h-4" />
+                        Editar nomes
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={handleExportPNGs}
                         disabled={exporting !== null}
                         className="gap-2"
@@ -1074,6 +1096,60 @@ export function DiscernirCoordenacao() {
                   </CardContent>
                 </Card>
 
+                {/* Dialog de edicao dos nomes que aparecem nos cards */}
+                <Dialog open={editNamesOpen} onOpenChange={setEditNamesOpen}>
+                  <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Editar nomes dos cards</DialogTitle>
+                      <DialogDescription>
+                        Os nomes que aparecem nos cards (PNG e PDF) podem ser ajustados aqui. Deixe vazio para usar o nome automático.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-6 py-2">
+                      {suggestedCircles.map((circle, cIdx) => {
+                        const rows = buildCardRows(circle as unknown as CircleCardMember[]);
+                        return (
+                          <div key={`edit-${cIdx}`} className="space-y-2">
+                            <p className="text-sm font-semibold text-amber-700">Círculo {cIdx + 1}</p>
+                            {rows.map((row, rIdx) => (
+                              <div key={`edit-${cIdx}-${rIdx}`} className="flex items-center gap-2">
+                                <span className="text-[10px] uppercase tracking-widest text-muted-foreground w-12 shrink-0">
+                                  {row.tag}
+                                </span>
+                                <Input
+                                  value={labelOverrides[cIdx]?.[rIdx] ?? row.label}
+                                  placeholder={row.label}
+                                  onChange={(e) => {
+                                    const v = e.target.value;
+                                    setLabelOverrides((prev) => {
+                                      const next = { ...prev };
+                                      const arr = [...(next[cIdx] || [])];
+                                      arr[rIdx] = v;
+                                      next[cIdx] = arr;
+                                      return next;
+                                    });
+                                  }}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-2">
+                      <Button
+                        variant="ghost"
+                        onClick={() => setLabelOverrides({})}
+                        className="gap-2"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                        Restaurar automáticos
+                      </Button>
+                      <Button onClick={() => setEditNamesOpen(false)}>Concluir</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
                 {/* Cards renderizados off-screen para captura via html2canvas */}
                 <div
                   style={{ position: 'fixed', left: -10000, top: 0, pointerEvents: 'none' }}
@@ -1085,6 +1161,7 @@ export function DiscernirCoordenacao() {
                       circleNumber={idx + 1}
                       members={circle as unknown as CircleCardMember[]}
                       domId={`circle-card-${idx}`}
+                      labelOverrides={labelOverrides[idx]}
                     />
                   ))}
                 </div>

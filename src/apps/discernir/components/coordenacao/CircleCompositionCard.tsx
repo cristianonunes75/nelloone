@@ -24,6 +24,8 @@ interface Props {
   members: CircleCardMember[];
   /** id usado para html2canvas localizar o nó no DOM */
   domId?: string;
+  /** Sobrescreve o label de cada linha (por índice). Vazio/undefined usa o auto. */
+  labelOverrides?: string[];
 }
 
 // Particulas portuguesas que nao contam como "sobrenome principal".
@@ -55,7 +57,7 @@ const firstAndLast = (full: string): string => {
  * Agrupa um casal numa linha unica "Joaquim e Luzia · casal" e mantem
  * jovens separados (com 1 sobrenome). Ordem: casal primeiro, jovens depois.
  */
-const buildRows = (members: CircleCardMember[]): { label: string; tag: string }[] => {
+export const buildRows = (members: CircleCardMember[]): { label: string; tag: string }[] => {
   const rows: { label: string; tag: string }[] = [];
   const used = new Set<string>();
 
@@ -95,9 +97,12 @@ const buildRows = (members: CircleCardMember[]): { label: string; tag: string }[
   return rows;
 };
 
-export function CircleCompositionCard({ circleNumber, members, domId }: Props) {
+export function CircleCompositionCard({ circleNumber, members, domId, labelOverrides }: Props) {
   const motorPhrase = getCircleMotorPhrase(members);
-  const rows = buildRows(members);
+  const rows = buildRows(members).map((r, i) => {
+    const ov = labelOverrides?.[i];
+    return ov && ov.trim().length > 0 ? { ...r, label: ov.trim() } : r;
+  });
 
   return (
     <div
