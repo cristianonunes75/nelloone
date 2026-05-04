@@ -638,21 +638,28 @@ export function DiscernirCoordenacao() {
 
             {p.participant_type === 'jovem' && (
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-muted-foreground w-14">Nasc.:</span>
+                <span className="text-[11px] text-muted-foreground w-14">Idade:</span>
                 <Input
-                  type="date"
-                  value={p.birth_date || ''}
-                  onChange={(e) =>
-                    updateProfileMarker(p.id, { birth_date: e.target.value || null })
-                  }
+                  type="number"
+                  min={10}
+                  max={120}
+                  placeholder="Ex: 18"
+                  value={calcAge(p.birth_date) ?? ''}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (!v) {
+                      updateProfileMarker(p.id, { birth_date: null });
+                      return;
+                    }
+                    const age = parseInt(v, 10);
+                    if (Number.isNaN(age) || age < 0 || age > 120) return;
+                    const year = new Date().getFullYear() - age;
+                    updateProfileMarker(p.id, { birth_date: `${year}-01-01` });
+                  }}
                   disabled={savingId === p.id}
                   className="h-8 text-xs flex-1"
                 />
-                {p.birth_date && (
-                  <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                    {calcAge(p.birth_date)} anos
-                  </span>
-                )}
+                <span className="text-[10px] text-muted-foreground whitespace-nowrap">anos</span>
               </div>
             )}
 
