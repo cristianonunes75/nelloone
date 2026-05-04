@@ -249,10 +249,11 @@ export const LandingAuthority = ({
 
 /* ───────── INVESTIMENTO ───────── */
 export const LandingPricing = ({
-  badge = "Acesso imediato",
+  badge = "Vagas iniciais",
   headline = "Investimento",
-  price = "R$ 99",
-  priceSubtitle = "pagamento único · acesso vitalício",
+  oldPrice = "R$ 197",
+  price = "R$ 97",
+  priceSubtitle = "pagamento único · acesso vitalício · vai pra R$ 197 após as 50 primeiras vagas",
   ctaText = "Começar agora",
   guaranteeText = "7 dias de garantia incondicional. Não gostou, devolvemos cada centavo.",
   urgencyText,
@@ -260,6 +261,7 @@ export const LandingPricing = ({
 }: {
   badge?: string;
   headline?: string;
+  oldPrice?: string | null;
   price?: string;
   priceSubtitle?: string;
   ctaText?: string;
@@ -277,11 +279,16 @@ export const LandingPricing = ({
         <h2 className="font-display text-3xl md:text-4xl text-foreground">
           {headline}
         </h2>
-        <div className="space-y-2">
+        <div className="space-y-1">
+          {oldPrice && (
+            <p className="text-2xl md:text-3xl font-display text-muted-foreground/50 line-through">
+              {oldPrice}
+            </p>
+          )}
           <p className="text-5xl md:text-6xl font-display text-[hsl(var(--nello-gold-deep))]">
             {price}
           </p>
-          <p className="text-muted-foreground text-sm">{priceSubtitle}</p>
+          <p className="text-muted-foreground text-sm pt-1">{priceSubtitle}</p>
         </div>
         {urgencyText && (
           <p className="text-sm text-[hsl(var(--nello-gold-deep))] font-medium">

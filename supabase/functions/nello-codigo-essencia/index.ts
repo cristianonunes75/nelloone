@@ -751,6 +751,21 @@ REGRAS DE NOMENCLATURA
 Responde APENAS em JSON válido. Sem texto fora do JSON.`;
 
 // User prompt refinado - mais estruturado e exigente
+// Heuristica leve para inferir genero pelo primeiro nome BR/PT quando profile.gender e null.
+// Cobre os nomes mais comuns + fallback por terminacao. Retorna 'masculino' | 'feminino' | null.
+const inferGenderFromName = (firstName: string): string | null => {
+  const n = firstName.toLowerCase().trim();
+  if (!n) return null;
+  const MASC = new Set(['cristiano','pedro','paulo','joao','joão','jose','josé','antonio','antônio','francisco','carlos','andre','andré','rafael','lucas','gabriel','felipe','bruno','eduardo','arthur','gustavo','leonardo','marcos','marco','thiago','tiago','rodrigo','fabio','fábio','roberto','fernando','diego','daniel','matheus','mateus','alexandre','ricardo','henrique','samuel','luiz','luis','luís','sergio','sérgio','jorge','mario','mário','flavio','flávio','vitor','victor','vinicius','vinícius','breno','caio','davi','david','enzo','heitor','igor','ivo','julio','júlio','marcelo','miguel','murilo','otavio','otávio','renato','sandro','wagner','william','yuri','adriano','alan','alex','aldo','alessandro','arnaldo','augusto','benjamin','cesar','césar','clovis','claudio','cláudio','dario','dário','elias','emerson','everton','fabricio','fabrício','geraldo','gilberto','guilherme','helio','hélio','hugo','italo','ítalo','ivan','jair','joaquim','julian','leandro','levi','lourenco','lourenço','marcio','márcio','milton','natan','nelson','nicolas','noel','olavo','orlando','oscar','pablo','rafa','raul','reinaldo','renan','roberto','rogerio','rogério','romulo','rômulo','samir','severino','silas','tadeu','tales','thales','theo','thiago','toni','valentin','valter','walter','vasco','vicente','wesley','wilson','xavier']);
+  const FEM = new Set(['maria','ana','lucia','lúcia','patricia','patrícia','fernanda','juliana','mariana','beatriz','bia','isabela','isabella','gabriela','amanda','camila','leticia','letícia','larissa','natalia','natália','rafaela','sara','sarah','carolina','carol','andreia','andréia','cristina','fabiana','rose','rosa','luiza','luíza','helena','lara','clara','sofia','alice','laura','jana','gina','erlene','saula','erica','érica','karima','adriana','aline','barbara','bárbara','bianca','bruna','carla','carmen','catarina','cecilia','cecília','celia','célia','daniela','danielle','denise','diana','elena','eliana','elis','emanuelle','emanuella','erika','érika','fatima','fátima','flavia','flávia','francisca','gilda','glaucia','gláucia','heloisa','heloísa','ines','inês','irene','isadora','jaqueline','jeanne','joana','julia','júlia','karen','katia','kátia','kelly','kety','lais','laís','laisa','lavinia','lavínia','liliana','lina','livia','lívia','lourdes','lorena','luana','luma','madalena','manuela','marcela','marcia','márcia','margarida','marina','marlene','mayara','melissa','michele','milena','miriam','myriam','monica','mônica','nair','nadia','nádia','natasha','nayara','neide','nilza','noemia','norma','olivia','olívia','paloma','pamela','paula','pietra','priscila','rachel','raquel','regina','renata','rita','sabrina','samanta','samira','sandra','silvia','sílvia','simone','solange','soraia','sonia','sônia','stella','suzana','suzy','tania','tânia','tatiana','tereza','teresa','thais','thaís','vanessa','valeria','valéria','vera','veronica','verônica','virginia','vitória','viviane','wanda','yara','yasmin','zelia','zélia']);
+  if (MASC.has(n)) return 'masculino';
+  if (FEM.has(n)) return 'feminino';
+  // Fallback por terminacao (acerta ~70% em PT-BR)
+  if (n.endsWith('a') && !['joshua','barba','luca','akira','elia'].includes(n)) return 'feminino';
+  if (n.endsWith('o') || n.endsWith('on') || n.endsWith('an') || n.endsWith('us') || n.endsWith('ar')) return 'masculino';
+  return null;
+};
+
 const getUserPrompt = (locale: string, results: any, userName: string, gender?: string | null, ageRange?: string | null) => {
   const isEuropean = locale === 'pt-pt';
   const isEnglish = locale === 'en';
@@ -759,6 +774,12 @@ const getUserPrompt = (locale: string, results: any, userName: string, gender?: 
   const yourWord = isEuropean ? 'teu' : isEnglish ? 'your' : 'seu';
 
   const firstName = userName.split(' ')[0];
+
+  // Se profile.gender vier null, inferir pelo primeiro nome.
+  // Resolve o caso de 100% dos usuarios atuais sem gender preenchido.
+  if (!gender) {
+    gender = inferGenderFromName(firstName);
+  }
 
   const resultsJson = JSON.stringify(results, null, 2);
 
@@ -784,11 +805,16 @@ CONTEXTO PESSOAL (usar apenas para personalizar o parágrafo de abertura):
 - Faixa etária: ${ageRange || 'desconhecida'}
 Usa isto para escrever uma abertura personalizada ("contexto_leitura") de 2-3 frases que reconheça a fase de vida desta pessoa e defina o tom certo. Que seja calorosa, específica e humana. Deixa explícito que isto NÃO é um diagnóstico clínico — é uma ferramenta de autoconhecimento. Diferentes fases da vida podem influenciar temporariamente como nos percebemos.`;
     }
+    const gramaticaInstrucao = gender === 'masculino'
+      ? `\n\n🚨 REGRA ABSOLUTA DE GÊNERO GRAMATICAL: ${firstName} é HOMEM. Use TODAS as palavras flexionadas no MASCULINO em TODO O TEXTO (não só no contexto_leitura). Use "ele", "dele", "estimulado", "esgotado", "centralizador", "levado", "tornado", "preparado", "voltado", "decidido", "firme". NUNCA escreva "ela", "dela", "estimulada", "esgotada", "centralizadora", "levada", "tornada", "ele/ela", "ele(a)" ou similares mistos. Releia o texto inteiro antes de fechar o JSON e corrija qualquer flexão feminina.`
+      : gender === 'feminino'
+      ? `\n\n🚨 REGRA ABSOLUTA DE GÊNERO GRAMATICAL: ${firstName} é MULHER. Use TODAS as palavras flexionadas no FEMININO em TODO O TEXTO (não só no contexto_leitura). Use "ela", "dela", "estimulada", "esgotada", "centralizadora", "levada", "tornada", "preparada", "voltada", "decidida", "firme". NUNCA escreva "ele", "dele", "estimulado", "esgotado", "centralizador", "levado", "tornado", "ele/ela", "ele(a)" ou similares mistos. Releia o texto inteiro antes de fechar o JSON e corrija qualquer flexão masculina.`
+      : '';
     return `
 CONTEXTO PESSOAL (usar apenas para personalizar o parágrafo de abertura):
 - Gênero: ${genderLabel}
 - Faixa etária: ${ageRange || 'desconhecida'}
-Use isso para escrever uma abertura personalizada ("contexto_leitura") de 2-3 frases que reconheça a fase de vida desta pessoa e defina o tom certo. Que seja calorosa, específica e humana. Deixe explícito que isso NÃO é um diagnóstico clínico — é uma ferramenta de autoconhecimento. Diferentes fases da vida podem influenciar temporariamente como nos percebemos.`;
+Use isso para escrever uma abertura personalizada ("contexto_leitura") de 2-3 frases que reconheça a fase de vida desta pessoa e defina o tom certo. Que seja calorosa, específica e humana. Deixe explícito que isso NÃO é um diagnóstico clínico — é uma ferramenta de autoconhecimento. Diferentes fases da vida podem influenciar temporariamente como nos percebemos.${gramaticaInstrucao}`;
   };
 
   const lifePhaseContext = buildLifePhaseContext();
@@ -1450,7 +1476,7 @@ Baseado em: Cruzamento de todos os testes aplicados a cada área
       "area": "Carreira e Dinheiro",
       "natural_strength": "[força natural nessa área baseada nos testes]",
       "main_risk": "[risco principal nessa área]",
-      "practical_direction": "[direção prática específica]"
+      "practical_direction": "[direção prática específica EM 3-4 FRASES. INCLUA, ao final, 2 a 3 áreas profissionais que conversam com a combinação de testes desta pessoa (exemplo: 'Áreas que dialogam com seu Código: empreendedorismo de impacto, liderança executiva, consultoria estratégica.'). Sempre encerre com a frase: 'Não é receita, é convite à reflexão. A escolha final é sua.']"
     },
     {
       "area": "Relacionamentos e Amor",
@@ -1507,10 +1533,12 @@ Baseado em: Combinação de todos os resultados
 Exemplo: "Apenas ~8% combinam DISC D com Eneagrama 4 e Arquétipo Criador. Isso cria uma tensão rara entre ação e profundidade."
 
 ═══════════════════════════════════════════
-SEÇÃO 15: CAMINHO DE 90 DIAS (MÉTODO NELLO)
+SEÇÃO 15: CAMINHO DE 90 DIAS (MÉTODO NELLO) — OBRIGATÓRIO
 ═══════════════════════════════════════════
 
 Seção: "plano_90_dias"
+
+🚨 OBRIGATORIEDADE ABSOLUTA: Esta seção NÃO PODE vir vazia ou incompleta. Os 3 meses DEVEM ser preenchidos com focus, practice e check específicos. Se você está sem espaço de tokens, ENCURTE outras seções (ex: contexto_leitura, raridade_perfil) mas NUNCA pule esta. O JSON é considerado inválido sem os 3 meses preenchidos.
 
 REGRA CRÍTICA: Todo exercício DEVE ter NOME PRÓPRIO do Método Nello!
 
@@ -2364,7 +2392,7 @@ serve(async (req) => {
     let parsedReport: any;
 
     try {
-      const primary = await requestAiCompletion(userPrompt, 12288, "primary");
+      const primary = await requestAiCompletion(userPrompt, 16000, "primary");
       generatedContent = primary.content || "";
       finishReason = primary.reason;
 

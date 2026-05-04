@@ -40,6 +40,7 @@ import {
   Mail,
   CircleDot,
   CheckCircle2,
+  FileText,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -60,6 +61,8 @@ import {
   type PairCompatibility,
 } from '../utils/circleCompatibility';
 import { cn } from '@/lib/utils';
+import { CircleCompositionCard, type CircleCardMember } from '../components/coordenacao/CircleCompositionCard';
+import { exportCardsAsPNGs, exportCardsAsPDF } from '../utils/exportCircleCards';
 
 type ParticipantType = 'casal' | 'jovem' | null;
 
@@ -127,6 +130,7 @@ export function DiscernirCoordenacao() {
   const [search, setSearch] = useState('');
   const [savingId, setSavingId] = useState<string | null>(null);
   const [suggestedCircles, setSuggestedCircles] = useState<TeamProfile[][] | null>(null);
+  const [exporting, setExporting] = useState<'png' | 'pdf' | null>(null);
 
   const isCoordinator = role === 'priest' || role === 'coordinator' || isSuperAdmin;
 
@@ -475,6 +479,31 @@ export function DiscernirCoordenacao() {
     setSuggestedCircles(newCircles);
   };
 
+  const handleExportPNGs = async () => {
+    if (!suggestedCircles) return;
+    setExporting('png');
+    try {
+      await exportCardsAsPNGs(suggestedCircles.map((_, idx) => ({ idx })));
+      toast({ title: 'Cards baixados', description: `${suggestedCircles.length} arquivo(s) salvos.` });
+    } catch (e: any) {
+      toast({ title: 'Erro ao gerar PNGs', description: e?.message || 'Tente novamente.', variant: 'destructive' });
+    } finally {
+      setExporting(null);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    if (!suggestedCircles) return;
+    setExporting('pdf');
+    try {
+      await exportCardsAsPDF(suggestedCircles.map((_, idx) => ({ idx })));
+      toast({ title: 'PDF gerado', description: 'Arquivo baixado.' });
+    } catch (e: any) {
+      toast({ title: 'Erro ao gerar PDF', description: e?.message || 'Tente novamente.', variant: 'destructive' });
+    } finally {
+      setExporting(null);
+    }
+  };
 
   if (authLoading || discernirLoading || adminLoading) {
     return (
@@ -1010,6 +1039,55 @@ export function DiscernirCoordenacao() {
                 <p className="text-xs text-muted-foreground italic text-center">
                   Esta é uma sugestão baseada nos perfis. Ajuste conforme o seu discernimento pastoral.
                 </p>
+
+                {/* Compartilhar formacao: PNG + PDF */}
+                <Card className="border-amber-200 bg-amber-50/30">
+                  <CardContent className="py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="space-y-0.5">
+                      <p className="text-sm font-semibold">Compartilhar formação</p>
+                      <p className="text-xs text-muted-foreground">
+                        Cards visuais sem percentuais nem rótulos técnicos.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleExportPNGs}
+                        disabled={exporting !== null}
+                        className="gap-2"
+                      >
+                        <Download className="w-4 h-4" />
+                        {exporting === 'png' ? 'Gerando...' : 'Baixar cards (PNG)'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleExportPDF}
+                        disabled={exporting !== null}
+                        className="gap-2"
+                      >
+                        <FileText className="w-4 h-4" />
+                        {exporting === 'pdf' ? 'Gerando...' : 'Baixar PDF consolidado'}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Cards renderizados off-screen para captura via html2canvas */}
+                <div
+                  style={{ position: 'fixed', left: -10000, top: 0, pointerEvents: 'none' }}
+                  aria-hidden="true"
+                >
+                  {suggestedCircles.map((circle, idx) => (
+                    <CircleCompositionCard
+                      key={`hidden-${idx}`}
+                      circleNumber={idx + 1}
+                      members={circle as unknown as CircleCardMember[]}
+                      domId={`circle-card-${idx}`}
+                    />
+                  ))}
+                </div>
               </div>
             )}
           </TabsContent>

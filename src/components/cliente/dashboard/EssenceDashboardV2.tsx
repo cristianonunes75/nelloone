@@ -281,7 +281,25 @@ export function EssenceDashboardV2({ displayName, userTests = [] }: EssenceDashb
       .then(({ data }) => {
         const sections = Array.isArray(data?.sections) ? (data!.sections as any[]) : [];
         const resumo = sections.find((s) => s.id === "resumo_executivo") || sections[0] || null;
-        setMapaSection(resumo);
+        // Defensiva: campos do JSONB podem vir como objetos i18n {pt, en, "pt-pt"}.
+        // Renderizar objeto como child JSX dispara React error 31. Normaliza pra string.
+        const pickI18n = (v: any): any => {
+          if (v == null) return v;
+          if (typeof v !== "object" || Array.isArray(v)) return v;
+          return v.pt || v.en || v["pt-pt"] || Object.values(v).find(x => typeof x === "string") || "";
+        };
+        const normalized = resumo ? {
+          ...resumo,
+          frase_sintese: pickI18n(resumo.frase_sintese),
+          quem_voce_e: pickI18n(resumo.quem_voce_e),
+          maior_forca: pickI18n(resumo.maior_forca),
+          maior_risco: pickI18n(resumo.maior_risco),
+          direcao_90_dias: pickI18n(resumo.direcao_90_dias),
+          tres_forcas_centrais: Array.isArray(resumo.tres_forcas_centrais)
+            ? resumo.tres_forcas_centrais.map(pickI18n)
+            : resumo.tres_forcas_centrais,
+        } : null;
+        setMapaSection(normalized);
         setIsLoadingMapa(false);
       });
   }, [effectiveUserId]);

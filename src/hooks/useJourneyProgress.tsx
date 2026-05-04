@@ -178,12 +178,21 @@ export function useJourneyProgress(targetUserId?: string) {
         currentStepFound = true;
       }
 
+      // Defensive: tests.name e tests.description podem vir como JSONB i18n {pt, en, "pt-pt"}
+      // Se vier objeto, extrai pt > en > primeiro valor. Se string, mantem.
+      const pickI18n = (v: any): string => {
+        if (v == null) return "";
+        if (typeof v === "string") return v;
+        if (typeof v === "object") return v.pt || v.en || v["pt-pt"] || Object.values(v).find(x => typeof x === "string") as string || "";
+        return String(v);
+      };
+
       return {
         step: index + 1,
         testType: journeySlug, // Use the canonical journey slug, not the database type
         testId: test.id,
-        name: test.name,
-        description: test.description,
+        name: pickI18n(test.name),
+        description: pickI18n(test.description),
         questionsCount: test.questions_count,
         estimatedMinutes: test.estimated_minutes,
         icon: test.icon || "Circle",

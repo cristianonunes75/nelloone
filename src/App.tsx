@@ -18,6 +18,7 @@ import { ConsentGate } from "@/components/ConsentGate";
 import { useVersionCheck } from "@/hooks/useVersionCheck";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import Cliente from "./pages/Cliente";
 import ClientePerfil from "./pages/ClientePerfil";
 import UserArea from "./pages/UserArea";
@@ -635,7 +636,9 @@ const App = () => (
                         <LanguageRoute>
                           {/* Nello App Router: Routes to Flow, Life, or One based on subdomain */}
                           <NelloAppRouter>
-                            <AppRoutes />
+                            <ErrorBoundary fallbackTitle="Tivemos um problema temporário ao carregar esta área">
+                              <AppRoutes />
+                            </ErrorBoundary>
                           </NelloAppRouter>
                         </LanguageRoute>
                       </ConsentGate>
