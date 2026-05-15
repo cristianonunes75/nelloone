@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -9,6 +9,7 @@ import {
   ClipboardCheck,
   Compass,
   Crown,
+  Download,
   GitCompare,
   HeartHandshake,
   Network,
@@ -21,6 +22,7 @@ import {
   UserPlus,
   X,
 } from 'lucide-react';
+import { useScreenPDF } from '@/hooks/useScreenPDF';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Bar, BarChart, CartesianGrid, Cell, PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { BusinessLayout } from '../components/BusinessLayout';
@@ -1047,6 +1049,9 @@ export default function BusinessTeamComparison() {
   const enforcement = useBusinessEnforcement();
   const [rows, setRows] = useState<MemberProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [pdfMode, setPdfMode] = useState(false);
+  const pdfRef = useRef<HTMLDivElement>(null);
+  const { generatePDFFromRef, isGenerating } = useScreenPDF();
 
   const loadData = useCallback(async () => {
     if (!company?.id) return;
@@ -1072,6 +1077,23 @@ export default function BusinessTeamComparison() {
   const contributionData = useMemo(() => buildDistribution(codedRows, (row) => row.leadershipMode), [codedRows]);
   const discRadar = useMemo(() => getAverageRadar(codedRows, 'disc'), [codedRows]);
   const temperamentRadar = useMemo(() => getAverageRadar(codedRows, 'temperament'), [codedRows]);
+
+  const handleExportPDF = useCallback(async () => {
+    if (rows.length === 0 || isGenerating) return;
+    setPdfMode(true);
+    // Espera o DOM renderizar todas as secoes empilhadas e os graficos do recharts montarem.
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    const safeCompany = (company?.name || 'empresa').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    try {
+      await generatePDFFromRef(pdfRef, {
+        fileName: `cruzamento-equipe-${safeCompany}`,
+        scale: 1.5,
+        backgroundColor: '#ffffff',
+      });
+    } finally {
+      setPdfMode(false);
+    }
+  }, [rows.length, isGenerating, company?.name, generatePDFFromRef]);
 
   if (!enforcement.canViewInsights) {
     return (
@@ -1100,7 +1122,18 @@ export default function BusinessTeamComparison() {
               <p className="mt-1 text-sm text-muted-foreground">Leitura completa e parcial dos mapas compartilhados pelas colaboradoras, com visão por time e supervisão.</p>
             </div>
           </div>
-          <Button variant="outline" onClick={loadData} disabled={isLoading} className="gap-2"><RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} /> Atualizar</Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={handleExportPDF}
+              disabled={isLoading || isGenerating || rows.length === 0}
+              className="gap-2"
+            >
+              <Download className={`h-4 w-4 ${isGenerating ? 'animate-pulse' : ''}`} />
+              {isGenerating ? 'Gerando PDF...' : 'Baixar PDF'}
+            </Button>
+            <Button variant="outline" onClick={loadData} disabled={isLoading} className="gap-2"><RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} /> Atualizar</Button>
+          </div>
         </div>
 
         {isLoading ? (
@@ -1117,66 +1150,121 @@ export default function BusinessTeamComparison() {
             </CardContent>
           </Card>
         ) : (
-          <>
+          <div ref={pdfRef} className="space-y-6 bg-background">
+            {pdfMode && (
+              <div className="space-y-1 border-b pb-3">
+                <h2 className="text-xl font-bold">Cruzamento de códigos da equipe</h2>
+                <p className="text-sm text-muted-foreground">
+                  {company?.name ? `${company.name} • ` : ''}
+                  Relatório gerado em {new Date().toLocaleString('pt-BR')}
+                </p>
+              </div>
+            )}
+
             <ExecutiveSummary rows={rows} />
 
-            <Tabs defaultValue="resumo" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
-                <TabsTrigger value="resumo">Resumo</TabsTrigger>
-                <TabsTrigger value="times">Times</TabsTrigger>
-                <TabsTrigger value="cruzamentos">Cruzamentos</TabsTrigger>
-                <TabsTrigger value="lideranca">Liderança 1:1</TabsTrigger>
-                <TabsTrigger value="combinar">Combinar grupos</TabsTrigger>
-                <TabsTrigger value="individual">Individual</TabsTrigger>
-              </TabsList>
+            {pdfMode ? (
+              <div className="space-y-10">
+                <section className="space-y-6">
+                  <div className="flex items-center gap-2"><Compass className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Resumo</h2></div>
+                  <div className="grid gap-6 xl:grid-cols-2">
+                    <DistributionChart title="Distribuição DISC" data={discData} />
+                    <DistributionChart title="Distribuição de Temperamentos" data={temperamentData} />
+                    <DistributionChart title="Arquétipos predominantes" data={archetypeData} />
+                    <DistributionChart title="Modo de contribuição no time" data={contributionData} />
+                  </div>
+                  <div className="grid gap-6 xl:grid-cols-2">
+                    <TeamRadar title="Média da equipe por eixo DISC" data={discRadar} />
+                    <TeamRadar title="Média da equipe por temperamento" data={temperamentRadar} />
+                  </div>
+                </section>
 
-              <TabsContent value="resumo" className="space-y-6">
-                <div className="grid gap-6 xl:grid-cols-2">
-                  <DistributionChart title="Distribuição DISC" data={discData} />
-                  <DistributionChart title="Distribuição de Temperamentos" data={temperamentData} />
-                  <DistributionChart title="Arquétipos predominantes" data={archetypeData} />
-                  <DistributionChart title="Modo de contribuição no time" data={contributionData} />
-                </div>
-                <div className="grid gap-6 xl:grid-cols-2">
-                  <TeamRadar title="Média da equipe por eixo DISC" data={discRadar} />
-                  <TeamRadar title="Média da equipe por temperamento" data={temperamentRadar} />
-                </div>
-              </TabsContent>
+                <section className="space-y-4">
+                  <div className="flex items-center gap-2"><Target className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Insights por time</h2></div>
+                  <TeamGroups rows={rows} />
+                </section>
 
-              <TabsContent value="times" className="space-y-4">
-                <div className="flex items-center gap-2"><Target className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Insights por time</h2></div>
-                <TeamGroups rows={rows} />
-              </TabsContent>
+                <section className="space-y-4">
+                  <div className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Cruzamentos de funcionamento</h2></div>
+                  <CrossingsPanel rows={rows} />
+                </section>
 
-              <TabsContent value="cruzamentos" className="space-y-4">
-                <div className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Cruzamentos de funcionamento</h2></div>
-                <CrossingsPanel rows={rows} />
-              </TabsContent>
+                <section className="space-y-4">
+                  <div className="flex items-center gap-2"><Crown className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Leitura Gestor → Liderado (1:1)</h2></div>
+                  <p className="text-sm text-muted-foreground">Para cada gestora, leitura individual de como acessar, delegar, dar feedback e o que evitar com cada colaboradora.</p>
+                  <LeadershipOneOnOne rows={rows} />
+                </section>
+
+                <section className="space-y-4">
+                  <div className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Combinar grupos da equipe</h2></div>
+                  <p className="text-sm text-muted-foreground">Cruzamentos personalizados disponíveis na tela. Os grupos montados pelo usuário aparecem abaixo.</p>
+                  <GroupBuilder rows={rows} />
+                </section>
+
+                <section className="space-y-4">
+                  <div className="flex items-center gap-2"><Brain className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Mapa por colaboradora</h2></div>
+                  <div className="grid gap-4 grid-cols-1">{rows.map((row) => <CollaboratorCard key={row.user_id || row.full_name} row={row} />)}</div>
+                </section>
+              </div>
+            ) : (
+              <Tabs defaultValue="resumo" className="space-y-4">
+                <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
+                  <TabsTrigger value="resumo">Resumo</TabsTrigger>
+                  <TabsTrigger value="times">Times</TabsTrigger>
+                  <TabsTrigger value="cruzamentos">Cruzamentos</TabsTrigger>
+                  <TabsTrigger value="lideranca">Liderança 1:1</TabsTrigger>
+                  <TabsTrigger value="combinar">Combinar grupos</TabsTrigger>
+                  <TabsTrigger value="individual">Individual</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="resumo" className="space-y-6">
+                  <div className="grid gap-6 xl:grid-cols-2">
+                    <DistributionChart title="Distribuição DISC" data={discData} />
+                    <DistributionChart title="Distribuição de Temperamentos" data={temperamentData} />
+                    <DistributionChart title="Arquétipos predominantes" data={archetypeData} />
+                    <DistributionChart title="Modo de contribuição no time" data={contributionData} />
+                  </div>
+                  <div className="grid gap-6 xl:grid-cols-2">
+                    <TeamRadar title="Média da equipe por eixo DISC" data={discRadar} />
+                    <TeamRadar title="Média da equipe por temperamento" data={temperamentRadar} />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="times" className="space-y-4">
+                  <div className="flex items-center gap-2"><Target className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Insights por time</h2></div>
+                  <TeamGroups rows={rows} />
+                </TabsContent>
+
+                <TabsContent value="cruzamentos" className="space-y-4">
+                  <div className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Cruzamentos de funcionamento</h2></div>
+                  <CrossingsPanel rows={rows} />
+                </TabsContent>
 
 
-              <TabsContent value="lideranca" className="space-y-4">
-                <div className="flex items-center gap-2"><Crown className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Leitura Gestor → Liderado (1:1)</h2></div>
-                <p className="text-sm text-muted-foreground">Escolha quem está liderando (Lisa, você, Larissa…). O sistema gera, para cada uma das outras colaboradoras, uma leitura individual de como acessá-la, como delegar, como dar feedback e o que evitar — cruzando perfil + cargo cadastrado.</p>
-                <LeadershipOneOnOne rows={rows} />
-              </TabsContent>
+                <TabsContent value="lideranca" className="space-y-4">
+                  <div className="flex items-center gap-2"><Crown className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Leitura Gestor → Liderado (1:1)</h2></div>
+                  <p className="text-sm text-muted-foreground">Escolha quem está liderando (Lisa, você, Larissa…). O sistema gera, para cada uma das outras colaboradoras, uma leitura individual de como acessá-la, como delegar, como dar feedback e o que evitar — cruzando perfil + cargo cadastrado.</p>
+                  <LeadershipOneOnOne rows={rows} />
+                </TabsContent>
 
-              <TabsContent value="combinar" className="space-y-4">
-                <div className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Combinar grupos da equipe</h2></div>
-                <p className="text-sm text-muted-foreground">Monte cruzamentos personalizados com quantas colaboradoras quiser (sem limite). Veja como o grupo se complementa, onde pode atritar e como devem se organizar para trabalhar juntas.</p>
-                <GroupBuilder rows={rows} />
-              </TabsContent>
+                <TabsContent value="combinar" className="space-y-4">
+                  <div className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Combinar grupos da equipe</h2></div>
+                  <p className="text-sm text-muted-foreground">Monte cruzamentos personalizados com quantas colaboradoras quiser (sem limite). Veja como o grupo se complementa, onde pode atritar e como devem se organizar para trabalhar juntas.</p>
+                  <GroupBuilder rows={rows} />
+                </TabsContent>
 
-              <TabsContent value="individual" className="space-y-4">
-                <div className="flex items-center gap-2"><Brain className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Mapa por colaboradora</h2></div>
-                <div className="grid gap-4 xl:grid-cols-2">{rows.map((row) => <CollaboratorCard key={row.user_id || row.full_name} row={row} />)}</div>
-              </TabsContent>
-            </Tabs>
+                <TabsContent value="individual" className="space-y-4">
+                  <div className="flex items-center gap-2"><Brain className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Mapa por colaboradora</h2></div>
+                  <div className="grid gap-4 grid-cols-1">{rows.map((row) => <CollaboratorCard key={row.user_id || row.full_name} row={row} />)}</div>
+                </TabsContent>
+              </Tabs>
+            )}
 
             <div className="flex items-start gap-2 rounded-lg border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground">
               <Shield className="mt-0.5 h-4 w-4 shrink-0" />
             <span>Esta página exibe somente pessoas vinculadas à equipe e dados do Nello Identity compartilhados com a empresa. Convites pendentes aparecem sem leitura comportamental até o acesso ser concluído. O acesso é restrito aos administradores da empresa.</span>
             </div>
-          </>
+          </div>
         )}
       </div>
     </BusinessLayout>
