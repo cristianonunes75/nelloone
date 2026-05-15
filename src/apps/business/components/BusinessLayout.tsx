@@ -1,9 +1,9 @@
 import { ReactNode, useState, type ElementType } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, 
-  Users, 
-  Settings, 
+  LayoutDashboard,
+  Users,
+  Settings,
   LogOut,
   Menu,
   Briefcase,
@@ -14,7 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  Compass,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -75,14 +76,19 @@ const bottomNavItems = [
   { href: '/settings', label: 'Configurações', icon: Settings },
 ];
 
-const collaboratorNavItems = [
+const collaboratorBaseNavItems = [
   { href: '/my-space', label: 'Meu espaço', icon: Sparkles },
   { href: '/cliente', label: 'Meu Identity', icon: ExternalLink },
 ];
 
+const leadershipExtraItem = { href: '/team-comparison', label: 'Minha equipe', icon: Compass };
+
 export function BusinessLayout({ children }: BusinessLayoutProps) {
   const { signOut } = useAuth();
-  const { company, isCompanyAdmin, switchCompany } = useBusinessAuth();
+  const { company, isCompanyAdmin, isLeadershipCollaborator, switchCompany } = useBusinessAuth();
+  const collaboratorNavItems = isLeadershipCollaborator
+    ? [collaboratorBaseNavItems[0], leadershipExtraItem, collaboratorBaseNavItems[1]]
+    : collaboratorBaseNavItems;
   const location = useLocation();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);

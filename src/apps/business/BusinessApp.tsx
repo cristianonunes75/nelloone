@@ -129,7 +129,7 @@ export default function BusinessApp() {
       <Route path="/people-strategy" element={<Navigate to="/team-comparison" replace />} />
 
       <Route path="/team-comparison" element={
-        <BusinessProtectedRoute requiredRole="company_admin">
+        <BusinessProtectedRoute requiredRole="any">
           <BusinessTeamComparison />
         </BusinessProtectedRoute>
       } />

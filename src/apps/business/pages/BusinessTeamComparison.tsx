@@ -23,11 +23,14 @@ import {
   X,
 } from 'lucide-react';
 import { useScreenPDF } from '@/hooks/useScreenPDF';
+import { useAuth } from '@/hooks/useAuth';
+import { Navigate } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Bar, BarChart, CartesianGrid, Cell, PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { BusinessLayout } from '../components/BusinessLayout';
 import { useBusinessAuth } from '../hooks/useBusinessAuth';
 import { useBusinessEnforcement } from '../hooks/useBusinessEnforcement';
+import { getLeadershipRank } from '../lib/gentleVocabulary';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -1045,13 +1048,28 @@ function GroupBuilder({ rows }: { rows: MemberProfile[] }) {
   );
 }
 export default function BusinessTeamComparison() {
-  const { company } = useBusinessAuth();
+  const { company, isCompanyAdmin } = useBusinessAuth();
+  const { user } = useAuth();
   const enforcement = useBusinessEnforcement();
   const [rows, setRows] = useState<MemberProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [pdfMode, setPdfMode] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
   const { generatePDFFromRef, isGenerating } = useScreenPDF();
+
+  // Hierarquia por job_title: lideranca (rank >= 1) ve subordinadas filtradas.
+  // Admin/super_admin ve a equipe inteira; vendedora sem cargo de lideranca nao acessa esta tela.
+  const selfRow = useMemo(() => rows.find((row) => row.user_id === user?.id), [rows, user?.id]);
+  const selfRank = useMemo(() => (isCompanyAdmin ? Number.POSITIVE_INFINITY : getLeadershipRank(selfRow?.job_title)), [isCompanyAdmin, selfRow?.job_title]);
+  const visibleRows = useMemo(() => {
+    if (isCompanyAdmin) return rows;
+    if (selfRank <= 0) return [];
+    return rows.filter((row) => {
+      if (row.user_id === user?.id) return true;
+      return getLeadershipRank(row.job_title) < selfRank;
+    });
+  }, [rows, isCompanyAdmin, selfRank, user?.id]);
+  const restrictedNonLeader = !isCompanyAdmin && !isLoading && rows.length > 0 && selfRank <= 0;
 
   const loadData = useCallback(async () => {
     if (!company?.id) return;
@@ -1070,7 +1088,7 @@ export default function BusinessTeamComparison() {
     if (enforcement.canViewInsights) loadData();
   }, [enforcement.canViewInsights, loadData]);
 
-  const codedRows = useMemo(() => rowsWithCode(rows), [rows]);
+  const codedRows = useMemo(() => rowsWithCode(visibleRows), [visibleRows]);
   const discData = useMemo(() => buildDistribution(codedRows, (row) => row.discProfile, DISC_LABELS), [codedRows]);
   const temperamentData = useMemo(() => buildDistribution(codedRows, (row) => row.temperamentProfile, TEMPERAMENT_LABELS), [codedRows]);
   const archetypeData = useMemo(() => buildDistribution(codedRows, (row) => row.archetypePrimary), [codedRows]);
@@ -1079,21 +1097,21 @@ export default function BusinessTeamComparison() {
   const temperamentRadar = useMemo(() => getAverageRadar(codedRows, 'temperament'), [codedRows]);
 
   const handleExportPDF = useCallback(async () => {
-    if (rows.length === 0 || isGenerating) return;
+    if (visibleRows.length === 0 || isGenerating) return;
     setPdfMode(true);
-    // Espera o DOM renderizar todas as secoes empilhadas e os graficos do recharts montarem.
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    // Tempo maior porque o recharts precisa re-renderizar na nova largura (794px) e cada card precisa relayoutar.
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     const safeCompany = (company?.name || 'empresa').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     try {
       await generatePDFFromRef(pdfRef, {
         fileName: `cruzamento-equipe-${safeCompany}`,
-        scale: 1.5,
+        scale: 2,
         backgroundColor: '#ffffff',
       });
     } finally {
       setPdfMode(false);
     }
-  }, [rows.length, isGenerating, company?.name, generatePDFFromRef]);
+  }, [visibleRows.length, isGenerating, company?.name, generatePDFFromRef]);
 
   if (!enforcement.canViewInsights) {
     return (
@@ -1107,6 +1125,11 @@ export default function BusinessTeamComparison() {
         </Card>
       </BusinessLayout>
     );
+  }
+
+  // Colaborador sem cargo de lideranca (rank 0): nao tem subordinadas pra ler, manda pro espaco dele.
+  if (restrictedNonLeader) {
+    return <Navigate to="/my-space" replace />;
   }
 
   return (
@@ -1126,7 +1149,7 @@ export default function BusinessTeamComparison() {
             <Button
               variant="outline"
               onClick={handleExportPDF}
-              disabled={isLoading || isGenerating || rows.length === 0}
+              disabled={isLoading || isGenerating || visibleRows.length === 0}
               className="gap-2"
             >
               <Download className={`h-4 w-4 ${isGenerating ? 'animate-pulse' : ''}`} />
@@ -1150,7 +1173,18 @@ export default function BusinessTeamComparison() {
             </CardContent>
           </Card>
         ) : (
-          <div ref={pdfRef} className="space-y-6 bg-background">
+          <div
+            ref={pdfRef}
+            className="space-y-6 bg-background"
+            style={pdfMode ? {
+              width: '794px',
+              maxWidth: '794px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              padding: '24px',
+              backgroundColor: '#ffffff',
+            } : undefined}
+          >
             {pdfMode && (
               <div className="space-y-1 border-b pb-3">
                 <h2 className="text-xl font-bold">Cruzamento de códigos da equipe</h2>
@@ -1161,7 +1195,7 @@ export default function BusinessTeamComparison() {
               </div>
             )}
 
-            <ExecutiveSummary rows={rows} />
+            <ExecutiveSummary rows={visibleRows} />
 
             {pdfMode ? (
               <div className="space-y-10">
@@ -1181,29 +1215,29 @@ export default function BusinessTeamComparison() {
 
                 <section className="space-y-4">
                   <div className="flex items-center gap-2"><Target className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Insights por time</h2></div>
-                  <TeamGroups rows={rows} />
+                  <TeamGroups rows={visibleRows} />
                 </section>
 
                 <section className="space-y-4">
                   <div className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Cruzamentos de funcionamento</h2></div>
-                  <CrossingsPanel rows={rows} />
+                  <CrossingsPanel rows={visibleRows} />
                 </section>
 
                 <section className="space-y-4">
                   <div className="flex items-center gap-2"><Crown className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Leitura Gestor → Liderado (1:1)</h2></div>
                   <p className="text-sm text-muted-foreground">Para cada gestora, leitura individual de como acessar, delegar, dar feedback e o que evitar com cada colaboradora.</p>
-                  <LeadershipOneOnOne rows={rows} />
+                  <LeadershipOneOnOne rows={visibleRows} />
                 </section>
 
                 <section className="space-y-4">
                   <div className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Combinar grupos da equipe</h2></div>
                   <p className="text-sm text-muted-foreground">Cruzamentos personalizados disponíveis na tela. Os grupos montados pelo usuário aparecem abaixo.</p>
-                  <GroupBuilder rows={rows} />
+                  <GroupBuilder rows={visibleRows} />
                 </section>
 
                 <section className="space-y-4">
                   <div className="flex items-center gap-2"><Brain className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Mapa por colaboradora</h2></div>
-                  <div className="grid gap-4 grid-cols-1">{rows.map((row) => <CollaboratorCard key={row.user_id || row.full_name} row={row} />)}</div>
+                  <div className="grid gap-4 grid-cols-1">{visibleRows.map((row) => <CollaboratorCard key={row.user_id || row.full_name} row={row} />)}</div>
                 </section>
               </div>
             ) : (
@@ -1232,30 +1266,30 @@ export default function BusinessTeamComparison() {
 
                 <TabsContent value="times" className="space-y-4">
                   <div className="flex items-center gap-2"><Target className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Insights por time</h2></div>
-                  <TeamGroups rows={rows} />
+                  <TeamGroups rows={visibleRows} />
                 </TabsContent>
 
                 <TabsContent value="cruzamentos" className="space-y-4">
                   <div className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Cruzamentos de funcionamento</h2></div>
-                  <CrossingsPanel rows={rows} />
+                  <CrossingsPanel rows={visibleRows} />
                 </TabsContent>
 
 
                 <TabsContent value="lideranca" className="space-y-4">
                   <div className="flex items-center gap-2"><Crown className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Leitura Gestor → Liderado (1:1)</h2></div>
                   <p className="text-sm text-muted-foreground">Escolha quem está liderando (Lisa, você, Larissa…). O sistema gera, para cada uma das outras colaboradoras, uma leitura individual de como acessá-la, como delegar, como dar feedback e o que evitar — cruzando perfil + cargo cadastrado.</p>
-                  <LeadershipOneOnOne rows={rows} />
+                  <LeadershipOneOnOne rows={visibleRows} />
                 </TabsContent>
 
                 <TabsContent value="combinar" className="space-y-4">
                   <div className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Combinar grupos da equipe</h2></div>
                   <p className="text-sm text-muted-foreground">Monte cruzamentos personalizados com quantas colaboradoras quiser (sem limite). Veja como o grupo se complementa, onde pode atritar e como devem se organizar para trabalhar juntas.</p>
-                  <GroupBuilder rows={rows} />
+                  <GroupBuilder rows={visibleRows} />
                 </TabsContent>
 
                 <TabsContent value="individual" className="space-y-4">
                   <div className="flex items-center gap-2"><Brain className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Mapa por colaboradora</h2></div>
-                  <div className="grid gap-4 grid-cols-1">{rows.map((row) => <CollaboratorCard key={row.user_id || row.full_name} row={row} />)}</div>
+                  <div className="grid gap-4 grid-cols-1">{visibleRows.map((row) => <CollaboratorCard key={row.user_id || row.full_name} row={row} />)}</div>
                 </TabsContent>
               </Tabs>
             )}

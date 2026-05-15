@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { getLeadershipRank } from '../lib/gentleVocabulary';
 
 export type BusinessRole = 'super_admin' | 'company_admin' | 'collaborator';
 
@@ -15,6 +16,7 @@ interface CompanyUser {
   onboarding_completed: boolean;
   share_report_with_company: boolean;
   joined_at: string | null;
+  job_title: string | null;
 }
 
 interface Company {
@@ -51,6 +53,7 @@ interface BusinessAuthContextType {
   isCollaborator: boolean;
   isSuperAdmin: boolean;
   isNelloOneSuperAdmin: boolean;
+  isLeadershipCollaborator: boolean;
   isLoading: boolean;
   hasCompany: boolean;
   needsOnboarding: boolean;
@@ -173,6 +176,8 @@ export function BusinessAuthProvider({ children }: BusinessAuthProviderProps) {
   const isCompanyAdmin = businessRole === 'company_admin' || businessRole === 'super_admin' || isNelloOneSuperAdmin;
   const isCollaborator = businessRole === 'collaborator';
   const isSuperAdmin = businessRole === 'super_admin' || isNelloOneSuperAdmin;
+  // Supervisora / lider de equipe: collaborator com job_title de lideranca (rank >= 1) ve cruzamento filtrado.
+  const isLeadershipCollaborator = isCollaborator && getLeadershipRank(companyUser?.job_title) >= 1;
   const hasCompany = !!company;
   const hasMultipleCompanies = userCompanies.length > 1;
   
@@ -187,6 +192,7 @@ export function BusinessAuthProvider({ children }: BusinessAuthProviderProps) {
     isCollaborator,
     isSuperAdmin,
     isNelloOneSuperAdmin,
+    isLeadershipCollaborator,
     isLoading: authLoading || isLoading,
     hasCompany,
     needsOnboarding,
