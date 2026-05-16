@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -22,9 +22,9 @@ import {
   UserPlus,
   X,
 } from 'lucide-react';
-import { useScreenPDF } from '@/hooks/useScreenPDF';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
+import { generateTeamComparisonPDF, type TeamComparisonPDFData } from '../lib/pdfTeamComparison';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Bar, BarChart, CartesianGrid, Cell, PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { BusinessLayout } from '../components/BusinessLayout';
@@ -62,7 +62,7 @@ type TeamMemberRow = {
   tests_data: Record<string, { result_data?: JsonRecord; completed_at?: string | null }> | null;
 };
 
-type MemberProfile = TeamMemberRow & {
+export type MemberProfile = TeamMemberRow & {
   groupName: string;
   discProfile: string | null;
   discSecondary: string | null;
@@ -83,10 +83,10 @@ type MemberProfile = TeamMemberRow & {
 type DistributionItem = { key: string; label: string; count: number; percent: number; fill: string };
 type RadarItem = { axis: string; value: number; fullMark: number };
 
-const DISC_LABELS: Record<string, string> = { D: 'Dominância', I: 'Influência', S: 'Estabilidade', C: 'Conformidade' };
-const TEMPERAMENT_LABELS: Record<string, string> = { sanguineo: 'Sanguíneo', colerico: 'Colérico', melancolico: 'Melancólico', fleumatico: 'Fleumático' };
+export const DISC_LABELS: Record<string, string> = { D: 'Dominância', I: 'Influência', S: 'Estabilidade', C: 'Conformidade' };
+export const TEMPERAMENT_LABELS: Record<string, string> = { sanguineo: 'Sanguíneo', colerico: 'Colérico', melancolico: 'Melancólico', fleumatico: 'Fleumático' };
 const CHART_FILLS = ['hsl(var(--primary))', 'hsl(var(--accent))', 'hsl(var(--destructive))', 'hsl(var(--secondary-foreground))', 'hsl(var(--muted-foreground))'];
-const MAP_LABELS: Record<string, string> = {
+export const MAP_LABELS: Record<string, string> = {
   disc: 'DISC',
   temperamentos: 'Temperamentos',
   eneagrama: 'Eneagrama',
@@ -112,7 +112,7 @@ function getString(value: unknown): string | null {
   return null;
 }
 
-function normalizeKey(value?: string | null) {
+export function normalizeKey(value?: string | null) {
   return value?.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') || '';
 }
 
@@ -206,7 +206,7 @@ function getLeadershipMode(profile: Pick<MemberProfile, 'discProfile' | 'tempera
   return 'Critério';
 }
 
-function getFirstName(name: string) {
+export function getFirstName(name: string) {
   return name.split(' ')[0] || name;
 }
 
@@ -229,7 +229,7 @@ function missingMaps(row: MemberProfile) {
   return EXPECTED_MAPS.filter((map) => !hasMap(row, map));
 }
 
-function getBehaviorReading(row: MemberProfile) {
+export function getBehaviorReading(row: MemberProfile) {
   const disc = row.discProfile;
   const temp = row.temperamentProfile;
   const first = getFirstName(row.full_name);
@@ -253,7 +253,7 @@ function getBehaviorReading(row: MemberProfile) {
   return `${first} ainda tem dados limitados para uma leitura profunda de comportamento atual. Use os mapas disponíveis como sinal inicial e complete a jornada para entender reações, motivações e forma de contribuição com mais segurança.`;
 }
 
-function getActionReading(row: MemberProfile) {
+export function getActionReading(row: MemberProfile) {
   const actions: string[] = [];
   if (row.discProfile === 'D') actions.push('delegue metas com indicador, prazo e liberdade para decidir o caminho');
   if (row.discProfile === 'I') actions.push('posicione em interações com cliente, relacionamento, acolhimento e apresentação de ideias');
@@ -268,7 +268,7 @@ function getActionReading(row: MemberProfile) {
   return actions.slice(0, 5);
 }
 
-function getGrowthReading(row: MemberProfile) {
+export function getGrowthReading(row: MemberProfile) {
   if (row.journey_status === 'pending_invite') return 'Neste momento, a melhor ação é concluir o acesso ao Business e autorizar o compartilhamento dos dados do Identity. Sem isso, qualquer leitura seria incompleta e injusta para a colaboradora.';
   if (row.leadershipMode === 'Direção') return 'Pode ser melhor aproveitada com pequenas frentes de responsabilidade: meta do dia, solução de gargalos, condução de uma ação comercial ou decisão operacional com prazo. O cuidado é equilibrar autonomia com escuta: combine indicadores objetivos e também peça que valide o impacto nas colegas antes de mudar o ritmo do time.';
   if (row.leadershipMode === 'Conexão') return 'Pode crescer quando sua sensibilidade ao ambiente vira ponte concreta com clientes e colegas. Funciona bem em acolhimento, vendas consultivas, reconquista de cliente, integração e comunicação interna. Para performar melhor, precisa transformar entusiasmo em execução: tarefa curta, prioridade visível, prazo e retorno sobre o que foi bem feito.';
@@ -276,7 +276,7 @@ function getGrowthReading(row: MemberProfile) {
   return 'Pode contribuir mais como guardiã de qualidade, organização e critério. É útil para conferir processos, reduzir erros, estruturar padrão de atendimento, cuidar de detalhes e preservar consistência. O ponto de desenvolvimento é não deixar excesso de análise, medo de errar ou perfeccionismo atrasarem decisões simples.';
 }
 
-function getRiskReading(row: MemberProfile): string[] {
+export function getRiskReading(row: MemberProfile): string[] {
   const first = getFirstName(row.full_name);
   const risks: string[] = [];
   if (row.journey_status === 'pending_invite') {
@@ -396,7 +396,7 @@ function describeRole(jobTitle: string | null) {
   return hit ? { label: hit.label, tone: hit.tone, raw: jobTitle } : { label: jobTitle.toLowerCase(), tone: '', raw: jobTitle };
 }
 
-function getLeaderToMemberReading(leader: MemberProfile, member: MemberProfile) {
+export function getLeaderToMemberReading(leader: MemberProfile, member: MemberProfile) {
   const leaderFirst = getFirstName(leader.full_name);
   const memberFirst = getFirstName(member.full_name);
   const leaderRole = describeRole(leader.job_title);
@@ -478,7 +478,7 @@ function getLeaderToMemberReading(leader: MemberProfile, member: MemberProfile) 
   return result;
 }
 
-function getDataNotice(row: MemberProfile) {
+export function getDataNotice(row: MemberProfile) {
   if (row.journey_status === 'pending_invite') {
     return `Não há Código da Essência disponível para ${getFirstName(row.full_name)} no Identity. Ela ainda não acessou ou aceitou o convite da equipe, por isso não há dados corporativos compartilhados.`;
   }
@@ -1053,9 +1053,7 @@ export default function BusinessTeamComparison() {
   const enforcement = useBusinessEnforcement();
   const [rows, setRows] = useState<MemberProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [pdfMode, setPdfMode] = useState(false);
-  const pdfRef = useRef<HTMLDivElement>(null);
-  const { generatePDFFromRef, isGenerating } = useScreenPDF();
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   // Hierarquia por job_title: lideranca (rank >= 1) ve subordinadas filtradas.
   // Admin/super_admin ve a equipe inteira; vendedora sem cargo de lideranca nao acessa esta tela.
@@ -1097,21 +1095,149 @@ export default function BusinessTeamComparison() {
   const temperamentRadar = useMemo(() => getAverageRadar(codedRows, 'temperament'), [codedRows]);
 
   const handleExportPDF = useCallback(async () => {
-    if (visibleRows.length === 0 || isGenerating) return;
-    setPdfMode(true);
-    // Tempo maior porque o recharts precisa re-renderizar na nova largura (794px) e cada card precisa relayoutar.
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    const safeCompany = (company?.name || 'empresa').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    if (visibleRows.length === 0 || isGeneratingPDF) return;
+    setIsGeneratingPDF(true);
+    const toastId = toast.loading('Gerando PDF...');
     try {
-      await generatePDFFromRef(pdfRef, {
-        fileName: `cruzamento-equipe-${safeCompany}`,
-        scale: 2,
-        backgroundColor: '#ffffff',
+      const analyzableRows = visibleRows.filter((row) => row.has_essence_code);
+      const fullCodes = analyzableRows.length;
+      const partialCodes = visibleRows.length - fullCodes;
+      const pending = visibleRows.filter((row) => row.journey_status === 'pending_invite').length;
+      const supervisor = analyzableRows.find((row) => normalizeKey(row.job_title).includes('supervisor'));
+      const modeDist = buildDistribution(analyzableRows, (row) => row.leadershipMode);
+      const topMode = [...modeDist].sort((a, b) => b.count - a.count)[0];
+      const topDisc = [...discData].sort((a, b) => b.count - a.count)[0];
+      const topTemp = [...temperamentData].sort((a, b) => b.count - a.count)[0];
+
+      const summaryParagraphs = [
+        `A equipe mostra maior força em ${topMode?.label || 'perfis ainda indefinidos'}, com predominância comportamental em ${topDisc?.label || 'DISC parcial'} e ${topTemp?.label || 'temperamentos parciais'}. Esta leitura usa somente pessoas vinculadas à equipe e dados do Nello Identity; convites pendentes aparecem apenas como ausência de informação.`,
+        supervisor
+          ? `${supervisor.full_name} foi incluída como supervisora. A leitura dela funciona como ponto de coordenação entre direção, rotina e comunicação da equipe.`
+          : 'Ainda não há supervisora identificada pelo cargo; a leitura está organizada pela equipe geral.',
+        'Para ação na empresa, conduza a equipe cruzando três perguntas: quem acelera decisões, quem preserva constância e quem percebe detalhes. Assim você delega venda, rotina, atendimento, conferência e supervisão sem exigir que todas funcionem do mesmo jeito.',
+        'O Identity Nello One é uma ferramenta de autoconhecimento e educação comportamental. Não substitui diagnóstico, avaliação clínica ou decisão profissional isolada.',
+      ];
+
+      const toBar = (item: DistributionItem) => ({ label: item.label, count: item.count, pct: item.percent });
+
+      // Group team by groupName for "Insights por time"
+      const groupsMap = visibleRows.reduce<Record<string, MemberProfile[]>>((acc, row) => {
+        acc[row.groupName] = [...(acc[row.groupName] || []), row];
+        return acc;
+      }, {});
+      const teamGroups = Object.entries(groupsMap).map(([groupName, members]) => {
+        const direction = members.filter((m) => m.leadershipMode === 'Direção').length;
+        const sustentation = members.filter((m) => m.leadershipMode === 'Sustentação').length;
+        const connection = members.filter((m) => m.leadershipMode === 'Conexão').length;
+        const criterion = members.filter((m) => m.leadershipMode === 'Critério').length;
+        return {
+          groupName,
+          membersCount: members.length,
+          modesCount: { direction, connection, sustentation, criterion },
+          howItWorks: sustentation >= direction
+            ? 'Time com boa capacidade de manter rotina, atender com constância e preservar confiança.'
+            : 'Time com maior impulso de ação e decisão, útil para metas e mudanças rápidas.',
+          recommendedManagement: 'Combine clareza de prioridade, rituais simples de acompanhamento e delegação alinhada ao modo natural de cada pessoa.',
+          memberPills: members.map((m) => ({ name: getFirstName(m.full_name), mode: m.leadershipMode })),
+        };
       });
+
+      // 1:1 readings: pra cada lider potencial (rank >= 1), gerar leitura sobre todos com rank menor
+      const leaders = visibleRows.filter((row) => getLeadershipRank(row.job_title) >= 1);
+      const oneOnOnes = leaders.map((leader) => {
+        const leaderRank = getLeadershipRank(leader.job_title);
+        const members = visibleRows
+          .filter((row) => row.user_id !== leader.user_id && getLeadershipRank(row.job_title) < leaderRank)
+          .map((member) => {
+            const reading = getLeaderToMemberReading(leader, member);
+            return {
+              memberName: member.full_name,
+              memberJobTitle: member.job_title,
+              memberDiscLabel: member.discProfile ? `DISC ${member.discProfile}` : 'Sem DISC',
+              memberMode: member.leadershipMode,
+              roleNote: reading.roleNote,
+              leaderNotice: reading.leaderNotice,
+              memberNotice: reading.memberNotice,
+              accessing: reading.accessing,
+              delegating: reading.delegating,
+              feedback: reading.feedback,
+              avoid: reading.avoid,
+            };
+          });
+        return {
+          leaderName: leader.full_name,
+          leaderJobTitle: leader.job_title,
+          members,
+        };
+      }).filter((ll) => ll.members.length > 0);
+
+      // Mapa individual
+      const individualMaps = visibleRows.map((row) => {
+        const statusLabel = row.journey_status === 'pending_invite'
+          ? 'Convite pendente'
+          : row.completeness === 'codigo_completo'
+            ? 'Código completo'
+            : row.completeness === 'jornada_sem_codigo'
+              ? 'Jornada completa'
+              : 'Dados parciais';
+        return {
+          fullName: row.full_name,
+          jobTitle: row.job_title,
+          groupName: row.groupName,
+          statusLabel,
+          disc: row.discProfile ? DISC_LABELS[row.discProfile] : null,
+          discSecondary: row.discSecondary ? DISC_LABELS[row.discSecondary] : null,
+          temperament: row.temperamentProfile ? TEMPERAMENT_LABELS[row.temperamentProfile] : null,
+          temperamentSecondary: row.temperamentSecondary ? TEMPERAMENT_LABELS[row.temperamentSecondary] : null,
+          archetype: row.archetypePrimary,
+          archetypeApoio: row.archetypeSecondary,
+          contribution: row.leadershipMode,
+          topIntelligence: row.topIntelligence,
+          connectionStyle: row.connectionStyle,
+          eneagramOrNello16: row.nello16Type || (row.enneagramType ? `Eneagrama ${row.enneagramType}` : null),
+          dataNotice: getDataNotice(row),
+          behavior: getBehaviorReading(row),
+          growth: getGrowthReading(row),
+          risks: getRiskReading(row),
+          actions: getActionReading(row),
+        };
+      });
+
+      const pdfData: TeamComparisonPDFData = {
+        companyName: company?.name || 'Sua empresa',
+        generatedAt: new Date().toLocaleString('pt-BR'),
+        totals: {
+          totalMembers: visibleRows.length,
+          completedCodes: fullCodes,
+          partialCodes,
+          pendingInvites: pending,
+        },
+        supervisorName: supervisor?.full_name || null,
+        dominantContribution: topMode?.label || null,
+        executiveSummaryText: summaryParagraphs.join('\n\n'),
+        distributions: {
+          disc: discData.map(toBar),
+          temperament: temperamentData.map(toBar),
+          archetype: archetypeData.map(toBar),
+          contribution: contributionData.map(toBar),
+        },
+        teamGroups,
+        oneOnOnes,
+        individualMaps,
+      };
+
+      const doc = generateTeamComparisonPDF(pdfData);
+      const safeCompany = (company?.name || 'empresa').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      const timestamp = new Date().toISOString().split('T')[0];
+      doc.save(`cruzamento-equipe-${safeCompany}-${timestamp}.pdf`);
+      toast.success('PDF baixado!', { id: toastId });
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      toast.error('Erro ao gerar PDF', { id: toastId });
     } finally {
-      setPdfMode(false);
+      setIsGeneratingPDF(false);
     }
-  }, [visibleRows.length, isGenerating, company?.name, generatePDFFromRef]);
+  }, [visibleRows, isGeneratingPDF, company?.name, discData, temperamentData, archetypeData, contributionData]);
 
   if (!enforcement.canViewInsights) {
     return (
@@ -1149,11 +1275,11 @@ export default function BusinessTeamComparison() {
             <Button
               variant="outline"
               onClick={handleExportPDF}
-              disabled={isLoading || isGenerating || visibleRows.length === 0}
+              disabled={isLoading || isGeneratingPDF || visibleRows.length === 0}
               className="gap-2"
             >
-              <Download className={`h-4 w-4 ${isGenerating ? 'animate-pulse' : ''}`} />
-              {isGenerating ? 'Gerando PDF...' : 'Baixar PDF'}
+              <Download className={`h-4 w-4 ${isGeneratingPDF ? 'animate-pulse' : ''}`} />
+              {isGeneratingPDF ? 'Gerando PDF...' : 'Baixar PDF'}
             </Button>
             <Button variant="outline" onClick={loadData} disabled={isLoading} className="gap-2"><RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} /> Atualizar</Button>
           </div>
@@ -1173,75 +1299,10 @@ export default function BusinessTeamComparison() {
             </CardContent>
           </Card>
         ) : (
-          <div
-            ref={pdfRef}
-            className="space-y-6 bg-background"
-            style={pdfMode ? {
-              width: '794px',
-              maxWidth: '794px',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              padding: '24px',
-              backgroundColor: '#ffffff',
-            } : undefined}
-          >
-            {pdfMode && (
-              <div className="space-y-1 border-b pb-3">
-                <h2 className="text-xl font-bold">Cruzamento de códigos da equipe</h2>
-                <p className="text-sm text-muted-foreground">
-                  {company?.name ? `${company.name} • ` : ''}
-                  Relatório gerado em {new Date().toLocaleString('pt-BR')}
-                </p>
-              </div>
-            )}
-
+          <div className="space-y-6 bg-background">
             <ExecutiveSummary rows={visibleRows} />
 
-            {pdfMode ? (
-              <div className="space-y-10">
-                <section className="space-y-6">
-                  <div className="flex items-center gap-2"><Compass className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Resumo</h2></div>
-                  <div className="grid gap-6 xl:grid-cols-2">
-                    <DistributionChart title="Distribuição DISC" data={discData} />
-                    <DistributionChart title="Distribuição de Temperamentos" data={temperamentData} />
-                    <DistributionChart title="Arquétipos predominantes" data={archetypeData} />
-                    <DistributionChart title="Modo de contribuição no time" data={contributionData} />
-                  </div>
-                  <div className="grid gap-6 xl:grid-cols-2">
-                    <TeamRadar title="Média da equipe por eixo DISC" data={discRadar} />
-                    <TeamRadar title="Média da equipe por temperamento" data={temperamentRadar} />
-                  </div>
-                </section>
-
-                <section className="space-y-4">
-                  <div className="flex items-center gap-2"><Target className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Insights por time</h2></div>
-                  <TeamGroups rows={visibleRows} />
-                </section>
-
-                <section className="space-y-4">
-                  <div className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Cruzamentos de funcionamento</h2></div>
-                  <CrossingsPanel rows={visibleRows} />
-                </section>
-
-                <section className="space-y-4">
-                  <div className="flex items-center gap-2"><Crown className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Leitura Gestor → Liderado (1:1)</h2></div>
-                  <p className="text-sm text-muted-foreground">Para cada gestora, leitura individual de como acessar, delegar, dar feedback e o que evitar com cada colaboradora.</p>
-                  <LeadershipOneOnOne rows={visibleRows} />
-                </section>
-
-                <section className="space-y-4">
-                  <div className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Combinar grupos da equipe</h2></div>
-                  <p className="text-sm text-muted-foreground">Cruzamentos personalizados disponíveis na tela. Os grupos montados pelo usuário aparecem abaixo.</p>
-                  <GroupBuilder rows={visibleRows} />
-                </section>
-
-                <section className="space-y-4">
-                  <div className="flex items-center gap-2"><Brain className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Mapa por colaboradora</h2></div>
-                  <div className="grid gap-4 grid-cols-1">{visibleRows.map((row) => <CollaboratorCard key={row.user_id || row.full_name} row={row} />)}</div>
-                </section>
-              </div>
-            ) : (
-              <Tabs defaultValue="resumo" className="space-y-4">
+            <Tabs defaultValue="resumo" className="space-y-4">
                 <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
                   <TabsTrigger value="resumo">Resumo</TabsTrigger>
                   <TabsTrigger value="times">Times</TabsTrigger>
@@ -1291,8 +1352,7 @@ export default function BusinessTeamComparison() {
                   <div className="flex items-center gap-2"><Brain className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Mapa por colaboradora</h2></div>
                   <div className="grid gap-4 grid-cols-1">{visibleRows.map((row) => <CollaboratorCard key={row.user_id || row.full_name} row={row} />)}</div>
                 </TabsContent>
-              </Tabs>
-            )}
+            </Tabs>
 
             <div className="flex items-start gap-2 rounded-lg border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground">
               <Shield className="mt-0.5 h-4 w-4 shrink-0" />

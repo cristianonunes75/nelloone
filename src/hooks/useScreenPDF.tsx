@@ -163,34 +163,33 @@ export const useScreenPDF = () => {
         height: s.height * canvasScale
       }));
 
-      // Calculate smart page breaks that don't cut sections.
-      // Tolerancia maxima de desperdicio: 15% da pagina. Se o break "limpo" deixaria
-      // mais que 15% em branco, corta no meio mesmo (melhor que pagina vazia).
+      // Calculate smart page breaks that don't cut sections
       const pageBreaks: number[] = [0];
       let currentY = 0;
-      const minPageFill = basePageHeightPx * 0.85; // pelo menos 85% preenchido
 
       while (currentY < canvas.height) {
-        const idealBreak = currentY + basePageHeightPx;
+        let idealBreak = currentY + basePageHeightPx;
 
         if (idealBreak >= canvas.height) {
           break;
         }
 
+        // Check if this break would cut through any section
         let adjustedBreak = idealBreak;
 
         for (const section of sectionBoundsInPx) {
+          // If the break is in the middle of a section
           if (idealBreak > section.top && idealBreak < section.bottom) {
+            // Try to break before the section if it would fit on the next page
             if (section.height < basePageHeightPx * 0.9) {
-              const candidate = section.top - 10;
-              if (candidate - currentY >= minPageFill) {
-                adjustedBreak = candidate;
-              }
+              // Move break to before this section
+              adjustedBreak = Math.max(currentY + basePageHeightPx * 0.5, section.top - 20);
             }
             break;
           }
         }
 
+        // Ensure we're making progress
         if (adjustedBreak <= currentY) {
           adjustedBreak = idealBreak;
         }
