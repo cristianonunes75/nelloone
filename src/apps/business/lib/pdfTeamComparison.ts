@@ -5,6 +5,25 @@ import {
   type RGBColor,
 } from "@/lib/pdf/pdfPremiumCore";
 
+// jsPDF default usa font Helvetica WinAnsi, que NAO suporta a maioria de chars unicode acima de
+// 0xFF. Quando passa "→" ele renderiza glifo invalido e ainda pode quebrar o kerning do resto
+// do titulo (causa do "tracking gigante" observado nos titulos das paginas 1:1). Substitui pra
+// equivalentes ASCII antes do text() pra evitar.
+function sanitize(text: string | null | undefined): string {
+  if (!text) return "";
+  return text
+    .replace(/→/g, "->")
+    .replace(/←/g, "<-")
+    .replace(/↑/g, "^")
+    .replace(/↓/g, "v")
+    .replace(/⇒/g, "=>")
+    .replace(/⇐/g, "<=")
+    .replace(/✓/g, "OK")
+    .replace(/✗/g, "X")
+    .replace(/★/g, "*")
+    .replace(/☆/g, "*");
+}
+
 export interface DistributionBar {
   label: string;
   count: number;
@@ -131,7 +150,7 @@ function renderDistributionBlock(
     doc.setFontSize(9.5);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(PREMIUM_COLORS.text.r, PREMIUM_COLORS.text.g, PREMIUM_COLORS.text.b);
-    doc.text(bar.label, builder.margin, y + 3.5);
+    doc.text(sanitize(bar.label), builder.margin, y + 3.5);
 
     // Track background
     doc.setFillColor(PREMIUM_COLORS.cardBg.r, PREMIUM_COLORS.cardBg.g, PREMIUM_COLORS.cardBg.b);
@@ -160,8 +179,10 @@ function renderTeamGroup(
 ): void {
   const doc = builder.doc;
 
-  builder.ensureSpace(60);
-  builder.renderCompactSectionHeader(`${group.groupName} • ${group.membersCount} pessoa(s)`);
+  // Bloco completo precisa de ~120mm. Se sobra menos que isso, pula pagina pra nao cortar
+  // o grupo no meio (header de um lado, "gestao recomendada" sozinha do outro).
+  builder.ensureSpace(120);
+  builder.renderCompactSectionHeader(sanitize(`${group.groupName} • ${group.membersCount} pessoa(s)`));
 
   // 4 modes in a row
   const modeWidth = (builder.contentWidth - 6) / 4;
@@ -193,7 +214,7 @@ function renderTeamGroup(
   // How it works
   builder.renderCard({
     title: "Como tende a funcionar",
-    content: group.howItWorks,
+    content: sanitize(group.howItWorks),
     accentColor: PREMIUM_COLORS.green,
     icon: true,
   });
@@ -201,7 +222,7 @@ function renderTeamGroup(
   // Recommended management
   builder.renderCard({
     title: "Gestão recomendada",
-    content: group.recommendedManagement,
+    content: sanitize(group.recommendedManagement),
     accentColor: PREMIUM_COLORS.gold,
     icon: true,
   });
@@ -212,7 +233,7 @@ function renderTeamGroup(
     doc.setFontSize(9);
     doc.setFont("helvetica", "italic");
     doc.setTextColor(PREMIUM_COLORS.muted.r, PREMIUM_COLORS.muted.g, PREMIUM_COLORS.muted.b);
-    const pillsText = group.memberPills.map((p) => `${p.name} (${p.mode})`).join(" • ");
+    const pillsText = sanitize(group.memberPills.map((p) => `${p.name} (${p.mode})`).join(" • "));
     const pillsLines = doc.splitTextToSize(pillsText, builder.contentWidth);
     doc.text(pillsLines, builder.margin, builder.currentY);
     builder.currentY += pillsLines.length * 4.5 + 6;
@@ -228,27 +249,30 @@ function renderOneOnOnePair(
 ): void {
   const doc = builder.doc;
 
-  builder.ensureSpace(40);
+  // Par 1:1 completo precisa de ~140mm (header + 4 zonas coloridas). Se nao cabe, pula pagina.
+  builder.ensureSpace(140);
 
-  // Pair header
+  // Pair header (sanitize -> evita kerning quebrado quando jsPDF nao acha glyph unicode)
   doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(PREMIUM_COLORS.primary.r, PREMIUM_COLORS.primary.g, PREMIUM_COLORS.primary.b);
-  doc.text(`${leader.leaderName} → ${member.memberName}`, builder.margin, builder.currentY);
+  doc.text(sanitize(`${leader.leaderName} -> ${member.memberName}`), builder.margin, builder.currentY);
   builder.currentY += 5;
 
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(PREMIUM_COLORS.muted.r, PREMIUM_COLORS.muted.g, PREMIUM_COLORS.muted.b);
-  const memberLine = [member.memberJobTitle || "Sem cargo", member.memberMode, member.memberDiscLabel]
-    .filter(Boolean)
-    .join(" • ");
+  const memberLine = sanitize(
+    [member.memberJobTitle || "Sem cargo", member.memberMode, member.memberDiscLabel]
+      .filter(Boolean)
+      .join(" • "),
+  );
   doc.text(memberLine, builder.margin, builder.currentY);
   builder.currentY += 6;
 
   // Notices (if any)
   if (member.roleNote || member.leaderNotice || member.memberNotice) {
-    const notes = [member.roleNote, member.leaderNotice, member.memberNotice].filter(Boolean).join(" ");
+    const notes = sanitize([member.roleNote, member.leaderNotice, member.memberNotice].filter(Boolean).join(" "));
     if (notes) {
       doc.setFontSize(8.5);
       doc.setFont("helvetica", "italic");
@@ -262,28 +286,28 @@ function renderOneOnOnePair(
   // 4 zones
   builder.renderColoredZone({
     title: "Como acessar",
-    description: member.accessing,
+    description: sanitize(member.accessing),
     mainColor: PREMIUM_COLORS.blue,
     bgColor: PREMIUM_COLORS.blueLight,
   });
 
   builder.renderColoredZone({
     title: "Como delegar",
-    description: member.delegating,
+    description: sanitize(member.delegating),
     mainColor: PREMIUM_COLORS.primary,
     bgColor: PREMIUM_COLORS.cardBg,
   });
 
   builder.renderColoredZone({
     title: "Como dar feedback",
-    description: member.feedback,
+    description: sanitize(member.feedback),
     mainColor: PREMIUM_COLORS.green,
     bgColor: PREMIUM_COLORS.greenLight,
   });
 
   builder.renderColoredZone({
     title: "O que evitar",
-    description: member.avoid,
+    description: sanitize(member.avoid),
     mainColor: PREMIUM_COLORS.red,
     bgColor: PREMIUM_COLORS.redLight,
   });
@@ -303,13 +327,13 @@ function renderIndividualCard(
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(PREMIUM_COLORS.primary.r, PREMIUM_COLORS.primary.g, PREMIUM_COLORS.primary.b);
-  doc.text(person.fullName, builder.margin, builder.currentY);
+  doc.text(sanitize(person.fullName), builder.margin, builder.currentY);
 
   // Status badge on the right
   doc.setFontSize(8.5);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(PREMIUM_COLORS.muted.r, PREMIUM_COLORS.muted.g, PREMIUM_COLORS.muted.b);
-  doc.text(person.statusLabel, builder.pageWidth - builder.margin, builder.currentY, { align: "right" });
+  doc.text(sanitize(person.statusLabel), builder.pageWidth - builder.margin, builder.currentY, { align: "right" });
 
   builder.currentY += 5;
 
@@ -317,7 +341,7 @@ function renderIndividualCard(
   doc.setFontSize(9.5);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(PREMIUM_COLORS.muted.r, PREMIUM_COLORS.muted.g, PREMIUM_COLORS.muted.b);
-  const subtitle = [person.jobTitle || "Sem cargo", person.groupName].filter(Boolean).join(" • ");
+  const subtitle = sanitize([person.jobTitle || "Sem cargo", person.groupName].filter(Boolean).join(" • "));
   doc.text(subtitle, builder.margin, builder.currentY);
   builder.currentY += 8;
 
@@ -325,12 +349,12 @@ function renderIndividualCard(
   const cellWidth = (builder.contentWidth - 6) / 2;
   const cellHeight = 14;
   const cells: { label: string; value: string; secondary?: string }[] = [
-    { label: "DISC", value: person.disc || "—", secondary: person.discSecondary ? `Sec: ${person.discSecondary}` : undefined },
-    { label: "Temperamento", value: person.temperament || "—", secondary: person.temperamentSecondary ? `Sec: ${person.temperamentSecondary}` : undefined },
-    { label: "Arquétipo", value: person.archetype || "—", secondary: person.archetypeApoio ? `Apoio: ${person.archetypeApoio}` : undefined },
-    { label: "Modo de contribuição", value: person.contribution || "—", secondary: person.topIntelligence || undefined },
-    { label: "Estilo de conexão", value: person.connectionStyle || "—" },
-    { label: "Eneagrama / nello16", value: person.eneagramOrNello16 || "—" },
+    { label: "DISC", value: sanitize(person.disc) || "—", secondary: person.discSecondary ? `Sec: ${sanitize(person.discSecondary)}` : undefined },
+    { label: "Temperamento", value: sanitize(person.temperament) || "—", secondary: person.temperamentSecondary ? `Sec: ${sanitize(person.temperamentSecondary)}` : undefined },
+    { label: "Arquétipo", value: sanitize(person.archetype) || "—", secondary: person.archetypeApoio ? `Apoio: ${sanitize(person.archetypeApoio)}` : undefined },
+    { label: "Modo de contribuição", value: sanitize(person.contribution) || "—", secondary: sanitize(person.topIntelligence) || undefined },
+    { label: "Estilo de conexão", value: sanitize(person.connectionStyle) || "—" },
+    { label: "Eneagrama / nello16", value: sanitize(person.eneagramOrNello16) || "—" },
   ];
 
   for (let i = 0; i < cells.length; i += 2) {
@@ -369,7 +393,7 @@ function renderIndividualCard(
   if (person.dataNotice) {
     builder.renderColoredZone({
       title: "Atenção aos dados",
-      description: person.dataNotice,
+      description: sanitize(person.dataNotice),
       mainColor: PREMIUM_COLORS.amber,
       bgColor: PREMIUM_COLORS.amberLight,
     });
@@ -377,14 +401,14 @@ function renderIndividualCard(
 
   builder.renderCard({
     title: "Como ela tende a agir e reagir",
-    content: person.behavior,
+    content: sanitize(person.behavior),
     accentColor: PREMIUM_COLORS.primary,
     icon: true,
   });
 
   builder.renderCard({
     title: "Como ela pode ser melhor na empresa",
-    content: person.growth,
+    content: sanitize(person.growth),
     accentColor: PREMIUM_COLORS.green,
     icon: true,
   });
@@ -392,7 +416,7 @@ function renderIndividualCard(
   if (person.risks.length > 0) {
     builder.renderColoredZone({
       title: "Pontos de atenção para o empreendedor",
-      points: person.risks,
+      points: person.risks.map(sanitize),
       mainColor: PREMIUM_COLORS.amber,
       bgColor: PREMIUM_COLORS.amberLight,
     });
@@ -401,7 +425,7 @@ function renderIndividualCard(
   if (person.actions.length > 0) {
     builder.renderColoredZone({
       title: "Ações de gestão",
-      points: person.actions,
+      points: person.actions.map(sanitize),
       mainColor: PREMIUM_COLORS.blue,
       bgColor: PREMIUM_COLORS.blueLight,
     });
@@ -421,7 +445,7 @@ export function generateTeamComparisonPDF(data: TeamComparisonPDFData): jsPDF {
   builder.renderPremiumCover({
     title: "CRUZAMENTO",
     subtitle: "Códigos da Equipe",
-    userName: data.companyName,
+    userName: sanitize(data.companyName),
     quote: "A leitura comportamental que vira decisão de gestão.",
   });
 
@@ -429,15 +453,16 @@ export function generateTeamComparisonPDF(data: TeamComparisonPDFData): jsPDF {
   builder.addNewPage();
   builder.renderSectionHeader("Resumo Executivo", PREMIUM_COLORS.primary);
 
-  builder.writeWrappedText(
-    data.executiveSummaryText,
+  // writeWrappedText retorna o novo Y; precisa atualizar builder.currentY pra proximo bloco
+  // nao sobrepor o texto.
+  builder.currentY = builder.writeWrappedText(
+    sanitize(data.executiveSummaryText),
     builder.margin,
     builder.currentY,
     builder.contentWidth,
     10,
     PREMIUM_COLORS.text,
-  );
-  builder.currentY += 8;
+  ) + 8;
 
   // 4 metric cards (2x2)
   const metricWidth = (builder.contentWidth - 6) / 2;
@@ -448,8 +473,8 @@ export function generateTeamComparisonPDF(data: TeamComparisonPDFData): jsPDF {
       value: `${data.totals.completedCodes}${data.totals.pendingInvites > 0 ? ` (${data.totals.pendingInvites} pendente)` : ""}`,
       color: PREMIUM_COLORS.green,
     },
-    { label: "Supervisão", value: data.supervisorName || "Não identificada", color: PREMIUM_COLORS.gold },
-    { label: "Força central", value: data.dominantContribution || "—", color: PREMIUM_COLORS.blue },
+    { label: "Supervisão", value: sanitize(data.supervisorName) || "Não identificada", color: PREMIUM_COLORS.gold },
+    { label: "Força central", value: sanitize(data.dominantContribution) || "—", color: PREMIUM_COLORS.blue },
   ];
 
   for (let i = 0; i < metrics.length; i += 2) {
@@ -490,7 +515,7 @@ export function generateTeamComparisonPDF(data: TeamComparisonPDFData): jsPDF {
 
   // ───── LIDERANÇA 1:1 ─────
   if (data.oneOnOnes.length > 0) {
-    builder.addSectionPage("Leitura Gestor → Liderado (1:1)");
+    builder.addSectionPage("Leitura Gestor -> Liderado (1:1)");
 
     data.oneOnOnes.forEach((leader) => {
       builder.ensureSpace(20);
@@ -500,7 +525,7 @@ export function generateTeamComparisonPDF(data: TeamComparisonPDFData): jsPDF {
       builder.doc.setFont("helvetica", "bold");
       builder.doc.setTextColor(255, 255, 255);
       builder.doc.text(
-        `Quem está liderando: ${leader.leaderName}${leader.leaderJobTitle ? ` (${leader.leaderJobTitle})` : ""}`,
+        sanitize(`Quem está liderando: ${leader.leaderName}${leader.leaderJobTitle ? ` (${leader.leaderJobTitle})` : ""}`),
         builder.margin + 4,
         builder.currentY + 7,
       );
