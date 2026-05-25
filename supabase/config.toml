@@ -1,5 +1,8 @@
 project_id = "eqksszzusydsfzgydhos"
 
+[functions.nello-export-equipe-perfil]
+verify_jwt = false
+
 [functions.create-checkout]
 verify_jwt = true
 
