@@ -45,19 +45,43 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     // 3) Cliente Supabase com service role
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const debugMode = !!(req.headers.get("x-debug") || (req as any)?.body?.debug);
+    if (!supabaseUrl || !serviceRoleKey) {
+      return json({
+        error: "Env vars do Supabase ausentes na funcao",
+        diag: {
+          supabase_url_set: !!supabaseUrl,
+          service_role_set: !!serviceRoleKey,
+          service_role_len: serviceRoleKey?.length ?? 0,
+        },
+      }, 500);
+    }
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     // 4) Confirma company existe
-    const { data: company } = await supabase
+    const { data: company, error: companyErr } = await supabase
       .from("companies")
       .select("id, name")
       .eq("id", company_id)
       .maybeSingle();
     if (!company) {
-      return json({ error: "company_id invalido" }, 404);
+      // Diagnostico: roda 2a query sem filtro pra confirmar acesso a tabela
+      const { data: sample, error: sampleErr } = await supabase
+        .from("companies")
+        .select("id, name")
+        .limit(5);
+      return json({
+        error: "company_id invalido",
+        diag: {
+          received_company_id: company_id,
+          company_query_error: companyErr?.message ?? null,
+          sample_count: sample?.length ?? 0,
+          sample_first_id: sample?.[0]?.id ?? null,
+          sample_error: sampleErr?.message ?? null,
+        },
+      }, 404);
     }
 
     // 5) Colaboradores ATIVOS com CONSENTIMENTO LGPD
