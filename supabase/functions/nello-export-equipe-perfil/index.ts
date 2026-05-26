@@ -273,6 +273,36 @@ function extrairResumoTeste(tipo: string | null, data: any): {
       out.scores = d.scores ?? null;
       break;
     }
+    case "arquetipos_proposito": {
+      // scores = [{ score, archetype }] — primario eh o archetype top
+      const arr = Array.isArray(d.scores) ? d.scores : [];
+      const sorted = [...arr].sort((a: any, b: any) => Number(b.score ?? 0) - Number(a.score ?? 0));
+      out.primario = sorted[0]?.archetype ?? null;
+      out.secundario = sorted[1]?.archetype ?? null;
+      out.scores = arr;
+      break;
+    }
+    case "inteligencias_multiplas": {
+      // scores = { musical: 22, espacial: 17, ... } — primario eh a top
+      const sc = d.scores ?? {};
+      const arr = Object.entries(sc)
+        .map(([k, v]) => ({ tipo: k, valor: Number(v ?? 0) }))
+        .filter(x => !isNaN(x.valor))
+        .sort((a, b) => b.valor - a.valor);
+      out.primario = arr[0]?.tipo ?? null;
+      out.secundario = arr[1]?.tipo ?? null;
+      out.scores = sc;
+      break;
+    }
+    case "mbti": {
+      // scores = { E: 2, F: 10, I: 10, J: 7, N: 5, P: 5, S: 7, T: 2 }
+      // Primario eh a string composta (ex: INFJ) escolhendo entre cada par
+      const sc = d.scores ?? {};
+      const pick = (a: string, b: string) => (Number(sc[a] ?? 0) >= Number(sc[b] ?? 0) ? a : b);
+      out.primario = `${pick("E", "I")}${pick("S", "N")}${pick("T", "F")}${pick("J", "P")}`;
+      out.scores = sc;
+      break;
+    }
     default: {
       // Fallback genérico: tenta pegar primary/secondary se existir
       out.primario = typeof d.primary === "object" ? d.primary?.name ?? null : d.primary ?? null;
