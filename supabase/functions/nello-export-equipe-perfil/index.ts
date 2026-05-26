@@ -116,13 +116,43 @@ serve(async (req: Request): Promise<Response> => {
       });
     }
 
-    // 6) Profiles (nome, email, journey_status)
-    const { data: profiles } = await supabase
+    // 6) Profiles (nome, email, journey_status) — tenta primeiro 'profiles',
+    // se vier sem nome/email tenta auth.users (Supabase nativo) como fallback
+    const { data: profiles, error: profErr } = await supabase
       .from("profiles")
       .select("id, full_name, email, journey_status, created_at")
       .in("id", userIds);
     const profileMap = new Map<string, any>();
     for (const p of (profiles ?? []) as any[]) profileMap.set(p.id, p);
+
+    // Fallback: se profiles nao tem nome/email, busca direto em auth.users
+    // (Supabase guarda email autenticado la). Service role pode ler.
+    const idsSemNome = userIds.filter(uid => {
+      const p = profileMap.get(uid);
+      return !p || (!p.email && !p.full_name);
+    });
+    if (idsSemNome.length > 0) {
+      try {
+        const { data: { users: authUsers } = { users: [] } } = await (supabase as any).auth.admin.listUsers({
+          page: 1, perPage: 200,
+        });
+        for (const u of (authUsers ?? []) as any[]) {
+          if (idsSemNome.includes(u.id)) {
+            const existing = profileMap.get(u.id) ?? { id: u.id };
+            profileMap.set(u.id, {
+              ...existing,
+              email: existing.email ?? u.email ?? null,
+              full_name: existing.full_name ?? u.user_metadata?.full_name ?? u.user_metadata?.name ?? null,
+              created_at: existing.created_at ?? u.created_at ?? null,
+            });
+          }
+        }
+      } catch (e) {
+        console.warn("[nello-export-equipe-perfil] auth admin fallback falhou:", (e as any)?.message);
+      }
+    }
+
+    console.log(`[nello-export-equipe-perfil] ${profileMap.size} profiles, primeiro tem email?`, !!profileMap.values().next().value?.email);
 
     // 7) Testes comportamentais
     const { data: tests } = await supabase
