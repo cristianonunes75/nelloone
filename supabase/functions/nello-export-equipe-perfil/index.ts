@@ -72,6 +72,12 @@ serve(async (req: Request): Promise<Response> => {
         .from("companies")
         .select("id, name")
         .limit(5);
+      // Também tenta busca por nome (independente do id) pra confirmar tabela
+      const { data: byName } = await supabase
+        .from("companies")
+        .select("id, name")
+        .ilike("name", "%imaculada%")
+        .limit(2);
       return json({
         error: "company_id invalido",
         diag: {
@@ -79,7 +85,13 @@ serve(async (req: Request): Promise<Response> => {
           company_query_error: companyErr?.message ?? null,
           sample_count: sample?.length ?? 0,
           sample_first_id: sample?.[0]?.id ?? null,
+          sample_first_name: sample?.[0]?.name ?? null,
           sample_error: sampleErr?.message ?? null,
+          by_name_count: byName?.length ?? 0,
+          by_name_first: byName?.[0] ?? null,
+          // URL onde a funcao esta conectando — confirma se eh o projeto certo
+          connected_to: supabaseUrl,
+          service_role_set: !!serviceRoleKey,
         },
       }, 404);
     }
