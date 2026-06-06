@@ -194,7 +194,7 @@ export function MiniMercadoOnboarding() {
           <DialogHeader>
             <DialogTitle>Criar retiro</DialogTitle>
             <DialogDescription>
-              Configure o básico. Produtos e servos você cadastra depois.
+              Configure o básico. Produtos e membros você cadastra depois.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">

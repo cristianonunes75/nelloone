@@ -120,7 +120,7 @@ export function MiniMercadoBalcao() {
       setQuickOpen(false);
       setQName('');
       setQTeam('none');
-      toast.success('Servo adicionado');
+      toast.success('Membro adicionado');
     } catch (e: any) {
       toast.error(e?.message || 'Erro ao adicionar');
     }
@@ -167,7 +167,7 @@ export function MiniMercadoBalcao() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar servo por nome ou apelido"
+            placeholder="Buscar membro por nome ou apelido"
             className="h-12 pl-9 text-base"
             autoFocus
           />
@@ -177,15 +177,15 @@ export function MiniMercadoBalcao() {
           className="w-full border-amber-300 text-amber-800"
           onClick={() => setQuickOpen(true)}
         >
-          <UserPlus className="mr-2 h-4 w-4" /> Adicionar servo rápido
+          <UserPlus className="mr-2 h-4 w-4" /> Adicionar membro rápido
         </Button>
 
         {servos.length === 0 && (
           <Card className="border-dashed">
             <CardContent className="p-6 text-center text-sm text-muted-foreground">
-              Nenhum servo cadastrado ainda. Use{' '}
+              Nenhum membro cadastrado ainda. Use{' '}
               <Link to="/mini-mercado/servos" className="font-medium text-amber-700 underline">
-                Servos
+                Membros
               </Link>{' '}
               para cadastrar a equipe ou importar o PDF.
             </CardContent>
@@ -220,7 +220,7 @@ export function MiniMercadoBalcao() {
         <Dialog open={quickOpen} onOpenChange={setQuickOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Servo rápido</DialogTitle>
+              <DialogTitle>Membro rápido</DialogTitle>
               <DialogDescription>Cadastro rápido no balcão.</DialogDescription>
             </DialogHeader>
             <div className="space-y-3">

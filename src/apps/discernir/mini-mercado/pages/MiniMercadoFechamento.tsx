@@ -9,7 +9,7 @@ export function MiniMercadoFechamento() {
         <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
           <Receipt className="h-9 w-9 text-amber-700/70" />
           <p className="text-sm text-muted-foreground">
-            O fechamento por servo (total, PIX e recibo) chega na próxima etapa. Por enquanto,
+            O fechamento por membro (total, PIX e recibo) chega na próxima etapa. Por enquanto,
             o balcão já registra todas as compras.
           </p>
         </CardContent>

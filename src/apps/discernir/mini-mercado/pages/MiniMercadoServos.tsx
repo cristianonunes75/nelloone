@@ -72,7 +72,7 @@ export function MiniMercadoServos() {
         kind,
         team_id: teamId === 'none' ? null : teamId,
       });
-      toast.success('Servo cadastrado');
+      toast.success('Membro cadastrado');
       setServoOpen(false);
       setName('');
       setNickname('');
@@ -108,7 +108,7 @@ export function MiniMercadoServos() {
     <div className="space-y-3">
       <Tabs defaultValue="servos">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="servos">Servos ({servos.length})</TabsTrigger>
+          <TabsTrigger value="servos">Membros ({servos.length})</TabsTrigger>
           <TabsTrigger value="equipes">Equipes ({teams.length})</TabsTrigger>
         </TabsList>
 
@@ -130,7 +130,7 @@ export function MiniMercadoServos() {
               </SelectContent>
             </Select>
             <Button size="sm" className="bg-amber-700 hover:bg-amber-800" onClick={() => setServoOpen(true)}>
-              <Plus className="mr-1 h-4 w-4" /> Servo
+              <Plus className="mr-1 h-4 w-4" /> Membro
             </Button>
           </div>
 
@@ -153,7 +153,7 @@ export function MiniMercadoServos() {
           ) : filteredServos.length === 0 ? (
             <Card className="border-dashed">
               <CardContent className="p-6 text-center text-sm text-muted-foreground">
-                Nenhum servo aqui ainda.
+                Nenhum membro aqui ainda.
               </CardContent>
             </Card>
           ) : (
@@ -220,7 +220,7 @@ export function MiniMercadoServos() {
       <Dialog open={servoOpen} onOpenChange={setServoOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Novo servo</DialogTitle>
+            <DialogTitle>Novo membro</DialogTitle>
             <DialogDescription>Pessoa que compra e acerta no fim.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
