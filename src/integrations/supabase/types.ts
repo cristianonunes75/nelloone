@@ -5271,6 +5271,485 @@ export type Database = {
         }
         Relationships: []
       }
+      mm_events: {
+        Row: {
+          created_at: string | null
+          currency: string
+          ends_on: string | null
+          id: string
+          join_code: string
+          movement: string | null
+          name: string
+          owner_id: string
+          pix_key: string | null
+          pix_key_type: string | null
+          pix_merchant_city: string | null
+          pix_merchant_name: string | null
+          starts_on: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string
+          ends_on?: string | null
+          id?: string
+          join_code?: string
+          movement?: string | null
+          name: string
+          owner_id: string
+          pix_key?: string | null
+          pix_key_type?: string | null
+          pix_merchant_city?: string | null
+          pix_merchant_name?: string | null
+          starts_on?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string
+          ends_on?: string | null
+          id?: string
+          join_code?: string
+          movement?: string | null
+          name?: string
+          owner_id?: string
+          pix_key?: string | null
+          pix_key_type?: string | null
+          pix_merchant_city?: string | null
+          pix_merchant_name?: string | null
+          starts_on?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mm_events_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mm_events_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "mm_events_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mm_operators: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          is_active: boolean
+          joined_at: string | null
+          role: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string | null
+          role?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string | null
+          role?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mm_operators_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "mm_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mm_operators_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mm_operators_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "mm_operators_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mm_products: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          is_active: boolean
+          name: string
+          price_cents: number
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          is_active?: boolean
+          name: string
+          price_cents?: number
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_cents?: number
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mm_products_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "mm_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mm_purchase_items: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          line_total_cents: number
+          name_snapshot: string
+          price_cents_snapshot: number
+          product_id: string | null
+          purchase_id: string
+          qty: number
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          line_total_cents: number
+          name_snapshot: string
+          price_cents_snapshot: number
+          product_id?: string | null
+          purchase_id: string
+          qty?: number
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          line_total_cents?: number
+          name_snapshot?: string
+          price_cents_snapshot?: number
+          product_id?: string | null
+          purchase_id?: string
+          qty?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mm_purchase_items_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "mm_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mm_purchase_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "mm_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mm_purchase_items_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "mm_purchases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mm_purchases: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          note: string | null
+          operator_id: string | null
+          servo_id: string
+          total_cents: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          note?: string | null
+          operator_id?: string | null
+          servo_id: string
+          total_cents?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          note?: string | null
+          operator_id?: string | null
+          servo_id?: string
+          total_cents?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mm_purchases_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "mm_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mm_purchases_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "mm_operators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mm_purchases_servo_id_fkey"
+            columns: ["servo_id"]
+            isOneToOne: false
+            referencedRelation: "mm_servo_balances"
+            referencedColumns: ["servo_id"]
+          },
+          {
+            foreignKeyName: "mm_purchases_servo_id_fkey"
+            columns: ["servo_id"]
+            isOneToOne: false
+            referencedRelation: "mm_servos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mm_servos: {
+        Row: {
+          birth_date: string | null
+          created_at: string | null
+          event_id: string
+          id: string
+          is_quick_add: boolean
+          kind: string
+          name: string
+          nickname: string | null
+          phone: string | null
+          spouse_servo_id: string | null
+          team_id: string | null
+          updated_at: string | null
+          wedding_date: string | null
+        }
+        Insert: {
+          birth_date?: string | null
+          created_at?: string | null
+          event_id: string
+          id?: string
+          is_quick_add?: boolean
+          kind?: string
+          name: string
+          nickname?: string | null
+          phone?: string | null
+          spouse_servo_id?: string | null
+          team_id?: string | null
+          updated_at?: string | null
+          wedding_date?: string | null
+        }
+        Update: {
+          birth_date?: string | null
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          is_quick_add?: boolean
+          kind?: string
+          name?: string
+          nickname?: string | null
+          phone?: string | null
+          spouse_servo_id?: string | null
+          team_id?: string | null
+          updated_at?: string | null
+          wedding_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mm_servos_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "mm_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mm_servos_spouse_servo_id_fkey"
+            columns: ["spouse_servo_id"]
+            isOneToOne: false
+            referencedRelation: "mm_servo_balances"
+            referencedColumns: ["servo_id"]
+          },
+          {
+            foreignKeyName: "mm_servos_spouse_servo_id_fkey"
+            columns: ["spouse_servo_id"]
+            isOneToOne: false
+            referencedRelation: "mm_servos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mm_servos_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "mm_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mm_settlements: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          note: string | null
+          paid_at: string | null
+          paid_method: string | null
+          servo_id: string
+          settled_by: string | null
+          status: string
+          total_cents: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          note?: string | null
+          paid_at?: string | null
+          paid_method?: string | null
+          servo_id: string
+          settled_by?: string | null
+          status?: string
+          total_cents?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          note?: string | null
+          paid_at?: string | null
+          paid_method?: string | null
+          servo_id?: string
+          settled_by?: string | null
+          status?: string
+          total_cents?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mm_settlements_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "mm_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mm_settlements_servo_id_fkey"
+            columns: ["servo_id"]
+            isOneToOne: false
+            referencedRelation: "mm_servo_balances"
+            referencedColumns: ["servo_id"]
+          },
+          {
+            foreignKeyName: "mm_settlements_servo_id_fkey"
+            columns: ["servo_id"]
+            isOneToOne: false
+            referencedRelation: "mm_servos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mm_settlements_settled_by_fkey"
+            columns: ["settled_by"]
+            isOneToOne: false
+            referencedRelation: "mm_operators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mm_teams: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mm_teams_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "mm_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nello_user_activity: {
         Row: {
           activity_type: string
@@ -7480,6 +7959,48 @@ export type Database = {
         }
         Relationships: []
       }
+      mm_servo_balances: {
+        Row: {
+          event_id: string | null
+          name: string | null
+          nickname: string | null
+          purchase_count: number | null
+          servo_id: string | null
+          spouse_servo_id: string | null
+          team_id: string | null
+          total_cents: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mm_servos_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "mm_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mm_servos_spouse_servo_id_fkey"
+            columns: ["spouse_servo_id"]
+            isOneToOne: false
+            referencedRelation: "mm_servo_balances"
+            referencedColumns: ["servo_id"]
+          },
+          {
+            foreignKeyName: "mm_servos_spouse_servo_id_fkey"
+            columns: ["spouse_servo_id"]
+            isOneToOne: false
+            referencedRelation: "mm_servos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mm_servos_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "mm_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nello_user_profile_summary: {
         Row: {
           essence_created_at: string | null
@@ -7738,6 +8259,9 @@ export type Database = {
         }
         Returns: string
       }
+      mm_is_gestor: { Args: { check_event_id: string }; Returns: boolean }
+      mm_is_operator: { Args: { check_event_id: string }; Returns: boolean }
+      mm_join_event: { Args: { p_join_code: string }; Returns: string }
       owns_user_test: { Args: { _user_test_id: string }; Returns: boolean }
       recalculate_climate_scores: {
         Args: { _cycle_id: string }
