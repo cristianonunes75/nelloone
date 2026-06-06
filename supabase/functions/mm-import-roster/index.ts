@@ -22,58 +22,16 @@ PESSOAS:
 - Para cada pessoa do casal, defina kind = "casal" e preencha spouse_name com o nome completo do conjuge.
 - Pessoa sozinha (jovem, solteiro) -> kind = "individual" ou "jovem". Padre / Diretor Espiritual -> kind = "padre" (sem conjuge).
 - nickname = o apelido/nome de tratamento (geralmente em MAIUSCULAS ao lado do nome, ex.: FELIPE, INGRID).
-- phone = primeiro telefone da pessoa, formato brasileiro (ex.: "61 98103-0157"). Se nao houver, deixe vazio.
-- birth_date e wedding_date = datas no formato dd/mm quando aparecerem (geralmente a direita). Se incerto, deixe vazio.
+- phone = primeiro telefone da pessoa, formato brasileiro (ex.: "61 98103-0157"). Se nao houver, "".
+- birth_date e wedding_date = datas no formato dd/mm quando aparecerem. Se incerto, "".
 - role = "coordenador", "encontreiro", "dirigente" ou "diretor_espiritual" conforme o bloco/secao.
 
-NOME DA EQUIPE: normalize para Title Case legivel mantendo acentos (ex.: "Cafe e Mini Mercado" -> "Café e Mini Mercado", "LITURGIA E VIGILIA" -> "Liturgia e Vigília").
+NOME DA EQUIPE: normalize para Title Case legivel mantendo acentos (ex.: "LITURGIA E VIGILIA" -> "Liturgia e Vigília").
 
-Extraia TODAS as pessoas que encontrar (de todas as equipes, da Dirigente em diante). Responda SEMPRE chamando a função extract_roster.`;
+SAIDA: responda APENAS com um JSON valido, sem markdown, sem comentarios, exatamente neste formato:
+{"teams":[{"name":"Nome da Equipe","people":[{"name":"Nome Completo","nickname":"","phone":"","birth_date":"","wedding_date":"","kind":"casal","role":"encontreiro","spouse_name":""}]}]}
 
-const TOOL = {
-  type: "function",
-  function: {
-    name: "extract_roster",
-    description: "Devolve as equipes e as pessoas extraidas do quadrante do retiro",
-    parameters: {
-      type: "object",
-      properties: {
-        teams: {
-          type: "array",
-          description: "Equipes do retiro, da Dirigente em diante",
-          items: {
-            type: "object",
-            properties: {
-              name: { type: "string", description: "Nome da equipe em Title Case" },
-              people: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    name: { type: "string", description: "Nome completo" },
-                    nickname: { type: "string", description: "Apelido / como e chamado" },
-                    phone: { type: "string", description: "Telefone principal" },
-                    birth_date: { type: "string", description: "dd/mm" },
-                    wedding_date: { type: "string", description: "dd/mm" },
-                    kind: {
-                      type: "string",
-                      enum: ["casal", "jovem", "individual", "padre"],
-                    },
-                    role: { type: "string", description: "coordenador|encontreiro|dirigente|diretor_espiritual" },
-                    spouse_name: { type: "string", description: "Nome completo do conjuge, se casal" },
-                  },
-                  required: ["name"],
-                },
-              },
-            },
-            required: ["name", "people"],
-          },
-        },
-      },
-      required: ["teams"],
-    },
-  },
-};
+Extraia TODAS as pessoas que encontrar (de todas as equipes, da Dirigente em diante).`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -89,7 +47,6 @@ serve(async (req) => {
       });
     }
 
-    // Valida usuario logado
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
@@ -113,9 +70,9 @@ serve(async (req) => {
       });
     }
 
-    const apiKey = Deno.env.get("OPENROUTER_API_KEY");
-    if (!apiKey) {
-      return new Response(JSON.stringify({ error: "Serviço de IA indisponível (sem chave)." }), {
+    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+    if (!lovableApiKey) {
+      return new Response(JSON.stringify({ error: "Serviço de IA indisponível." }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -137,10 +94,10 @@ serve(async (req) => {
       }
     }
 
-    const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${lovableApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -149,8 +106,6 @@ serve(async (req) => {
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userContent },
         ],
-        tools: [TOOL],
-        tool_choice: { type: "function", function: { name: "extract_roster" } },
         max_tokens: 8000,
       }),
     });
@@ -177,9 +132,10 @@ serve(async (req) => {
     }
 
     const aiResult = await aiResponse.json();
-    const toolCall = aiResult?.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall || toolCall.function?.name !== "extract_roster") {
-      console.error("[mm-import] sem tool_call", JSON.stringify(aiResult)?.slice(0, 500));
+    const content: string = aiResult?.choices?.[0]?.message?.content || "";
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error("[mm-import] sem JSON na resposta:", content.slice(0, 400));
       return new Response(JSON.stringify({ error: "Não consegui identificar a lista no arquivo." }), {
         status: 422,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -188,8 +144,9 @@ serve(async (req) => {
 
     let parsed: any;
     try {
-      parsed = JSON.parse(toolCall.function.arguments);
+      parsed = JSON.parse(jsonMatch[0]);
     } catch (_e) {
+      console.error("[mm-import] JSON invalido:", jsonMatch[0].slice(0, 400));
       return new Response(JSON.stringify({ error: "Resposta da IA inválida." }), {
         status: 422,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
