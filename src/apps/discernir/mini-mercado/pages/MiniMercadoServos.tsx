@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Loader2, Users, FileUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
@@ -34,6 +35,7 @@ const KINDS: { value: MMServoKind; label: string }[] = [
 ];
 
 export function MiniMercadoServos() {
+  const navigate = useNavigate();
   const { activeEventId, activeRole } = useMiniMercado();
   const { servos, teams, addServo, addTeam, teamName, isLoading } =
     useMiniMercadoServos(activeEventId);
@@ -138,11 +140,9 @@ export function MiniMercadoServos() {
             <Button
               variant="outline"
               className="w-full border-amber-300 text-amber-800"
-              onClick={() =>
-                toast.info('Importação do PDF do Quadrante chega na próxima etapa')
-              }
+              onClick={() => navigate('/mini-mercado/importar')}
             >
-              <FileUp className="mr-2 h-4 w-4" /> Importar do PDF (em breve)
+              <FileUp className="mr-2 h-4 w-4" /> Importar de PDF, Word ou foto
             </Button>
           )}
 

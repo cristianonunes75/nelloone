@@ -7,6 +7,7 @@ import { MiniMercadoBalcao } from './pages/MiniMercadoBalcao';
 import { MiniMercadoServos } from './pages/MiniMercadoServos';
 import { MiniMercadoProdutos } from './pages/MiniMercadoProdutos';
 import { MiniMercadoFechamento } from './pages/MiniMercadoFechamento';
+import { MiniMercadoImport } from './pages/MiniMercadoImport';
 
 export default function MiniMercadoRoutes() {
   return (
@@ -34,6 +35,14 @@ export default function MiniMercadoRoutes() {
             element={
               <MiniMercadoProtectedRoute>
                 <MiniMercadoServos />
+              </MiniMercadoProtectedRoute>
+            }
+          />
+          <Route
+            path="importar"
+            element={
+              <MiniMercadoProtectedRoute requireGestor>
+                <MiniMercadoImport />
               </MiniMercadoProtectedRoute>
             }
           />
