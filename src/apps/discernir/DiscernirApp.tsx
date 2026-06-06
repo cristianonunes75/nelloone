@@ -18,6 +18,7 @@ import { DiscernirDiscernimento } from './pages/DiscernirDiscernimento';
 import { DiscernirCoordenacao } from './pages/DiscernirCoordenacao';
 import { useDiscernirPilotMode } from './hooks/useDiscernirPilotMode';
 import { DiscernirPilotStandby } from './components/DiscernirPilotStandby';
+import MiniMercadoRoutes from './mini-mercado/MiniMercadoRoutes';
 
 /**
  * DISCERNIR - Pastoral Listening Experience
@@ -140,6 +141,9 @@ export default function DiscernirApp() {
           />
         </Route>
         
+        {/* Mini Mercado - modulo operacional do retiro (provider/layout proprios) */}
+        <Route path="/mini-mercado/*" element={<MiniMercadoRoutes />} />
+
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
