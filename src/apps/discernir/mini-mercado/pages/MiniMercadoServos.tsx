@@ -72,7 +72,7 @@ export function MiniMercadoServos() {
         kind,
         team_id: teamId === 'none' ? null : teamId,
       });
-      toast.success('Membro cadastrado');
+      toast.success('Trabalhador cadastrado');
       setServoOpen(false);
       setName('');
       setNickname('');
@@ -108,7 +108,7 @@ export function MiniMercadoServos() {
     <div className="space-y-3">
       <Tabs defaultValue="servos">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="servos">Membros ({servos.length})</TabsTrigger>
+          <TabsTrigger value="servos">Trabalhadores ({servos.length})</TabsTrigger>
           <TabsTrigger value="equipes">Equipes ({teams.length})</TabsTrigger>
         </TabsList>
 
@@ -130,7 +130,7 @@ export function MiniMercadoServos() {
               </SelectContent>
             </Select>
             <Button size="sm" className="bg-amber-700 hover:bg-amber-800" onClick={() => setServoOpen(true)}>
-              <Plus className="mr-1 h-4 w-4" /> Membro
+              <Plus className="mr-1 h-4 w-4" /> Trabalhador
             </Button>
           </div>
 
@@ -153,7 +153,7 @@ export function MiniMercadoServos() {
           ) : filteredServos.length === 0 ? (
             <Card className="border-dashed">
               <CardContent className="p-6 text-center text-sm text-muted-foreground">
-                Nenhum membro aqui ainda.
+                Nenhum trabalhador aqui ainda.
               </CardContent>
             </Card>
           ) : (
@@ -220,23 +220,25 @@ export function MiniMercadoServos() {
       <Dialog open={servoOpen} onOpenChange={setServoOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Novo membro</DialogTitle>
-            <DialogDescription>Pessoa que compra e acerta no fim.</DialogDescription>
+            <DialogTitle>Novo trabalhador</DialogTitle>
+            <DialogDescription>Quem compra e acerta no fim do retiro.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label>Nome</Label>
+              <Label>Nome completo</Label>
               <Input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>Apelido</Label>
-                <Input value={nickname} onChange={(e) => setNickname(e.target.value)} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Telefone</Label>
-                <Input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" />
-              </div>
+            <div className="space-y-1.5">
+              <Label>Como é chamado no retiro</Label>
+              <Input
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder="Apelido / nome de tratamento usado no retiro"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Telefone</Label>
+              <Input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">

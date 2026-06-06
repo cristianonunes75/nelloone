@@ -56,6 +56,7 @@ export function MiniMercadoBalcao() {
 
   // quick add servo
   const [qName, setQName] = useState('');
+  const [qNick, setQNick] = useState('');
   const [qTeam, setQTeam] = useState<string>('none');
   // item avulso
   const [aName, setAName] = useState('');
@@ -113,14 +114,16 @@ export function MiniMercadoBalcao() {
     try {
       const created = await addServo({
         name: qName.trim(),
+        nickname: qNick.trim() || null,
         team_id: qTeam === 'none' ? null : qTeam,
         is_quick_add: true,
       });
       setServo(created);
       setQuickOpen(false);
       setQName('');
+      setQNick('');
       setQTeam('none');
-      toast.success('Membro adicionado');
+      toast.success('Trabalhador adicionado');
     } catch (e: any) {
       toast.error(e?.message || 'Erro ao adicionar');
     }
@@ -167,7 +170,7 @@ export function MiniMercadoBalcao() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar membro por nome ou apelido"
+            placeholder="Buscar trabalhador pelo nome ou como é chamado"
             className="h-12 pl-9 text-base"
             autoFocus
           />
@@ -177,15 +180,15 @@ export function MiniMercadoBalcao() {
           className="w-full border-amber-300 text-amber-800"
           onClick={() => setQuickOpen(true)}
         >
-          <UserPlus className="mr-2 h-4 w-4" /> Adicionar membro rápido
+          <UserPlus className="mr-2 h-4 w-4" /> Adicionar trabalhador rápido
         </Button>
 
         {servos.length === 0 && (
           <Card className="border-dashed">
             <CardContent className="p-6 text-center text-sm text-muted-foreground">
-              Nenhum membro cadastrado ainda. Use{' '}
+              Nenhum trabalhador cadastrado ainda. Use{' '}
               <Link to="/mini-mercado/servos" className="font-medium text-amber-700 underline">
-                Membros
+                Trabalhadores
               </Link>{' '}
               para cadastrar a equipe ou importar o PDF.
             </CardContent>
@@ -203,12 +206,12 @@ export function MiniMercadoBalcao() {
                 {(s.nickname || s.name).slice(0, 2).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-foreground">{s.name}</p>
+                <p className="truncate font-medium text-foreground">{s.nickname || s.name}</p>
                 {(s.nickname || s.team_id) && (
                   <p className="truncate text-xs text-muted-foreground">
-                    {s.nickname ? s.nickname : ''}
-                    {s.nickname && s.team_id ? ' · ' : ''}
-                    {teamName(s.team_id)}
+                    {[s.nickname ? s.name : null, teamName(s.team_id) || null]
+                      .filter(Boolean)
+                      .join(' · ')}
                   </p>
                 )}
               </div>
@@ -220,13 +223,21 @@ export function MiniMercadoBalcao() {
         <Dialog open={quickOpen} onOpenChange={setQuickOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Membro rápido</DialogTitle>
+              <DialogTitle>Trabalhador rápido</DialogTitle>
               <DialogDescription>Cadastro rápido no balcão.</DialogDescription>
             </DialogHeader>
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label>Nome</Label>
+                <Label>Nome completo</Label>
                 <Input value={qName} onChange={(e) => setQName(e.target.value)} autoFocus />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Como é chamado no retiro</Label>
+                <Input
+                  value={qNick}
+                  onChange={(e) => setQNick(e.target.value)}
+                  placeholder="Apelido / nome de tratamento"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Equipe</Label>
@@ -268,8 +279,12 @@ export function MiniMercadoBalcao() {
           {(servo.nickname || servo.name).slice(0, 2).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold text-amber-900">{servo.name}</p>
-          <p className="truncate text-xs text-amber-800/70">{teamName(servo.team_id)}</p>
+          <p className="truncate font-semibold text-amber-900">{servo.nickname || servo.name}</p>
+          <p className="truncate text-xs text-amber-800/70">
+            {[servo.nickname ? servo.name : null, teamName(servo.team_id) || null]
+              .filter(Boolean)
+              .join(' · ')}
+          </p>
         </div>
         <Button
           variant="ghost"

@@ -12,7 +12,7 @@ import {
 
 const navItems = [
   { to: '/mini-mercado/balcao', label: 'Balcão', icon: ShoppingCart, gestorOnly: false },
-  { to: '/mini-mercado/servos', label: 'Membros', icon: Users, gestorOnly: false },
+  { to: '/mini-mercado/servos', label: 'Trabalhadores', icon: Users, gestorOnly: false },
   { to: '/mini-mercado/produtos', label: 'Produtos', icon: Package, gestorOnly: true },
   { to: '/mini-mercado/fechamento', label: 'Fechar', icon: Receipt, gestorOnly: true },
 ];
