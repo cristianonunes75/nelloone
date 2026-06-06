@@ -19,6 +19,7 @@ import { DiscernirCoordenacao } from './pages/DiscernirCoordenacao';
 import { useDiscernirPilotMode } from './hooks/useDiscernirPilotMode';
 import { DiscernirPilotStandby } from './components/DiscernirPilotStandby';
 import MiniMercadoRoutes from './mini-mercado/MiniMercadoRoutes';
+import BibliotecaRoutes from './biblioteca/BibliotecaRoutes';
 
 /**
  * DISCERNIR - Pastoral Listening Experience
@@ -143,6 +144,9 @@ export default function DiscernirApp() {
         
         {/* Mini Mercado - modulo operacional do retiro (provider/layout proprios) */}
         <Route path="/mini-mercado/*" element={<MiniMercadoRoutes />} />
+
+        {/* Biblioteca de Documentos ECC - privada, acesso por allowlist */}
+        <Route path="/biblioteca/*" element={<BibliotecaRoutes />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
