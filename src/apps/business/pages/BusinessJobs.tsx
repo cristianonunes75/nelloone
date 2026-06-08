@@ -206,9 +206,21 @@ export default function BusinessJobs() {
   };
 
   const copyJobLink = async (slug: string) => {
+    if (!slug || !slug.trim()) {
+      toast.error("Esta vaga ainda não tem link público gerado.");
+      return;
+    }
     const link = getJobLink(slug);
     await navigator.clipboard.writeText(link);
     toast.success("Link da vaga copiado!");
+  };
+
+  const openPublicPage = (slug: string) => {
+    if (!slug || !slug.trim()) {
+      toast.error("Esta vaga ainda não tem link público gerado.");
+      return;
+    }
+    window.open(getJobLink(slug), "_blank");
   };
 
   const filteredJobs = jobs.filter(job => {
@@ -522,7 +534,7 @@ export default function BusinessJobs() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => window.open(getJobLink(job.public_slug), '_blank')}>
+                            <DropdownMenuItem onClick={() => openPublicPage(job.public_slug)}>
                               <ExternalLink className="h-4 w-4 mr-2" />
                               Ver página pública
                             </DropdownMenuItem>
