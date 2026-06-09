@@ -3941,6 +3941,258 @@ export type Database = {
           },
         ]
       }
+      ecc_access: {
+        Row: {
+          added_by: string | null
+          created_at: string | null
+          email: string
+          id: string
+          role: string
+          user_id: string | null
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          role?: string
+          user_id?: string | null
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          role?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ecc_access_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecc_access_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "ecc_access_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecc_access_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecc_access_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "ecc_access_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ecc_documents: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          folder_id: string | null
+          id: string
+          notes: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          folder_id?: string | null
+          id?: string
+          notes?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          folder_id?: string | null
+          id?: string
+          notes?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ecc_documents_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecc_documents_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "ecc_documents_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecc_documents_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "ecc_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ecc_folders: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          kind: string
+          name: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          kind?: string
+          name: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          kind?: string
+          name?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ecc_folders_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecc_folders_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "ecc_folders_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ecc_pages: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          document_id: string
+          id: string
+          image_path: string | null
+          notes: string | null
+          page_number: number
+          status: string
+          transcription: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          document_id: string
+          id?: string
+          image_path?: string | null
+          notes?: string | null
+          page_number?: number
+          status?: string
+          transcription?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          document_id?: string
+          id?: string
+          image_path?: string | null
+          notes?: string | null
+          page_number?: number
+          status?: string
+          transcription?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ecc_pages_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecc_pages_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "nello_user_profile_summary"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "ecc_pages_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecc_pages_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "ecc_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       engagement_campaigns: {
         Row: {
           body: string
@@ -8047,6 +8299,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      ecc_can_edit: { Args: never; Returns: boolean }
+      ecc_claim_access: { Args: never; Returns: undefined }
+      ecc_has_access: { Args: never; Returns: boolean }
+      ecc_is_owner: { Args: never; Returns: boolean }
       get_admin_permission_level: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["admin_permission_level"]
